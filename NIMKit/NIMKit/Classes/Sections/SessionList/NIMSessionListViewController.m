@@ -1,0 +1,304 @@
+//
+//  NIMSessionListViewController.m
+//  NIMKit
+//
+//  Created by NetEase.
+//  Copyright (c) 2015年 NetEase. All rights reserved.
+//
+
+#import "NIMSessionListViewController.h"
+#import "NIMSessionViewController.h"
+#import "NIMSessionListCell.h"
+#import "UIView+NIM.h"
+#import "NIMAvatarImageView.h"
+#import "NIMKitUtil.h"
+
+
+@interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate>
+
+@end
+
+@implementation NIMSessionListViewController
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+
+    }
+    return self;
+}
+
+- (void)dealloc{
+    [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
+    [[NIMSDK sharedSDK].teamManager removeDelegate:self];
+    [[NIMSDK sharedSDK].loginManager removeDelegate:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    [self.view addSubview:self.tableView];
+    self.tableView.delegate         = self;
+    self.tableView.dataSource       = self;
+    self.tableView.tableFooterView  = [[UIView alloc] init];
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    
+    if (!self.recentSessions.count) {
+        _recentSessions = [NSMutableArray array];
+    }
+    
+    [[NIMSDK sharedSDK].teamManager addDelegate:self];
+    [[NIMSDK sharedSDK].conversationManager addDelegate:self];
+    [[NIMSDK sharedSDK].loginManager addDelegate:self];
+    extern NSString *NIMKitUserInfoHasUpdatedNotification;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInfoUpdate:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+    extern NSString *NIMKitTeamInfoHasUpdatedNotification;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInfoUpdate:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
+
+
+}
+
+- (void)reload{
+    if (!self.recentSessions.count) {
+        self.tableView.hidden = YES;
+    }else{
+        self.tableView.hidden = NO;
+        [self.tableView reloadData];
+    }
+}
+
+#pragma mark - UITableViewDelegate
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NIMRecentSession *recentSession = self.recentSessions[indexPath.row];
+    [self onSelectedRecent:recentSession atIndexPath:indexPath];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 70.f;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    NIMRecentSession * recentSession = self.recentSessions[indexPath.row];
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [self onDeleteRecentAtIndexPath:recentSession atIndexPath:indexPath];
+    }
+}
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return self.recentSessions.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    static NSString * cellId = @"cellId";
+    NIMSessionListCell * cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    if (!cell) {
+        cell = [[NIMSessionListCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+    }
+    NIMRecentSession *recent = self.recentSessions[indexPath.row];
+    cell.nameLabel.text = [self nameForRecentSession:recent];
+    if (recent.session.sessionType == NIMSessionTypeP2P) {
+        cell.avatarImageView.clipPath = YES;
+    }else if(recent.session.sessionType == NIMSessionTypeTeam){
+        cell.avatarImageView.clipPath = NO;
+    }
+    [cell.avatarImageView setAvatarBySession:recent.session];
+    [cell.nameLabel sizeToFit];
+    cell.messageLabel.text  = [self contentForRecentSession:recent];
+    [cell.messageLabel sizeToFit];
+    cell.timeLabel.text = [self timestampDescriptionForRecentSession:recent];
+    [cell.timeLabel sizeToFit];
+    
+    [cell refresh:recent];
+    return cell;
+}
+
+
+#pragma mark - NIMConversationManagerDelegate
+- (void)didAddRecentSession:(NIMRecentSession *)recentSession
+           totalUnreadCount:(NSInteger)totalUnreadCount{
+    NSInteger find = [self findRecentSession:recentSession];
+    if (find >=0) {
+        [self.recentSessions removeObjectAtIndex:find];
+    }
+    NSInteger insert = [self findInsertPlace:recentSession];
+    [self.recentSessions insertObject:recentSession atIndex:insert];
+    [self reload];
+}
+
+
+- (void)didUpdateRecentSession:(NIMRecentSession *)recentSession
+              totalUnreadCount:(NSInteger)totalUnreadCount{
+    NSInteger find = [self findRecentSession:recentSession];
+    if (find >=0) {
+        [self.recentSessions removeObjectAtIndex:find];
+        NSInteger insert = [self findInsertPlace:recentSession];
+        [self.recentSessions insertObject:recentSession atIndex:insert];
+        [self reload];
+    }
+}
+
+- (void)messagesDeletedInSession:(NIMSession *)session{
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    [self reload];
+}
+
+- (void)allMessagesDeleted{
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    [self reload];
+}
+
+#pragma mark - NIMTeamManagerDelegate
+- (void)onTeamMemberChanged:(NIMTeam *)team{
+    [self.tableView reloadData];
+}
+#pragma mark - NIMLoginManagerDelegate
+- (void)onLogin:(NIMLoginStep)step
+{
+    if (step == NIMLoginStepSyncOK) {
+        [self reload];
+    }
+}
+
+
+
+#pragma mark - Override
+- (void)onSelectedRecent:(NIMRecentSession *)recentSession atIndexPath:(NSIndexPath *)indexPath{
+    NIMSessionViewController *vc = [[NIMSessionViewController alloc] initWithSession:recentSession.session];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)onDeleteRecentAtIndexPath:(NIMRecentSession *)recent atIndexPath:(NSIndexPath *)indexPath{
+    id<NIMConversationManager> manager = [[NIMSDK sharedSDK] conversationManager];
+    
+    [manager deleteRecentSession:recent];
+    
+    //清理本地数据
+    [self.recentSessions removeObjectAtIndex:indexPath.row];
+    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
+    if (self.autoRemoveRemoteSession)
+    {
+        [manager deleteRemoteSessions:@[recent.session]
+                           completion:nil];
+    }
+}
+
+
+- (NSString *)nameForRecentSession:(NIMRecentSession *)recent{
+    if (recent.session.sessionType == NIMSessionTypeP2P) {
+        return [NIMKitUtil showNick:recent.session.sessionId inSession:recent.session];
+    }else{
+        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:recent.session.sessionId];
+        return team.teamName;
+    }
+}
+
+- (NSString *)contentForRecentSession:(NIMRecentSession *)recent{
+    return [self messageContent:recent.lastMessage];
+}
+
+- (NSString *)timestampDescriptionForRecentSession:(NIMRecentSession *)recent{
+    return [NIMKitUtil showTime:recent.lastMessage.timestamp showDetail:NO];
+}
+
+#pragma mark - Misc
+- (NSInteger)findRecentSession:(NIMRecentSession *)recentSession{
+    __block NSUInteger matchIdx = -1;
+    [self.recentSessions enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([recentSession isEqual:obj]) {
+            *stop = YES;
+            matchIdx = idx;
+        }
+    }];
+    return matchIdx;
+}
+
+
+- (NSInteger)findInsertPlace:(NIMRecentSession *)recentSession{
+    __block NSUInteger matchIdx = 0;
+    __block BOOL find = NO;
+    [self.recentSessions enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NIMRecentSession *item = obj;
+        if (item.lastMessage.timestamp <= recentSession.lastMessage.timestamp) {
+            *stop = YES;
+            find  = YES;
+            matchIdx = idx;
+        }
+    }];
+    if (find) {
+        return matchIdx;
+    }else{
+        return self.recentSessions.count;
+    }
+}
+
+
+
+#pragma mark - Private
+- (NSString*)messageContent:(NIMMessage*)lastMessage{
+    NSString *text = @"";
+    switch (lastMessage.messageType) {
+        case NIMMessageTypeText:
+            text = lastMessage.text;
+            break;
+        case NIMMessageTypeAudio:
+            text = @"[语音]";
+            break;
+        case NIMMessageTypeImage:
+            text = @"[图片]";
+            break;
+        case NIMMessageTypeVideo:
+            text = @"[视频]";
+            break;
+        case NIMMessageTypeLocation:
+            text = @"[位置]";
+            break;
+        case NIMMessageTypeNotification:{
+            return [self notificationMessageContent:lastMessage];
+        }
+        case NIMMessageTypeFile:
+            text = @"[文件]";
+            break;
+        default:
+            text = @"[未知消息]";
+    }
+    if (lastMessage.session.sessionType == NIMSessionTypeP2P) {
+        return text;
+    }else{
+        NSString *nickName = [NIMKitUtil showNick:lastMessage.from inSession:lastMessage.session];
+        return nickName.length ? [nickName stringByAppendingFormat:@" : %@",text] : @"";
+    }
+}
+
+- (NSString *)notificationMessageContent:(NIMMessage *)lastMessage{
+    NIMNotificationObject *object = lastMessage.messageObject;
+    if (object.notificationType == NIMNotificationTypeNetCall) {
+        NIMNetCallNotificationContent *content = (NIMNetCallNotificationContent *)object.content;
+        if (content.callType == NIMNetCallTypeAudio) {
+            return @"[网络通话]";
+        }
+        return @"[视频聊天]";
+    }
+    if (object.notificationType == NIMNotificationTypeTeam) {
+        return @"[群信息更新]";
+    }
+    return @"[未知消息]";
+}
+
+#pragma mark - Notification
+- (void)onInfoUpdate:(NSNotificationCenter *)center{
+    [self reload];
+}
+
+
+@end
