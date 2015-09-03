@@ -8,7 +8,7 @@ NIMKit是一款可以帮助用户快速打造出聊天功能的UI组件，开发
 ##NIMKit说明
 
 * NIMKit依赖云信通讯能力库，在使用的时候请引入静态库NIMLib，以及相关头文件。
-* 具体使用范例请参考NIM Demo For iOS。
+* 具体使用范例请参考[NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo")。
 
 
 
@@ -184,7 +184,7 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 ####自定义消息和MessageCell
 
 ######MessageCell结构
-<img src="./images/iOS/nimkit_cell.jpg" width="550" height="220" />
+<img src="./Images/iOS/nimkit_cell.jpg" width="550" height="220" />
 
 蓝色区域：为具体内容，如文字 UILabel ,图片 UIImageView 等。
 
