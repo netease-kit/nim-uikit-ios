@@ -303,6 +303,50 @@ NIMCellLayoutConfig 中主要的方法有：
 
 
 
+##联系人选择器 NIMContactSelectViewController
+NIMKit 提供联系人选择器功能。支持选择用户或者群组，支持多选。
+
+###初始化联系人选择器
+
+开发者需要在初始化的时候通过传入配置器 `id<NIMContactSelectConfig>`，对联系人选择器进行配置。 NIMKit 预留了三种常用的配置，分别为：
+
+1.选择好友 ` NIMContactFriendSelectConfig`
+
+2.选择群  `NIMContactTeamSelectConfig`
+
+3.选择群成员 `NIMContactTeamMemberSelectConfig`
+
+开发者可在 `NIMContactSelectConfig.h` 中找到对应声明。
+
+选择好友示例:
+
+```objc
+    NSMutableArray *users = [[NSMutableArray alloc] init];
+    //使用内置的好友选择器
+    NIMContactFriendSelectConfig *config = [[NIMContactFriendSelectConfig alloc] init];
+    //获取自己id
+    NSString *currentUserId = [[NIMSDK sharedSDK].loginManager currentAccount];
+    [users addObject:currentUserId];
+    //将自己的id过滤
+    config.filterIds = users;
+    //需要多选
+    config.needMutiSelected = YES;
+    //初始化联系人选择器
+    NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+    //回调处理
+    vc.finshBlock = block;
+```
+
+###显示联系人选择器
+创建完联系人选择器之后，调用 `-(void)show` 方法就可以弹出联系人选择器。
+
+###联系人选择器回调
+
+联系人选择器提供 `delegate` 和	 `block` 两种回调，可以根据业务需求自行选择监听方式。
+
+##群名片
+群名片分为普通群群名片 ` NIMNormalTeamCardViewController` 和 高级群群名片 `NIMAdvancedTeamCardViewController` 两种类型，初始化时传入需要展示的群组 `NIMTeam` 即可。
+此组件意在为快速为开发者搭建一套可以直接使用的群名片，开发者可以根据需求自行修改组件源码。
 
 
 
