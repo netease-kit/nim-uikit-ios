@@ -1,14 +1,14 @@
-# 网易云信 组件工具包NIMKit
+# 网易云信 组件工具包  NIMKit
 
-##云信组件包NIMKit介绍
+##云信组件包  NIMKit 介绍
 
-NIMKit是一款可以帮助用户快速打造出聊天功能的UI组件，开发者可以通过一些简洁的代码，快速的实现聊天界面和最近联系人功能，并实现基础的一些定制化开发。NIMKit完全开源，如果开发者希望修改界面，只需要通过替换界面资源，修改配置等方式即可实现。如果开发者希望更深层次的自定义，也可自行修改代码。
+`NIMKit` 是一款可以帮助用户快速打造出聊天功能的UI组件，开发者可以通过一些简洁的代码，快速的实现聊天界面和最近联系人功能，并实现基础的一些定制化开发。 `NIMKit` 完全开源，如果开发者希望修改界面，只需要通过替换界面资源，修改配置等方式即可实现。如果开发者希望更深层次的自定义，也可自行修改代码。
 
 
 ##NIMKit说明
 
-* NIMKit依赖云信通讯能力库，在使用的时候请引入静态库NIMLib，以及相关头文件。
-* 具体使用范例请参考[NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo)。
+* `NIMKit` 依赖云信通讯能力库，在使用的时候请引入静态库 `NIMSDK`，以及相关头文件。
+* 具体使用范例请参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo)。
 
 
 
@@ -16,7 +16,18 @@ NIMKit是一款可以帮助用户快速打造出聊天功能的UI组件，开发
 
 ###基础使用
 
-* 添加 NIMKit 工程和 NIMSDK静态库 到工程中，并添加必要的依赖项
+
+*  添加 `NIMKit` 到工程中（注意只需要添加xcodeproj文件即可） 添加后示例如图：
+
+   <img src="./Images/iOS/nimkit_init_1.jpg" width="250" height="160" />
+
+
+*  添加  `NIMSDK` 静态库 到 `NIMKit` 中，示例如图：
+        
+   <img src="./Images/iOS/nimkit_init_2.jpg" width="250" height="110" />
+
+
+* 在您的工程中，添加必要的依赖项
 	* CoreText.framework
 	* CoreTelephony.framework
 	* AVFoundation.framework
@@ -24,15 +35,21 @@ NIMKit是一款可以帮助用户快速打造出聊天功能的UI组件，开发
 	* SystemConfiguration.framework
 	* AudioToolbox.framework
 	* CoreMedia.framework
-	* libstdc++6.0.9.dylib
-	* libsqlite3.0.dylib
-	* libz.dylib
+	* libstdc++6.0.9.tbd
+	* libsqlite3.0.tbd
+	* libz.tbd
+	* libNIMKit.a
 
-* 设置 Other Linker Flags 为 -ObjC
+* 设置 `Other Linker Flags` 为 `-ObjC`
 
-* 如果你是在 workspace 中引入 IMKit,还需要在 Header Search Paths 中添加 NIMKit 的文件路径
+* 在 `Header Search Paths` 中添加 `NIMKit` 的文件路径，并设置为recursive。 示例如图：
+  
+  <img src="./Images/iOS/nimkit_init_3.jpg" width="450" height="120" />
+
 	
-* 在工程中添加 NIMKitResouce.bundle
+* 在工程中添加 `NIMKitResouce.bundle`
+
+* 在需要的地方导入头文件 `NIMKit.h`
 
 * 新建一个 SessionViewController，从 NIMSessionViewController 进行继承 (此时运行将可以得到一个简单的会话界面)
 
