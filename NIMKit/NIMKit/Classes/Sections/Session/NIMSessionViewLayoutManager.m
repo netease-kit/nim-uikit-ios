@@ -52,7 +52,7 @@
         [addIndexPathes addObject:[NSIndexPath indexPathForRow:[obj integerValue] inSection:0]];
     }];
     [_tableView beginUpdates];
-    [_tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
+    [_tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
     [_tableView endUpdates];
     
     NSTimeInterval scrollDelay = .01f;

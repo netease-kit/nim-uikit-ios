@@ -77,11 +77,21 @@ NSInteger ButtonBegintLeftX = 11;
     _mediaButtons = mediaButtons;
     _mediaItems = mediaItems;
     
-    _pageView= [[NIMPageView alloc] initWithFrame:self.bounds];
+    _pageView = [[NIMPageView alloc] initWithFrame:self.bounds];
+    _pageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _pageView.dataSource = self;
     [self addSubview:_pageView];
     [_pageView scrollToPage:0];
 }
+
+- (void)setFrame:(CGRect)frame{
+    CGFloat originalWidth = self.frame.size.width;
+    [super setFrame:frame];
+    if (originalWidth != frame.size.width) {
+        [_pageView reloadData];
+    }
+}
+
 
 
 - (void)dealloc

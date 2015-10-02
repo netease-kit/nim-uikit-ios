@@ -7,7 +7,6 @@
 //
 
 #import "NIMTimestampModel.h"
-#import "NIMTimestampConfig.h"
 #import "NIMAttributedLabel+NIMKit.h"
 #import "NIMKitUtil.h"
 

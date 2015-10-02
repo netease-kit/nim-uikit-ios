@@ -37,6 +37,16 @@
              atIndexPath:(NSIndexPath *)indexPath;
 
 /**
+ *  选中某一条最近会话的头像控件，触发的事件回调
+ *
+ *  @param recent    最近会话
+ *  @param indexPath 最近会话cell所在的位置
+ *  @discussion      默认将进入会话界面
+ */
+- (void)onSelectedAvatar:(NIMRecentSession *)recent
+             atIndexPath:(NSIndexPath *)indexPath;
+
+/**
  *  删除某一条最近会话时触发的事件回调
  *
  *  @param recent    最近会话

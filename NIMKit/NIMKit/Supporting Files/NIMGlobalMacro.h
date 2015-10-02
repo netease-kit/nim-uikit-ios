@@ -10,8 +10,12 @@
 #define NIMKit_GlobalMacro_h
 
 #define NIMKit_IOS8            ([[[UIDevice currentDevice] systemVersion] doubleValue] >= 8.0)
+#define NIMKit_UIScreenWidth   [UIScreen mainScreen].bounds.size.width
+#define NIMKit_UIScreenHeight  [UIScreen mainScreen].bounds.size.height
+
 
 #define NIMKit_Message_Font_Size   14      // 文字大小
+#define NIMKit_Notification_Font_Size   10      // 通知中文字大小
 
 #define NIMKit_SuppressPerformSelectorLeakWarning(Stuff) \
 do { \

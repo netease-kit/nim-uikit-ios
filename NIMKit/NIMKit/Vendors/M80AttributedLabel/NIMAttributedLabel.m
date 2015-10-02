@@ -1080,4 +1080,11 @@ static dispatch_queue_t get_nim_attributed_label_parse_queue() \
 }
 
 
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    NIMAttributedLabelURL *url = [self urlForPoint:point];
+    return url ? self : nil;
+}
+
+
 @end

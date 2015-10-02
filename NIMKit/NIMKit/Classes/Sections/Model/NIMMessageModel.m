@@ -26,6 +26,13 @@
     return self;
 }
 
+- (void)cleanCache
+{
+    _contentSize = CGSizeZero;
+    _contentViewInsets = UIEdgeInsetsZero;
+    _bubbleViewInsets = UIEdgeInsetsZero;
+}
+
 - (NSString*)description{
     return self.message.text;
 }
@@ -44,7 +51,10 @@
 }
 
 - (void)calculateContent:(CGFloat)width{
-    _contentSize = [self.layoutConfig contentSize:self cellWidth:width];
+    if (CGSizeEqualToSize(_contentSize, CGSizeZero))
+    {
+        _contentSize = [self.layoutConfig contentSize:self cellWidth:width];
+    }
 }
 
 

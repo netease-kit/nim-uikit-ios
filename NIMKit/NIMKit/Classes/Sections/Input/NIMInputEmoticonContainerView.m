@@ -40,27 +40,28 @@ NSInteger CustomPageViewHeight    = 159;
     self.backgroundColor = [UIColor clearColor];
 }
 
+
+
 - (void)loadUIComponents
 {
     _emoticonPageView                  = [[NIMPageView alloc] initWithFrame:self.bounds];
-    _emoticonPageView.nim_height           = CustomPageViewHeight;
+    _emoticonPageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    _emoticonPageView.nim_height       = CustomPageViewHeight;
     _emoticonPageView.backgroundColor  = [UIColor clearColor];
     _emoticonPageView.dataSource       = self;
     _emoticonPageView.pageViewDelegate = self;
     [self addSubview:_emoticonPageView];
     
     _emotPageController = [[UIPageControl alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, CustomPageControlHeight)];
+    _emotPageController.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _emotPageController.pageIndicatorTintColor = [UIColor lightGrayColor];
     _emotPageController.currentPageIndicatorTintColor = [UIColor grayColor];
     [self addSubview:_emotPageController];
     [_emotPageController setUserInteractionEnabled:NO];
     
-    NIMInputEmoticonCatalog * defaultCatalog = [self loadDefaultCatalog];
-    NSArray *charlets = [self loadChartlet];
-    NSArray *catalogs = defaultCatalog? [@[defaultCatalog] arrayByAddingObjectsFromArray:charlets] : charlets;
-    self.currentCatalogData = catalogs.firstObject;
-    
+    NSArray *catalogs = [self reloadData];
     _tabView = [[NIMInputEmoticonTabView alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, 0) catalogs:catalogs];
+    _tabView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _tabView.delegate = self;
     [_tabView.sendButton addTarget:self action:@selector(didPressSend:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_tabView];
@@ -70,6 +71,22 @@ NSInteger CustomPageViewHeight    = 159;
         _emotPageController.currentPage = 0;
         [_emoticonPageView scrollToPage:0];
     }
+}
+
+- (void)setFrame:(CGRect)frame{
+    CGFloat originalWidth = self.frame.size.width;
+    [super setFrame:frame];
+    if (originalWidth != frame.size.width) {
+        [self reloadData];
+    }
+}
+
+- (NSArray *)reloadData{
+    NIMInputEmoticonCatalog * defaultCatalog = [self loadDefaultCatalog];
+    NSArray *charlets = [self loadChartlet];
+    NSArray *catalogs = defaultCatalog? [@[defaultCatalog] arrayByAddingObjectsFromArray:charlets] : charlets;
+    self.currentCatalogData = catalogs.firstObject;
+    return catalogs;
 }
 
 #define EmotPageControllerMarginBottom 10

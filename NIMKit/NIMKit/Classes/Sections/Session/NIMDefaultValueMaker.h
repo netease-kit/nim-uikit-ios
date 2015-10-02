@@ -10,8 +10,10 @@
 #import "NIMCellLayoutDefaultConfig.h"
 @interface NIMDefaultValueMaker : NSObject
 
+@property (nonatomic,readonly) NIMCellLayoutDefaultConfig *cellLayoutDefaultConfig;
+
 + (instancetype)sharedMaker;
 
-@property (nonatomic,readonly) NIMCellLayoutDefaultConfig *cellLayoutDefaultConfig;
+- (CGFloat)maxNotificationTipPadding;
 
 @end

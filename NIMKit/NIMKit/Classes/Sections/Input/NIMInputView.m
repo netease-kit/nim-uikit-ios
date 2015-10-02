@@ -129,6 +129,7 @@
     [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpInside:) forControlEvents:UIControlEventTouchUpInside];
     [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
     _toolBar.nim_size = [_toolBar sizeThatFits:CGSizeMake(self.nim_width, CGFLOAT_MAX)];
+    _toolBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [_toolBar.recordButton setTitle:@"按住说话" forState:UIControlStateNormal];
     [self addSubview:_toolBar];
     _toolBar.inputTextView.delegate = self;
@@ -143,10 +144,12 @@
     
     
     _moreContainer = [[NIMInputMoreContainerView alloc] initWithFrame:CGRectMake(0, [NIMUIConfig topInputViewHeight], self.nim_width, [NIMUIConfig bottomInputViewHeight])];
+    _moreContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _moreContainer.hidden   = YES;
     [self addSubview:_moreContainer];
     
     _emoticonContainer = [[NIMInputEmoticonContainerView alloc] initWithFrame:CGRectMake(0, [NIMUIConfig topInputViewHeight], self.nim_width, [NIMUIConfig bottomInputViewHeight])];
+    _emoticonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _emoticonContainer.delegate = self;
     _emoticonContainer.hidden = YES;
     [self addSubview:_emoticonContainer];
@@ -240,6 +243,9 @@
 
 - (void)keyboardWillChangeFrame:(NSNotification *)notification
 {
+    if (!self.window) {
+        return;//如果当前vc不是堆栈的top vc，则不需要监听
+    }
     NSDictionary *userInfo = notification.userInfo;
     CGRect endFrame   = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGRect beginFrame = [userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];

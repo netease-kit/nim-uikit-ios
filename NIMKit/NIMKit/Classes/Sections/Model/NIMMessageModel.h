@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NIMCellConfig.h"
+#import "NIMSessionConfig.h"
 
 @interface NIMMessageModel : NSObject
 
@@ -21,6 +21,10 @@
  */
 @property (nonatomic,strong) id<NIMCellLayoutConfig> layoutConfig;
 
+/**
+ *  消息对应的session配置
+ */
+@property (nonatomic,strong) id<NIMSessionConfig>  sessionConfig;
 
 @property (nonatomic, readonly) CGSize     contentSize;
 
@@ -47,5 +51,10 @@
  *  @return NIMMessageModel实例
  */
 - (instancetype)initWithMessage:(NIMMessage*)message;
+
+/**
+ *  清楚缓存的排版数据
+ */
+- (void)cleanCache;
 
 @end

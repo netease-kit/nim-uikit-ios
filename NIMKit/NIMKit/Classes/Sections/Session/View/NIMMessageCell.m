@@ -344,13 +344,11 @@
 
 - (BOOL)unreadHidden {
     if (self.model.message.messageType == NIMMessageTypeAudio) { //音频
-        BOOL showIcon = NO;
-        if ([self.model.layoutConfig respondsToSelector:@selector(shouldShowAudioPlayedStatusIcon:)]) {
-            showIcon = [self.model.layoutConfig shouldShowAudioPlayedStatusIcon:self.model];
-        }else{
-            showIcon = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig shouldShowAudioPlayedStatusIcon:self.model];
+        BOOL hideIcon = NO;
+        if ([self.model.sessionConfig respondsToSelector:@selector(disableAudioPlayedStatusIcon)]) {
+            hideIcon = [self.model.sessionConfig disableAudioPlayedStatusIcon];
         }
-        return (!showIcon || self.model.message.isOutgoingMsg || [self.model.message isPlayed]);
+        return (hideIcon || self.model.message.isOutgoingMsg || [self.model.message isPlayed]);
     }
     return YES;
 }

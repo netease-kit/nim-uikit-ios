@@ -16,12 +16,10 @@
 {
     CGSize defaultBubbleSize = CGSizeMake(60, 35);
     if (self = [self initWithFrame:CGRectMake(0, 0, defaultBubbleSize.width, defaultBubbleSize.height)]) {
-        self.opaque = YES;
         [self addTarget:self action:@selector(onTouchDown:) forControlEvents:UIControlEventTouchDown];
         [self addTarget:self action:@selector(onTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [self addTarget:self action:@selector(onTouchUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
         _bubbleImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,defaultBubbleSize.width,defaultBubbleSize.height)];
-        _bubbleImageView.opaque = YES;
         _bubbleImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self addSubview:_bubbleImageView];
     }
@@ -35,6 +33,7 @@
     switch (self.bubbleType) {
         case NIMKitBubbleTypeChat:
             [_bubbleImageView setImage:[self chatBubbleImageForState:UIControlStateNormal]];
+            [_bubbleImageView setHighlightedImage:[self chatBubbleImageForState:UIControlStateHighlighted]];
             break;
         case NIMKitBubbleTypeNotify:
             [_bubbleImageView setImage:[self notifyBubbleImageForState:UIControlStateNormal]];
@@ -110,13 +109,17 @@
 - (CGSize)bubbleViewSize:(NIMMessageModel *)model
 {
     CGSize bubbleSize;
-    id<NIMCellLayoutConfig> config = model.layoutConfig;
     CGSize contentSize  = model.contentSize;
-    UIEdgeInsets insets = [config contentViewInsets:model];
+    UIEdgeInsets insets = model.contentViewInsets;
     bubbleSize.width  = contentSize.width + insets.left + insets.right;
     bubbleSize.height = contentSize.height + insets.top + insets.bottom;
     return bubbleSize;
 }
 
+
+- (void)setHighlighted:(BOOL)highlighted{
+    [super setHighlighted:highlighted];
+    _bubbleImageView.highlighted = highlighted;
+}
 
 @end

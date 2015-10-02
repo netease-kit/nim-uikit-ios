@@ -12,10 +12,10 @@
 #import <CommonCrypto/CommonDigest.h>
 
 // See https://github.com/rs/SDWebImage/pull/1141 for discussion
-@interface NIMAutoPurgeCache : NSCache
+@interface AutoPurgeCache : NSCache
 @end
 
-@implementation NIMAutoPurgeCache
+@implementation AutoPurgeCache
 
 - (id)init
 {
@@ -102,7 +102,7 @@ FOUNDATION_STATIC_INLINE NSUInteger NIMCacheCostForImage(UIImage *image) {
         _maxCacheAge = kDefaultCacheMaxCacheAge;
 
         // Init the memory cache
-        _memCache = [[NIMAutoPurgeCache alloc] init];
+        _memCache = [[AutoPurgeCache alloc] init];
         _memCache.name = fullNamespace;
 
         // Init the disk cache

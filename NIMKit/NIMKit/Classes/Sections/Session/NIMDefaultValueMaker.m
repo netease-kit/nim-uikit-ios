@@ -32,4 +32,9 @@
     return self;
 }
 
+- (CGFloat)maxNotificationTipPadding{
+    return 20.f;
+}
+
+
 @end

@@ -22,9 +22,10 @@
 -(instancetype)initSessionMessageContentView
 {
     if (self = [super initSessionMessageContentView]) {
-        //
         _label = [[UILabel alloc] initWithFrame:CGRectZero];
         _label.font = [UIFont systemFontOfSize:14.f];
+        _label.backgroundColor = [UIColor clearColor];
+        _label.userInteractionEnabled = NO;
         [self addSubview:_label];
     }
     return self;
@@ -35,15 +36,11 @@
     NSString *text = @"未知类型消息";
     [self.label setText:text];
     [self.label sizeToFit];
-    
     if (!self.model.message.isOutgoingMsg) {
-        self.label.backgroundColor = [UIColor whiteColor];
         self.label.textColor = [UIColor blackColor];
     }else{
-        self.label.backgroundColor = NIMKit_UIColorFromRGB(0x238efa);
         self.label.textColor = [UIColor whiteColor];
     }
-    
 }
 
 

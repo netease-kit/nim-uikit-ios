@@ -43,7 +43,7 @@
         _showTimeInterval  = timeInterval;
         _firstTimeInterval = 0;
         _lastTimeInterval  = 0;
-        [[[NIMSDK sharedSDK] conversationManager] markAllMessageReadInSession:_currentSession];
+        [[[NIMSDK sharedSDK] conversationManager] markAllMessagesReadInSession:_currentSession];
     }
     return self;
 }
@@ -218,12 +218,16 @@
     return dels;
 }
 
-#pragma mark - update
-
-- (void)deleteAllMessages
+- (void)cleanCache
 {
-//    [[[NIMSDK sharedSDK] conversationManager] deleteAllmessagesInSession:_currentSession
-//                                                     removeRecentSession:removeRecentSession];
+    for (id item in _modelArray)
+    {
+        if ([item isKindOfClass:[NIMMessageModel class]])
+        {
+            NIMMessageModel *model = (NIMMessageModel *)item;
+            [model cleanCache];
+        }
+    }
 }
 
 #pragma mark - private methods

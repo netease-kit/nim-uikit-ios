@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMMessageModel.h"
+
+@class NIMMessageModel;
 /**
  *  返回消息结果集的回调
  *  @param messages 消息结果集

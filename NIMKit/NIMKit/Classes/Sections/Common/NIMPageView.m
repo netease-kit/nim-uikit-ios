@@ -45,6 +45,14 @@
     return self;
 }
 
+- (void)setFrame:(CGRect)frame{
+    CGFloat originalWidth = self.frame.size.width;
+    [super setFrame:frame];
+    if (originalWidth != frame.size.width) {
+        [self reloadData];
+    }
+}
+
 - (void)dealloc
 {
     _scrollView.delegate = nil;

@@ -26,6 +26,7 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
         _textLabel.numberOfLines = 0;
         _textLabel.lineBreakMode = NSLineBreakByWordWrapping;
         _textLabel.font = [UIFont systemFontOfSize:14.f];
+        _textLabel.backgroundColor = [UIColor clearColor];
         [self addSubview:_textLabel];
     }
     return self;
@@ -36,11 +37,9 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
     NSString *text = self.model.message.text;
     [_textLabel nim_setText:text];
     if (!self.model.message.isOutgoingMsg) {
-        _textLabel.backgroundColor = [UIColor whiteColor];
-        _textLabel.textColor = [UIColor blackColor];
+        self.textLabel.textColor = [UIColor blackColor];
     }else{
-        _textLabel.backgroundColor = NIMKit_UIColorFromRGB(0x238efa);
-        _textLabel.textColor = [UIColor whiteColor];
+        self.textLabel.textColor = [UIColor whiteColor];
     }
 }
 

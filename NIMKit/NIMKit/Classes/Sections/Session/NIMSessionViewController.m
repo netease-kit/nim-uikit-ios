@@ -20,7 +20,6 @@
 #import "NIMMessageMaker.h"
 #import "NIMDefaultValueMaker.h"
 #import "NIMTimestampModel.h"
-#import "NIMTimestampConfig.h"
 #import "NIMMessageCellMaker.h"
 #import "NIMUIConfig.h"
 
@@ -31,7 +30,8 @@ NIMChatManagerDelegate,
 NIMConversationManagerDelegate,
 NIMTeamManagerDelegate,
 NIMMediaManagerDelgate,
-NIMMessageCellDelegate>
+NIMMessageCellDelegate,
+NIMUserManagerDelegate>
 
 @property (nonatomic,strong,readwrite) UITableView *tableView;
 
@@ -65,6 +65,7 @@ NIMMessageCellDelegate>
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
     [[NIMSDK sharedSDK].teamManager removeDelegate:self];
+    [[NIMSDK sharedSDK].userManager removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -123,6 +124,7 @@ NIMMessageCellDelegate>
 
     [[[NIMSDK sharedSDK] chatManager] addDelegate:self];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:self];
+    [[NIMSDK sharedSDK].userManager addDelegate:self];
     if (self.session.sessionType == NIMSessionTypeTeam) {
         [[[NIMSDK sharedSDK] teamManager] addDelegate:self];
     }
@@ -248,7 +250,7 @@ NIMMessageCellDelegate>
         return;
     }
     [self uiAddMessages:messages];
-    [[NIMSDK sharedSDK].conversationManager markAllMessageReadInSession:self.session];
+    [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
 }
 
 
@@ -322,6 +324,11 @@ NIMMessageCellDelegate>
     }
 }
 
+#pragma mark - NIMUserManagerDelegate
+- (void)onUserInfoChanged:(NIMUser *)user{
+    self.navigationItem.title = [self sessionTitle];
+    [self.tableView reloadData];
+}
 
 #pragma mark - Touch Event
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -333,17 +340,18 @@ NIMMessageCellDelegate>
 #pragma mark - Private
 
 - (void)layoutConfig:(NIMMessageModel *)model{
-    if (model.layoutConfig) {
-        return;
+    model.sessionConfig = self.sessionConfig;
+    if (model.layoutConfig == nil)
+    {
+        id<NIMCellLayoutConfig> layoutConfig = nil;
+        if ([self.sessionConfig respondsToSelector:@selector(layoutConfigWithMessage:)]) {
+            layoutConfig = [self.sessionConfig layoutConfigWithMessage:model.message];
+        }
+        if (!layoutConfig) {
+            layoutConfig = [NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig;
+        }
+        model.layoutConfig = layoutConfig;
     }
-    id<NIMCellLayoutConfig> layoutConfig;
-    if ([self.sessionConfig respondsToSelector:@selector(layoutConfigWithMessage:)]) {
-        layoutConfig = [self.sessionConfig layoutConfigWithMessage:model.message];
-    }
-    if (!layoutConfig) {
-        layoutConfig = [NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig;
-    }
-    model.layoutConfig = layoutConfig;
     [model calculateContent:self.tableView.nim_width];
 }
 
@@ -599,6 +607,32 @@ NIMMessageCellDelegate>
     [self.sessionDatasource.modelArray replaceObjectAtIndex:index withObject:model];
     [self.layoutManager updateCellAtIndex:index model:model];
 }
+
+
+#pragma mark - 旋转处理 (iOS7)
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+                                duration:(NSTimeInterval)duration
+{
+    [self.sessionDatasource cleanCache];
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [self.tableView reloadData];
+}
+
+#pragma mark - 旋转处理 (iOS8 or above)
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
+     {
+         [self.sessionDatasource cleanCache];
+         [self.tableView reloadData];
+     } completion:nil];
+}
+
 
 
 @end

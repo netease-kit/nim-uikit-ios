@@ -40,7 +40,7 @@
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index , NSError *error))handler;
 - (NSArray*)addMessages:(NSArray*)messages;
 - (NSArray*)deleteMessageModel:(NIMMessageModel*)model;
-//删除
-- (void)deleteAllMessages;
 
+//清理缓存数据
+- (void)cleanCache;
 @end

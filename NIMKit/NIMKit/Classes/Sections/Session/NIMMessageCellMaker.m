@@ -9,7 +9,6 @@
 #import "NIMMessageCellMaker.h"
 #import "NIMMessageModel.h"
 #import "NIMTimestampModel.h"
-#import "NIMTimestampConfig.h"
 
 @implementation NIMMessageCellMaker
 

@@ -12,7 +12,9 @@
 @implementation NIMKitUtil
 
 + (NSString *)showNick:(NSString*)uid inSession:(NIMSession*)session{
-    
+    if (!uid.length) {
+        return nil;
+    }
     NSString *nickname = nil;
     if (session.sessionType == NIMSessionTypeTeam)
     {

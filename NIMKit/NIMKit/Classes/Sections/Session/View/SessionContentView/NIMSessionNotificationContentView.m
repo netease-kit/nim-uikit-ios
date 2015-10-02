@@ -10,6 +10,7 @@
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
 #import "NIMKitUtil.h"
+#import "NIMDefaultValueMaker.h"
 
 @implementation NIMSessionNotificationContentView
 
@@ -17,8 +18,9 @@
 {
     if (self = [super initSessionMessageContentView]) {
         _label = [[UILabel alloc] initWithFrame:CGRectZero];
-        _label.font = [UIFont boldSystemFontOfSize:10.f];
+        _label.font = [UIFont boldSystemFontOfSize:NIMKit_Notification_Font_Size];
         _label.textColor = [UIColor whiteColor];
+        _label.numberOfLines = 0;
         [self addSubview:_label];
         self.bubbleType = NIMKitBubbleTypeNotify;
     }
@@ -37,9 +39,11 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    CGFloat padding = [NIMDefaultValueMaker sharedMaker].maxNotificationTipPadding;
+    self.label.nim_size = [self.label sizeThatFits:CGSizeMake(self.nim_width - 2 * padding, CGFLOAT_MAX)];
     self.label.nim_centerX = self.nim_width * .5f;
     self.label.nim_centerY = self.nim_height * .5f;
-    self.bubbleImageView.frame = CGRectMake(self.label.nim_left - 7, self.label.nim_top - 2, self.label.nim_width + 14, self.label.nim_height + 4);
+    self.bubbleImageView.frame = CGRectInset(self.label.frame, -8, -4);
 }
 
 

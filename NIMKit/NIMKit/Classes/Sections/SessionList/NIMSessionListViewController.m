@@ -14,7 +14,7 @@
 #import "NIMKitUtil.h"
 
 
-@interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate>
+@interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate,NIMUserManagerDelegate>
 
 @end
 
@@ -32,6 +32,7 @@
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
     [[NIMSDK sharedSDK].teamManager removeDelegate:self];
     [[NIMSDK sharedSDK].loginManager removeDelegate:self];
+    [[NIMSDK sharedSDK].userManager removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -44,7 +45,7 @@
     self.tableView.dataSource       = self;
     self.tableView.tableFooterView  = [[UIView alloc] init];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
     
     if (!self.recentSessions.count) {
         _recentSessions = [NSMutableArray array];
@@ -53,6 +54,7 @@
     [[NIMSDK sharedSDK].teamManager addDelegate:self];
     [[NIMSDK sharedSDK].conversationManager addDelegate:self];
     [[NIMSDK sharedSDK].loginManager addDelegate:self];
+    [[NIMSDK sharedSDK].userManager addDelegate:self];
     extern NSString *NIMKitUserInfoHasUpdatedNotification;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInfoUpdate:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
     extern NSString *NIMKitTeamInfoHasUpdatedNotification;
@@ -102,6 +104,7 @@
     NIMSessionListCell * cell = [tableView dequeueReusableCellWithIdentifier:cellId];
     if (!cell) {
         cell = [[NIMSessionListCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+        [cell.avatarImageView addTarget:self action:@selector(onTouchAvatar:) forControlEvents:UIControlEventTouchUpInside];
     }
     NIMRecentSession *recent = self.recentSessions[indexPath.row];
     cell.nameLabel.text = [self nameForRecentSession:recent];
@@ -147,12 +150,12 @@
 }
 
 - (void)messagesDeletedInSession:(NIMSession *)session{
-    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
     [self reload];
 }
 
 - (void)allMessagesDeleted{
-    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSession mutableCopy];
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
     [self reload];
 }
 
@@ -167,10 +170,16 @@
         [self reload];
     }
 }
-
+#pragma mark - NIMUserManagerDelegate
+- (void)onUserInfoChanged:(NIMUser *)user{
+    [self reload];
+}
 
 
 #pragma mark - Override
+- (void)onSelectedAvatar:(NSString *)userId
+             atIndexPath:(NSIndexPath *)indexPath{};
+
 - (void)onSelectedRecent:(NIMRecentSession *)recentSession atIndexPath:(NSIndexPath *)indexPath{
     NIMSessionViewController *vc = [[NIMSessionViewController alloc] initWithSession:recentSession.session];
     [self.navigationController pushViewController:vc animated:YES];
@@ -240,6 +249,17 @@
     }else{
         return self.recentSessions.count;
     }
+}
+
+- (void)onTouchAvatar:(id)sender{
+    UIView *view = [sender superview];
+    while (![view isKindOfClass:[UITableViewCell class]]) {
+        view = view.superview;
+    }
+    UITableViewCell *cell  = (UITableViewCell *)view;
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    NIMRecentSession *recent = self.recentSessions[indexPath.row];
+    [self onSelectedAvatar:recent atIndexPath:indexPath];
 }
 
 

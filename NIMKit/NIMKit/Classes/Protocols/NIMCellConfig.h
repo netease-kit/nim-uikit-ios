@@ -46,10 +46,6 @@
  */
 - (BOOL)shouldShowNickName:(NIMMessageModel *)model;
 
-/**
- *  是否显示语音未播放的红点
- */
-- (BOOL)shouldShowAudioPlayedStatusIcon:(NIMMessageModel *)model;
 
 /**
  *  格式化消息文本

@@ -80,6 +80,9 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
 
 - (NIMKitInfo *)infoByUser:(NSString *)userId
 {
+    if (![userId isKindOfClass:[NSString class]]) {
+        return nil;
+    }
     NIMKitInfo *member;
     if (_provider && [_provider respondsToSelector:@selector(infoByUser:)]) {
         member = [_provider infoByUser:userId];
@@ -89,6 +92,9 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
 
 - (NIMKitInfo *)infoByTeam:(NSString *)teamId;
 {
+    if (![teamId isKindOfClass:[NSString class]]) {
+        return nil;
+    }
     NIMKitInfo *member;
     if (_provider && [_provider respondsToSelector:@selector(infoByTeam:)]) {
         member = [_provider infoByTeam:teamId];

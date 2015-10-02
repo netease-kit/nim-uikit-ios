@@ -61,7 +61,10 @@
 - (NSTimeInterval)showTimestampInterval;
 
 
-
+/**
+ *  是否禁掉语音未读红点
+ */
+- (BOOL)disableAudioPlayedStatusIcon;
 
 /**
  *  消息数据提供器

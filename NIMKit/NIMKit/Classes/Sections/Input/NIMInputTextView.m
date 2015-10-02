@@ -41,6 +41,13 @@
     return self;
 }
 
+- (void)setFrame:(CGRect)frame{
+    if (self.frame.size.width != frame.size.width) {
+        [self setNeedsDisplay];
+    }
+    [super setFrame:frame];
+}
+
 - (void)setCustomUI
 {
     [self customUI];

@@ -87,8 +87,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 @end
 
 @interface NIMKit(Private)
-//这两个接口是NIMKit内部调用的。
-//用户应该自己实现获取用户及群组信息方法，并注入到NIMKit的provider属性中，而不是调用这两个接口，靠NIMKit来获取用户信息。
+//用户首先应该自己实现获取用户及群组信息方法，并注入到NIMKit的provider属性中，而不是直接调用这两个接口，靠NIMKit来获取用户信息。
 - (NIMKitInfo *)infoByUser:(NSString *)userId;
 - (NIMKitInfo *)infoByTeam:(NSString *)teamId;
 @end
@@ -96,6 +95,11 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 
 @interface NIMKitInfo : NSObject
+/**
+ *   id,如果是用户信息，为用户id；如果是群信息，为群id
+ */
+@property (nonatomic,copy) NSString *infoId;
+
 /**
  *  显示名
  */
