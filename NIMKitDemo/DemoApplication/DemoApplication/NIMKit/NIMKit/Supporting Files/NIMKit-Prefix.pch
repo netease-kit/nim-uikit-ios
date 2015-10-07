@@ -1,0 +1,20 @@
+//
+//  NIMKit-Prefix.pch
+//  NIMKit
+//
+//  Created by NetEase.
+//  Copyright (c) 2015年 NetEase. All rights reserved.
+//
+
+#ifndef NIMKit_NIMKit_Prefix_pch
+#define NIMKit_NIMKit_Prefix_pch
+
+#ifdef __OBJC__
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import "NIMSDK.h"
+#import "NIMGlobalMacro.h"
+
+
+#endif
+#endif
