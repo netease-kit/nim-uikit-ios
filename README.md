@@ -32,16 +32,20 @@
 	* CoreText.framework
 	* CoreTelephony.framework
 	* AVFoundation.framework
-	* MobileCoreService.framework
+	* MobileCoreServices.framework
 	* SystemConfiguration.framework
 	* AudioToolbox.framework
 	* CoreMedia.framework
-	* libstdc++6.0.9.tbd
-	* libsqlite3.0.tbd
-	* libz.tbd
+	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup>
+	* libsqlite3.0.tbd  <sup> 注<sup>1</sup> </sup>
+	* libz.tbd  <sup> 注<sup>1</sup> </sup>
 	* libNIMKit.a
+	
+  **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
 
-* 设置 `Other Linker Flags` 为 `-ObjC`
+* 设置 `Other Linker Flags` 为 `-ObjC`。
+
+* 在工程配置 `info.plist` 文件中，添加条目 `NSAppTransportSecurity` ，属性设为 `Dictionary`。在此条目下添加键值对，key 为  `NSAllowsArbitraryLoads`, 值为 `YES`。
 
 * 在 `Header Search Paths` 中添加 `NIMKit` 的文件路径，并设置为recursive。 示例如图：
   
