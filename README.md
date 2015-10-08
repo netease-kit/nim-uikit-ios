@@ -181,7 +181,7 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 * 是否禁用输入框
 
-*   输入框面板菜单
+* 输入框面板菜单
 
 * 最大输入长度
 
@@ -195,7 +195,99 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 * 自定义消息数据源
 
-所有的配置项都可以在 NIMSessionConfig 中找到。
+所有的配置项都可以在 `NIMSessionConfig` 中找到。
+
+开发者需要自定义一个配置类实现 `NIMSessionConfig` 中的配置方法，并注入到 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法中 (可由子类复写)。详细可参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo) 中的 `NTESSessionViewController` 类。
+
+#####`NIMSessionConfig` 配置范例
+
+```objc
+
+@interface NTESSessionConfig()<NIMSessionConfig>
+
+@end
+
+@implementation NTESSessionConfig
+
+/**
+ *  可以显示在点击输入框“+”按钮里的多媒体按钮
+ */
+- (NSArray *)mediaItems
+{
+    // NTESMediaButtonPicture , NTESMediaButtonShoot 为 NIMMediaItem 的 tag 值，用来区分多个 NIMMediaItem 。
+    
+    return @[[NIMMediaItem item:NTESMediaButtonPicture
+                    normalImage:[UIImage imageNamed:@"bk_media_picture_normal"]
+                  selectedImage:[UIImage imageNamed:@"bk_media_picture_nomal_pressed"]
+                          title:@"相册"],
+             
+             [NIMMediaItem item:NTESMediaButtonShoot
+                    normalImage:[UIImage imageNamed:@"bk_media_shoot_normal"]
+                  selectedImage:[UIImage imageNamed:@"bk_media_shoot_pressed"]
+                          title:@"拍摄"],
+}
+
+/**
+ *  是否隐藏多媒体按钮
+ */
+- (BOOL)shouldHideItem:(NIMMediaItem *)item
+{
+  return NO;
+}
+
+/**
+ *  是否禁用输入控件
+ */
+- (BOOL)disableInputView
+{
+  return NO;
+}
+
+/**
+ *  输入控件最大输入长度
+ */
+- (NSInteger)maxInputLength
+{
+  return 5000;
+}
+
+/**
+ *  输入控件placeholder
+ */
+- (NSString *)inputViewPlaceholder
+{
+  return @"请输入消息";
+}
+
+/**
+ *  一次最多显示的消息条数
+ */
+- (NSInteger)messageLimit
+{
+   return 20;
+}
+
+/**
+ *  消息的排版配置，只有使用默认的NIMMessageCell，才会触发此回调
+ */
+- (id<NIMCellLayoutConfig>)layoutConfigWithMessage:(NIMMessage *)message
+{
+  //具体消息的排版配置，关于消息结构模型，请参考下一章节 自定义消息和 MessageCell 。
+  id<NIMCellLayoutConfig> config;
+    switch (message.messageType) {
+        case NIMMessageTypeCustom:{
+            if ([NTESSessionCustomLayoutConfig supportMessage:message]) {
+               config = [[NTESSessionCustomLayoutConfig alloc] init];
+               break;
+            }
+        }
+        default:
+            break;
+    }
+    return config;
+}
+
+```
 
 
 
