@@ -199,6 +199,9 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 * 自定义消息数据源
 
+* 是否禁用语音未读红点
+
+
 所有的配置项都可以在 `NIMSessionConfig` 中找到。
 
 开发者需要自定义一个配置类实现 `NIMSessionConfig` 中的配置方法，并注入到 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法中 (可由子类复写)。详细可参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo) 中的 `NTESSessionViewController` 类。
@@ -365,15 +368,6 @@ NIMCellLayoutConfig 中主要的方法有：
 ```objc
 - (BOOL)shouldShowNickName:(NIMMessageModel *)model;
 ```
-
-*  是否显示语音未播放的红点
-
-```objc
-- (BOOL)shouldShowAudioPlayedStatusIcon:(NIMMessageModel *)model;
-```
-
-
-
 
 
 只要用户对自定义消息实现这2个接口就能够完整的实现一个 MessageCell 。需要注意的是返回的ContentView类必须是 NIMSessionMessageContentView 的子类。
