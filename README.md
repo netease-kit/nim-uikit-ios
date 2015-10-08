@@ -287,6 +287,8 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
     return config;
 }
 
+@end
+
 ```
 
 
