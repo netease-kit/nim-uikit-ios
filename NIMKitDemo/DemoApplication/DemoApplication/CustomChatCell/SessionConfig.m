@@ -26,6 +26,7 @@
     if (message.messageType == NIMMessageTypeCustom) {
         return [[CellLayoutConfig alloc] init];
     }
+    //其他内置消息类型，如果需沿用预定义的组件布局，则返回nil。
     return nil;
 }
 
