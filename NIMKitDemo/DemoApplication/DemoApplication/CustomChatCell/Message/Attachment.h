@@ -10,8 +10,8 @@
 #import "NIMSDK.h"
 @interface Attachment : NSObject<NIMCustomAttachment>
 
-@property (nonatomic,strong) NSString *title;
+@property (nonatomic,copy) NSString *title;
 
-@property (nonatomic,strong) NSString *subTitle;
+@property (nonatomic,copy) NSString *subTitle;
 
 @end
