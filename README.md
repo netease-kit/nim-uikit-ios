@@ -8,7 +8,8 @@
 ##NIMKit说明
 
 * `NIMKit` 依赖云信通讯能力库，在使用的时候请引入静态库 `NIMSDK`，以及相关头文件。
-*    工程配置示例请参考 `NIMKitDemo\DemoApplication` 工程(请自行添加 `NIMSDK.a` )。
+* 利用组件添加自定义消息教程 [NIM Guide For Custom Message](/NIM_Guide_For_Custom_Message.md)。
+* 工程配置和自定义消息配置示例请参考 `NIMKitDemo\DemoApplication` 工程(请自行添加 `NIMSDK.a` )。
 * 具体使用范例请参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo)。
 
 
