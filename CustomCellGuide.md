@@ -100,63 +100,63 @@
 
 * 选择何处发送自定义消息，这里做在输入区的菜单栏中发送的示例。
    
-   1.构建自定义会话配置，并加进组件会话控制器中
+   * 构建自定义会话配置，并加进组件会话控制器中
    
-   ```objc
-   @interface SessionConfig : NSObject<NIMSessionConfig>
-   @end
-   ```
+	   ```objc
+	   @interface SessionConfig : NSObject<NIMSessionConfig>
+	   @end
+	   ```
+	   
+	   ```objc
+	   @implementation SessionConfig
+	    ...
+	    - (NSArray *)mediaItems{
+	        NSInteger itemTag = 0; //即button的tag,在点击事件中判断这个tag来确定点了哪个菜单
+	        return @[
+	                [NIMMediaItem item:itemTag
+	                        normalImage:[UIImage imageNamed:@"icon_custom_normal"]
+	                    selectedImage:[UIImage imageNamed:@"icon_custom_pressed"]
+	                            title:@"自定义消息"]
+	        ];
+	    }
+	    ...
+	    @end
+	   ```
    
-   ```objc
-   @implementation SessionConfig
-    ...
-    - (NSArray *)mediaItems{
-        NSInteger itemTag = 0; //即button的tag,在点击事件中判断这个tag来确定点了哪个菜单
-        return @[
-                [NIMMediaItem item:itemTag
-                        normalImage:[UIImage imageNamed:@"icon_custom_normal"]
-                    selectedImage:[UIImage imageNamed:@"icon_custom_pressed"]
-                            title:@"自定义消息"]
-        ];
-    }
-    ...
-    @end
-   ```
-   
- ```objc
- - (void)onTapMediaItem:(NIMMediaItem *)item{
-        switch (item.tag) {
-            case 0:
-            //发送自定义消息
-                [self sendCustomMessage];
-                break;
-            default:
-                break;
-        }
- }
- ```
+	 ```objc
+	 - (void)onTapMediaItem:(NIMMediaItem *)item{
+	        switch (item.tag) {
+	            case 0:
+	            //发送自定义消息
+	                [self sendCustomMessage];
+	                break;
+	            default:
+	                break;
+	        }
+	 }
+	 ```
+  
+ * 构造自定义消息并发送。
  
- 2.构造自定义消息并发送。
- 
-   ```objc
-    - (void)sendCustomMessage{
-        //构造自定义内容
-        Attachment *attachment = [[Attachment alloc] init];
-        attachment.title = @"这是一条自定义消息";
-        attachment.subTitle = @"这是自定义消息的副标题";
-        
-        //构造自定义MessageObject
-        NIMCustomObject *object = [[NIMCustomObject alloc] init];
-        object.attachment = attachment;
-        
-        //构造自定义消息
-        NIMMessage *message = [[NIMMessage alloc] init];
-        message.messageObject = object;
-        
-        //发送消息
-        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:self.session error:nil];
-    }
-   ```
+	   ```objc
+	    - (void)sendCustomMessage{
+	        //构造自定义内容
+	        Attachment *attachment = [[Attachment alloc] init];
+	        attachment.title = @"这是一条自定义消息";
+	        attachment.subTitle = @"这是自定义消息的副标题";
+	        
+	        //构造自定义MessageObject
+	        NIMCustomObject *object = [[NIMCustomObject alloc] init];
+	        object.attachment = attachment;
+	        
+	        //构造自定义消息
+	        NIMMessage *message = [[NIMMessage alloc] init];
+	        message.messageObject = object;
+	        
+	        //发送消息
+	        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:self.session error:nil];
+	    }
+	   ```
    
 4.接收自定义消息
   
