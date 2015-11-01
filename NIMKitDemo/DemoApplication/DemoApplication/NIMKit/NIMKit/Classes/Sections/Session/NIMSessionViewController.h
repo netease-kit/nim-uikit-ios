@@ -106,7 +106,7 @@
 - (void)uiDeleteMessage:(NIMMessage *)message;
 
 /**
- *  更新一条小心
+ *  更新一条消息
  *
  *  @param message 消息
  *
