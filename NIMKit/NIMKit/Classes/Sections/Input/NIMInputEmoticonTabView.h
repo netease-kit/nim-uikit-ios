@@ -17,7 +17,7 @@
 
 @interface NIMInputEmoticonTabView : UIControl
 
-@property (nonatomic,readonly) NSArray *emoticonCatalogs;
+@property (nonatomic,strong) NSArray *emoticonCatalogs;
 
 @property (nonatomic,strong) UIButton * sendButton;
 

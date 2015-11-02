@@ -16,6 +16,7 @@
 		6152C7991BE5E440005E028F /* icon_custom_pressed@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6152C7951BE5E440005E028F /* icon_custom_pressed@3x.png */; };
 		6152C79C1BE5E6EF005E028F /* CellLayoutConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 6152C79B1BE5E6EF005E028F /* CellLayoutConfig.m */; };
 		6152C79F1BE5EE5F005E028F /* ContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6152C79E1BE5EE5F005E028F /* ContentView.m */; };
+		61F087811BE777B800293A32 /* libNIMKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F087801BE7775900293A32 /* libNIMKit.a */; };
 		61F16E781BC567F700ABEE57 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16E771BC567F700ABEE57 /* main.m */; };
 		61F16E7B1BC567F700ABEE57 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16E7A1BC567F700ABEE57 /* AppDelegate.m */; };
 		61F16E7E1BC567F700ABEE57 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16E7D1BC567F700ABEE57 /* ViewController.m */; };
@@ -32,7 +33,6 @@
 		61F16ECF1BC5696D00ABEE57 /* libstdc++.6.0.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F16ECE1BC5696D00ABEE57 /* libstdc++.6.0.9.tbd */; };
 		61F16ED11BC5697300ABEE57 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F16ED01BC5697300ABEE57 /* libsqlite3.0.tbd */; };
 		61F16ED31BC5697B00ABEE57 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F16ED21BC5697B00ABEE57 /* libz.tbd */; };
-		61F16ED41BC5698000ABEE57 /* libNIMKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 61F16E921BC5689800ABEE57 /* libNIMKit.a */; };
 		61F16ED61BC56AB300ABEE57 /* NIMKitResouce.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 61F16ED51BC56AB300ABEE57 /* NIMKitResouce.bundle */; };
 		61F16ED91BC56DE000ABEE57 /* SessionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16ED81BC56DE000ABEE57 /* SessionViewController.m */; };
 		61F16EDC1BC5719C00ABEE57 /* DataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16EDB1BC5719C00ABEE57 /* DataProvider.m */; };
@@ -41,9 +41,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		61F16E911BC5689800ABEE57 /* PBXContainerItemProxy */ = {
+		61F0877F1BE7775900293A32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 61F16E8D1BC5689800ABEE57 /* NIMKit.xcodeproj */;
+			containerPortal = 61F0877B1BE7775800293A32 /* NIMKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 6187F91F1B818ED800EFFB3A;
 			remoteInfo = NIMKit;
@@ -65,6 +65,7 @@
 		6152C79B1BE5E6EF005E028F /* CellLayoutConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CellLayoutConfig.m; sourceTree = "<group>"; };
 		6152C79D1BE5EE5F005E028F /* ContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContentView.h; sourceTree = "<group>"; };
 		6152C79E1BE5EE5F005E028F /* ContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContentView.m; sourceTree = "<group>"; };
+		61F0877B1BE7775800293A32 /* NIMKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = NIMKit.xcodeproj; path = NIMKit/NIMKit.xcodeproj; sourceTree = "<group>"; };
 		61F16E731BC567F700ABEE57 /* DemoApplication.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DemoApplication.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		61F16E771BC567F700ABEE57 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		61F16E791BC567F700ABEE57 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -75,7 +76,6 @@
 		61F16E821BC567F700ABEE57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		61F16E851BC567F700ABEE57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		61F16E871BC567F700ABEE57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		61F16E8D1BC5689800ABEE57 /* NIMKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = NIMKit.xcodeproj; path = NIMKit/NIMKit.xcodeproj; sourceTree = "<group>"; };
 		61F16EC01BC5692200ABEE57 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		61F16EC21BC5692A00ABEE57 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		61F16EC41BC5693000ABEE57 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -100,7 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				61F16ED41BC5698000ABEE57 /* libNIMKit.a in Frameworks */,
+				61F087811BE777B800293A32 /* libNIMKit.a in Frameworks */,
 				61F16ED31BC5697B00ABEE57 /* libz.tbd in Frameworks */,
 				61F16ED11BC5697300ABEE57 /* libsqlite3.0.tbd in Frameworks */,
 				61F16ECF1BC5696D00ABEE57 /* libstdc++.6.0.9.tbd in Frameworks */,
@@ -142,6 +142,14 @@
 			path = Message;
 			sourceTree = "<group>";
 		};
+		61F0877C1BE7775800293A32 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				61F087801BE7775900293A32 /* libNIMKit.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		61F16E6A1BC567F700ABEE57 = {
 			isa = PBXGroup;
 			children = (
@@ -161,7 +169,7 @@
 		61F16E751BC567F700ABEE57 /* DemoApplication */ = {
 			isa = PBXGroup;
 			children = (
-				61F16E8D1BC5689800ABEE57 /* NIMKit.xcodeproj */,
+				61F0877B1BE7775800293A32 /* NIMKit.xcodeproj */,
 				61F16E7C1BC567F700ABEE57 /* ViewController.h */,
 				61F16E7D1BC567F700ABEE57 /* ViewController.m */,
 				61F16ED71BC56DE000ABEE57 /* SessionViewController.h */,
@@ -203,14 +211,6 @@
 				61F16E771BC567F700ABEE57 /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		61F16E8E1BC5689800ABEE57 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				61F16E921BC5689800ABEE57 /* libNIMKit.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -260,8 +260,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 61F16E8E1BC5689800ABEE57 /* Products */;
-					ProjectRef = 61F16E8D1BC5689800ABEE57 /* NIMKit.xcodeproj */;
+					ProductGroup = 61F0877C1BE7775800293A32 /* Products */;
+					ProjectRef = 61F0877B1BE7775800293A32 /* NIMKit.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -272,11 +272,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		61F16E921BC5689800ABEE57 /* libNIMKit.a */ = {
+		61F087801BE7775900293A32 /* libNIMKit.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libNIMKit.a;
-			remoteRef = 61F16E911BC5689800ABEE57 /* PBXContainerItemProxy */;
+			remoteRef = 61F0877F1BE7775900293A32 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

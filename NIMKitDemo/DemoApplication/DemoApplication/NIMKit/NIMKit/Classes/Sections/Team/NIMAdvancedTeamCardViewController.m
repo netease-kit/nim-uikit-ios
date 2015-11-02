@@ -62,12 +62,13 @@
         [self addSubview:_createTimeLabel];
         
         self.backgroundColor = NIMKit_UIColorFromRGB(0xecf1f5);
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     }
     return self;
 }
 
 - (CGSize)sizeThatFits:(CGSize)size{
-    return CGSizeMake(NIMKit_UIScreenWidth, CardHeaderHeight);
+    return CGSizeMake(size.width, CardHeaderHeight);
 }
 
 - (NSString*)formartCreateTime{
@@ -153,7 +154,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     NIMAdvancedTeamCardHeaderView *headerView = [[NIMAdvancedTeamCardHeaderView alloc] initWithTeam:self.team];
-    [headerView sizeToFit];
+    headerView.nim_size = [headerView sizeThatFits:self.view.nim_size];
     self.navigationItem.title = self.team.teamName;
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -205,9 +206,11 @@
             }
             wself.memberData = members;
         }else if(error.code == NIMRemoteErrorCodeTeamNotMember){
-            [wself.view nimkit_makeToast:@"你已经不在群里"];
+            [wself.view nimkit_makeToast:@"你已经不在群里" duration:2
+                                position:NIMKitToastPositionCenter];
         }else{
-            [wself.view nimkit_makeToast:@"拉好友失败"];
+            [wself.view nimkit_makeToast:@"拉好友失败" duration:2
+                                position:NIMKitToastPositionCenter];
         }
         handler(error);
     }];
@@ -430,7 +433,7 @@
         cell = [[NIMAdvancedTeamMemberCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:TableMemberCellReuseId];
         cell.delegate = self;
     }
-    [cell rereshWithTeam:self.team members:self.memberData];
+    [cell rereshWithTeam:self.team members:self.memberData width:self.tableView.nim_width];
     cell.textLabel.text = bodyData.title;
     cell.detailTextLabel.text = bodyData.subTitle;
     if ([bodyData respondsToSelector:@selector(actionDisabled)] && bodyData.actionDisabled) {
@@ -456,7 +459,7 @@
 
 #pragma mark - Action
 - (void)onMore:(id)sender{
-    _moreActionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"转让群",@"转让群并退出",nil];
+    _moreActionSheet = [[UIActionSheet alloc] initWithTitle:@"请操作" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"转让群",@"转让群并退出",nil];
     [_moreActionSheet showInView:self.view];
 }
 
@@ -528,7 +531,9 @@
                                                  inTeam:[self.team teamId]
                                              completion:^(NSError *error) {
                                                  if (error) {
-                                                     [weakSelf.view nimkit_makeToast:@"修改失败"];
+                                                     [weakSelf.view nimkit_makeToast:@"修改失败"
+                                                                            duration:2
+                                                                            position:NIMKitToastPositionCenter];
                                                  }
                                                  [weakSelf reloadData];
                                              }];
@@ -562,9 +567,13 @@
     NSString *postscript = @"邀请你加入群组";
     [[NIMSDK sharedSDK].teamManager addUsers:selectedContacts toTeam:self.team.teamId postscript:postscript completion:^(NSError *error, NSArray *members) {
         if (!error) {
-            [self.view nimkit_makeToast:@"邀请成功"];
+            [self.view nimkit_makeToast:@"邀请成功"
+                               duration:2
+                               position:NIMKitToastPositionCenter];
         }else{
-            [self.view nimkit_makeToast:@"邀请失败"];
+            [self.view nimkit_makeToast:@"邀请失败"
+                               duration:2
+                               position:NIMKitToastPositionCenter];
         }
     }];
 }
@@ -604,10 +613,12 @@
                 [[NIMSDK sharedSDK].teamManager updateTeamName:name teamId:self.team.teamId completion:^(NSError *error) {
                     if (!error) {
                         self.team.teamName = name;
-                        [self.view nimkit_makeToast:@"修改成功"];
+                        [self.view nimkit_makeToast:@"修改成功" duration:2
+                                           position:NIMKitToastPositionCenter];
                         [self reloadData];
                     }else{
-                        [self.view nimkit_makeToast:@"修改失败"];
+                        [self.view nimkit_makeToast:@"修改失败" duration:2
+                                           position:NIMKitToastPositionCenter];
                     }
                 }];
             }
@@ -762,6 +773,26 @@
             
         }];
     }
+}
+
+
+#pragma mark - 旋转处理 (iOS7)
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+    [self.tableView reloadRowsAtIndexPaths:@[reloadIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+}
+
+#pragma mark - 旋转处理 (iOS8 or above)
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [self.tableView reloadRowsAtIndexPaths:@[reloadIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    } completion:nil];
 }
 
 

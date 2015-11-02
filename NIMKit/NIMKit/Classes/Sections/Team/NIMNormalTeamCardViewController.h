@@ -6,9 +6,9 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMTeamCardViewController.h"
+#import <UIKit/UIKit.h>
 
-@interface NIMNormalTeamCardViewController : NIMTeamCardViewController
+@interface NIMNormalTeamCardViewController : UIViewController
 
 - (instancetype)initWithTeam:(NIMTeam *)team;
 

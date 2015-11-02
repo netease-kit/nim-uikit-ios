@@ -66,9 +66,6 @@
         NSString *placeholder = [_inputConfig inputViewPlaceholder];
         _toolBar.inputTextView.placeHolder = placeholder;
     }
-    
-    
-    
     _moreContainer.config = config;
 }
 
@@ -169,6 +166,7 @@
         self.recordPhase = AudioRecordPhaseRecording;
     } else {
         [self.audioRecordIndicator removeFromSuperview];
+        self.recordPhase = AudioRecordPhaseEnd;
     }
     _recording = recording;
 }
@@ -260,11 +258,25 @@
 
 - (void)willShowKeyboardFromFrame:(CGRect)beginFrame toFrame:(CGRect)toFrame
 {
-    toFrame.origin.y -= _inputBottomViewHeight;
-    if (toFrame.origin.y == [[UIScreen mainScreen] bounds].size.height) {
-        [self willShowBottomHeight:0];
+    UIInterfaceOrientation orientation =
+    [[UIApplication sharedApplication] statusBarOrientation];
+    BOOL ios7 = ([[[UIDevice currentDevice] systemVersion] doubleValue] < 8.0);
+    //IOS7的横屏UIDevice的宽高不会发生改变，需要手动去调整
+    if (ios7 && (orientation == UIDeviceOrientationLandscapeLeft
+                 || orientation == UIDeviceOrientationLandscapeRight)) {
+        toFrame.origin.y -= _inputBottomViewHeight;
+        if (toFrame.origin.y == [[UIScreen mainScreen] bounds].size.width) {
+            [self willShowBottomHeight:0];
+        }else{
+            [self willShowBottomHeight:toFrame.size.width];
+        }
     }else{
-        [self willShowBottomHeight:toFrame.size.height];
+        toFrame.origin.y -= _inputBottomViewHeight;
+        if (toFrame.origin.y == [[UIScreen mainScreen] bounds].size.height) {
+            [self willShowBottomHeight:0];
+        }else{
+            [self willShowBottomHeight:toFrame.size.height];
+        }
     }
 }
 
@@ -313,7 +325,7 @@
         [self updateInputTopViewFrame:rect];
         
         if (self.toolBar.inputTextView.text.length) {
-            [self.toolBar.inputTextView setContentOffset:CGPointMake(0.0f, (self.toolBar.inputTextView.contentSize.height - self.toolBar.inputTextView.frame.size.height) / 2) animated:YES];
+            [self.toolBar.inputTextView setContentOffset:CGPointMake(0.0f, (self.toolBar.inputTextView.contentSize.height - self.toolBar.inputTextView.frame.size.height)) animated:YES];
         }
         _inputTextViewOlderHeight = toHeight;
         
@@ -326,6 +338,7 @@
 - (void)updateInputTopViewFrame:(CGRect)rect
 {
     self.toolBar.frame             = rect;
+    [self.toolBar layoutIfNeeded];
     self.moreContainer.nim_top     = self.toolBar.nim_bottom;
     self.emoticonContainer.nim_top = self.toolBar.nim_bottom;
 }
@@ -445,7 +458,13 @@
     BOOL endEditing = [super endEditing:force];
     if (![self.toolBar.inputTextView isFirstResponder]) {
         _inputBottomViewHeight = 0.0;
-        [self willShowBottomHeight:0.0];
+        _inputType = InputTypeText;
+        UIViewAnimationCurve curve = UIViewAnimationCurveEaseInOut;
+        void(^animations)() = ^{
+            [self willShowKeyboardFromFrame:CGRectZero toFrame:CGRectZero];
+        };
+        NSTimeInterval duration = 0.25;
+        [UIView animateWithDuration:duration delay:0.0f options:(curve << 16 | UIViewAnimationOptionBeginFromCurrentState) animations:animations completion:nil];
     }
     return endEditing;
 }

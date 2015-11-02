@@ -25,6 +25,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = NIMKit_UIColorFromRGBA(0x0, .5f);
+        self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         _bkgBtn = [UIButton buttonWithType:UIButtonTypeSystem];
         [_bkgBtn addTarget:self action:@selector(onActionTouchBkgBtn:) forControlEvents:UIControlEventTouchUpInside];
         _bkgBtn.frame = self.bounds;

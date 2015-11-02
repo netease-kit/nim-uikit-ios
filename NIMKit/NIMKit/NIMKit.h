@@ -17,7 +17,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <NIMKit/PublicHeader.h>
 
-#import "NIMSDK.h"
 
 /**
  *  基础Model
@@ -97,24 +96,26 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 @interface NIMKitInfo : NSObject
 /**
- *   id,如果是用户信息，为用户id；如果是群信息，为群id。不需要上层填写。
+ *   id,如果是用户信息，为用户id；如果是群信息，为群id
  */
 @property (nonatomic,copy) NSString *infoId;
 
 /**
- *  显示名，需要上层填写。
+ *  显示名
  */
 @property (nonatomic,copy)   NSString *showName;
 
+
+//如果avatarUrlString为nil，则显示头像图片
+//如果avatarUrlString不为nil,则将头像图片当做占位图，当下载完成后显示头像url指定的图片。
+
 /**
- *  头像url，需要上层填写。
- *  如果avatarUrlString为nil，则显示头像图片。
- *  如果avatarUrlString不为nil,则将头像图片当做占位图，当下载完成后显示头像url指定的图片。
+ *  头像url
  */
 @property (nonatomic,copy)   NSString *avatarUrlString;
 
 /**
- *  头像图片，需要上层填写。
+ *  头像图片
  */
 @property (nonatomic,strong) UIImage  *avatarImage;
 

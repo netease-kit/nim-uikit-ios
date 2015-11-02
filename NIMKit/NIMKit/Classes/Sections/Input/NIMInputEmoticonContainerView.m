@@ -77,7 +77,7 @@ NSInteger CustomPageViewHeight    = 159;
     CGFloat originalWidth = self.frame.size.width;
     [super setFrame:frame];
     if (originalWidth != frame.size.width) {
-        [self reloadData];
+        self.tabView.emoticonCatalogs = [self reloadData];
     }
 }
 

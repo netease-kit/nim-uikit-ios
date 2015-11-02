@@ -134,7 +134,7 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param teamId 群组ID
  *  @param block  完成后的block回调
  */
-- (void)dismissTeam:(NSString*)teamId
+- (void)dismissTeam:(NSString *)teamId
          completion:(NIMTeamHandler)block;
 
 /**

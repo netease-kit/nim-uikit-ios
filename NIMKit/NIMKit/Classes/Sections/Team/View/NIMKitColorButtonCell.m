@@ -28,7 +28,11 @@
 }
 
 - (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
-    return self;
+    CGRect buttonRect = self.button.frame;
+    if(CGRectContainsPoint(buttonRect, point)){
+        return self;
+    }
+    return [super hitTest:point withEvent:event];
 }
 
 
