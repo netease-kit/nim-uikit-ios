@@ -20,5 +20,6 @@
 @property(nonatomic,weak) id<NIMAdvancedTeamMemberCellActionDelegate>delegate;
 
 - (void)rereshWithTeam:(NIMTeam*)team
-               members:(NSArray*)members;
+               members:(NSArray*)members
+                 width:(CGFloat)width;
 @end

@@ -199,7 +199,7 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
 /**
  *  从本地获取用户资料
  *
- *  @param users 用户id
+ *  @param  userId 用户id
  *
  *  @return NIMUser
  *

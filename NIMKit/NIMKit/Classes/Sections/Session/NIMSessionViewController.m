@@ -39,6 +39,7 @@ NIMUserManagerDelegate>
 @property (nonatomic,strong) NIMSessionViewLayoutManager *layoutManager;
 @property (nonatomic,strong) NIMSessionMsgDatasource *sessionDatasource;
 @property (nonatomic,readwrite)   NIMMessage *messageForMenu;
+@property (nonatomic,strong) NSIndexPath *lastVisibleIndexPathBeforeRotation;
 
 @end
 
@@ -130,20 +131,26 @@ NIMUserManagerDelegate>
     }
 }
 
+
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
-    [self.sessionInputView endEditing:YES];
 }
 
 
 - (void)viewDidLayoutSubviews{
     [self changeLeftBarBadge:[[NIMSDK sharedSDK] conversationManager].allUnreadCount];
+    BOOL isFirstLayout = CGRectEqualToRect(_layoutManager.viewRect, CGRectZero);
+    if (isFirstLayout) {
+        [self.tableView nim_scrollToBottom:NO];
+    }
     [_layoutManager setViewRect:self.view.frame];
-    [self.tableView nim_scrollToBottom:NO];
     self.sessionInputView.nim_bottom = self.view.nim_height;
+    [self.sessionDatasource cleanCache];
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource & UITableViewDelegate
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
@@ -406,11 +413,7 @@ NIMUserManagerDelegate>
         }
             break;
         case NIMSessionTypeP2P:{
-            if ([self.session.sessionId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
-                title = @"我的电脑";
-            }else{
-                title = [NIMKitUtil showNick:self.session.sessionId inSession:self.session];
-            }
+            title = [NIMKitUtil showNick:self.session.sessionId inSession:self.session];
         }
             break;
         default:
@@ -609,28 +612,40 @@ NIMUserManagerDelegate>
 }
 
 
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
+    return self.interfaceOrientation;
+}
+
 #pragma mark - 旋转处理 (iOS7)
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
                                 duration:(NSTimeInterval)duration
 {
-    [self.sessionDatasource cleanCache];
+    
+    self.lastVisibleIndexPathBeforeRotation = [self.tableView indexPathsForVisibleRows].lastObject;
+    if (self.view.window) {
+        [self.sessionInputView endEditing:YES];
+        [[NIMSDK sharedSDK].mediaManager cancelRecord];
+    }
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [self.tableView reloadData];
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    [self.tableView scrollToRowAtIndexPath:self.lastVisibleIndexPathBeforeRotation atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 #pragma mark - 旋转处理 (iOS8 or above)
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
+    self.lastVisibleIndexPathBeforeRotation = [self.tableView indexPathsForVisibleRows].lastObject;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
-     {
-         [self.sessionDatasource cleanCache];
-         [self.tableView reloadData];
-     } completion:nil];
+    if (self.view.window) {
+        __weak typeof(self) wself = self;
+        [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
+         {
+             [[NIMSDK sharedSDK].mediaManager cancelRecord];
+             [wself.tableView scrollToRowAtIndexPath:wself.lastVisibleIndexPathBeforeRotation atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+         } completion:nil];
+    }
 }
 
 

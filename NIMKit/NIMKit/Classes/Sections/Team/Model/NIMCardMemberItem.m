@@ -12,7 +12,7 @@
 #import "NIMKit.h"
 
 @interface NIMTeamCardMemberItem()
-@property (nonatomic,strong) NIMTeamMember *member;
+@property (nonatomic,readwrite,strong) NIMTeamMember *member;
 @property (nonatomic,copy)   NSString      *userId;
 @end;
 

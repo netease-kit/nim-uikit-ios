@@ -117,7 +117,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  删除某个会话的所有消息
  *
  *  @param session 待删除会话
- *  @param removeRecentSession 是否移除对应的会话项  YES则移除,NO则不移除，但会将所有会话项设置成已删除状态
+ *  @param removeRecentSession 是否移除对应的会话项  YES则移除,NO则不移除。
  */
 - (void)deleteAllmessagesInSession:(NIMSession *)session
                removeRecentSession:(BOOL)removeRecentSession;

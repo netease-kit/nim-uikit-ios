@@ -1,5 +1,5 @@
 //
-//  NTESCardDataSourceProtocol.h
+//  NIMCardDataSourceProtocol.h
 //  NIM
 //
 //  Created by chris on 15/3/5.
@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 typedef NS_ENUM(NSInteger, NIMKitCardHeaderOpeator){
-    CardHeaderOpeatorNone,
-    CardHeaderOpeatorAdd,
-    CardHeaderOpeatorRemove,
+    CardHeaderOpeatorNone   = 0,
+    CardHeaderOpeatorAdd    = (1UL << 0),
+    CardHeaderOpeatorRemove = (1UL << 1),
 };
 
 typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {

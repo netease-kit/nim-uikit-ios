@@ -46,7 +46,6 @@
     self.tableView.tableFooterView  = [[UIView alloc] init];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
-    
     if (!self.recentSessions.count) {
         _recentSessions = [NSMutableArray array];
     }
@@ -88,7 +87,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    NIMRecentSession * recentSession = self.recentSessions[indexPath.row];
+    NIMRecentSession *recentSession = self.recentSessions[indexPath.row];
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self onDeleteRecentAtIndexPath:recentSession atIndexPath:indexPath];
     }
@@ -128,25 +127,18 @@
 #pragma mark - NIMConversationManagerDelegate
 - (void)didAddRecentSession:(NIMRecentSession *)recentSession
            totalUnreadCount:(NSInteger)totalUnreadCount{
-    NSInteger find = [self findRecentSession:recentSession];
-    if (find >=0) {
-        [self.recentSessions removeObjectAtIndex:find];
-    }
-    NSInteger insert = [self findInsertPlace:recentSession];
-    [self.recentSessions insertObject:recentSession atIndex:insert];
+    [self.recentSessions addObject:recentSession];
+    [self sort];
     [self reload];
 }
 
 
 - (void)didUpdateRecentSession:(NIMRecentSession *)recentSession
               totalUnreadCount:(NSInteger)totalUnreadCount{
-    NSInteger find = [self findRecentSession:recentSession];
-    if (find >=0) {
-        [self.recentSessions removeObjectAtIndex:find];
-        NSInteger insert = [self findInsertPlace:recentSession];
-        [self.recentSessions insertObject:recentSession atIndex:insert];
-        [self reload];
-    }
+    [self.recentSessions removeObject:recentSession];
+    NSInteger insert = [self findInsertPlace:recentSession];
+    [self.recentSessions insertObject:recentSession atIndex:insert];
+    [self reload];
 }
 
 - (void)messagesDeletedInSession:(NIMSession *)session{
@@ -221,17 +213,6 @@
 }
 
 #pragma mark - Misc
-- (NSInteger)findRecentSession:(NIMRecentSession *)recentSession{
-    __block NSUInteger matchIdx = -1;
-    [self.recentSessions enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([recentSession isEqual:obj]) {
-            *stop = YES;
-            matchIdx = idx;
-        }
-    }];
-    return matchIdx;
-}
-
 
 - (NSInteger)findInsertPlace:(NIMRecentSession *)recentSession{
     __block NSUInteger matchIdx = 0;
@@ -249,6 +230,20 @@
     }else{
         return self.recentSessions.count;
     }
+}
+
+- (void)sort{
+    [self.recentSessions sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NIMRecentSession *item1 = obj1;
+        NIMRecentSession *item2 = obj2;
+        if (item1.lastMessage.timestamp < item2.lastMessage.timestamp) {
+            return NSOrderedDescending;
+        }
+        if (item1.lastMessage.timestamp > item2.lastMessage.timestamp) {
+            return NSOrderedAscending;
+        }
+        return NSOrderedSame;
+    }];
 }
 
 - (void)onTouchAvatar:(id)sender{

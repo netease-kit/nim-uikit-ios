@@ -87,8 +87,13 @@ typedef NS_ENUM(NSInteger, NIMTeamApplyStatus) {
 @property (nonatomic,copy)      NSString        *announcement;
 
 /**
- *  附言
- *  @discussion 当创建的群为高级群需要带上
+ *  客户端自定义信息
+ */
+@property (nonatomic,copy)      NSString        *clientCustomInfo;
+
+/**
+ *  邀请他人的附言
+ *  @discussion 当创建的群为高级群需要带上,普通群没有认证过程,所以不需要
  */
 @property (nonatomic,copy)      NSString        *postscript;
 
@@ -170,7 +175,7 @@ typedef NS_ENUM(NSInteger, NIMTeamApplyStatus) {
 
 
 /**
- *  群服务端自定义信息
+ *  群客户端自定义信息
  *  @discussion 应用方可以自行拓展这个字段做个性化配置,客户端可以修改这个字段
  */
 @property (nonatomic,copy,readonly)     NSString *clientCustomInfo;

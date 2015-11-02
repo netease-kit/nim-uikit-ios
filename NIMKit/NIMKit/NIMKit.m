@@ -87,7 +87,6 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
     if (_provider && [_provider respondsToSelector:@selector(infoByUser:)]) {
         member = [_provider infoByUser:userId];
     }
-    member.infoId = userId;
     return member;
 }
 
@@ -100,7 +99,6 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
     if (_provider && [_provider respondsToSelector:@selector(infoByTeam:)]) {
         member = [_provider infoByTeam:teamId];
     }
-    member.infoId = teamId;
     return member;
 }
 

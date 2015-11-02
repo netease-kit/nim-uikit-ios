@@ -91,7 +91,7 @@
     self.imageView.nim_left          = fileTransMessageIconLeft;
     self.imageView.nim_centerY       = self.nim_height * .5f;
 
-    if (self.nim_width < fileTransMessageIconLeft + self.titleLabel.nim_width + fileTransMessageSizeTitleRight) {
+    if (self.nim_width < fileTransMessageTitleLeft + self.titleLabel.nim_width + fileTransMessageSizeTitleRight) {
         self.titleLabel.nim_width = self.nim_width - fileTransMessageTitleLeft - fileTransMessageSizeTitleRight;
     }
     self.titleLabel.nim_left     = fileTransMessageTitleLeft;

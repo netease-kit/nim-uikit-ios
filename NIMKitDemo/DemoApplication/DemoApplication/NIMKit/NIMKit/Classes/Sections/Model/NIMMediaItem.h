@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 NetEase. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface NIMMediaItem : NSObject
 @property (nonatomic,assign)    NSInteger tag;

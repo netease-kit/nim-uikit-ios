@@ -75,7 +75,7 @@ NSString * const NIMKitToastPositionBottom          = @"bottom";
 #pragma mark - Toast Methods
 
 - (void)nimkit_makeToast:(NSString *)message {
-    [self nimkit_makeToast:message duration:NIMKitToastDefaultDuration position:nil];
+    [self nimkit_makeToast:message duration:NIMKitToastDefaultDuration position:NIMKitToastPositionCenter];
 }
 
 - (void)nimkit_makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position {

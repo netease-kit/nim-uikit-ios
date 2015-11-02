@@ -10,12 +10,6 @@
 
 @interface NIMTeamCardOperationItem()
 
-@property(nonatomic,copy)   NSString *title;
-
-@property(nonatomic,strong) UIImage  *imageNormal;
-
-@property(nonatomic,strong) UIImage  *imageHighLight;
-
 @property(nonatomic,assign) NIMKitCardHeaderOpeator opera;
 
 @end
