@@ -78,7 +78,7 @@ NIMUserManagerDelegate>
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarView];
     self.navigationItem.leftBarButtonItem = leftItem;
     self.navigationItem.leftItemsSupplementBackButton = YES;
-
+    
     self.view.backgroundColor = [UIColor whiteColor];
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     self.tableView.backgroundColor = NIMKit_UIColorFromRGB(0xe4e7ec);
@@ -103,6 +103,7 @@ NIMUserManagerDelegate>
         [self.sessionInputView setInputActionDelegate:self];
         [self.view addSubview:self.sessionInputView];
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
 }
 
 - (void)makeHandlerAndDataSource
@@ -122,7 +123,7 @@ NIMUserManagerDelegate>
     _sessionDatasource = [[NIMSessionMsgDatasource alloc] initWithSession:_session dataProvider:dataProvider showTimeInterval:showTimestampInterval limit:limit];
     _sessionDatasource.delegate = self;
     [_sessionDatasource resetMessages:nil];
-
+    
     [[[NIMSDK sharedSDK] chatManager] addDelegate:self];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:self];
     [[NIMSDK sharedSDK].userManager addDelegate:self];
@@ -226,7 +227,7 @@ NIMUserManagerDelegate>
         }else{
             [self uiAddMessages:@[message]];
         }
-
+        
     }
 }
 
@@ -376,9 +377,9 @@ NIMUserManagerDelegate>
     NIMMessageModel *model;
     for (NIMMessageModel *item in self.sessionDatasource.modelArray.reverseObjectEnumerator.allObjects) {
         if ([item isKindOfClass:[NIMMessageModel class]] && [item.message isEqual:message]) {
-           model = item;
-           //防止那种进了会话又退出去再进来这种行为，防止SDK里回调上来的message和会话持有的message不是一个，导致刷界面刷跪了的情况
-           model.message = message;
+            model = item;
+            //防止那种进了会话又退出去再进来这种行为，防止SDK里回调上来的message和会话持有的message不是一个，导致刷界面刷跪了的情况
+            model.message = message;
         }
     }
     return model;
@@ -585,6 +586,11 @@ NIMUserManagerDelegate>
     NIMMessageModel *model = [self makeModel:message];
     [self.layoutManager deleteCellAtIndexs:[self.sessionDatasource deleteMessageModel:model]];
     [[[NIMSDK sharedSDK] conversationManager] deleteMessage:model.message];
+}
+
+- (void)menuDidHide:(NSNotification *)notification
+{
+    [UIMenuController sharedMenuController].menuItems = nil;
 }
 
 
