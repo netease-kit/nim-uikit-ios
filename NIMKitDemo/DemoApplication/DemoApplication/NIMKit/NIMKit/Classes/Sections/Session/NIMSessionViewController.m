@@ -103,6 +103,7 @@ NIMUserManagerDelegate>
         [self.sessionInputView setInputActionDelegate:self];
         [self.view addSubview:self.sessionInputView];
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
 }
 
 - (void)makeHandlerAndDataSource
@@ -585,6 +586,11 @@ NIMUserManagerDelegate>
     NIMMessageModel *model = [self makeModel:message];
     [self.layoutManager deleteCellAtIndexs:[self.sessionDatasource deleteMessageModel:model]];
     [[[NIMSDK sharedSDK] conversationManager] deleteMessage:model.message];
+}
+
+- (void)menuDidHide:(NSNotification *)notification
+{
+    [UIMenuController sharedMenuController].menuItems = nil;
 }
 
 
