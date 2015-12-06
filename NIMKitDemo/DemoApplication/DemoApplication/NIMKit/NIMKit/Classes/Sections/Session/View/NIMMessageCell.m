@@ -344,7 +344,7 @@
 
 - (BOOL)unreadHidden {
     if (self.model.message.messageType == NIMMessageTypeAudio) { //音频
-        BOOL hideIcon = NO;
+        BOOL hideIcon = self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateDownloaded;
         if ([self.model.sessionConfig respondsToSelector:@selector(disableAudioPlayedStatusIcon)]) {
             hideIcon = [self.model.sessionConfig disableAudioPlayedStatusIcon];
         }

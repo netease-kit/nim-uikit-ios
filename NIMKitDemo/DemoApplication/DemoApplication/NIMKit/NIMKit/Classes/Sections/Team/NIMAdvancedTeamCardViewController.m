@@ -209,7 +209,7 @@
             [wself.view nimkit_makeToast:@"你已经不在群里" duration:2
                                 position:NIMKitToastPositionCenter];
         }else{
-            [wself.view nimkit_makeToast:@"拉好友失败" duration:2
+            [wself.view nimkit_makeToast:[NSString stringWithFormat:@"拉好友失败 error: %zd",error.code] duration:2
                                 position:NIMKitToastPositionCenter];
         }
         handler(error);
@@ -531,7 +531,7 @@
                                                  inTeam:[self.team teamId]
                                              completion:^(NSError *error) {
                                                  if (error) {
-                                                     [weakSelf.view nimkit_makeToast:@"修改失败"
+                                                     [weakSelf.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败  error:%zd",error.code]
                                                                             duration:2
                                                                             position:NIMKitToastPositionCenter];
                                                  }
@@ -571,7 +571,7 @@
                                duration:2
                                position:NIMKitToastPositionCenter];
         }else{
-            [self.view nimkit_makeToast:@"邀请失败"
+            [self.view nimkit_makeToast:[NSString stringWithFormat:@"邀请失败 code:%zd",error.code]
                                duration:2
                                position:NIMKitToastPositionCenter];
         }
@@ -617,7 +617,7 @@
                                            position:NIMKitToastPositionCenter];
                         [self reloadData];
                     }else{
-                        [self.view nimkit_makeToast:@"修改失败" duration:2
+                        [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code] duration:2
                                            position:NIMKitToastPositionCenter];
                     }
                 }];
@@ -643,7 +643,7 @@
                         [self.view nimkit_makeToast:@"修改成功"];
                         [self reloadData];
                     }else{
-                        [self.view nimkit_makeToast:@"修改失败"];
+                        [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
                     }
                 }];
             }
@@ -668,7 +668,7 @@
                         [self.view nimkit_makeToast:@"修改成功"];
                         [self reloadData];
                     }else{
-                        [self.view nimkit_makeToast:@"修改失败"];
+                        [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
                     }
                 }];
             }
@@ -688,7 +688,7 @@
                 if (!error) {
                     [self.navigationController popToRootViewControllerAnimated:YES];
                 }else{
-                    [self.view nimkit_makeToast:@"退出失败"];
+                    [self.view nimkit_makeToast:[NSString stringWithFormat:@"退出失败 code:%zd",error.code]];
                 }
             }];
             break;
@@ -708,7 +708,7 @@
                 if (!error) {
                     [self.navigationController popToRootViewControllerAnimated:YES];
                 }else{
-                    [self.view nimkit_makeToast:@"解散失败"];
+                    [self.view nimkit_makeToast:[NSString stringWithFormat:@"解散失败 code:%zd",error.code]];
                 }
             }];
             break;
@@ -745,7 +745,7 @@
                         [wself reloadData];
                     }
                 }else{
-                    [wself.view nimkit_makeToast:@"转移失败！" duration:2.0 position:NIMKitToastPositionCenter];
+                    [wself.view nimkit_makeToast:[NSString stringWithFormat:@"转移失败！code:%zd",error.code] duration:2.0 position:NIMKitToastPositionCenter];
                 }
             }];
         };
@@ -768,7 +768,7 @@
                 [self.view nimkit_makeToast:@"修改成功"];
                 [self reloadData];
             }else{
-                [self.view nimkit_makeToast:@"修改失败"];
+                [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
             }
             
         }];

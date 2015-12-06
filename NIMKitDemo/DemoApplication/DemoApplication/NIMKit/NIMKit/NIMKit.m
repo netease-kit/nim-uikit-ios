@@ -56,22 +56,24 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
     return instance;
 }
 
-- (void)notfiyUserInfoChanged:(NSString *)userId{
-    if (!userId.length) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:NIMKitUserInfoHasUpdatedNotification object:nil userInfo:nil];
+- (void)notfiyUserInfoChanged:(NSArray *)userIds{
+    if (!userIds.count) {
         return;
     }
-    NIMSession *session = [NIMSession session:userId type:NIMSessionTypeP2P];
-    [self.firer addFireInfo:session];
+    for (NSString *userId in userIds) {
+        NIMSession *session = [NIMSession session:userId type:NIMSessionTypeP2P];
+        [self.firer addFireInfo:session];
+    }
 }
 
-- (void)notfiyTeamInfoChanged:(NSString *)teamId{
-    if (!teamId.length) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:NIMKitTeamInfoHasUpdatedNotification object:nil userInfo:nil];
+- (void)notfiyTeamInfoChanged:(NSArray *)teamIds{
+    if (!teamIds.count) {
         return;
     }
-    NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
-    [self.firer addFireInfo:session];
+    for (NSString *teamId in teamIds) {
+        NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        [self.firer addFireInfo:session];
+    }
 }
 
 @end

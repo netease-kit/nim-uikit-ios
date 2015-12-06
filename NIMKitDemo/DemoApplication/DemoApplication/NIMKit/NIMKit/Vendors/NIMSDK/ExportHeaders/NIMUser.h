@@ -58,7 +58,17 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
 /**
  *  用户Id
  */
-@property (nonatomic,copy,readonly)   NSString    *userId;
+@property (nonatomic,copy)   NSString    *userId;
+
+/**
+ *  备注名，长度限制为128个字符。
+ */
+@property (nonatomic,copy)   NSString    *alias;
+
+/**
+ *  扩展字段，上层需要保证NSDictionary可以转换为JSON,JSON长度限制为256个字符。
+ */
+@property (nonatomic,copy)   NSDictionary  *ext;
 
 /**
  *  用户资料，仅当用户选择托管信息到云信时有效

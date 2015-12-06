@@ -4,7 +4,6 @@
 //
 //  Created by Netease.
 //  Copyright (c) 2015 Netease. All rights reserved.
-//  Version 1.5.0
 
 #import <Foundation/Foundation.h>
 #import "NIMSDKHeaders.h"

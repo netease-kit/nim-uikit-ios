@@ -86,8 +86,9 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     self.imageView.nim_centerX    = self.nim_width * .5f;
-    self.titleLabel.nim_width     = self.nim_width;
+    self.titleLabel.nim_width     = self.nim_width + 10;
     self.titleLabel.nim_bottom    = self.nim_height;
+    self.titleLabel.nim_centerX   = self.nim_width * .5f;
     [self.roleImageView sizeToFit];
     self.roleImageView.nim_bottom = self.imageView.nim_bottom;
     self.roleImageView.nim_right  = self.imageView.nim_right;

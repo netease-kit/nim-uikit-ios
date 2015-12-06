@@ -36,15 +36,19 @@ typedef NS_ENUM(NSInteger, NIMMessageType){
      */
     NIMMessageTypeLocation      = 4,
     /**
-     *  通知消息
+     *  通知类型消息
      */
     NIMMessageTypeNotification  = 5,
     /**
-     *  文件消息
+     *  文件类型消息
      */
     NIMMessageTypeFile          = 6,
     /**
-     *  自定义消息
+     *  提醒类型消息
+     */
+    NIMMessageTypeTip           = 10,
+    /**
+     *  自定义类型消息
      */
     NIMMessageTypeCustom        = 100
 };

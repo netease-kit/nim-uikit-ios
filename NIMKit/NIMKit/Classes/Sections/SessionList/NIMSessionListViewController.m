@@ -167,6 +167,10 @@
     [self reload];
 }
 
+- (void)onFriendChanged:(NIMUser *)user{
+    [self reload];
+}
+
 
 #pragma mark - Override
 - (void)onSelectedAvatar:(NSString *)userId
@@ -305,7 +309,12 @@
         return @"[视频聊天]";
     }
     if (object.notificationType == NIMNotificationTypeTeam) {
-        return @"[群信息更新]";
+        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:lastMessage.session.sessionId];
+        if (team.type == NIMTeamTypeNormal) {
+            return @"[讨论组信息更新]";
+        }else{
+            return @"[群信息更新]";
+        }
     }
     return @"[未知消息]";
 }

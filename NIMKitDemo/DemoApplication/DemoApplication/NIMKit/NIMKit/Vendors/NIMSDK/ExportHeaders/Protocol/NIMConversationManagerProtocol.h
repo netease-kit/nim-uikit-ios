@@ -155,7 +155,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  @param message 需要更新的消息
  *  @param session 需要更新的会话
  *  @param completion 完成后的回调
- *  @discussion 目前只支持自定义消息(NIMMessageTypeCustom)
+ *  @discussion 为了保证存储消息的完整性,提供给上层调用的消息更新接口只允许更新如下字段:所有消息的本地拓展字段(LocalExt)和自定义消息的消息对象(messageObject)
  */
 - (void)updateMessage:(NIMMessage *)message
            forSession:(NIMSession *)session
@@ -168,7 +168,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  @param message 需要更新的消息
  *  @param session 需要更新西消息
  *  @param completion 完成后的回调
- *  @discussion 当保存消息成功之后，会收到 NIMChatManagerDelegate 中的 onRecvMessages: 回调。目前支持消息类型:NIMMessageTypeText,NIMMessageTypeCustom
+ *  @discussion 当保存消息成功之后，会收到 NIMChatManagerDelegate 中的 onRecvMessages: 回调。目前支持消息类型:NIMMessageTypeText,NIMMessageTypeTip,NIMMessageTypeCustom
  */
 - (void)saveMessage:(NIMMessage *)message
          forSession:(NIMSession *)session
@@ -184,11 +184,24 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  @param message 当前最早的消息,没有则传入nil
  *  @param limit   个数限制
  *
- *  @return 消息列表
+ *  @return 消息列表，按时间从小到大排列
  */
-- (NSArray*)messagesInSession:(NIMSession *)session
+- (NSArray *)messagesInSession:(NIMSession *)session
                       message:(NIMMessage *)message
                         limit:(NSInteger)limit;
+
+
+/**
+ *  根据消息Id获取消息
+ *
+ *  @param session    消息所属会话结合
+ *
+ *  @param messageIds 消息Id集合
+ *
+ *  @return 消息列表,按时间从小到大排列
+ */
+- (NSArray *)messagesInSession:(NIMSession *)session
+                    messageIds:(NSArray *)messageIds;
 
 /**
  *  获取所有未读数

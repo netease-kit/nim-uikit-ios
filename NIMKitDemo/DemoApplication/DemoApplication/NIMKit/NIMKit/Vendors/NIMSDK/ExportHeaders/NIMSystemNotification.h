@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "NIMSession.h"
 #import "NIMUser.h"
+#import "NIMCustomSystemNotificationSetting.h"
 
 /**
  *  系统通知类型
@@ -38,7 +39,7 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
     
 };
 
-
+#pragma mark - 系统通知
 /**
  *  系统通知
  */
@@ -102,6 +103,18 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 
 
 /**
+ *  系统通知过滤器
+ */
+@interface NIMSystemNotificationFilter : NSObject
+/**
+ *  类型列表
+ */
+@property (nonatomic,strong)    NSArray     *notificationTypes;
+@end
+
+
+#pragma mark - 自定义系统通知
+/**
  *  自定义系统消息
  */
 @interface NIMCustomSystemNotification : NSObject
@@ -143,6 +156,19 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
  *  @discussion 默认为nil,用户可以设置当前通知的推送文案
  */
 @property (nonatomic,copy)                  NSString *apnsContent;
+
+
+/**
+ *  apns推送Payload
+ *  @discussion 可以通过这个字段定义自定义通知的推送Payload,支持字段参考苹果技术文档,最多支持2K
+ */
+@property (nonatomic,copy)                  NSDictionary *apnsPayload;
+
+/**
+ *  自定义系统通知设置
+ *  @discussion 可以通过这个字段制定当前通知的各种设置,如是否需要计入推送未读，是否需要带推送前缀等等
+ */
+@property (nonatomic,strong)                NIMCustomSystemNotificationSetting *setting;
 
 
 - (instancetype)initWithContent:(NSString *)content;

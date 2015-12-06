@@ -25,6 +25,7 @@ typedef void(^NIMUserBlock)(NSError *error);
 typedef void(^NIMUserInfoBlock)(NSArray *users,NSError *error);
 
 
+
 /**
  *  用户信息修改字段
  */
@@ -210,6 +211,19 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
  *                                    3.程序再次启动，此时会同步好友信息
  */
 - (NIMUser *)userInfo:(NSString *)userId;
+
+
+/**
+ *  修改自己与目标用户的关系
+ *
+ *  @param user  目标用户
+ *  @param block 修改结果回调
+ *  @discussion  这个接口提供了备注名的修改以及一些扩展。这些值是基于当前用户和目标用户关系的，
+ *               同一个目标用户的的属性字段会随着登录用户的改变而改变。
+ *
+ */
+- (void)updateUser:(NIMUser *)user
+        completion:(NIMUserBlock)block;
 
 
 /**

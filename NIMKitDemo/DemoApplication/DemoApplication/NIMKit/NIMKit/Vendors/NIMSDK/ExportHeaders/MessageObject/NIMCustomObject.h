@@ -26,15 +26,7 @@
  具体可以参考 DEMO 中阅后即焚的实现
  
 服务器配置:
- 为了满足更丰富的用户场景，自定义消息的服务器存储也做了不同的配置：
- 
- 1.- (BOOL)messageHistoryEnabled  是否支持在消息历史中拉取当前这条消息,默认为YES。正常而言所有消息都会出现在通过 NIMConversationManager 调用(fetchMessageHistory:option:result:)返回的结果中，但是可以通过设置这个值来使得消息不出现在这其中。
- 
- 2.- (BOOL)meessageRoamingEnabled 是否支持消息漫游，默认为YES。消息漫游的概念是指一定时间内发送的消息可以在另一端被同步到，以保证最大限度的消息同步。
- 
- 3.- (BOOL)messageSyncEnabled 是否支持多端消息同步，默认为YES。在默认情况下，如果用户在 iOS端和其他端（如PC）同时登录一个帐号，那么iOS 端发送的消息会被同步到其他端，同样其他端发送的消息也会被同步到 iOS 端。但是需要注意的是因为 iOS 经常会退到后台，所以其他端发送的消息在 iOS 断线后是通过漫游消息来同步到的。
- 
- 以阅后即焚为例，一般而言为了保证阅后即焚的消息的安全，可以设置为不支持消息历史拉取和不支持漫游，这样用户就无法通过一些极端手段重新查看到当前消息，如重装 APP 后会漫游到已经阅后即焚的消息。
+此处API已废弃，参考NIMMessageSetting
 
  */
 
@@ -89,15 +81,16 @@
  *
  *  @return 附件url
  */
-- (NSString *)attachmentURLStringForDownload;
-
+- (NSString *)attachmentURLStringForDownloading;
 
 /**
- *  更新附件本地存储路径
+ *  需要下载的附件本地路径
  *
- *  @param path 下载的附件存储路径
+ *  @return 附件本地路径
+ *  @discussion 上层需要保证路径的
  */
-- (void)downloadAttachmentPath:(NSString *)path;
+- (NSString *)attachmentPathForDownloading;
+
 
 #pragma mark - 服务器存储相关接口
 /**
@@ -105,21 +98,21 @@
  *
  *  @return 是否允许在消息历史中拉取
  */
-- (BOOL)messageHistoryEnabled;
+- (BOOL)messageHistoryEnabled __deprecated_msg("Method deprecated. Use ‘historyEnabled’ in NIMMessageSetting");
 
 /**
  *  是否支持漫游
  *
  *  @return 是否支持漫游
  */
-- (BOOL)messageRoamingEnabled;
+- (BOOL)messageRoamingEnabled __deprecated_msg("Method deprecated. Use ‘roamingEnabled’ in NIMMessageSetting");
 
 /**
  *  是否支持多端同步
  *
  *  @return 是否支持多端同步
  */
-- (BOOL)messageSyncEnabled;
+- (BOOL)messageSyncEnabled __deprecated_msg("Method deprecated. Use ‘syncEnabled’ in NIMMessageSetting");
 @end
 
 
