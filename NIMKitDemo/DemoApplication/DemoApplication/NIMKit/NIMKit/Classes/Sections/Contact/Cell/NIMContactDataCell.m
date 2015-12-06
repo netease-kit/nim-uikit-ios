@@ -53,7 +53,6 @@
 
 - (void)refreshTitle:(NSString *)title{
     self.textLabel.text = title;
-    [self.textLabel sizeToFit];
 }
 
 - (void)refreshAvatar:(NIMKitInfo *)info{
@@ -84,6 +83,9 @@
 
 - (void)layoutSubviews{
     [super layoutSubviews];
+    CGFloat scale = self.nim_width / 320;
+    CGFloat maxTextLabelWidth = 210 * scale;
+    self.textLabel.nim_width = MIN(self.textLabel.nim_width, maxTextLabelWidth);
     self.accessoryBtn.nim_left = NIMContactAccessoryLeft;
     self.accessoryBtn.nim_centerY = self.nim_height * .5f;
     self.avatarImageView.nim_left = self.accessoryBtn.hidden ? NIMContactAvatarLeft : NIMContactAvatarAndAccessorySpacing + self.accessoryBtn.nim_right;

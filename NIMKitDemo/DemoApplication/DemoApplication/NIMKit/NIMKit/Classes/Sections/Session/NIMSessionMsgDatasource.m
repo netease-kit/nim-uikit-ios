@@ -157,7 +157,7 @@
 }
 
 
-- (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index,  NSError *error))handler
+- (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler
 {
     __block NIMMessageModel *currentOldestMsg = nil;
     [_modelArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -175,7 +175,7 @@
                 NIMKit_Dispatch_Async_Main(^{
                     NSInteger index = [wself insertMessages:messages];
                     if (handler) {
-                        handler(index,error);
+                        handler(index,messages,error);
                     }
                 });
             }];
@@ -187,12 +187,16 @@
                                                                                     message:currentOldestMsg.message
                                                                                       limit:self.messageLimit];
             index = [self insertMessages:messages];
-            
+            if (handler) {
+                NIMKit_Dispatch_Async_Main(^{
+                    handler(index,messages,nil);
+                });
+            }
         }
     }
     if (handler) {
         NIMKit_Dispatch_Async_Main(^{
-            handler(index,nil);
+            handler(index,nil,nil);
         });
     }
 }

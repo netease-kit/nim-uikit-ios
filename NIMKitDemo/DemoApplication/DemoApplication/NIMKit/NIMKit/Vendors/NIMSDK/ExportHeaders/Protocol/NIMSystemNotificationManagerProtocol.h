@@ -11,6 +11,7 @@
 @class NIMSession;
 @class NIMSystemNotification;
 @class NIMCustomSystemNotification;
+@class NIMSystemNotificationFilter;
 
 /**
  *  系统通知block
@@ -37,7 +38,7 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
 /**
  *  系统通知数量变化
  *
- *  @param unreadCount 未读数目
+ *  @param unreadCount 总系统通知未读数目
  */
 - (void)onSystemNotificationCountChanged:(NSInteger)unreadCount;
 
@@ -69,12 +70,35 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
 - (NSArray *)fetchSystemNotifications:(NIMSystemNotification *)notification
                                 limit:(NSInteger)limit;
 
+
+/**
+ *  获取本地存储的系统通知
+ *
+ *  @param notification 当前最早系统消息,没有则传入nil
+ *  @param limit        最大获取数
+ *  @param filter       过滤器
+ *
+ *  @return 系统消息列表
+ */
+- (NSArray *)fetchSystemNotifications:(NIMSystemNotification *)notification
+                                limit:(NSInteger)limit
+                               filter:(NIMSystemNotificationFilter *)filter;
+
 /**
  *  未读系统消息数
  *
  *  @return 未读系统消息数
  */
 - (NSInteger)allUnreadCount;
+
+/**
+ *  未读系统消息数
+ *
+ *  @param filter 过滤器
+ *
+ *  @return 未读系统消息数
+ */
+- (NSInteger)allUnreadCount:(NIMSystemNotificationFilter *)filter;
 
 /**
  *  删除单条系统消息
@@ -88,6 +112,14 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  */
 - (void)deleteAllNotifications;
 
+
+/**
+ *  删除所有命中过滤器的系统消息
+ *
+ *  @param filter 过滤器
+ */
+- (void)deleteAllNotifications:(NIMSystemNotificationFilter *)filter;
+
 /**
  *  标记单条系统消息为已读
  *
@@ -100,12 +132,19 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  */
 - (void)markAllNotificationsAsRead;
 
+/**
+ *  标记所有命中过滤器的系统消息为已读
+ *
+ *  @param filter 过滤器
+ */
+- (void)markAllNotificationsAsRead:(NIMSystemNotificationFilter *)filter;
+
 
 /**
- *  发送系统通知
+ *  发送自定义系统通知
  *
  *  @param notification 系统通知
- *  @param session 接收方
+ *  @param session      接收方
  *  @param completion   发送结果回调
  *
  */

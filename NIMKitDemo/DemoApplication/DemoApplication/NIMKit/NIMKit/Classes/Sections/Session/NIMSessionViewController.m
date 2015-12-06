@@ -55,6 +55,7 @@ NIMUserManagerDelegate>
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationController.interactivePopGestureRecognizer.delaysTouchesBegan = NO;
     [self makeUI];
     [self makeHandlerAndDataSource];
 }
@@ -103,6 +104,7 @@ NIMUserManagerDelegate>
         [self.sessionInputView setInputActionDelegate:self];
         [self.view addSubview:self.sessionInputView];
     }
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
 }
 
@@ -123,13 +125,23 @@ NIMUserManagerDelegate>
     _sessionDatasource = [[NIMSessionMsgDatasource alloc] initWithSession:_session dataProvider:dataProvider showTimeInterval:showTimestampInterval limit:limit];
     _sessionDatasource.delegate = self;
     [_sessionDatasource resetMessages:nil];
+    
+    NSMutableArray *messageArray = [[NSMutableArray alloc] init];
+    for (id model in _sessionDatasource.modelArray) {
+        if ([model isKindOfClass:[NIMMessageModel class]]) {
+            [messageArray addObject:[model message]];
+        }
+    }
+    [self checkAttachmentState:messageArray];
 
     [[[NIMSDK sharedSDK] chatManager] addDelegate:self];
     [[[NIMSDK sharedSDK] conversationManager] addDelegate:self];
-    [[NIMSDK sharedSDK].userManager addDelegate:self];
     if (self.session.sessionType == NIMSessionTypeTeam) {
         [[[NIMSDK sharedSDK] teamManager] addDelegate:self];
     }
+    
+    [[NIMSDK sharedSDK].userManager addDelegate:self];
+
 }
 
 
@@ -148,6 +160,14 @@ NIMUserManagerDelegate>
     self.sessionInputView.nim_bottom = self.view.nim_height;
     [self.sessionDatasource cleanCache];
     [self.tableView reloadData];
+}
+
+- (void)checkAttachmentState:(NSArray *)messages{
+    for (NIMMessage *message in messages) {
+        if (message.attachmentDownloadState == NIMMessageAttachmentDownloadStateNeedDownload) {
+            [[NIMSDK sharedSDK].chatManager fetchMessageAttachment:message error:nil];
+        }
+    }
 }
 
 #pragma mark - UITableViewDataSource & UITableViewDelegate
@@ -253,7 +273,8 @@ NIMUserManagerDelegate>
 //接收消息
 - (void)onRecvMessages:(NSArray *)messages
 {
-    NIMSession *session = [[messages firstObject] session];
+    NIMMessage *message = messages.firstObject;
+    NIMSession *session = message.session;
     if (![session isEqual:self.session] || !messages.count){
         return;
     }
@@ -310,7 +331,7 @@ NIMUserManagerDelegate>
 }
 
 - (void)changeLeftBarBadge:(NSInteger)unreadCount{
-    NIMCustomLeftBarView *leftBarView = (NIMCustomLeftBarView*)self.navigationItem.leftBarButtonItem.customView;
+    NIMCustomLeftBarView *leftBarView = (NIMCustomLeftBarView *)self.navigationItem.leftBarButtonItem.customView;
     leftBarView.badgeView.badgeValue = @(unreadCount).stringValue;
     leftBarView.badgeView.hidden = !unreadCount;
 }
@@ -337,6 +358,13 @@ NIMUserManagerDelegate>
     self.navigationItem.title = [self sessionTitle];
     [self.tableView reloadData];
 }
+
+- (void)onFriendChanged:(NIMUser *)user{
+    self.navigationItem.title = [self sessionTitle];
+    [self.tableView reloadData];
+}
+
+
 
 #pragma mark - Touch Event
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -390,9 +418,11 @@ NIMUserManagerDelegate>
 {
     __weak NIMSessionViewLayoutManager *layoutManager = self.layoutManager;
     __weak UIRefreshControl *refreshControl = self.refreshControl;
-    [self.sessionDatasource loadHistoryMessagesWithComplete:^(NSInteger index, NSError *error) {
+    __weak typeof(self) wself = self;
+    [self.sessionDatasource loadHistoryMessagesWithComplete:^(NSInteger index,NSArray *memssages, NSError *error) {
         [layoutManager reloadDataToIndex:index withAnimation:NO];
         [refreshControl endRefreshing];
+        [wself checkAttachmentState:memssages];
     }];
 }
 #pragma marlk - 通知
@@ -425,10 +455,8 @@ NIMUserManagerDelegate>
 
 #pragma mark - NIMMediaManagerDelegate
 - (void)recordAudio:(NSString *)filePath didBeganWithError:(NSError *)error {
-    if (filePath && error == nil) {
-        _sessionInputView.recording = YES;
-    }
-    else{
+    if (!filePath || error) {
+        _sessionInputView.recording = NO;
         [self onRecordFailed:error];
     }
 }
@@ -495,6 +523,7 @@ NIMUserManagerDelegate>
 
 - (void)onStartRecording
 {
+    _sessionInputView.recording = YES;
     [[NIMSDK sharedSDK].mediaManager recordAudioForDuration:60.f
                                                withDelegate:self];
 }

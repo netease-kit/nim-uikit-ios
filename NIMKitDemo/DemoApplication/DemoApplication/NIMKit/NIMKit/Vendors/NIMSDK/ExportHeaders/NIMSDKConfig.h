@@ -21,6 +21,13 @@
  */
 + (instancetype)sharedConfig;
 
+
+/**
+ *  是否在收到消息后自动下载附件
+ *  @discussion 默认为YES,SDK会在第一次收到消息是直接下载消息附件,上层开发可以根据自己的需要进行设置
+ */
+@property (nonatomic,assign)    BOOL    fetchAttachmentAutomaticallyAfterReceiving;
+
 /**
  *  设置 SDK 根目录
  *

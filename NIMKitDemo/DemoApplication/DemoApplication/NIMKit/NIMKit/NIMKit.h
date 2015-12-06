@@ -18,6 +18,8 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <NIMKit/PublicHeader.h>
 
 
+#import "NIMSDK.h"
+
 /**
  *  基础Model
  */
@@ -75,14 +77,14 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *
  *  @param userId 用户id
  */
-- (void)notfiyUserInfoChanged:(NSString *)userId;
+- (void)notfiyUserInfoChanged:(NSArray *)userIds;
 
 /**
  *  群信息变更通知接口
  *
  *  @param teamId 群id
  */
-- (void)notfiyTeamInfoChanged:(NSString *)teamId;
+- (void)notfiyTeamInfoChanged:(NSArray *)teamIds;
 
 @end
 

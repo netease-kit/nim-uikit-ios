@@ -164,25 +164,27 @@
             }
         }
         NSString *targetText = [targets count] > 1 ? [targets componentsJoinedByString:@","] : [targets firstObject];
+        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:message.session.sessionId];
+        NSString *teamName = team.type == NIMTeamTypeNormal ? @"讨论组" : @"群";
         switch (content.operationType) {
             case NIMTeamOperationTypeInvite:{
                 NSString *str = [NSString stringWithFormat:@"%@邀请%@",source,targets.firstObject];
                 if (targets.count>1) {
                     str = [str stringByAppendingFormat:@"等%zd人",targets.count];
                 }
-                str = [str stringByAppendingFormat:@"进入了群聊"];
+                str = [str stringByAppendingFormat:@"进入了%@",teamName];
                 formatedMessage = str;
             }
                 break;
             case NIMTeamOperationTypeDismiss:
-                formatedMessage = [NSString stringWithFormat:@"%@解散了群聊",source];
+                formatedMessage = [NSString stringWithFormat:@"%@解散了%@",source,teamName];
                 break;
             case NIMTeamOperationTypeKick:{
                 NSString *str = [NSString stringWithFormat:@"%@将%@",source,targets.firstObject];
                 if (targets.count>1) {
                     str = [str stringByAppendingFormat:@"等%zd人",targets.count];
                 }
-                str = [str stringByAppendingFormat:@"移出了群聊"];
+                str = [str stringByAppendingFormat:@"移出了%@",teamName];
                 formatedMessage = str;
             }
                 break;
@@ -196,16 +198,16 @@
                         NIMTeamUpdateTag tag = [[[teamAttachment.values allKeys] firstObject] integerValue];
                         switch (tag) {
                             case NIMTeamUpdateTagName:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了群名称",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称",source,teamName];
                                 break;
                             case NIMTeamUpdateTagIntro:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了群介绍",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍",source,teamName];
                                 break;
                             case NIMTeamUpdateTagAnouncement:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了群公告",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告",source,teamName];
                                 break;
                             case NIMTeamUpdateTagJoinMode:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了群验证方式",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式",source,teamName];
                                 break;
                             default:
                                 break;
@@ -214,19 +216,19 @@
                     }
                 }
                 if (formatedMessage == nil){
-                    formatedMessage = [NSString stringWithFormat:@"%@更新了群信息",source];
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
                 }
             }
                 break;
             case NIMTeamOperationTypeLeave:
-                formatedMessage = [NSString stringWithFormat:@"%@离开了群聊",source];
+                formatedMessage = [NSString stringWithFormat:@"%@离开了%@",source,teamName];
                 break;
             case NIMTeamOperationTypeApplyPass:{
                 if ([source isEqualToString:targetText]) {
                     //说明是以不需要验证的方式进入
-                    formatedMessage = [NSString stringWithFormat:@"%@进入了群聊",source];
+                    formatedMessage = [NSString stringWithFormat:@"%@进入了%@",source,teamName];
                 }else{
-                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的入群申请",source,targetText];
+                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的申请",source,targetText];
                 }
             }
                 break;
