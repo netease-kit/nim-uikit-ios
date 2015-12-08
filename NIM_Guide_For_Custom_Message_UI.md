@@ -106,7 +106,7 @@
 @end
 ```
 
-3.将创建好的布局配置填入[第一节](/NIM_Guide_For_Custom_Message.md#NIMSessionConfig)配置的 `SessionConfig` 中。
+3.将创建好的布局配置填入[定制自定义消息教程](/NIM_Guide_For_Custom_Message.md#NIMSessionConfig)配置的 `SessionConfig` 中。
 
 ```objc
 @interface SessionConfig : NSObject<NIMSessionConfig>
