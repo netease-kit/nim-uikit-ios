@@ -51,6 +51,12 @@
   **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
   	
   **注<sup>2</sup> ：请注意c++库的版本号，务必保证为 6.0.9 。**
+  
+  
+  添加后如图所示：
+  
+  <img src="./Images/iOS/nimkit_init_5.jpg" width="600" height="250" />
+  
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
 
