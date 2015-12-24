@@ -55,7 +55,7 @@
   
   添加后如图所示：
   
-  <img src="./Images/iOS/nimkit_init_5.jpg" width="600" height="270" />
+  <img src="./Images/iOS/nimkit_init_5.jpg" width="600" height="290" />
   
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
