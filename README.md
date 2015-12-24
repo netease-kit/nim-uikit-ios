@@ -25,12 +25,17 @@
    <img src="./Images/iOS/nimkit_init_1.jpg" width="250" height="160" />
 
 
-*  添加  `NIMSDK` 静态库 到 `NIMKit` 中，示例如图：
+*  添加  `NIMSDK` 静态库 到 `NIMKit` 工程中，示例如图：
         
    <img src="./Images/iOS/nimkit_init_2.jpg" width="250" height="110" />
+   
+ 
+* 在 `NIMKit` 工程中，打开 `Build Phases` 选项，展开 `Link Binary With Libraries` 选项卡。添加 `libNIMSDK.a` 库如图：
 
+   <img src="./Images/iOS/nimkit_init_4.jpg" width="430" height="110" />
+   
 
-* 在您的工程中，添加必要的依赖项
+* 在 **您自己的工程** 中，打开 `Build Phases` 选项，展开 `Link Binary With Libraries` 选项卡。添加必要的依赖项：
 	* CoreText.framework
 	* CoreTelephony.framework
 	* AVFoundation.framework
@@ -38,12 +43,14 @@
 	* SystemConfiguration.framework
 	* AudioToolbox.framework
 	* CoreMedia.framework
-	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup>
+	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup><sup> 注<sup>2</sup> </sup>
 	* libsqlite3.0.tbd  <sup> 注<sup>1</sup> </sup>
 	* libz.tbd  <sup> 注<sup>1</sup> </sup>
 	* libNIMKit.a
 	
   **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
+  	
+  **注<sup>2</sup> ：请注意c++库的版本号，务必保证为 6.0.9 。**
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
 
@@ -56,7 +63,7 @@
 	
 * 在工程中添加 `NIMKitResouce.bundle`
 
-* 在需要的地方导入头文件 `NIMKit.h`
+* 在需要使用到组件的地方导入头文件 `NIMKit.h`
 
 * 新建一个 SessionViewController，从 NIMSessionViewController 进行继承 (此时运行将可以得到一个简单的会话界面)
 
