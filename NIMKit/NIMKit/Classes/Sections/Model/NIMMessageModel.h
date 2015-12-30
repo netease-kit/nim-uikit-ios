@@ -19,12 +19,12 @@
 /**
  *  消息对应的布局配置
  */
-@property (nonatomic,strong) id<NIMCellLayoutConfig> layoutConfig;
+@property (nonatomic,weak) id<NIMCellLayoutConfig> layoutConfig;
 
 /**
  *  消息对应的session配置
  */
-@property (nonatomic,strong) id<NIMSessionConfig>  sessionConfig;
+@property (nonatomic,weak) id<NIMSessionConfig>  sessionConfig;
 
 @property (nonatomic, readonly) CGSize     contentSize;
 
