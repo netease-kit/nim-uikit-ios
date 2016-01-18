@@ -47,8 +47,8 @@
     CGFloat otherNickNameHeight          = 20;
     CGFloat otherBubbleOriginX           = 55;
     CGFloat cellBubbleButtomToCellButtom = 13;
-    if (model.message.session.sessionType == NIMSessionTypeTeam) {
-        //要显示名字。。
+    if ([self shouldShowNickName:model]) {
+        //要显示名字
         return UIEdgeInsetsMake(cellTopToBubbleTop + otherNickNameHeight ,otherBubbleOriginX,cellBubbleButtomToCellButtom, 0);
     }
     return UIEdgeInsetsMake(cellTopToBubbleTop,otherBubbleOriginX,cellBubbleButtomToCellButtom, 0);

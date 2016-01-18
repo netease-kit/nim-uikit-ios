@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "NIMGlobalDefs.h"
 
+@class NIMNetCallOption;
+
 /**
  *  发起通话Block
  *
@@ -115,6 +117,17 @@ typedef NS_ENUM(NSInteger, NIMNetCallControlType){
      *  收到呼叫请求的反馈，通常用于被叫告诉主叫可以播放回铃音了
      */
     NIMNetCallControlTypeFeedabck       = 12,
+    
+    /**
+     *  开始本地录制
+     */
+    NIMNetCallControlTypeStartLocalRecord = 13,
+    
+    /**
+     *  结束本地录制
+     */
+    NIMNetCallControlTypeStopLocalRecord = 14,
+
 };
 
 /**
@@ -144,10 +157,12 @@ typedef NS_ENUM(NSInteger, NIMNetCallCamera){
  *  @param callID call id
  *  @param caller 主叫帐号
  *  @param type   呼叫类型
+ *  @param extendMessage   扩展消息, 透传主叫发起通话时携带的该信息
  */
 - (void)onReceive:(UInt64)callID
              from:(NSString *)caller
-             type:(NIMNetCallType)type;
+             type:(NIMNetCallType)type
+          message:(NSString *)extendMessage;
 
 /**
  *  主叫收到被叫响应
@@ -235,6 +250,34 @@ typedef NS_ENUM(NSInteger, NIMNetCallCamera){
  */
 - (void)onRemoteImageReady:(CGImageRef)image;
 
+/**
+ *  本地录制成功开始
+ *
+ *  @param callID  录制的相关网络通话的call id
+ *  @param fileURL 录制的文件路径
+ */
+- (void)onLocalRecordStarted:(UInt64)callID
+                     fileURL:(NSURL *)fileURL;
+
+/**
+ *  本地录制发生了错误
+ *
+ *  @param error  错误
+ *  @param callID 录制错误相关网络通话的call id
+ */
+- (void)onLocalRecordError:(NSError *)error
+                    callID:(UInt64)callID;
+
+/**
+ *  本地录制成功结束
+ *
+ *  @param callID  录制的相关网络通话的call id
+ *  @param fileURL 录制的文件路径
+ */
+- (void) onLocalRecordStopped:(UInt64)callID
+                      fileURL:(NSURL *)fileURL;
+
+
 @end
 
 /**
@@ -243,28 +286,31 @@ typedef NS_ENUM(NSInteger, NIMNetCallCamera){
 @protocol NIMNetCallManager <NSObject>
 
 /**
- *  主叫发起通话
+ *  主叫发起通话 - 新接口
  *
- *  @param callee 被叫帐号
- *  @param type  呼叫类型
- *  @param completion  发起通话结果回调
+ *  @param callees    被叫帐号列表, 现在只支持传入一个被叫
+ *  @param type       呼叫类型
+ *  @param option     开始通话附带的选项, 可以为空
+ *  @param completion 发起通话结果回调
  */
-- (void)start:(NSString *)callee
+- (void)start:(NSArray *)callees
          type:(NIMNetCallType)type
+       option:(NIMNetCallOption *)option
    completion:(NIMNetCallStartHandler)completion;
-
 
 /**
  *  被叫响应呼叫
  *
- *  @param callID call id
- *  @param accept  是否接听
+ *  @param callID      call id
+ *  @param accept      是否接听
+ *  @param option      开始通话附带的选项, 可以为空
  *  @param completion  响应呼叫结果回调
  *
  *  @discussion 被叫拒绝接听时, 主叫不需要再调用hangup:接口
  */
 - (void)response:(UInt64)callID
           accept:(BOOL)accept
+          option:(NIMNetCallOption *)option
       completion:(NIMNetCallResponseHandler)completion;
 
 /**
@@ -357,6 +403,28 @@ typedef NS_ENUM(NSInteger, NIMNetCallCamera){
  *  @return 网络状态
  */
 - (NIMNetCallNetStatus)netStatus;
+
+
+/**
+ *  开始本地MP4文件录制, 录制通话过程中自己的音视频内容到MP4文件
+ *
+ *  @param filePath     录制文件路径, SDK不负责创建目录, 请确保文件路径的合法性,
+ *                      也可以传入nil, 由SDK自己选择文件路径
+ *  @param videoBitrate 录制文件视频码率设置, 可以不指定, 由SDK自己选择合适的码率
+ *
+ *  @return 是否允许开始录制
+ *
+ *  @discussion 只有通话连接建立以后才允许开始录制
+ */
+- (BOOL)startLocalRecording:(NSURL *)filePath
+               videoBitrate:(UInt32)videoBitrate;
+
+/**
+ *  停止本地MP4文件录制
+ *
+ *  @return 是否接受停止录制请求
+ */
+- (BOOL)stopLocalRecording;
 
 /**
  *  添加网络通话委托

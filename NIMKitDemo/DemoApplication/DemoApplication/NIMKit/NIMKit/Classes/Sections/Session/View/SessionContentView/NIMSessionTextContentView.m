@@ -25,7 +25,7 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
         _textLabel.delegate = self;
         _textLabel.numberOfLines = 0;
         _textLabel.lineBreakMode = NSLineBreakByWordWrapping;
-        _textLabel.font = [UIFont systemFontOfSize:14.f];
+        _textLabel.font = [UIFont systemFontOfSize:NIMKit_Message_Font_Size];
         _textLabel.backgroundColor = [UIColor clearColor];
         [self addSubview:_textLabel];
     }

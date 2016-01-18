@@ -10,10 +10,13 @@
 
 @interface NIMKitUtil : NSObject
 
++ (NSString *)showNick:(NSString*)uid inMessage:(NIMMessage*)message;
+
 + (NSString *)showNick:(NSString*)uid inSession:(NIMSession*)session;
 
 + (NSString *)showTime:(NSTimeInterval) msglastTime showDetail:(BOOL)showDetail;
 
 + (NSString *)formatedMessage:(NIMMessage *)message;
+
 
 @end

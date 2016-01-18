@@ -93,6 +93,11 @@
         if (![[NIMSDK sharedSDK].mediaManager isPlaying]) {
             [[NIMSDK sharedSDK].mediaManager switchAudioOutputDevice:NIMAudioOutputDeviceSpeaker];
             NIMAudioObject *audioObject = (NIMAudioObject*)self.model.message.messageObject;
+            BOOL needProximityMonitor = YES;
+            if ([self.model.sessionConfig respondsToSelector:@selector(disableProximityMonitor)]) {
+                needProximityMonitor = !self.model.sessionConfig.disableProximityMonitor;
+            }
+            [[NIMSDK sharedSDK].mediaManager setNeedProximityMonitor:needProximityMonitor];
             [[NIMSDK sharedSDK].mediaManager playAudio:audioObject.path withDelegate:self];
         } else {
             [[NIMSDK sharedSDK].mediaManager stopPlay];

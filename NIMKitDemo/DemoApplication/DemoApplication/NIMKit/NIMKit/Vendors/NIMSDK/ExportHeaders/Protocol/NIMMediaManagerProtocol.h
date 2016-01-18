@@ -147,6 +147,15 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  */
 - (BOOL)switchAudioOutputDevice:(NIMAudioOutputDevice)outputDevice;
 
+
+/**
+ *  在播放声音的时候,如果手机贴近耳朵,是否需要自动切换成听筒播放
+ *
+ *  @param needProximityMonitor 是否需要贴耳传感器监听
+ */
+- (void)setNeedProximityMonitor:(BOOL)needProximityMonitor;
+
+
 /**
  *  是否正在播放音频
  *

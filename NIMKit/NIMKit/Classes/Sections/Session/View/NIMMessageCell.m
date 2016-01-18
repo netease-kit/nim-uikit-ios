@@ -114,7 +114,7 @@
     
     if([self needShowNickName])
     {
-        NSString *nick = [NIMKitUtil showNick:self.model.message.from inSession:self.model.message.session];
+        NSString *nick = [NIMKitUtil showNick:self.model.message.from inMessage:self.model.message];
         [_nameLabel setText:nick];
     }
     [_nameLabel setHidden:![self needShowNickName]];

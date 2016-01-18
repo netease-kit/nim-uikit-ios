@@ -13,12 +13,12 @@
 #import "NIMDefaultValueMaker.h"
 #import "UIView+NIM.h"
 
-NSInteger MaxItemCountInPage = 8;
-NSInteger ButtonItemWidth = 74;
-NSInteger ButtonItemHeight = 85;
-NSInteger PageRowCount     = 2;
-NSInteger PageColumnCount  = 4;
-NSInteger ButtonBegintLeftX = 11;
+NSInteger NIMMaxItemCountInPage = 8;
+NSInteger NIMButtonItemWidth = 74;
+NSInteger NIMButtonItemHeight = 85;
+NSInteger NIMPageRowCount     = 2;
+NSInteger NIMPageColumnCount  = 4;
+NSInteger NIMButtonBegintLeftX = 11;
 
 
 
@@ -103,16 +103,16 @@ NSInteger ButtonBegintLeftX = 11;
 #pragma mark PageViewDataSource
 - (NSInteger)numberOfPages: (NIMPageView *)pageView
 {
-    NSInteger count = [_mediaButtons count] / MaxItemCountInPage;
-    count = ([_mediaButtons count] % MaxItemCountInPage == 0) ? count: count + 1;
+    NSInteger count = [_mediaButtons count] / NIMMaxItemCountInPage;
+    count = ([_mediaButtons count] % NIMMaxItemCountInPage == 0) ? count: count + 1;
     return MAX(count, 1);
 }
 
 - (UIView*)mediaPageView:(NIMPageView*)pageView beginItem:(NSInteger)begin endItem:(NSInteger)end
 {
     UIView *subView = [[UIView alloc] init];
-    NSInteger span = (self.nim_width - PageColumnCount * ButtonItemWidth) / (PageColumnCount +1);
-    CGFloat startY          = ButtonBegintLeftX;
+    NSInteger span = (self.nim_width - NIMPageColumnCount * NIMButtonItemWidth) / (NIMPageColumnCount +1);
+    CGFloat startY          = NIMButtonBegintLeftX;
     NSInteger coloumnIndex = 0;
     NSInteger rowIndex = 0;
     NSInteger indexInPage = 0;
@@ -121,19 +121,19 @@ NSInteger ButtonBegintLeftX = 11;
         UIButton *button = [_mediaButtons objectAtIndex:index];
         [button addTarget:self action:@selector(onTouchButton:) forControlEvents:UIControlEventTouchUpInside];
         //计算位置
-        rowIndex    = indexInPage / PageColumnCount;
-        coloumnIndex= indexInPage % PageColumnCount;
-        CGFloat x = span + (ButtonItemWidth + span) * coloumnIndex;
+        rowIndex    = indexInPage / NIMPageColumnCount;
+        coloumnIndex= indexInPage % NIMPageColumnCount;
+        CGFloat x = span + (NIMButtonItemWidth + span) * coloumnIndex;
         CGFloat y = 0.0;
         if (rowIndex > 0)
         {
-            y = rowIndex * ButtonItemHeight + startY + 15;
+            y = rowIndex * NIMButtonItemHeight + startY + 15;
         }
         else
         {
-            y = rowIndex * ButtonItemHeight + startY;
+            y = rowIndex * NIMButtonItemHeight + startY;
         }
-        [button setFrame:CGRectMake(x, y, ButtonItemWidth, ButtonItemHeight)];
+        [button setFrame:CGRectMake(x, y, NIMButtonItemWidth, NIMButtonItemHeight)];
         [subView addSubview:button];
         indexInPage ++;
     }
@@ -145,13 +145,13 @@ NSInteger ButtonBegintLeftX = 11;
                             count:(NSInteger)count
 {
     UIView *subView = [[UIView alloc] init];
-    NSInteger span = (self.nim_width - count * ButtonItemWidth) / (count +1);
+    NSInteger span = (self.nim_width - count * NIMButtonItemWidth) / (count +1);
     
     for (NSInteger btnIndex = 0; btnIndex < count; btnIndex ++)
     {
         UIButton *button = [_mediaButtons objectAtIndex:btnIndex];
         [button addTarget:self action:@selector(onTouchButton:) forControlEvents:UIControlEventTouchUpInside];
-        CGRect iconRect = CGRectMake(span + (ButtonItemWidth + span) * btnIndex, 58, ButtonItemWidth, ButtonItemHeight);
+        CGRect iconRect = CGRectMake(span + (NIMButtonItemWidth + span) * btnIndex, 58, NIMButtonItemWidth, NIMButtonItemHeight);
         [button setFrame:iconRect];
         [subView addSubview:button];
     }
@@ -170,8 +170,8 @@ NSInteger ButtonBegintLeftX = 11;
         assert(0);
         index = 0;
     }
-    NSInteger begin = index * MaxItemCountInPage;
-    NSInteger end = (index + 1) * MaxItemCountInPage;
+    NSInteger begin = index * NIMMaxItemCountInPage;
+    NSInteger end = (index + 1) * NIMMaxItemCountInPage;
     if (end > [_mediaButtons count])
     {
         end = [_mediaButtons count];

@@ -33,8 +33,9 @@
 
 /**
  *  语音时长，毫秒为单位
+ *  @discussion SDK会根据传入文件信息自动解析出duration,但上层也可以自己设置这个值
  */
-@property (nonatomic, assign, readonly)  NSInteger duration;
+@property (nonatomic, assign)  NSInteger duration;
 
 
 @end
