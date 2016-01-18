@@ -139,7 +139,17 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  *  @discussion 启动APP如果已经保存了用户帐号和令牌,建议使用这个登录方式,使用这种方式可以在无网络时直接打开会话窗口
  */
 - (void)autoLogin:(NSString *)account
-            token:(NSString *)token;
+            token:(NSString *)token; 
+
+
+/**
+ *  自动登录
+ *
+ *  @param loginData 自动登录参数
+ *  @discussion 启动APP如果已经保存了用户帐号和令牌,建议使用这个登录方式,使用这种方式可以在无网络时直接打开会话窗口
+ */
+- (void)autoLogin:(NIMAutoLoginData *)loginData;
+
 /**
  *  登出
  *
@@ -150,7 +160,7 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
 /**
  *  踢人
  *
- *  @param client     当前登录的其他帐号
+ *  @param client     当前登录的其他客户端
  *  @param completion 完成回调
  */
 - (void)kickOtherClient:(NIMLoginClient *)client

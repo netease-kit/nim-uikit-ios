@@ -26,7 +26,7 @@ NSString * const NIMProgressHUDStatusUserInfoKey                = @"NIMProgressH
 static UIColor *NIMProgressHUDBackgroundColor;
 static UIColor *NIMProgressHUDForegroundColor;
 static CGFloat NIMProgressHUDRingThickness;
-static UIFont *NIMProgressHUDFont;
+static UIFont  *NIMProgressHUDFont;
 static UIImage *NIMProgressHUDInfoImage;
 static UIImage *NIMProgressHUDSuccessImage;
 static UIImage *NIMProgressHUDErrorImage;

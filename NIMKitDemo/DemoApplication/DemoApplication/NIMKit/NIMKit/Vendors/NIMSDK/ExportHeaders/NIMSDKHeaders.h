@@ -57,6 +57,12 @@
  *  实时会话选项定义
  */
 #import "NIMRTSOption.h"
+#import "NIMRTSRecordingInfo.h"
+
+/**
+ *  音视频网络通话选项定义
+ */
+#import "NIMNetCallOption.h"
 
 /**
  *  各个对外接口协议定义

@@ -72,21 +72,22 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
 @optional
 
 /**
- *  好友状态发生变化
+ *  好友状态发生变化 (在线)
  *
  *  @param user 用户对象
  */
 - (void)onFriendChanged:(NIMUser *)user;
 
 /**
- *  黑名单状态发生变化
+ *  黑名单列表发生变化 (在线)
  */
 - (void)onBlackListChanged;
 
 /**
- *  用户个人信息发生变化
+ *  用户个人信息发生变化 (在线)
  *
  *  @param user 用户对象
+ *  @discussion 出于性能和上层 APP 处理难易度的考虑，本地调用批量接口获取用户信息时不触发当前回调。
  */
 - (void)onUserInfoChanged:(NIMUser *)user;
 

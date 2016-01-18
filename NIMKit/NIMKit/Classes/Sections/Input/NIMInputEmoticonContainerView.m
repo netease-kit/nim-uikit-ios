@@ -15,8 +15,8 @@
 #import "NIMInputEmoticonDefine.h"
 #import "UIImage+NIM.h"
 
-NSInteger CustomPageControlHeight = 36;
-NSInteger CustomPageViewHeight    = 159;
+NSInteger NIMCustomPageControlHeight = 36;
+NSInteger NIMCustomPageViewHeight    = 159;
 
 @interface NIMInputEmoticonContainerView()<NIMEmoticonButtonTouchDelegate,NIMInputEmoticonTabDelegate>
 
@@ -46,13 +46,13 @@ NSInteger CustomPageViewHeight    = 159;
 {
     _emoticonPageView                  = [[NIMPageView alloc] initWithFrame:self.bounds];
     _emoticonPageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    _emoticonPageView.nim_height       = CustomPageViewHeight;
+    _emoticonPageView.nim_height       = NIMCustomPageViewHeight;
     _emoticonPageView.backgroundColor  = [UIColor clearColor];
     _emoticonPageView.dataSource       = self;
     _emoticonPageView.pageViewDelegate = self;
     [self addSubview:_emoticonPageView];
     
-    _emotPageController = [[UIPageControl alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, CustomPageControlHeight)];
+    _emotPageController = [[UIPageControl alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, NIMCustomPageControlHeight)];
     _emotPageController.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _emotPageController.pageIndicatorTintColor = [UIColor lightGrayColor];
     _emotPageController.currentPageIndicatorTintColor = [UIColor grayColor];

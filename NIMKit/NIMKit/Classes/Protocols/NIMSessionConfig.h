@@ -66,6 +66,12 @@
  */
 - (BOOL)disableAudioPlayedStatusIcon;
 
+
+/**
+ *  是否禁用在贴耳的时候自动切换成听筒模式
+ */
+- (BOOL)disableProximityMonitor;
+
 /**
  *  消息数据提供器
  *

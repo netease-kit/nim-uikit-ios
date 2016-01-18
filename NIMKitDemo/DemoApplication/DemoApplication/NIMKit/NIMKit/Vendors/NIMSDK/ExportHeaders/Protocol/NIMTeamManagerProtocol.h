@@ -382,10 +382,21 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param teamId 群组ID
  *  @param block  完成后的block回调
  *  @discussion   绝大多数情况这个请求都是从本地读取缓存并同步返回
- *                但考虑到用户网络等问题SDK有可能没有即时缓存群成员信息,那么这个请求将是个网络请求(增量)
+ *                但考虑到用户网络等问题, SDK 有可能没有即时缓存群成员信息,那么这个请求将是个带网络请求的异步操作(增量请求)
  */
 - (void)fetchTeamMembers:(NSString *)teamId
               completion:(NIMTeamMemberHandler)block;
+
+
+/**
+ *  通过网络请求获取群组成员
+ *
+ *  @param teamId 群组ID
+ *  @param block  完成后的block回调
+ *  @discussion   通过网络请求获取群成员列表,不同于fetchTeamMembers:completion这个接口是个必然带网络请求的异步操作(增量请求)
+ */
+- (void)fetchTeamMembersFromServer:(NSString *)teamId
+                        completion:(NIMTeamMemberHandler)block;
 
 
 /**

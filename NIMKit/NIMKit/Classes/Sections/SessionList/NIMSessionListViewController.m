@@ -49,17 +49,18 @@
     if (!self.recentSessions.count) {
         _recentSessions = [NSMutableArray array];
     }
-    
-    [[NIMSDK sharedSDK].teamManager addDelegate:self];
+
     [[NIMSDK sharedSDK].conversationManager addDelegate:self];
     [[NIMSDK sharedSDK].loginManager addDelegate:self];
-    [[NIMSDK sharedSDK].userManager addDelegate:self];
-    extern NSString *NIMKitUserInfoHasUpdatedNotification;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInfoUpdate:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+    [[NIMSDK sharedSDK].teamManager addDelegate:self];
     extern NSString *NIMKitTeamInfoHasUpdatedNotification;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onInfoUpdate:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
-
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamInfoHasUpdatedNotification:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
+    extern NSString *NIMKitUserInfoHasUpdatedNotification;
+    if ([NIMSDKConfig sharedConfig].hostUserInfos) {
+        [[NIMSDK sharedSDK].userManager addDelegate:self];
+    }else{
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+    }
 }
 
 - (void)reload{
@@ -320,7 +321,11 @@
 }
 
 #pragma mark - Notification
-- (void)onInfoUpdate:(NSNotificationCenter *)center{
+- (void)onUserInfoHasUpdatedNotification:(NSNotificationCenter *)center{
+    [self reload];
+}
+
+- (void)onTeamInfoHasUpdatedNotification:(NSNotificationCenter *)center{
     [self reload];
 }
 

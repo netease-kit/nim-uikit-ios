@@ -11,8 +11,8 @@
 #import "UIView+NIM.h"
 #import "UIImage+NIM.h"
 
-const NSInteger InputEmoticonTabViewHeight = 35;
-const NSInteger InputEmoticonSendButtonWidth = 50;
+const NSInteger NIMInputEmoticonTabViewHeight = 35;
+const NSInteger NIMInputEmoticonSendButtonWidth = 50;
 
 const CGFloat InputLineBoarder = .5f;
 
@@ -27,7 +27,7 @@ const CGFloat InputLineBoarder = .5f;
 
 @implementation NIMInputEmoticonTabView
 - (instancetype)initWithFrame:(CGRect)frame catalogs:(NSArray*)emoticonCatalogs{
-    self = [super initWithFrame:CGRectMake(0, 0, frame.size.width, InputEmoticonTabViewHeight)];
+    self = [super initWithFrame:CGRectMake(0, 0, frame.size.width, NIMInputEmoticonTabViewHeight)];
     if (self) {
         _emoticonCatalogs = emoticonCatalogs;
         _tabs = [[NSMutableArray alloc] init];
@@ -43,7 +43,7 @@ const CGFloat InputLineBoarder = .5f;
             [self addSubview:button];
             [_tabs addObject:button];
             
-            UIView *sep = [[UIView alloc] initWithFrame:CGRectMake(0, 0, InputLineBoarder, InputEmoticonTabViewHeight)];
+            UIView *sep = [[UIView alloc] initWithFrame:CGRectMake(0, 0, InputLineBoarder, NIMInputEmoticonTabViewHeight)];
             sep.backgroundColor = sepColor;
             [_seps addObject:sep];
             [self addSubview:sep];
@@ -51,12 +51,10 @@ const CGFloat InputLineBoarder = .5f;
         _sendButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_sendButton setTitle:@"发送" forState:UIControlStateNormal];
         _sendButton.titleLabel.font = [UIFont systemFontOfSize:13.f];
+        [_sendButton setBackgroundColor:NIMKit_UIColorFromRGB(0x0079FF)];
         
-        [_sendButton setBackgroundImage:[UIImage nim_imageInKit:@"icon_input_send_btn_normal"] forState:UIControlStateNormal];
-        [_sendButton setBackgroundImage:[UIImage nim_imageInKit:@"icon_input_send_btn_pressed"] forState:UIControlStateHighlighted];
-        
-        _sendButton.nim_height = InputEmoticonTabViewHeight;
-        _sendButton.nim_width = InputEmoticonSendButtonWidth;
+        _sendButton.nim_height = NIMInputEmoticonTabViewHeight;
+        _sendButton.nim_width = NIMInputEmoticonSendButtonWidth;
         [self addSubview:_sendButton];
         
         

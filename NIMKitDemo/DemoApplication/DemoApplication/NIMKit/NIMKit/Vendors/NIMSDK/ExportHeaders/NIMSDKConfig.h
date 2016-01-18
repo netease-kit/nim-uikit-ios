@@ -28,6 +28,14 @@
  */
 @property (nonatomic,assign)    BOOL    fetchAttachmentAutomaticallyAfterReceiving;
 
+
+/**
+ *  是否托管好友信息
+ *  @discussion 默认为 YES,SDK 默认上层应用托管了好友信息,会尝试从服务器和本地获取好友信息。如果应用确认不托管好友资料信息，可以将这个值设为 NO，使得 SDK 可以忽略很多耗费流量和 CPU 的操作。
+ */
+@property (nonatomic,assign)    BOOL    hostUserInfos;
+
+
 /**
  *  设置 SDK 根目录
  *

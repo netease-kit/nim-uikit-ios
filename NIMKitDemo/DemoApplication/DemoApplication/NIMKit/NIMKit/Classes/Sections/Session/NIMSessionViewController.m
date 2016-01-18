@@ -140,8 +140,14 @@ NIMUserManagerDelegate>
         [[[NIMSDK sharedSDK] teamManager] addDelegate:self];
     }
     
-    [[NIMSDK sharedSDK].userManager addDelegate:self];
-
+    if ([NIMSDKConfig sharedConfig].hostUserInfos) {
+        //说明托管了用户信息，那就直接加 userManager 的监听
+        [[NIMSDK sharedSDK].userManager addDelegate:self];
+    }else{
+        //没有托管用户信息，就直接加 NIMKit 的监听
+        extern NSString* NIMKitUserInfoHasUpdatedNotification;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+    }
 }
 
 
@@ -354,16 +360,21 @@ NIMUserManagerDelegate>
 }
 
 #pragma mark - NIMUserManagerDelegate
-- (void)onUserInfoChanged:(NIMUser *)user{
+- (void)onUserInfoChanged:(NIMUser *)user {
     self.navigationItem.title = [self sessionTitle];
     [self.tableView reloadData];
 }
 
-- (void)onFriendChanged:(NIMUser *)user{
+- (void)onFriendChanged:(NIMUser *)user {
     self.navigationItem.title = [self sessionTitle];
     [self.tableView reloadData];
 }
 
+
+- (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification {
+    self.navigationItem.title = [self sessionTitle];
+    [self.tableView reloadData];
+}
 
 
 #pragma mark - Touch Event

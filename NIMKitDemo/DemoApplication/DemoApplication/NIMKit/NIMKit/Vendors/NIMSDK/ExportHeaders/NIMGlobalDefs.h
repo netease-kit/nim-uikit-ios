@@ -68,6 +68,28 @@ typedef NS_ENUM(NSInteger, NIMNetCallType){
     NIMNetCallTypeVideo = 2,
 };
 
+/**
+ *  网络通话视频质量
+ */
+typedef NS_ENUM(NSInteger, NIMNetCallVideoQuality) {
+    /**
+     *  默认视频质量
+     */
+    NIMNetCallVideoQualityDefault = 0,
+    /**
+     *  低视频质量
+     */
+    NIMNetCallVideoQualityLow     = 1,
+    /**
+     *  中等视频质量
+     */
+    NIMNetCallVideoQualityMedium  = 2,
+    /**
+     *  高视频质量
+     */
+    NIMNetCallVideoQualityHigh    = 3,
+};
+
 
 
 /**
@@ -151,6 +173,51 @@ typedef NS_ENUM(NSInteger, NIMLocalErrorCode) {
      *  用户信息缺失 (未登录 或 未提供用户资料)
      */
     NIMLocalErrorCodeUserInfoNeeded               = 16,
+    
+    /**
+     *  无法开始录制, 因为文件路径不合法
+     */
+    NIMLocalErrorCodeRecordInvalidFilePath       = 17,
+    /**
+     *  开始本地录制失败
+     */
+    NIMLocalErrorCodeRecordStartFailed           = 18,
+
+    /**
+     *  创建录制文件失败
+     */
+    NIMLocalErrorCodeRecordCreateFileFailed      = 19,
+    
+    /**
+     *  初始化录制音频失败
+     */
+    NIMLocalErrorCodeRecordInitAudioFailed       = 20,
+    
+    /**
+     *  初始化录制视频失败
+     */
+    NIMLocalErrorCodeRecordInitVideoFailed       = 21,
+    
+    /**
+     *  开始写录制文件失败
+     */
+    NIMLocalErrorCodeRecordStartWritingFailed    = 22,
+    
+    /**
+     *  结束本地录制失败
+     */
+    NIMLocalErrorCodeRecordStopFailed            = 23,
+    
+    /**
+     *  写录制文件失败
+     */
+    NIMLocalErrorCodeRecordWritingFileFailed     = 24,
+    
+    /**
+     *  空间不足，录制即将结束
+     */
+    NIMLocalErrorCodeRecordWillStopForLackSpace  = 25,
+
 };
 
 

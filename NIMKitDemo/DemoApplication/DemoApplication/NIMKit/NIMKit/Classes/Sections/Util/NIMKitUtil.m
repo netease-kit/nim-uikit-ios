@@ -11,6 +11,13 @@
 
 @implementation NIMKitUtil
 
++ (NSString *)showNick:(NSString*)uid inMessage:(NIMMessage*)message{
+    NSString *nickname = [NIMKitUtil showNick:uid inSession:message.session];
+    nickname = nickname? nickname : message.senderName;
+    nickname = nickname? nickname : uid;
+    return nickname;
+}
+
 + (NSString *)showNick:(NSString*)uid inSession:(NIMSession*)session{
     if (!uid.length) {
         return nil;
@@ -25,9 +32,9 @@
         NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid];
         nickname = info.showName;
     }
+    nickname = nickname? nickname : uid;
     return nickname;
 }
-
 
 + (NSString*)showTime:(NSTimeInterval) msglastTime showDetail:(BOOL)showDetail
 {
@@ -147,25 +154,11 @@
     if (object.notificationType == NIMNotificationTypeTeam)
     {
         NIMTeamNotificationContent *content = (NIMTeamNotificationContent*)object.content;
-        NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
-        NSString *source;
-        if ([content.sourceID isEqualToString:currentAccount]) {
-            source = @"你";
-        }else{
-            source = [NIMKitUtil showNick:content.sourceID inSession:message.session];
-        }
-        NSMutableArray *targets = [[NSMutableArray alloc] init];
-        for (NSString *item in content.targetIDs) {
-            if ([item isEqualToString:currentAccount]) {
-                [targets addObject:@"你"];
-            }else{
-                NSString *targetShowName = [NIMKitUtil showNick:item inSession:message.session];
-                [targets addObject:targetShowName];
-            }
-        }
+        NSString *source = [NIMKitUtil teamNotificationSourceName:message];
+        NSArray *targets = [NIMKitUtil teamNotificationTargetNames:message];
         NSString *targetText = [targets count] > 1 ? [targets componentsJoinedByString:@","] : [targets firstObject];
-        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:message.session.sessionId];
-        NSString *teamName = team.type == NIMTeamTypeNormal ? @"讨论组" : @"群";
+        NSString *teamName = [NIMKitUtil teamNotificationTeamShowName:message];
+        
         switch (content.operationType) {
             case NIMTeamOperationTypeInvite:{
                 NSString *str = [NSString stringWithFormat:@"%@邀请%@",source,targets.firstObject];
@@ -286,5 +279,44 @@
     }
     return text;
 }
+
+
+#pragma mark - Private
++ (NSString *)teamNotificationSourceName:(NIMMessage *)message{
+    NSString *source;
+    NIMNotificationObject *object = message.messageObject;
+    NIMTeamNotificationContent *content = (NIMTeamNotificationContent*)object.content;
+    NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
+    if ([content.sourceID isEqualToString:currentAccount]) {
+        source = @"你";
+    }else{
+        source = [NIMKitUtil showNick:content.sourceID inSession:message.session];
+    }
+    return source;
+}
+
++ (NSArray *)teamNotificationTargetNames:(NIMMessage *)message{
+    NSMutableArray *targets = [[NSMutableArray alloc] init];
+    NIMNotificationObject *object = message.messageObject;
+    NIMTeamNotificationContent *content = (NIMTeamNotificationContent*)object.content;
+    NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
+    for (NSString *item in content.targetIDs) {
+        if ([item isEqualToString:currentAccount]) {
+            [targets addObject:@"你"];
+        }else{
+            NSString *targetShowName = [NIMKitUtil showNick:item inSession:message.session];
+            [targets addObject:targetShowName];
+        }
+    }
+    return targets;
+}
+
+
++ (NSString *)teamNotificationTeamShowName:(NIMMessage *)message{
+    NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:message.session.sessionId];
+    NSString *teamName = team.type == NIMTeamTypeNormal ? @"讨论组" : @"群";
+    return teamName;
+}
+
 
 @end
