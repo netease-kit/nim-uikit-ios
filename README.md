@@ -7,10 +7,10 @@
 
 ##NIMKit说明
 
-* `NIMKit` 依赖云信通讯能力库 `NIMSDK`。通讯能力库在组件中已经自动连接，开发者无需在自己的工程中再次添加。
+* `NIMKit` 依赖云信通讯能力库 `NIMSDK`，请自行在您的工程中添加。
 * 定制自定义消息教程 [NIM Guide For Custom Message](/NIM_Guide_For_Custom_Message.md) 。
 * 利用组件绘制自定义消息气泡教程 [NIM Guide For Custom Message UI](/NIM_Guide_For_Custom_Message_UI.md) 。
-* 工程配置和自定义消息配置示例请参考 `NIMKitDemo\DemoApplication` 工程 。
+* 工程配置和自定义消息配置示例请参考 `NIMKitDemo\DemoApplication` 工程 **(请自行在 DemoApplication/NIMKit/Vendors/NIMSDK/ 下添加通讯能力库 libNIMSDK.a )**。
 * 具体使用范例请参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo) 。
 
 
@@ -20,13 +20,13 @@
 ###基础使用
 
 
-*  添加 `NIMKit` 到工程中（注意只需要添加xcodeproj文件即可）。添加后示例如图：
-
-   <img src="./Images/iOS/nimkit_init_1.jpg" width="250" height="160" />
-   
-
-* 在 **您自己的工程** 中，打开 `Build Phases` 选项，展开 `Link Binary With Libraries` 选项卡。添加必要的依赖项：
+*  添加 `NIMKit` 到您自己的工程中。
+*  添加 `NIMSDK` 到您自己的工程中，您可以选择手动添加或者使用 CocoaPods 导入。
+*  在您自己的工程中，打开 `Build Phases` 选项，展开 `Link Binary With Libraries` 选项卡。添加必要的依赖项：
 	* CoreText.framework
+	
+	如果您选择手动添加 NIMSDK ， 您还要添加以下依赖项：
+	
 	* CoreTelephony.framework
 	* AVFoundation.framework
 	* MobileCoreServices.framework
@@ -36,32 +36,21 @@
 	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup><sup> 注<sup>2</sup> </sup>
 	* libsqlite3.0.tbd  <sup> 注<sup>1</sup> </sup>
 	* libz.tbd  <sup> 注<sup>1</sup> </sup>
-	* libNIMKit.a
 	
   **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
   	
   **注<sup>2</sup> ：请注意c++库的版本号，务必保证为 6.0.9 。**
   
-  
-  添加后如图所示：
-  
-  <img src="./Images/iOS/nimkit_init_5.jpg" width="600" height="290" />
-  
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
 
 * 在工程配置 `info.plist` 文件中，添加条目 `NSAppTransportSecurity` ，属性设为 `Dictionary`。在此条目下添加键值对，key 为  `NSAllowsArbitraryLoads`, 值为 `YES`。
-
-* 在 `Header Search Paths` 中添加 `NIMKit` 的文件路径，并设置为recursive。 示例如图：
-  
-  <img src="./Images/iOS/nimkit_init_3.jpg" width="450" height="120" />
-
 	
-* 在工程中添加 `NIMKitResouce.bundle`
+* 在工程中添加 `NIMKitResouce.bundle`。
 
-* 在需要使用到组件的地方导入头文件 `NIMKit.h`
+* 在需要使用到组件的地方导入头文件 `NIMKit.h` 。
 
-* 新建一个 SessionViewController，从 NIMSessionViewController 进行继承 (此时运行将可以得到一个简单的会话界面)
+* 新建一个 SessionViewController，从 NIMSessionViewController 进行继承 (此时运行将可以得到一个简单的会话界面)。
 
 ###NIMKit基本体系架构
 NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面。开发者只需要继承 NIMSessionViewController 和 NIMSessionListViewController ， 通过简洁的代码设置，即可在最短的时间内将聊天功能快速集成进App产品中。

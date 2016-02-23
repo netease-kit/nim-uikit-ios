@@ -10,7 +10,8 @@
 
 @implementation DataProvider
 
-- (NIMKitInfo *)infoByUser:(NSString *)userId{
+- (NIMKitInfo *)infoByUser:(NSString *)userId
+               withMessage:(NIMMessage *)message{
     NIMKitInfo *info = [[NIMKitInfo alloc] init];
     info.avatarImage = [UIImage imageNamed:@"DefaultAvatar"];
     //注意只有将用户数据托管给云信才可以调用此方法，否则请自行维护用户昵称等数据
