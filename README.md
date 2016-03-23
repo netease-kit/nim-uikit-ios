@@ -66,24 +66,51 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
 开发者需要自定义一个提供类并实现NIMKitDataProvider协议
 
 ```objc
+@protocol NIMKitDataProvider <NSObject>
+
+@optional
+
 /**
- *  上层提供用户信息的方法
+ *  上层提供用户信息的接口
  *
- *  @param userId 用户Id
+ *  @param userId  用户ID
+ *  @param session 所在的会话
  *
  *  @return 用户信息
  */
-- (NIMKitInfo *)infoByUser:(NSString *)userId;
-
+- (NIMKitInfo *)infoByUser:(NSString *)userId
+                 inSession:(NIMSession *)session;
 
 /**
- *  上层提供群组信息的方法
+ *  上层提供用户信息的接口
  *
- *  @param teamId 群组id
+ *  @param userId  用户ID
+ *  @param message 所在的消息
+ *
+ *  @return 用户信息
+ */
+- (NIMKitInfo *)infoByUser:(NSString *)userId
+               withMessage:(NIMMessage *)message;
+
+/**
+ *  上层提供群组信息的接口
+ *
+ *  @param teamId 群组ID
  *
  *  @return 群组信息
  */
 - (NIMKitInfo *)infoByTeam:(NSString *)teamId;
+
+
+/**
+ *  当消息作为提醒时(即会话里灰色的提示条)，需要显示的文本
+ *
+ *  @param message 消息
+ *
+ *  @return 显示文本
+ */
+- (NSString *)tipMessage:(NIMMessage *)message;
+
 ```
 
 开发者可以在程序启动的时候，将实现类注入到 NIMKit 里。代码示例：
@@ -123,28 +150,57 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
 代码示例：
 
 ```objc
-- (NIMKitInfo *)infoByUser:(NSString *)userId{
-    ContactDataMember *member = [[NTESContactsManager sharedInstance] localContactByUsrId:userId];
-    if (member) {
-        //如果本地有数据则直接返回
-        NIMKitInfo *info = [[NIMKitInfo alloc] init];
-        info.showName    = member.nick;
-        info.avatarImage = [UIImage imageNamed:member.iconId];
-        return info;
-    }else{
-        //如果本地没有数据则去自己的应用服务器请求数据
-        [[NTESContactsManager sharedInstance] queryContactByUsrId:userId completion:^(ContactDataMember *member) {
-            if (member) {
-                //请求成功后调用通知接口刷新
-                [[NIMKit sharedKit] notfiyUserInfoChanged:member.usrId];
+- (NIMKitInfo *)infoByUser:(NSString *)userId
+                 inSession:(NIMSession *)session
+{
+    BOOL needFetchInfo = NO;
+    NIMSessionType sessionType = session.sessionType;
+    NIMKitInfo *info = [[NIMKitInfo alloc] init];
+    //填写默认值
+    info.infoId   = userId;
+    info.showName = userId; 
+    switch (sessionType) {
+        case NIMSessionTypeP2P:
+        case NIMSessionTypeTeam:
+        {
+            NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
+            NIMUserInfo *userInfo = user.userInfo;
+            NIMTeamMember *member = nil;
+            if (sessionType == NIMSessionTypeTeam)
+            {
+                member = [[NIMSDK sharedSDK].teamManager teamMember:userId
+                                                             inTeam:session.sessionId];
             }
-        }];
-        //先返回一个默认数据,以供网络请求没回来的时候界面可以有东西展示
-        NIMKitInfo *info = [[NIMKitInfo alloc] init];
-        info.showName    = userId; //本地没有昵称，拿userId代替
-        info.avatarImage = [UIImage imageNamed:@"DefaultAvatar"]; //默认占位头像
-        return info;
+            NSString *name = [self nickname:user
+                                 memberInfo:member];
+            if (name)
+            {
+                info.showName = name;
+            }
+            info.avatarUrlString = userInfo.thumbAvatarUrl;
+            info.avatarImage = self.defaultUserAvatar;
+            
+            if (userInfo == nil)
+            {
+                needFetchInfo = YES;
+            }
+        }
+            break;
+        case NIMSessionTypeChatroom:
+        //聊天室的Info不会通过这个回调请求
+            NSAssert(0, @"invalid type"); 
+            break;
+        default:
+            NSAssert(0, @"invalid type");
+            break;
     }
+    
+    if (needFetchInfo)
+    {
+        //远程获取用户信息
+        [self.request requestUserIds:@[userId]];
+    }
+    return info;
 }
 ```
 
@@ -177,23 +233,16 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 目前 NIMKit 提供如下的界面逻辑配置
 
-* 是否禁用输入框
+|**是否禁用输入框** | **输入框面板菜单** | 
+|:----- | :-----|
+|**最大输入长度** | **输入框place holder** |
+|**消息分页条数** | **消息时间戳显示间隔** | 
+|**内置聊天气泡布局配置** | **自定义消息数据源** | 
+|**这次消息时候需要做已读回执的处理** | **是否需要处理已读回执** |
+|**进入会话自动获取历史消息**   | **录音类型** | 
+|**是否禁用语音未读红点** | **是否禁用在贴耳的时候自动切换成听筒模式** | 
 
-* 输入框面板菜单
 
-* 最大输入长度
-
-* 输入框place holder
-
-* 消息分页条数
-
-* 消息时间戳显示间隔
-
-* 内置聊天气泡布局配置
-
-* 自定义消息数据源
-
-* 是否禁用语音未读红点
 
 
 所有的配置项都可以在 `NIMSessionConfig` 中找到。
