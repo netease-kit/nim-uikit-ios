@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "NIMKitMessageProvider.h"
+#import "NIMSessionConfig.h"
 
 @class NIMMessageModel;
 
@@ -29,6 +30,7 @@
 @property (nonatomic, readonly) NSInteger         messageLimit;                //每页消息显示条数
 @property (nonatomic, readonly) NSInteger         showTimeInterval;            //两条消息相隔多久显示一条时间戳
 @property (nonatomic, weak) id<NIMSessionMsgDatasourceDelegate> delegate;
+@property (nonatomic, weak) id<NIMSessionConfig> sessionConfig;
 
 
 - (NSInteger)indexAtModelArray:(NIMMessageModel*)model;
@@ -42,6 +44,8 @@
 - (NSArray<NSNumber *> *)addMessageModels:(NSArray*)models;
 
 - (NSArray<NSNumber *> *)deleteMessageModel:(NIMMessageModel*)model;
+
+- (NSDictionary *)checkReceipt;
 
 //清理缓存数据
 - (void)cleanCache;

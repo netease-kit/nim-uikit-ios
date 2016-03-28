@@ -58,9 +58,11 @@
     }
 }
 
-- (void)calculateContent:(CGFloat)width{
-    if (CGSizeEqualToSize(_contentSize, CGSizeZero))
+- (void)calculateContent:(CGFloat)width force:(BOOL)force{
+    if (CGSizeEqualToSize(_contentSize, CGSizeZero) || force)
     {
+        [self updateLayoutConfig];
+        
         _contentSize = [self.layoutConfig contentSize:self cellWidth:width];
     }
 }
@@ -96,15 +98,18 @@
     return _bubbleViewInsets;
 }
 
-- (void)setLayoutConfig:(id<NIMCellLayoutConfig>)layoutConfig{
-    _layoutConfig = layoutConfig;
+- (void)updateLayoutConfig
+{
+    id<NIMCellLayoutConfig> layoutConfig = _layoutConfig;
+    id<NIMCellLayoutConfig> defaultConfig = [[NIMDefaultValueMaker sharedMaker] cellLayoutDefaultConfig];
+    
     if ([layoutConfig respondsToSelector:@selector(shouldShowAvatar:)])
     {
         _shouldShowAvatar = [layoutConfig shouldShowAvatar:self];
     }
     else
     {
-        _shouldShowAvatar = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig shouldShowAvatar:self];
+        _shouldShowAvatar = [defaultConfig shouldShowAvatar:self];
     }
     
     if ([layoutConfig respondsToSelector:@selector(shouldShowNickName:)])
@@ -113,7 +118,7 @@
     }
     else
     {
-        _shouldShowNickName = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig shouldShowNickName:self];
+        _shouldShowNickName = [defaultConfig shouldShowNickName:self];
     }
     
     if ([layoutConfig respondsToSelector:@selector(shouldShowLeft:)])
@@ -122,7 +127,7 @@
     }
     else
     {
-        _shouldShowLeft = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig shouldShowLeft:self];
+        _shouldShowLeft = [defaultConfig shouldShowLeft:self];
     }
     
     
@@ -132,7 +137,7 @@
     }
     else
     {
-        _avatarMargin = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig avatarMargin:self];
+        _avatarMargin = [defaultConfig avatarMargin:self];
     }
     
     if ([layoutConfig respondsToSelector:@selector(nickNameMargin:)])
@@ -141,8 +146,15 @@
     }
     else
     {
-        _nickNameMargin = [[NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig nickNameMargin:self];
+        _nickNameMargin = [defaultConfig nickNameMargin:self];
     }
+
+}
+
+
+- (BOOL)shouldShowReadLabel
+{
+    return _shouldShowReadLabel && self.message.isRemoteRead;
 }
 
 @end

@@ -16,20 +16,26 @@
     CGFloat attachmentImageMinHeight = (cellWidth / 4.0);
     CGFloat attachmemtImageMaxWidth  = (cellWidth - 184);
     CGFloat attachmentImageMaxHeight = (cellWidth - 184);
-    CGSize  contentSize = CGSizeMake(attachmentImageMinWidth, attachmentImageMinHeight);
     
     NIMImageObject *imageObject = (NIMImageObject*)[self.message messageObject];
-    if (!CGSizeEqualToSize(imageObject.size, CGSizeZero))
+    CGSize imageSize;
+    if (!CGSizeEqualToSize(imageObject.size, CGSizeZero)) {
+        imageSize = imageObject.size;
+    }
+    else
     {
-        contentSize = [UIImage nim_sizeWithImageOriginSize:imageObject.size
+        UIImage *image = [UIImage imageWithContentsOfFile:imageObject.thumbPath];
+        imageSize = image ? image.size : CGSizeZero;
+    }
+    CGSize contentSize = [UIImage nim_sizeWithImageOriginSize:imageSize
                                                    minSize:CGSizeMake(attachmentImageMinWidth, attachmentImageMinHeight)
                                                    maxSize:CGSizeMake(attachmemtImageMaxWidth, attachmentImageMaxHeight )];
-    }
     return contentSize;
 }
 
 - (NSString *)cellContent
 {
+
     return @"NIMSessionImageContentView";
 }
 

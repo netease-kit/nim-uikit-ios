@@ -80,6 +80,16 @@
     [_nameLabel setHidden:YES];
     [self.contentView addSubview:_nameLabel];
     
+    //readlabel
+    _readLabel = [[UILabel alloc] init];
+    _readLabel.backgroundColor = [UIColor clearColor];
+    _readLabel.opaque = YES;
+    _readLabel.font = [UIFont systemFontOfSize:13.0];
+    [_readLabel setTextColor:[UIColor darkGrayColor]];
+    [_readLabel setHidden:YES];
+    [_readLabel setText:NSLocalizedString(@"已读", nil)];
+    [_readLabel setBounds:CGRectMake(0, 0, 28, 20.0)];
+    [self.contentView addSubview:_readLabel];
 }
 
 - (void)makeGesture{
@@ -103,6 +113,11 @@
     _model = model;
 }
 
+- (void)injected
+{
+    [self refreshData:_model];
+}
+
 - (void)refresh{
     [self addContentViewIfNotExist];
     [self addUserCustomViews];
@@ -118,7 +133,10 @@
         [self.nameLabel setText:nick];
     }
     [_nameLabel setHidden:![self needShowNickName]];
+    
+    
     [_bubbleView refresh:self.model];
+    [_bubbleView setNeedsLayout];
     
     BOOL isActivityIndicatorHidden = [self activityIndicatorHidden];
     if (isActivityIndicatorHidden)
@@ -132,6 +150,8 @@
     [_traningActivityIndicator setHidden:isActivityIndicatorHidden];
     [_retryButton setHidden:[self retryButtonHidden]];
     [_audioPlayedIcon setHidden:[self unreadHidden]];
+    [_readLabel setHidden:[self readLabelHidden]];
+    
     [self setNeedsLayout];
 }
 
@@ -189,6 +209,7 @@
     [self layoutRetryButton];
     [self layoutAudioPlayedIcon];
     [self layoutActivityIndicator];
+    [self layoutReadLabel];
 }
 
 - (void)layoutAvatar
@@ -274,6 +295,19 @@
             _audioPlayedIcon.nim_right = _bubbleView.nim_left - padding;
         }
         _audioPlayedIcon.nim_top = _bubbleView.nim_top;
+    }
+}
+
+- (void)layoutReadLabel{
+    
+    if (!_readLabel.isHidden) {
+        
+        CGFloat left = _bubbleView.nim_left;
+        CGFloat bottom = _bubbleView.nim_bottom;
+        
+        _readLabel.nim_left = left - CGRectGetWidth(_readLabel.bounds) - [self readLabelBubblePadding];
+        _readLabel.nim_bottom = bottom;
+
     }
 }
 
@@ -380,10 +414,25 @@
     return YES;
 }
 
-- (CGFloat)audioPlayedIconBubblePadding{
-    return 10;
+- (BOOL)readLabelHidden
+{
+    if (self.model.shouldShowReadLabel &&
+        [self activityIndicatorHidden] &&
+        [self unreadHidden])
+    {
+        return NO;
+    }
+    return YES;
 }
 
+
+- (CGFloat)audioPlayedIconBubblePadding{
+    return 10.0;
+}
+
+- (CGFloat)readLabelBubblePadding{
+    return 2.0;
+}
 
 - (CGFloat)cellPaddingToProtrait
 {

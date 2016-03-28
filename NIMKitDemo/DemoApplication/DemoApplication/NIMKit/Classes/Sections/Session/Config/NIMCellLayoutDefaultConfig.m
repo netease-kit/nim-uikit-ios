@@ -76,6 +76,9 @@
             return NO;
         }
     }
+    if (message.messageType == NIMMessageTypeTip) {
+        return NO;
+    }
     return (!message.isOutgoingMsg && message.session.sessionType == NIMSessionTypeTeam);
 }
 
@@ -95,10 +98,6 @@
     return [self shouldShowAvatar:model] ? 57.f : 10.f;
 }
 
-
-- (NSString *)formatedMessage:(NIMMessageModel *)model{
-    return [NIMKitUtil formatedMessage:model.message];
-}
 
 - (NSArray *)customViews:(NIMMessageModel *)model
 {

@@ -259,7 +259,6 @@
     void(^animations)() = ^{
         [self willShowKeyboardFromFrame:beginFrame toFrame:endFrame];
     };
-    NSLog(@"------> end frame height %.2f",endFrame.origin.y);
     [UIView animateWithDuration:duration delay:0.0f options:(curve << 16 | UIViewAnimationOptionBeginFromCurrentState) animations:animations completion:nil];
 }
 
@@ -395,8 +394,6 @@
 }
 
 - (IBAction)onTouchRecordBtnDown:(id)sender {
-    NSLog(@"onTouchRecordBtnDown");
-    // start Recording
     self.recordPhase = AudioRecordPhaseStart;
 }
 - (IBAction)onTouchRecordBtnUpInside:(id)sender {

@@ -83,6 +83,9 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
 @end
 
 
+/**
+ *  聊天室通知内容
+ */
 @interface NIMChatroomNotificationContent : NIMNotificationContent
 
 /**

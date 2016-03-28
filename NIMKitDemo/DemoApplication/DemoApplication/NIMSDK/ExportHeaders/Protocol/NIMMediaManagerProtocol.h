@@ -24,6 +24,21 @@ typedef NS_ENUM(NSInteger, NIMAudioOutputDevice){
 
 
 /**
+ *  云信支持的音频类型
+ */
+typedef NS_ENUM(NSInteger, NIMAudioType) {
+    /**
+     *  aac
+     */
+    NIMAudioTypeAAC,
+    /**
+     *  amr
+     */
+    NIMAudioTypeAMR
+};
+
+
+/**
  *  语音转文字
  *
  *  @param error 执行结果,如果成功error为nil
@@ -190,12 +205,25 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
 /**
  *  开始录制音频
  *
- *  @discussion 开始录音，NIMMediaManagerDelgate中的recordAudio:didBeganWithError:回调会被触发，录音完成后, NIMMediaManagerDelgate中的recordAudio:didCompletedWithError:回调会被触发
  *  @param duration 最长录音时间
  *  @param delegate NIMMediaManagerDelgate
+ *  @discussion 开始录音，NIMMediaManagerDelgate中的recordAudio:didBeganWithError:回调会被触发，录音完成后, NIMMediaManagerDelgate中的recordAudio:didCompletedWithError:回调会被触发
+ *              默认使用 aac 编码格式
  */
 - (void)recordAudioForDuration:(NSTimeInterval)duration
                   withDelegate:(id<NIMMediaManagerDelgate>)delegate;
+
+/**
+ *  开始录音
+ *
+ *  @param type     音频类型
+ *  @param duration 最大时长
+ *  @param delegate  NIMMediaManagerDelgate
+ *  @discussion 开始录音，NIMMediaManagerDelgate中的recordAudio:didBeganWithError:回调会被触发，录音完成后, NIMMediaManagerDelgate中的recordAudio:didCompletedWithError:回调会被触发
+ */
+- (void)record:(NIMAudioType)type
+      duration:(NSTimeInterval)duration
+      delegate:(id<NIMMediaManagerDelgate>)delegate;
 
 /**
  *  停止录制音频
@@ -232,5 +260,16 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  */
 - (void)transAudioToText:(NIMAudioToTextOption *)option
                   result:(NIMAudioToTextBlock)block;
+
+
+#pragma mark - common setting
+
+/**
+ *  设置录制或者播放完成以后是否自动deactivate AVAudioSession
+ *
+ *  @param deactivate 是否deactivate，默认为YES
+ */
+- (void)setDeactivateAudioSessionAfterComplete:(BOOL)deactivate;
+
 
 @end

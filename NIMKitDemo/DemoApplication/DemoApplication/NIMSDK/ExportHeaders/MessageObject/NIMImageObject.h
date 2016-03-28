@@ -54,9 +54,18 @@ typedef enum : NSUInteger
 - (instancetype)initWithImage:(UIImage*)image;
 
 /**
+ *  图片实例对象初始化方法
+ *
+ *  @param filepath 要发送的图片路径
+ *
+ *  @return 图片实例对象
+ */
+- (instancetype)initWithFilepath:(NSString *)filepath;
+
+/**
  *  文件展示名
  */
-@property (nonatomic, copy) NSString * displayName;
+@property (nonatomic, copy) NSString *displayName;
 
 /**
  *  图片本地路径
@@ -87,6 +96,7 @@ typedef enum : NSUInteger
 
 /**
  *  图片选项
+ *  @discussion 仅在发送时且通过 initWithImage: 方式初始化才有效
  */
 @property (nonatomic ,strong) NIMImageOption *option;
 

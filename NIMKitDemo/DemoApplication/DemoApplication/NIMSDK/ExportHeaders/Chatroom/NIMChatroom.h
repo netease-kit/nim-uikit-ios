@@ -45,6 +45,11 @@
  */
 @property (nonatomic,assign)   NSInteger onlineUserCount;
 
+/**
+ *  直播拉流地址
+ */
+@property (nonatomic,copy)     NSString *broadcastUrl;
+
 @end
 
 

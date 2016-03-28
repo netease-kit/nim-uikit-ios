@@ -60,7 +60,7 @@
     if ([self.dataProvider respondsToSelector:@selector(pullDown:handler:)])
     {
         __weak typeof(self) wself = self;
-        [self.dataProvider pullDown:nil handler:^(NSError *error, NSArray *messages) {
+        [self.dataProvider pullDown:nil handler:^(NSError *error, NSArray<NIMMessage *> *messages) {
             NIMKit_Dispatch_Async_Main(^{
                 [wself appendMessageModels:[self modelsWithMessages:messages]];
                 wself.firstTimeInterval = [messages.firstObject timestamp];
@@ -73,7 +73,7 @@
     }
     else
     {
-        NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:_currentSession
+        NSArray<NIMMessage *> *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:_currentSession
                                                                                    message:nil
                                                                                      limit:_messageLimit];
         [self appendMessageModels:[self modelsWithMessages:messages]];
@@ -213,6 +213,46 @@
     }
     return dels;
 }
+
+- (NSDictionary *)checkReceipt
+{
+    BOOL hasConfig = self.sessionConfig && [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    BOOL findLastReceipt = NO;
+    
+    for (NSInteger i = [_modelArray count] - 1; i >= 0; i--) {
+        id item = [_modelArray objectAtIndex:i];
+        if ([item isKindOfClass:[NIMMessageModel class]]) {
+            NIMMessageModel *model = (NIMMessageModel *)item;
+            NIMMessage *message = [model message];
+            if (message.isOutgoingMsg) {
+                
+                if (!findLastReceipt) {
+                    
+                    if (message.isRemoteRead && hasConfig && [self.sessionConfig shouldHandleReceiptForMessage:message])
+                    {
+                        if (model.shouldShowReadLabel) {
+                            break;  //当前没有变化
+                        }else{
+                            dict[@(i)] = model;
+                            model.shouldShowReadLabel = YES;
+                            findLastReceipt = YES;
+                        }
+                    }
+                }
+                else {
+                    if (model.shouldShowReadLabel) {
+                        dict[@(i)] = model;
+                        model.shouldShowReadLabel = NO;
+                        break;  //理论上只有一个已读标记在UI上,所以找到就可以跳出循环
+                    }
+                }
+            }
+        }
+    }
+    return dict;
+}
+
 
 - (void)cleanCache
 {

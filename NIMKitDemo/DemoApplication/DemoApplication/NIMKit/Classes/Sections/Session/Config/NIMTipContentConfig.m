@@ -16,7 +16,7 @@
 {
     CGFloat TeamNotificationMessageWidth  = cellWidth;
     UILabel *label = [[UILabel alloc] init];
-    label.text  = [NIMKitUtil formatedMessage:self.message];
+    label.text  = [NIMKitUtil messageTipContent:self.message];
     label.font = [UIFont boldSystemFontOfSize:NIMKit_Notification_Font_Size];
     label.numberOfLines = 0;
     CGFloat padding = [NIMDefaultValueMaker sharedMaker].maxNotificationTipPadding;

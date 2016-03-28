@@ -67,7 +67,7 @@
 {
     NIMKitEvent *event = [[NIMKitEvent alloc] init];
     event.eventName = NIMKitEventNameTapContent;
-    event.message = self.model.message;
+    event.messageModel = self.model;
     [self.delegate onCatchEvent:event];
 }
 

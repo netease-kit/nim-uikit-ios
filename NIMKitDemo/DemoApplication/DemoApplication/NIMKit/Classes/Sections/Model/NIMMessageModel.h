@@ -42,12 +42,14 @@
 
 @property (nonatomic, readonly) BOOL shouldShowLeft;
 
+@property (nonatomic) BOOL shouldShowReadLabel;
+
 /**
  *  计算内容大小
  *
  *  @param width 内容宽度
  */
-- (void)calculateContent:(CGFloat)width;
+- (void)calculateContent:(CGFloat)width force:(BOOL)force;
 
 /**
  *  NIMMessage封装成NIMMessageModel的方法

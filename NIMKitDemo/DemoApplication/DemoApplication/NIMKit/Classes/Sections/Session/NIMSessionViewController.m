@@ -23,6 +23,19 @@
 #import "NIMUIConfig.h"
 #import <AVFoundation/AVFoundation.h>
 
+
+static const void * const NTESDispatchMessageDataPrepareSpecificKey = &NTESDispatchMessageDataPrepareSpecificKey;
+dispatch_queue_t NTESMessageDataPrepareQueue()
+{
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("nim.demo.message.queue", 0);
+        dispatch_queue_set_specific(queue, NTESDispatchMessageDataPrepareSpecificKey, (void *)NTESDispatchMessageDataPrepareSpecificKey, NULL);
+    });
+    return queue;
+}
+
 @interface NIMSessionViewController ()
 <UITableViewDataSource,
 UITableViewDelegate,
@@ -35,7 +48,7 @@ NIMUserManagerDelegate>
 @property (nonatomic,strong,readwrite) UITableView *tableView;
 
 @property (nonatomic,strong) NIMSessionMsgDatasource *sessionDatasource;
-@property (nonatomic,strong) NSMutableArray *insertMessages;
+@property (nonatomic,strong) NSMutableArray *pendingMessages;   //缓存的插入消息,聊天室需要在另外个线程计算高度,减少UI刷新
 @property (nonatomic,readwrite)   NIMMessage *messageForMenu;
 @property (nonatomic,strong) NSIndexPath *lastVisibleIndexPathBeforeRotation;
 @property (nonatomic,assign) BOOL isRefreshing;
@@ -48,7 +61,7 @@ NIMUserManagerDelegate>
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _session = session;
-        _insertMessages = [[NSMutableArray alloc] init];
+        _pendingMessages = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -108,6 +121,7 @@ NIMUserManagerDelegate>
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vcBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)makeHandlerAndDataSource
@@ -125,6 +139,7 @@ NIMUserManagerDelegate>
         showTimestampInterval = [self.sessionConfig showTimestampInterval];
     }
     _sessionDatasource = [[NIMSessionMsgDatasource alloc] initWithSession:_session dataProvider:dataProvider showTimeInterval:showTimestampInterval limit:limit];
+    _sessionDatasource.sessionConfig = [self sessionConfig];
     [self.conversationManager markAllMessagesReadInSession:_session];
     
     _sessionDatasource.delegate = self;
@@ -142,6 +157,7 @@ NIMUserManagerDelegate>
         }
     }
     [self checkAttachmentState:messageArray];
+    [self sendMessageReceipt:messageArray];
 
     [[[NIMSDK sharedSDK] chatManager] addDelegate:self];
     [self.conversationManager addDelegate:self];
@@ -154,9 +170,11 @@ NIMUserManagerDelegate>
         [[NIMSDK sharedSDK].userManager addDelegate:self];
     }else{
         //没有托管用户信息，就直接加 NIMKit 的监听
-        extern NSString* NIMKitUserInfoHasUpdatedNotification;
+        extern NSString *const NIMKitUserInfoHasUpdatedNotification;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
     }
+    
+    
 }
 
 
@@ -318,6 +336,8 @@ NIMUserManagerDelegate>
         [self uiAddMessages:messages];
         [self.conversationManager markAllMessagesReadInSession:self.session];
     }
+    
+    [self sendMessageReceipt:messages];
 }
 
 
@@ -333,7 +353,16 @@ NIMUserManagerDelegate>
 {
     if ([message.session isEqual:_session]) {
         NIMMessageModel *model = [self makeModel:message];
+        //下完缩略图之后，因为比例有变化，重新刷下宽高。
+        [model calculateContent:self.tableView.nim_width force:YES];
         [_layoutManager updateCellAtIndex:[self.sessionDatasource indexAtModelArray:model] model:model];
+    }
+}
+
+- (void)onRecvMessageReceipt:(NIMMessageReceipt *)receipt
+{
+    if ([receipt.session isEqual:_session]) {
+        [self checkReceipt];
     }
 }
 
@@ -418,6 +447,11 @@ NIMUserManagerDelegate>
 
 #pragma marlk - 通知
 - (void)messageDataIsReady{
+
+    if ([self shouldHandleReceipt]) {
+        [self.sessionDatasource checkReceipt];
+    }
+
     [self.tableView reloadData];
     [self.tableView nim_scrollToBottom:NO];
 }
@@ -515,8 +549,22 @@ NIMUserManagerDelegate>
 - (void)onStartRecording
 {
     _sessionInputView.recording = YES;
-    [[NIMSDK sharedSDK].mediaManager recordAudioForDuration:60.f
-                                               withDelegate:self];
+    
+    NIMAudioType type = NIMAudioTypeAAC;
+    if ([self.sessionConfig respondsToSelector:@selector(recordType)])
+    {
+        type = [self.sessionConfig recordType];
+    }
+    
+    NSTimeInterval duration = 60.f;
+    if ([self.sessionConfig respondsToSelector:@selector(maxRecordDuration)])
+    {
+        duration = [self.sessionConfig maxRecordDuration];
+    }
+    
+    [[[NIMSDK sharedSDK] mediaManager] record:type
+                                     duration:duration
+                                     delegate:self];
 }
 
 #pragma mark - CellActionDelegate
@@ -603,9 +651,8 @@ NIMUserManagerDelegate>
 - (void)deleteMsg:(id)sender
 {
     NIMMessage *message    = [self messageForMenu];
-    NIMMessageModel *model = [self makeModel:message];
-    [self.layoutManager deleteCellAtIndexs:[self.sessionDatasource deleteMessageModel:model]];
-    [self.conversationManager deleteMessage:model.message];
+    [self uiDeleteMessage:message];
+    [self.conversationManager deleteMessage:message];
 }
 
 - (void)menuDidHide:(NSNotification *)notification
@@ -634,35 +681,47 @@ NIMUserManagerDelegate>
 {
     dispatch_async(NTESMessageDataPrepareQueue(), ^{
         //后台线程处理宽度计算，处理完之后同步抛到主线程插入
-        BOOL needCheck  = self.insertMessages.count == 0;
-        [self.insertMessages addObjectsFromArray:messages];
-        if (needCheck) {
-            [self checkInsert];
+        BOOL noPendingMessage = self.pendingMessages.count == 0;
+        [self.pendingMessages addObjectsFromArray:messages];
+        if (noPendingMessage)
+        {
+            [self processPendingMessages];
         }
     });
 }
 
 - (void)uiDeleteMessage:(NIMMessage *)message{
-    NIMMessageModel *model = [self makeModel:message];
+    NIMMessageModel *model = [self findModel:message];
+    BOOL receipteRelated = model.shouldShowReadLabel;
+    
     NSArray *indexs = [self.sessionDatasource deleteMessageModel:model];
     [self.tableView beginUpdates];
     [self.layoutManager deleteCellAtIndexs:indexs];
     [self.tableView endUpdates];
+    
+    if (receipteRelated)
+    {
+        [self checkReceipt];
+    }
 }
 
 - (void)uiUpdateMessage:(NIMMessage *)message{
-    NIMMessageModel *model = [self makeModel:message];
+    NIMMessageModel *model = [self findModel:message];
     NSInteger index = [self.sessionDatasource indexAtModelArray:model];
     [self.sessionDatasource.modelArray replaceObjectAtIndex:index withObject:model];
     [self.layoutManager updateCellAtIndex:index model:model];
 }
 
+- (void)uiCheckReceipt
+{
+    [self checkReceipt];
+}
 
+#pragma mark - 旋转处理 (iOS7)
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
     return self.interfaceOrientation;
 }
 
-#pragma mark - 旋转处理 (iOS7)
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
                                 duration:(NSTimeInterval)duration
 {
@@ -694,23 +753,79 @@ NIMUserManagerDelegate>
     }
 }
 
+#pragma mark - 已读回执
+- (BOOL)shouldHandleReceipt
+{
+    return self.session.sessionType == NIMSessionTypeP2P &&
+    [self.sessionConfig respondsToSelector:@selector(shouldHandleReceipt)] &&
+    [self.sessionConfig shouldHandleReceipt];
+}
+
+
+- (void)sendMessageReceipt:(NSArray *)messages
+{
+    if ([self shouldHandleReceipt])
+    {
+        //只有在当前 Application 是激活的状态下才发送已读回执
+        if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive)
+        {
+            //找到最后一个需要发送已读回执的消息标记为已读
+            for (NSInteger i = [messages count] - 1; i >= 0; i--) {
+                id item = [messages objectAtIndex:i];
+                NIMMessage *message = nil;
+                if ([item isKindOfClass:[NIMMessage class]])
+                {
+                    message = item;
+                }
+                else if ([item isKindOfClass:[NIMMessageModel class]])
+                {
+                    message = [(NIMMessageModel *)item message];
+                }
+                if (message)
+                {
+                    if (!message.isOutgoingMsg &&
+                        self.sessionConfig &&
+                        [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)] &&
+                        [self.sessionConfig shouldHandleReceiptForMessage:message])
+                    {
+                        
+                        NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
+                        
+                        [[[NIMSDK sharedSDK] chatManager] sendMessageReceipt:receipt
+                                                                  completion:nil];  //忽略错误,如果失败下次再发即可
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+- (void)vcBecomeActive:(NSNotification *)notification
+{
+    if ([self shouldHandleReceipt])
+    {
+        NSArray *models = [self.sessionDatasource modelArray];
+        [self sendMessageReceipt:models];
+    }
+}
+
 
 #pragma mark - Private
+- (id<NIMCellLayoutConfig>)layoutConfigForModel:(NIMMessageModel *)model
+{
+    id<NIMCellLayoutConfig> config = nil;
+    if ([self.sessionConfig respondsToSelector:@selector(layoutConfigWithMessage:)]) {
+        config = [self.sessionConfig layoutConfigWithMessage:model.message];
+    }
+    return config ? : [[NIMDefaultValueMaker sharedMaker] cellLayoutDefaultConfig];
+}
 
 - (void)layoutConfig:(NIMMessageModel *)model{
+    
     model.sessionConfig = self.sessionConfig;
-    if (model.layoutConfig == nil)
-    {
-        id<NIMCellLayoutConfig> layoutConfig = nil;
-        if ([self.sessionConfig respondsToSelector:@selector(layoutConfigWithMessage:)]) {
-            layoutConfig = [self.sessionConfig layoutConfigWithMessage:model.message];
-        }
-        if (!layoutConfig) {
-            layoutConfig = [NIMDefaultValueMaker sharedMaker].cellLayoutDefaultConfig;
-        }
-        model.layoutConfig = layoutConfig;
-    }
-    [model calculateContent:self.tableView.nim_width];
+    model.layoutConfig = [self layoutConfigForModel:model];
+    [model calculateContent:self.tableView.nim_width force:NO];
 }
 
 
@@ -745,6 +860,7 @@ NIMUserManagerDelegate>
         [refreshControl endRefreshing];
         [layoutManager reloadDataToIndex:index atScrollPosition:UITableViewScrollPositionBottom withAnimation:NO];
         [wself checkAttachmentState:memssages];
+        [wself checkReceipt];
     }];
 }
 
@@ -761,34 +877,40 @@ NIMUserManagerDelegate>
 }
 
 
-- (void)checkInsert
+
+- (void)processPendingMessages
 {
     __weak typeof(self) weakSelf = self;
-    if (!weakSelf) {
+    NSUInteger pendingMessageCount = self.pendingMessages.count;
+    if (!weakSelf || pendingMessageCount== 0) {
         return;
     }
+    
+    
     if (weakSelf.tableView.isDecelerating || weakSelf.tableView.isDragging)
     {
         //滑动的时候为保证流畅，暂停插入
         NSTimeInterval delay = 1;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), NTESMessageDataPrepareQueue(), ^{
-            [weakSelf checkInsert];
+            [weakSelf processPendingMessages];
         });
         return;
     }
-    static NSInteger NTESMaxInsert = 1;
-    NSArray *insert;
+    
+    //获取一定量的消息计算高度，并扔回到主线程
+    static NSInteger NTESMaxInsert = 2;
+    NSArray *insert = nil;
     NSRange range;
-    if (self.insertMessages.count > NTESMaxInsert)
+    if (pendingMessageCount > NTESMaxInsert)
     {
         range = NSMakeRange(0, NTESMaxInsert);
     }
     else
     {
-        range = NSMakeRange(0, self.insertMessages.count);
+        range = NSMakeRange(0, pendingMessageCount);
     }
-    insert = [self.insertMessages subarrayWithRange:range];
-    [self.insertMessages removeObjectsInRange:range];
+    insert = [self.pendingMessages subarrayWithRange:range];
+    [self.pendingMessages removeObjectsInRange:range];
     
     NSMutableArray *models = [[NSMutableArray alloc] init];
     for (NIMMessage *message in insert)
@@ -797,33 +919,36 @@ NIMUserManagerDelegate>
         [self layoutConfig:model];
         [models addObject:model];
     }
+    
+    NSUInteger leftPendingMessageCount = self.pendingMessages.count;
+    BOOL animated = leftPendingMessageCount== 0;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSArray *insert = [weakSelf.sessionDatasource addMessageModels:models];
         [weakSelf.tableView beginUpdates];
-        BOOL animated = !self.insertMessages.count;
         [weakSelf.layoutManager insertTableViewCellAtRows:insert animated:animated];
         [weakSelf.tableView endUpdates];
     });
     
-    if (self.insertMessages.count)
+    if (leftPendingMessageCount)
     {
         NSTimeInterval delay = 0.1;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), NTESMessageDataPrepareQueue(), ^{
-            [weakSelf checkInsert];
+            [weakSelf processPendingMessages];
         });
     }
 }
 
-static const void * const NTESDispatchMessageDataPrepareSpecificKey = &NTESDispatchMessageDataPrepareSpecificKey;
-dispatch_queue_t NTESMessageDataPrepareQueue()
+- (void)checkReceipt
 {
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("nim.demo.message.queue", 0);
-        dispatch_queue_set_specific(queue, NTESDispatchMessageDataPrepareSpecificKey, (void *)NTESDispatchMessageDataPrepareSpecificKey, NULL);
-    });
-    return queue;
+    if ([self shouldHandleReceipt])
+    {
+        NSDictionary *models = [self.sessionDatasource checkReceipt];
+        for (NSNumber *index in models.allKeys) {
+            [_layoutManager updateCellAtIndex:[index integerValue]
+                                        model:models[index]];
+        }
+    }
 }
 
 @end
+

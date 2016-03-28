@@ -58,7 +58,7 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
              clickedOnLink:(id)linkData{
     NIMKitEvent *event = [[NIMKitEvent alloc] init];
     event.eventName = NIMKitEventNameTapLabelLink;
-    event.message = self.model.message;
+    event.messageModel = self.model;
     event.data = linkData;
     [self.delegate onCatchEvent:event];
 }

@@ -129,4 +129,9 @@
  */
 - (void)uiUpdateMessage:(NIMMessage *)message;
 
+/**
+ *  调整已读回执状态
+ */
+- (void)uiCheckReceipt;
+
 @end

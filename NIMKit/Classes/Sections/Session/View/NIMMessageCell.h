@@ -22,6 +22,7 @@
 @property (nonatomic, strong) UIActivityIndicatorView *traningActivityIndicator;  //发送loading
 @property (nonatomic, strong) UIButton *retryButton;                              //重试
 @property (nonatomic, strong) NIMBadgeView *audioPlayedIcon;                      //语音未读红点
+@property (nonatomic, strong) UILabel *readLabel;                                 //已读
 
 @property (nonatomic, weak)   id<NIMMessageCellDelegate> messageDelegate;
 

@@ -61,7 +61,7 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
 
 - (NSString *)memberTypeString:(NIMTeamMemberType)type {
     if(type == NIMTeamMemberTypeNormal) {
-        return @"普通群员";
+        return @"普通成员";
     } else if (type == NIMTeamMemberTypeOwner) {
         return @"群主";
     } else if (type == NIMTeamMemberTypeManager) {

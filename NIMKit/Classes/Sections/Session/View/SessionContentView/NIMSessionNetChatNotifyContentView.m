@@ -28,7 +28,7 @@
 
 - (void)refresh:(NIMMessageModel *)data{
     [super refresh:data];
-    NSString *text = [NIMKitUtil formatedMessage:data.message];
+    NSString *text = [NIMKitUtil messageTipContent:data.message];
     [_textLabel nim_setText:text];
     if (!self.model.message.isOutgoingMsg) {
         _textLabel.textColor = [UIColor blackColor];

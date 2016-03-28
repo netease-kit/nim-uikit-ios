@@ -189,8 +189,8 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  @return 消息列表，按时间从小到大排列
  */
 - (NSArray *)messagesInSession:(NIMSession *)session
-                      message:(NIMMessage *)message
-                        limit:(NSInteger)limit;
+                       message:(NIMMessage *)message
+                         limit:(NSInteger)limit;
 
 
 /**

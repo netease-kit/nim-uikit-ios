@@ -2,7 +2,7 @@
 //  NIMRTSRecordingInfo.h
 //  NIMLib
 //
-//  Created by Netease .
+//  Created by Netease.
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
@@ -17,7 +17,7 @@
 /**
  *  录制文件的服务类型
  */
-@property (nonatomic, readonly) NIMRTSService service;
+@property (nonatomic, readonly, assign) NIMRTSService service;
 
 /**
  *  录制存储服务器地址
