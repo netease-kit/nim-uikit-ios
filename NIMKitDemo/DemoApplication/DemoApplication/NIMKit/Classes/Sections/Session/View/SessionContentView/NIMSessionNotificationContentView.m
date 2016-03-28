@@ -30,11 +30,8 @@
 
 - (void)refresh:(NIMMessageModel *)model{
     [super refresh:model];
-    id<NIMCellLayoutConfig> config = model.layoutConfig;
-    if ([config respondsToSelector:@selector(formatedMessage:)]) {
-        _label.text = [model.layoutConfig formatedMessage:model];;
-        [_label sizeToFit];
-    }
+    _label.text = [NIMKitUtil messageTipContent:model.message];
+    [_label sizeToFit];
 }
 
 - (UIImage *)chatBubbleImageForState:(UIControlState)state outgoing:(BOOL)outgoing{

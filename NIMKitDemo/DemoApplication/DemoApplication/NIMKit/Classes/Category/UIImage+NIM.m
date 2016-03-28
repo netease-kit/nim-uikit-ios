@@ -49,7 +49,7 @@
     CGSize size;
     NSInteger imageWidth = originSize.width ,imageHeight = originSize.height;
     NSInteger imageMinWidth = imageMinSize.width, imageMinHeight = imageMinSize.height;
-    NSInteger imageMaxWidth = imageMaxSiz.width, imageMaxHeight = imageMaxSiz.height;
+    NSInteger imageMaxWidth = imageMaxSiz.width,  imageMaxHeight = imageMaxSiz.height;
     if (imageWidth > imageHeight) //宽图
     {
         size.height = imageMinHeight;  //高度取最小高度

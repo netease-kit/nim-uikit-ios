@@ -10,7 +10,7 @@
 * `NIMKit` 依赖云信通讯能力库 `NIMSDK`，请自行在您的工程中添加。
 * 定制自定义消息教程 [NIM Guide For Custom Message](/NIM_Guide_For_Custom_Message.md) 。
 * 利用组件绘制自定义消息气泡教程 [NIM Guide For Custom Message UI](/NIM_Guide_For_Custom_Message_UI.md) 。
-* 工程配置和自定义消息配置示例请参考 `NIMKitDemo\DemoApplication` 工程 **(请自行在 DemoApplication/NIMKit/Vendors/NIMSDK/ 下添加通讯能力库 libNIMSDK.a )**。
+* 工程配置和自定义消息配置示例请参考 `NIMKitDemo\DemoApplication` 工程 **(请自行在 DemoApplication/NIMSDK/ 下添加通讯能力库 libNIMSDK.a )**。
 * 具体使用范例请参考 [NIM Demo For iOS](https://github.com/netease-im/NIM_iOS_Demo) 。
 
 

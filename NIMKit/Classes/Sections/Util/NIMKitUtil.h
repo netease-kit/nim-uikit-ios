@@ -18,7 +18,7 @@
 
 + (NSString *)showTime:(NSTimeInterval)msglastTime showDetail:(BOOL)showDetail;
 
-+ (NSString *)formatedMessage:(NIMMessage *)message;
++ (NSString *)messageTipContent:(NIMMessage *)message;
 
 
 @end

@@ -53,7 +53,7 @@
         [addIndexPathes addObject:[NSIndexPath indexPathForRow:[obj integerValue] inSection:0]];
     }];
     [_tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationFade];
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [_tableView scrollToRowAtIndexPath:[addIndexPathes lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
     });
 }
@@ -73,11 +73,21 @@
 
 - (void)updateCellAtIndex:(NSInteger)index model:(NIMMessageModel *)model
 {
-    if (index > -1) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-
-        NIMMessageCell *cell = (NIMMessageCell *)[_tableView cellForRowAtIndexPath:indexPath];
-        [cell refreshData:model];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    NIMMessageCell *cell = (NIMMessageCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+    if (cell) {
+        CGFloat originalHeight = [self.tableView cellForRowAtIndexPath:indexPath].frame.size.height;
+        CGFloat newHeight = [self.tableView cellForRowAtIndexPath:indexPath].frame.size.height;
+        CGFloat delta = newHeight - originalHeight;
+        if (delta) {
+            [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            CGFloat scrollOffsetY = self.tableView.contentOffset.y + delta;
+            [self.tableView setContentOffset:CGPointMake(self.tableView.contentOffset.x, scrollOffsetY) animated:NO];
+        }
+        else
+        {
+            [cell refreshData:model];
+        }
     }
 }
 

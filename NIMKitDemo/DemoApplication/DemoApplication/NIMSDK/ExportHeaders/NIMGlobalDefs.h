@@ -222,6 +222,11 @@ typedef NS_ENUM(NSInteger, NIMLocalErrorCode) {
      *  聊天室不存在
      */
     NIMLocalErrorChatroomNotExists               = 26,
+    
+    /**
+     *  操作尚未完成
+     */
+    NIMLocalErrorCodeOperationIncomplete         = 27,
 };
 
 

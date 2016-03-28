@@ -294,6 +294,9 @@
         case NIMMessageTypeFile:
             text = @"[文件]";
             break;
+        case NIMMessageTypeTip:
+            text = @"[提醒消息]";   //调整成你需要显示的文案
+            break;
         default:
             text = @"[未知消息]";
     }

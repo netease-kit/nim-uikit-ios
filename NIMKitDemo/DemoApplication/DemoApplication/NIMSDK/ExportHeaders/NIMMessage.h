@@ -18,6 +18,7 @@
 #import "NIMNotificationObject.h"
 #import "NIMTipObject.h"
 #import "NIMMessageSetting.h"
+#import "NIMMessageReceipt.h"
 
 @class NIMMessageChatroomExtension;
 
@@ -180,6 +181,13 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
  *  @discussion 已删除的消息在获取本地消息列表时会被过滤掉，只有根据messageId获取消息的接口可能会返回已删除消息。
  */
 @property (nonatomic,assign,readonly)       BOOL isDeleted;
+
+
+/**
+ *  对端是否已读
+ *  @discussion 只有当当前消息为 P2P 消息且 isOutgoingMsg 为 YES 时这个字段才有效，需要对端调用过发送已读回执的接口
+ */
+@property (nonatomic,assign,readonly)       BOOL isRemoteRead;
 
 /**
  *  消息发送者名字

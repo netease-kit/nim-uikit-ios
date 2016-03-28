@@ -10,6 +10,13 @@
 #import "NIMMessage.h"
 
 /**
+ *  发送已读回执Block
+ *
+ *  @param error 错误信息,如果成功
+ */
+typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
+
+/**
  *  聊天委托
  */
 @protocol NIMChatManagerDelegate <NSObject>
@@ -50,10 +57,19 @@
 
 
 /**
+ *  收到消息回执
+ *
+ *  @param receipt 消息回执
+ *  @discussion 当上层收到此消息时所有的存储和 model 层业务都已经更新，只需要更新 UI 即可。如果对端发送的已读回执时间戳比当前端存储的最后时间戳还小，这个已读回执将被忽略。
+ */
+- (void)onRecvMessageReceipt:(NIMMessageReceipt *)receipt;
+
+
+/**
  *  收取消息附件回调
- *  @discussion 附件包括:图片,视频的缩略图,语音文件
  *  @param message  当前收取的消息
  *  @param progress 进度
+ *  @discussion 附件包括:图片,视频的缩略图,语音文件
  */
 - (void)fetchMessageAttachment:(NIMMessage *)message
                       progress:(CGFloat)progress;
@@ -99,6 +115,17 @@
  */
 - (BOOL)resendMessage:(NIMMessage *)message
                 error:(NSError **)error;
+
+
+/**
+ *  发送已读回执
+ *
+ *  @param receipt    已读回执
+ *  @param completion 完成回调
+ *  @discussion 如果已有比当前已读回执时间戳更大的已读回执已确认，客户端将忽略当前请求直接返回(error code 为 NIMRemoteErrorCodeExist)
+ */
+- (void)sendMessageReceipt:(NIMMessageReceipt *)receipt
+                completion:(NIMSendMessageReceiptBlock)completion;
 
 
 

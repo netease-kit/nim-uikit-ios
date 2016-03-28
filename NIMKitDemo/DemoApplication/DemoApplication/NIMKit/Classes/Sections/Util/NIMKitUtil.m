@@ -116,16 +116,28 @@
 }
 
 
-+ (NSString *)formatedMessage:(NIMMessage *)message{
-    switch (message.messageType) {
-        case NIMMessageTypeNotification:
-            return [NIMKitUtil notificationMessage:message];
-        case NIMMessageTypeTip:
-            return message.text;
-        default:
-            break;
++ (NSString *)messageTipContent:(NIMMessage *)message{
+    
+    NSString *text = nil;
+    id<NIMKitDataProvider> provider = [[NIMKit sharedKit] provider];
+    if ([provider respondsToSelector:@selector(tipMessage:)]) {
+        text = [provider tipMessage:message];
     }
-    return nil;
+    
+    //如果上层没提供,使用默认值
+    if (text == nil) {
+        switch (message.messageType) {
+            case NIMMessageTypeNotification:
+                text =  [NIMKitUtil notificationMessage:message];
+                break;
+            case NIMMessageTypeTip:
+                text = message.text;
+                break;
+            default:
+                break;
+        }
+    }
+    return text;
 }
 
 

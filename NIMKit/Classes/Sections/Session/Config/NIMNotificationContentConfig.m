@@ -23,7 +23,7 @@
         {
             CGFloat TeamNotificationMessageWidth  = cellWidth;
             UILabel *label = [[UILabel alloc] init];
-            label.text  = [NIMKitUtil formatedMessage:self.message];
+            label.text  = [NIMKitUtil messageTipContent:self.message];
             label.font = [UIFont boldSystemFontOfSize:NIMKit_Notification_Font_Size];
             label.numberOfLines = 0;
             CGFloat padding = [NIMDefaultValueMaker sharedMaker].maxNotificationTipPadding;
@@ -35,7 +35,7 @@
         case NIMNotificationTypeNetCall:{
             NIMAttributedLabel *label = [[NIMAttributedLabel alloc] initWithFrame:CGRectZero];
             label.font = [UIFont systemFontOfSize:NIMKit_Message_Font_Size];
-            NSString *text = [NIMKitUtil formatedMessage:self.message];
+            NSString *text = [NIMKitUtil messageTipContent:self.message];
             [label nim_setText:text];
             
             CGFloat msgBubbleMaxWidth    = (cellWidth - 130);

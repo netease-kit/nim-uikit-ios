@@ -2,7 +2,7 @@
 //  NIMMessageSearchOption.h
 //  NIMLib
 //
-//  Created by amao on 6/30/15.
+//  Created by Netease.
 //  Copyright (c) 2015 Netease. All rights reserved.
 //
 

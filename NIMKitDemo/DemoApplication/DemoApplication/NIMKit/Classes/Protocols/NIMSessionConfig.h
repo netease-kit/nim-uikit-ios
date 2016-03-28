@@ -92,6 +92,34 @@
  */
 - (BOOL)autoFetchWhenOpenSession;
 
+/**
+ *  是否需要处理已读回执
+ *
+ */
+- (BOOL)shouldHandleReceipt;
+
+/**
+ *  这次消息时候需要做已读回执的处理
+ *
+ *  @param message 消息
+ *
+ *  @return 是否需要
+ */
+- (BOOL)shouldHandleReceiptForMessage:(NIMMessage *)message;
+
+/**
+ *  录音类型
+ *
+ *  @return 录音类型
+ */
+- (NIMAudioType)recordType;
+
+/**
+ *  最大录音时长
+ *
+ *  @return 录音时常
+ */
+- (NSTimeInterval)maxRecordDuration;
 
 /**
  *  消息数据提供器

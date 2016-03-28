@@ -88,6 +88,11 @@ typedef NS_ENUM(NSInteger, NIMChatroomConnectionState) {
      *  和聊天室失去连接
      */
     NIMChatroomConnectionStateLoseConnection   = 3,
+    /**
+     *  发生严重错误,需要用户手动进行重连
+     *  @discussion 一般出现在自动重连时发生密码错误或者有其他端已登录的情况
+     */
+    NIMChatroomConnectionStateFatalError       = 4,
 };
 
 /**
@@ -97,7 +102,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
     /**
      *  未知原因
      */
-    NIMChatroomKickReasonUnknow          = -1,
+    NIMChatroomKickReasonUnknown         = -1,
     /**
      *  聊天室已经解散
      */
@@ -123,7 +128,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
  *  被踢回调
  *
  *  @param roomId   被踢的聊天室Id
- *  @param resson   被踢原因
+ *  @param reason   被踢原因
  */
 - (void)chatroom:(NSString *)roomId beKicked:(NIMChatroomKickReason)reason;
 
@@ -132,7 +137,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
  *  聊天室连接状态变化
  *
  *  @param roomId 聊天室Id
- *  @param step   当前步骤
+ *  @param state  当前状态
  */
 - (void)chatroom:(NSString *)roomId connectionStateChanged:(NIMChatroomConnectionState)state;
 
@@ -165,9 +170,9 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
 /**
  *  查询服务器保存的聊天室消息记录
  *
- *  @param session 聊天会话
+ *  @param roomId  聊天室ID
  *  @param option  查询选项
- *  @param block   消息回调
+ *  @param completion   完成回调
  */
 - (void)fetchMessageHistory:(NSString *)roomId
                      option:(NIMHistoryMessageSearchOption *)option
