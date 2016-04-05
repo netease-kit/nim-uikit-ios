@@ -105,7 +105,6 @@
 		6162A7311C7C61B300F87275 /* NIMKitUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6A61C7C61B300F87275 /* NIMKitUtil.m */; };
 		6162A7321C7C61B300F87275 /* NIMPinyinConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6A91C7C61B300F87275 /* NIMPinyinConverter.m */; };
 		6162A7331C7C61B300F87275 /* NIMSpellingCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6AB1C7C61B300F87275 /* NIMSpellingCenter.m */; };
-		6162A7341C7C61B300F87275 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6162A6AD1C7C61B300F87275 /* Info.plist */; };
 		6162A7351C7C61B300F87275 /* NIMAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6B11C7C61B300F87275 /* NIMAttributedLabel.m */; };
 		6162A7361C7C61B300F87275 /* NIMAttributedLabelAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6B31C7C61B300F87275 /* NIMAttributedLabelAttachment.m */; };
 		6162A7371C7C61B300F87275 /* NIMAttributedLabelURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 6162A6B61C7C61B300F87275 /* NIMAttributedLabelURL.m */; };
@@ -401,7 +400,6 @@
 		6162A6A91C7C61B300F87275 /* NIMPinyinConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NIMPinyinConverter.m; sourceTree = "<group>"; };
 		6162A6AA1C7C61B300F87275 /* NIMSpellingCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NIMSpellingCenter.h; sourceTree = "<group>"; };
 		6162A6AB1C7C61B300F87275 /* NIMSpellingCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NIMSpellingCenter.m; sourceTree = "<group>"; };
-		6162A6AD1C7C61B300F87275 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6162A6B01C7C61B300F87275 /* NIMAttributedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NIMAttributedLabel.h; sourceTree = "<group>"; };
 		6162A6B11C7C61B300F87275 /* NIMAttributedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NIMAttributedLabel.m; sourceTree = "<group>"; };
 		6162A6B21C7C61B300F87275 /* NIMAttributedLabelAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NIMAttributedLabelAttachment.h; sourceTree = "<group>"; };
@@ -619,7 +617,6 @@
 			isa = PBXGroup;
 			children = (
 				6162A5DA1C7C61B200F87275 /* Classes */,
-				6162A6AC1C7C61B300F87275 /* Supporting Files */,
 				6162A6AE1C7C61B300F87275 /* Vendors */,
 			);
 			path = NIMKit;
@@ -995,14 +992,6 @@
 			path = Spelling;
 			sourceTree = "<group>";
 		};
-		6162A6AC1C7C61B300F87275 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				6162A6AD1C7C61B300F87275 /* Info.plist */,
-			);
-			path = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		6162A6AE1C7C61B300F87275 /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
@@ -1233,7 +1222,6 @@
 				61F16ED61BC56AB300ABEE57 /* NIMKitResouce.bundle in Resources */,
 				6152C7991BE5E440005E028F /* icon_custom_pressed@3x.png in Resources */,
 				61F16EE01BC5769100ABEE57 /* DefaultAvatar@3x.png in Resources */,
-				6162A7341C7C61B300F87275 /* Info.plist in Resources */,
 				61F16E811BC567F700ABEE57 /* Main.storyboard in Resources */,
 				6152C7961BE5E440005E028F /* icon_custom_normal@2x.png in Resources */,
 			);
