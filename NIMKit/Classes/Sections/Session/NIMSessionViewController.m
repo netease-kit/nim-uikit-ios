@@ -37,8 +37,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 }
 
 @interface NIMSessionViewController ()
-<UITableViewDataSource,
-UITableViewDelegate,
+<
 NIMConversationManagerDelegate,
 NIMTeamManagerDelegate,
 NIMMediaManagerDelgate,
@@ -51,7 +50,6 @@ NIMUserManagerDelegate>
 @property (nonatomic,strong) NSMutableArray *pendingMessages;   //缓存的插入消息,聊天室需要在另外个线程计算高度,减少UI刷新
 @property (nonatomic,readwrite)   NIMMessage *messageForMenu;
 @property (nonatomic,strong) NSIndexPath *lastVisibleIndexPathBeforeRotation;
-@property (nonatomic,assign) BOOL isRefreshing;
 
 @end
 
@@ -269,17 +267,6 @@ NIMUserManagerDelegate>
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
     [[UIMenuController sharedMenuController] setMenuVisible:NO animated:YES];
-    CGFloat offset = 44.f;
-    if (scrollView.contentOffset.y <= -offset && !self.isRefreshing && self.tableView.isDragging) {
-        self.isRefreshing = YES;
-        [self.refreshControl beginRefreshing];
-        [self.refreshControl sendActionsForControlEvents:UIControlEventValueChanged];
-        [scrollView endEditing:YES];
-    }
-    else if(scrollView.contentOffset.y >= 0)
-    {
-        self.isRefreshing = NO;
-    }
 }
 
 #pragma mark - 消息收发接口
@@ -858,9 +845,11 @@ NIMUserManagerDelegate>
     __weak UIRefreshControl *refreshControl = self.refreshControl;
     [self.sessionDatasource loadHistoryMessagesWithComplete:^(NSInteger index,NSArray *memssages, NSError *error) {
         [refreshControl endRefreshing];
-        [layoutManager reloadDataToIndex:index atScrollPosition:UITableViewScrollPositionBottom withAnimation:NO];
-        [wself checkAttachmentState:memssages];
-        [wself checkReceipt];
+        if (memssages.count) {
+            [layoutManager reloadData];
+            [wself checkAttachmentState:memssages];
+            [wself checkReceipt];
+        }
     }];
 }
 

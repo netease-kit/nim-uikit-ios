@@ -9,7 +9,7 @@
 #import "NSString+NIM.h"
 #import <CommonCrypto/CommonDigest.h>
 
-@implementation NSString (NIM)
+@implementation NSString (NIMKit)
 
 - (CGSize)nim_stringSizeWithFont:(UIFont *)font{
     return [self sizeWithAttributes:@{NSFontAttributeName:font}];

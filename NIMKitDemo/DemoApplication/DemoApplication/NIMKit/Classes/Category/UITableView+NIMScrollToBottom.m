@@ -8,7 +8,7 @@
 
 #import "UITableView+NIMScrollToBottom.h"
 
-@implementation UITableView (NIMScrollToBottom)
+@implementation UITableView (NIMKit)
 
 - (void)nim_scrollToBottom:(BOOL)animation
 {

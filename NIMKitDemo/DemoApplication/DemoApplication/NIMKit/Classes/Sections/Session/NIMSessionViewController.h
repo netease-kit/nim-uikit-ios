@@ -14,7 +14,7 @@
 #import "NIMSessionMsgDatasource.h"
 #import "NIMSessionViewLayoutManager.h"
 
-@interface NIMSessionViewController : UIViewController<NIMInputActionDelegate,NIMMessageCellDelegate,NIMSessionMsgDatasourceDelegate,NIMChatManagerDelegate>
+@interface NIMSessionViewController : UIViewController<NIMInputActionDelegate,NIMMessageCellDelegate,NIMSessionMsgDatasourceDelegate,NIMChatManagerDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (nonatomic, strong, readonly) UITableView *tableView;
 

@@ -8,7 +8,7 @@
 
 #import "UIView+NIM.h"
 
-@implementation UIView (NIM)
+@implementation UIView (NIMKit)
 
 - (CGFloat)nim_left {
     return self.frame.origin.x;

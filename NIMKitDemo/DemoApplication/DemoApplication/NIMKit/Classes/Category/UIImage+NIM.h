@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIImage (NIM)
+@interface UIImage (NIMKit)
 
 + (UIImage *)nim_fetchImage:(NSString *)imageNameOrPath;
 

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NSString (NIM)
+@interface NSString (NIMKit)
 
 - (CGSize)nim_stringSizeWithFont:(UIFont *)font;
 
@@ -17,4 +17,6 @@
 - (NSUInteger)nim_getBytesLength;
 
 - (NSString *)nim_stringByDeletingPictureResolution;
+
+
 @end
