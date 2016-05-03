@@ -10,7 +10,7 @@
 #import "NIMInputEmoticonDefine.h"
 #import "NIMKit.h"
 
-@implementation UIImage (NIM)
+@implementation UIImage (NIMKit)
 
 + (UIImage *)nim_fetchImage:(NSString *)imageNameOrPath{
     UIImage *image = [UIImage imageNamed:imageNameOrPath];

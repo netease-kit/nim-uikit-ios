@@ -103,17 +103,14 @@
     [_tableView deleteRowsAtIndexPaths:delIndexPathes withRowAnimation:UITableViewRowAnimationNone];
 }
 
--(void)reloadDataToIndex:(NSInteger)index
-        atScrollPosition:(UITableViewScrollPosition)scrollPosition
-           withAnimation:(BOOL)animated
+-(void)reloadData
 {
+    CGFloat bottom  = _tableView.contentSize.height - _tableView.contentOffset.y;
     [_tableView reloadData];
-    if (index > 0) {
-        NSTimeInterval scrollDelay = .01f;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(scrollDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0] atScrollPosition:scrollPosition animated:YES];
-        });
-    }
+    CGFloat offsetY = _tableView.contentSize.height - bottom;
+    CGPoint offset  = _tableView.contentOffset;
+    offset.y = offsetY;
+    [_tableView setContentOffset:offset animated:NO];
 }
 
 #pragma mark - NTESInputViewDelegate

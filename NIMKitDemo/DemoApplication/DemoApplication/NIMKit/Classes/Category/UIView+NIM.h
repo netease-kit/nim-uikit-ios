@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIView (NIM)
+@interface UIView (NIMKit)
 
 @property (nonatomic) CGFloat nim_left;
 

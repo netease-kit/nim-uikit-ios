@@ -24,8 +24,6 @@
 
 -(void)deleteCellAtIndexs:(NSArray*)delIndexs;
 
--(void)reloadDataToIndex:(NSInteger)index
-        atScrollPosition:(UITableViewScrollPosition)scrollPosition
-           withAnimation:(BOOL)animated;
+-(void)reloadData;
 
 @end
