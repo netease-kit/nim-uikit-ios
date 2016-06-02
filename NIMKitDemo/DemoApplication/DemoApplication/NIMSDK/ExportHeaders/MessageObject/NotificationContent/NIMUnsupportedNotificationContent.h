@@ -8,5 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NIMUnsupportedNotificationContent : NIMNotificationContent
 @end
+
+
+NS_ASSUME_NONNULL_END

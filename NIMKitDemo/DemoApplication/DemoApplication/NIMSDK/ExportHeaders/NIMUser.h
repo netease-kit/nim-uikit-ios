@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMUserInfo;
 
 /**
@@ -58,17 +61,17 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
 /**
  *  用户Id
  */
-@property (nonatomic,copy)   NSString    *userId;
+@property (nullable,nonatomic,copy)   NSString    *userId;
 
 /**
  *  备注名，长度限制为128个字符。
  */
-@property (nonatomic,copy)   NSString    *alias;
+@property (nullable,nonatomic,copy)   NSString    *alias;
 
 /**
- *  扩展字段，上层需要保证NSDictionary可以转换为JSON,JSON长度限制为256个字符。
+ *  扩展字段
  */
-@property (nonatomic,copy)   NSDictionary  *ext;
+@property (nullable,nonatomic,copy)   NSString  *ext;
 
 /**
  *  用户资料，仅当用户选择托管信息到云信时有效
@@ -77,7 +80,7 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
  *                        2.收到此用户发来消息
  *                        3.程序再次启动，此时会同步好友信息
  */
-@property (nonatomic,strong,readonly) NIMUserInfo *userInfo;
+@property (nullable,nonatomic,strong,readonly) NIMUserInfo *userInfo;
 
 /**
  *  是否需要消息提醒
@@ -105,22 +108,23 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
 /**
  *  用户昵称
  */
-@property (nonatomic,copy,readonly) NSString *nickName;
+@property (nullable,nonatomic,copy,readonly) NSString *nickName;
 
 /**
  *  用户头像
  */
-@property (nonatomic,copy,readonly) NSString *avatarUrl;
+@property (nullable,nonatomic,copy,readonly) NSString *avatarUrl;
 
 /**
- *  用户头像缩略图，仅适用于使用云信上传服务进行上传的资源。否则为和用户头像原图值一致。
+ *  用户头像缩略图
+ *  @discussion 仅适用于使用云信上传服务进行上传的资源，否则无效。
  */
-@property (nonatomic,copy,readonly) NSString *thumbAvatarUrl;
+@property (nullable,nonatomic,copy,readonly) NSString *thumbAvatarUrl;
 
 /**
  *  用户签名
  */
-@property (nonatomic,copy,readonly) NSString *sign;
+@property (nullable,nonatomic,copy,readonly) NSString *sign;
 
 /**
  *  用户性别
@@ -130,22 +134,22 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
 /**
  *  邮箱
  */
-@property (nonatomic,copy,readonly) NSString *email;
+@property (nullable,nonatomic,copy,readonly) NSString *email;
 
 /**
  *  生日
  */
-@property (nonatomic,copy,readonly) NSString *birth;
+@property (nullable,nonatomic,copy,readonly) NSString *birth;
 
 /**
  *  电话号码
  */
-@property (nonatomic,copy,readonly) NSString *mobile;
+@property (nullable,nonatomic,copy,readonly) NSString *mobile;
 
 /**
  *  用户自定义扩展字段
  */
-@property (nonatomic,copy,readonly) NSString *ex;
+@property (nullable,nonatomic,copy,readonly) NSString *ext;
 
 
 @end
@@ -166,8 +170,9 @@ typedef NS_ENUM(NSInteger, NIMUserGender) {
 
 /**
  *  附言
- *  @dicussion 
  */
-@property (nonatomic,copy)      NSString            *message;
+@property (nullable,nonatomic,copy)      NSString            *message;
 
 @end
+
+NS_ASSUME_NONNULL_END

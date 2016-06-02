@@ -9,12 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "NIMMessage.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  发送已读回执Block
  *
  *  @param error 错误信息,如果成功
  */
-typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
+typedef void(^NIMSendMessageReceiptBlock)(NSError * __nullable error);
 
 /**
  *  聊天委托
@@ -45,7 +47,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *  @param error   失败原因,如果发送成功则error为nil
  */
 - (void)sendMessage:(NIMMessage *)message
-    didCompleteWithError:(NSError *)error;
+    didCompleteWithError:(nullable NSError *)error;
 
 
 /**
@@ -53,7 +55,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *
  *  @param messages 消息列表,内部为NIMMessage
  */
-- (void)onRecvMessages:(NSArray *)messages;
+- (void)onRecvMessages:(NSArray<NIMMessage *> *)messages;
 
 
 /**
@@ -82,7 +84,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *  @param error   错误返回,如果收取成功,error为nil
  */
 - (void)fetchMessageAttachment:(NIMMessage *)message
-          didCompleteWithError:(NSError *)error;
+          didCompleteWithError:(nullable NSError *)error;
 
 @end
 
@@ -103,7 +105,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  */
 - (BOOL)sendMessage:(NIMMessage *)message
           toSession:(NIMSession *)session
-              error:(NSError **)error;
+              error:(NSError * __nullable *)error;
 
 /**
  *  重发消息
@@ -114,7 +116,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *  @return 是否调用成功,这里返回的result只是表示当前这个函数调用是否成功,需要后续的回调才能够判断消息是否已经发送至服务器
  */
 - (BOOL)resendMessage:(NIMMessage *)message
-                error:(NSError **)error;
+                error:(NSError * __nullable *)error;
 
 
 /**
@@ -125,7 +127,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *  @discussion 如果已有比当前已读回执时间戳更大的已读回执已确认，客户端将忽略当前请求直接返回(error code 为 NIMRemoteErrorCodeExist)
  */
 - (void)sendMessageReceipt:(NIMMessageReceipt *)receipt
-                completion:(NIMSendMessageReceiptBlock)completion;
+                completion:(nullable NIMSendMessageReceiptBlock)completion;
 
 
 
@@ -138,7 +140,7 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  *  @return 是否调用成功
  */
 - (BOOL)fetchMessageAttachment:(NIMMessage *)message
-                         error:(NSError **)error;
+                         error:(NSError * __nullable *)error;
 
 /**
  *  消息是否正在传输 (发送/接受附件)
@@ -172,3 +174,5 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError *error);
  */
 - (void)removeDelegate:(id<NIMChatManagerDelegate>)delegate;
 @end
+
+NS_ASSUME_NONNULL_END

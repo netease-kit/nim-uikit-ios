@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  音频输出设备类型
  */
@@ -44,7 +46,7 @@ typedef NS_ENUM(NSInteger, NIMAudioType) {
  *  @param error 执行结果,如果成功error为nil
  *  @prarm text  转换后的文本
  */
-typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
+typedef void(^NIMAudioToTextBlock)(NSError * __nullable error,NSString * __nullable text);
 
 
 /**
@@ -79,7 +81,7 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  *  @param filePath 音频文件路径
  *  @param error    错误信息
  */
-- (void)playAudio:(NSString *)filePath didBeganWithError:(NSError *)error;
+- (void)playAudio:(NSString *)filePath didBeganWithError:(nullable NSError *)error;
 
 /**
  *  播放完音频的回调
@@ -87,7 +89,7 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  *  @param filePath 音频文件路径
  *  @param error    错误信息
  */
-- (void)playAudio:(NSString *)filePath didCompletedWithError:(NSError *)error;
+- (void)playAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error;
 
 /**
  *  播放音频开始被打断回调
@@ -104,8 +106,9 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  *
  *  @param filePath 录制的音频的文件路径
  *  @param error    错误信息
+ *  @discussion 如果录音失败，filePath 有可能为 nil
  */
-- (void)recordAudio:(NSString *)filePath didBeganWithError:(NSError *)error;
+- (void)recordAudio:(nullable NSString *)filePath didBeganWithError:(nullable NSError *)error;
 
 /**
  *  录制音频完成后的回调
@@ -113,7 +116,7 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  *  @param filePath 录制完成的音频文件路径
  *  @param error    错误信息
  */
-- (void)recordAudio:(NSString *)filePath didCompletedWithError:(NSError *)error;
+- (void)recordAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error;
 
 /**
  *  录音被取消的回调
@@ -259,7 +262,7 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
  *  @param block  完成回调
  */
 - (void)transAudioToText:(NIMAudioToTextOption *)option
-                  result:(NIMAudioToTextBlock)block;
+                  result:(NIMAudioToTextBlock)result;
 
 
 #pragma mark - common setting
@@ -273,3 +276,5 @@ typedef void(^NIMAudioToTextBlock)(NSError *error,NSString *text);
 
 
 @end
+
+NS_ASSUME_NONNULL_END

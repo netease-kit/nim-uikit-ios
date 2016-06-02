@@ -7,6 +7,9 @@
 //
 
 #import "NIMMessageObjectProtocol.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  位置实例对象
  */
@@ -22,7 +25,7 @@
  */
 - (instancetype)initWithLatitude:(double)latitude
                        longitude:(double)longitude
-                           title:(NSString *)title;
+                           title:(nullable NSString *)title;
 
 /**
  *  维度
@@ -37,7 +40,9 @@
 /**
  *  标题
  */
-@property (nonatomic, copy, readonly) NSString *title;
+@property (nullable, nonatomic, copy, readonly) NSString *title;
 
 
 @end
+
+NS_ASSUME_NONNULL_END

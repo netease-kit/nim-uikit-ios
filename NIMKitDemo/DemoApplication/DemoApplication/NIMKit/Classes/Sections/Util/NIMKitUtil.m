@@ -197,6 +197,7 @@
                 id attachment = [content attachment];
                 if ([attachment isKindOfClass:[NIMUpdateTeamInfoAttachment class]]) {
                     NIMUpdateTeamInfoAttachment *teamAttachment = (NIMUpdateTeamInfoAttachment *)attachment;
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
                     //如果只是单个项目项被修改则显示具体的修改项
                     if ([teamAttachment.values count] == 1) {
                         NIMTeamUpdateTag tag = [[[teamAttachment.values allKeys] firstObject] integerValue];
@@ -212,6 +213,18 @@
                                 break;
                             case NIMTeamUpdateTagJoinMode:
                                 formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式",source,teamName];
+                                break;
+                            case NIMTeamUpdateTagAvatar:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像",source,teamName];
+                                break;
+                            case NIMTeamUpdateTagInviteMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了邀请他人权限",source];
+                                break;
+                            case NIMTeamUpdateTagBeInviteMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了被邀请人身份验证权限",source];
+                                break;
+                            case NIMTeamUpdateTagUpdateInfoMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了群资料修改权限",source];
                                 break;
                             default:
                                 break;
@@ -248,13 +261,24 @@
             case NIMTeamOperationTypeAcceptInvitation:
                 formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群",source,targetText];
                 break;
+            case NIMTeamOperationTypeMute:{
+                id attachment = [content attachment];
+                if ([attachment isKindOfClass:[NIMMuteTeamMemberAttachment class]])
+                {
+                    BOOL mute = [(NIMMuteTeamMemberAttachment *)attachment flag];
+                    NSString *muteStr = mute? @"禁言" : @"解除禁言";
+                    NSString *str = [targets componentsJoinedByString:@","];
+                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@",str,source,muteStr];
+                }
+            }
+                break;
             default:
                 break;
         }
         
     }
     if (!formatedMessage.length) {
-        formatedMessage = [NSString stringWithFormat:@"未知系统信息"];
+        formatedMessage = [NSString stringWithFormat:@"未知系统消息"];
     }
     return formatedMessage;
 }
@@ -409,5 +433,31 @@
     return teamName;
 }
 
++ (BOOL)canEditTeamInfo:(NIMTeamMember *)member
+{
+    NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:member.teamId];
+    if (team.updateInfoMode == NIMTeamUpdateInfoModeManager)
+    {
+        return member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager;
+    }
+    else
+    {
+        return member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager || member.type == NIMTeamMemberTypeNormal;
+    }
+}
+
++ (BOOL)canInviteMember:(NIMTeamMember *)member
+{
+    NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:member.teamId];
+    if (team.inviteMode == NIMTeamInviteModeManager)
+    {
+        return member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager;
+    }
+    else
+    {
+        return member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager || member.type == NIMTeamMemberTypeNormal;
+    }
+
+}
 
 @end

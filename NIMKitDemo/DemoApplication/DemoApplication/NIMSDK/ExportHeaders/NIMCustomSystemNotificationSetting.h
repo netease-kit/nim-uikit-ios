@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  自定义系统通知配置
  */
@@ -29,3 +31,6 @@
 @property (nonatomic,assign)    BOOL        apnsWithPrefix;
 
 @end
+
+
+NS_ASSUME_NONNULL_END

@@ -227,6 +227,10 @@ typedef NS_ENUM(NSInteger, NIMLocalErrorCode) {
      *  操作尚未完成
      */
     NIMLocalErrorCodeOperationIncomplete         = 27,
+    /**
+     *  AppKey 缺失，未注册 AppKey 就进行登录行为之类的接口
+     */
+    NIMLocalErrorCodeAppKeyNeed                  = 28,
 };
 
 
@@ -234,7 +238,7 @@ typedef NS_ENUM(NSInteger, NIMLocalErrorCode) {
 
 /**
  *  服务器错误码
- *  @discussion 更多错误详见 http://dev.netease.im/docs/index.php?index=6&title=%E5%85%A8%E5%B1%80%E8%BF%94%E5%9B%9E%E7%A0%81%E8%AF%B4%E6%98%8E
+ *  @discussion 更多错误详见 http://dev.netease.im/docs?doc=nim_status_code#服务器端状态码
  */
 typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
     /**
@@ -282,7 +286,11 @@ typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
      */
     NIMRemoteErrorCodeExist               = 417,
     /**
-     *  未知错误，或者不方便告诉你
+     *  账号被禁用
+     */
+    NIMRemoteErrorAccountBlock            = 422,
+    /**
+     *  未知错误
      */
     NIMRemoteErrorCodeUnknownError        = 500,
     /**
@@ -300,7 +308,7 @@ typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
     /**
      *  无效协议
      */
-    NIMRemoteErrorCodeInvalidProtocol      = 509,
+    NIMRemoteErrorCodeInvalidProtocol     = 509,
     /**
      *  用户不存在
      */
@@ -354,6 +362,18 @@ typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
      *  被叫离线(无可送达的被叫方)
      */
     NIMRemoteErrorCodeCalleeOffline       = 11001,
+    /**
+     *  聊天室状态异常
+     */
+    NIMRemoteErrorCodeInvalidChatroom     = 13002,
+    /**
+     *  账号在黑名单中,不允许进入聊天室
+     */
+    NIMRemoteErrorCodeInChatroomBlackList = 13003,
+    /**
+     *  在禁言列表中,不允许发言
+     */
+    NIMRemoteErrorCodeInChatroomMuteList  = 13004,
 };
 
 

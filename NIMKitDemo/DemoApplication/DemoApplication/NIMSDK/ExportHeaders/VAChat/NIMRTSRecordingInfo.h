@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "NIMRTSManagerProtocol.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  实时会话录制服务信息
  */
@@ -20,13 +22,11 @@
 @property (nonatomic, readonly, assign) NIMRTSService service;
 
 /**
- *  录制存储服务器地址
- */
-@property (nonatomic, readonly, copy) NSString *serverAddress;
-
-/**
  *  录制存储文件名
  */
 @property (nonatomic, readonly, copy) NSString *recordFileName;
 
 @end
+
+
+NS_ASSUME_NONNULL_END

@@ -9,12 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "NIMLoginClient.h"
 
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  登录服务相关Block
  *
  *  @param error 执行结果,如果成功error为nil
  */
-typedef void(^NIMLoginHandler)(NSError *error);
+typedef void(^NIMLoginHandler)(NSError * __nullable error);
 
 /**
  *  登录步骤枚举
@@ -53,6 +54,10 @@ typedef NS_ENUM(NSInteger, NIMLoginStep)
      *  同步完成
      */
     NIMLoginStepSyncOK,
+    /**
+     *  连接断开
+     */
+    NIMLoginStepLoseConnection,
     /**
      *  网络切换
      *  @discussion 这个并不是登录步骤的一种,但是UI有可能需要通过这个状态进行UI展现
@@ -105,6 +110,8 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  *  自动登录失败回调
  *
  *  @param error 失败原因
+ *  @discussion 自动重连不需要上层开发关心，但是如果发生一些需要上层开发处理的错误，SDK 会通过这个方法回调
+ *              用户需要处理的情况包括：AppKey 未被设置，参数错误，密码错误，多端登录冲突，账号被封禁，操作过于频繁等
  */
 - (void)onAutoLoginFailed:(NSError *)error;
 
@@ -157,7 +164,7 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  *  @discussion 用户在登出是需要调用这个接口进行 SDK 相关数据的清理,回调 Block 中的 error 只是指明和服务器的交互流程中可能出现的错误,但不影响后续的流程。
  *              如用户登出时发生网络错误导致服务器没有收到登出请求，客户端仍可以登出(切换界面，清理数据等)，但会出现推送信息仍旧会发到当前手机的问题。
  */
-- (void)logout:(NIMLoginHandler)completion;
+- (void)logout:(nullable NIMLoginHandler)completion;
 
 /**
  *  踢人
@@ -166,12 +173,12 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  *  @param completion 完成回调
  */
 - (void)kickOtherClient:(NIMLoginClient *)client
-             completion:(NIMLoginHandler)completion;
+             completion:(nullable NIMLoginHandler)completion;
 
 /**
  *  返回当前登录帐号
  *
- *  @return 当前登录帐号,如果没有登录成功,这个地方会返回nil
+ *  @return 当前登录帐号,如果没有登录成功,这个地方会返回空字符串""
  */
 - (NSString *)currentAccount;
 
@@ -187,7 +194,7 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  *
  *  @return 当前登录设备列表 内部是NIMLoginClient,不包括自己
  */
-- (NSArray *)currentLoginClients;
+- (nullable NSArray<NIMLoginClient *> *)currentLoginClients;
 
 /**
  *  添加登录委托
@@ -203,3 +210,5 @@ typedef NS_ENUM(NSInteger, NIMKickReason)
  */
 - (void)removeDelegate:(id<NIMLoginManagerDelegate>)delegate;
 @end
+
+NS_ASSUME_NONNULL_END

@@ -48,17 +48,14 @@ typedef NS_ENUM(NSInteger, TeamAnnouncementSectionType) {
     [self.tableView registerClass:[NIMTeamAnnouncementListCell class] forCellReuseIdentifier:@"NIMTeamAnnouncementListCell"];
     self.tableView.rowHeight = 267;
     [self.tableView setTableFooterView:[UIView new]];
-    NSArray *data = [NSJSONSerialization JSONObjectWithData:[self.team.announcement dataUsingEncoding:NSUTF8StringEncoding] options:0 error:0];
-    _announcements = [NSMutableArray arrayWithArray:data];
+    if (self.team.announcement.length) {
+        NSArray *data = [NSJSONSerialization JSONObjectWithData:[self.team.announcement dataUsingEncoding:NSUTF8StringEncoding] options:0 error:0];
+        _announcements = [NSMutableArray arrayWithArray:data];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)onCreateAnnouncement:(id)sender {
@@ -66,7 +63,6 @@ typedef NS_ENUM(NSInteger, TeamAnnouncementSectionType) {
     vc.delegate = self;
     [self.navigationController pushViewController:vc animated:YES];
 }
-
 
 
 #pragma mark - UITableViewDataSource

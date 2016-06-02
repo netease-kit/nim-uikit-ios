@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  聊天室
  */
@@ -16,29 +18,29 @@
 /**
  *  聊天室Id
  */
-@property (nonatomic,copy)     NSString    *roomId;
+@property (nullable,nonatomic,copy)     NSString    *roomId;
 
 /**
  *  聊天室名
  */
-@property (nonatomic,copy)     NSString    *name;
+@property (nullable,nonatomic,copy)     NSString    *name;
 
 /**
  *  公告
  */
-@property (nonatomic,copy)     NSString    *announcement;
+@property (nullable,nonatomic,copy)     NSString    *announcement;
 
 
 /**
  *  创建者
  */
-@property (nonatomic,copy)     NSString    *creator;
+@property (nullable,nonatomic,copy)     NSString    *creator;
 
 
 /**
  *  第三方扩展字段，长度限制4K
  */
-@property (nonatomic,copy)     NSDictionary *ext;
+@property (nullable,nonatomic,copy)     NSString *ext;
 
 /**
  *  当前在线用户数量
@@ -48,9 +50,11 @@
 /**
  *  直播拉流地址
  */
-@property (nonatomic,copy)     NSString *broadcastUrl;
+@property (nullable,nonatomic,copy)   NSString *broadcastUrl;
 
 @end
 
+
+NS_ASSUME_NONNULL_END
 
 

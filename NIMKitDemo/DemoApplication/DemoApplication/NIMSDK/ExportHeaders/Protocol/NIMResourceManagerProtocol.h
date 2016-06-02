@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  上传Block
  *
  *  @param urlString 上传后得到的URL,失败时为nil
  *  @param error     错误信息,成功时为nil
  */
-typedef void(^NIMUploadCompleteBlock)(NSString *urlString,NSError *error);
+typedef void(^NIMUploadCompleteBlock)(NSString * __nullable urlString,NSError * __nullable error);
 
 /**
  *  上传/下载进度Block
@@ -29,7 +30,7 @@ typedef void(^NIMHttpProgressBlock)(CGFloat progress);
  *
  *  @param error 错误信息,成功时为nil
  */
-typedef void(^NIMDownloadCompleteBlock)(NSError *error);
+typedef void(^NIMDownloadCompleteBlock)(NSError * __nullable error);
 
 
 /**
@@ -45,8 +46,8 @@ typedef void(^NIMDownloadCompleteBlock)(NSError *error);
  *  @param completion 上传Block
  */
 - (void)upload:(NSString *)filepath
-      progress:(NIMHttpProgressBlock)progress
-    completion:(NIMUploadCompleteBlock)completion;
+      progress:(nullable NIMHttpProgressBlock)progress
+    completion:(nullable NIMUploadCompleteBlock)completion;
 
 /**
  *  下载文件
@@ -58,8 +59,8 @@ typedef void(^NIMDownloadCompleteBlock)(NSError *error);
  */
 - (void)download:(NSString *)urlString
         filepath:(NSString *)filepath
-        progress:(NIMHttpProgressBlock)progress
-      completion:(NIMDownloadCompleteBlock)completion;
+        progress:(nullable NIMHttpProgressBlock)progress
+      completion:(nullable NIMDownloadCompleteBlock)completion;
 
 /**
  *  取消上传/下载任务
@@ -70,3 +71,6 @@ typedef void(^NIMDownloadCompleteBlock)(NSError *error);
 - (void)cancelTask:(NSString *)filepath;
 
 @end
+
+
+NS_ASSUME_NONNULL_END

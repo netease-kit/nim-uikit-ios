@@ -23,8 +23,6 @@
 
 @property (nonatomic,strong) NIMTeam *team;
 
-@property (nonatomic,copy)   NSArray *members;
-
 @property (nonatomic,strong) UICollectionView *collectionView;
 
 @property (nonatomic,copy)   NSMutableArray *data;
@@ -40,9 +38,8 @@
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _team = team;
-        _members = members;
         _data = [[NSMutableArray alloc] init];
-        for (NIMTeamMember *member in _members) {
+        for (NIMTeamMember *member in members) {
             NIMTeamCardMemberItem *item = [[NIMTeamCardMemberItem alloc] initWithMember:member];
             [_data addObject:item];
             if([member.userId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
@@ -125,7 +122,8 @@
     index += indexpath.row;
     NIMTeamMemberCardViewController *vc = [[NIMTeamMemberCardViewController alloc] init];
     vc.delegate = self;
-    NIMTeamCardMemberItem *member = [[NIMTeamCardMemberItem alloc] initWithMember:self.members[index]];
+    
+    NIMTeamCardMemberItem *member = self.data[index];
     NIMTeamCardMemberItem *viewer = [[NIMTeamCardMemberItem alloc] initWithMember:self.myTeamCard];
     vc.member = member;
     vc.viewer = viewer;

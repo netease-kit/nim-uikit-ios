@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMSession;
 @class NIMMessage;
 
@@ -20,7 +22,7 @@
  *  已读回执对应的会话
  *  @discussion 当前只支持 P2P 会话类型
  */
-@property (nonatomic,strong,readonly)   NIMSession  *session;
+@property (nullable,nonatomic,strong,readonly)   NIMSession  *session;
 
 /**
  *  时间戳
@@ -39,3 +41,5 @@
 - (instancetype)initWithMessage:(NIMMessage *)message;
 
 @end
+
+NS_ASSUME_NONNULL_END

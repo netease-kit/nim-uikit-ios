@@ -7,6 +7,9 @@
 //
 
 #import "NIMMessageObjectProtocol.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  文件的实例对象
  */
@@ -36,23 +39,23 @@
 /**
  *  文件显示名
  */
-@property (nonatomic, copy)  NSString *displayName;
+@property (nullable, nonatomic, copy)  NSString *displayName;
 
 /**
  *  文件的本地路径
  */
-@property (nonatomic, copy, readonly) NSString *path;
+@property (nullable ,nonatomic, copy, readonly) NSString *path;
 
 /**
  *  文件的远程路径
  */
-@property (nonatomic, copy, readonly) NSString *url;
+@property (nullable,nonatomic, copy, readonly) NSString *url;
 
 
 /**
  *  文件MD5
  */
-@property (nonatomic, copy, readonly) NSString * md5;
+@property (nullable,nonatomic, copy, readonly) NSString *md5;
 
 /**
  *  文件大小
@@ -61,3 +64,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -7,6 +7,7 @@
 //
 
 #import "NIMSessionViewController.h"
+#import <AVFoundation/AVFoundation.h>
 #import "NIMInputView.h"
 #import "NIMInputTextView.h"
 #import "UIView+NIM.h"
@@ -21,7 +22,7 @@
 #import "NIMTimestampModel.h"
 #import "NIMMessageCellMaker.h"
 #import "NIMUIConfig.h"
-#import <AVFoundation/AVFoundation.h>
+#import "NIMKit.h"
 
 
 static const void * const NTESDispatchMessageDataPrepareSpecificKey = &NTESDispatchMessageDataPrepareSpecificKey;
@@ -163,7 +164,7 @@ NIMUserManagerDelegate>
         [[[NIMSDK sharedSDK] teamManager] addDelegate:self];
     }
     
-    if ([NIMSDKConfig sharedConfig].hostUserInfos) {
+    if ([NIMKit sharedKit].hostUserInfos) {
         //说明托管了用户信息，那就直接加 userManager 的监听
         [[NIMSDK sharedSDK].userManager addDelegate:self];
     }else{

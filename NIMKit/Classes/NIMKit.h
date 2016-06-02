@@ -65,6 +65,11 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 @property (nonatomic,strong)    id<NIMKitDataProvider> provider;
 
+/**
+ *  是否托管用户数据
+ */
+@property (nonatomic,assign)    BOOL hostUserInfos;
+
 
 /**
  *  NIMKit资源所在的bundle名称。

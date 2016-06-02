@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  消息配置
  */
@@ -42,4 +44,11 @@
  *  @discussion 默认为YES。将这个字段设为NO，推送消息将不带有前缀(xx:)。
  */
 @property (nonatomic,assign)    BOOL        apnsWithPrefix;
+/**
+ *  是否需要抄送
+ *  @discussion 默认为YES，即默认会抄送消息给开发者的服务器(如果有配置的话)
+ */
+@property (nonatomic,assign)    BOOL        routeEnabled;
 @end
+
+NS_ASSUME_NONNULL_END

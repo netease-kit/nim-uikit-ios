@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  通知类型
  */
@@ -46,3 +47,4 @@ typedef NS_ENUM(NSInteger, NIMNotificationType){
 - (NIMNotificationType)notificationType;
 @end
 
+NS_ASSUME_NONNULL_END

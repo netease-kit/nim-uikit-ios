@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "NIMMessageObjectProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NIMTipObject : NSObject<NIMMessageObject>
 
 @end
+
+NS_ASSUME_NONNULL_END

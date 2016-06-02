@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMRTSOption;
 @class NIMRTSRecordingInfo;
 
@@ -17,7 +19,7 @@
  *  @param error 发起结果, 如果成功error为nil
  *  @param sessionID 发起的实时会话的ID
  */
-typedef void(^NIMRTSRequestHandler)(NSError *error, NSString *sessionID);
+typedef void(^NIMRTSRequestHandler)(NSError * __nullable error,NSString * __nullable sessionID);
 
 /**
  *  响应实时会话请求Block
@@ -25,7 +27,7 @@ typedef void(^NIMRTSRequestHandler)(NSError *error, NSString *sessionID);
  *  @param error  响应实时会话请求, 如果成功error为nil
  *  @param callID响应的实时会话的ID
  */
-typedef void(^NIMRTSResponseHandler)(NSError *error, NSString *sessionID);
+typedef void(^NIMRTSResponseHandler)(NSError * __nullable error,NSString * __nullable sessionID);
 
 
 /**
@@ -74,7 +76,7 @@ typedef NS_ENUM(NSInteger, NIMRTSStatus){
 - (void)onRTSRequest:(NSString *)sessionID
                 from:(NSString *)caller
             services:(NSUInteger)types
-             message:(NSString *)extendMessage;
+             message:(nullable NSString *)extendMessage;
 
 /**
  *  主叫收到被叫实时会话响应
@@ -117,7 +119,7 @@ typedef NS_ENUM(NSInteger, NIMRTSStatus){
 - (void)onRTS:(NSString *)sessionID
       service:(NIMRTSService)type
        status:(NIMRTSStatus)status
-        error:(NSError *)error;
+        error:(nullable NSError *)error;
 
 /**
  *  收到实时会话数据
@@ -169,10 +171,10 @@ typedef NS_ENUM(NSInteger, NIMRTSStatus){
  *
  *  @return 发起的实时会话ID
  */
-- (NSString *)requestRTS:(NSArray *)callees
+- (NSString *)requestRTS:(NSArray<NSString *> *)callees
                 services:(NSUInteger)types
-                  option:(NIMRTSOption *)option
-              completion:(NIMRTSRequestHandler)completion;
+                  option:(nullable NIMRTSOption *)option
+              completion:(nullable NIMRTSRequestHandler)completion;
 
 /**
  *  被叫响应实时会话请求
@@ -185,8 +187,8 @@ typedef NS_ENUM(NSInteger, NIMRTSStatus){
  */
 - (void)responseRTS:(NSString *)sessionID
              accept:(BOOL)accept
-             option:(NIMRTSOption *)option
-         completion:(NIMRTSResponseHandler)completion;
+             option:(nullable NIMRTSOption *)option
+         completion:(nullable NIMRTSResponseHandler)completion;
 
 /**
  *  挂断实时会话
@@ -251,3 +253,5 @@ typedef NS_ENUM(NSInteger, NIMRTSStatus){
  */
 - (void)removeDelegate:(id<NIMRTSManagerDelegate>)delegate;
 @end
+
+NS_ASSUME_NONNULL_END

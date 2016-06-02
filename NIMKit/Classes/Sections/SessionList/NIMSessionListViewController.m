@@ -12,6 +12,7 @@
 #import "UIView+NIM.h"
 #import "NIMAvatarImageView.h"
 #import "NIMKitUtil.h"
+#import "NIMKit.h"
 
 
 @interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate,NIMUserManagerDelegate>
@@ -56,7 +57,7 @@
     extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamInfoHasUpdatedNotification:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
     extern NSString *const NIMKitUserInfoHasUpdatedNotification;
-    if ([NIMSDKConfig sharedConfig].hostUserInfos) {
+    if ([NIMKit sharedKit].hostUserInfos) {
         [[NIMSDK sharedSDK].userManager addDelegate:self];
     }else{
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
@@ -108,11 +109,6 @@
     }
     NIMRecentSession *recent = self.recentSessions[indexPath.row];
     cell.nameLabel.text = [self nameForRecentSession:recent];
-    if (recent.session.sessionType == NIMSessionTypeP2P) {
-        cell.avatarImageView.clipPath = YES;
-    }else if(recent.session.sessionType == NIMSessionTypeTeam){
-        cell.avatarImageView.clipPath = NO;
-    }
     [cell.avatarImageView setAvatarBySession:recent.session];
     [cell.nameLabel sizeToFit];
     cell.messageLabel.text  = [self contentForRecentSession:recent];

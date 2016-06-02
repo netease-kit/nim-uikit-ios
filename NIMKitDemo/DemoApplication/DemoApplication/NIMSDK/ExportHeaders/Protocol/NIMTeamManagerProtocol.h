@@ -7,15 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NIMTeamDefs.h"
 #import "NIMTeam.h"
 #import "NIMTeamMember.h"
+#import "NIMCreateTeamOption.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  通用的群组操作block
  *
  *  @param error 错误,如果成功则error为nil
  */
-typedef void(^NIMTeamHandler)(NSError *error);
+typedef void(^NIMTeamHandler)(NSError * __nullable error);
 
 /**
  *  创建群组block
@@ -23,7 +27,7 @@ typedef void(^NIMTeamHandler)(NSError *error);
  *  @param error   错误,如果成功则error为nil
  *  @param teamId 群组ID
  */
-typedef void(^NIMTeamCreateHandler)(NSError *error,NSString *teamId);
+typedef void(^NIMTeamCreateHandler)(NSError * __nullable error,NSString * __nullable teamId);
 
 /**
  *  群成员block
@@ -31,7 +35,7 @@ typedef void(^NIMTeamCreateHandler)(NSError *error,NSString *teamId);
  *  @param error   错误,如果成功则error为nil
  *  @param members 群成员列表,内部为NIMTeamMember
  */
-typedef void(^NIMTeamMemberHandler)(NSError *error,NSArray *members);
+typedef void(^NIMTeamMemberHandler)(NSError * __nullable error,NSArray<NIMTeamMember *> * __nullable members);
 
 /**
  *  拉取群信息Block
@@ -39,7 +43,7 @@ typedef void(^NIMTeamMemberHandler)(NSError *error,NSArray *members);
  *  @param error 错误,如果成功则error为nil
  *  @param team  群信息
  */
-typedef void(^NIMTeamFetchInfoHandler)(NSError *error,NIMTeam *team);
+typedef void(^NIMTeamFetchInfoHandler)(NSError * __nullable error,NIMTeam * __nullable team);
 
 /**
  *  群申请block
@@ -47,7 +51,7 @@ typedef void(^NIMTeamFetchInfoHandler)(NSError *error,NIMTeam *team);
  *  @param error       错误,如果成功则error为nil
  *  @param applyStatus 群申请状态
  */
-typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus);
+typedef void(^NIMTeamApplyHandler)(NSError * __nullable error,NIMTeamApplyStatus applyStatus);
 
 
 /**
@@ -96,7 +100,7 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *
  *  @return 返回所有群组
  */
-- (NSArray *)allMyTeams;
+- (nullable NSArray<NIMTeam *> *)allMyTeams;
 
 /**
  *  根据群组ID获取具体的群组信息
@@ -105,7 +109,7 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *
  *  @return 群组信息
  */
-- (NIMTeam *)teamById:(NSString *)teamId;
+- (nullable NIMTeam *)teamById:(NSString *)teamId;
 
 
 /**
@@ -120,89 +124,150 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
 /**
  *  创建群组
  *
- *  @param option 创建群选项
- *  @param users 用户ID列表
- *  @param block 完成后的block回调
+ *  @param option     创建群选项
+ *  @param users      用户ID列表
+ *  @param completion 完成后的回调
  */
 - (void)createTeam:(NIMCreateTeamOption *)option
-              users:(NSArray *)users
-         completion:(NIMTeamCreateHandler)block;
+              users:(NSArray<NSString *> *)users
+         completion:(nullable NIMTeamCreateHandler)completion;
 
 /**
  *  解散群组
  *
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  */
 - (void)dismissTeam:(NSString *)teamId
-         completion:(NIMTeamHandler)block;
+         completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  退出群组
  *
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param teamId     群组ID
+ *  @param completion 完成后的回调
  */
 - (void)quitTeam:(NSString *)teamId
-       completion:(NIMTeamHandler)block;
+      completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  邀请用户入群
  *
- *  @param users  用户ID列表
- *  @param teamId 群组ID
- *  @param postscript 邀请附言
- *  @param block  完成后的block回调
+ *  @param users       用户ID列表
+ *  @param teamId      群组ID
+ *  @param postscript  邀请附言
+ *  @param completion  完成后的回调
  */
-- (void)addUsers:(NSArray  *)users
+- (void)addUsers:(NSArray<NSString *>  *)users
           toTeam:(NSString *)teamId
       postscript:(NSString *)postscript
-      completion:(NIMTeamMemberHandler)block;
+      completion:(nullable NIMTeamMemberHandler)completion;
 
 /**
  *  从群组内移除成员
  *
- *  @param users   需要移除的用户ID列表
- *  @param teamId  群组ID
- *  @param block   完成后的block回调
+ *  @param users       需要移除的用户ID列表
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  */
-- (void)kickUsers:(NSArray *)users
+- (void)kickUsers:(NSArray<NSString *> *)users
          fromTeam:(NSString *)teamId
-      completion:(NIMTeamHandler)block;
+       completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  更新群组名称
  *
- *  @param teamName 群组名称
- *  @param teamId   群组ID
- *  @param block    完成后的block回调
+ *  @param teamName   群组名称
+ *  @param teamId     群组ID
+ *  @param completion 完成后的回调
  */
 - (void)updateTeamName:(NSString *)teamName
                 teamId:(NSString *)teamId
-            completion:(NIMTeamHandler)block;
+            completion:(nullable NIMTeamHandler)completion;
+
+
+/**
+ *  更新群组头像
+ *
+ *  @param teamAvatarUrl 群组头像Url
+ *  @param teamId        群组ID
+ *  @param completion    完成后的回调
+ */
+- (void)updateTeamAvatar:(NSString *)teamAvatarUrl
+                  teamId:(NSString *)teamId
+              completion:(nullable NIMTeamHandler)completion;
 
 
 /**
  *  更新群组验证方式
  *
- *  @param joinMode 验证方式
- *  @param teamId   群组ID
- *  @param block    完成后的block回调
+ *  @param joinMode   验证方式
+ *  @param teamId     群组ID
+ *  @param completion 完成后的回调
  */
 - (void)updateTeamJoinMode:(NIMTeamJoinMode)joinMode
                     teamId:(NSString *)teamId
-                completion:(NIMTeamHandler)block;
+                completion:(nullable NIMTeamHandler)completion;
+
+
+/**
+ *  更新群组邀请他人方式
+ *
+ *  @param inviteMode  邀请方式
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
+ */
+- (void)updateTeamInviteMode:(NIMTeamInviteMode)inviteMode
+                      teamId:(NSString *)teamId
+                  completion:(nullable NIMTeamHandler)completion;
+
+/**
+ *  更新群组被邀请人验证方式
+ *
+ *  @param beInviteMode 邀请方式
+ *  @param teamId       群组ID
+ *  @param completion   完成后的回调
+ */
+- (void)updateTeamBeInviteMode:(NIMTeamBeInviteMode)beInviteMode
+                        teamId:(NSString *)teamId
+                    completion:(nullable NIMTeamHandler)completion;
+
+
+/**
+ *  更改群组更新信息的权限
+ *
+ *  @param updateInfoMode 修改谁有权限更新群组信息
+ *  @param teamId         群组ID
+ *  @param completion     完成后的回调
+ */
+- (void)updateTeamUpdateInfoMode:(NIMTeamUpdateInfoMode)updateInfoMode
+                          teamId:(NSString *)teamId
+                      completion:(nullable NIMTeamHandler)completion;
+
+
+/**
+ *  更改群组更新自定义字段的权限
+ *
+ *  @param clientCustomMode 修改谁有权限更新群组自定义字段
+ *  @param teamId           群组ID
+ *  @param completion       完成后的回调
+ */
+- (void)updateTeamUpdateClientCustomMode:(NIMTeamUpdateClientCustomMode)clientCustomMode
+                                  teamId:(NSString *)teamId
+                              completion:(nullable NIMTeamHandler)completion;
+
+
 
 /**
  *  更新群介绍
  *
- *  @param intro  群介绍
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param intro       群介绍
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  */
 - (void)updateTeamIntro:(NSString *)intro
                  teamId:(NSString *)teamId
-             completion:(NIMTeamHandler)block;
+             completion:(nullable NIMTeamHandler)completion;
 
 
 /**
@@ -210,60 +275,60 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *
  *  @param announcement 群公告
  *  @param teamId       群组ID
- *  @param block        完成后的block回调
+ *  @param completion   完成后的回调
  */
 - (void)updateTeamAnnouncement:(NSString *)announcement
                         teamId:(NSString *)teamId
-                    completion:(NIMTeamHandler)block;
+                    completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  更新群自定义信息
  *
  *  @param info         群自定义信息
  *  @param teamId       群组ID
- *  @param block        完成后的block回调
+ *  @param completion   完成后的回调
  */
 - (void)updateTeamCustomInfo:(NSString *)info
                       teamId:(NSString *)teamId
-                  completion:(NIMTeamHandler)block;
+                  completion:(nullable NIMTeamHandler)completion;
 
 
 /**
  *  更新群信息
  *
- *  @param values 需要更新的群信息键值对
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param values      需要更新的群信息键值对
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  *  @discussion   这个接口可以一次性修改群的多个属性,如名称,公告等,传入的数据键值对是 {@(NIMTeamUpdateTag) : NSString},无效数据将被过滤
  */
-- (void)updateTeamInfos:(NSDictionary *)values
+- (void)updateTeamInfos:(NSDictionary<NSNumber *,NSString *> *)values
                  teamId:(NSString *)teamId
-             completion:(NIMTeamHandler)block;
+             completion:(nullable NIMTeamHandler)completion;
 
 
 
 /**
  *  群申请
  *
- *  @param teamId  群组ID
- *  @param message 申请消息
- *  @param block   完成后的block回调
+ *  @param teamId     群组ID
+ *  @param message    申请消息
+ *  @param completion 完成后的回调
  */
 - (void)applyToTeam:(NSString *)teamId
             message:(NSString *)message
-         completion:(NIMTeamApplyHandler)block;
+         completion:(nullable NIMTeamApplyHandler)completion;
 
 
 /**
  *  通过群申请
  *
- *  @param teamId  群组ID
- *  @param userId  申请的用户ID
- *  @param block   完成后的block回调
+ *  @param teamId       群组ID
+ *  @param userId       申请的用户ID
+ *  @param completion   完成后的回调
  */
 - (void)passApplyToTeam:(NSString *)teamId
                  userId:(NSString *)userId
-         completion:(NIMTeamApplyHandler)block;
+             completion:(nullable NIMTeamApplyHandler)completion;
 
 /**
  *  拒绝群申请
@@ -271,12 +336,12 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param teamId       群组ID
  *  @param userId       申请的用户ID
  *  @param rejectReason 拒绝理由
- *  @param block        完成后的block回调
+ *  @param completion   完成后的回调
  */
 - (void)rejectApplyToTeam:(NSString *)teamId
                    userId:(NSString *)userId
              rejectReason:(NSString*)rejectReason
-               completion:(NIMTeamHandler)block;
+               completion:(nullable NIMTeamHandler)completion;
 
 
 /**
@@ -284,35 +349,48 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *
  *  @param userId       群成员ID
  *  @param newNick      新的群成员昵称
- *  @param teamId       群主ID
- *  @param block        完成后的block回调
+ *  @param teamId       群组ID
+ *  @param completion   完成后的回调
  */
 - (void)updateUserNick:(NSString *)userId
                newNick:(NSString *)newNick
                 inTeam:(NSString *)teamId
-            completion:(NIMTeamHandler)block;
+            completion:(nullable NIMTeamHandler)completion;
+
+
+/**
+ *  更新成员群自定义属性
+ *
+ *  @param newInfo      新的自定义属性
+ *  @param teamId       群组ID
+ *  @param completion   完成后的回调
+ *  @discussion
+ */
+- (void)updateMyCustomInfo:(NSString *)newInfo
+                    inTeam:(NSString *)teamId
+                completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  添加管理员
  *
- *  @param teamId 群组ID
- *  @param users  需要添加为管理员的用户ID列表
- *  @param block  完成后的block回调
+ *  @param teamId      群组ID
+ *  @param users       需要添加为管理员的用户ID列表
+ *  @param completion  完成后的回调
  */
 - (void)addManagersToTeam:(NSString *)teamId
-                    users:(NSArray  *)users
-               completion:(NIMTeamHandler)block;
+                    users:(NSArray<NSString *>  *)users
+               completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  移除管理员
  *
- *  @param teamId 群组ID
- *  @param users  需要移除管理员的用户ID列表
- *  @param block  完成后的block回调
+ *  @param teamId     群组ID
+ *  @param users      需要移除管理员的用户ID列表
+ *  @param completion 完成后的回调
  */
 - (void)removeManagersFromTeam:(NSString *)teamId
-                         users:(NSArray  *)users
-                    completion:(NIMTeamHandler)block;
+                         users:(NSArray<NSString *>  *)users
+                    completion:(nullable NIMTeamHandler)completion;
 
 
 /**
@@ -321,24 +399,24 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param teamId     群组ID
  *  @param newOwnerId 新群主ID
  *  @param isLeave    是否同时离开群组
- *  @param block      完成后的block回调
+ *  @param completion 完成后的回调
  */
 - (void)transferManagerWithTeam:(NSString *)teamId
                      newOwnerId:(NSString *)newOwnerId
                         isLeave:(BOOL)isLeave
-                     completion:(NIMTeamHandler)block;
+                     completion:(nullable NIMTeamHandler)completion;
 
 
 /**
  *  接受入群邀请
  *
- *  @param teamId    群组ID
- *  @param invitorId 邀请者ID
- *  @param block     完成后的block回调
+ *  @param teamId     群组ID
+ *  @param invitorId  邀请者ID
+ *  @param completion 完成后的回调
  */
 - (void)acceptInviteWithTeam:(NSString*)teamId
                    invitorId:(NSString*)invitorId
-                  completion:(NIMTeamHandler)block;
+                  completion:(nullable NIMTeamHandler)completion;
 
 
 /**
@@ -347,12 +425,12 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param teamId       群组ID
  *  @param invitorId    邀请者ID
  *  @param rejectReason 拒绝原因
- *  @param block        完成后的block回调
+ *  @param completion   完成后的回调
  */
 - (void)rejectInviteWithTeam:(NSString*)teamId
                    invitorId:(NSString*)invitorId
                 rejectReason:(NSString*)rejectReason
-                  completion:(NIMTeamHandler)block;
+                  completion:(nullable NIMTeamHandler)completion;
 
 
 /**
@@ -360,11 +438,11 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *
  *  @param notify       是否通知
  *  @param teamId       群组ID
- *  @param block        完成后的block回调
+ *  @param completion   完成后的回调
  */
 - (void)updateNotifyState:(BOOL)notify
                    inTeam:(NSString *)teamId
-               completion:(NIMTeamHandler)block;
+               completion:(nullable NIMTeamHandler)completion;
 
 /**
  *  是否需要消息通知
@@ -377,36 +455,53 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
 
 
 /**
+ *  群成员禁言
+ *
+ *  @param mute        是否禁言
+ *  @param userId      用户ID
+ *  @param teamId      群组ID
+ *  @param completion  经验操作完成后的回调
+ *  @discussion   操作成功后，云信服务器会下发禁言的群通知消息
+ */
+- (void)updateMuteState:(BOOL)mute
+                 userId:(NSString *)userId
+                 inTeam:(NSString *)teamId
+             completion:(nullable NIMTeamHandler)completion;
+
+
+/**
  *  获取群组成员
  *
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
- *  @discussion   绝大多数情况这个请求都是从本地读取缓存并同步返回
- *                但考虑到用户网络等问题, SDK 有可能没有即时缓存群成员信息,那么这个请求将是个带网络请求的异步操作(增量请求)
+ *  @param teamId     群组ID
+ *  @param completion 完成后的回调
+ *  @discussion   绝大多数情况这个请求都是从本地读取缓存并同步返回，但是由于群成员信息量较大， SDK 采取的是登录后延迟拉取的策略
+ *                考虑到用户网络等问题, SDK 有可能没有及时缓存群成员信息,那么这个请求将是个带网络请求的异步操作(增量请求)。
+ *                同时这个接口会去请求本地没有缓存的群用户的资料信息，但不会触发 - (void)onUserInfoChanged: 回调。
  */
 - (void)fetchTeamMembers:(NSString *)teamId
-              completion:(NIMTeamMemberHandler)block;
+              completion:(nullable NIMTeamMemberHandler)completion;
 
 
 /**
  *  通过网络请求获取群组成员
  *
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  *  @discussion   通过网络请求获取群成员列表,不同于fetchTeamMembers:completion这个接口是个必然带网络请求的异步操作(增量请求)
+ *                同时这个接口会去请求本地没有缓存的群用户的资料信息，但不会触发 - (void)onUserInfoChanged: 回调。
  */
 - (void)fetchTeamMembersFromServer:(NSString *)teamId
-                        completion:(NIMTeamMemberHandler)block;
+                        completion:(nullable NIMTeamMemberHandler)completion;
 
 
 /**
  *  获取群信息
  *
- *  @param teamId 群组ID
- *  @param block  完成后的block回调
+ *  @param teamId      群组ID
+ *  @param completion  完成后的回调
  */
 - (void)fetchTeamInfo:(NSString *)teamId
-           completion:(NIMTeamFetchInfoHandler)block;
+           completion:(nullable NIMTeamFetchInfoHandler)completion;
 
 
 /**
@@ -415,10 +510,11 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  *  @param userId 用户ID
  *  @param teamId 群组ID
  *  @return       返回成员信息
- *  @discussion   这个值永远不会返回nil,如果传入的userId和teamId是无效值或者本地还没有缓存信息,将返回只带有userId和teamId信息的NIMTeamMember
+ *  @discussion   返回本地缓存的群成员信息，如果本地没有相应数据则返回 nil。
  */
-- (NIMTeamMember *)teamMember:(NSString *)userId
-                       inTeam:(NSString *)teamId;
+- (nullable NIMTeamMember *)teamMember:(NSString *)userId
+                                inTeam:(NSString *)teamId;
+
 
 /**
  *  添加群组委托
@@ -434,3 +530,5 @@ typedef void(^NIMTeamApplyHandler)(NSError *error,NIMTeamApplyStatus applyStatus
  */
 - (void)removeDelegate:(id<NIMTeamManagerDelegate>)delegate;
 @end
+
+NS_ASSUME_NONNULL_END
