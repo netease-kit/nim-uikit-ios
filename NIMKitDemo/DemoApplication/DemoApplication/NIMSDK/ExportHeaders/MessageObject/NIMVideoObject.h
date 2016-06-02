@@ -7,6 +7,9 @@
 //
 
 #import "NIMMessageObjectProtocol.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  视频实例对象
  */
@@ -21,37 +24,50 @@
  */
 - (instancetype)initWithSourcePath:(NSString *)sourcePath;
 
+
+/**
+ *  视频实例对象的初始化方法
+ *
+ *  @param data 视频数据
+ *  @param extension 视频文件后缀
+ *
+ *  @return 视频实例对象
+ */
+- (instancetype)initWithData:(NSData *)data
+                   extension:(NSString *)extension;
+
 /**
  *  视频展示名
  */
-@property (nonatomic, copy) NSString * displayName;
+@property (nullable, nonatomic, copy) NSString *displayName;
 /**
  *  视频MD5
  */
-@property (nonatomic, copy, readonly) NSString * md5;
+@property (nullable, nonatomic, copy, readonly) NSString *md5;
 
 
 
 /**
  *  视频的本地路径
- *  @discussion 目前SDK并不提供视频下载功能,但是建议APP使用这个path作为视频的下载地址,以便后期SDK提供缓存清理等功能
+ *  @discussion 目前 SDK 并不提供视频下载功能,但是建议 APP 使用这个 path 作为视频的下载地址,以便后期 SDK 提供缓存清理等功能
  */
-@property (nonatomic, copy, readonly) NSString * path;
+@property (nullable, nonatomic, copy, readonly) NSString *path;
 
 /**
  *  视频的远程路径
  */
-@property (nonatomic, copy, readonly) NSString * url;
+@property (nullable, nonatomic, copy, readonly) NSString *url;
 
 /**
  *  视频封面的远程路径
+ *  @discussion 只有是上传到云信服务器上的视频才支持封面地址，否则地址无效
  */
-@property (nonatomic, copy, readonly) NSString * coverUrl;
+@property (nullable, nonatomic, copy, readonly) NSString *coverUrl;
 
 /**
  *  视频封面的本地路径
  */
-@property (nonatomic, copy, readonly) NSString * coverPath;
+@property (nullable, nonatomic, copy, readonly) NSString *coverPath;
 
 /**
  *  封面尺寸
@@ -72,3 +88,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

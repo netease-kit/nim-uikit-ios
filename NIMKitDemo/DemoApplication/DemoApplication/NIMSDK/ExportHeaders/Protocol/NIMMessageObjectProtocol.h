@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "NIMGlobalDefs.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMMessage;
 
 
@@ -19,7 +22,7 @@
 /**
  *  消息体所在的消息对象
  */
-@property (nonatomic, weak) NIMMessage *message;
+@property (nullable,nonatomic, weak) NIMMessage *message;
 
 /**
  *  消息内容类型
@@ -30,3 +33,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 
 /**
  *  登录的设备枚举
@@ -47,7 +49,7 @@ typedef NS_ENUM(NSInteger, NIMLoginClientType){
 /**
  *  操作系统
  */
-@property (nonatomic,copy,readonly)     NSString                *os;
+@property (nullable,nonatomic,copy,readonly)     NSString                *os;
 /**
  *  登录时间
  */
@@ -81,4 +83,6 @@ typedef NS_ENUM(NSInteger, NIMLoginClientType){
 @property (nonatomic,assign)    BOOL        forcedMode;
 
 @end
+
+NS_ASSUME_NONNULL_END
 

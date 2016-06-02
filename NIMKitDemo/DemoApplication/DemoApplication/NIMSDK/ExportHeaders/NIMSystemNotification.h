@@ -11,6 +11,8 @@
 #import "NIMUser.h"
 #import "NIMCustomSystemNotificationSetting.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  系统通知类型
  */
@@ -56,16 +58,16 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 /**
  *  操作者
  */
-@property (nonatomic,copy,readonly)         NSString *sourceID;
+@property (nullable,nonatomic,copy,readonly)         NSString *sourceID;
 /**
  *  目标ID,群ID或者是用户ID
  */
-@property (nonatomic,copy,readonly)         NSString *targetID;
+@property (nullable,nonatomic,copy,readonly)         NSString *targetID;
 
 /**
  *  附言
  */
-@property (nonatomic,copy,readonly)         NSString *postscript;
+@property (nullable,nonatomic,copy,readonly)         NSString *postscript;
 
 /**
  *  是否已读
@@ -84,7 +86,7 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
  *  附件
  *  @discussion 额外信息,目前只有好友添加有额外信息,attachment为NIMUserAddAttachment
  */
-@property (nonatomic,strong,readonly)       id attachment;
+@property (nullable,nonatomic,strong,readonly)       id attachment;
 
 @end
 
@@ -109,7 +111,7 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 /**
  *  类型列表
  */
-@property (nonatomic,strong)    NSArray     *notificationTypes;
+@property (nonatomic,copy)    NSArray<NSNumber *>     *notificationTypes;
 @end
 
 
@@ -127,12 +129,12 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 /**
  *  通知发起者id
  */
-@property (nonatomic,copy,readonly)         NSString *sender;
+@property (nullable,nonatomic,copy,readonly)         NSString *sender;
 
 /**
  *  通知接受者id
  */
-@property (nonatomic,copy,readonly)         NSString *receiver;
+@property (nullable,nonatomic,copy,readonly)         NSString *receiver;
 
 
 /**
@@ -143,7 +145,7 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 /**
  *  透传的消息体内容
  */
-@property (nonatomic,copy,readonly)         NSString    *content;
+@property (nullable,nonatomic,copy,readonly)         NSString    *content;
 
 /**
  *  是否只发送给在线用户
@@ -155,22 +157,24 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
  *  apns推送文案
  *  @discussion 默认为nil,用户可以设置当前通知的推送文案
  */
-@property (nonatomic,copy)                  NSString *apnsContent;
+@property (nullable,nonatomic,copy)                  NSString *apnsContent;
 
 
 /**
  *  apns推送Payload
  *  @discussion 可以通过这个字段定义自定义通知的推送Payload,支持字段参考苹果技术文档,最多支持2K
  */
-@property (nonatomic,copy)                  NSDictionary *apnsPayload;
+@property (nullable,nonatomic,copy)                  NSDictionary *apnsPayload;
 
 /**
  *  自定义系统通知设置
  *  @discussion 可以通过这个字段制定当前通知的各种设置,如是否需要计入推送未读，是否需要带推送前缀等等
  */
-@property (nonatomic,strong)                NIMCustomSystemNotificationSetting *setting;
+@property (nullable,nonatomic,strong)                NIMCustomSystemNotificationSetting *setting;
 
 
 - (instancetype)initWithContent:(NSString *)content;
 
 @end
+
+NS_ASSUME_NONNULL_END

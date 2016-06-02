@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMSession;
 @class NIMSystemNotification;
 @class NIMCustomSystemNotification;
@@ -18,7 +20,7 @@
  *
  *  @param error 错误,如果成功则error为nil
  */
-typedef void(^NIMSystemNotificationHandler)(NSError *error);
+typedef void(^NIMSystemNotificationHandler)(NSError * __nullable error);
 
 /**
  *  系统通知回调
@@ -67,8 +69,8 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  *
  *  @return 系统消息列表
  */
-- (NSArray *)fetchSystemNotifications:(NIMSystemNotification *)notification
-                                limit:(NSInteger)limit;
+- (nullable NSArray<NIMSystemNotification *> *)fetchSystemNotifications:(nullable NIMSystemNotification *)notification
+                                                                  limit:(NSInteger)limit;
 
 
 /**
@@ -80,9 +82,9 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  *
  *  @return 系统消息列表
  */
-- (NSArray *)fetchSystemNotifications:(NIMSystemNotification *)notification
-                                limit:(NSInteger)limit
-                               filter:(NIMSystemNotificationFilter *)filter;
+- (nullable NSArray<NIMSystemNotification *> *)fetchSystemNotifications:(nullable NIMSystemNotification *)notification
+                                                                  limit:(NSInteger)limit
+                                                                 filter:(nullable NIMSystemNotificationFilter *)filter;
 
 /**
  *  未读系统消息数
@@ -98,7 +100,7 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  *
  *  @return 未读系统消息数
  */
-- (NSInteger)allUnreadCount:(NIMSystemNotificationFilter *)filter;
+- (NSInteger)allUnreadCount:(nullable NIMSystemNotificationFilter *)filter;
 
 /**
  *  删除单条系统消息
@@ -118,7 +120,7 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  *
  *  @param filter 过滤器
  */
-- (void)deleteAllNotifications:(NIMSystemNotificationFilter *)filter;
+- (void)deleteAllNotifications:(nullable NIMSystemNotificationFilter *)filter;
 
 /**
  *  标记单条系统消息为已读
@@ -137,7 +139,7 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  *
  *  @param filter 过滤器
  */
-- (void)markAllNotificationsAsRead:(NIMSystemNotificationFilter *)filter;
+- (void)markAllNotificationsAsRead:(nullable NIMSystemNotificationFilter *)filter;
 
 
 /**
@@ -150,7 +152,7 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  */
 - (void)sendCustomNotification:(NIMCustomSystemNotification *)notification
                      toSession:(NIMSession *)session
-                    completion:(NIMSystemNotificationHandler)completion;
+                    completion:(nullable NIMSystemNotificationHandler)completion;
 
 /**
  *  添加系统消息通知委托
@@ -166,3 +168,5 @@ typedef void(^NIMSystemNotificationHandler)(NSError *error);
  */
 - (void)removeDelegate:(id<NIMSystemNotificationManagerDelegate>)delegate;
 @end
+
+NS_ASSUME_NONNULL_END

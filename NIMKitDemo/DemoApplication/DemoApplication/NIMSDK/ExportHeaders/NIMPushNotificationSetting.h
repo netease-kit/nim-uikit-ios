@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  推送消息显示类型
  */
@@ -58,3 +60,5 @@ typedef NS_ENUM(NSInteger, NIMPushNotificationDisplayType){
 @property (nonatomic) NSUInteger noDisturbingEndM;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  会话类型
@@ -58,3 +59,5 @@ typedef NS_ENUM(NSInteger, NIMSessionType){
                    type:(NIMSessionType)sessionType;
 
 @end
+
+NS_ASSUME_NONNULL_END

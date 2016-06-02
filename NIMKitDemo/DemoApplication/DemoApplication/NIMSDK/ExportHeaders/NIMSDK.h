@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import "NIMSDKHeaders.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  NIMSDK
  */
@@ -33,14 +35,14 @@
  *  @param cerName 推送证书名
  */
 - (void)registerWithAppID:(NSString *)appKey
-                  cerName:(NSString *)cerName;
+                  cerName:(nullable NSString *)cerName;
 
 /**
  *  获取AppKey
  *
  *  @return 返回当前注册的AppKey
  */
-- (NSString *)appKey;
+- (nullable NSString *)appKey;
 
 /**
  *  是否正在使用Demo AppKey
@@ -115,7 +117,7 @@
  *  资源管理器,负责文件上传和下载
  */
 @property (nonatomic,strong,readonly)   id<NIMResourceManager> resourceManager;
-
+//NET_CALL_DEFINE_START
 /**
  *  网络通话管理类
  */
@@ -125,6 +127,7 @@
  *  实时会话管理类
  */
 @property (nonatomic,strong,readonly)   id<NIMRTSManager> rtsManager;
+//NET_CALL_DEFINE_END
 
 /**
  *  聊天室管理类
@@ -133,3 +136,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

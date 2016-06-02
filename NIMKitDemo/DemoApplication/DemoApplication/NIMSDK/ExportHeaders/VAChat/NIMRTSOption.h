@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 /**
  *  实时会话的附带选项, 用于发起和响应
  */
@@ -16,7 +17,7 @@
 /**
  *  扩展消息, 仅在发起会话时有效, 用于开发者在主被叫之间沟通额外信息
  */
-@property (nonatomic, copy) NSString *extendMessage;
+@property (nullable,nonatomic, copy) NSString *extendMessage;
 
 /**
  *  禁用服务器录制
@@ -45,19 +46,21 @@
  *  apns推送文案
  *  @discussion 默认为nil，用户可以设置当前通知的推送文案
  */
-@property (nonatomic,copy)      NSString      *apnsContent;
+@property (nullable,nonatomic,copy)      NSString      *apnsContent;
 
 /**
  *  apns推送声音文件
  *  @discussion 默认为nil，用户可以设置当前通知的推送声音。该设置会覆盖apnsPayload中的sound设置
  */
-@property (nonatomic,copy)      NSString      *apnsSound;
+@property (nullable,nonatomic,copy)      NSString      *apnsSound;
 
 /**
  *  apns推送Payload
  *  @discussion 可以通过这个字段定义自定义通知的推送Payload,支持字段参考苹果技术文档,最多支持2K
  */
-@property (nonatomic,copy)      NSDictionary   *apnsPayload;
+@property (nullable,nonatomic,copy)      NSDictionary   *apnsPayload;
 
 
 @end
+
+NS_ASSUME_NONNULL_END

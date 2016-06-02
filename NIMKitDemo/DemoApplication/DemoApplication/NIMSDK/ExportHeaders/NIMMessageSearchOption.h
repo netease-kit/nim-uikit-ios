@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "NIMGlobalDefs.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMMessage;
 
 
@@ -30,7 +32,7 @@ typedef enum : NSUInteger {
 
 /**
  *  本地搜索选项
- *  @discussion 搜索条件: 时间在(startTime,endTime)内(不包含)，类型为messageType，且 匹配searchContent或fromIds 的一定数量(limit)消息
+ *  @discussion 搜索条件: 时间在(startTime,endTime) 内(不包含)，类型为 messageType （或全类型） ，且匹配 searchContent 或 fromIds 的一定数量 (limit) 消息
  */
 @interface NIMMessageSearchOption : NSObject
 
@@ -42,7 +44,7 @@ typedef enum : NSUInteger {
 
 /**
  *  结束时间,默认为0
- *  @discussion 搜索的结束时间,0表示最大时间戳
+ *  @discussion 搜索的结束时间,0 表示最大时间戳
  */
 @property (nonatomic,assign)    NSTimeInterval endTime;
 
@@ -58,20 +60,27 @@ typedef enum : NSUInteger {
 @property (nonatomic,assign)    NIMMessageSearchOrder order;
 
 /**
- *  查询的消息类型,默认为NIMMessageTypeText
- *  @discussion 只有在messageType为Text时searchContent才起效
+ *  查询的消息类型
+ *  @discusssion 默认为 NIMMessageTypeText
  */
-@property (nonatomic,assign)    NIMMessageType  messageType;
+@property (nonatomic,assign)    NIMMessageType messageType;
+
+/**
+ *  全部消息类型
+ *  @discussion 默认为 NO，当设置为 YES 时，忽略 messageType 和 searchContent，同时返回所有的消息类型消息
+ */
+@property (nonatomic,assign)    BOOL allMessageTypes;
 
 /**
  *  检索文本
+ *  @discussion 只有在 messageType 为 NIMMessageTypeText 时才有效
  */
-@property (nonatomic,copy)      NSString *searchContent;
+@property (nullable,nonatomic,copy)      NSString *searchContent;
 
 /**
  *  消息发出者帐号列表
  */
-@property (nonatomic,strong)    NSArray *fromIds;
+@property (nullable,nonatomic,copy)      NSArray<NSString *> *fromIds;
 
 @end
 
@@ -105,7 +114,7 @@ typedef enum : NSUInteger {
  *  检索消息的当前参考消息,返回的消息结果集里不会包含这条消息,此参数对聊天室会话无效。
  *  @discussion 传入最早时间,没有则传入nil。
  */
-@property (nonatomic,strong)      NIMMessage      *currentMessage;
+@property (nullable,nonatomic,strong)      NIMMessage      *currentMessage;
 
 
 /**
@@ -120,3 +129,5 @@ typedef enum : NSUInteger {
 
 
 @end
+
+NS_ASSUME_NONNULL_END

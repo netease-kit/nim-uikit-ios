@@ -21,4 +21,6 @@
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName;
 
+- (UIImage *)nim_imageForAvatarUpload;
+
 @end

@@ -7,6 +7,8 @@
 //
 
 #import "NIMTeamMemberCardViewController.h"
+#import "NIMCommonTableData.h"
+#import "NIMCommonTableDelegate.h"
 #import "NIMAvatarImageView.h"
 #import "NIMCardMemberItem.h"
 #import "NIMUsrInfoData.h"
@@ -14,16 +16,10 @@
 #import "UIView+NIMKitToast.h"
 #import "NIMKit.h"
 #import "UIView+NIM.h"
+#import "NIMKitColorButtonCell.h"
+#import "NIMKitSwitcherCell.h"
 
-typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
-    TeamMemberCardSectionHead,
-    TeamMemberCardSectionNick,
-    TeamMemberCardSectionMemberType,
-    TeamMemberCardSectionAction,
-    TeamMemberCardSectionCount
-};
-
-@interface NIMTeamMemberCardViewController () <UITableViewDelegate, UITableViewDataSource,UIActionSheetDelegate>{
+@interface NIMTeamMemberCardViewController () <UIActionSheetDelegate>{
     UIAlertView *_kickAlertView;
     UIAlertView *_updateNickAlertView;
 }
@@ -32,14 +28,19 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
 
 @property (strong, nonatomic) NIMUsrInfo *usrInfo;
 
+@property (nonatomic,strong) NIMCommonTableDelegate *delegator;
+
+@property (nonatomic,strong) NSArray *data;
+
 @end
 
 @implementation NIMTeamMemberCardViewController
 
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+- (instancetype)initWithUserId:(NSString *)userId team:(NSString *)teamId{
+    self = [super initWithNibName:nil bundle:nil];
     if(self) {
-
+        _member = [[NIMTeamCardMemberItem alloc] initWithMember:[[NIMSDK sharedSDK].teamManager teamMember:userId inTeam:teamId]];
+        _viewer = [[NIMTeamCardMemberItem alloc] initWithMember:[[NIMSDK sharedSDK].teamManager teamMember:[NIMSDK sharedSDK].loginManager.currentAccount inTeam:teamId]];
     }
     return self;
 }
@@ -51,13 +52,83 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:self.tableView];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
+    self.tableView.tableFooterView = [UIView new];
     
     NIMUsrInfo *user = [[NIMUsrInfo alloc] init];
     user.info = [[NIMKit sharedKit] infoByUser:self.member.memberId];
     self.usrInfo = user;
+
+    [self buildData];
+    __weak typeof(self) wself = self;
+    self.delegator = [[NIMCommonTableDelegate alloc] initWithTableData:^NSArray *{
+        return wself.data;
+    }];
+    self.tableView.delegate   = self.delegator;
+    self.tableView.dataSource = self.delegator;
+
 }
+
+
+- (void)buildData{
+    NIMTeamMember *member = [[NIMSDK sharedSDK].teamManager teamMember:self.member.memberId inTeam:self.member.team.teamId];
+    
+    NSArray *data = @[
+                      @{
+                          HeaderTitle:@"",
+                          RowContent :@[
+                                  @{
+                                      CellClass     : @"NIMTeamMemberCardHeaderCell",
+                                      RowHeight     : @(222),
+                                      ExtraInfo     : @{@"user":self.usrInfo,@"team":self.member.team},
+                                      SepLeftEdge   : @(SepLineLeft),
+                                  },
+                                  @{
+                                      Title         : @"群昵称",
+                                      DetailTitle   : member.nickname.length? member.nickname : @"未设置",
+                                      CellAction    : ([self isSelf] || [self canUpdateTeamMember])? @"updateTeamNick" : @"",
+                                      ShowAccessory : ([self isSelf] || [self canUpdateTeamMember])? @(YES) : @(NO),
+                                      RowHeight     : @(50),
+                                      SepLeftEdge   : @(SepLineLeft),
+                                      },
+                                  @{
+                                      Title         : @"身份",
+                                      DetailTitle   : [self memberTypeString:self.member.type],
+                                      CellAction    : ([self isOwner] && ![self isSelf])? @"updateTeamRole" : @"",
+                                      ShowAccessory : [self isOwner] && ![self isSelf]? @(YES) : @(NO),
+                                      RowHeight     : @(50),
+                                      SepLeftEdge   : @(SepLineLeft),
+                                    },
+                                  @{
+                                      Title         : @"设置禁言",
+                                      CellClass     : @"NIMKitSwitcherCell",
+                                      CellAction    : @"updateMute:",
+                                      ForbidSelect  : @(YES),
+                                      RowHeight     : @(50),
+                                      Disable       : @(![self canUpdateTeamMember]),
+                                      ExtraInfo     : @(member.isMuted),
+                                      SepLeftEdge   : @(SepLineLeft),
+                                    },
+                                  @{
+                                      Title         : @"移出本群",
+                                      CellClass     : @"NIMKitColorButtonCell",
+                                      CellAction    : @"onKickBtnClick:",
+                                      ExtraInfo     : @(NIMKitColorButtonCellStyleRed),
+                                      RowHeight     : @(70),
+                                      Disable       : @(![self canUpdateTeamMember]),
+                                      SepLeftEdge   : @(0),
+                                    }
+                                  ],
+                          FooterTitle:@""
+                          },
+                       ];
+    self.data = [NIMCommonTableSection sectionsWithData:data];
+}
+
+- (void)refreshData{
+    [self buildData];
+    [self.tableView reloadData];
+}
+
 
 - (NSString *)memberTypeString:(NIMTeamMemberType)type {
     if(type == NIMTeamMemberTypeNormal) {
@@ -70,49 +141,37 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
     return @"";
 }
 
+
 - (void)onKickBtnClick:(id)sender {
     _kickAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"移出本群" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
     [_kickAlertView show];
 }
 
-#pragma mark - UITableViewDelegate
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger row = indexPath.row;
-    switch (row) {
-        case TeamMemberCardSectionHead: {
-            return 222;
-        } break;
-        case TeamMemberCardSectionNick: {
-            return 50;
-        } break;
-        case TeamMemberCardSectionMemberType: {
-            return 50;
-        } break;
-        case TeamMemberCardSectionAction: {
-            return 70;
-        } break;
-        default: {
-            return 0;
-        } break;
-    }
-
+- (void)updateTeamNick
+{
+    _updateNickAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"修改群昵称" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
+    _updateNickAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_updateNickAlertView show];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    NSInteger row = indexPath.row;
-    if(row == TeamMemberCardSectionNick) {
-        _updateNickAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"修改群昵称" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
-        _updateNickAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        [_updateNickAlertView show];
-        
-    } else if (row == TeamMemberCardSectionMemberType) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"管理员操作" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles: self.member.type == NIMTeamMemberTypeManager ? @"取消管理员" : @"设为管理员", nil];
-        [sheet showInView:self.view];
-    }
-   
+- (void)updateTeamRole
+{
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"管理员操作" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles: self.member.type == NIMTeamMemberTypeManager ? @"取消管理员" : @"设为管理员", nil];
+    [sheet showInView:self.view];
 }
+
+- (void)updateMute:(UISwitch *)switcher
+{
+    __block typeof(self) wself = self;
+    BOOL mute = switcher.on;
+    [[NIMSDK sharedSDK].teamManager updateMuteState:mute userId:self.member.memberId inTeam:self.member.team.teamId completion:^(NSError *error) {
+        if (error) {
+            [wself.view nimkit_makeToast:@"修改失败"];
+            switcher.on = !mute;
+        }
+    }];
+}
+
 
 - (void)removeManager:(NSString *)memberId{
     __block typeof(self) wself = self;
@@ -120,7 +179,7 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
         if (!error) {
             wself.member.type = NIMTeamMemberTypeNormal;
             [wself.view nimkit_makeToast:@"修改成功"];
-            [wself.tableView reloadData];
+            [wself refreshData];
             if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
                 [_delegate onTeamMemberInfoChaneged:wself.member];
             }
@@ -137,7 +196,7 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
         if (!error) {
             wself.member.type = NIMTeamMemberTypeManager;
             [wself.view nimkit_makeToast:@"修改成功"];
-            [wself.tableView reloadData];
+            [wself refreshData];
             if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
                 [_delegate onTeamMemberInfoChaneged:wself.member];
             }
@@ -145,97 +204,6 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
             [wself.view nimkit_makeToast:@"修改失败"];
         }
     }];
-}
-
-#pragma mark - UITableViewDataSource
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return TeamMemberCardSectionCount;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger row = indexPath.row;
-    switch (row) {
-        case TeamMemberCardSectionHead: {
-            UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"TeamMemberCardHeadCell"];
-            NIMAvatarImageView *avatarView = [[NIMAvatarImageView alloc] initWithFrame:CGRectMake(125, 52, 70, 70)];
-            avatarView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-            NSURL *avatarURL;
-            if (self.usrInfo.info.avatarUrlString.length) {
-                avatarURL = [NSURL URLWithString:self.usrInfo.info.avatarUrlString];
-            }
-            [avatarView nim_setImageWithURL:avatarURL placeholderImage:self.usrInfo.info.avatarImage];
-            [cell addSubview:avatarView];
-            
-            UILabel *nickLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-            nickLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-            nickLabel.font = [UIFont systemFontOfSize:17];
-            nickLabel.textColor = [UIColor colorWithRed:51.0 / 255 green:51.0 / 255 blue:51.0 / 255 alpha:1.0];
-            NIMSession *session = [NIMSession session:self.member.team.teamId type:NIMSessionTypeTeam];
-            nickLabel.text = [NIMKitUtil showNick:self.member.memberId inSession:session];
-            [nickLabel sizeToFit];
-            nickLabel.nim_centerX = avatarView.nim_centerX;
-            nickLabel.nim_top = avatarView.nim_bottom + 10;
-            [cell addSubview:nickLabel];
-            cell.userInteractionEnabled = NO;
-            return cell;
-            
-        } break;
-        case TeamMemberCardSectionNick: {
-            NIMTeamMember *member = [[NIMSDK sharedSDK].teamManager teamMember:self.member.memberId inTeam:self.member.team.teamId];
-            UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"TeamMemberCardHeadCell"];
-            cell.textLabel.text = @"群昵称";
-            if (member.nickname.length) {
-                cell.detailTextLabel.text = member.nickname;
-            }else{
-                cell.detailTextLabel.text = @"未设置";
-            }
-            if(self.viewer.type == NIMTeamMemberTypeNormal && ![self.viewer.memberId isEqualToString:self.member.memberId]){
-                cell.userInteractionEnabled = NO;
-                cell.accessoryType = UITableViewCellAccessoryNone;
-            } else {
-                cell.userInteractionEnabled = YES;
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            }
-            return cell;
-        } break;
-        case TeamMemberCardSectionMemberType: {
-            UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"TeamMemberCardHeadCell"];
-            cell.textLabel.text = @"身份";
-            cell.detailTextLabel.text = [self memberTypeString:self.member.type];
-            if(self.viewer.type == NIMTeamMemberTypeOwner && ![self.viewer.memberId isEqualToString:self.member.memberId]) {
-                cell.userInteractionEnabled = YES;
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            } else {
-                cell.userInteractionEnabled = NO;
-                cell.accessoryType = UITableViewCellAccessoryNone;
-            }
-            return cell;
-        } break;
-        case TeamMemberCardSectionAction: {
-            UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"TeamMemberCardActionCell"];
-            UIButton *kickBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-            kickBtn.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-            kickBtn.frame = CGRectMake(8, 25, 305, 45);
-            [kickBtn setBackgroundImage:[UIImage imageNamed:@"icon_cell_red_normal"] forState:UIControlStateNormal];
-            kickBtn.titleLabel.font = [UIFont systemFontOfSize:19];
-            [kickBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-            [kickBtn setTitle:@"移出本群" forState:UIControlStateNormal];
-            [kickBtn addTarget:self action:@selector(onKickBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-            [cell addSubview:kickBtn];
-            if(self.viewer.type == NIMTeamMemberTypeNormal || [self.viewer.memberId isEqualToString:self.member.memberId]) {
-                kickBtn.hidden = YES;
-                cell.userInteractionEnabled = NO;
-            } else {
-                kickBtn.hidden = NO;
-                cell.userInteractionEnabled = YES;
-            }
-            return cell;
-        } break;
-        default: {
-            return nil;
-        } break;
-    }
 }
 
 
@@ -266,7 +234,7 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
                     [[NIMSDK sharedSDK].teamManager updateUserNick:self.member.memberId newNick:name inTeam:self.member.team.teamId completion:^(NSError *error) {
                         if (!error) {
                             [self.view nimkit_makeToast:@"修改成功"];
-                            [self.tableView reloadData];
+                            [self refreshData];
                             if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
                                 [_delegate onTeamMemberInfoChaneged:self.member];
                             }
@@ -294,4 +262,37 @@ typedef NS_ENUM(NSInteger, TeamMemberCardSectionType) {
     }
 }
 
+#pragma mark - Private
+
+- (BOOL)isSelf
+{
+    return [self.viewer.memberId isEqualToString:self.member.memberId];
+}
+
+- (BOOL)isOwner
+{
+    return self.viewer.member.type == NIMTeamMemberTypeOwner;
+}
+
+- (BOOL)canModifyTeamInfo
+{
+    return [NIMKitUtil canEditTeamInfo:self.viewer.member];
+}
+
+- (BOOL)canUpdateTeamMember
+{
+    BOOL viewerIsOwner   = [self isOwner];
+    BOOL viewerIsManager = self.viewer.member.type == NIMTeamMemberTypeManager;
+    BOOL memberIsNormal  = self.member.member.type == NIMTeamMemberTypeNormal;
+    if (viewerIsOwner) {
+        return ![self isSelf];
+    }
+    if (viewerIsManager) {
+        return memberIsNormal;
+    }
+    return NO;
+}
+
 @end
+
+

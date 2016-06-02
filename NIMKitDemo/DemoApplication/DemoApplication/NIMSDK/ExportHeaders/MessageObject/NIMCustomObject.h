@@ -8,7 +8,7 @@
 
 #import "NIMMessageObjectProtocol.h"
 
-
+NS_ASSUME_NONNULL_BEGIN
 /*
  除了 SDK 预定义的几种消息类型，上层APP开发者如果想要实现更多的消息类型，不可避免需要使用自定义消息这种类型
  由于 SDK 并不能预测上层 APP 的应用场景，所以 NIMCustomObject 采取消息透传的方式以提供给上层开发者最大的自由度
@@ -25,9 +25,6 @@
  3. - (void)updateAttachmentURL:(NSString *)urlString 上传成功后SDK会调用这个接口,APP 需要实现这个接口来保存上传后的URL
  具体可以参考 DEMO 中阅后即焚的实现
  
-服务器配置:
-此处API已废弃，参考NIMMessageSetting
-
  */
 
 
@@ -108,7 +105,7 @@
  *
  *  @return 自定义消息附件
  */
-- (id<NIMCustomAttachment>)decodeAttachment:(NSString *)content;
+- (nullable id<NIMCustomAttachment>)decodeAttachment:(nullable NSString *)content;
 @end
 
 
@@ -121,7 +118,7 @@
  *  用户自定义附件
  *  @discussion SDK负责将attachment通过encodeAttachment接口序列化后的结果进行透传
  */
-@property(nonatomic, strong) id<NIMCustomAttachment>  attachment;
+@property(nullable, nonatomic, strong) id<NIMCustomAttachment>  attachment;
 
 
 /**
@@ -135,5 +132,4 @@
 @end
 
 
-
-
+NS_ASSUME_NONNULL_END

@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  聊天室用户类型
  */
@@ -42,22 +44,22 @@ typedef NS_ENUM(NSInteger, NIMChatroomMemberType) {
 /**
  *  用户ID
  */
-@property (nonatomic,copy)   NSString *userId;
+@property (nullable,nonatomic,copy)   NSString *userId;
 
 /**
  *  聊天室内的昵称字段，由用户进聊天室时提交。
  */
-@property (nonatomic,copy)   NSString *roomNickname;
+@property (nullable,nonatomic,copy)   NSString *roomNickname;
 
 /**
- *  聊天室内的昵称字段，由用户进聊天室时提交。
+ *  聊天室内的头像字段，由用户进聊天室时提交。
  */
-@property (nonatomic,copy)   NSString *roomAvatar;
+@property (nullable,nonatomic,copy)   NSString *roomAvatar;
 
 /**
  *  聊天室内预留给开发者的扩展字段，由用户进聊天室时提交。
  */
-@property (nonatomic,copy)   NSDictionary *roomExt;
+@property (nullable,nonatomic,copy)   NSString *roomExt;
 
 /**
  *  用户类型
@@ -85,3 +87,5 @@ typedef NS_ENUM(NSInteger, NIMChatroomMemberType) {
 @property (nonatomic,assign) NSTimeInterval enterTimeInterval;
 
 @end
+
+NS_ASSUME_NONNULL_END

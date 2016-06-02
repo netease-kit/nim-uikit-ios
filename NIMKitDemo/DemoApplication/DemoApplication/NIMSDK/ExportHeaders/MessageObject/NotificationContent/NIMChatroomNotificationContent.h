@@ -8,6 +8,8 @@
 
 #import "NIMNotificationContent.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  聊天室操作类型
  */
@@ -74,11 +76,11 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
 /**
  *  聊天室成员ID
  */
-@property (nonatomic,copy,readonly) NSString *userId;
+@property (nullable,nonatomic,copy,readonly) NSString *userId;
 /**
  *  聊天室成员昵称
  */
-@property (nonatomic,copy,readonly) NSString *nick;
+@property (nullable,nonatomic,copy,readonly) NSString *nick;
 
 @end
 
@@ -96,16 +98,18 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
 /**
  *  操作者
  */
-@property (nonatomic,copy,readonly) NIMChatroomNotificationMember *source;
+@property (nullable,nonatomic,copy,readonly) NIMChatroomNotificationMember *source;
 
 /**
  *  被操作者，NSArray<NIMChatroomNotificationMember *>
  */
-@property (nonatomic,copy,readonly) NSArray *targets;
+@property (nullable,nonatomic,copy,readonly) NSArray<NIMChatroomNotificationMember *> *targets;
 
 /**
  *  扩展信息
  */
-@property (nonatomic,copy,readonly) NSDictionary *notifyExt;
+@property (nullable,nonatomic,copy,readonly) NSString *notifyExt;
 
 @end
+
+NS_ASSUME_NONNULL_END

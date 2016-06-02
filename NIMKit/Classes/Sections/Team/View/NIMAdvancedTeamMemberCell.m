@@ -114,7 +114,7 @@ typedef NS_ENUM(NSInteger, NIMAdvancedTeamMemberType) {
         }
     }
     NSInteger count = 0;
-    if (myTeamInfo.type == NIMTeamMemberTypeOwner || myTeamInfo.type == NIMTeamMemberTypeManager) {
+    if ([NIMKitUtil canInviteMember:myTeamInfo]) {
         NIMAdvancedTeamMemberView *view = [self fetchMemeberView:0];
         UIImage *addImage = [UIImage imageNamed:@"icon_add_normal"];
         [view.imageView nim_setImageWithURL:nil placeholderImage:addImage];

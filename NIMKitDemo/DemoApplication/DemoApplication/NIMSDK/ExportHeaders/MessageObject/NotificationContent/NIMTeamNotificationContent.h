@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "NIMNotificationContent.h"
 
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  群操作类型
@@ -55,6 +56,11 @@ typedef NS_ENUM(NSInteger, NIMTeamOperationType){
      */
     NIMTeamOperationTypeAcceptInvitation= 9,
     
+    /**
+     *  群内禁言/解禁
+     */
+    NIMTeamOperationTypeMute            = 10,
+    
 };
 
 
@@ -87,6 +93,26 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
      *  @discussion SDK 无法直接修改这个字段
      */
     NIMTeamUpdateTagServerCustom    = 19,
+    /**
+     *  头像
+     */
+    NIMTeamUpdateTagAvatar          = 20,
+    /**
+     *  被邀请模式
+     */
+    NIMTeamUpdateTagBeInviteMode    = 21,
+    /**
+     *  邀请权限
+     */
+    NIMTeamUpdateTagInviteMode      = 22,
+    /**
+     *  更新群信息权限
+     */
+    NIMTeamUpdateTagUpdateInfoMode  = 23,
+    /**
+     *  更新群客户端自定义拓展字段权限
+     */
+    NIMTeamUpdateTagUpdateClientCustomMode = 24,
     
 };
 
@@ -99,7 +125,7 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
 /**
  *  操作发起者ID
  */
-@property (nonatomic,copy,readonly)     NSString    *sourceID;
+@property (nullable,nonatomic,copy,readonly)     NSString    *sourceID;
 
 /**
  *  操作类型
@@ -109,13 +135,13 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
 /**
  *  被操作者ID列表
  */
-@property (nonatomic,strong,readonly)   NSArray *targetIDs;
+@property (nullable,nonatomic,copy,readonly)   NSArray<NSString *> *targetIDs;
 
 /**
  *  额外信息
- *  @discussion 目前只有群信息更新才有attachment,attachment为NIMUpdateTeamInfoAttachment
+ *  @discussion 群更新时 attachment 为 NIMUpdateTeamInfoAttachment，禁言时为 NIMMuteTeamMemberAttachment
  */
-@property (nonatomic,strong,readonly)   id attachment;
+@property (nullable,nonatomic,strong,readonly)   id attachment;
 @end
 
 
@@ -127,6 +153,20 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
 /**
  *  群内修改的信息键值对
  */
-@property (nonatomic,strong,readonly)   NSDictionary    *values;
+@property (nullable,nonatomic,copy,readonly)   NSDictionary<NSNumber *,NSString *>    *values;
 @end
 
+
+/**
+ *  禁言通知的额外信息
+ */
+@interface NIMMuteTeamMemberAttachment : NSObject
+
+/**
+ *  是否被禁言
+ *  @discussion YES 为禁言，NO 为 解除禁言
+ */
+@property (nonatomic,assign,readonly)   BOOL    flag;
+@end
+
+NS_ASSUME_NONNULL_END

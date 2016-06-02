@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMUserRequest;
 @class NIMUser;
 
@@ -15,14 +18,14 @@
  *
  *  @param error 错误信息
  */
-typedef void(^NIMUserBlock)(NSError *error);
+typedef void(^NIMUserBlock)(NSError * __nullable error);
 
 /**
  *  用户信息获取Block,返回NIMUser列表
  *
  *  @param error 错误信息
  */
-typedef void(^NIMUserInfoBlock)(NSArray *users,NSError *error);
+typedef void(^NIMUserInfoBlock)(NSArray<NIMUser *> * __nullable users,NSError * __nullable error);
 
 
 
@@ -61,7 +64,7 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
     /**
      *  扩展字段
      */
-    NIMUserInfoUpdateTagEx = 10,
+    NIMUserInfoUpdateTagExt = 10,
 };
 
 /**
@@ -84,6 +87,11 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
 - (void)onBlackListChanged;
 
 /**
+ *  静音列表发生变化 (在线)
+ */
+- (void)onMuteListChanged;
+
+/**
  *  用户个人信息发生变化 (在线)
  *
  *  @param user 用户对象
@@ -101,45 +109,45 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
 /**
  *  添加好友
  *
- *  @param request 添加好友请求
- *  @param block   完成回调
+ *  @param request    添加好友请求
+ *  @param completion 完成回调
  */
 - (void)requestFriend:(NIMUserRequest *)request
-           completion:(NIMUserBlock)block;
+           completion:(nullable NIMUserBlock)completion;
 
 /**
  *  删除好友
  *
- *  @param userId 好友Id
- *  @param block  完成回调
+ *  @param userId      好友Id
+ *  @param completion  完成回调
  */
 - (void)deleteFriend:(NSString *)userId
-          completion:(NIMUserBlock)block;
+          completion:(nullable NIMUserBlock)completion;
 
 /**
  *  返回我的好友列表
  *
  *  @return NIMUser列表
  */
-- (NSArray *)myFriends;
+- (nullable NSArray<NIMUser *> *)myFriends;
 
 /**
  *  添加用户到黑名单
  *
- *  @param userId     用户Id
- *  @param block      完成block
+ *  @param userId          用户Id
+ *  @param completion      完成回调
  */
 - (void)addToBlackList:(NSString *)userId
-            completion:(NIMUserBlock)block;
+            completion:(NIMUserBlock)completion;
 
 /**
  *  将用户从黑名单移除
  *
- *  @param userId     用户Id
- *  @param block      完成block
+ *  @param userId        用户Id
+ *  @param completion    完成回调
  */
 - (void)removeFromBlackBlackList:(NSString *)userId
-                      completion:(NIMUserBlock)block;
+                      completion:(NIMUserBlock)completion;
 
 /**
  *  判断用户是否已被拉黑
@@ -155,19 +163,19 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
  *
  *  @return 黑名单成员NIMUser列表
  */
-- (NSArray *)myBlackList;
+- (nullable NSArray<NIMUser *> *)myBlackList;
 
 
 /**
  *  设置消息提醒
  *
- *  @param notify     是否提醒
- *  @param userId     用户Id
- *  @param block      完成block
+ *  @param notify       是否提醒
+ *  @param userId       用户Id
+ *  @param completion   完成回调
  */
 - (void)updateNotifyState:(BOOL)notify
                   forUser:(NSString *)userId
-               completion:(NIMUserBlock)block;
+               completion:(nullable NIMUserBlock)completion;
 
 
 /**
@@ -184,18 +192,21 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
  *
  *  @return 返回被我设置为取消消息通知的NIMUser列表
  */
-- (NSArray *)myMuteUserList;
+- (nullable NSArray<NIMUser *> *)myMuteUserList;
 
 
 /**
  *  从云信服务器批量获取用户资料
  *
- *  @param users  用户id列表
- *  @param block  用户信息回调
+ *  @param users       用户id列表
+ *  @param completion  用户信息回调
  *
- *  @discussion 需要将用户信息交给云信托管，此接口才有效。
+ *  @discussion 需要将用户信息交给云信托管，此接口才有效。调用此接口，不会触发 - (void)onUserInfoChanged: 回调。
+ *              该接口会将获取到的用户信息缓存在本地，所以需要避免此接口的滥调，导致存储过多无用数据到本地而撑爆缓存:如在聊天室请求请求每个聊天室用户数据将造成缓存过大而影响程序性能
+ *              本接口一次最多支持 150 个用户信息获取
  */
-- (void)fetchUserInfos:(NSArray *)users completion:(NIMUserInfoBlock)block;
+- (void)fetchUserInfos:(NSArray<NSString *> *)users
+            completion:(nullable NIMUserInfoBlock)completion;
 
 
 /**
@@ -205,38 +216,39 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
  *
  *  @return NIMUser
  *
- *  @discussion 需要将用户信息交给云信托管，此接口才有效。
+ *  @discussion 需要将用户信息交给云信托管，且数据已经正常缓存到本地，此接口才有效。
  *              用户资料除自己之外，不保证其他用户资料实时更新
  *              其他用户资料更新的时机为: 1.调用 - (void)fetchUserInfos:completion: 方法刷新用户
  *                                    2.收到此用户发来消息
  *                                    3.程序再次启动，此时会同步好友信息
  */
-- (NIMUser *)userInfo:(NSString *)userId;
+- (nullable NIMUser *)userInfo:(NSString *)userId;
 
 
 /**
  *  修改自己与目标用户的关系
  *
- *  @param user  目标用户
- *  @param block 修改结果回调
+ *  @param user       目标用户
+ *  @param completion 修改结果回调
  *  @discussion  这个接口提供了备注名的修改以及一些扩展。这些值是基于当前用户和目标用户关系的，
  *               同一个目标用户的的属性字段会随着登录用户的改变而改变。
  *
  */
 - (void)updateUser:(NIMUser *)user
-        completion:(NIMUserBlock)block;
+        completion:(nullable NIMUserBlock)completion;
 
 
 /**
  *  修改自己的用户资料
  *
- *  @param values 需要更新的用户信息键值对
- *  @param block  修改结果回调
+ *  @param values      需要更新的用户信息键值对
+ *  @param completion  修改结果回调
  *
  *  @discussion   这个接口可以一次性修改多个属性,如昵称,头像等,传入的数据键值对是 {@(NIMUserInfoUpdateTag) : NSString},
  *                无效数据将被过滤。一些字段有修改限制，具体请参看 NIMUserInfoUpdateTag 的相关说明
  */
-- (void)updateMyUserInfo:(NSDictionary *)values completion:(NIMUserBlock)block;
+- (void)updateMyUserInfo:(NSDictionary<NSNumber *,NSString *> *)values
+              completion:(nullable NIMUserBlock)completion;
 
 /**
  *  添加好友委托
@@ -253,3 +265,5 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
 - (void)removeDelegate:(id<NIMUserManagerDelegate>)delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END

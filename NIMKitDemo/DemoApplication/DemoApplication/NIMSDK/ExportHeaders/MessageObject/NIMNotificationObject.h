@@ -7,12 +7,15 @@
 //
 
 #import "NIMMessageObjectProtocol.h"
+//NET_CALL_DEFINE_START
 #import "NIMNetCallManagerProtocol.h"
+//NET_CALL_DEFINE_END
 #import "NIMTeamNotificationContent.h"
 #import "NIMNetCallNotificationContent.h"
 #import "NIMChatroomNotificationContent.h"
 #import "NIMUnsupportedNotificationContent.h"
 
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  通知对象
@@ -30,3 +33,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END

@@ -20,5 +20,8 @@
 
 + (NSString *)messageTipContent:(NIMMessage *)message;
 
++ (BOOL)canEditTeamInfo:(NIMTeamMember *)member;
+
++ (BOOL)canInviteMember:(NIMTeamMember *)member;
 
 @end

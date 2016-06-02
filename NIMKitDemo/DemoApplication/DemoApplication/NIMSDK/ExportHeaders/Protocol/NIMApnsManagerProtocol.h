@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMPushNotificationSetting;
 
 /**
@@ -15,7 +17,7 @@
  *
  *  @param error 错误信息，成功则error为nil
  */
-typedef void(^NIMApnsHandler)(NSError *error);
+typedef void(^NIMApnsHandler)(NSError * __nullable error);
 
 /**
  *  获取 badge 回调
@@ -33,7 +35,7 @@ typedef NSUInteger(^NIMBadgeHandler)(void);
  *
  *  @return 推送设置
  */
-- (NIMPushNotificationSetting *)currentSetting;
+- (nullable NIMPushNotificationSetting *)currentSetting;
 
 /**
  *  更新推送设置
@@ -42,7 +44,7 @@ typedef NSUInteger(^NIMBadgeHandler)(void);
  *  @param completion 完成的回调
  */
 - (void)updateApnsSetting:(NIMPushNotificationSetting *)setting
-               completion:(NIMApnsHandler)completion;
+               completion:(nullable NIMApnsHandler)completion;
 
 
 /**
@@ -52,3 +54,5 @@ typedef NSUInteger(^NIMBadgeHandler)(void);
  */
 - (void)registerBadgeCountHandler:(NIMBadgeHandler)handler;
 @end
+
+NS_ASSUME_NONNULL_END

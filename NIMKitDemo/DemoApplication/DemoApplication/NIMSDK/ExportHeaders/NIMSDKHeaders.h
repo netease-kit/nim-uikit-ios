@@ -34,9 +34,10 @@
 /**
  *  群相关定义
  */
+#import "NIMTeamDefs.h"
 #import "NIMTeam.h"
 #import "NIMTeamMember.h"
-
+#import "NIMCreateTeamOption.h"
 /**
  *  聊天室相关定义
  */
@@ -61,18 +62,22 @@
  *  登录定义
  */
 #import "NIMLoginClient.h"
-
+//NET_CALL_DEFINE_START
 /**
  *  实时会话选项定义
  */
+#import "NIMRTSManagerProtocol.h"
 #import "NIMRTSOption.h"
 #import "NIMRTSRecordingInfo.h"
 
 /**
- *  音视频网络通话选项定义
+ *  音视频网络通话定义
  */
+#import "NIMNetCallManagerProtocol.h"
 #import "NIMNetCallOption.h"
-
+#import "NIMNetCallRecordingInfo.h"
+#import "NIMNetCallMeeting.h"
+//NET_CALL_DEFINE_END
 
 /**
  *  各个对外接口协议定义
@@ -86,8 +91,6 @@
 #import "NIMSystemNotificationManagerProtocol.h"
 #import "NIMApnsManagerProtocol.h"
 #import "NIMResourceManagerProtocol.h"
-#import "NIMNetCallManagerProtocol.h"
-#import "NIMRTSManagerProtocol.h"
 #import "NIMChatroomManagerProtocol.h"
 
 #endif

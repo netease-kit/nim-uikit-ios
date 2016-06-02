@@ -44,6 +44,7 @@ NSString *const NIMKitChatroomMembersKey              = @"NIMKitChatroomMembersK
     if (self = [super init]) {
         _bundleName = @"NIMKitResouce.bundle";
         _firer = [[NIMKitNotificationFirer alloc] init];
+        _hostUserInfos = YES;
     }
     return self;
 }

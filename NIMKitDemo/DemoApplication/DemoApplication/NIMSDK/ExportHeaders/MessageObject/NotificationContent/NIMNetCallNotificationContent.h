@@ -10,6 +10,7 @@
 #import "NIMGlobalDefs.h"
 #import "NIMNotificationContent.h"
 
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  网络电话类型
@@ -56,3 +57,5 @@ typedef NS_ENUM(NSInteger, NIMNetCallEventType){
 @property (nonatomic,assign)   NSTimeInterval duration;
 
 @end
+
+NS_ASSUME_NONNULL_END

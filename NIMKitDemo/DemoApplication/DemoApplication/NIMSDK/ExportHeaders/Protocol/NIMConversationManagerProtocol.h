@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMMessage;
 @class NIMSession;
 @class NIMRecentSession;
@@ -21,14 +24,14 @@
  *  @param error  错误,如果成功则error为nil
  *  @param messages 读取的消息列表
  */
-typedef void(^NIMFetchMessageHistoryBlock)(NSError *error,NSArray *messages);
+typedef void(^NIMFetchMessageHistoryBlock)(NSError * __nullable error,NSArray<NIMMessage *> * __nullable messages);
 
 /**
  *  更新本地消息Block
  *
  *  @param error  错误,如果成功则error为nil
  */
-typedef void(^NIMUpdateMessageBlock)(NSError *error);
+typedef void(^NIMUpdateMessageBlock)(NSError * __nullable error);
 
 
 /**
@@ -36,7 +39,7 @@ typedef void(^NIMUpdateMessageBlock)(NSError *error);
  *
  *  @param error  错误,如果成功则error为nil
  */
-typedef void(^NIMRemoveRemoteSessionBlock)(NSError *error);
+typedef void(^NIMRemoveRemoteSessionBlock)(NSError * __nullable error);
 
 
 /**
@@ -46,7 +49,7 @@ typedef void(^NIMRemoveRemoteSessionBlock)(NSError *error);
  *  @param messages 读取的消息列表
  *  @discussion 只有在传入参数错误时才会有error产生
  */
-typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
+typedef void(^NIMSearchMessageBlock)(NSError * __nullable error,NSArray<NIMMessage *> * __nullable messages);
 
 /**
  *  会话管理器回调
@@ -161,7 +164,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  */
 - (void)updateMessage:(NIMMessage *)message
            forSession:(NIMSession *)session
-           completion:(NIMUpdateMessageBlock)completion;
+           completion:(nullable NIMUpdateMessageBlock)completion;
 
 
 /**
@@ -174,7 +177,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  */
 - (void)saveMessage:(NIMMessage *)message
          forSession:(NIMSession *)session
-         completion:(NIMUpdateMessageBlock)completion;
+         completion:(nullable NIMUpdateMessageBlock)completion;
 
 
 
@@ -188,9 +191,9 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *
  *  @return 消息列表，按时间从小到大排列
  */
-- (NSArray *)messagesInSession:(NIMSession *)session
-                       message:(NIMMessage *)message
-                         limit:(NSInteger)limit;
+- (nullable NSArray<NIMMessage *> *)messagesInSession:(NIMSession *)session
+                                              message:(nullable NIMMessage *)message
+                                                limit:(NSInteger)limit;
 
 
 /**
@@ -202,12 +205,12 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *
  *  @return 消息列表,按时间从小到大排列
  */
-- (NSArray *)messagesInSession:(NIMSession *)session
-                    messageIds:(NSArray *)messageIds;
+- (nullable NSArray<NIMMessage *> *)messagesInSession:(NIMSession *)session
+                                           messageIds:(NSArray<NSString *> *)messageIds;
 
 /**
  *  获取所有未读数
- *  @discussion 只能在主线程调用
+ *  @discussion 只能在主线程调用,包括忽略提醒的会话
  *  @return 未读数
  */
 - (NSInteger)allUnreadCount;
@@ -217,7 +220,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *  @discussion 只能在主线程调用
  *  @return 最近会话列表
  */
-- (NSArray*)allRecentSessions;
+- (nullable NSArray<NIMRecentSession *> *)allRecentSessions;
 
 
 /**
@@ -225,13 +228,13 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *
  *  @param session 消息所属的会话
  *  @param option  搜索选项
- *  @param block   读取的消息列表结果
+ *  @param result  读取的消息列表结果
  *  @discussion    此接口不支持查询聊天室消息，聊天室请参考 NIMChatroomManagerProtocol 中的查询消息接口。
  *
  */
 - (void)fetchMessageHistory:(NIMSession *)session
                      option:(NIMHistoryMessageSearchOption *)option
-                     result:(NIMFetchMessageHistoryBlock)block;
+                     result:(nullable NIMFetchMessageHistoryBlock)result;
 
 
 
@@ -240,24 +243,24 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
  *
  *  @param session 消息所属的会话
  *  @param option  搜索选项
- *  @param block   读取的消息列表结果
+ *  @param result  读取的消息列表结果
  *
  */
 - (void)searchMessages:(NIMSession *)session
                 option:(NIMMessageSearchOption *)option
-                result:(NIMSearchMessageBlock)block;
+                result:(nullable NIMSearchMessageBlock)result;
 
 
 
 /**
  *  删除服务器端最近会话
  *
- *  @param sessions 需要删除的会话列表，内部只能是NIMSession
- *  @param block   完成的回调
- *  @discussion    调用这个接口成功后，当前会话之前的消息都不会漫游到其他端
+ *  @param sessions   需要删除的会话列表，内部只能是NIMSession
+ *  @param completion 完成的回调
+ *  @discussion       调用这个接口成功后，当前会话之前的消息都不会漫游到其他端
  */
-- (void)deleteRemoteSessions:(NSArray *)sessions
-                  completion:(NIMRemoveRemoteSessionBlock)block;
+- (void)deleteRemoteSessions:(NSArray<NIMSession *> *)sessions
+                  completion:(nullable NIMRemoveRemoteSessionBlock)completion;
 
 /**
  *  添加通知对象
@@ -275,6 +278,7 @@ typedef void(^NIMSearchMessageBlock)(NSError *error,NSArray *messages);
 
 @end
 
+NS_ASSUME_NONNULL_END
 
 
 

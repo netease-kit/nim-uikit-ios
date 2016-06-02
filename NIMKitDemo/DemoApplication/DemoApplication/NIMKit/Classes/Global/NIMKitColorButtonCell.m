@@ -8,8 +8,11 @@
 
 #import "NIMKitColorButtonCell.h"
 #import "UIView+NIM.h"
+#import "NIMCommonTableData.h"
 
 @interface NIMKitColorButtonCell()
+
+@property (nonatomic,strong) NIMCommonTableRow *rowData;
 
 @end
 
@@ -25,6 +28,18 @@
         [self addSubview:_button];
     }
     return self;
+}
+
+- (void)refreshData:(NIMCommonTableRow *)rowData tableView:(UITableView *)tableView{
+    self.rowData = rowData;
+    [self.button setTitle:rowData.title forState:UIControlStateNormal];
+    NIMKitColorButtonCellStyle style = [rowData.extraInfo integerValue];
+    self.button.style = style;
+    [self.button removeTarget:tableView.nim_viewController action:NULL forControlEvents:UIControlEventTouchUpInside];
+    if (rowData.cellActionName.length) {
+        SEL action = NSSelectorFromString(rowData.cellActionName);
+        [_button addTarget:tableView.nim_viewController action:action forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 - (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event{

@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class NIMChatroomMember;
 
 /**
@@ -46,7 +49,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
 /**
  *  最后一位成员锚点，不包括此成员。填nil会使用当前服务器最新时间开始查询，即第一页。
  */
-@property (nonatomic,strong) NIMChatroomMember *lastMember;
+@property (nullable,nonatomic,strong) NIMChatroomMember *lastMember;
 
 /**
  *  获取聊天室成员个数
@@ -72,7 +75,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
 /**
  *  用户ID列表，最多20个
  */
-@property (nonatomic,copy)   NSArray  *userIds;
+@property (nonatomic,copy)   NSArray<NSString *>  *userIds;
 
 
 @end
@@ -104,7 +107,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
 /**
  *  操作通知事件扩展
  */
-@property (nonatomic,copy) NSDictionary *notifyExt;
+@property (nullable,nonatomic,copy) NSString *notifyExt;
 
 @end
 
@@ -126,6 +129,8 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
 /**
  *  被踢通知扩展字段
  */
-@property (nonatomic,copy) NSDictionary *notifyExt;
+@property (nullable,nonatomic,copy) NSString *notifyExt;
 
 @end
+
+NS_ASSUME_NONNULL_END

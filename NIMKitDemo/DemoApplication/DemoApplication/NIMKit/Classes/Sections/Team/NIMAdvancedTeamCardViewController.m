@@ -9,6 +9,7 @@
 #import "NIMAdvancedTeamCardViewController.h"
 #import "NIMTeamCardRowItem.h"
 #import "UIView+NIM.h"
+#import "UIImage+NIM.h"
 #import "NIMKitColorButtonCell.h"
 #import "NIMAdvancedTeamMemberCell.h"
 #import "UIView+NIMKitToast.h"
@@ -20,12 +21,21 @@
 #import "NIMTeamAnnouncementListViewController.h"
 #import "NIMKitUtil.h"
 #import "NIMTeamSwitchTableViewCell.h"
+#import "NIMAvatarImageView.h"
+#import "NIMProgressHUD.h"
 
 #pragma mark - Team Header View
 #define CardHeaderHeight 89
+
+@protocol NIMAdvancedTeamCardHeaderViewDelegate <NSObject>
+
+- (void)onTouchAvatar:(id)sender;
+
+@end
+
 @interface NIMAdvancedTeamCardHeaderView : UIView
 
-@property (nonatomic,strong) UIImageView *avatar;
+@property (nonatomic,strong) NIMAvatarImageView *avatar;
 
 @property (nonatomic,strong) UILabel *titleLabel;
 
@@ -35,6 +45,10 @@
 
 @property (nonatomic,strong) NIMTeam *team;
 
+@property (nonatomic,weak) id<NIMAdvancedTeamCardHeaderViewDelegate> delegate;
+
+- (void)refresh;
+
 @end
 
 @implementation NIMAdvancedTeamCardHeaderView
@@ -42,8 +56,9 @@
 - (instancetype)initWithTeam:(NIMTeam*)team{
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        _team = team;
-        _avatar          = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"avatar_team"]];
+        _team = [[NIMSDK sharedSDK].teamManager teamById:team.teamId];
+        _avatar  = [[NIMAvatarImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+        [_avatar addTarget:self action:@selector(onTouchAvatar:) forControlEvents:UIControlEventTouchUpInside];
         _titleLabel                      = [[UILabel alloc]initWithFrame:CGRectZero];
         _titleLabel.backgroundColor      = [UIColor clearColor];
         _titleLabel.font                 = [UIFont systemFontOfSize:17.f];
@@ -63,12 +78,22 @@
         
         self.backgroundColor = NIMKit_UIColorFromRGB(0xecf1f5);
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        
+        [self refresh];
     }
     return self;
 }
 
 - (CGSize)sizeThatFits:(CGSize)size{
     return CGSizeMake(size.width, CardHeaderHeight);
+}
+
+- (void)refresh
+{
+    // team 缓存可能发生改变，需要重新从 SDK 里拿一遍
+    _team = [[NIMSDK sharedSDK].teamManager teamById:_team.teamId];
+    NSURL *avatarUrl = _team.thumbAvatarUrl.length? [NSURL URLWithString:_team.thumbAvatarUrl] : nil;
+    [_avatar nim_setImageWithURL:avatarUrl placeholderImage:[UIImage imageNamed:@"avatar_team"]];
 }
 
 - (NSString*)formartCreateTime{
@@ -82,6 +107,12 @@
     return [NSString stringWithFormat:@"于%@创建",dateString];
 }
 
+- (void)onTouchAvatar:(id)sender
+{
+    if ([self.delegate respondsToSelector:@selector(onTouchAvatar:)]) {
+        [self.delegate onTouchAvatar:sender];
+    }
+}
 
 #define AvatarLeft 20
 #define AvatarTop  25
@@ -116,7 +147,7 @@
 #define TableMemberCellReuseId  @"tableMemberCell"
 #define TableSwitchReuseId      @"tableSwitchCell"
 
-@interface NIMAdvancedTeamCardViewController ()<NIMAdvancedTeamMemberCellActionDelegate,NIMContactSelectDelegate,NIMTeamSwitchProtocol,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate>{
+@interface NIMAdvancedTeamCardViewController ()<NIMAdvancedTeamMemberCellActionDelegate,NIMContactSelectDelegate,NIMTeamSwitchProtocol,NIMAdvancedTeamCardHeaderViewDelegate,NIMTeamManagerDelegate,UIActionSheetDelegate,UITableViewDataSource,UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>{
     
     UIAlertView *_updateTeamNameAlertView;
     UIAlertView *_updateTeamNickAlertView;
@@ -126,6 +157,11 @@
     
     UIActionSheet *_moreActionSheet;
     UIActionSheet *_authActionSheet;
+    UIActionSheet *_inviteActionSheet;
+    UIActionSheet *_beInviteActionSheet;
+    UIActionSheet *_updateInfoActionSheet;
+    UIActionSheet *_avatarActionSheet;
+
 }
 
 @property (nonatomic,strong) UITableView *tableView;
@@ -151,9 +187,16 @@
 }
 
 
+- (void)dealloc
+{
+    [[NIMSDK sharedSDK].teamManager removeDelegate:self];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     NIMAdvancedTeamCardHeaderView *headerView = [[NIMAdvancedTeamCardHeaderView alloc] initWithTeam:self.team];
+
+    headerView.delegate = self;
     headerView.nim_size = [headerView sizeThatFits:self.view.nim_size];
     self.navigationItem.title = self.team.teamName;
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
@@ -172,6 +215,8 @@
             [wself reloadData];
         }
     }];
+    
+    [[NIMSDK sharedSDK].teamManager addDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -217,8 +262,9 @@
 }
 
 - (void)buildBodyData{
-    BOOL isManager = self.myTeamInfo.type == NIMTeamMemberTypeManager || self.myTeamInfo.type == NIMTeamMemberTypeOwner;
-    BOOL isOwner   = self.myTeamInfo.type == NIMTeamMemberTypeOwner;
+    BOOL canEdit = [NIMKitUtil canEditTeamInfo:self.myTeamInfo];
+    BOOL isOwner    = self.myTeamInfo.type == NIMTeamMemberTypeOwner;
+    BOOL isManager  = self.myTeamInfo.type == NIMTeamMemberTypeManager;
     
     NIMTeamCardRowItem *teamMember = [[NIMTeamCardRowItem alloc] init];
     teamMember.title  = @"群成员";
@@ -232,7 +278,7 @@
     teamName.action = @selector(updateTeamName);
     teamName.rowHeight = 50.f;
     teamName.type   = TeamCardRowItemTypeCommon;
-    teamName.actionDisabled = !isManager;
+    teamName.actionDisabled = !canEdit;
     
     NIMTeamCardRowItem *teamNick = [[NIMTeamCardRowItem alloc] init];
     teamNick.title = @"群昵称";
@@ -244,11 +290,11 @@
     
     NIMTeamCardRowItem *teamIntro = [[NIMTeamCardRowItem alloc] init];
     teamIntro.title = @"群介绍";
-    teamIntro.subTitle = self.team.intro.length ? self.team.intro : (isManager ? @"点击填写群介绍" : @"");
+    teamIntro.subTitle = self.team.intro.length ? self.team.intro : (canEdit ? @"点击填写群介绍" : @"");
     teamIntro.action = @selector(updateTeamIntro);
     teamIntro.rowHeight = 50.f;
     teamIntro.type   = TeamCardRowItemTypeCommon;
-    teamIntro.actionDisabled = !isManager;
+    teamIntro.actionDisabled = !canEdit;
     
     NIMTeamCardRowItem *teamAnnouncement = [[NIMTeamCardRowItem alloc] init];
     teamAnnouncement.title = @"群公告";
@@ -281,9 +327,33 @@
     itemAuth.title  = @"身份验证";
     itemAuth.subTitle = [self joinModeText:self.team.joinMode];
     itemAuth.action = @selector(changeAuthMode);
-    itemAuth.actionDisabled = !isManager;
+    itemAuth.actionDisabled = !canEdit;
     itemAuth.rowHeight = 60.f;
     itemAuth.type   = TeamCardRowItemTypeCommon;
+    
+    NIMTeamCardRowItem *itemInvite = [[NIMTeamCardRowItem alloc] init];
+    itemInvite.title  = @"邀请他人权限";
+    itemInvite.subTitle = [self inviteModeText:self.team.inviteMode];
+    itemInvite.action = @selector(changeInviteMode);
+    itemInvite.actionDisabled = !canEdit;
+    itemInvite.rowHeight = 60.f;
+    itemInvite.type   = TeamCardRowItemTypeCommon;
+    
+    NIMTeamCardRowItem *itemUpdateInfo = [[NIMTeamCardRowItem alloc] init];
+    itemUpdateInfo.title  = @"群资料修改权限";
+    itemUpdateInfo.subTitle = [self updateInfoModeText:self.team.updateInfoMode];
+    itemUpdateInfo.action = @selector(changeUpdateInfoMode);
+    itemUpdateInfo.actionDisabled = !canEdit;
+    itemUpdateInfo.rowHeight = 60.f;
+    itemUpdateInfo.type   = TeamCardRowItemTypeCommon;
+    
+    NIMTeamCardRowItem *itemBeInvite = [[NIMTeamCardRowItem alloc] init];
+    itemBeInvite.title  = @"被邀请人身份验证";
+    itemBeInvite.subTitle = [self beInviteModeText:self.team.beInviteMode];
+    itemBeInvite.action = @selector(changeBeInviteMode);
+    itemBeInvite.actionDisabled = !canEdit;
+    itemBeInvite.rowHeight = 60.f;
+    itemBeInvite.type   = TeamCardRowItemTypeCommon;
     
 
     
@@ -292,15 +362,23 @@
                   @[teamMember],
                   @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
                   @[itemAuth],
-                  @[itemDismiss]
+                  @[itemInvite,itemUpdateInfo,itemBeInvite],
+                  @[itemDismiss],
                  ];
-    }else{
+    }else if(isManager){
         self.bodyData = @[
                  @[teamMember],
                  @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
                  @[itemAuth],
-                 @[itemQuit]
+                 @[itemInvite,itemUpdateInfo,itemBeInvite],
+                 @[itemQuit],
                  ];
+    }else{
+        self.bodyData = @[
+                          @[teamMember],
+                          @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
+                          @[itemQuit],
+                          ];
     }
 }
 
@@ -325,6 +403,15 @@
         *stop = stopped;
     }];
     return [NSIndexPath indexPathForRow:row inSection:section];
+}
+
+#pragma mark - NIMTeamManagerDelegate
+- (void)onTeamMemberChanged:(NIMTeam *)team
+{
+    __weak typeof(self) weakSelf = self;
+    [self requestData:^(NSError *error) {
+        [weakSelf reloadData];
+    }];
 }
 
 #pragma mark - UITableViewDelegate
@@ -463,6 +550,14 @@
     [_moreActionSheet showInView:self.view];
 }
 
+- (void)onTouchAvatar:(id)sender{
+    if([NIMKitUtil canEditTeamInfo:self.myTeamInfo])
+    {
+        _avatarActionSheet = [[UIActionSheet alloc] initWithTitle:@"设置群头像" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册", nil];
+        [_avatarActionSheet showInView:self.view];
+    }
+}
+
 - (void)updateTeamName{
     _updateTeamNameAlertView = [[UIAlertView alloc] initWithTitle:@"" message:@"修改群名称" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];
     _updateTeamNameAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -482,10 +577,9 @@
 }
 
 - (void)updateTeamAnnouncement{
-    BOOL isManager = self.myTeamInfo.type == NIMTeamMemberTypeManager || self.myTeamInfo.type == NIMTeamMemberTypeOwner;
     NIMTeamAnnouncementListViewController *vc = [[NIMTeamAnnouncementListViewController alloc] initWithNibName:nil bundle:nil];
     vc.team = self.team;
-    vc.canCreateAnnouncement = isManager;
+    vc.canCreateAnnouncement = [NIMKitUtil canEditTeamInfo:self.myTeamInfo];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -506,6 +600,22 @@
     [_authActionSheet showInView:self.view];
 }
 
+- (void)changeInviteMode{
+    _inviteActionSheet = [[UIActionSheet alloc] initWithTitle:@"邀请他人入群" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"管理员邀请",@"所有人邀请", nil];
+    [_inviteActionSheet showInView:self.view];
+}
+
+- (void)changeUpdateInfoMode{
+    _updateInfoActionSheet = [[UIActionSheet alloc] initWithTitle:@"群资料修改权限" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"管理员修改",@"所有人修改", nil];
+    [_updateInfoActionSheet showInView:self.view];
+}
+
+- (void)changeBeInviteMode{
+    _beInviteActionSheet = [[UIActionSheet alloc] initWithTitle:@"被邀请人身份验证" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"需要验证",@"不需要验证", nil];
+    [_beInviteActionSheet showInView:self.view];
+}
+
+
 - (NSString*)joinModeText:(NIMTeamJoinMode)mode{
     switch (mode) {
         case NIMTeamJoinModeNoAuth:
@@ -518,6 +628,40 @@
             break;
     }
 }
+
+- (NSString*)inviteModeText:(NIMTeamInviteMode)mode{
+    switch (mode) {
+        case NIMTeamInviteModeManager:
+            return @"管理员";
+        case NIMTeamInviteModeAll:
+            return @"所有人";
+        default:
+            return @"未知权限";
+    }
+}
+
+- (NSString*)updateInfoModeText:(NIMTeamUpdateInfoMode)mode{
+    switch (mode) {
+        case NIMTeamUpdateInfoModeManager:
+            return @"管理员";
+        case NIMTeamUpdateInfoModeAll:
+            return @"所有人";
+        default:
+            return @"未知权限";
+    }
+}
+
+- (NSString*)beInviteModeText:(NIMTeamBeInviteMode)mode{
+    switch (mode) {
+        case NIMTeamBeInviteModeNeedAuth:
+            return @"需要验证";
+        case NIMTeamBeInviteModeNoAuth:
+            return @"不需要验证";
+        default:
+            return @"未知";
+    }
+}
+
 
 - (void)enterMemberCard{
     NIMTeamMemberListViewController *vc = [[NIMTeamMemberListViewController alloc] initTeam:self.team members:self.memberData];
@@ -588,16 +732,16 @@
     if (alertView == _updateTeamNameAlertView) {
         [self updateTeamNameAlert:buttonIndex];
     }
-    if (alertView == _updateTeamNickAlertView) {
+    else if (alertView == _updateTeamNickAlertView) {
         [self updateTeamNickAlert:buttonIndex];
     }
-    if (alertView == _updateTeamIntroAlertView) {
+    else if (alertView == _updateTeamIntroAlertView) {
         [self updateTeamIntroAlert:buttonIndex];
     }
-    if (alertView == _quitTeamAlertView) {
+    else if (alertView == _quitTeamAlertView) {
         [self quitTeamAlert:buttonIndex];
     }
-    if (alertView == _dismissTeamAlertView) {
+    else if (alertView == _dismissTeamAlertView) {
         [self dismissTeamAlert:buttonIndex];
     }
 }
@@ -721,60 +865,228 @@
 #pragma mark - UIActionSheetDelegate
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)index{
     if (actionSheet == _moreActionSheet) {
-        BOOL isLeave = NO;
-        switch (index) {
-            case 0:{
-                isLeave = NO;
-                break;
-            case 1:
-                isLeave = YES;
-                break;
-            }
-            default:
-                return;
-                break;
-        }
-        __weak typeof(self) wself = self;
-        __block ContactSelectFinishBlock finishBlock =  ^(NSArray * memeber){
-            [[NIMSDK sharedSDK].teamManager transferManagerWithTeam:wself.team.teamId newOwnerId:memeber.firstObject isLeave:isLeave completion:^(NSError *error) {
-                if (!error) {
-                    [wself.view nimkit_makeToast:@"转移成功！" duration:2.0 position:NIMKitToastPositionCenter];
-                    if (isLeave) {
-                        [wself.navigationController popToRootViewControllerAnimated:YES];
-                    }else{
-                        [wself reloadData];
-                    }
-                }else{
-                    [wself.view nimkit_makeToast:[NSString stringWithFormat:@"转移失败！code:%zd",error.code] duration:2.0 position:NIMKitToastPositionCenter];
-                }
-            }];
-        };
-        NSString *currentUserID = [[[NIMSDK sharedSDK] loginManager] currentAccount];
-        NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
-        config.teamId = self.team.teamId;
-        config.filterIds = @[currentUserID];
-        NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
-        vc.finshBlock = finishBlock;
-        [vc show];
+        [self ontransferActionSheet:actionSheet index:index];
     }
-    
-    if (actionSheet == _authActionSheet) {
-        if (index == _authActionSheet.cancelButtonIndex) {
-            return;
-        }
-        [[NIMSDK sharedSDK].teamManager updateTeamJoinMode:index teamId:self.team.teamId completion:^(NSError *error) {
-            if (!error) {
-                self.team.joinMode = index;
-                [self.view nimkit_makeToast:@"修改成功"];
-                [self reloadData];
-            }else{
-                [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
-            }
-            
-        }];
+    else if (actionSheet == _authActionSheet) {
+        [self onAuthActionSheet:actionSheet index:index];
+    }
+    else if (actionSheet == _inviteActionSheet) {
+        [self onInviteActionSheet:actionSheet index:index];
+    }
+    else if (actionSheet == _updateInfoActionSheet) {
+        [self onUpdateInfoActionSheet:actionSheet index:index];
+    }
+    else if (actionSheet == _beInviteActionSheet)
+    {
+        [self onBeInviteActionSheet:actionSheet index:index];
+    }
+    else if (actionSheet == _avatarActionSheet)
+    {
+        [self onAvatarActionSheet:actionSheet index:index];
     }
 }
 
+- (void)onAvatarActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    switch (index) {
+        case 0:
+            [self showImagePicker:UIImagePickerControllerSourceTypeCamera];
+            break;
+        case 1:
+            [self showImagePicker:UIImagePickerControllerSourceTypePhotoLibrary];
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)showImagePicker:(UIImagePickerControllerSourceType)type{
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate      = self;
+    picker.sourceType    = type;
+    picker.allowsEditing = YES;
+    [self presentViewController:picker animated:YES completion:nil];
+}
+
+- (void)ontransferActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    BOOL isLeave = NO;
+    switch (index) {
+        case 0:{
+            isLeave = NO;
+            break;
+        case 1:
+            isLeave = YES;
+            break;
+        }
+        default:
+            return;
+            break;
+    }
+    __weak typeof(self) wself = self;
+    __block ContactSelectFinishBlock finishBlock =  ^(NSArray * memeber){
+        [[NIMSDK sharedSDK].teamManager transferManagerWithTeam:wself.team.teamId newOwnerId:memeber.firstObject isLeave:isLeave completion:^(NSError *error) {
+            if (!error) {
+                [wself.view nimkit_makeToast:@"转移成功！" duration:2.0 position:NIMKitToastPositionCenter];
+                if (isLeave) {
+                    [wself.navigationController popToRootViewControllerAnimated:YES];
+                }else{
+                    [wself reloadData];
+                }
+            }else{
+                [wself.view nimkit_makeToast:[NSString stringWithFormat:@"转移失败！code:%zd",error.code] duration:2.0 position:NIMKitToastPositionCenter];
+            }
+        }];
+    };
+    NSString *currentUserID = [[[NIMSDK sharedSDK] loginManager] currentAccount];
+    NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
+    config.teamId = self.team.teamId;
+    config.filterIds = @[currentUserID];
+    NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+    vc.finshBlock = finishBlock;
+    [vc show];
+}
+
+- (void)onAuthActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    if (index == _authActionSheet.cancelButtonIndex) {
+        return;
+    }
+    [[NIMSDK sharedSDK].teamManager updateTeamJoinMode:index teamId:self.team.teamId completion:^(NSError *error) {
+        if (!error) {
+            self.team.joinMode = index;
+            [self.view nimkit_makeToast:@"修改成功"];
+            [self reloadData];
+        }else{
+            [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+        }
+    }];
+}
+
+- (void)onInviteActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    NIMTeamInviteMode mode;
+    switch (index) {
+        case 0:
+            mode = NIMTeamInviteModeManager;
+            break;
+        case 1:
+            mode = NIMTeamInviteModeAll;
+            break;
+        default:
+            return;
+    }
+    [[NIMSDK sharedSDK].teamManager updateTeamInviteMode:mode teamId:self.team.teamId completion:^(NSError *error) {
+        if (!error) {
+            self.team.inviteMode = mode;
+            [self.view nimkit_makeToast:@"修改成功"];
+            [self reloadData];
+        }else{
+            [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+        }
+    }];
+}
+
+- (void)onUpdateInfoActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    NIMTeamUpdateInfoMode mode;
+    switch (index) {
+        case 0:
+            mode = NIMTeamUpdateInfoModeManager;
+            break;
+        case 1:
+            mode = NIMTeamUpdateInfoModeAll;
+            break;
+        default:
+            return;
+    }
+    [[NIMSDK sharedSDK].teamManager updateTeamUpdateInfoMode:mode teamId:self.team.teamId completion:^(NSError *error) {
+        if (!error) {
+            self.team.updateInfoMode = mode;
+            [self.view nimkit_makeToast:@"修改成功"];
+            [self reloadData];
+        }else{
+            [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+        }
+    }];
+}
+
+- (void)onBeInviteActionSheet:(UIActionSheet *)actionSheet index:(NSInteger)index
+{
+    NIMTeamBeInviteMode mode;
+    switch (index) {
+        case 0:
+            mode = NIMTeamBeInviteModeNeedAuth;
+            break;
+        case 1:
+            mode = NIMTeamBeInviteModeNoAuth;
+            break;
+        default:
+            return;
+    }
+    [[NIMSDK sharedSDK].teamManager updateTeamBeInviteMode:mode teamId:self.team.teamId completion:^(NSError *error) {
+        if (!error) {
+            self.team.beInviteMode = mode;
+            [self.view nimkit_makeToast:@"修改成功"];
+            [self reloadData];
+        }else{
+            [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+        }
+    }];
+}
+
+
+#pragma mark - UIImagePickerControllerDelegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
+    UIImage *image = info[UIImagePickerControllerEditedImage];
+    [picker dismissViewControllerAnimated:YES completion:^{
+        [self uploadImage:image];
+    }];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - Private
+- (void)uploadImage:(UIImage *)image{
+    UIImage *imageForAvatarUpload = [image nim_imageForAvatarUpload];
+    NSString *fileName = [[[[NSUUID UUID] UUIDString] lowercaseString] stringByAppendingPathExtension:@"jpg"];
+    NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+    NSData *data = UIImageJPEGRepresentation(imageForAvatarUpload, 1.0);
+    BOOL success = data && [data writeToFile:filePath atomically:YES];
+    __weak typeof(self) wself = self;
+    if (success) {
+        [NIMProgressHUD show];
+        [[NIMSDK sharedSDK].resourceManager upload:filePath progress:nil completion:^(NSString *urlString, NSError *error) {
+            [NIMProgressHUD dismiss];
+            if (!error && wself) {
+                [[NIMSDK sharedSDK].teamManager updateTeamAvatar:urlString teamId:wself.team.teamId completion:^(NSError *error) {
+                    if (!error) {
+                        wself.team.avatarUrl = urlString;
+                        [[NIMWebImageManager sharedManager] saveImageToCache:imageForAvatarUpload forURL:[NSURL URLWithString:urlString]];
+                        NIMAdvancedTeamCardHeaderView *headerView = (NIMAdvancedTeamCardHeaderView *)wself.tableView.tableHeaderView;
+                        [headerView refresh];
+                    }else{
+                        [wself.view nimkit_makeToast:@"设置头像失败，请重试"
+                                     duration:2
+                                     position:NIMKitToastPositionCenter];
+                    }
+                }];
+                
+            }else{
+                [wself.view nimkit_makeToast:@"图片上传失败，请重试"
+                             duration:2
+                             position:NIMKitToastPositionCenter];
+            }
+        }];
+    }else{
+        [self.view nimkit_makeToast:@"图片保存失败，请重试"
+                    duration:2
+                    position:NIMKitToastPositionCenter];
+    }
+}
 
 #pragma mark - 旋转处理 (iOS7)
 
