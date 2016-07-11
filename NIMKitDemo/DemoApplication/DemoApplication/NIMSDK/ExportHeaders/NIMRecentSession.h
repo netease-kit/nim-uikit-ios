@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  当前会话
  */
-@property (nullable,nonatomic,readonly,strong)   NIMSession  *session;
+@property (nullable,nonatomic,readonly,copy)   NIMSession  *session;
 
 /**
  *  最后一条消息

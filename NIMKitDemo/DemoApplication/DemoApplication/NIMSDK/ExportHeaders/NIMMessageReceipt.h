@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  已读回执对应的会话
  *  @discussion 当前只支持 P2P 会话类型
  */
-@property (nullable,nonatomic,strong,readonly)   NIMSession  *session;
+@property (nullable,nonatomic,copy,readonly)   NIMSession  *session;
 
 /**
  *  时间戳

@@ -15,7 +15,7 @@
 #import "NIMKit.h"
 
 
-@interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate,NIMUserManagerDelegate>
+@interface NIMSessionListViewController ()<NIMConversationManagerDelegate,NIMTeamManagerDelegate>
 
 @end
 
@@ -31,9 +31,7 @@
 
 - (void)dealloc{
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
-    [[NIMSDK sharedSDK].teamManager removeDelegate:self];
     [[NIMSDK sharedSDK].loginManager removeDelegate:self];
-    [[NIMSDK sharedSDK].userManager removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -53,15 +51,15 @@
 
     [[NIMSDK sharedSDK].conversationManager addDelegate:self];
     [[NIMSDK sharedSDK].loginManager addDelegate:self];
-    [[NIMSDK sharedSDK].teamManager addDelegate:self];
+    
     extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamInfoHasUpdatedNotification:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
+    
+    extern NSString *const NIMKitTeamMembersHasUpdatedNotification;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamMembersHasUpdatedNotification:) name:NIMKitTeamMembersHasUpdatedNotification object:nil];
+    
     extern NSString *const NIMKitUserInfoHasUpdatedNotification;
-    if ([NIMKit sharedKit].hostUserInfos) {
-        [[NIMSDK sharedSDK].userManager addDelegate:self];
-    }else{
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
-    }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
 }
 
 - (void)reload{
@@ -153,10 +151,7 @@
     [self reload];
 }
 
-#pragma mark - NIMTeamManagerDelegate
-- (void)onTeamMemberChanged:(NIMTeam *)team{
-    [self.tableView reloadData];
-}
+
 #pragma mark - NIMLoginManagerDelegate
 - (void)onLogin:(NIMLoginStep)step
 {
@@ -164,15 +159,6 @@
         [self reload];
     }
 }
-#pragma mark - NIMUserManagerDelegate
-- (void)onUserInfoChanged:(NIMUser *)user{
-    [self reload];
-}
-
-- (void)onFriendChanged:(NIMUser *)user{
-    [self reload];
-}
-
 
 #pragma mark - Override
 - (void)onSelectedAvatar:(NSString *)userId
@@ -325,13 +311,18 @@
 }
 
 #pragma mark - Notification
-- (void)onUserInfoHasUpdatedNotification:(NSNotificationCenter *)center{
+- (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification{
     [self reload];
 }
 
-- (void)onTeamInfoHasUpdatedNotification:(NSNotificationCenter *)center{
+- (void)onTeamInfoHasUpdatedNotification:(NSNotification *)notification{
     [self reload];
 }
+
+- (void)onTeamMembersHasUpdatedNotification:(NSNotification *)notification{
+    [self reload];
+}
+
 
 
 @end

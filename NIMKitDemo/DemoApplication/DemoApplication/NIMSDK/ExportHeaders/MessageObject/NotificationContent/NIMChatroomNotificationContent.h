@@ -66,6 +66,14 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
      *  聊天室成员被踢
      */
     NIMChatroomEventTypeKicked        = 313,
+    /**
+     *  聊天室成员被临时禁言
+     */
+    NIMChatroomEventTypeAddMuteTemporarily   = 314,
+    /**
+     *  聊天室成员被解除临时禁言
+     */
+    NIMChatroomEventTypeRemoveMuteTemporarily= 315,
     
 };
 
@@ -106,9 +114,15 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
 @property (nullable,nonatomic,copy,readonly) NSArray<NIMChatroomNotificationMember *> *targets;
 
 /**
- *  扩展信息
+ *  通知信息
  */
 @property (nullable,nonatomic,copy,readonly) NSString *notifyExt;
+
+/**
+ *  拓展信息
+ *  @discusssion 目前只有NIMChatroomEventTypeAddMuteTemp才有拓展信息,拓展信息为NSNumber，表示临时禁言时长
+ */
+@property (nullable,nonatomic,copy,readonly) id ext;
 
 @end
 

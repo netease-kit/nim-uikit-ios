@@ -101,12 +101,24 @@
 
 - (IBAction)onDoneBtnClick:(id)sender {
     [self dismissViewControllerAnimated:YES completion:^() {
-        if (self.finshBlock) {
-            self.finshBlock(_selectecContacts);
-            self.finshBlock = nil;
+        
+        if (_selectecContacts.count) {
+            if ([self.delegate respondsToSelector:@selector(didFinishedSelect:)]) {
+                [self.delegate didFinishedSelect:_selectecContacts];
+            }
+            if (self.finshBlock) {
+                self.finshBlock(_selectecContacts);
+                self.finshBlock = nil;
+            }
         }
-        if([_delegate respondsToSelector:@selector(didFinishedSelect:)]) {
-            [_delegate didFinishedSelect:_selectecContacts];
+        else {
+            if([_delegate respondsToSelector:@selector(didCancelledSelect)]) {
+                [_delegate didCancelledSelect];
+            }
+            if (self.cancelBlock) {
+                self.cancelBlock();
+                self.cancelBlock = nil;
+            }
         }
     }];
 }

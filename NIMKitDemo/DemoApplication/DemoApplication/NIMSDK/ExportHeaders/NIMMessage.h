@@ -89,7 +89,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 /**
  *  消息所属会话
  */
-@property (nullable,nonatomic,strong,readonly)       NIMSession *session;
+@property (nullable,nonatomic,copy,readonly)       NIMSession *session;
 
 /**
  *  消息ID,唯一标识
@@ -98,6 +98,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  消息文本
+ *  @discussion 聊天室消息中除 NIMMessageTypeText 和 NIMMessageTypeTip 外，其他消息 text 字段都为 nil
  */
 @property (nullable,nonatomic,copy)                  NSString *text;
 
@@ -193,7 +194,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  消息发送者名字
- *  @discussion 当发送者是自己时,这个值为空,这个值表示的是发送者当前的昵称,而不是发送消息时的昵称
+ *  @discussion 当发送者是自己时,这个值可能为空,这个值表示的是发送者当前的昵称,而不是发送消息时的昵称
  */
 @property (nullable,nonatomic,copy,readonly)         NSString *senderName;
 @end

@@ -66,12 +66,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 @property (nonatomic,strong)    id<NIMKitDataProvider> provider;
 
 /**
- *  是否托管用户数据
- */
-@property (nonatomic,assign)    BOOL hostUserInfos;
-
-
-/**
  *  NIMKit资源所在的bundle名称。
  */
 @property (nonatomic,copy)      NSString *bundleName;
@@ -84,12 +78,34 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 - (void)notfiyUserInfoChanged:(NSArray *)userIds;
 
+
+/**
+ *  用户黑名单变更通知接口
+ *
+ *  @param userId 用户id
+ */
+- (void)notifyUserBlackListChanged;
+
+
+/**
+ *  用户静音列表变更通知接口
+ */
+- (void)notifyUserMuteListChanged;
+
 /**
  *  群信息变更通知接口
  *
  *  @param teamId 群id
  */
 - (void)notfiyTeamInfoChanged:(NSArray *)teamIds;
+
+
+/**
+ *  群成员变更通知接口
+ *
+ *  @param teamId 群id
+ */
+- (void)notfiyTeamMemebersChanged:(NSArray *)teamIds;
 
 @end
 
@@ -135,9 +151,36 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 @end
 
+/**
+ *  用户信息变更通知
+ */
 extern NSString *const NIMKitUserInfoHasUpdatedNotification;
+
+/**
+ *  群组信息变更通知
+ */
 extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
+
+/**
+ *  黑名单更新通知
+ */
+extern NSString *const NIMKitUserBlackListHasUpdatedNotification;
+
+/**
+ *  静音列表更新通知
+ */
+extern NSString *const NIMKitUserMuteListHasUpdatedNotification;
+
+/**
+ *  群组成员变更通知
+ */
+extern NSString *const NIMKitTeamMembersHasUpdatedNotification;
+
+/**
+ *  聊天室成员信息变更通知
+ */
 extern NSString *const NIMKitChatroomMemberInfoHasUpdatedNotification;
+
 
 extern NSString *const NIMKitInfoKey;
 extern NSString *const NIMKitChatroomMembersKey;

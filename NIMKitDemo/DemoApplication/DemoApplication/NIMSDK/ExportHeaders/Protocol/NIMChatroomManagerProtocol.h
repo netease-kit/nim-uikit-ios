@@ -256,6 +256,17 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
               completion:(nullable NIMChatroomHandler)completion;
 
 
+
+/**
+ *  更新用户聊天室临时禁言状态
+ *
+ *  @param request    更新请求
+ *  @param duration   临时禁言时长，单位为妙
+ *  @param completion 请求回调
+ */
+- (void)updateMemberTempMute:(NIMChatroomMemberUpdateRequest *)request
+                    duration:(unsigned long long)duration
+                  completion:(nullable NIMChatroomHandler)completion;
 /**
  *  将特定成员踢出聊天室
  *

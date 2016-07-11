@@ -211,6 +211,10 @@
         [_msgIdDict removeObjectForKey:msgModel.message.messageId];
         [dels addObject:@(delMsgIndex)];
     }
+    if ([_modelArray.lastObject isKindOfClass:[NIMMessageModel class]] || !_modelArray.lastObject) {
+        _lastTimeInterval  = [[(NIMMessageModel *)[_modelArray lastObject] message] timestamp];
+        _firstTimeInterval = _firstTimeInterval < _lastTimeInterval ? _firstTimeInterval : _lastTimeInterval;
+    }
     return dels;
 }
 

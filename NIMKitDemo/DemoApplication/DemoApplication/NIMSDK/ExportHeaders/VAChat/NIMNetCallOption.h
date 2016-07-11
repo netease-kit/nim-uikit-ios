@@ -28,6 +28,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic,assign)    BOOL          disableVideoCropping;
 
+
+/**
+ *  自动旋转远端画面, 默认为 YES
+ *  @discussion 开启该选项, 以在远端设备旋转时在本端自动调整角度
+ */
+@property (nonatomic, assign)   BOOL          autoRotateRemoteVideo;
+
 /**
  *  服务器录制音频开关 (该开关仅在服务器开启录制功能时才有效)
  */
