@@ -91,10 +91,8 @@
 }
 
 - (NSString *)showName{
-    if (self.member.nickname.length) {
-        return self.member.nickname;
-    }
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId];
+    NIMSession *session = [NIMSession session:self.member.teamId type:NIMSessionTypeTeam];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId inSession:session];
     return info.showName;
 }
 

@@ -43,13 +43,21 @@ typedef void(^NIMRemoveRemoteSessionBlock)(NSError * __nullable error);
 
 
 /**
- *  搜索本地消息记录block
+ *  搜索本地消息记录Block
  *
  *  @param error  错误,如果成功则error为nil
  *  @param messages 读取的消息列表
  *  @discussion 只有在传入参数错误时才会有error产生
  */
 typedef void(^NIMSearchMessageBlock)(NSError * __nullable error,NSArray<NIMMessage *> * __nullable messages);
+
+/**
+ *  全局搜索本地消息记录Block
+ *
+ *  @param error      错误,如果成功则error为nil
+ *  @param messages   读取的消息列表
+ */
+typedef void(^NIMGlobalSearchMessageBlock)(NSError * __nullable error,NSDictionary<NIMSession *,NSArray<NIMMessage *> *> * __nullable messages);
 
 /**
  *  会话管理器回调
@@ -239,7 +247,7 @@ typedef void(^NIMSearchMessageBlock)(NSError * __nullable error,NSArray<NIMMessa
 
 
 /**
- *  搜索本地消息
+ *  搜索本地会话内消息
  *
  *  @param session 消息所属的会话
  *  @param option  搜索选项
@@ -249,6 +257,15 @@ typedef void(^NIMSearchMessageBlock)(NSError * __nullable error,NSArray<NIMMessa
 - (void)searchMessages:(NIMSession *)session
                 option:(NIMMessageSearchOption *)option
                 result:(nullable NIMSearchMessageBlock)result;
+
+/**
+ *  全局搜索本地消息
+ *
+ *  @param option 搜索选项
+ *  @param result 读取的消息内容
+ */
+- (void)searchAllMessages:(NIMMessageSearchOption *)option
+                   result:(nullable NIMGlobalSearchMessageBlock)result;
 
 
 

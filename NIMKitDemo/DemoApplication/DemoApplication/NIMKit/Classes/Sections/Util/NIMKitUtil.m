@@ -48,7 +48,7 @@
     {
         hour = hour - 12;
     }
-    if (gapTime < onedayTimeIntervalValue * 3) {
+    if (gapTime < onedayTimeIntervalValue * 3 && gapTime > 0) {
         int gapDay = gapTime/(60*60*24) ;
         if(gapDay == 0) //在24小时内,存在跨天的现象. 判断两个时间是否在同一天内
         {
@@ -64,7 +64,7 @@
             result = showDetail? [[NSString alloc] initWithFormat:@"前天%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : @"前天";
         }
     }
-    else if([nowDate timeIntervalSinceDate:msgDate] < 7 * onedayTimeIntervalValue)//一周内
+    else if([nowDate timeIntervalSinceDate:msgDate] < 7 * onedayTimeIntervalValue && gapTime > 0)//一周内
     {
         NSString *weekDay = [NIMKitUtil weekdayStr:msgDateComponents.weekday];
         result = showDetail? [weekDay stringByAppendingFormat:@"%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : weekDay;
@@ -388,6 +388,21 @@
         case NIMChatroomEventTypeClosed:
         {
             return [NSString stringWithFormat:@"直播间已关闭"];
+        }
+        case NIMChatroomEventTypeAddMuteTemporarily:
+        {
+            if (content.targets.count == 1 && [[content.targets.firstObject userId] isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]])
+            {
+                return @"你已被临时禁言";
+            }
+            else
+            {
+                return [NSString stringWithFormat:@"%@被管理员禁言",targetText];
+            }
+        }
+        case NIMChatroomEventTypeRemoveMuteTemporarily:
+        {
+            return [NSString stringWithFormat:@"%@被管理员解除临时禁言",targetText];
         }
         default:
             break;

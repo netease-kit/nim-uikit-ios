@@ -55,10 +55,12 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
  *  时间戳
  */
 @property (nonatomic,assign,readonly)       NSTimeInterval timestamp;
+
 /**
  *  操作者
  */
 @property (nullable,nonatomic,copy,readonly)         NSString *sourceID;
+
 /**
  *  目标ID,群ID或者是用户ID
  */

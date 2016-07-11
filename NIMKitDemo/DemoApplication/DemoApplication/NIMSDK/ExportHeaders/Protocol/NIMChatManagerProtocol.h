@@ -120,6 +120,20 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError * __nullable error);
 
 
 /**
+ *  转发消息
+ *
+ *  @param message 消息
+ *  @param session 接收方
+ *  @param error   错误 如果在准备发送消息阶段发生错误,这个error会被填充相应的信息
+ *n
+ *  @return 是否调用成功,这里返回的result只是表示当前这个函数调用是否成功,需要后续的回调才能够判断消息是否已经发送至服务器
+ */
+- (BOOL)forwardMessage:(NIMMessage *)message
+             toSession:(NIMSession *)session
+                 error:(NSError * __nullable *)error;
+
+
+/**
  *  发送已读回执
  *
  *  @param receipt    已读回执

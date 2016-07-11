@@ -78,8 +78,6 @@ NIMUserManagerDelegate>
     _tableView.dataSource = nil;
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
     [self.conversationManager removeDelegate:self];
-    [[NIMSDK sharedSDK].teamManager removeDelegate:self];
-    [[NIMSDK sharedSDK].userManager removeDelegate:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -160,20 +158,13 @@ NIMUserManagerDelegate>
 
     [[[NIMSDK sharedSDK] chatManager] addDelegate:self];
     [self.conversationManager addDelegate:self];
+    
     if (self.session.sessionType == NIMSessionTypeTeam) {
-        [[[NIMSDK sharedSDK] teamManager] addDelegate:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamInfoHasUpdatedNotification:) name:NIMKitTeamInfoHasUpdatedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onTeamMembersHasUpdatedNotification:) name:NIMKitTeamMembersHasUpdatedNotification object:nil];
     }
     
-    if ([NIMKit sharedKit].hostUserInfos) {
-        //说明托管了用户信息，那就直接加 userManager 的监听
-        [[NIMSDK sharedSDK].userManager addDelegate:self];
-    }else{
-        //没有托管用户信息，就直接加 NIMKit 的监听
-        extern NSString *const NIMKitUserInfoHasUpdatedNotification;
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
-    }
-    
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
 }
 
 
@@ -285,7 +276,6 @@ NIMUserManagerDelegate>
         }else{
             [self uiAddMessages:@[message]];
         }
-
     }
 }
 
@@ -391,38 +381,29 @@ NIMUserManagerDelegate>
     leftBarView.badgeView.hidden = !unreadCount;
 }
 
-#pragma mark - NIMTeamManagerDelegate
-- (void)onTeamUpdated:(NIMTeam *)team
-{
-    if (self.session.sessionType == NIMSessionTypeTeam &&
-        [self.session.sessionId isEqualToString:team.teamId]) {
-        self.navigationItem.title = [self sessionTitle];
-    }
+#pragma mark - Notification
+- (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification {
+    self.navigationItem.title = [self sessionTitle];
+    [self.tableView reloadData];
 }
 
-- (void)onTeamMemberChanged:(NIMTeam *)team{
-    if (self.session.sessionType == NIMSessionTypeTeam &&
-        [team.teamId isEqualToString:self.session.sessionId]) {
+- (void)onTeamMembersHasUpdatedNotification:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSArray *teamIds = userInfo[NIMKitInfoKey];
+    if (self.session.sessionType == NIMSessionTypeTeam
+        && [teamIds containsObject:self.session.sessionId]) {
         [self.tableView reloadData];
         self.navigationItem.title = [self sessionTitle];
     }
 }
 
-#pragma mark - NIMUserManagerDelegate
-- (void)onUserInfoChanged:(NIMUser *)user {
-    self.navigationItem.title = [self sessionTitle];
-    [self.tableView reloadData];
-}
-
-- (void)onFriendChanged:(NIMUser *)user {
-    self.navigationItem.title = [self sessionTitle];
-    [self.tableView reloadData];
-}
-
-
-- (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification {
-    self.navigationItem.title = [self sessionTitle];
-    [self.tableView reloadData];
+- (void)onTeamInfoHasUpdatedNotification:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSArray *teamIds = userInfo[NIMKitInfoKey];
+    if (self.session.sessionType == NIMSessionTypeTeam
+        && [teamIds containsObject:self.session.sessionId]) {
+        self.navigationItem.title = [self sessionTitle];
+    }
 }
 
 
@@ -715,6 +696,7 @@ NIMUserManagerDelegate>
 {
     
     self.lastVisibleIndexPathBeforeRotation = [self.tableView indexPathsForVisibleRows].lastObject;
+    [self.sessionDatasource cleanCache];
     if (self.view.window) {
         [self.sessionInputView endEditing:YES];
         [[NIMSDK sharedSDK].mediaManager cancelRecord];
@@ -722,6 +704,7 @@ NIMUserManagerDelegate>
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    [self.tableView reloadData];
     [self.tableView scrollToRowAtIndexPath:self.lastVisibleIndexPathBeforeRotation atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
@@ -736,6 +719,8 @@ NIMUserManagerDelegate>
         [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
          {
              [[NIMSDK sharedSDK].mediaManager cancelRecord];
+             [wself.sessionDatasource cleanCache];
+             [wself.tableView reloadData];
              [wself.tableView scrollToRowAtIndexPath:wself.lastVisibleIndexPathBeforeRotation atScrollPosition:UITableViewScrollPositionBottom animated:NO];
          } completion:nil];
     }

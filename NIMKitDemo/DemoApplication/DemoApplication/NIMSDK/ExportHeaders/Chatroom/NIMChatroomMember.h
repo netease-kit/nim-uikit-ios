@@ -72,6 +72,17 @@ typedef NS_ENUM(NSInteger, NIMChatroomMemberType) {
 @property (nonatomic,assign) BOOL isMuted;
 
 /**
+ *  是否被临时禁言
+ *  @discussion 临时禁言和禁言属性无相关性
+ */
+@property (nonatomic,assign) BOOL isTempMuted;
+
+/**
+ *  临时禁言剩余时长
+ */
+@property (nonatomic,assign) unsigned long long tempMuteDuration;
+
+/**
  *  是否被拉黑
  */
 @property (nonatomic,assign) BOOL isInBlackList;

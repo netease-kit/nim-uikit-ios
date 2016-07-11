@@ -14,20 +14,20 @@ NS_ASSUME_NONNULL_BEGIN
 @class NIMMessage;
 
 
-/*
- * 搜索顺序
+/**
+ *  搜索顺序
  */
-typedef enum : NSUInteger {
-    /*
-     * 从新消息往旧消息查询
+typedef NS_ENUM(NSInteger,NIMMessageSearchOrder) {
+    /**
+     *  从新消息往旧消息查询
      */
     NIMMessageSearchOrderDesc       =   0,
-    /*
-     * 从旧消息往新消息查询
+    
+    /**
+     *  从旧消息往新消息查询
      */
     NIMMessageSearchOrderAsc        =   1,
-    
-} NIMMessageSearchOrder;
+};
 
 
 /**

@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  图片格式
  */
-typedef enum : NSUInteger
+typedef NS_ENUM(NSInteger, NIMImageFormat)
 {
     /**
      *  Jpeg格式
@@ -23,7 +23,7 @@ typedef enum : NSUInteger
      *  Png格式
      */
     NIMImageFormatPNG,
-} NIMImageFormat;
+};
 
 /**
  *  图片选项

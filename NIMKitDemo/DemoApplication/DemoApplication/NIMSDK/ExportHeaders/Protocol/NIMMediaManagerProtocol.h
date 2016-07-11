@@ -259,7 +259,7 @@ typedef void(^NIMAudioToTextBlock)(NSError * __nullable error,NSString * __nulla
  *  语音转文字
  *
  *  @param option  语音转文字选项
- *  @param block  完成回调
+ *  @param result  完成回调
  */
 - (void)transAudioToText:(NIMAudioToTextOption *)option
                   result:(NIMAudioToTextBlock)result;
