@@ -1,11 +1,11 @@
 # 网易云信 组件工具包  NIMKit
 
-##云信组件包  NIMKit 介绍
+## 云信组件包  NIMKit 介绍
 
 `NIMKit` 是一款可以帮助用户快速打造出聊天功能的UI组件，开发者可以通过一些简洁的代码，快速的实现聊天界面和最近联系人功能，并实现基础的一些定制化开发。 `NIMKit` 完全开源，如果开发者希望修改界面，只需要通过替换界面资源，修改配置等方式即可实现。如果开发者希望更深层次的自定义，也可自行修改代码。
 
 
-##NIMKit说明
+## NIMKit说明
 
 * `NIMKit` 依赖云信通讯能力库 `NIMSDK`，请自行在您的工程中添加。
 * 定制自定义消息教程 [NIM Guide For Custom Message](/NIM_Guide_For_Custom_Message.md) 。
@@ -15,18 +15,18 @@
 
 
 
-##NIMKit文档
+## NIMKit文档
 
-###基础使用
+### 基础使用
 
 
 *  添加 `NIMKit` 到您自己的工程中。
 *  添加 `NIMSDK` 到您自己的工程中，您可以选择手动添加或者使用 CocoaPods 导入。
 *  在您自己的工程中，打开 `Build Phases` 选项，展开 `Link Binary With Libraries` 选项卡。添加必要的依赖项：
 	* CoreText.framework
-	
+
 	如果您选择手动添加 NIMSDK ， 您还要添加以下依赖项：
-	
+
 	* CoreTelephony.framework
 	* AVFoundation.framework
 	* MobileCoreServices.framework
@@ -36,30 +36,30 @@
 	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup><sup> 注<sup>2</sup> </sup>
 	* libsqlite3.0.tbd  <sup> 注<sup>1</sup> </sup>
 	* libz.tbd  <sup> 注<sup>1</sup> </sup>
-	
+
   **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
-  	
+
   **注<sup>2</sup> ：请注意c++库的版本号，务必保证为 6.0.9 。**
-  
+
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
 
 * 在工程配置 `info.plist` 文件中，添加条目 `NSAppTransportSecurity` ，属性设为 `Dictionary`。在此条目下添加键值对，key 为  `NSAllowsArbitraryLoads`, 值为 `YES`。
-	
+
 * 在工程中添加 `NIMKitResouce.bundle`。
 
 * 在需要使用到组件的地方导入头文件 `NIMKit.h` 。
 
 * 新建一个 SessionViewController，从 NIMSessionViewController 进行继承 (此时运行将可以得到一个简单的会话界面)。
 
-###NIMKit基本体系架构
+### NIMKit基本体系架构
 NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面。开发者只需要继承 NIMSessionViewController 和 NIMSessionListViewController ， 通过简洁的代码设置，即可在最短的时间内将聊天功能快速集成进App产品中。
 
 <img src="./Images/iOS/nimkit_structure.jpg" width="550" height="280" />
 
 
 
-###NIMKit内容提供
+### NIMKit内容提供
 
 由于 NIMKit 并不关心业务逻辑信息，比如用户昵称，用户头像等。用户可以通过 NIMKit 单例向 NIMKit 注入一个内容提供类，通过这个内容提供类，NIMKit 才能够正确的进行业务逻辑数据的绘制。
 
@@ -126,7 +126,7 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
 
 ```
 
-####内容变更通知
+#### 内容变更通知
 由于开发者应用的数据很多时候都是异步获取的（如用户信息可能从应用服务器请求获取），内容提供类在接收到 NIMKit 数据请求时，可能本地并没有数据，这个时候可以在回调里直接返回占位信息，如用户的昵称可以用 ID 代替，用户的头像可以用默认头像代替。等到数据请求回来时，调用 NIMKit 的通知接口，NIMKit  会自动刷新用户信息。
 
 刷新接口
@@ -158,7 +158,7 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
     NIMKitInfo *info = [[NIMKitInfo alloc] init];
     //填写默认值
     info.infoId   = userId;
-    info.showName = userId; 
+    info.showName = userId;
     switch (sessionType) {
         case NIMSessionTypeP2P:
         case NIMSessionTypeTeam:
@@ -179,7 +179,7 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
             }
             info.avatarUrlString = userInfo.thumbAvatarUrl;
             info.avatarImage = self.defaultUserAvatar;
-            
+
             if (userInfo == nil)
             {
                 needFetchInfo = YES;
@@ -188,13 +188,13 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
             break;
         case NIMSessionTypeChatroom:
         //聊天室的Info不会通过这个回调请求
-            NSAssert(0, @"invalid type"); 
+            NSAssert(0, @"invalid type");
             break;
         default:
             NSAssert(0, @"invalid type");
             break;
     }
-    
+
     if (needFetchInfo)
     {
         //远程获取用户信息
@@ -205,17 +205,92 @@ NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面�
 ```
 
 
-###自定义UI
+### 自定义UI
 
-####界面素材
+#### 界面素材
 
 NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发可以替换相应的素材以起到修改界面的效果。
 
 
 
-###会话界面 NIMSessionViewController
+### 会话界面 NIMSessionViewController
 
-####多媒体界面
+### 会话结构漫游
+
+* 概述
+    `NIMSessionViewController` 继承 `UIViewController`，由 `UITableView`(界面)，`id<NIMSessionConfig>`(会话配置)， `NIMSessionMsgDatasource` (数据源) 作为基本构成。
+    
+    会话配置 需要重写 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法，返回一个实现 `id<NIMSessionConfig>` 协议的配置类。如果没有重写，或者返回的配置类里有一些配置方法没有实现，则会调用默认配置 `NIMCellLayoutDefaultConfig`。会话配置会在下一节作详细说明。
+
+    数据源 `NIMSessionMsgDatasource` 包含两类数据模型，`NIMMessageModel` 和 `NIMTimestampModel`。 数据源会将 消息 `NIMMessaage` 包装成界面显示模型 `NIMMessageModel`，用来缓存一些布局信息来避免重复计算，如消息高度，内容大小等等；同时，由于有的消息距离上一条消息过久，需要在此之间显示一条时间。数据源会根据定义的间隔规则，计算出需要显示的时间模型 `NIMTimestampModel`，插在这两条消息中间。
+    
+    当消息显示时，首先会触发 `UITableViewDatasource` 的几个基本回调:
+
+    ```objc
+    - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+    ```
+     在这个回调中，会将数据源中的模型取出，如果模型中没有缓存 `cell` 的布局信息，则进行一次计算，并存入模型的缓存。
+
+    ```objc
+    - (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+    ```
+     在这个回调中，根据模型的种类复用 `NIMMessageCell` 或者 `NIMSessionTimestampCell` 来进行显示。 
+     >      
+     消息 `NIMMessageCell` 的几点说明：
+     * `NIMMessageCell` 本质是由一个所有消息通用(如重试红点，头像)的视图和内容子视图 `NIMSessionMessageContentView` 构成的。
+     * `NIMSessionMessageContentView` 是一个子视图的基类，所有消息的子视图都必须继承这个类。
+     * 不同消息类型 `NIMMessageCell` 需要由不同的 `cellReuseIdentifier` 来方便复用，`cellReuseIdentifier` 即为内容子视图的类名。
+     * `NIMSessionMessageContentView` 的具体实现子类名由协议 `NIMCellLayoutConfig` 中方法 `- (NSString *)cellContent:(NIMMessageModel *)model`返回。
+  
+  关于 `NIMMessageCell` 会在下一节做详细说明。
+     
+     对于内置的消息类型（如图片，语音，位置等消息）， `NIMKit` 已在 `NIMCellLayoutDefaultConfig`(实现了 `NIMCellLayoutConfig` 协议) 中定义。`NIMCellLayoutDefaultConfig` 将根据消息类型返回不同的消息配置。所有内置的消息配置都可以从 `NIMKit/Classes/Sections/Session/Config/` 目录下找到。
+     
+     内置的 `NIMSessionMessageContentView` 如下，在命名自己的子视图时，请注意不要重名。
+     
+     * NIMSessionTextContentView
+     * NIMSessionVideoContentView
+     * NIMSessionAudioContentView
+     * NIMSessionFileTransContentView
+     * NIMSessionImageContentView
+     * NIMSessionLocationContentView
+     * NIMSessionNetChatNotifyContentView
+     * NIMSessionNotificationContentView
+     * NIMSessionUnknowContentView
+     
+     
+     对于开发者上层的自定义消息类型，开发者需要自己实现一个配置类并实现 `NIMCellLayoutConfig` 协议，并在 `cellContent:` 方法中返回此消息独有的 `cellReuseIdentifier` (见会话配置)。
+
+
+
+* NIMMessageCell
+
+    <img src="./Images/iOS/nimkit_cell.jpg" width="550" height="210" />
+
+    * 蓝色区域：为具体内容 ContentView，如文字 UILabel ,图片 UIImageView 等。
+
+    * 绿色区域：为消息的气泡，具体的内容和气泡之间会有一定的内间距，这里为 contentViewInsets 。
+
+    * 紫色区域：为整个 UITableViewCell ，具体的气泡和整个cell会有一定的内间距，这里为 cellInsets 。
+
+    * 红色区域：为用户的头像。
+    
+ 在刷新数据时，会调用方法并 `-(void)refresh` 将界面模型 `NIMMessageModel` 传入。
+    
+ 当第一次调用这个方法（即不是复用生成），会调用 `- (void)addContentViewIfNotExist` 方法，根据 `NIMMessageModel` 找到对应的布局配置(如果找不到则按未知类型消息处理)。
+ 
+ Tips：开发者在第一次接入的时候，可能由于协议实现不全或者注入布局配置有误等原因，导致消息在界面上显示为 `未知类型消息`，这个时候可以尝试从 `NIMMessageCell` 的 `- (void)addContentViewIfNotExist` 方法入手调试，查看`NIMMessageModel` 对应的布局配置以及协议的返回值是否正确。
+    
+* NIMSessionMsgDatasource
+
+    会话数据源主要用于数据读取，在读取数据后会自动排序成界面需要的消息顺序，需要注意的是，会话数据源可以接受一个消息数据提供者 `NIMKitMessageProvider` ，用来显示不同来源的数据，默认不设置则读取本地数据。
+
+    以 云信Demo 为例，在进入单人会话 `NTESSessionViewController` 时，读取的本地数据；当进入拉取服务器云端会话页 `NTESSessionRemoteHistoryViewController` 时，则将自己的配置改成 `NTESRemoteSessionConfig`，并在 `NTESRemoteSessionConfig` 的 `- (id<NIMKitMessageProvider>)messageDataProvider` 方法里返回了 `NIMRemoteMessageDataProvider`,即可用来显示云端记录。
+    
+
+
+
+#### 多媒体界面
 
 NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessionConfig 即可。SessionViewController 会在初始化进行查询。
 
@@ -225,7 +300,7 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 - (BOOL)shouldHideItem:(NIMMediaItem *)item;
 ```
 
-####事件处理
+#### 事件处理
 
 目前 NIMKit 提供了多种多样的事件的，主要定义在 NIMInputActionDelegate 和 NIMMessageCellDelegate，子类只需要按需实现即可。
 
@@ -233,14 +308,14 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 目前 NIMKit 提供如下的界面逻辑配置
 
-|**是否禁用输入框** | **输入框面板菜单** | 
+|**是否禁用输入框** | **输入框面板菜单** |
 |:----- | :-----|
 |**最大输入长度** | **输入框place holder** |
-|**消息分页条数** | **消息时间戳显示间隔** | 
-|**内置聊天气泡布局配置** | **自定义消息数据源** | 
+|**消息分页条数** | **消息时间戳显示间隔** |
+|**内置聊天气泡布局配置** | **自定义消息数据源** |
 |**这次消息时候需要做已读回执的处理** | **是否需要处理已读回执** |
-|**进入会话自动获取历史消息**   | **录音类型** | 
-|**是否禁用语音未读红点** | **是否禁用在贴耳的时候自动切换成听筒模式** | 
+|**进入会话自动获取历史消息**   | **录音类型** |
+|**是否禁用语音未读红点** | **是否禁用在贴耳的时候自动切换成听筒模式** |
 
 
 
@@ -265,12 +340,12 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 - (NSArray *)mediaItems
 {
     // NTESMediaButtonPicture , NTESMediaButtonShoot 为 NIMMediaItem 的 tag 值，用来区分多个 NIMMediaItem 。
-    
+
     return @[[NIMMediaItem item:NTESMediaButtonPicture
                     normalImage:[UIImage imageNamed:@"bk_media_picture_normal"]
                   selectedImage:[UIImage imageNamed:@"bk_media_picture_nomal_pressed"]
                           title:@"相册"],
-             
+
              [NIMMediaItem item:NTESMediaButtonShoot
                     normalImage:[UIImage imageNamed:@"bk_media_shoot_normal"]
                   selectedImage:[UIImage imageNamed:@"bk_media_shoot_pressed"]
@@ -343,32 +418,15 @@ NIMKit 提供一个自定义的多媒体面板，用户只需要实现 NIMSessio
 
 
 
-####自定义消息和MessageCell
-
-######MessageCell结构
-<img src="./Images/iOS/nimkit_cell.jpg" width="550" height="220" />
-
-蓝色区域：为具体内容，如文字 UILabel ,图片 UIImageView 等。
-
-绿色区域：为消息的气泡，具体的内容和气泡之间会有一定的内间距，这里为 contentViewInsets 。
-
-紫色区域：为整个 UITableViewCell ，具体的气泡和整个cell会有一定的内间距，这里为 cellInsets 。
-
-红色区域：为用户的头像。
-
-#####NIMMessageModel
-NIMMessageModel 为消息 ( NIMMessage ) 在NIMKit中的封装。这个封装主要是为了对计算结果和布局配置进行缓存，以避免反复的计算和读取相同的信息，从而提高应用性能。
-
-NIMMessageModel 提供的初始化方法，可以很方便得由 NIMMessage 转换过来。
-
-```objc	
-- (instancetype)initWithMessage:(NIMMessage*)message;
-```
-
+####自定义消息
 
 #####内置MessageCell的自定义配置
 
-使用云信用户可以自定义自己的消息格式，而同样的 NIMKit 也提供了不同消息类型的绘制方法。对于绝大部分自定义消息而言，用户并不需要关心内容区域外的界面(头像，昵称，气泡等)，只需要实现具体的内容承载控件即可，基于这个原则 NIMKit 提取了一个 NIMCellConfig 的协议。
+使用云信用户可以自定义自己的消息格式，而同样的 NIMKit 也提供了不同消息类型的绘制方法。手把手教程可以参考如下：
+
+* 定制自定义消息教程 [NIM Guide For Custom Message](/NIM_Guide_For_Custom_Message.md) 。
+
+* 利用组件绘制自定义消息气泡教程 [NIM Guide For Custom Message UI](/NIM_Guide_For_Custom_Message_UI.md) 。
 
 
 在会话中，每种 message 都对应一个 NIMCellLayoutConfig，NIMSessionViewController 在生成 message 对应的 cell 时会询问子类是否有 当前 message 到 NIMCellLayoutConfig 的对应关系，如果没有则直接使用默认配置。
@@ -448,7 +506,7 @@ NIMCellLayoutConfig 中主要的方法有：
 默认实现为：显示最近一条消息的内容，文本消息则显示文本信息，其他消息显示消息类型文案
 
  *  cell显示的最近会话时间戳
- 
+
 ```objc
 - (NSString *)timestampDescriptionForRecentSession:(NIMRecentSession *)recent;
 ```
@@ -500,9 +558,3 @@ NIMKit 提供联系人选择器功能。支持选择用户或者群组，支持�
 ##群名片
 群名片分为普通群群名片 ` NIMNormalTeamCardViewController` 和 高级群群名片 `NIMAdvancedTeamCardViewController` 两种类型，初始化时传入需要展示的群组 `NIMTeam` 即可。
 此组件意在为快速为开发者搭建一套可以直接使用的群名片，开发者可以根据需求自行修改组件源码。
-
-
-
-
-
-
