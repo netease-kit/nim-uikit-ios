@@ -106,7 +106,7 @@
  *
  *  @param message 消息
  *
- *  @discussion 不会触发DB操作，请手动调用SDK里 saveMessage:forSession:completion: 接口
+ *  @discussion 不会触发 DB 操作，请手动调用 SDK 里 saveMessage:forSession:completion: 接口
  */
 
 - (void)uiAddMessages:(NSArray *)messages;
@@ -116,18 +116,21 @@
  *
  *  @param message 消息
  *
- *  @discussion 不会触发DB操作，请手动调用SDK里 deleteMessage: 接口
+ *  @return 被删除的 MessageModel
+ *
+ *  @discussion 不会触发 DB 操作，请手动调用 SDK 里 deleteMessage: 接口
  */
-- (void)uiDeleteMessage:(NIMMessage *)message;
+- (NIMMessageModel *)uiDeleteMessage:(NIMMessage *)message;
 
 /**
  *  更新一条消息
  *
  *  @param message 消息
  *
- *  @discussion 不会触发DB操作，请手动调用SDK里 updateMessage:forSession:completion: 接口
+ *  @discussion 不会触发 DB 操作，请手动调用 SDK 里 updateMessage:forSession:completion: 接口
  */
 - (void)uiUpdateMessage:(NIMMessage *)message;
+
 
 /**
  *  调整已读回执状态

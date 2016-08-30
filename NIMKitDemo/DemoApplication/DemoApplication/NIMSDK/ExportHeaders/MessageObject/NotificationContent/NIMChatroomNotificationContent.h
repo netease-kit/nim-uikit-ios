@@ -73,7 +73,15 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
     /**
      *  聊天室成员被解除临时禁言
      */
-    NIMChatroomEventTypeRemoveMuteTemporarily= 315,
+    NIMChatroomEventTypeRemoveMuteTemporarily = 315,
+    /**
+     *  聊天室成员主动更新了聊天室的角色信息
+     */
+    NIMChatroomEventTypeMemberUpdateInfo = 316,
+    /**
+     *  聊天室通用队列变更的通知
+     */
+    NIMChatroomEventTypeQueueChange = 317,
     
 };
 
@@ -109,7 +117,7 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
 @property (nullable,nonatomic,copy,readonly) NIMChatroomNotificationMember *source;
 
 /**
- *  被操作者，NSArray<NIMChatroomNotificationMember *>
+ *  被操作者
  */
 @property (nullable,nonatomic,copy,readonly) NSArray<NIMChatroomNotificationMember *> *targets;
 

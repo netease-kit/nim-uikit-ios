@@ -779,18 +779,16 @@
             break;
         case 1:{
             NSString *name = [_updateTeamNickAlertView textFieldAtIndex:0].text;
-            if (name.length) {
-                NSString *currentUserId = [NIMSDK sharedSDK].loginManager.currentAccount;
-                [[NIMSDK sharedSDK].teamManager updateUserNick:currentUserId newNick:name inTeam:self.team.teamId completion:^(NSError *error) {
-                    if (!error) {
-                        self.myTeamInfo.nickname = name;
-                        [self.view nimkit_makeToast:@"修改成功"];
-                        [self reloadData];
-                    }else{
-                        [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
-                    }
-                }];
-            }
+            NSString *currentUserId = [NIMSDK sharedSDK].loginManager.currentAccount;
+            [[NIMSDK sharedSDK].teamManager updateUserNick:currentUserId newNick:name inTeam:self.team.teamId completion:^(NSError *error) {
+                if (!error) {
+                    self.myTeamInfo.nickname = name;
+                    [self.view nimkit_makeToast:@"修改成功"];
+                    [self reloadData];
+                }else{
+                    [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+                }
+            }];
             break;
         }
         default:
@@ -804,18 +802,15 @@
             break;
         case 1:{
             NSString *intro = [_updateTeamIntroAlertView textFieldAtIndex:0].text;
-            if (intro.length) {
-                
-                [[NIMSDK sharedSDK].teamManager updateTeamIntro:intro teamId:self.team.teamId completion:^(NSError *error) {
-                    if (!error) {
-                        self.team.intro = intro;
-                        [self.view nimkit_makeToast:@"修改成功"];
-                        [self reloadData];
-                    }else{
-                        [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
-                    }
-                }];
-            }
+            [[NIMSDK sharedSDK].teamManager updateTeamIntro:intro teamId:self.team.teamId completion:^(NSError *error) {
+                if (!error) {
+                    self.team.intro = intro;
+                    [self.view nimkit_makeToast:@"修改成功"];
+                    [self reloadData];
+                }else{
+                    [self.view nimkit_makeToast:[NSString stringWithFormat:@"修改失败 code:%zd",error.code]];
+                }
+            }];
             break;
         }
         default:

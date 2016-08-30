@@ -12,9 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- *  登录的设备枚举
+ *  客户端类型
  */
-typedef NS_ENUM(NSInteger, NIMLoginClientType){
+typedef NS_ENUM(NSInteger, NIMLoginClientType) {
+    
+    /**
+     *  未知类型
+     */
+    NIMLoginClientTypeUnknown    = 0,
     /**
      *  Android
      */
@@ -22,11 +27,15 @@ typedef NS_ENUM(NSInteger, NIMLoginClientType){
     /**
      *  iOS
      */
-    NIMLoginClientTypeIOS         = 2,
+    NIMLoginClientTypeiOS         = 2,
     /**
      *  PC
      */
     NIMLoginClientTypePC          = 4,
+    /**
+     *  WP
+     */
+    NIMLoginClientTypeWP          = 8,
     /**
      *  WEB
      */
@@ -34,7 +43,7 @@ typedef NS_ENUM(NSInteger, NIMLoginClientType){
     /**
      *  REST API
      */
-    NIMLoginClientTypeRest        = 32,
+    NIMLoginClientTypeRestful     = 32,
 };
 
 

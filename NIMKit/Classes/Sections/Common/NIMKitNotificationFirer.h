@@ -31,7 +31,7 @@
 
 @property (nonatomic,copy)   NSString *notificationName;
 
-- (NSString *)fireIdentity;
+- (NSObject *)fireObject;
 
 - (NSString *)saveIdentity;
 

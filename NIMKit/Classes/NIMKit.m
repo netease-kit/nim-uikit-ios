@@ -61,16 +61,13 @@ extern NSString *const NIMKitUserMuteListHasUpdatedNotification;
     }
 }
 
-- (void)notfiyTeamInfoChanged:(NSArray *)teamIds{
-    if (!teamIds.count) {
-        return;
-    }
-    for (NSString *teamId in teamIds) {
-        NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
-        NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
-        info.session = session;
-        info.notificationName = NIMKitTeamInfoHasUpdatedNotification;
-        [self.firer addFireInfo:info];
+- (void)notifyTeamInfoChanged:(NSArray *)teamIds{
+    if (teamIds.count) {
+        for (NSString *teamId in teamIds) {
+            [self notifyTeam:teamId];
+        }
+    }else{
+        [self notifyTeam:nil];
     }
 }
 
@@ -88,18 +85,38 @@ extern NSString *const NIMKitUserMuteListHasUpdatedNotification;
     [self.firer addFireInfo:info];
 }
 
-- (void)notfiyTeamMemebersChanged:(NSArray *)teamIds
+- (void)notifyTeamMemebersChanged:(NSArray *)teamIds
 {
-    if (!teamIds.count) {
-        return;
+    if (teamIds.count) {
+        for (NSString *teamId in teamIds) {
+            [self notifyTeamMemebers:teamId];
+        }
+    }else{
+        [self notifyTeamMemebers:nil];
     }
-    for (NSString *teamId in teamIds) {
+}
+
+
+- (void)notifyTeam:(NSString *)teamId
+{
+    NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
+    if (teamId.length) {
         NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
-        NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
         info.session = session;
-        info.notificationName = NIMKitTeamInfoHasUpdatedNotification;
-        [self.firer addFireInfo:info];
     }
+    info.notificationName = NIMKitTeamInfoHasUpdatedNotification;
+    [self.firer addFireInfo:info];
+}
+
+- (void)notifyTeamMemebers:(NSString *)teamId
+{
+    NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
+    if (teamId.length) {
+        NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        info.session = session;
+    }
+    info.notificationName = NIMKitTeamMembersHasUpdatedNotification;
+    [self.firer addFireInfo:info];
 }
 
 @end

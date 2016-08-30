@@ -97,7 +97,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *
  *  @param teamId 群id
  */
-- (void)notfiyTeamInfoChanged:(NSArray *)teamIds;
+- (void)notifyTeamInfoChanged:(NSArray *)teamIds;
 
 
 /**
@@ -105,7 +105,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *
  *  @param teamId 群id
  */
-- (void)notfiyTeamMemebersChanged:(NSArray *)teamIds;
+- (void)notifyTeamMemebersChanged:(NSArray *)teamIds;
 
 @end
 

@@ -277,12 +277,12 @@
             text = @"[文件]";
             break;
         case NIMMessageTypeTip:
-            text = @"[提醒消息]";   //调整成你需要显示的文案
+            text = lastMessage.text;
             break;
         default:
             text = @"[未知消息]";
     }
-    if (lastMessage.session.sessionType == NIMSessionTypeP2P) {
+    if (lastMessage.session.sessionType == NIMSessionTypeP2P || lastMessage.messageType == NIMMessageTypeTip) {
         return text;
     }else{
         NSString *nickName = [NIMKitUtil showNick:lastMessage.from inSession:lastMessage.session];

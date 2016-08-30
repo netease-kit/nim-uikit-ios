@@ -13,11 +13,6 @@
 #import "NIMKitUtil.h"
 #import "NIMKit.h"
 
-typedef NS_ENUM(NSInteger, NIMAdvancedTeamMemberType) {
-    AdvancedTeamMemberTypeInvalid,
-    AdvancedTeamMemberTypeAdd,
-    AdvancedTeamMemberTypeMember,
-};
 
 @interface NIMAdvancedTeamMemberView : UIView{
 
@@ -28,8 +23,6 @@ typedef NS_ENUM(NSInteger, NIMAdvancedTeamMemberType) {
 @property(nonatomic,strong) UILabel *titleLabel;
 
 @property(nonatomic,strong) NIMKitInfo *member;
-
-@property(nonatomic,assign) NIMAdvancedTeamMemberType type;
 
 @end
 
@@ -119,7 +112,6 @@ typedef NS_ENUM(NSInteger, NIMAdvancedTeamMemberType) {
         UIImage *addImage = [UIImage imageNamed:@"icon_add_normal"];
         [view.imageView nim_setImageWithURL:nil placeholderImage:addImage];
         view.titleLabel.text = @"邀请";
-        view.type  = AdvancedTeamMemberTypeAdd;
         count = 1;
         self.addBtn.userInteractionEnabled = YES;
     }else{
@@ -142,7 +134,6 @@ typedef NS_ENUM(NSInteger, NIMAdvancedTeamMemberType) {
             NIMKitInfo *info            = [[NIMKit sharedKit] infoByUser:member.userId];
             view.member                 = info;
             view.titleLabel.text        = [NIMKitUtil showNick:member.userId inSession:session];
-            view.type                   = AdvancedTeamMemberTypeMember;
         }
         [self addSubview:view];
         [view setNeedsLayout];

@@ -14,7 +14,17 @@
 /**
  *  消息数据
  */
-@property (nonatomic, strong) NIMMessage *message;
+@property (nonatomic,strong) NIMMessage *message;
+
+/**
+ *  时间戳
+ *
+ *  @discussion 这个时间戳为缓存的界面显示的时间戳，消息发出的时候记录下的本地时间，
+ *              由于 NIMMessage 在服务器确认收到后会将自身发送时间 timestamp 字段修正为服务器时间，所以缓存当前发送的本地时间避免刷新时由于发送时间修
+ *              改导致的消息界面位置跳跃。
+ *              messageTime 和 message.timestamp 会有一定的误差。
+ */
+@property (nonatomic,readonly) NSTimeInterval messageTime;
 
 /**
  *  消息对应的布局配置

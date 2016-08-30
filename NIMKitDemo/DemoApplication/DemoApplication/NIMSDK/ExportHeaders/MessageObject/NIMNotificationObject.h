@@ -7,9 +7,6 @@
 //
 
 #import "NIMMessageObjectProtocol.h"
-//NET_CALL_DEFINE_START
-#import "NIMNetCallManagerProtocol.h"
-//NET_CALL_DEFINE_END
 #import "NIMTeamNotificationContent.h"
 #import "NIMNetCallNotificationContent.h"
 #import "NIMChatroomNotificationContent.h"

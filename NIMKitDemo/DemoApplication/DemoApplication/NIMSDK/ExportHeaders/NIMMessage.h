@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "NIMGlobalDefs.h"
 #import "NIMSession.h"
+#import "NIMLoginClient.h"
 #import "NIMImageObject.h"
 #import "NIMLocationObject.h"
 #import "NIMAudioObject.h"
@@ -19,6 +20,7 @@
 #import "NIMTipObject.h"
 #import "NIMMessageSetting.h"
 #import "NIMMessageReceipt.h"
+#import "NIMMessageApnsMemberOption.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -114,6 +116,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
  */
 @property (nullable,nonatomic,strong)                NIMMessageSetting *setting;
 
+
 /**
  *  消息推送文案,长度限制200字节
  */
@@ -124,6 +127,13 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
  *  @discussion 可以通过这个字段定义消息推送Payload,支持字段参考苹果技术文档,转成 JSON 后长度限制为 2K
  */
 @property (nullable,nonatomic,copy)                NSDictionary *apnsPayload;
+
+/**
+ *  指定成员推送选项
+ *  @discussion 通过这个选项进行一些更复杂的推送设定，目前只能在群会话中使用
+ */
+@property (nullable,nonatomic,strong)                NIMMessageApnsMemberOption *apnsMemberOption;
+
 
 /**
  *  服务器扩展
@@ -145,8 +155,9 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  消息发送时间
+ *  @discussion 本地存储消息可以通过修改时间戳来调整其在会话列表中的位置，发完服务器的消息时间戳将被服务器自动修正
  */
-@property (nonatomic,assign,readonly)       NSTimeInterval timestamp;
+@property (nonatomic,assign)                NSTimeInterval timestamp;
 
 /**
  *  消息投递状态 仅针对发送的消息
@@ -197,6 +208,12 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
  *  @discussion 当发送者是自己时,这个值可能为空,这个值表示的是发送者当前的昵称,而不是发送消息时的昵称
  */
 @property (nullable,nonatomic,copy,readonly)         NSString *senderName;
+
+
+/**
+ *  发送者客户端类型
+ */
+@property (nonatomic,assign,readonly)   NIMLoginClientType senderClientType;
 @end
 
 NS_ASSUME_NONNULL_END

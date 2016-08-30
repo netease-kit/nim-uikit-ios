@@ -253,10 +253,10 @@
                 formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@",source,targetText];
                 break;
             case NIMTeamOperationTypeAddManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被群主添加为群管理员",targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员",targetText];
                 break;
             case NIMTeamOperationTypeRemoveManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被群主撤销了群管理员身份",targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份",targetText];
                 break;
             case NIMTeamOperationTypeAcceptInvitation:
                 formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群",source,targetText];
@@ -403,6 +403,10 @@
         case NIMChatroomEventTypeRemoveMuteTemporarily:
         {
             return [NSString stringWithFormat:@"%@被管理员解除临时禁言",targetText];
+        }
+        case NIMChatroomEventTypeMemberUpdateInfo:
+        {
+            return [NSString stringWithFormat:@"%@更新了自己的个人信息",targetText];
         }
         default:
             break;

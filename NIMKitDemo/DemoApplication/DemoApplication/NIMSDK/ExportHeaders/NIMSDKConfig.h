@@ -64,6 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,assign)    BOOL    fileProtectionNone;
 
 /**
+ *  是否需要将被撤回的消息计入未读计算考虑
+ *  默认为 NO。设置成 YES 的情况下，如果被撤回的消息本地还未读，那么当消息发生撤回时，对应会话的未读计数将减 1 以保持最近会话未读数的一致性
+ *  默认未读 NO 的原因是客户端常常需要直接再写入一条 tip 消息用于提醒显示，使用 NO 作为默认值直接写入一条已读 tip 消息，避免未读计数发生两次变化，最终导致界面重复刷新
+ *  如果客户场景不需要写入 tip 消息，可以设置为 YES，以保持未读计数的一致性。
+ */
+@property (nonatomic,assign)    BOOL    shouldConsiderRevokedMessageUnreadCount;;
+
+/**
  *  配置项委托
  */
 @property (nullable,nonatomic,weak)    id<NIMSDKConfigDelegate>    delegate;
