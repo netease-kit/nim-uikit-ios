@@ -138,8 +138,14 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
 @property (nullable,nonatomic,copy,readonly)   NSArray<NSString *> *targetIDs;
 
 /**
+ *  群通知下发的自定义扩展信息
+ */
+@property (nullable,nonatomic,readonly)   NSString *notifyExt;
+
+/**
  *  额外信息
- *  @discussion 群更新时 attachment 为 NIMUpdateTeamInfoAttachment，禁言时为 NIMMuteTeamMemberAttachment
+ *  @discussion 群更新时 attachment 为 NIMUpdateTeamInfoAttachment，
+ *              禁言时 attachment 为  NIMMuteTeamMemberAttachment
  */
 @property (nullable,nonatomic,strong,readonly)   id attachment;
 @end
@@ -168,5 +174,7 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
  */
 @property (nonatomic,assign,readonly)   BOOL    flag;
 @end
+
+
 
 NS_ASSUME_NONNULL_END

@@ -2,7 +2,7 @@
 //  NIMChatroomManagerProtocol.h
 //  NIMLib
 //
-//  Created by amao on 12/14/15.
+//  Created by Netease.
 //  Copyright © 2015 Netease. All rights reserved.
 //
 
@@ -13,13 +13,16 @@ NS_ASSUME_NONNULL_BEGIN
 @class NIMMessage;
 @class NIMChatroom;
 @class NIMChatroomEnterRequest;
+@class NIMChatroomUpdateRequest;
+@class NIMChatroomMemberInfoUpdateRequest;
 @class NIMChatroomMember;
 @class NIMChatroomMemberRequest;
 @class NIMChatroomMemberUpdateRequest;
 @class NIMChatroomMemberKickRequest;
 @class NIMChatroomMembersByIdsRequest;
+@class NIMChatroomQueueUpdateRequest;
+@class NIMChatroomQueueRemoveRequest;
 @class NIMHistoryMessageSearchOption;
-
 /**
  *  聊天室网络请求回调
  *
@@ -59,6 +62,23 @@ typedef void(^NIMChatroomInfoHandler)(NSError * __nullable error,NIMChatroom * _
  *  @param error 错误信息
  */
 typedef void(^NIMChatroomMembersHandler)(NSError * __nullable error, NSArray<NIMChatroomMember *> * __nullable members);
+
+
+/**
+ *  聊天室队列数据回调
+ *
+ *  @param error 错误信息
+ */
+typedef void(^NIMChatroomQueueInfoHandler)(NSError * __nullable error, NSArray<NSDictionary<NSString *, NSString *> *> * __nullable info);
+
+
+/**
+ *  聊天室队列移除元素回调
+ *
+ *  @param error 错误信息
+ */
+typedef void(^NIMChatroomQueueRemoveHandler)(NSError * __nullable error, NSDictionary<NSString *, NSString *> * __nullable element);
+
 
 
 /**
@@ -197,6 +217,25 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
                completion:(nullable NIMChatroomInfoHandler)completion;
 
 
+/**
+ *  修改聊天室信息
+ *
+ *  @param request    聊天室修改请求
+ *  @param completion 修改后完成的回调
+ */
+- (void)updateChatroomInfo:(NIMChatroomUpdateRequest *)request
+                completion:(nullable NIMChatroomHandler)completion;
+
+
+/**
+ *  修改自己在聊天室内的个人信息
+ *
+ *  @param request    个人信息更新请求
+ *  @param completion 修改完成后的回调
+ */
+- (void)updateMyChatroomMemberInfo:(NIMChatroomMemberInfoUpdateRequest *)request
+                        completion:(nullable NIMChatroomHandler)completion;
+
 
 /**
  *  获取聊天室成员
@@ -275,6 +314,48 @@ typedef NS_ENUM(NSInteger, NIMChatroomKickReason) {
  */
 - (void)kickMember:(NIMChatroomMemberKickRequest *)request
         completion:(nullable NIMChatroomHandler)completion;
+
+
+/**
+ *  更新聊天室通用队列
+ *
+ *  @param request    聊天室队列请求
+ *  @param completion 请求回调
+ */
+- (void)updateChatroomQueueObject:(NIMChatroomQueueUpdateRequest *)request
+                       completion:(nullable NIMChatroomHandler)completion;
+
+
+/**
+ *  移除聊天室队列元素
+ *
+ *  @param request    拉取请求
+ *  @param completion 请求回调
+ */
+- (void)removeChatroomQueueObject:(NIMChatroomQueueRemoveRequest *)request
+                       completion:(nullable NIMChatroomQueueRemoveHandler)completion;
+
+
+/**
+ *  获取聊天室通用队列
+ *
+ *  @param roomId     聊天室ID
+ *  @param completion 请求回调
+ */
+- (void)fetchChatroomQueue:(NSString *)roomId
+                completion:(nullable NIMChatroomQueueInfoHandler)completion;
+
+
+/**
+ *  删除聊天室通用队列
+ *
+ *  @param roomId     聊天室ID
+ *  @param completion 请求回调
+ */
+- (void)dropChatroomQueue:(NSString *)roomId
+               completion:(nullable NIMChatroomHandler)completion;
+
+
 
 /**
  *  添加通知对象

@@ -99,11 +99,6 @@
     [self.contentTextView endEditing:YES];
     NSString *title = [self.titleTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *content = [self.contentTextView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if(title.length <= 0 || content.length  <= 0) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"标题或者内容不能为空" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [alert show];
-        return;
-    }
     [self.navigationController popViewControllerAnimated:YES];
     if([self.delegate respondsToSelector:@selector(createTeamAnnouncementCompleteWithTitle:content:)]) {
         [self.delegate createTeamAnnouncementCompleteWithTitle:title content:content];

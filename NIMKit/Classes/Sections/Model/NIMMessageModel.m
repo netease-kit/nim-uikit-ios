@@ -30,6 +30,7 @@
     if (self = [self init])
     {
         _message = message;
+        _messageTime = message.timestamp;
     }
     return self;
 }

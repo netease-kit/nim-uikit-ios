@@ -85,8 +85,14 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
 
 
 /**
+ *  系统通知下发的自定义扩展信息
+ */
+@property (nullable,nonatomic,readonly)   NSString *notifyExt;
+
+/**
  *  附件
- *  @discussion 额外信息,目前只有好友添加有额外信息,attachment为NIMUserAddAttachment
+ *  @discussion 额外信息,只有 好友添加
+ *              好友添加的 attachment 为 NIMUserAddAttachment
  */
 @property (nullable,nonatomic,strong,readonly)       id attachment;
 

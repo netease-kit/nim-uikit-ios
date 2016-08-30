@@ -48,8 +48,8 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
             fireInfos = [[NSMutableArray alloc] init];
             dict[info.notificationName] = fireInfos;
         }
-        if (info.fireIdentity) {
-            [fireInfos addObject:info.fireIdentity];
+        if (info.fireObject) {
+            [fireInfos addObject:info.fireObject];
         }
     }
     
@@ -67,12 +67,12 @@ NSString *const NIMKitInfoKey                        = @"InfoId";
 
 @implementation NIMKitFirerInfo
 
-- (NSString *)fireIdentity
+- (NSObject *)fireObject
 {
     if (self.session) {
         return self.session.sessionId;
     }
-    return nil;
+    return [NSNull null];
 }
 
 - (NSString *)saveIdentity

@@ -32,6 +32,25 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
 
 
 /**
+ *  聊天室成员信息修改字段
+ */
+typedef NS_ENUM(NSInteger, NIMChatroomMemberInfoUpdateTag) {
+    /**
+     *  聊天室成员昵称信息
+     */
+    NIMChatroomMemberInfoUpdateTagNick   = 5,
+    /**
+     *  聊天室成员头像信息
+     */
+    NIMChatroomMemberInfoUpdateTagAvatar = 6,
+    /**
+     *  聊天室成员扩展信息
+     */
+    NIMChatroomMemberInfoUpdateTagExt    = 7,
+};
+
+
+/**
  *  聊天室获取成员请求
  */
 @interface NIMChatroomMemberRequest : NSObject
@@ -108,6 +127,36 @@ typedef NS_ENUM(NSInteger, NIMChatroomFetchMemberType){
  *  操作通知事件扩展
  */
 @property (nullable,nonatomic,copy) NSString *notifyExt;
+
+@end
+
+
+
+/**
+ *  聊天室成员信息修改请求
+ */
+@interface NIMChatroomMemberInfoUpdateRequest : NSObject
+
+/**
+ *  聊天室ID
+ */
+@property (nonatomic,copy) NSString *roomId;
+
+/**
+ *  需要更新的信息，修改传入的数据键值对是 {@(NIMChatroomMemberInfoUpdateTag) : NSString},无效数据将被过滤
+ */
+@property (nonatomic,copy) NSDictionary *updateInfo;
+
+/**
+ *  是否需要通知
+ */
+@property (nonatomic,assign) BOOL needNotify;
+
+/**
+ *  操作通知事件扩展
+ */
+@property (nullable,nonatomic,copy) NSString *notifyExt;
+
 
 @end
 

@@ -230,19 +230,17 @@
                 break;
             case 1:{
                 NSString *name = [alertView textFieldAtIndex:0].text;
-                if (name.length) {
-                    [[NIMSDK sharedSDK].teamManager updateUserNick:self.member.memberId newNick:name inTeam:self.member.team.teamId completion:^(NSError *error) {
-                        if (!error) {
-                            [self.view nimkit_makeToast:@"修改成功"];
-                            [self refreshData];
-                            if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
-                                [_delegate onTeamMemberInfoChaneged:self.member];
-                            }
-                        }else{
-                            [self.view nimkit_makeToast:@"修改失败"];
+                [[NIMSDK sharedSDK].teamManager updateUserNick:self.member.memberId newNick:name inTeam:self.member.team.teamId completion:^(NSError *error) {
+                    if (!error) {
+                        [self.view nimkit_makeToast:@"修改成功"];
+                        [self refreshData];
+                        if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
+                            [_delegate onTeamMemberInfoChaneged:self.member];
                         }
-                    }];
-                }
+                    }else{
+                        [self.view nimkit_makeToast:@"修改失败"];
+                    }
+                }];
                 break;
             }
             default:

@@ -40,7 +40,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 @interface NIMSessionViewController ()
 <
 NIMConversationManagerDelegate,
-NIMTeamManagerDelegate,
 NIMMediaManagerDelgate,
 NIMMessageCellDelegate,
 NIMUserManagerDelegate>
@@ -344,7 +343,6 @@ NIMUserManagerDelegate>
     }
 }
 
-
 #pragma mark - NIMConversationManagerDelegate
 - (void)messagesDeletedInSession:(NIMSession *)session{
     [self.sessionDatasource resetMessages:nil];
@@ -381,6 +379,12 @@ NIMUserManagerDelegate>
     leftBarView.badgeView.hidden = !unreadCount;
 }
 
+#pragma mark - NIMTeamManagerDelegate
+- (void)onTeamMemberChanged:(NIMTeam *)team
+{
+    [self.tableView reloadData];
+}
+
 #pragma mark - Notification
 - (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification {
     self.navigationItem.title = [self sessionTitle];
@@ -391,7 +395,7 @@ NIMUserManagerDelegate>
     NSDictionary *userInfo = notification.userInfo;
     NSArray *teamIds = userInfo[NIMKitInfoKey];
     if (self.session.sessionType == NIMSessionTypeTeam
-        && [teamIds containsObject:self.session.sessionId]) {
+                      && ([teamIds containsObject:self.session.sessionId] || [teamIds containsObject:[NSNull null]])) {
         [self.tableView reloadData];
         self.navigationItem.title = [self sessionTitle];
     }
@@ -401,8 +405,9 @@ NIMUserManagerDelegate>
     NSDictionary *userInfo = notification.userInfo;
     NSArray *teamIds = userInfo[NIMKitInfoKey];
     if (self.session.sessionType == NIMSessionTypeTeam
-        && [teamIds containsObject:self.session.sessionId]) {
+        && ([teamIds containsObject:self.session.sessionId] || [teamIds containsObject:[NSNull null]])) {
         self.navigationItem.title = [self sessionTitle];
+        [self.tableView reloadData];
     }
 }
 
@@ -659,26 +664,31 @@ NIMUserManagerDelegate>
     });
 }
 
-- (void)uiDeleteMessage:(NIMMessage *)message{
+- (NIMMessageModel *)uiDeleteMessage:(NIMMessage *)message{
     NIMMessageModel *model = [self findModel:message];
-    BOOL receipteRelated = model.shouldShowReadLabel;
-    
-    NSArray *indexs = [self.sessionDatasource deleteMessageModel:model];
-    [self.tableView beginUpdates];
-    [self.layoutManager deleteCellAtIndexs:indexs];
-    [self.tableView endUpdates];
-    
-    if (receipteRelated)
-    {
-        [self checkReceipt];
+    if (model) {
+        BOOL receipteRelated = model.shouldShowReadLabel;
+        
+        NSArray *indexs = [self.sessionDatasource deleteMessageModel:model];
+        [self.tableView beginUpdates];
+        [self.layoutManager deleteCellAtIndexs:indexs];
+        [self.tableView endUpdates];
+        
+        if (receipteRelated)
+        {
+            [self checkReceipt];
+        }
     }
+    return model;
 }
 
 - (void)uiUpdateMessage:(NIMMessage *)message{
     NIMMessageModel *model = [self findModel:message];
-    NSInteger index = [self.sessionDatasource indexAtModelArray:model];
-    [self.sessionDatasource.modelArray replaceObjectAtIndex:index withObject:model];
-    [self.layoutManager updateCellAtIndex:index model:model];
+    if (model) {
+        NSInteger index = [self.sessionDatasource indexAtModelArray:model];
+        [self.sessionDatasource.modelArray replaceObjectAtIndex:index withObject:model];
+        [self.layoutManager updateCellAtIndex:index model:model];
+    }
 }
 
 - (void)uiCheckReceipt

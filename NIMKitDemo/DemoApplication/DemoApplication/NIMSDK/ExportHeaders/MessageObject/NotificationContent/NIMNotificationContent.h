@@ -2,7 +2,7 @@
 //  NIMNotificationContent.h
 //  NIMLib
 //
-//  Created by amao on 7/22/15.
+//  Created by Netease.
 //  Copyright (c) 2015 Netease. All rights reserved.
 //
 

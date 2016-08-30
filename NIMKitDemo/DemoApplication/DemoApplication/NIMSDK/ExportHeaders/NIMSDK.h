@@ -117,17 +117,6 @@ NS_ASSUME_NONNULL_BEGIN
  *  资源管理器,负责文件上传和下载
  */
 @property (nonatomic,strong,readonly)   id<NIMResourceManager> resourceManager;
-//NET_CALL_DEFINE_START
-/**
- *  网络通话管理类
- */
-@property (nonatomic,strong,readonly)   id<NIMNetCallManager> netCallManager;
-
-/**
- *  实时会话管理类
- */
-@property (nonatomic,strong,readonly)   id<NIMRTSManager> rtsManager;
-//NET_CALL_DEFINE_END
 
 /**
  *  聊天室管理类

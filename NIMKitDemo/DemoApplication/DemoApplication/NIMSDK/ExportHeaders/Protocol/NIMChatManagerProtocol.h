@@ -7,16 +7,27 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMMessage.h"
+
+@class NIMMessage;
+@class NIMSession;
+@class NIMMessageReceipt;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  *  发送已读回执Block
  *
- *  @param error 错误信息,如果成功
+ *  @param error 错误信息,如果成功,error 为 nil
  */
 typedef void(^NIMSendMessageReceiptBlock)(NSError * __nullable error);
+
+/**
+ *  撤回消息Block
+ *
+ *  @param error 错误信息,如果成功,error 为 nil
+ */
+typedef void(^NIMRevokeMessageBlock)(NSError * __nullable error);
+
 
 /**
  *  聊天委托
@@ -65,6 +76,15 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError * __nullable error);
  *  @discussion 当上层收到此消息时所有的存储和 model 层业务都已经更新，只需要更新 UI 即可。如果对端发送的已读回执时间戳比当前端存储的最后时间戳还小，这个已读回执将被忽略。
  */
 - (void)onRecvMessageReceipt:(NIMMessageReceipt *)receipt;
+
+
+/**
+ *  收到消息被撤回的通知
+ *
+ *  @param message 被撤回的消息
+ *  @discusssion 云信在收到消息撤回后，会先从本地数据库中找到对应消息并进行删除，之后通知上层消息已删除
+ */
+- (void)onMessageRevoked:(NIMMessage *)message;
 
 
 /**
@@ -143,6 +163,15 @@ typedef void(^NIMSendMessageReceiptBlock)(NSError * __nullable error);
 - (void)sendMessageReceipt:(NIMMessageReceipt *)receipt
                 completion:(nullable NIMSendMessageReceiptBlock)completion;
 
+
+/**
+ *  撤回消息
+ *
+ *  @param message    需要被撤回的消息
+ *  @param completion 完成回调
+ */
+- (void)revokeMessage:(NIMMessage *)message
+           completion:(nullable NIMRevokeMessageBlock)completion;
 
 
 /**

@@ -87,20 +87,29 @@ typedef NS_ENUM(NSInteger, TeamAnnouncementSectionType) {
 NSString *NTESCreatAnnouncementNotification = @"NTESCreatAnnouncementNotification";
 
 - (void)createTeamAnnouncementCompleteWithTitle:(NSString *)title content:(NSString *)content {
-    NSDictionary *announcement = @{@"title": title,
-                                   @"content": content,
-                                   @"creator": [[NIMSDK sharedSDK].loginManager currentAccount],
-                                   @"time": @((NSInteger)[NSDate date].timeIntervalSince1970)};
-    NSData *data = [NSJSONSerialization dataWithJSONObject:@[announcement] options:0 error:nil];
-    self.team.announcement = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if (title.length && content.length) {
+        NSDictionary *announcement = @{@"title": title,
+                                       @"content": content,
+                                       @"creator": [[NIMSDK sharedSDK].loginManager currentAccount],
+                                       @"time": @((NSInteger)[NSDate date].timeIntervalSince1970)};
+        NSData *data = [NSJSONSerialization dataWithJSONObject:@[announcement] options:0 error:nil];
+        self.team.announcement = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    }else{
+        self.team.announcement = nil;
+    }
     __weak typeof(self) wself = self;
     [NIMProgressHUD show];
     [[NIMSDK sharedSDK].teamManager updateTeamAnnouncement:[self.team.announcement copy] teamId:self.team.teamId completion:^(NSError *error) {
         [NIMProgressHUD dismiss];
         if(!error && wself) {
             [wself.view nimkit_makeToast:@"创建成功"];
-            NSArray *data = [NSJSONSerialization JSONObjectWithData:[self.team.announcement dataUsingEncoding:NSUTF8StringEncoding] options:0 error:0];
-            wself.announcements = [NSMutableArray arrayWithArray:data];
+            if (self.team.announcement.length) {
+                NSArray *data = [NSJSONSerialization JSONObjectWithData:[self.team.announcement dataUsingEncoding:NSUTF8StringEncoding] options:0 error:0];
+                wself.announcements = [NSMutableArray arrayWithArray:data];
+            }else{
+                wself.announcements = nil;
+            }
+            
             [wself.tableView reloadData];
             [[NSNotificationCenter defaultCenter] postNotificationName:NTESCreatAnnouncementNotification object:nil];
         } else {

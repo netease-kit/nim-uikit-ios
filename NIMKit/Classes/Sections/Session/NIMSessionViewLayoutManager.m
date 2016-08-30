@@ -52,24 +52,12 @@
     [addIndexs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [addIndexPathes addObject:[NSIndexPath indexPathForRow:[obj integerValue] inSection:0]];
     }];
-    [_tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationFade];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [_tableView scrollToRowAtIndexPath:[addIndexPathes lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+    [_tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [_tableView nim_scrollToBottom:animated];
     });
 }
 
-- (void)checkScroll
-{
-    if (self.scrollToIndexPath) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [_tableView scrollToRowAtIndexPath:self.scrollToIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-            self.scrollToIndexPath = nil;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self checkScroll];
-            });
-        });
-    }
-}
 
 - (void)updateCellAtIndex:(NSInteger)index model:(NIMMessageModel *)model
 {

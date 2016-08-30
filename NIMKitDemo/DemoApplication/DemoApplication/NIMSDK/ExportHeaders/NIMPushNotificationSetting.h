@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, NIMPushNotificationDisplayType){
 
 
 /**
- *  消息推送参数设置
+ *  消息推送免打扰参数设置
  */
 @interface NIMPushNotificationSetting : NSObject
 /**
@@ -60,5 +60,20 @@ typedef NS_ENUM(NSInteger, NIMPushNotificationDisplayType){
 @property (nonatomic,assign) NSUInteger noDisturbingEndM;
 
 @end
+
+
+/**
+ *  自定义消息推送配置项
+ */
+@interface NIMPushNotificationMultiportConfig : NSObject
+
+/**
+ *  桌面端在线时是否需要发送推送给手机端
+ *  @discussion 默认为 YES，即需要推送,桌面端包括 PC，web 等...
+ */
+@property (nonatomic,assign)    BOOL    shouldPushNotificationWhenPCOnline;
+
+@end
+
 
 NS_ASSUME_NONNULL_END
