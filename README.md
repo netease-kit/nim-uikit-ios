@@ -220,20 +220,27 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
 * 概述
     `NIMSessionViewController` 继承 `UIViewController`，由 `UITableView`(界面)，`id<NIMSessionConfig>`(会话配置)， `NIMSessionMsgDatasource` (数据源) 作为基本构成。
     
-    会话配置 需要重写 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法，返回一个实现 `id<NIMSessionConfig>` 协议的配置类。如果没有重写，或者返回的配置类里有一些配置方法没有实现，则会调用默认配置 `NIMCellLayoutDefaultConfig`。会话配置会在下一节作详细说明。
-
-    数据源 `NIMSessionMsgDatasource` 包含两类数据模型，`NIMMessageModel` 和 `NIMTimestampModel`。 数据源会将 消息 `NIMMessaage` 包装成界面显示模型 `NIMMessageModel`，用来缓存一些布局信息来避免重复计算，如消息高度，内容大小等等；同时，由于有的消息距离上一条消息过久，需要在此之间显示一条时间。数据源会根据定义的间隔规则，计算出需要显示的时间模型 `NIMTimestampModel`，插在这两条消息中间。
+    * 会话配置 
+      
+      需要重写 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法，返回一个实现 `id<NIMSessionConfig>` 协议的配置类。如果没有重写，或者返回的配置类里有一些配置方法没有实现，则会调用默认配置 `NIMCellLayoutDefaultConfig`。
     
-    当消息显示时，首先会触发 `UITableViewDatasource` 的几个基本回调:
+      会话配置会在下一节作详细说明。
 
-    ```objc
-    - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-    ```
-     在这个回调中，会将数据源中的模型取出，如果模型中没有缓存 `cell` 的布局信息，则进行一次计算，并存入模型的缓存。
+    * 数据源 
 
-    ```objc
-    - (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-    ```
+      `NIMSessionMsgDatasource` 包含两类数据模型，`NIMMessageModel` 和 `NIMTimestampModel`。 数据源会将 消息 `NIMMessaage` 包装成界面显示模型 `NIMMessageModel`，用来缓存一些布局信息来避免重复计算，如消息高度，内容大小等等；同时，由于有的消息距离上一条消息过久，需要在此之间显示一条时间。数据源会根据定义的间隔规则，计算出需要显示的时间模型 `NIMTimestampModel`，插在这两条消息中间。
+    
+      当消息显示时，首先会触发 `UITableViewDatasource` 的几个基本回调:
+
+      ```objc
+       - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+      ```
+      在这个回调中，会将数据源中的模型取出，如果模型中没有缓存 `cell` 的布局信息，则进行一次计算，并存入模型的缓存。
+
+      ```objc
+      - (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+      ```
+      
      在这个回调中，根据模型的种类复用 `NIMMessageCell` 或者 `NIMSessionTimestampCell` 来进行显示。 
      >      
      消息 `NIMMessageCell` 的几点说明：
@@ -242,7 +249,7 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
      * 不同消息类型 `NIMMessageCell` 需要由不同的 `cellReuseIdentifier` 来方便复用，`cellReuseIdentifier` 即为内容子视图的类名。
      * `NIMSessionMessageContentView` 的具体实现子类名由协议 `NIMCellLayoutConfig` 中方法 `- (NSString *)cellContent:(NIMMessageModel *)model`返回。
   
-  关于 `NIMMessageCell` 会在下一节做详细说明。
+     关于 `NIMMessageCell` 会在下一节做详细说明。
      
      对于内置的消息类型（如图片，语音，位置等消息）， `NIMKit` 已在 `NIMCellLayoutDefaultConfig`(实现了 `NIMCellLayoutConfig` 协议) 中定义。`NIMCellLayoutDefaultConfig` 将根据消息类型返回不同的消息配置。所有内置的消息配置都可以从 `NIMKit/Classes/Sections/Session/Config/` 目录下找到。
      
@@ -261,7 +268,33 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
      
      对于开发者上层的自定义消息类型，开发者需要自己实现一个配置类并实现 `NIMCellLayoutConfig` 协议，并在 `cellContent:` 方法中返回此消息独有的 `cellReuseIdentifier` (见会话配置)。
 
+* 会话页结构
 
+	```
+	├── NIMSessionViewController  ＃核心会话类
+	│   ├── NIMSession   # 所属会话
+	│   ├── UITableView  # 聊天气泡聊表
+	│   ├── NIMSessionViewLayoutManager # 布局管理器
+	│   ├── NIMSessionConfig            # 会话参数配置协议
+	│   │   ├── NIMCellLayoutConfig     # 消息的排版配置协议
+	│   │   │   ├── # 气泡大小
+	│   │   │   ├── # 气泡内容布局
+	│   │   │   ├── # 是否显示头像
+	│   │   │   ├── # 是否显示姓名
+	│   │   │   └── # 气泡自定义控件
+	│   │   ├── NIMKitMessageProvider   # 消息数据提供器协议
+	│   │   │   ├── # 自定义消息数据源
+	│   │   │   └── # 是否需要时间戳
+	│   │   ├── # 输入按钮类型，录音，文本，表情，更多菜单等按钮，支持自定义顺序排列
+	│   │   ├── # 更多菜单中的按钮定义 
+	│   │   ├── # 自定义按钮禁用规则
+	│   │   ├── # 文本输入长度限制
+	│   │   ├── # 文本输入提示占位符
+	│   │   ├── # 会话中一次拉取的最大条数
+	│   │   ├── # 会话中一次拉取的最大条数
+	│   ├── NIMInputView     # 输入框
+	│   └── UIRefreshControl # 下拉刷新控件
+	```
 
 * NIMMessageCell
 
