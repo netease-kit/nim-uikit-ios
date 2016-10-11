@@ -228,7 +228,7 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
 		│   ├── UITableView  # 聊天气泡聊表
 		│   ├── NIMSessionViewLayoutManager # 布局管理器
 		│   ├── NIMSessionConfig            # 会话参数配置协议
-		│   │   ├── NIMCellLayoutConfig     # 消息的排版配置协议
+		│   │   ├── NIMCellLayoutConfig     # 消息的排版配置协议，默认配置为 NIMCellLayoutDefaultConfig , 可以继承这个类，并重写部分布局方法
 		│   │   │   ├── # 气泡大小
 		│   │   │   ├── # 气泡内容布局
 		│   │   │   ├── # 是否显示头像
@@ -242,8 +242,13 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
 		│   │   ├── # 自定义按钮禁用规则
 		│   │   ├── # 文本输入长度限制
 		│   │   ├── # 文本输入提示占位符
+		│   │   ├── # 进入会话是否自动获取历史消息
 		│   │   ├── # 会话中一次拉取的最大条数
-		│   │   ├── # 会话中一次拉取的最大条数
+		│   │   ├── # 消息之间时间戳的显示间隔
+		│   │   ├── # 语音未读红点是否禁用
+		│   │   ├── # 贴耳时，是否自动切换成听筒模式
+		│   │   ├── # 录音类型和最大时长设置
+		│   │   └── # 是否处理已读回执
 		│   ├── NIMInputView     # 输入框
 		│   └── UIRefreshControl # 下拉刷新控件
 		```
