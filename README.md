@@ -218,8 +218,35 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
 ### 会话结构漫游
 
 * 概述
+
     `NIMSessionViewController` 继承 `UIViewController`，由 `UITableView`(界面)，`id<NIMSessionConfig>`(会话配置)， `NIMSessionMsgDatasource` (数据源) 作为基本构成。
-    
+    * 会话页结构
+
+		```
+		├── NIMSessionViewController  ＃核心会话类
+		│   ├── NIMSession   # 所属会话
+		│   ├── UITableView  # 聊天气泡聊表
+		│   ├── NIMSessionViewLayoutManager # 布局管理器
+		│   ├── NIMSessionConfig            # 会话参数配置协议
+		│   │   ├── NIMCellLayoutConfig     # 消息的排版配置协议
+		│   │   │   ├── # 气泡大小
+		│   │   │   ├── # 气泡内容布局
+		│   │   │   ├── # 是否显示头像
+		│   │   │   ├── # 是否显示姓名
+		│   │   │   └── # 气泡自定义控件
+		│   │   ├── NIMKitMessageProvider   # 消息数据提供器协议
+		│   │   │   ├── # 自定义消息数据源
+		│   │   │   └── # 是否需要时间戳
+		│   │   ├── # 输入按钮类型，录音，文本，表情，更多菜单等按钮，支持自定义顺序排列
+		│   │   ├── # 更多菜单中的按钮定义 
+		│   │   ├── # 自定义按钮禁用规则
+		│   │   ├── # 文本输入长度限制
+		│   │   ├── # 文本输入提示占位符
+		│   │   ├── # 会话中一次拉取的最大条数
+		│   │   ├── # 会话中一次拉取的最大条数
+		│   ├── NIMInputView     # 输入框
+		│   └── UIRefreshControl # 下拉刷新控件
+		```
     * 会话配置 
       
       需要重写 `NIMSessionViewController` 的 `- (id<NIMSessionConfig>)sessionConfig` 方法，返回一个实现 `id<NIMSessionConfig>` 协议的配置类。如果没有重写，或者返回的配置类里有一些配置方法没有实现，则会调用默认配置 `NIMCellLayoutDefaultConfig`。
@@ -267,34 +294,6 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
      
      
      对于开发者上层的自定义消息类型，开发者需要自己实现一个配置类并实现 `NIMCellLayoutConfig` 协议，并在 `cellContent:` 方法中返回此消息独有的 `cellReuseIdentifier` (见会话配置)。
-
-* 会话页结构
-
-	```
-	├── NIMSessionViewController  ＃核心会话类
-	│   ├── NIMSession   # 所属会话
-	│   ├── UITableView  # 聊天气泡聊表
-	│   ├── NIMSessionViewLayoutManager # 布局管理器
-	│   ├── NIMSessionConfig            # 会话参数配置协议
-	│   │   ├── NIMCellLayoutConfig     # 消息的排版配置协议
-	│   │   │   ├── # 气泡大小
-	│   │   │   ├── # 气泡内容布局
-	│   │   │   ├── # 是否显示头像
-	│   │   │   ├── # 是否显示姓名
-	│   │   │   └── # 气泡自定义控件
-	│   │   ├── NIMKitMessageProvider   # 消息数据提供器协议
-	│   │   │   ├── # 自定义消息数据源
-	│   │   │   └── # 是否需要时间戳
-	│   │   ├── # 输入按钮类型，录音，文本，表情，更多菜单等按钮，支持自定义顺序排列
-	│   │   ├── # 更多菜单中的按钮定义 
-	│   │   ├── # 自定义按钮禁用规则
-	│   │   ├── # 文本输入长度限制
-	│   │   ├── # 文本输入提示占位符
-	│   │   ├── # 会话中一次拉取的最大条数
-	│   │   ├── # 会话中一次拉取的最大条数
-	│   ├── NIMInputView     # 输入框
-	│   └── UIRefreshControl # 下拉刷新控件
-	```
 
 * NIMMessageCell
 
