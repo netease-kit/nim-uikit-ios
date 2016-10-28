@@ -33,13 +33,12 @@
 	* SystemConfiguration.framework
 	* AudioToolbox.framework
 	* CoreMedia.framework
-	* libstdc++.6.0.9.tbd  <sup> 注<sup>1</sup> </sup><sup> 注<sup>2</sup> </sup>
-	* libsqlite3.0.tbd  <sup> 注<sup>1</sup> </sup>
-	* libz.tbd  <sup> 注<sup>1</sup> </sup>
+	* libc++.tbd  <sup> 注<sup>1</sup> </sup>
+	* libsqlite3.0.tbd  
+	* libz.tbd  
 
-  **注<sup>1</sup> ：在 XCode7 以上版本中后缀为 tbd , XCode6 及以下均为 dylib。**
 
-  **注<sup>2</sup> ：请注意c++库的版本号，务必保证为 6.0.9 。**
+   **注<sup>1</sup> ：在 SDK 3.0.0 以前版本 (包括 3.0.0) ，c++ 库请使用 libstdc++6.0.9.tbd , 之后的版本统一替换成 libc++.tbd**
 
 
 * 设置 `Other Linker Flags` 为 `-ObjC`。
@@ -55,7 +54,7 @@
 ### NIMKit基本体系架构
 NIMKit 代替开发者实现了会话页和最近会话列表两个复杂界面。开发者只需要继承 NIMSessionViewController 和 NIMSessionListViewController ， 通过简洁的代码设置，即可在最短的时间内将聊天功能快速集成进App产品中。
 
-<img src="./Images/nimkit_structure.jpg" width="550" height="280" />
+<img src="./Images/iOS/nimkit_structure.jpg" width="550" height="280" />
 
 
 
@@ -302,7 +301,7 @@ NIMKit 中所有的资源都文件都是从 NIMKitResouce.bundle 读取，开发
 
 * NIMMessageCell
 
-    <img src="./Images/nimkit_cell.jpg" width="550" height="210" />
+    <img src="./Images/iOS/nimkit_cell.jpg" width="550" height="210" />
 
     * 蓝色区域：为具体内容 ContentView，如文字 UILabel ,图片 UIImageView 等。
 
