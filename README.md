@@ -97,11 +97,11 @@ NIMSessionListViewController *vc = [[NIMSessionViewController alloc] init];
 
 在不做任何修改，直接套用 `NIMKit` 组件，就能够达到上述效果。但不同的产品往往会有不同的定制化需求，定制化需求参考
 
-1.《项目结构介绍》
+1.[《项目结构介绍》](./Documents/nim_arch.md)
 
-2.《界面排版自定义》
+2.[《界面排版自定义》](./Documents/nim_custom_ui.md)
 
-3.《用户信息自定义》
+3.[《新消息类型集成》](./Documents/nim_custom_message.md)
 
-4.《新消息类型集成》
+4.[《用户信息自定义》](./nim_userinfo.md)
 
