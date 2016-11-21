@@ -54,7 +54,7 @@ pod 'NIMSDK_Lite'
 	* SystemConfiguration.framework
 	* AudioToolbox.framework
 	* CoreMedia.framework
-	* libc++.tbd  <sup> 注<sup>1</sup> </sup>
+	* libc++.tbd
 	* libsqlite3.0.tbd  
 	* libz.tbd 
 
