@@ -2,7 +2,7 @@
 
 ## 前言
 
-针对开发者对组件的不同定制需求，云信 iOS UI 组件提供了大量配置可以让开发者便捷的修改或自定义排版。根据定制的深度，大体可以分为三种：
+针对开发者对组件的不同定制需求，云信 iOS UI 组件提供了大量配置可以让开发者便捷的修改或自定义排版。根据定制的深度，大体可以分为两种：
 
  * **聊天气泡的简单布局定制**
 
@@ -17,10 +17,6 @@
    排版配置器需要实现 `NIMCellLayoutConfig` 协议。
 
  
- * **聊天界面的部分 Cell 完全自定义**
-   
-   UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的。在有些场景下，开发者需要自行定义其他的 `UITabelViewCell` 类型来完成界面绘制，这种深度定制需求没有接口支持，开发者需要修改 `NIMSessionTableDelegate` 类中的 `-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath` 根据消息类型来返回自己定义的 `UITabelViewCell` .
-   
 ## NIMMessageCell
 
 UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此，了解 `NIMMessageCell` 的大致组成，对排版是很有帮助的。
@@ -101,7 +97,7 @@ UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此�
    
    布局配置器可以选择实现 `NIMCellLayoutConfig` 接口所定义的方法，不实现的接口，会采用内置的默认布局参数进行处理。
    
-   在很多场景下，只是在特殊消息场景下需要修正一下排版配置，其他情况还是沿用默认配置，因此强烈建议自定义的排版控制器继承内置的排版实现 `NIMCellLayoutConfig`。这样在开发者需要自定义布局的场景下，填入自定义配置，其他情况只需调用 `super` 方法即可。
+   在很多场景下，只是在特殊消息场景下需要修正一下排版配置，其他情况还是沿用默认配置，因此强烈建议自定义的排版控制器继承内置的排版实现 `NIMCellLayoutConfig` 协议。这样在开发者需要自定义布局的场景下，填入自定义配置，其他情况只需调用 `super` 方法即可。
    
    具体实现逻辑示范见 Demo 中 `NTESCellLayoutConfig` 类。
    
