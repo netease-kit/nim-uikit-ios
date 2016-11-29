@@ -91,7 +91,19 @@ NIMSessionListViewController *vc = [[NIMSessionViewController alloc] init];
 
 ## 集成效果
 
-（此处贴图 by 小王~~~）
+
+最近会话进入会话 | 群组会话 | 发送多张图片 
+-------------|-------------|-------------|-------------
+![image](./Documents/Images/nimkit_1.gif)|![image](./Documents/Images/nimkit_2.gif)  | ![image](./Documents/Images/nimkit_3.gif) 
+
+发送语音| 发送地理位置 |发送中与发送失败，点击叹号可重发 
+-------------|-------------|-------------
+![image](./Documents/Images/nimkit_4.gif)|![image](./Documents/Images/nimkit_5.gif)  | ![image](./Documents/Images/nimkit_6.gif) 
+
+自定义消息-阅后即焚示例 | 最近联系人选择器 | 最近会话删除与未读删除 
+-------------|-------------|------------
+![image](./Documents/Images/nimkit_7.gif)|![image](./Documents/Images/nimkit_8.gif)  | ![image](./Documents/Images/nimkit_9.gif) 
+
 
 ## 定制化
 
