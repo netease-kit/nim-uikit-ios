@@ -49,7 +49,7 @@
 	 │      │                            │
 	 │      │                            │      
 	 │      │                            │                            
-	 │   TableView                       └────────TableDelegate                           
+	 │   TableView                       └────────TableAdapter                           
 	 │      │                                       │                            
 	 │      └───────────────────────────────────────┘
 	 │                                        
@@ -60,7 +60,7 @@
 * 会话类 `SessionController` 操作 `Interactor` 接口。
 * `Configurator` 类为接口连接器，用来将接口与具体实现类相关联，实现与会话控制器的解耦。
      * 注入 `NIMSessionInteractor` 的具体实现类( 组件中为 `NIMSessionInteractorImpl`)
-     * 注入 `UITableDataSource` 以及 `UITableDelegate` 的具体实现类 ( 组件中为 `NIMSessionTableDelegate`)
+     * 注入 `UITableDataSource` 以及 `UITableDelegate` 的具体实现类 ( 组件中为 `NIMSessionTableAdapter`)
 
 * **会话配置类**
    
