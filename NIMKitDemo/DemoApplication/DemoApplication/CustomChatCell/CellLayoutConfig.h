@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "NIMKit.h"
 
-@interface CellLayoutConfig : NSObject<NIMCellLayoutConfig>
+@interface CellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
 
 
 

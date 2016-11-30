@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable,nonatomic,copy)  NSString    *roomAvatar;
 
 /**
- *  聊天室拓展字段
+ *  本人的聊天室成员信息拓展字段，仅对当次进入有效
  */
 @property (nullable,nonatomic,copy)  NSString    *roomExt;
 /**

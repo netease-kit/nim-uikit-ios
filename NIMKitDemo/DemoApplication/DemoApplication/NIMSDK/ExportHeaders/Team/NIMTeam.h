@@ -127,6 +127,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,assign,readonly)   BOOL notifyForNewMsg;
 
 
+/**
+ *  群组是否正在全员禁言
+ *  @discussion 只有高级群有效
+ */
+- (BOOL)inAllMuteMode;
+
 
 @end
 

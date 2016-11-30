@@ -52,6 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nullable,nonatomic,copy)   NSString *broadcastUrl;
 
+/**
+ *  聊天室是否正在全员禁言标记，禁言后只有管理员可以发言
+ */
+- (BOOL)inAllMuteMode;
+
 @end
 
 

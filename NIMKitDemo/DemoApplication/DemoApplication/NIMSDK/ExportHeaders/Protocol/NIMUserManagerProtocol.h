@@ -131,6 +131,17 @@ typedef NS_ENUM(NSInteger, NIMUserInfoUpdateTag) {
  */
 - (nullable NSArray<NIMUser *> *)myFriends;
 
+
+/**
+ *  判断是否是我的好友
+ *
+ *  @param userId 用户Id
+ *
+ *  @return 是否是我的好友 (云信关系)
+ */
+- (BOOL)isMyFriend:(NSString *)userId;
+
+
 /**
  *  添加用户到黑名单
  *

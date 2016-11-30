@@ -82,7 +82,14 @@ typedef NS_ENUM(NSInteger, NIMChatroomEventType){
      *  聊天室通用队列变更的通知
      */
     NIMChatroomEventTypeQueueChange = 317,
-    
+    /**
+     *  聊天室被禁言了，只有管理员可以发言,其他人都处于禁言状态
+     */
+    NIMChatroomEventTypeRoomMuted = 318,
+    /**
+     *  聊天室不在禁言状态
+     */
+    NIMChatroomEventTypeRoomUnMuted = 319,
 };
 
 /**

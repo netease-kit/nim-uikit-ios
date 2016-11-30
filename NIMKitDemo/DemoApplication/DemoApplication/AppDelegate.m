@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "NIMSDK.h"
 #import "DataProvider.h"
+#import "CellLayoutConfig.h"
 #import "AttachmentDecoder.h"
 #define NIMSDKAppKey @"8fc95f505b6cbaedf613677c8e08fc0b"
 
@@ -27,6 +28,10 @@
     
     //需要自定义消息时使用
     [NIMCustomObject registerCustomDecoder:[[AttachmentDecoder alloc]init]];
+    
+    //注入 NIMKit 布局管理器
+    [[NIMKit sharedKit] registerLayoutConfig:[CellLayoutConfig class]];
+    
     return YES;
 }
 

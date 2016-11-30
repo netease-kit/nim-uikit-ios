@@ -11,6 +11,7 @@
 @class NIMMessage;
 @class NIMSession;
 @class NIMMessageReceipt;
+@class NIMRevokeMessageNotification;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -81,10 +82,10 @@ typedef void(^NIMRevokeMessageBlock)(NSError * __nullable error);
 /**
  *  收到消息被撤回的通知
  *
- *  @param message 被撤回的消息
+ *  @param notification 被撤回的消息信息
  *  @discusssion 云信在收到消息撤回后，会先从本地数据库中找到对应消息并进行删除，之后通知上层消息已删除
  */
-- (void)onMessageRevoked:(NIMMessage *)message;
+- (void)onRecvRevokeMessageNotification:(NIMRevokeMessageNotification *)notification;
 
 
 /**
