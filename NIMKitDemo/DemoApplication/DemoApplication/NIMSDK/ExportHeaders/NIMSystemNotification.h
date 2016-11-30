@@ -10,6 +10,7 @@
 #import "NIMSession.h"
 #import "NIMUser.h"
 #import "NIMCustomSystemNotificationSetting.h"
+#import "NIMAntiSpamOption.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -179,6 +180,12 @@ typedef NS_ENUM(NSInteger, NIMSystemNotificationType){
  *  @discussion 可以通过这个字段制定当前通知的各种设置,如是否需要计入推送未读，是否需要带推送前缀等等
  */
 @property (nullable,nonatomic,strong)                NIMCustomSystemNotificationSetting *setting;
+
+
+/**
+ *  反垃圾选项
+ */
+@property (nullable,nonatomic,strong)                NIMAntiSpamOption *antiSpamOption;
 
 
 - (instancetype)initWithContent:(NSString *)content;

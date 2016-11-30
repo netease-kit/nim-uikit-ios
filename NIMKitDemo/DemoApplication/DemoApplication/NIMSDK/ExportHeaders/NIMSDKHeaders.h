@@ -54,6 +54,7 @@
  */
 #import "NIMMessage.h"
 #import "NIMSystemNotification.h"
+#import "NIMRevokeMessageNotification.h"
 
 /**
  *  推送定义

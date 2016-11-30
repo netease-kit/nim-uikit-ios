@@ -12,9 +12,20 @@
 
 @interface SessionViewController ()
 
+@property (nonatomic,strong) SessionConfig *config;
+
 @end
 
 @implementation SessionViewController
+
+- (instancetype)initWithSession:(NIMSession *)session
+{
+    self = [super initWithSession:session];
+    if (self) {
+        _config = [[SessionConfig alloc] init];
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -25,17 +36,7 @@
 }
 
 - (id<NIMSessionConfig>)sessionConfig{
-    return [[SessionConfig alloc] init];
-}
-
-- (void)onTapMediaItem:(NIMMediaItem *)item{
-    switch (item.tag) {
-        case 0:
-            [self sendCustomMessage];
-            break;
-        default:
-            break;
-    }
+    return self.config;
 }
 
 

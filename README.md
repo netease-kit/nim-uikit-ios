@@ -53,7 +53,8 @@ pod 'NIMSDK_Lite'
 
 * 添加 `NIMKit` 下所有源文件到你的工程中
 
-* 添加 `NIMKitResource.bundle` 到你的工程中
+* 添加 `NIMKitResource.bundle` ， `NIMKitEmoticon.bundle` ， `NIMKitSettings.bundle` 到你的工程中
+
 
 * 添加必要的依赖项
 	* CoreText.framework

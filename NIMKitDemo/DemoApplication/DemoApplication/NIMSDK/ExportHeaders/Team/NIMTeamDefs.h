@@ -47,7 +47,7 @@ typedef NS_ENUM(NSInteger, NIMTeamJoinMode) {
  */
 typedef NS_ENUM(NSInteger, NIMTeamInviteMode) {
     /**
-     *  只有管理员/群组可以邀请他人入群
+     *  只有管理员/群主可以邀请他人入群
      */
     NIMTeamInviteModeManager    = 0,
     /**

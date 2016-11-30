@@ -20,6 +20,7 @@
 #import "NIMTipObject.h"
 #import "NIMMessageSetting.h"
 #import "NIMMessageReceipt.h"
+#import "NIMAntiSpamOption.h"
 #import "NIMMessageApnsMemberOption.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -116,6 +117,12 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
  */
 @property (nullable,nonatomic,strong)                NIMMessageSetting *setting;
 
+/**
+ *  消息反垃圾配置
+ *  @discussion 目前仅支持易盾，只有接入了易盾才可以设置这个配置
+ */
+@property (nullable,nonatomic,strong)                NIMAntiSpamOption *antiSpamOption;
+
 
 /**
  *  消息推送文案,长度限制200字节
@@ -124,7 +131,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  消息推送Payload
- *  @discussion 可以通过这个字段定义消息推送Payload,支持字段参考苹果技术文档,转成 JSON 后长度限制为 2K
+ *  @discussion 可以通过这个字段定义消息推送Payload,支持字段参考苹果技术文档,长度限制 2K
  */
 @property (nullable,nonatomic,copy)                NSDictionary *apnsPayload;
 
@@ -137,13 +144,13 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  服务器扩展
- *  @discussion 客户端可以设置这个字段,这个字段将在本地存储且发送至对端,上层需要保证 NSDictionary 可以转换为 JSON
+ *  @discussion 客户端可以设置这个字段,这个字段将在本地存储且发送至对端,上层需要保证 NSDictionary 可以转换为 JSON，长度限制 4K
  */
 @property (nullable,nonatomic,copy)                NSDictionary    *remoteExt;
 
 /**
  *  客户端本地扩展
- *  @discussion 客户端可以设置这个字段，这个字段只在本地存储,不会发送至对端,,上层需要保证 NSDictionary 可以转换为 JSON
+ *  @discussion 客户端可以设置这个字段，这个字段只在本地存储,不会发送至对端,上层需要保证 NSDictionary 可以转换为 JSON
  */
 @property (nullable,nonatomic,copy)                NSDictionary    *localExt;
 
@@ -205,7 +212,7 @@ typedef NS_ENUM(NSInteger, NIMMessageAttachmentDownloadState){
 
 /**
  *  消息发送者名字
- *  @discussion 当发送者是自己时,这个值可能为空,这个值表示的是发送者当前的昵称,而不是发送消息时的昵称
+ *  @discussion 当发送者是自己时,这个值可能为空,这个值表示的是发送者当前的昵称,而不是发送消息时的昵称。聊天室消息里，此字段无效。
  */
 @property (nullable,nonatomic,copy,readonly)         NSString *senderName;
 

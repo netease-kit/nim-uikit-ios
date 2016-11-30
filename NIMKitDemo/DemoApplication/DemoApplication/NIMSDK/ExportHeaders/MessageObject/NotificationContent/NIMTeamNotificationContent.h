@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, NIMTeamOperationType){
 
 
 /**
- *  群信息修改字段
+ *  群信息更新字段
  */
 typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
     /**
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
     NIMTeamUpdateTagClientCustom    = 18,
     /**
      *  服务器自定义拓展字段
-     *  @discussion SDK 无法直接修改这个字段
+     *  @discussion SDK 无法直接修改这个字段, 请调用服务器接口
      */
     NIMTeamUpdateTagServerCustom    = 19,
     /**
@@ -113,6 +113,11 @@ typedef NS_ENUM(NSInteger, NIMTeamUpdateTag){
      *  更新群客户端自定义拓展字段权限
      */
     NIMTeamUpdateTagUpdateClientCustomMode = 24,
+    /**
+     *  群全体禁言
+     *  @discussion SDK 无法直接修改这个字段, 请调用服务器接口
+     */
+    NIMTeamUpdateTagMuteMode       = 100
     
 };
 

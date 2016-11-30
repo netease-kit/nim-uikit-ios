@@ -309,6 +309,10 @@ typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
      */
     NIMRemoteErrorCodeServiceUnavailable  = 514,
     /**
+     *  群人数超过上限
+     */
+    NIMRemoteErrorCodeTeamMemberLimit     = 801,
+    /**
      *  没有操作群的权限
      */
     NIMRemoteErrorCodeTeamAccessError     = 802,
@@ -325,9 +329,9 @@ typedef NS_ENUM(NSInteger, NIMRemoteErrorCode) {
      */
     NIMRemoteErrorCodeTeamInvaildType     = 805,
     /**
-     *  超出群成员个数限制
+     *  超出群个数限制
      */
-    NIMRemoteErrorCodeTeamMemberLimit     = 806,
+    NIMRemoteErrorCodeTeamCountLimit      = 806,
     /**
      *  已经在群里
      */
