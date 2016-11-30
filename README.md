@@ -35,17 +35,25 @@
 pod 'NIMKit'
 ```
 
-需要注意的是 `NIMKit` 依赖于 `NIMSDK`，但是我们并没有在对应的 `podspec` 文件类添加 `NIMSDK` 为 `NIMKit` 的 dependency，原因是完整的 `NIMSDK` 不仅有 IM 模块，也有音视频模块。对于很多产品而言，只需要接入单纯的 IM 模块，所以我们推荐使用 [NIMSDK_Lite](https://github.com/netease-im/NIM_iOS_SDK_Lite) 以减少对不必要模块的依赖，进而减少 App 体积。基于这个考虑，用于需要自行添加 `NIMSDK` 的依赖，即
+需要注意的是默认 `NIMKit` 依赖于[轻量版本](https://github.com/netease-im/NIM_iOS_SDK_Lite)的 `NIMSDK`，而完整的 `NIMSDK` 不仅有 IM 模块，也有音视频模块。对于很多产品而言，只需要接入单纯的 IM 模块，这样可以减少对不必要模块的依赖，进而减少 App 体积。所以我们有两个版本的组件可供选择，安装完组件之后，则不必再安装 `NIMSDK` 依赖。
 
-```shell
-pod 'NIMSDK'
-```
+* 轻量版本
 
-或者添加
+	```shell
+	pod 'NIMKit'
+	```
 
-```shell
-pod 'NIMSDK_Lite'
-```
+    或
+
+    ```shell
+	pod 'NIMKit/Lite'
+	```
+
+* 完整版本
+
+	```shell
+	pod 'NIMSDK/Full'
+	```
 
 ### 手动集成
 
