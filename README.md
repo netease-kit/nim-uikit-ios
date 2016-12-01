@@ -118,7 +118,7 @@ NIMSessionListViewController *vc = [[NIMSessionViewController alloc] init];
 
 发送语音| 发送地理位置 |发送中与发送失败，点击叹号可重发 
 -------------|-------------|-------------
-![image](https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_4.gif)|![image](https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_5.gif)  | ![image](.https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_6.gif) 
+![image](https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_4.gif)|![image](https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_5.gif)  | ![image](https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_6.gif) 
 
 自定义消息-阅后即焚示例 | 最近联系人选择器 | 最近会话删除与未读删除 
 -------------|-------------|------------
