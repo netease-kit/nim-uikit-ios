@@ -135,5 +135,5 @@ NIMSessionListViewController *vc = [[NIMSessionViewController alloc] init];
 
 3.[《新消息类型集成》](./Documents/nim_custom_message.md)
 
-4.[《用户信息自定义》](./nim_userinfo.md)
+4.[《用户信息自定义》](./Documents/nim_userinfo.md)
 
