@@ -21,7 +21,7 @@
 
 UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此，了解 `NIMMessageCell` 的大致组成，对排版是很有帮助的。
 
-<img src="./Images/nimkit_cell.jpg" width="550" height="210" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell.jpg" width="550" height="210" />
 
     * 蓝色区域：为具体内容 ContentView，如文字 UILabel ,图片 UIImageView 等。
 
