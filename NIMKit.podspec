@@ -1,6 +1,6 @@
 Pod::Spec.new do |s| 
  s.name = "NIMKit" 
- s.version = "1.0.2" 
+ s.version = "1.0.3" 
  s.summary = "Netease IM UI Kit" 
  s.homepage = "http://netease.im" 
  s.license = { :"type" => "Copyright", :"text" => " Copyright 2016 Netease "} 
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
  s.source  = { :git => "https://github.com/netease-im/NIM_iOS_UIKit.git", :tag => "#{s.version}"} 
  s.platform = :ios, '8.0' 
  s.source_files = "NIMKit/NIMKit/**/*.{h,m}" 
- s.resource = 'NIMKitResource.bundle','NIMKitEmoticon.bundle','NIMKitSettings.bundle'
+ s.resource = 'NIMKit/Resources/*'
  s.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
  s.libraries  = 'sqlite3.0', 'z', 'c++'
  s.dependency 'SDWebImage'
