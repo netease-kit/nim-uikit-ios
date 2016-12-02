@@ -1,0 +1,46 @@
+PODS:
+  - CTAssetsPickerController (3.3.1):
+    - PureLayout (~> 3.0.0)
+  - M80AttributedLabel (1.6.2)
+  - NIMKit (1.0.3):
+    - CTAssetsPickerController
+    - M80AttributedLabel
+    - NIMKit/Lite (= 1.0.3)
+    - SDWebImage
+    - SVProgressHUD
+    - Toast
+  - NIMKit/Lite (1.0.3):
+    - CTAssetsPickerController
+    - M80AttributedLabel
+    - NIMSDK_LITE (~> 3.2.0)
+    - SDWebImage
+    - SVProgressHUD
+    - Toast
+  - NIMSDK_LITE (3.2.0)
+  - PureLayout (3.0.2)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
+  - SVProgressHUD (2.0.4)
+  - Toast (3.1.0)
+
+DEPENDENCIES:
+  - NIMKit (from `../`)
+
+EXTERNAL SOURCES:
+  NIMKit:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CTAssetsPickerController: b1d1d50ab87cf6b8b13531de5f4530482e7e53ed
+  M80AttributedLabel: 1bcddc0acb6097991bb41fe17fbf947d128836d6
+  NIMKit: 05b4096692dcfc5b50e179013b7982a684cd9c99
+  NIMSDK_LITE: b74a660130f0443fea92d8327c4011a03dc2efe4
+  PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
+  SVProgressHUD: bfde85ed6c573ea802b9cb37894ed9b629034f1b
+  Toast: 14a93686d6c8bfe2727afd342414e35660a8a1f3
+
+PODFILE CHECKSUM: 88f858a19a91dd32b6714728622b02683d783f5c
+
+COCOAPODS: 1.1.1
