@@ -27,7 +27,7 @@
 * [M80AttributedLabel](https://github.com/xiangwangfeng/M80AttributedLabel) v1.6.2
 * [CTAsstsPickerController](https://github.com/chiunam/CTAssetsPickerController) v3.3.2-alpha
 
-为防止文档更新不够即时，推荐在导入第三方库时参考当前的 [podspec](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/NIMKit.podspec) 内指定的版本号。
+为防止文档更新不够及时，推荐在导入第三方库时参考当前的 [podspec](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/NIMKit.podspec) 内指定的版本号。
 
 **注:** 导入 `CTAsstsPickerController` 时需要同时添加它的 `bundle` 文件
 
