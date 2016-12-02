@@ -13,5 +13,5 @@ target 'NIM' do
         pod 'SVProgressHUD', '~> 2.0.3'
         pod 'M80AttributedLabel', '~> 1.5.0'
         pod 'CTAssetsPickerController', '~> 3.3.2-alpha'
-        pod 'NIMKit/Lite'
+        pod 'NIMKit/Full'
 end

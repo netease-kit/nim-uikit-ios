@@ -7,11 +7,9 @@ Pod::Spec.new do |s|
  s.authors = "Netease IM Team" 
  s.source  = { :git => "https://github.com/netease-im/NIM_iOS_UIKit.git", :tag => "#{s.version}"} 
  s.platform = :ios, '8.0' 
-
-
  s.subspec 'Full' do |cs|
 	cs.source_files = "NIMKit/NIMKit/**/*.{h,m}" 
-	cs.resource = 'NIMKit/Resources/*'
+	cs.resource   = 'NIMKit/Resources/*'
 	cs.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
 	cs.libraries  = 'sqlite3.0', 'z', 'c++'
 	cs.dependency 'SDWebImage'
@@ -24,7 +22,7 @@ Pod::Spec.new do |s|
 
  s.subspec 'Lite' do |cs|
     cs.source_files = "NIMKit/NIMKit/**/*.{h,m}" 
-	cs.resource = 'NIMKit/Resources/*'
+	cs.resource   = 'NIMKit/Resources/*'
 	cs.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
 	cs.libraries  = 'sqlite3.0', 'z', 'c++'
 	cs.dependency 'SDWebImage'
