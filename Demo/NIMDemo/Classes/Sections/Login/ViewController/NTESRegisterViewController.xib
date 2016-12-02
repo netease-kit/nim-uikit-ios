@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NTESRegisterViewController">
+            <connections>
+                <outlet property="accountTextfield" destination="VC9-kk-c3c" id="mLe-ea-3TX"/>
+                <outlet property="containView" destination="hcA-Dk-fbv" id="zex-f9-KNH"/>
+                <outlet property="existedButton" destination="awC-mY-Foj" id="9Hx-xF-ld3"/>
+                <outlet property="logo" destination="Clw-di-T1L" id="dBM-xR-ogs"/>
+                <outlet property="nicknameTextfield" destination="qTH-0Z-CzS" id="wPQ-fe-lpm"/>
+                <outlet property="passwordTextfield" destination="1u6-ap-0i4" id="Ax8-1k-BNa"/>
+                <outlet property="view" destination="giF-MN-Gxx" id="c8v-4Q-Rc0"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="giF-MN-Gxx">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="login_bg" id="qFv-d4-mUb">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
+                </imageView>
+                <view contentMode="scaleToFill" id="hcA-Dk-fbv">
+                    <rect key="frame" x="0.0" y="202" width="320" height="195"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" id="Qq4-39-YjA">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="195"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="login_icon_usr_" id="AWa-fv-ADk">
+                            <rect key="frame" x="25" y="19" width="22" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="帐号：限20位字母或者数字" minimumFontSize="17" clearButtonMode="whileEditing" id="VC9-kk-c3c" userLabel="usernameTextField">
+                            <rect key="frame" x="60" y="8" width="245" height="51"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <action selector="onChanged:" destination="-1" eventType="editingChanged" id="u7D-WW-Jlw"/>
+                                <outlet property="delegate" destination="-1" id="CXg-Z9-qwc"/>
+                            </connections>
+                        </textField>
+                        <view contentMode="scaleToFill" id="9Db-Cb-zab">
+                            <rect key="frame" x="10" y="59" width="300" height="1"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="1" alpha="0.59999999999999998" colorSpace="calibratedWhite"/>
+                        </view>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="icon_nickname" id="cLx-98-pzj">
+                            <rect key="frame" x="25" y="80" width="22" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="昵称：限10位汉字、字母或者数字" minimumFontSize="17" clearButtonMode="whileEditing" id="qTH-0Z-CzS" userLabel="passwordTextField">
+                            <rect key="frame" x="60" y="77" width="245" height="35"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <action selector="onChanged:" destination="-1" eventType="editingChanged" id="mMb-FW-x5g"/>
+                                <outlet property="delegate" destination="-1" id="rOF-v6-wet"/>
+                            </connections>
+                        </textField>
+                        <view contentMode="scaleToFill" id="LDz-dQ-7CU">
+                            <rect key="frame" x="10" y="184" width="300" height="1"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="1" alpha="0.59999999999999998" colorSpace="calibratedWhite"/>
+                        </view>
+                        <view contentMode="scaleToFill" id="rpH-yC-DeK">
+                            <rect key="frame" x="10" y="120" width="300" height="1"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                        </view>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="login_icon_pwd_" id="DUs-9B-3vy">
+                            <rect key="frame" x="26" y="148" width="22" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="密码：6~20位字母或者数字" minimumFontSize="17" clearButtonMode="whileEditing" id="1u6-ap-0i4" userLabel="passwordTextField">
+                            <rect key="frame" x="60" y="143" width="245" height="35"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                            <connections>
+                                <action selector="onChanged:" destination="-1" eventType="editingChanged" id="XFR-Ho-D6x"/>
+                                <outlet property="delegate" destination="-1" id="rhx-ME-9W0"/>
+                            </connections>
+                        </textField>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="login_logo" id="Clw-di-T1L">
+                    <rect key="frame" x="129" y="100" width="62" height="62"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="awC-mY-Foj">
+                    <rect key="frame" x="88" y="419" width="144" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="已有帐号？直接登录">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="exist:" destination="-1" eventType="touchUpInside" id="Jrz-jl-KuJ"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <point key="canvasLocation" x="475" y="435"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="icon_nickname" width="23" height="22"/>
+        <image name="login_bg" width="320" height="568"/>
+        <image name="login_icon_pwd_" width="22" height="22"/>
+        <image name="login_icon_usr_" width="22" height="22"/>
+        <image name="login_logo" width="59" height="59"/>
+    </resources>
+</document>
