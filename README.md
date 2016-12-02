@@ -57,30 +57,8 @@ pod 'NIMKit'
 
 ### 手动集成
 
-当然你也可以通过手动导入 `NIMKit`。步骤如下
+一般我们不推荐你使用手动导入的方式来集成 NIMKit，但如果你一定要这么做，可以参考这个[文档](./Documents/nim_mi.md)。
 
-* 添加 `NIMKit` 下所有源文件到你的工程中
-
-* 添加 `NIMKitResource.bundle` ， `NIMKitEmoticon.bundle` ， `NIMKitSettings.bundle` 到你的工程中
-
-
-* 添加必要的依赖项
-	* CoreText.framework
-	
-* 如果你选择手动添加 NIMSDK，还需要添加如下依赖项
-	* CoreTelephony.framework
-	* AVFoundation.framework
-	* MobileCoreServices.framework
-	* SystemConfiguration.framework
-	* AudioToolbox.framework
-	* CoreMedia.framework
-	* libc++.tbd
-	* libsqlite3.0.tbd  
-	* libz.tbd 
-
-* 设置 `Other Linker Flags` 为 `-ObjC`
-
-* 在需要使用到组件的地方导入头文件 `NIMKit.h` 
 
 ## 快速使用
 
