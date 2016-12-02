@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 	cs.dependency 'SDWebImage', '~> 3.8.2'
 	cs.dependency 'Toast', '~> 3.0'
 	cs.dependency 'SVProgressHUD', '~> 2.0.3'
-	cs.dependency 'M80AttributedLabel', '~> 1.5.0’
+	cs.dependency 'M80AttributedLabel', '~> 1.5.0'
 	cs.dependency 'CTAssetsPickerController', '~> 3.3.2-alpha'
     cs.dependency 'NIMSDK', '~> 3.2.0'
   end
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
 	cs.dependency 'SDWebImage', '~> 3.8.2'
 	cs.dependency 'Toast', '~> 3.0'
 	cs.dependency 'SVProgressHUD', '~> 2.0.3'
-	cs.dependency 'M80AttributedLabel', '~> 1.5.0’
+	cs.dependency 'M80AttributedLabel', '~> 1.5.0'
 	cs.dependency 'CTAssetsPickerController', '~> 3.3.2-alpha'
 	cs.dependency 'NIMSDK_LITE', '~> 3.2.0'
   end
