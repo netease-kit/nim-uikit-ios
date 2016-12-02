@@ -1,0 +1,10 @@
+//
+//  nim_adhoc.xcconfig
+//  NIM
+//
+//  Created by amao on 9/22/15.
+//  Copyright © 2015 Netease. All rights reserved.
+//
+
+XCCONFIG_BUNDLE_ID                  = com.netease.NIM.demo
+XCCONFIG_BUNDLE_NAME                = 云信 Demo
