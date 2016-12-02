@@ -18,3 +18,4 @@ DerivedData
 *.ipa
 *.xcuserstate
 Pods/
+Podfile.lock
