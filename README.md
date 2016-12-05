@@ -1,4 +1,9 @@
 # 网易云信 UI 组件 	· iOS
+[![Build Status](https://img.shields.io/travis/netease-im/NIM_iOS_UIKit/master.svg?style=flat)](https://travis-ci.org/netease-im/NIM_iOS_UIKit)
+[![Pod Version](https://img.shields.io/cocoapods/v/NIMKit.svg?style=flat)](#)
+[![Pod Platform](http://img.shields.io/cocoapods/p/NIMKit.svg?style=flat)](#)
+[![Minimum Requirement](http://img.shields.io/badge/Requirement-iOS%208.0%2B-green.svg?style=flat)](#)
+
 
 ## 简介
 
