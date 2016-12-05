@@ -6,7 +6,4 @@ before_install:
   - brew upgrade xctool
   - pod repo update
 podfile: Demo/Podfile
-xcode_workspace: Demo/NIM.xcworkspace
-xcode_scheme: NIM
-xcode_sdk: iphonesimulator
-script: xcodebuild
+script: xcodebuild -workspace Demo/NIM.xcworkspace -scheme NIM -sdk iphonesimulator 
