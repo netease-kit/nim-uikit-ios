@@ -5,7 +5,7 @@ script:
         - gem install cocoapods -v  1.0.1
         - pod repo update
 
-        
+
         - echo Install Demo pod dependence
         - pushd Demo
         - pod install
@@ -20,5 +20,5 @@ script:
         - pod install
         - popd
 
-        - echo Build Example project
+        - echo Build Example project 
         - xcodebuild -workspace Example/DemoApplication.xcworkspace -scheme DemoApplication -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
