@@ -4,4 +4,4 @@ before_install:
   - gem install cocoapods -v  1.0.1
   - pod repo update
 podfile: Demo/Podfile
-script: xcodebuild -workspace Demo/NIM.xcworkspace -scheme NIM -sdk iphonesimulator 
+script: xcodebuild -workspace Demo/NIM.xcworkspace -scheme NIM -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
