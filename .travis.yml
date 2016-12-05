@@ -1,0 +1,10 @@
+language: objective-c
+osx_image: xcode8
+podfile: Demo/Podfile
+before_install:
+  - gem install cocoapods -v  1.0.1
+  - brew update
+  - brew upgrade xctool
+xcode_workspace: Demo/NIM.xcworkspace
+xcode_scheme: NIM
+xcode_sdk: iphonesimulator
