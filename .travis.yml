@@ -12,7 +12,7 @@ script:
         - popd
 
         - echo Build Demo project
-        - xcodebuild -workspace Demo/NIM.xcworkspace -scheme NIM -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+        - xcodebuild -quiet -workspace Demo/NIM.xcworkspace -scheme NIM -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
 
 
         - echo Install Example pod dependence
@@ -21,4 +21,4 @@ script:
         - popd
 
         - echo Build Example project 
-        - xcodebuild -workspace Example/DemoApplication.xcworkspace -scheme DemoApplication -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+        - xcodebuild -quiet -workspace Example/DemoApplication.xcworkspace -scheme DemoApplication -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
