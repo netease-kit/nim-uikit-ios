@@ -3,7 +3,7 @@
 [![Pod Version](https://img.shields.io/cocoapods/v/NIMKit.svg?style=flat)](#)
 [![Pod Platform](http://img.shields.io/cocoapods/p/NIMKit.svg?style=flat)](#)
 [![Minimum Requirement](http://img.shields.io/badge/Requirement-iOS%208.0%2B-green.svg?style=flat)](#)
-
+[![LICENSE](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](./LICENSE)
 
 ## 简介
 
