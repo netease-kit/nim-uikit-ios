@@ -1,4 +1,7 @@
 # 手动集成 NIMKit
+### 前言
+
+正如我们的 [README](../README.MD) 所描述：我们强烈不推荐你使用受到导入的方式来集成 `NIMKit`，原因在于整个 `NIMKit` 的依赖关系对于初学者而言过于复杂，手动导入的流程也相当繁琐。
 
 ### 导入代码
 
@@ -29,7 +32,8 @@
 
 为防止文档更新不够及时，推荐在导入第三方库时参考当前的 [podspec](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/NIMKit.podspec) 内指定的版本号。
 
-**注:** 导入 `CTAsstsPickerController` 时需要同时添加它的 `bundle` 文件
+**注1:** 导入 `CTAsstsPickerController` 时需要同时添加它的 `bundle` 文件
+**注2:** `CTAsstsPickerController` 依赖于 [PureLayout](https://github.com/PureLayout/PureLayout)，需要同步导入
 
 
 ### 添加系统依赖项
