@@ -61,7 +61,7 @@ pod 'NIMKit'
 * 完整版本
 
 	```shell
-	pod 'NIMSDK/Full'
+	pod 'NIMKit/Full'
 	```
 
 ### 手动集成
