@@ -66,15 +66,15 @@ pod 'NIMKit'
 
 ### 手动集成
 
-一般我们不推荐你使用手动导入的方式来集成 NIMKit，但如果你一定要这么做，可以参考这个[文档](./Documents/nim_mi.md)。
+我们`强烈`不推荐你使用手动导入的方式来集成 `NIMKit`，但如果你一定要这么做，可以参考这个[文档](./Documents/nim_mi.md)。
 
 
 ## 快速使用
 
 `NIMKit` 提供两个最重要的类
 
-* NIMSessionViewController
-* NIMSessionListViewController
+* `NIMSessionViewController`
+* `NIMSessionListViewController`
 
 前者用于会话界面的显示和互动，而后者提供了最近会话功能。在集成 `NIMSDK` 且完成了基础设置后，直接调用这两个类就可以得到完善的聊天界面和会话列表。
 
