@@ -28,11 +28,6 @@
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>云信想使用您的地理位置信息</string>
 	<key>NSLocationWhenInUseDescription</key>
