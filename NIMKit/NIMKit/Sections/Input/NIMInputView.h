@@ -43,10 +43,12 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 
 @interface NIMInputView : UIView
 
+@property (nonatomic, strong) NIMSession             *session;
+
 @property (nonatomic, assign) NSInteger              maxTextLength;
 @property (nonatomic, assign) CGFloat                inputBottomViewHeight;
 
-@property (assign, nonatomic, getter=isRecording) BOOL recording;
+@property (assign, nonatomic, getter=isRecording)    BOOL recording;
 
 @property (strong, nonatomic)  NIMInputToolBar *toolBar;
 @property (strong, nonatomic)  NIMInputMoreContainerView *moreContainer;

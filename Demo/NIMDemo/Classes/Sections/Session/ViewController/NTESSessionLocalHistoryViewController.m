@@ -263,7 +263,7 @@
 - (NSArray *)searchUsersByKeyword:(NSString *)keyword users:(NSArray *)users{
     NSMutableArray *data = [[NSMutableArray alloc] init];
     for (NSString *uid in users) {
-        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid];
+        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid option:nil];
         [data addObject:info];
     }
     NSPredicate *predicate = [NSPredicate predicateWithFormat: @"SELF.showName CONTAINS[cd] %@",keyword];

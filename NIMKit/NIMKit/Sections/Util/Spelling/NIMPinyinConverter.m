@@ -8,9 +8,6 @@
 
 #import "NIMPinyinConverter.h"
 
-#define kHanziMin       0x4E00
-#define kHanziMax       0x9FA5
-
 @interface NIMPinyinConverter ()
 {
     int     *_codeIndex;
@@ -36,14 +33,10 @@
     {
         return nil;
     }
-    NSMutableString *pinyin = [source mutableCopy];
-    
-    if (!CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformMandarinLatin, NO) ||
-        !CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformStripCombiningMarks, NO))
-    {
-        return nil;
-    }
-    return pinyin;
+    NSMutableString *mutableString = [NSMutableString stringWithString:source];
+    CFStringTransform((CFMutableStringRef)mutableString, NULL, kCFStringTransformToLatin, false);
+    mutableString = (NSMutableString *)[mutableString stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    return [mutableString stringByReplacingOccurrencesOfString:@"'" withString:@""];
 }
 
 

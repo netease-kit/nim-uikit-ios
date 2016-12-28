@@ -61,7 +61,7 @@
 
 
     NSString *sourceID = self.notification.sourceID;
-    NIMKitInfo *sourceMember = [[NIMKit sharedKit] infoByUser:sourceID];
+    NIMKitInfo *sourceMember = [[NIMKit sharedKit] infoByUser:sourceID option:nil];
     [self updateSourceMember:sourceMember];
 }
 

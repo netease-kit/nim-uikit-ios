@@ -40,14 +40,14 @@
 - (void)refreshUser:(id<NIMGroupMemberProtocol>)member{
     [self refreshTitle:member.showName];
     self.memberId = [member memberId];
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId option:nil];
     [self refreshAvatar:info];
 }
 
 - (void)refreshTeam:(id<NIMGroupMemberProtocol>)member{
     [self refreshTitle:member.showName];
     self.memberId = [member memberId];
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByTeam:self.memberId];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByTeam:self.memberId option:nil];
     [self refreshAvatar:info];
 }
 

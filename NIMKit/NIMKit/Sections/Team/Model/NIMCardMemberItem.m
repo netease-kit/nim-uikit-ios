@@ -36,7 +36,7 @@
 }
 
 - (NSString *)imageUrl{
-    return [[NIMKit sharedKit] infoByUser:_member.userId].avatarUrlString;
+    return [[NIMKit sharedKit] infoByUser:_member.userId option:nil].avatarUrlString;
 }
 
 - (NIMTeamMemberType)type {
@@ -59,12 +59,12 @@
 #pragma mark - TeamCardHeaderData
 
 - (UIImage*)imageNormal{
-     NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.member.userId];
+     NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.member.userId option:nil];
     return info.avatarImage;
 }
 
 - (UIImage*)imageHighLight{
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.member.userId];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.member.userId option:nil];
     return info.avatarImage;
 }
 
@@ -89,7 +89,7 @@
 - (instancetype)initWithUserId:(NSString*)userId{
     self = [self init];
     if (self) {
-        _info = [[NIMKit sharedKit] infoByUser:userId];
+        _info = [[NIMKit sharedKit] infoByUser:userId option:nil];
     }
     return self;
 }

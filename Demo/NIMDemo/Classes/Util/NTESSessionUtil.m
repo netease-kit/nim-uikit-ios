@@ -15,7 +15,12 @@
 #import "NIMKit.h"
 #import "NTESSnapchatAttachment.h"
 #import "NTESWhiteboardAttachment.h"
+#import "NIMKitInfoFetchOption.h"
+
 double OnedayTimeIntervalValue = 24*60*60;  //一天的秒数
+
+static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
+
 @implementation NTESSessionUtil
 
 + (CGSize)getImageSizeWithImageOriginSize:(CGSize)originSize
@@ -104,7 +109,7 @@ double OnedayTimeIntervalValue = 24*60*60;  //一天的秒数
         nickname = member.nickname;
     }
     if (!nickname.length) {
-        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid];
+        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid option:nil];
         nickname = info.showName;
     }
     return nickname;
@@ -249,8 +254,9 @@ double OnedayTimeIntervalValue = 24*60*60;  //一天的秒数
                 tip = @"对方";
                 break;
             case NIMSessionTypeTeam:{
-                NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:fromUid
-                                                        inSession:session];
+                NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+                option.session = session;
+                NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:fromUid option:option];
                 tip = info.showName;
             }
                 break;
@@ -300,6 +306,44 @@ double OnedayTimeIntervalValue = 24*60*60;  //一天的秒数
             return NO;
     }
     return YES;
+}
+
+
++ (void)addRecentSessionAtMark:(NIMSession *)session
+{
+    NSArray *recents = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
+    NIMRecentSession *recent;
+    for (recent in recents) {
+        if ([recent.session isEqual:session]) {
+            break;
+        }
+    }
+    NSDictionary *localExt = recent.localExt?:@{};
+    NSMutableDictionary *dict = [localExt mutableCopy];
+    [dict setObject:@(YES) forKey:NTESRecentSessionAtMark];
+    [[NIMSDK sharedSDK].conversationManager updateRecentLocalExt:dict recentSession:recent];
+}
+
++ (void)removeRecentSessionAtMark:(NIMSession *)session
+{
+    NSArray *recents = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
+    NIMRecentSession *recent;
+    for (recent in recents) {
+        if ([recent.session isEqual:session]) {
+            break;
+        }
+    }
+    if (recent) {
+        NSMutableDictionary *localExt = [recent.localExt mutableCopy];
+        [localExt removeObjectForKey:NTESRecentSessionAtMark];
+        [[NIMSDK sharedSDK].conversationManager updateRecentLocalExt:localExt recentSession:recent];
+    }
+}
+
++ (BOOL)recentSessionIsAtMark:(NIMRecentSession *)recent
+{
+    NSDictionary *localExt = recent.localExt;
+    return [localExt[NTESRecentSessionAtMark] boolValue] == YES;
 }
 
 @end

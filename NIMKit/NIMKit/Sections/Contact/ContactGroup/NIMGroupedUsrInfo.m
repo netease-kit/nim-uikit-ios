@@ -9,6 +9,7 @@
 #import "NIMGroupedUsrInfo.h"
 #import "NIMKit.h"
 #import "NIMSpellingCenter.h"
+#import "NIMKitInfoFetchOption.h"
 
 @interface NIMGroupUser()
 
@@ -24,7 +25,7 @@
     self = [super init];
     if (self) {
         _userId = userId;
-        _info = [[NIMKit sharedKit] infoByUser:userId];
+        _info = [[NIMKit sharedKit] infoByUser:userId option:nil];
     }
     return self;
 }
@@ -92,7 +93,9 @@
 
 - (NSString *)showName{
     NIMSession *session = [NIMSession session:self.member.teamId type:NIMSessionTypeTeam];
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId inSession:session];
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.session = session;
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId option:option];
     return info.showName;
 }
 

@@ -166,7 +166,7 @@
     }
 }
 
-- (NSUInteger)audioDenoise
+- (BOOL)audioDenoise
 {
     id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_audio_denoise"];
     
@@ -179,7 +179,7 @@
     
 }
 
-- (NSUInteger)voiceDetect
+- (BOOL)voiceDetect
 {
     id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_voice_detect"];
     
@@ -192,6 +192,17 @@
     
 }
 
+- (BOOL)preferHDAudio
+{
+    id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_prefer_hd_audio"];
+    
+    if (setting) {
+        return [setting boolValue];
+    }
+    else {
+        return NO;
+    }
+}
 
 
 - (NSString *)description
@@ -219,6 +230,7 @@
                 "videochat_auto_disable_audiosession %zd\n" \
                 "videochat_audio_denoise %zd\n" \
                 "videochat_voice_detect %zd\n" \
+                "videochat_prefer_hd_audio %zd\n" \
                 "\n\n\n",
                 [self removeSessionWheDeleteMessages],
                 [self localSearchOrderByTimeDesc],
@@ -240,7 +252,8 @@
                 [self localRecordVideoKbps],
                 [self autoDeactivateAudioSession],
                 [self audioDenoise],
-                [self voiceDetect]
+                [self voiceDetect],
+                [self preferHDAudio]
             ];
 }
 @end

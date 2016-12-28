@@ -60,7 +60,10 @@
 
 - (BOOL)autoDeactivateAudioSession;                 //自动结束AudioSession
 
-- (NSUInteger)audioDenoise;                         //降噪开关
+- (BOOL)audioDenoise;                               //降噪开关
 
-- (NSUInteger)voiceDetect;                          //语音检测开关
+- (BOOL)voiceDetect;                                //语音检测开关
+
+- (BOOL)preferHDAudio;                              //期望高清语音
+
 @end

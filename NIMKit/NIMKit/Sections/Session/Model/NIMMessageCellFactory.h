@@ -14,10 +14,10 @@
 
 @interface NIMMessageCellFactory : NSObject
 
-+ (NIMMessageCell *)cellInTable:(UITableView*)tableView
+- (NIMMessageCell *)cellInTable:(UITableView*)tableView
                  forMessageMode:(NIMMessageModel *)model;
 
-+ (NIMSessionTimestampCell *)cellInTable:(UITableView *)tableView
+- (NIMSessionTimestampCell *)cellInTable:(UITableView *)tableView
                             forTimeModel:(NIMTimestampModel *)model;
 
 @end

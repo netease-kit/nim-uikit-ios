@@ -26,6 +26,8 @@
 #import "NTESBlackListViewController.h"
 #import "NTESUserUtil.h"
 #import "NTESLogUploader.h"
+#import "NTESNetDetectViewController.h"
+#import "NTESSessionUtil.h"
 
 @interface NTESSettingViewController ()<NIMUserManagerDelegate>
 
@@ -143,6 +145,10 @@
                                             CellAction :@"onTouchCustomNotify:",
                                           },
                                         @{
+                                            Title      :@"音视频网络探测",
+                                            CellAction :@"onTouchNetDetect:",
+                                            },
+                                        @{
                                             Title      :@"关于",
                                             CellAction :@"onTouchAbout:",
                                           },
@@ -189,7 +195,7 @@
 }
 
 - (void)onTouchShowLog:(id)sender{
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"查看日志" delegate:nil cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"查看 DEMO 配置",@"查看 SDK 日志",@"查看网络通话日志",@"查看 Demo 日志", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"查看日志" delegate:nil cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"查看 DEMO 配置",@"查看 SDK 日志",@"查看网络通话日志",@"查看网络探测日志",@"查看 Demo 日志", nil];
     [actionSheet showInView:self.view completionHandler:^(NSInteger index) {
         switch (index) {
             case 0:
@@ -202,6 +208,9 @@
                 [self showSDKNetCallLog];
                 break;
             case 3:
+                [self showSDKNetDetectLog];
+                break;
+            case 4:
                 [self showDemoLog];
                 break;
             default:
@@ -240,6 +249,9 @@
             case 0:{
                 BOOL removeRecentSession = [NTESBundleSetting sharedConfig].removeSessionWheDeleteMessages;
                 [[NIMSDK sharedSDK].conversationManager deleteAllMessages:removeRecentSession];
+                for (NIMRecentSession *recent in [NIMSDK sharedSDK].conversationManager.allRecentSessions) {
+                    [NTESSessionUtil removeRecentSessionAtMark:recent.session];
+                }
                 [self.view makeToast:@"消息已删除" duration:2 position:CSToastPositionCenter];
                 break;
             }
@@ -257,6 +269,14 @@
 - (void)onTouchAbout:(id)sender{
     NTESAboutViewController *about = [[NTESAboutViewController alloc] initWithNibName:nil bundle:nil];
     [self.navigationController pushViewController:about animated:YES];
+}
+
+- (void)onTouchNetDetect:(id)sender {
+    NTESNetDetectViewController *vc = [[NTESNetDetectViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    [self presentViewController:nav
+                       animated:YES
+                     completion:nil];
 }
 
 - (void)logoutCurrentAccount:(id)sender{
@@ -311,6 +331,15 @@
                        animated:YES
                      completion:nil];
 }
+
+- (void)showSDKNetDetectLog{
+    UIViewController *vc = [[NTESLogManager sharedManager] sdkNetDetectLogViewController];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    [self presentViewController:nav
+                       animated:YES
+                     completion:nil];
+}
+
 
 - (void)showDemoLog{
     UIViewController *logViewController = [[NTESLogManager sharedManager] demoLogViewController];

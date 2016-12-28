@@ -72,6 +72,15 @@
     return vc;
 }
 
+- (UIViewController *)sdkNetDetectLogViewController
+{
+    NSString *filepath = [[NIMSDK sharedSDK].avchatNetDetectManager logFilepath];
+    NTESLogViewController *vc = [[NTESLogViewController alloc] initWithFilepath:filepath];
+    vc.title = @"Net Detect Log";
+    return vc;
+}
+
+
 
 - (UIViewController *)demoConfigViewController
 {

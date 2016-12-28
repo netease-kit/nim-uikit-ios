@@ -67,7 +67,7 @@ CGFloat SearchCellContentMinHeight      = 15.f; //cell的高度是由文本高�
 - (void)refresh:(NTESSearchLocalHistoryObject *)object{
     self.object = object;
     NIMMessage *message    = object.message;
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:message.from];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:message.from option:nil];
     NSURL *avatarURL;
     if (info.avatarUrlString.length) {
         avatarURL = [NSURL URLWithString:info.avatarUrlString];

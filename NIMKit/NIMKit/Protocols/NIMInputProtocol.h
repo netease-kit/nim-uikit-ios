@@ -17,7 +17,8 @@
 
 - (void)onTextChanged:(id)sender;
 
-- (void)onSendText:(NSString *)text;
+- (void)onSendText:(NSString *)text
+           atUsers:(NSArray *)atUsers;
 
 - (void)onSelectChartlet:(NSString *)chartletId
                  catalog:(NSString *)catalogId;

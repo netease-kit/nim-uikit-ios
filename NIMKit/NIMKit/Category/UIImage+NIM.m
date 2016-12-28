@@ -113,17 +113,17 @@
 
 - (UIImage *)nim_imageForUpload: (CGFloat)suggestPixels
 {
-    const CGFloat kMaxPixels = 4000000;
-    const CGFloat kMaxRatio  = 3;
+    CGFloat maxPixels = 4000000;
+    CGFloat maxRatio  = 3;
     
     CGFloat width = self.size.width;
     CGFloat height= self.size.height;
     
     //对于超过建议像素，且长宽比超过max ratio的图做特殊处理
     if (width * height > suggestPixels &&
-        (width / height > kMaxRatio || height / width > kMaxRatio))
+        (width / height > maxRatio || height / width > maxRatio))
     {
-        return [self nim_scaleWithMaxPixels:kMaxPixels];
+        return [self nim_scaleWithMaxPixels:maxPixels];
     }
     else
     {

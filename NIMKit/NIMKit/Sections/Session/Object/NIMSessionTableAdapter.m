@@ -12,7 +12,22 @@
 #import "UIView+NIM.h"
 #import "NIMKitUIConfig.h"
 
+@interface NIMSessionTableAdapter()
+
+@property (nonatomic,strong) NIMMessageCellFactory *cellFactory;
+
+@end
+
 @implementation NIMSessionTableAdapter
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _cellFactory = [[NIMMessageCellFactory alloc] init];
+    }
+    return self;
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -29,13 +44,13 @@
     UITableViewCell *cell = nil;
     id model = [[self.interactor items] objectAtIndex:indexPath.row];
     if ([model isKindOfClass:[NIMMessageModel class]]) {
-        cell = [NIMMessageCellFactory cellInTable:tableView
+        cell = [self.cellFactory cellInTable:tableView
                                    forMessageMode:model];
         [(NIMMessageCell *)cell setDelegate:self.delegate];
     }
     else if ([model isKindOfClass:[NIMTimestampModel class]])
     {
-        cell = [NIMMessageCellFactory cellInTable:tableView
+        cell = [self.cellFactory cellInTable:tableView
                                      forTimeModel:model];
     }
     else

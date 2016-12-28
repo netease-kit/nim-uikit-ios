@@ -117,25 +117,14 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  *  返回用户信息
  */
-- (NIMKitInfo *)infoByUser:(NSString *)userId;
-
-
-/**
- *  返回用户在会话中需要显示的信息
- */
 - (NIMKitInfo *)infoByUser:(NSString *)userId
-                 inSession:(NIMSession *)session;
-
-/**
- *  返回用户在某条消息中需要显示的信息
- */
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-               withMessage:(NIMMessage *)message;
+                    option:(NIMKitInfoFetchOption *)option;
 
 /**
  *  返回群信息
  */
-- (NIMKitInfo *)infoByTeam:(NSString *)teamId;
+- (NIMKitInfo *)infoByTeam:(NSString *)teamId
+                    option:(NIMKitInfoFetchOption *)option;
 
 @end
 

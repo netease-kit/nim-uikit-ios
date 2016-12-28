@@ -105,16 +105,13 @@
     if (!models.count) {
         return @[];
     }
-    NSInteger count = self.items.count;
+    NSMutableArray *append = [[NSMutableArray alloc] init];
     for (NIMMessageModel *model in models) {
         if ([self modelIsExist:model]) {
             continue;
         }
-        [self insertMessageModel:model index:self.items.count];
-    }
-    NSMutableArray *append = [[NSMutableArray alloc] init];
-    for (NSInteger i = count; i < self.items.count; i++) {
-        [append addObject:@(i)];
+        NSArray *result = [self insertMessageModel:model index:self.items.count];
+        [append addObjectsFromArray:result];
     }
     return append;
 }
@@ -136,15 +133,15 @@
     NSArray *sortModels = [models sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NIMMessageModel *first  = obj1;
         NIMMessageModel *second = obj2;
-        return first.message.timestamp < second.message.timestamp ? NSOrderedAscending : NSOrderedDescending;
+        return first.messageTime < second.messageTime ? NSOrderedAscending : NSOrderedDescending;
     }];
     for (NIMMessageModel *model in sortModels) {
         if ([self modelIsExist:model]) {
             continue;
         }
         NSInteger i = [self findInsertPosistion:model];
-        [self insertMessageModel:model index:i];
-        [insert addObject:@(i)];
+        NSArray *result = [self insertMessageModel:model index:i];
+        [insert addObjectsFromArray:result];
     }
     return insert;
 }
@@ -168,26 +165,6 @@
 }
 
 #pragma mark - msg
-
-- (NSArray<NSNumber *> *)addMessageModels:(NSArray*)models
-{
-    NSInteger index = models.count;
-    //判断插入位置
-    for (NSInteger i=0; i<models.count; i++) {
-        NIMMessageModel *model = models[i];
-        NSTimeInterval timestamp = model.message.timestamp;
-        NSTimeInterval lastTimeInterval = [self lastTimeInterval];
-        if (timestamp > lastTimeInterval) {
-            index = i;
-            break;
-        }
-    }
-    NSArray *insert = [models subarrayWithRange:NSMakeRange(0, index)];
-    NSArray *append = [models subarrayWithRange:NSMakeRange(index, models.count - index)];
-    NSArray *insertIndex = [self insertMessageModels:insert];
-    NSArray *appendIndex = [self appendMessageModels:append];
-    return [insertIndex arrayByAddingObjectsFromArray:appendIndex];
-}
 
 - (BOOL)modelIsExist:(NIMMessageModel *)model
 {
@@ -300,7 +277,7 @@
         return;
     }
     NSTimeInterval firstTimeInterval = [self firstTimeInterval];
-    if (firstTimeInterval && firstTimeInterval - model.message.timestamp < self.showTimeInterval) {
+    if (firstTimeInterval && firstTimeInterval - model.messageTime < self.showTimeInterval) {
         //此时至少有一条消息和时间戳（如果有的话）
         //干掉时间戳（如果有的话）
         if ([self.items.firstObject isKindOfClass:[NIMTimestampModel class]]) {
@@ -309,27 +286,31 @@
     }
     [self.items insertObject:model atIndex:0];
     if (![self.dataProvider respondsToSelector:@selector(needTimetag)] || self.dataProvider.needTimetag) {
+        //这种情况下必须要插入时间戳
         NIMTimestampModel *timeModel = [[NIMTimestampModel alloc] init];
-        timeModel.messageTime = model.message.timestamp;
+        timeModel.messageTime = model.messageTime;
         [self.items insertObject:timeModel atIndex:0];
     }
     [self.msgIdDict setObject:model forKey:model.message.messageId];
 }
 
 
-- (void)insertMessageModel:(NIMMessageModel *)model index:(NSInteger)index{
+- (NSArray *)insertMessageModel:(NIMMessageModel *)model index:(NSInteger)index{
+    NSMutableArray *inserts = [[NSMutableArray alloc] init];
     if (![self.dataProvider respondsToSelector:@selector(needTimetag)] || self.dataProvider.needTimetag)
     {
-        NSTimeInterval lastTimeInterval = [self lastTimeInterval];
-        if (model.message.timestamp - lastTimeInterval > self.showTimeInterval) {
+        if ([self shouldInsertTimestamp:model]) {
             NIMTimestampModel *timeModel = [[NIMTimestampModel alloc] init];
-            timeModel.messageTime = model.message.timestamp;
+            timeModel.messageTime = model.messageTime;
             [self.items insertObject:timeModel atIndex:index];
+            [inserts addObject:@(index)];
             index++;
         }
     }
     [self.items insertObject:model atIndex:index];
     [self.msgIdDict setObject:model forKey:model.message.messageId];
+    [inserts addObject:@(index)];
+    return inserts;
 }
 
 - (void)subHeadMessages:(NSInteger)count
@@ -365,7 +346,12 @@
 
 - (NSInteger)findInsertPosistion:(NSArray *)array model:(NIMMessageModel *)model
 {
+    if (array.count == 0) {
+        //即初始什么消息都没的情况下，调用了插入消息，放在第一个就好了。
+        return 0;
+    }
     if (array.count == 1) {
+        //递归出口
         NIMMessageModel *obj = array.firstObject;
         NSInteger index = [self.items indexOfObject:obj];
         return obj.messageTime > model.messageTime? index : index+1;
@@ -383,6 +369,12 @@
 }
 
 
+- (BOOL)shouldInsertTimestamp:(NIMMessageModel *)model
+{
+    NSTimeInterval lastTimeInterval = [self lastTimeInterval];
+    return model.messageTime - lastTimeInterval > self.showTimeInterval;
+}
+
 - (NSTimeInterval)firstTimeInterval
 {
     if (!self.items.count) {
@@ -395,13 +387,13 @@
     {
         model = self.items[0];
     }
-    return model.message.timestamp;
+    return model.messageTime;
 }
 
 - (NSTimeInterval)lastTimeInterval
 {
     NIMMessageModel *model = self.items.lastObject;
-    return model.message.timestamp;
+    return model.messageTime;
 }
 
 @end

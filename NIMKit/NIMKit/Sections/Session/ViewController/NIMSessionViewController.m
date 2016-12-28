@@ -19,6 +19,7 @@
 #import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
 #import "NIMSessionConfigurator.h"
+#import "NIMKitInfoFetchOption.h"
 
 @interface NIMSessionViewController ()<NIMMediaManagerDelgate,NIMInputDelegate>
 
@@ -106,6 +107,8 @@
     if (!disableInputView) {
         self.sessionInputView = [[NIMInputView alloc] initWithFrame:inputViewRect];
         self.sessionInputView.nim_bottom = _tableView.nim_height;
+        
+        [self.sessionInputView setSession:self.session];
         [self.sessionInputView setInputConfig:self.sessionConfig];
         [self.sessionInputView setInputDelegate:self];
         [self.sessionInputView setInputActionDelegate:self];
@@ -383,9 +386,21 @@
 
 - (void)onTextChanged:(id)sender{}
 
-- (void)onSendText:(NSString *)text
+- (void)onSendText:(NSString *)text atUsers:(NSArray *)atUsers
 {
     NIMMessage *message = [NIMMessageMaker msgWithText:text];
+    if (atUsers.count) {
+        NIMMessageApnsMemberOption *apnsOption = [[NIMMessageApnsMemberOption alloc] init];
+        apnsOption.userIds = atUsers;
+        apnsOption.forcePush = YES;
+        
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = self.session;
+        
+        NSString *me = [[NIMKit sharedKit].provider infoByUser:[NIMSDK sharedSDK].loginManager.currentAccount option:option].showName;
+        apnsOption.apnsContent = [NSString stringWithFormat:@"%@在群里@了你",me];
+        message.apnsMemberOption = apnsOption;
+    }
     [self sendMessage:message];
 }
 
@@ -519,6 +534,10 @@
     [self.interactor addMessages:messages];
 }
 
+- (void)uiInsertMessages:(NSArray *)messages
+{
+    [self.interactor insertMessages:messages];
+}
 
 - (NIMMessageModel *)uiDeleteMessage:(NIMMessage *)message{
     NIMMessageModel *model = [self.interactor deleteMessage:message];
@@ -600,7 +619,6 @@
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
 }
-
 
 - (void)changeLeftBarBadge:(NSInteger)unreadCount
 {

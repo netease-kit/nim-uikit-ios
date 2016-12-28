@@ -27,14 +27,11 @@
     {
         return nil;
     }
-    NSMutableString *pinyin = [source mutableCopy];
+    NSMutableString *piyin = [NSMutableString stringWithString:source];
+    CFStringTransform((__bridge CFMutableStringRef)piyin, NULL, kCFStringTransformToLatin, false);
     
-    if (!CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformMandarinLatin, NO) ||
-        !CFStringTransform((__bridge CFMutableStringRef)pinyin, NULL, kCFStringTransformStripCombiningMarks, NO))
-    {
-        return nil;
-    }
-    return pinyin;
+    NSString *py = [piyin stringByFoldingWithOptions:NSDiacriticInsensitiveSearch locale:[NSLocale currentLocale]];
+    return [py stringByReplacingOccurrencesOfString:@"'" withString:@""];
 }
 
 

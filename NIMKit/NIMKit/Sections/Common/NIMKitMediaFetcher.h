@@ -11,7 +11,7 @@
 
 @class NIMMessage;
 
-typedef void(^NIMKitLibraryFetchResult)(NSString *path, PHAssetMediaType type);
+typedef void(^NIMKitLibraryFetchResult)(NSArray *images, NSString *path, PHAssetMediaType type);
 
 typedef void(^NIMKitCameraFetchResult)(NSString *path, UIImage *image);
 

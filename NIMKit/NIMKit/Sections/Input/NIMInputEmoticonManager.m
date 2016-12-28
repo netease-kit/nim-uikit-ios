@@ -8,7 +8,7 @@
 
 #import "NIMInputEmoticonManager.h"
 #import "NIMInputEmoticonDefine.h"
-#import "NSString+NIM.h"
+#import "NSString+NIMKit.h"
 #import "NIMKit.h"
 
 @implementation NIMInputEmoticon

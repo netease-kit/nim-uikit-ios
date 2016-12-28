@@ -58,7 +58,7 @@
     NSString *uid = rowData.extraInfo;
     if ([uid isKindOfClass:[NSString class]]) {
         NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:uid];
-        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid];
+        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:uid option:nil];
         self.nameLabel.text   = info.showName ;
         self.accountLabel.text = [NSString stringWithFormat:@"帐号：%@",uid];
         [self.accountLabel sizeToFit];

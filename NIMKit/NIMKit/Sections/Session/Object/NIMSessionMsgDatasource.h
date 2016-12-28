@@ -32,10 +32,16 @@
 //数据对外接口
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index , NSArray *messages ,NSError *error))handler;
 
-- (NSArray<NSNumber *> *)addMessageModels:(NSArray*)models;
+//添加消息，会根据时间戳插入到相应位置
+- (NSArray<NSNumber *> *)insertMessageModels:(NSArray*)models;
 
+//添加消息，直接插入消息列表末尾
+- (NSArray<NSNumber *> *)appendMessageModels:(NSArray *)models;
+
+//删除消息
 - (NSArray<NSNumber *> *)deleteMessageModel:(NIMMessageModel*)model;
 
+//根据范围批量删除消息
 - (NSArray<NSNumber *> *)deleteModels:(NSRange)range;
 
 //清理缓存数据

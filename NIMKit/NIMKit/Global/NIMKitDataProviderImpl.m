@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "NIMKit.h"
 #import "NIMKitDataProviderImpl.h"
-
+#import "NIMKitInfoFetchOption.h"
 
 @interface NIMKitDataRequest : NSObject
 
@@ -52,8 +52,18 @@
     [[NIMSDK sharedSDK].loginManager removeDelegate:self];
 }
 
+- (NIMKitInfo *)infoByUser:(NSString *)userId option:(NIMKitInfoFetchOption *)option
+{
+    if (option.message) {
+        NSAssert([userId isEqualToString:option.message.from], @"user id should be same with message from");
+        return [self infoByUser:userId message:option.message option:option];
+    }
+    return [self infoByUser:userId session:option.session option:option];
+}
+
 - (NIMKitInfo *)infoByUser:(NSString *)userId
-                 inSession:(NIMSession *)session
+                   session:(NIMSession *)session
+                    option:(NIMKitInfoFetchOption *)option
 {
     BOOL needFetchInfo = NO;
     NIMSessionType sessionType = session.sessionType;
@@ -73,7 +83,8 @@
                                                              inTeam:session.sessionId];
             }
             NSString *name = [self nickname:user
-                                 memberInfo:member];
+                                 memberInfo:member
+                                     option:option];
             if (name)
             {
                 info.showName = name;
@@ -102,7 +113,7 @@
     return info;
 }
 
-- (NIMKitInfo *)infoByTeam:(NSString *)teamId
+- (NIMKitInfo *)infoByTeam:(NSString *)teamId option:(NIMKitInfoFetchOption *)option
 {
     NIMTeam *team    = [[NIMSDK sharedSDK].teamManager teamById:teamId];
     NIMKitInfo *info = [[NIMKitInfo alloc] init];
@@ -114,7 +125,8 @@
 }
 
 - (NIMKitInfo *)infoByUser:(NSString *)userId
-               withMessage:(NIMMessage *)message
+                   message:(NIMMessage *)message
+                    option:(NIMKitInfoFetchOption *)option
 {
     if (message.session.sessionType == NIMSessionTypeChatroom)
     {
@@ -136,7 +148,8 @@
     else
     {
         return [self infoByUser:userId
-                      inSession:message.session];
+                        session:message.session
+                         option:option];
     }
 }
 
@@ -190,10 +203,11 @@
 #pragma mark - nickname
 - (NSString *)nickname:(NIMUser *)user
             memberInfo:(NIMTeamMember *)memberInfo
+                option:(NIMKitInfoFetchOption *)option
 {
     NSString *name = nil;
     do{
-        if ([user.alias length])
+        if (!option.forbidaAlias && [user.alias length])
         {
             name = user.alias;
             break;

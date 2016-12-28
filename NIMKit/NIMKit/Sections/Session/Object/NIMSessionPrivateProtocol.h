@@ -28,6 +28,8 @@
 
 - (NIMSessionMessageOperateResult *)addMessageModels:(NSArray *)models;
 
+- (NIMSessionMessageOperateResult *)insertMessageModels:(NSArray *)models;
+
 - (NIMSessionMessageOperateResult *)deleteMessageModel:(NIMMessageModel *)model;
 
 - (NIMSessionMessageOperateResult *)updateMessageModel:(NIMMessageModel *)model;

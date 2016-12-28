@@ -20,4 +20,6 @@
 
 @property (nonatomic, weak) id<NIMPlayAudioUIDelegate> audioUIDelegate;
 
+- (void)setPlaying:(BOOL)isPlaying;
+
 @end

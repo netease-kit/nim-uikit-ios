@@ -69,8 +69,10 @@
     [self.titleLabel sizeToFit];
     
     self.sizeLabel.font = config.contentTextFont;
-    self.sizeLabel.text = [NSString stringWithFormat:@"%zdKB",fileObject.fileLength/1024];
+    long long size = fileObject.fileLength/1024;
+    self.sizeLabel.text = [NSString stringWithFormat:@"%zdKB",size?: 1];
     [self.sizeLabel sizeToFit];
+    
     if (self.model.message.deliveryState == NIMMessageDeliveryStateDelivering) {
         self.progressView.hidden   = NO;
         self.progressView.progress = [[NIMSDK sharedSDK].chatManager messageTransportProgress:self.model.message];

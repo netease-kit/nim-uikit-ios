@@ -8,6 +8,7 @@
 
 #import "NIMKitUtil.h"
 #import "NIMKit.h"
+#import "NIMKitInfoFetchOption.h"
 
 @implementation NIMKitUtil
 
@@ -26,17 +27,18 @@
     if (!uid.length) {
         return nil;
     }
-    
-    return [[NIMKit sharedKit] infoByUser:uid
-                              withMessage:message].showName;
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.message = message;
+    return [[NIMKit sharedKit] infoByUser:uid option:option].showName;
 }
 
 + (NSString *)showNick:(NSString*)uid inSession:(NIMSession*)session{
     if (!uid.length) {
         return nil;
     }
-    return [[NIMKit sharedKit] infoByUser:uid
-                                inSession:session].showName;
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.session = session;
+    return [[NIMKit sharedKit] infoByUser:uid option:option].showName;
 }
 
 

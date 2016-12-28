@@ -179,8 +179,10 @@
 }
 
 
-- (NSString *)contentForRecentSession:(NIMRecentSession *)recent{
-    if (recent.lastMessage.messageType == NIMMessageTypeCustom) {
+- (NSAttributedString *)contentForRecentSession:(NIMRecentSession *)recent{
+    NSAttributedString *content;
+    if (recent.lastMessage.messageType == NIMMessageTypeCustom)
+    {
         NIMCustomObject *object = recent.lastMessage.messageObject;
         NSString *text = @"";
         if ([object.attachment isKindOfClass:[NTESSnapchatAttachment class]]) {
@@ -197,14 +199,29 @@
         }else{
             text = @"[未知消息]";
         }
-        if (recent.session.sessionType == NIMSessionTypeP2P) {
-            return text;
-        }else{
+        if (recent.session.sessionType != NIMSessionTypeP2P)
+        {
             NSString *nickName = [NTESSessionUtil showNick:recent.lastMessage.from inSession:recent.lastMessage.session];
-            return nickName.length ? [nickName stringByAppendingFormat:@" : %@",text] : @"";
+            text =  nickName.length ? [nickName stringByAppendingFormat:@" : %@",text] : @"";
         }
+        content = [[NSAttributedString alloc] initWithString:text];
     }
-    return [super contentForRecentSession:recent];
+    else
+    {
+        content = [super contentForRecentSession:recent];
+    }
+    NSMutableAttributedString *attContent = [[NSMutableAttributedString alloc] initWithAttributedString:content];
+    [self checkNeedAtTip:recent content:attContent];
+    return attContent;
+}
+
+
+- (void)checkNeedAtTip:(NIMRecentSession *)recent content:(NSMutableAttributedString *)content
+{
+    if ([NTESSessionUtil recentSessionIsAtMark:recent]) {
+        NSAttributedString *atTip = [[NSAttributedString alloc] initWithString:@"[有人@你] " attributes:@{NSForegroundColorAttributeName:[UIColor redColor]}];
+        [content insertAttributedString:atTip atIndex:0];
+    }
 }
 
 @end

@@ -131,7 +131,7 @@
         if (!count || i != 0) {
             NSInteger memberIndex       = i - count;
             NIMTeamMember *member       = members[memberIndex];
-            NIMKitInfo *info            = [[NIMKit sharedKit] infoByUser:member.userId];
+            NIMKitInfo *info            = [[NIMKit sharedKit] infoByUser:member.userId option:nil];
             view.member                 = info;
             view.titleLabel.text        = [NIMKitUtil showNick:member.userId inSession:session];
         }

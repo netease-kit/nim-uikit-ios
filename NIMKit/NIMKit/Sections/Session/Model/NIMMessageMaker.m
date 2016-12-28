@@ -7,7 +7,7 @@
 //
 
 #import "NIMMessageMaker.h"
-#import "NSString+NIM.h"
+#import "NSString+NIMKit.h"
 #import "NIMKitLocationPoint.h"
 
 @implementation NIMMessageMaker
@@ -43,7 +43,10 @@
 
 + (NIMMessage*)msgWithImage:(UIImage*)image
 {
-    NIMImageObject * imageObject = [[NIMImageObject alloc] initWithImage:image];
+    NIMImageObject *imageObject = [[NIMImageObject alloc] initWithImage:image];
+    NIMImageOption *option  = [[NIMImageOption alloc] init];
+    option.compressQuality  = 0.7;
+    imageObject.option      = option;
     return [NIMMessageMaker generateImageMessage:imageObject];
 }
 
@@ -59,9 +62,6 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
     NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
     imageObject.displayName = [NSString stringWithFormat:@"图片发送于%@",dateString];
-    NIMImageOption *option  = [[NIMImageOption alloc] init];
-    option.compressQuality  = 0.8;
-    imageObject.option = option;
     NIMMessage *message     = [[NIMMessage alloc] init];
     message.messageObject   = imageObject;
     message.apnsContent = @"发来了一张图片";

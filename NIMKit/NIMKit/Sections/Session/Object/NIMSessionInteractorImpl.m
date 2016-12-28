@@ -74,6 +74,20 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     }
 }
 
+- (void)insertMessages:(NSArray *)messages
+{
+    NSMutableArray *models = [[NSMutableArray alloc] init];
+    for (NIMMessage *message in messages) {
+        NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
+        [models addObject:model];
+    }
+    NIMSessionMessageOperateResult *result = [self.dataSource insertMessageModels:models];
+    for (NIMMessageModel *model in result.messageModels) {
+        [self.layout layoutConfig:model];
+    }
+    [self.layout insert:result.indexpaths animated:YES];
+}
+
 - (void)addNormalMessages:(NSArray *)messages
 {
     NSMutableArray *models = [[NSMutableArray alloc] init];
@@ -291,19 +305,30 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (void)mediaPicturePressed
 {
     __weak typeof(self) weakSelf = self;
-    [self.mediaFetcher fetchPhotoFromLibrary:^(NSString *path, PHAssetMediaType type) {
-        NIMMessage *message;
+    [self.mediaFetcher fetchPhotoFromLibrary:^(NSArray *images, NSString *path, PHAssetMediaType type) {
         switch (type) {
             case PHAssetMediaTypeImage:
-                message = [NIMMessageMaker msgWithImagePath:path];
+            {
+                for (UIImage *image in images) {
+                    NIMMessage *message = [NIMMessageMaker msgWithImage:image];
+                    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+                }
+                if (path) {
+                    NIMMessage *message = [NIMMessageMaker msgWithImagePath:path];
+                    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+                }
+            }
                 break;
             case PHAssetMediaTypeVideo:
-                message = [NIMMessageMaker msgWithVideo:path];
+            {
+                NIMMessage *message = [NIMMessageMaker msgWithVideo:path];
+                [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+            }
                 break;
             default:
                 return;
         }
-        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+        
     }];
 }
 

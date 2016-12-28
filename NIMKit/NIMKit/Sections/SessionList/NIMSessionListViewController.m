@@ -15,7 +15,7 @@
 #import "NIMKit.h"
 
 
-@interface NIMSessionListViewController ()<NIMConversationManagerDelegate>
+@interface NIMSessionListViewController ()
 
 @end
 
@@ -67,8 +67,8 @@
         self.tableView.hidden = YES;
     }else{
         self.tableView.hidden = NO;
-        [self.tableView reloadData];
     }
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDelegate
@@ -109,7 +109,7 @@
     cell.nameLabel.text = [self nameForRecentSession:recent];
     [cell.avatarImageView setAvatarBySession:recent.session];
     [cell.nameLabel sizeToFit];
-    cell.messageLabel.text  = [self contentForRecentSession:recent];
+    cell.messageLabel.attributedText  = [self contentForRecentSession:recent];
     [cell.messageLabel sizeToFit];
     cell.timeLabel.text = [self timestampDescriptionForRecentSession:recent];
     [cell.timeLabel sizeToFit];
@@ -196,8 +196,9 @@
     }
 }
 
-- (NSString *)contentForRecentSession:(NIMRecentSession *)recent{
-    return [self messageContent:recent.lastMessage];
+- (NSAttributedString *)contentForRecentSession:(NIMRecentSession *)recent{
+    NSString *content = [self messageContent:recent.lastMessage];
+    return [[NSAttributedString alloc] initWithString:content];
 }
 
 - (NSString *)timestampDescriptionForRecentSession:(NIMRecentSession *)recent{
@@ -252,7 +253,7 @@
 
 
 #pragma mark - Private
-- (NSString*)messageContent:(NIMMessage*)lastMessage{
+- (NSString *)messageContent:(NIMMessage*)lastMessage{
     NSString *text = @"";
     switch (lastMessage.messageType) {
         case NIMMessageTypeText:

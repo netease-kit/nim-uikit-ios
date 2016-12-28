@@ -10,7 +10,7 @@
 #import "NIMCellConfig.h"
 #import "NIMSDK.h"
 
-@interface NIMSessionListViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,NIMLoginManagerDelegate>
+@interface NIMSessionListViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,NIMLoginManagerDelegate,NIMConversationManagerDelegate>
 /**
  *  会话列表tableView
  */
@@ -75,9 +75,9 @@
  *
  *  @return 具体内容名
  *
- *  @discussion 默认实现为：显示最近一条消息的内容，文本消息则显示文本信息，其他类型消息详见本类中 - (NSString*)messageContent:(NIMMessage *)lastMessage 方法的实现。
+ *  @discussion 默认实现为：显示最近一条消息的内容，文本消息则显示文本信息，其他类型消息详见本类中 - (NSAttributedString *)messageContent:(NIMMessage *)lastMessage 方法的实现。
  */
-- (NSString *)contentForRecentSession:(NIMRecentSession *)recent;
+- (NSAttributedString *)contentForRecentSession:(NIMRecentSession *)recent;
 
 
 /**

@@ -110,7 +110,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     [manager addDelegate:self];
     [self updateButton];
     
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:_peerID];
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:_peerID option:nil];
     NSURL *avatarURL;
     if (info.avatarUrlString.length) {
         avatarURL = [NSURL URLWithString:info.avatarUrlString];
@@ -662,6 +662,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
+    option.preferHDAudio =  [[NTESBundleSetting sharedConfig] voiceDetect];
 }
 
 

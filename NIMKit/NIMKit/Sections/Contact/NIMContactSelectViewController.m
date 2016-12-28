@@ -100,27 +100,25 @@
 }
 
 - (IBAction)onDoneBtnClick:(id)sender {
-    [self dismissViewControllerAnimated:YES completion:^() {
-        
-        if (_selectecContacts.count) {
-            if ([self.delegate respondsToSelector:@selector(didFinishedSelect:)]) {
-                [self.delegate didFinishedSelect:_selectecContacts];
-            }
-            if (self.finshBlock) {
-                self.finshBlock(_selectecContacts);
-                self.finshBlock = nil;
-            }
+    [self dismissViewControllerAnimated:YES completion:nil];    
+    if (_selectecContacts.count) {
+        if ([self.delegate respondsToSelector:@selector(didFinishedSelect:)]) {
+            [self.delegate didFinishedSelect:_selectecContacts];
         }
-        else {
-            if([_delegate respondsToSelector:@selector(didCancelledSelect)]) {
-                [_delegate didCancelledSelect];
-            }
-            if (self.cancelBlock) {
-                self.cancelBlock();
-                self.cancelBlock = nil;
-            }
+        if (self.finshBlock) {
+            self.finshBlock(_selectecContacts);
+            self.finshBlock = nil;
         }
-    }];
+    }
+    else {
+        if([_delegate respondsToSelector:@selector(didCancelledSelect)]) {
+            [_delegate didCancelledSelect];
+        }
+        if (self.cancelBlock) {
+            self.cancelBlock();
+            self.cancelBlock = nil;
+        }
+    }
 }
 
 
@@ -152,6 +150,7 @@
                         }
                         NSArray *uids = [wself filterData:data];
                         wself.data = [wself makeTeamMemberInfoData:uids teamId:teamId];
+                        [wself.tableView reloadData];
                     }
                 }];
             }
@@ -177,9 +176,9 @@
     for (NSString *selectId in _selectecContacts) {
         NIMKitInfo *info;
         if (self.selectType == NIMContactSelectTypeTeam) {
-            info = [[NIMKit sharedKit] infoByTeam:selectId];
+            info = [[NIMKit sharedKit] infoByTeam:selectId option:nil];
         }else{
-            info = [[NIMKit sharedKit] infoByUser:selectId];
+            info = [[NIMKit sharedKit] infoByUser:selectId option:nil];
         }
         [self.selectIndicatorView.pickedView addMemberInfo:info];
     }
@@ -282,9 +281,9 @@
     NIMContactDataCell *cell = (NIMContactDataCell *)[tableView cellForRowAtIndexPath:indexPath];
     NIMKitInfo *info;
     if (self.selectType == NIMContactSelectTypeTeam) {
-        info = [[NIMKit sharedKit] infoByTeam:memberId];
+        info = [[NIMKit sharedKit] infoByTeam:memberId option:nil];
     }else{
-        info = [[NIMKit sharedKit] infoByUser:memberId];
+        info = [[NIMKit sharedKit] infoByUser:memberId option:nil];
     }
     if([_selectecContacts containsObject:memberId]) {
         [_selectecContacts removeObject:memberId];

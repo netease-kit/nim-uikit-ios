@@ -82,6 +82,7 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         isPlaying = NO;
     });
+    [self checkMessageAt:messages];
 }
 
 - (void)playMessageAudioTip
@@ -102,6 +103,30 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     }
 }
 
+- (void)checkMessageAt:(NSArray *)messages
+{
+    //同个 session 的消息
+    NIMSession *session = [messages.firstObject session];
+    UINavigationController *nav = [NTESMainTabController instance].selectedViewController;
+    for (UIViewController *vc in nav.viewControllers) {
+        if ([vc isKindOfClass:[NIMSessionViewController class]])
+        {
+            //只有在@所属会话页外面才需要标记有人@你
+            if ([[(NIMSessionViewController*)vc session] isEqual:session]) {
+                return;
+            };
+        }
+    }
+    NSString *me = [[NIMSDK sharedSDK].loginManager currentAccount];
+    
+    for (NIMMessage *message in messages) {
+        if ([message.apnsMemberOption.userIds containsObject:me]) {
+            [NTESSessionUtil addRecentSessionAtMark:session];
+            return;
+        }
+    }
+}
+
 - (void)onRecvRevokeMessageNotification:(NIMRevokeMessageNotification *)notification
 {
     NIMMessage *tipMessage = [NTESSessionMsgConverter msgWithTip:[NTESSessionUtil tipOnMessageRevoked:notification]];
@@ -118,7 +143,7 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
             && [vc.session.sessionId isEqualToString:notification.session.sessionId]) {
             NIMMessageModel *model = [vc uiDeleteMessage:notification.message];
             if (model) {
-                [vc uiAddMessages:@[tipMessage]];
+                [vc uiInsertMessages:@[tipMessage]];
             }
             break;
         }

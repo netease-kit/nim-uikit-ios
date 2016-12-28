@@ -21,7 +21,7 @@
 
 - (void)setImage:(UIImage *)image
 {
-    NSData *data = UIImageJPEGRepresentation(image, 0.75);
+    NSData *data = UIImageJPEGRepresentation(image, 0.7);
     NSString *md5= [data MD5String];
     self.md5 = md5;
     
@@ -149,6 +149,13 @@
         [self updateCover];
     }
     return _showCoverImage;
+}
+
+#pragma mark - https
+- (NSString *)url
+{
+    return [_url length] ?
+    [[[NIMSDK sharedSDK] resourceManager] convertHttpToHttps:_url] : nil;
 }
 
 @end

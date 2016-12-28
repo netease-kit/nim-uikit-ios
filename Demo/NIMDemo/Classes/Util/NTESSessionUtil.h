@@ -36,6 +36,10 @@
 
 + (NSString *)tipOnMessageRevoked:(id)message;
 
++ (void)addRecentSessionAtMark:(NIMSession *)session;
 
++ (void)removeRecentSessionAtMark:(NIMSession *)session;
+
++ (BOOL)recentSessionIsAtMark:(NIMRecentSession *)recent;
 
 @end

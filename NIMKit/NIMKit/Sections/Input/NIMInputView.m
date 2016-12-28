@@ -18,8 +18,12 @@
 #import "UIImage+NIM.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKitUIConfig.h"
+#import "NIMContactSelectViewController.h"
+#import "NIMInputAtCache.h"
+#import "NIMKit.h"
+#import "NIMKitInfoFetchOption.h"
 
-@interface NIMInputView()<UITextViewDelegate,NIMInputEmoticonProtocol>
+@interface NIMInputView()<UITextViewDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate>
 {
     UIView  *_emoticonView;
     NIMInputType  _inputType;
@@ -31,7 +35,7 @@
 @property (nonatomic, weak) id<NIMSessionConfig> inputConfig;
 @property (nonatomic, weak) id<NIMInputDelegate> inputDelegate;
 @property (nonatomic, weak) id<NIMInputActionDelegate> actionDelegate;
-
+@property (nonatomic, strong) NIMInputAtCache *atCache;
 
 @end
 
@@ -44,6 +48,7 @@
     if (self) {
         _recording = NO;
         _recordPhase = AudioRecordPhaseEnd;
+        _atCache = [[NIMInputAtCache alloc] init];
         self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
         [self initUIComponents];
     }
@@ -500,13 +505,24 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     if ([text isEqualToString:@"\n"]) {
-        if ([self.actionDelegate respondsToSelector:@selector(onSendText:)] && [textView.text length] > 0) {
-            [self.actionDelegate onSendText:textView.text];
-            textView.text = @"";
-            [textView layoutIfNeeded];
-            [self inputTextViewToHeight:[self getTextViewContentH:textView]];;
-        }
+        [self didPressSend:nil];
         return NO;
+    }
+    if ([text isEqualToString:@""]) {//删除
+        [self onTextDelete];
+        return NO;
+    }
+    if ([text isEqualToString:NIMInputAtStartChar] && self.session.sessionType == NIMSessionTypeTeam) {
+        NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
+        config.needMutiSelected = NO;
+        config.teamId = self.session.sessionId;
+        config.filterIds = @[[NIMSDK sharedSDK].loginManager.currentAccount];
+        NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+        vc.delegate = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+           [vc show];
+        });
+        
     }
     NSString *str = [textView.text stringByAppendingString:text];
     if (str.length > self.maxTextLength) {
@@ -525,12 +541,33 @@
     [self inputTextViewToHeight:[self getTextViewContentH:textView]];
 }
 
+#pragma mark - NIMContactSelectDelegate
+- (void)didFinishedSelect:(NSArray *)selectedContacts
+{
+    NSMutableString *str = [[NSMutableString alloc] initWithString:@""];
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.session = self.session;
+    option.forbidaAlias = YES;
+    for (NSString *uid in selectedContacts) {
+        NSString *nick = [[NIMKit sharedKit].provider infoByUser:uid option:option].showName;
+        [str appendString:nick];
+        [str appendString:NIMInputAtEndChar];
+        if (![selectedContacts.lastObject isEqualToString:uid]) {
+            [str appendString:NIMInputAtStartChar];
+        }
+        NIMInputAtItem *item = [[NIMInputAtItem alloc] init];
+        item.uid  = uid;
+        item.name = nick;
+        [self.atCache addAtItem:item];
+    }
+    UITextView *textView = self.toolBar.inputTextView;
+    [textView replaceRange:textView.selectedTextRange withText:str];
+}
 
 #pragma mark - InputEmoticonProtocol
 - (void)selectedEmoticon:(NSString*)emoticonID catalog:(NSString*)emotCatalogID description:(NSString *)description{
     if (!emotCatalogID) { //删除键
-        NSRange range = [self rangeForEmoticon];
-        [self deleteTextRange:range];
+        [self onTextDelete];
     }else{
         if ([emotCatalogID isEqualToString:NIMKit_EmojiCatalog]) {
             [self.toolBar.inputTextView insertText:description];
@@ -546,8 +583,10 @@
 }
 
 - (void)didPressSend:(id)sender{
-    if ([self.actionDelegate respondsToSelector:@selector(onSendText:)] && [self.toolBar.inputTextView.text length] > 0) {
-        [self.actionDelegate onSendText:self.toolBar.inputTextView.text];
+    if ([self.actionDelegate respondsToSelector:@selector(onSendText:atUsers:)] && [self.toolBar.inputTextView.text length] > 0) {
+        NSString *sendText = self.toolBar.inputTextView.text;
+        [self.actionDelegate onSendText:sendText atUsers:[self.atCache allAtUid:sendText]];
+        [self.atCache clean];
         self.toolBar.inputTextView.text = @"";
         [self.toolBar.inputTextView layoutIfNeeded];
         [self inputTextViewToHeight:[self getTextViewContentH:self.toolBar.inputTextView]];;
@@ -568,41 +607,80 @@
     }
 }
 
-- (NSRange)rangeForEmoticon
+
+- (void)onTextDelete
+{
+    NSRange range = [self delRangeForEmoticon];
+    if (range.length == 1) {
+        //删的不是表情，可能是@
+        NIMInputAtItem *item = [self delRangeForAt];
+        if (item) {
+            range = item.range;
+        }
+    }
+    [self deleteTextRange:range];
+}
+
+- (NSRange)delRangeForEmoticon
+{
+    NSString *text = [self.toolBar.inputTextView text];
+    NSRange range = [self rangeForPrefix:@"[" suffix:@"]"];
+    NSRange selectedRange = [self.toolBar.inputTextView selectedRange];
+    if (range.length > 1)
+    {
+        NSString *name = [text substringWithRange:range];
+        NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
+        range = icon? range : NSMakeRange(selectedRange.location - 1, 1);
+    }
+    return range;
+}
+
+
+- (NIMInputAtItem *)delRangeForAt
+{
+    NSString *text = [self.toolBar.inputTextView text];
+    NSRange range = [self rangeForPrefix:NIMInputAtStartChar suffix:NIMInputAtEndChar];
+    NSRange selectedRange = [self.toolBar.inputTextView selectedRange];
+    NIMInputAtItem *item = nil;
+    if (range.length > 1)
+    {
+        NSString *name = [text substringWithRange:range];
+        NSString *set = [NIMInputAtStartChar stringByAppendingString:NIMInputAtEndChar];
+        name = [name stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:set]];
+        item = [self.atCache item:name];
+        range = item? range : NSMakeRange(selectedRange.location - 1, 1);
+    }
+    item.range = range;
+    return item;
+}
+
+
+- (NSRange)rangeForPrefix:(NSString *)prefix suffix:(NSString *)suffix
 {
     NSString *text = [self.toolBar.inputTextView text];
     NSRange range = [self.toolBar.inputTextView selectedRange];
     NSString *selectedText = range.length ? [text substringWithRange:range] : text;
-    NSInteger endLocation =range.location;
+    NSInteger endLocation = range.location;
     if (endLocation <= 0)
     {
         return NSMakeRange(NSNotFound, 0);
     }
     NSInteger index = -1;
-    if ([selectedText hasSuffix:@"]"]) {
-        for (NSInteger i = endLocation; i >= endLocation - 6 && i-1 >= 0 ; i--)
+    if ([selectedText hasSuffix:suffix]) {
+        //往前搜最多20个字符，一般来讲是够了...
+        NSInteger p = 20;
+        for (NSInteger i = endLocation; i >= endLocation - p && i-1 >= 0 ; i--)
         {
             NSRange subRange = NSMakeRange(i - 1, 1);
             NSString *subString = [text substringWithRange:subRange];
-            if ([subString compare:@"["] == NSOrderedSame)
+            if ([subString compare:prefix] == NSOrderedSame)
             {
                 index = i - 1;
                 break;
             }
         }
     }
-    if (index == -1)
-    {
-        return NSMakeRange(endLocation - 1, 1);
-    }
-    else
-    {
-        NSRange emoticonRange = NSMakeRange(index, endLocation - index);
-        NSString *name = [text substringWithRange:emoticonRange];
-        NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
-        return icon ? emoticonRange : NSMakeRange(endLocation - 1, 1);
-    }
+    return index == -1? NSMakeRange(endLocation - 1, 1) : NSMakeRange(index, endLocation - index);
 }
-
 
 @end

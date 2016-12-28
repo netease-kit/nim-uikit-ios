@@ -7,14 +7,19 @@
 //
 
 #import "NIMKitMediaFetcher.h"
-#import "CTAssetsPickerController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "NIMKitFileLocationHelper.h"
 #import "NIMMessageMaker.h"
 #import "SVProgressHUD.h"
 #import "NIMGlobalMacro.h"
+#import "TZImagePickerController.h"
+#import "TZImageManager.h"
 
-@interface NIMKitMediaFetcher()<CTAssetsPickerControllerDelegate,UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface NIMKitMediaPickerController : TZImagePickerController
+
+@end
+
+@interface NIMKitMediaFetcher()<TZImagePickerControllerDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
 
 @property (nonatomic,copy)   NIMKitLibraryFetchResult libraryResultHandler;
 
@@ -22,7 +27,7 @@
 
 @property (nonatomic,strong) UIImagePickerController  *imagePicker;
 
-@property (nonatomic,strong) CTAssetsPickerController *assetsPicker;
+@property (nonatomic,strong) NIMKitMediaPickerController  *assetsPicker;
 
 @end
 
@@ -41,14 +46,14 @@
 - (void)fetchPhotoFromLibrary:(NIMKitLibraryFetchResult)result
 {
     __weak typeof(self) weakSelf = self;
-    [self setUpPhotoLibrary:^(CTAssetsPickerController * _Nullable picker) {
+    [self setUpPhotoLibrary:^(NIMKitMediaPickerController * _Nullable picker) {
         if (picker && weakSelf) {
             weakSelf.assetsPicker = picker;
             weakSelf.libraryResultHandler = result;
             [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:picker animated:YES completion:nil];
             
         }else{
-            result(nil,PHAssetMediaTypeUnknown);
+            result(nil,nil,PHAssetMediaTypeUnknown);
         }
     }];
 }
@@ -67,7 +72,7 @@
 }
 
 
-- (void)setUpPhotoLibrary:(void(^)( CTAssetsPickerController * _Nullable picker)) handler
+- (void)setUpPhotoLibrary:(void(^)(NIMKitMediaPickerController * _Nullable picker)) handler
 {
     __weak typeof(self) weakSelf = self;
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status){
@@ -81,12 +86,12 @@
                 if(handler) handler(nil);
             }
             if (status == PHAuthorizationStatusAuthorized) {
-                CTAssetsPickerController *assetsPicker = [[CTAssetsPickerController alloc] init];
-                assetsPicker.assetCollectionSubtypes = weakSelf.assetMediaTypes;
-                assetsPicker.delegate = weakSelf;
-                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-                    assetsPicker.modalPresentationStyle = UIModalPresentationFormSheet;
-                if(handler) handler(assetsPicker);
+                NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:self.limit delegate:weakSelf];
+                vc.navigationBar.barTintColor = [UIColor whiteColor];
+                vc.barItemTextColor = [UIColor blackColor];
+                vc.navigationBar.barStyle = UIBarStyleDefault;
+                vc.allowPickingVideo = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
+                if(handler) handler(vc);
             }
         });
     }];
@@ -133,21 +138,25 @@
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
+
 #pragma mark - 相册回调
-- (void)assetsPickerController:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
+- (void)imagePickerController:(TZImagePickerController *)picker didFinishPickingPhotos:(NSArray<UIImage *> *)photos sourceAssets:(NSArray *)assets isSelectOriginalPhoto:(BOOL)isSelectOriginalPhoto infos:(NSArray<NSDictionary *> *)infos
 {
-    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
-    options.synchronous  = YES;
-    options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
-    [SVProgressHUD show];
-    
-    NSMutableArray *items = [[NSMutableArray alloc] initWithArray:assets];
+    if (isSelectOriginalPhoto)
+    {
+        [self requestAssets:[assets mutableCopy]];
+    }
+    else
+    {
+        if (self.libraryResultHandler) {
+            self.libraryResultHandler(photos,nil,PHAssetMediaTypeImage);
+        }
+    }
+}
+
+- (void)imagePickerController:(TZImagePickerController *)picker didFinishPickingVideo:(UIImage *)coverImage sourceAssets:(id)asset{
+    NSMutableArray *items = [[NSMutableArray alloc] initWithArray:@[asset]];
     [self requestAssets:items];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD dismiss];
-        [picker dismissViewControllerAnimated:YES completion:nil];
-    });
 }
 
 - (void)requestAssets:(NSMutableArray *)assets
@@ -158,7 +167,7 @@
     __weak typeof(self) weakSelf = self;
     [self requestAsset:assets.firstObject handler:^(NSString *path, PHAssetMediaType type) {
         if (weakSelf.libraryResultHandler) {
-            weakSelf.libraryResultHandler(path,type);
+            weakSelf.libraryResultHandler(nil,path,type);
         }
         NIMKit_Dispatch_Async_Main(^{
             [assets removeObjectAtIndex:0];
@@ -186,49 +195,13 @@
     
 }
 
-- (BOOL)assetsPickerController:(CTAssetsPickerController *)picker shouldSelectAsset:(PHAsset *)asset
-{
-    if (self.limit == 1) {
-        [self assetsPickerController:picker didFinishPickingAssets:@[asset]];
-        return NO;
-    }
-    
-    for (PHAsset *item in picker.selectedAssets) {
-        if (item.mediaType == PHAssetMediaTypeVideo || asset.mediaType == PHAssetMediaTypeVideo) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"视频只能单独发送,一次只能发送一个" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-            [alert show];
-            return NO;
-        }
-    }
-    
-    return picker.selectedAssets.count < self.limit;
-}
-
-
 #pragma mark - Private
 
 - (void)setMediaTypes:(NSArray *)mediaTypes
 {
     _mediaTypes = mediaTypes;
     _imagePicker.mediaTypes = mediaTypes;
-    _assetsPicker.assetCollectionSubtypes = self.assetMediaTypes;
-}
-
-- (NSArray *)assetMediaTypes
-{
-    NSMutableArray *subTypes   = [self.assetSubtypes mutableCopy];
-    
-    NSArray *videoTypes = @[
-                            @(PHAssetCollectionSubtypeSmartAlbumVideos),
-                            @(PHAssetCollectionSubtypeSmartAlbumSlomoVideos)];
-    
-    if (![_mediaTypes containsObject:(NSString *)kUTTypeImage]) {
-        subTypes = [videoTypes mutableCopy];
-    }
-    if (![_mediaTypes containsObject:(NSString *)kUTTypeMovie]) {
-        [subTypes removeObjectsInArray:videoTypes];
-    }
-    return subTypes;
+    _assetsPicker.allowPickingVideo = [mediaTypes containsObject:(NSString *)kUTTypeMovie];
 }
 
 - (AVMutableVideoComposition *)getVideoComposition:(AVAsset *)asset
@@ -317,38 +290,111 @@
     return YES;
 }
 
-- (NSArray *)assetSubtypes
-{
-    NSArray *assetCollectionSubtypes =
-    @[@(PHAssetCollectionSubtypeSmartAlbumUserLibrary),
-      @(PHAssetCollectionSubtypeAlbumMyPhotoStream),
-      @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
-      @(PHAssetCollectionSubtypeSmartAlbumFavorites),
-      @(PHAssetCollectionSubtypeSmartAlbumPanoramas),
-      @(PHAssetCollectionSubtypeSmartAlbumVideos),
-      @(PHAssetCollectionSubtypeSmartAlbumSlomoVideos),
-      @(PHAssetCollectionSubtypeSmartAlbumTimelapses),
-      @(PHAssetCollectionSubtypeSmartAlbumBursts),
-      @(PHAssetCollectionSubtypeSmartAlbumAllHidden),
-      @(PHAssetCollectionSubtypeSmartAlbumGeneric),
-      @(PHAssetCollectionSubtypeAlbumRegular),
-      @(PHAssetCollectionSubtypeAlbumSyncedAlbum),
-      @(PHAssetCollectionSubtypeAlbumSyncedEvent),
-      @(PHAssetCollectionSubtypeAlbumSyncedFaces),
-      @(PHAssetCollectionSubtypeAlbumImported),
-      @(PHAssetCollectionSubtypeAlbumCloudShared)];
-    
-    // Add iOS 9's new albums
-    if ([[PHAsset new] respondsToSelector:@selector(sourceType)])
-    {
-        NSMutableArray *subtypes = [NSMutableArray arrayWithArray:assetCollectionSubtypes];
-        [subtypes insertObject:@(PHAssetCollectionSubtypeSmartAlbumSelfPortraits) atIndex:4];
-        [subtypes insertObject:@(PHAssetCollectionSubtypeSmartAlbumScreenshots) atIndex:10];
-        
-        assetCollectionSubtypes = [NSArray arrayWithArray:subtypes];
-    }
-    return assetCollectionSubtypes;
+- (void)originalPhotoWithAsset:(id)asset completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion {
+    PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
+    option.networkAccessAllowed = YES;
+    option.synchronous = YES;
+    [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+        if (downloadFinined && result) {
+            result = [self fixOrientation:result];
+            BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+            if (completion) completion(result,info,isDegraded);
+        }
+    }];
 }
 
+
+/// 修正图片转向
+- (UIImage *)fixOrientation:(UIImage *)aImage {
+    
+    // No-op if the orientation is already correct
+    if (aImage.imageOrientation == UIImageOrientationUp)
+        return aImage;
+    
+    // We need to calculate the proper transformation to make the image upright.
+    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (aImage.imageOrientation) {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.width, aImage.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, aImage.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+        default:
+            break;
+    }
+    
+    switch (aImage.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        default:
+            break;
+    }
+    
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+    CGContextRef ctx = CGBitmapContextCreate(NULL, aImage.size.width, aImage.size.height,
+                                             CGImageGetBitsPerComponent(aImage.CGImage), 0,
+                                             CGImageGetColorSpace(aImage.CGImage),
+                                             CGImageGetBitmapInfo(aImage.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    switch (aImage.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            // Grr...
+            CGContextDrawImage(ctx, CGRectMake(0,0,aImage.size.height,aImage.size.width), aImage.CGImage);
+            break;
+            
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,aImage.size.width,aImage.size.height), aImage.CGImage);
+            break;
+    }
+    
+    // And now we just create a new UIImage from the drawing context
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    return img;
+}
+#pragma clang diagnostic pop
+
+
+
+@end
+
+
+@implementation NIMKitMediaPickerController
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [UIApplication sharedApplication].statusBarStyle =  UIStatusBarStyleDefault;
+}
 
 @end

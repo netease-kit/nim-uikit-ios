@@ -1,6 +1,6 @@
 Pod::Spec.new do |s| 
  s.name = "NIMKit" 
- s.version = "1.0.6" 
+ s.version = "1.0.7" 
  s.summary = "Netease IM UI Kit" 
  s.homepage = "http://netease.im" 
  s.license = { :"type" => "Copyright", :"text" => " Copyright 2016 Netease "} 
@@ -12,13 +12,13 @@ Pod::Spec.new do |s|
  s.subspec 'Full' do |cs|	
 	cs.source_files = "NIMKit/NIMKit/**/*.{h,m}"
 	cs.dependency 'NIMKit/Core'
-    cs.dependency 'NIMSDK', '~> 3.2.5'
+    cs.dependency 'NIMSDK', '~> 3.3.0'
   end
 
  s.subspec 'Lite' do |cs|
     cs.source_files = "NIMKit/NIMKit/**/*.{h,m}"
     cs.dependency 'NIMKit/Core'
-	cs.dependency 'NIMSDK_LITE', '~> 3.2.5'
+	cs.dependency 'NIMSDK_LITE', '~> 3.3.0'
   end
 
  s.subspec 'Core' do |os|     
@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
 	os.dependency 'Toast', '~> 3.0'
 	os.dependency 'SVProgressHUD', '~> 2.0.3'
 	os.dependency 'M80AttributedLabel', '~> 1.5.0'
-	os.dependency 'CTAssetsPickerController', '~> 3.3.2-alpha'
+	os.dependency 'TZImagePickerController', '~> 1.7.7'
  end
 
  s.default_subspec = 'Lite'

@@ -100,15 +100,27 @@
 - (void)showRecordFileNotSendReason;
 
 #pragma mark - 操作接口
+
+/**
+ *  追加一条消息
+ *
+ *  @param message 消息
+ *
+ *  @discussion 不会比较时间戳，直接加在消息列表末尾。不会触发 DB 操作，，请手动调用 SDK 里 saveMessage:forSession:completion: 接口。
+ */
+
+- (void)uiAddMessages:(NSArray *)messages;
+
+
 /**
  *  插入一条消息
  *
  *  @param message 消息
  *
- *  @discussion 不会触发 DB 操作，请手动调用 SDK 里 saveMessage:forSession:completion: 接口
+ *  @discussion 会比较时间戳，加在合适的地方，不推荐聊天室这种大消息量场景使用。不会触发 DB 操作，，请手动调用 SDK 里 saveMessage:forSession:completion: 接口。
  */
 
-- (void)uiAddMessages:(NSArray *)messages;
+- (void)uiInsertMessages:(NSArray *)messages;
 
 /**
  *  删除一条消息

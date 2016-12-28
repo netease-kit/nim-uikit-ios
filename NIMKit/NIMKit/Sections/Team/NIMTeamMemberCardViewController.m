@@ -55,7 +55,7 @@
     self.tableView.tableFooterView = [UIView new];
     
     NIMUsrInfo *user = [[NIMUsrInfo alloc] init];
-    user.info = [[NIMKit sharedKit] infoByUser:self.member.memberId];
+    user.info = [[NIMKit sharedKit] infoByUser:self.member.memberId option:nil];
     self.usrInfo = user;
 
     [self buildData];

@@ -32,7 +32,7 @@
 }
 
 - (void)refresh:(NIMChatroomMember *)member{
-    [self.avatarImageView nim_setImageWithURL:[NSURL URLWithString:member.roomAvatar]
+    [self.avatarImageView nim_setImageWithURL:[NSURL URLWithString:member.roomAvatarThumbnail]
                              placeholderImage:[UIImage imageNamed:@"avatar_user"]];
     self.textLabel.text = member.roomNickname;
     [self.textLabel sizeToFit];

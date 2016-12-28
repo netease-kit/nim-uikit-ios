@@ -8,7 +8,7 @@
 
 
 #import "NIMBadgeView.h"
-#import "NSString+NIM.h"
+#import "NSString+NIMKit.h"
 
 @interface NIMBadgeView ()
 

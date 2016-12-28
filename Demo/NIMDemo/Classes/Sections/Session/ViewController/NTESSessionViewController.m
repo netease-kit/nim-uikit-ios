@@ -45,10 +45,10 @@
 #import "UIAlertView+NTESBlock.h"
 #import "NIMKit.h"
 #import "NTESSessionUtil.h"
-#import <CTAssetsPickerController/CTAssetsPickerController.h>
 #import "NIMKitMediaFetcher.h"
 #import "NIMKitLocationPoint.h"
 #import "NIMLocationViewController.h"
+#import "NIMKitInfoFetchOption.h"
 
 @interface NTESSessionViewController ()
 <UIImagePickerControllerDelegate,
@@ -89,6 +89,9 @@ NIMContactSelectDelegate>
         self.fpsLabel.right = self.view.width;
         self.fpsLabel.top   = self.tableView.top + self.tableView.contentInset.top;
     }
+    
+    //删除最近会话列表中有人@你的标记
+    [NTESSessionUtil removeRecentSessionAtMark:self.session];
 }
 
 - (void)dealloc
@@ -244,15 +247,13 @@ NIMContactSelectDelegate>
         switch (index) {
             case 0:{
                 //相册
-                [wself.mediaFetcher fetchPhotoFromLibrary:^(NSString *path, PHAssetMediaType type) {
-                    if (type == PHAssetMediaTypeImage) {
-                        [wself sendSnapchatMessagePath:path];
-                    }else{
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [wself.view makeToast:@"阅后即焚只支持图片" duration:2.0 position:CSToastPositionCenter];
-                        });
+                [wself.mediaFetcher fetchPhotoFromLibrary:^(NSArray *images, NSString *path, PHAssetMediaType type){
+                    if (images.count) {
+                        [wself sendSnapchatMessage:images.firstObject];
                     }
-                    
+                    if (path) {
+                        [wself sendSnapchatMessagePath:path];
+                    }
                 }];
                 
             }
@@ -623,7 +624,7 @@ NIMContactSelectDelegate>
             NIMMessageModel *model = [self uiDeleteMessage:message];
             NIMMessage *tip = [NTESSessionMsgConverter msgWithTip:[NTESSessionUtil tipOnMessageRevoked:message]];
             tip.timestamp = model.messageTime;
-            [self uiAddMessages:@[tip]];
+            [self uiInsertMessages:@[tip]];
             
             tip.timestamp = message.timestamp;
             // saveMessage 方法执行成功后会触发 onRecvMessages: 回调，但是这个回调上来的 NIMMessage 时间为服务器时间，和界面上的时间有一定出入，所以要提前先在界面上插入一个和被删消息的界面时间相符的 Tip, 当触发 onRecvMessages: 回调时，组件判断这条消息已经被插入过了，就会忽略掉。
@@ -638,11 +639,13 @@ NIMContactSelectDelegate>
     NSString *name;
     if (session.sessionType == NIMSessionTypeP2P)
     {
-        name = [[NIMKit sharedKit] infoByUser:session.sessionId inSession:session].showName;
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = session;
+        name = [[NIMKit sharedKit] infoByUser:session.sessionId option:option].showName;
     }
     else
     {
-        name = [[NIMKit sharedKit] infoByTeam:session.sessionId].showName;
+        name = [[NIMKit sharedKit] infoByTeam:session.sessionId option:nil].showName;
     }
     NSString *tip = [NSString stringWithFormat:@"确认转发给 %@ ?",name];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"确认转发" message:tip delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确认", nil];

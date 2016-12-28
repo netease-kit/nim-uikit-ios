@@ -32,6 +32,8 @@
 //界面操作接口
 - (void)addMessages:(NSArray *)messages;
 
+- (void)insertMessages:(NSArray *)messages;
+
 - (NIMMessageModel *)updateMessage:(NIMMessage *)message;
 
 - (NIMMessageModel *)deleteMessage:(NIMMessage *)message;

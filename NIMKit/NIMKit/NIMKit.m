@@ -12,6 +12,7 @@
 #import "NIMKitDataProviderImpl.h"
 #import "NIMCellLayoutConfig.h"
 #import "NIMKitUIConfig.h"
+#import "NIMKitInfoFetchOption.h"
 
 extern NSString *const NIMKitUserInfoHasUpdatedNotification;
 extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
@@ -124,44 +125,23 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     [self.firer addFireInfo:info];
 }
 
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-{
-    return [self infoByUser:userId
-                  inSession:nil];
-}
-
-
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-                 inSession:(NIMSession *)session
+- (NIMKitInfo *)infoByUser:(NSString *)userId option:(NIMKitInfoFetchOption *)option
 {
     NIMKitInfo *info = nil;
-    if (self.provider && [self.provider respondsToSelector:@selector(infoByUser:inSession:)]) {
-        info = [self.provider infoByUser:userId inSession:session];
+    if (self.provider && [self.provider respondsToSelector:@selector(infoByUser:option:)]) {
+        info = [self.provider infoByUser:userId option:option];
     }
     return info;
 }
 
-- (NIMKitInfo *)infoByTeam:(NSString *)teamId
+- (NIMKitInfo *)infoByTeam:(NSString *)teamId option:(NIMKitInfoFetchOption *)option
 {
     NIMKitInfo *info = nil;
-    if (self.provider && [self.provider respondsToSelector:@selector(infoByTeam:)]) {
-        info = [self.provider infoByTeam:teamId];
+    if (self.provider && [self.provider respondsToSelector:@selector(infoByTeam:option:)]) {
+        info = [self.provider infoByTeam:teamId option:option];
     }
     return info;
 
-}
-
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-               withMessage:(NIMMessage *)message
-{
-    NSAssert([userId isEqualToString:message.from], @"user id should be same with message from");
-    
-    NIMKitInfo *info = nil;
-    if (self.provider && [self.provider respondsToSelector:@selector(infoByUser:withMessage:)]) {
-        info = [self.provider infoByUser:userId
-                         withMessage:message];
-    }
-    return info;
 }
 
 @end

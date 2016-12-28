@@ -33,6 +33,16 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
+}
+
+- (void)setPlaying:(BOOL)isPlaying
+{
+    if (isPlaying) {
+        [self.voiceImageView startAnimating];
+    }else{
+        [self.voiceImageView stopAnimating];
+    }
 }
 
 - (void)addVoiceView{
@@ -116,7 +126,7 @@
         
         if ([audioObject.path isEqualToString:filePath] && [self.audioUIDelegate respondsToSelector:@selector(startPlayingAudioUI)]) {
             [self.audioUIDelegate startPlayingAudioUI];
-            [self.voiceImageView startAnimating];
+            [self setPlaying:YES];
         }
     }
 }
@@ -129,6 +139,6 @@
 #pragma mark - private methods
 - (void)stopPlayingUI
 {
-    [self.voiceImageView stopAnimating];
+    [self setPlaying:NO];
 }
 @end

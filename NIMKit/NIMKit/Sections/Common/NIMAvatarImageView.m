@@ -11,7 +11,7 @@
 #import "objc/runtime.h"
 #import "UIView+WebCacheOperation.h"
 #import "NIMKit.h"
-
+#import "NIMKitInfoFetchOption.h"
 
 static char imageURLKey;
 
@@ -104,12 +104,13 @@ CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
     NIMKitInfo *info = nil;
     if (session.sessionType == NIMSessionTypeTeam)
     {
-        info = [[NIMKit sharedKit] infoByTeam:session.sessionId];
+        info = [[NIMKit sharedKit] infoByTeam:session.sessionId option:nil];
     }
     else
     {
-        info = [[NIMKit sharedKit] infoByUser:session.sessionId
-                                    inSession:session];
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = session;
+        info = [[NIMKit sharedKit] infoByUser:session.sessionId option:option];
     }
     NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
     [self nim_setImageWithURL:url placeholderImage:info.avatarImage];
@@ -117,8 +118,9 @@ CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
 
 - (void)setAvatarByMessage:(NIMMessage *)message
 {
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:message.from
-                                          withMessage:message];
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.message = message;
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:message.from option:option];
     NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
     [self nim_setImageWithURL:url placeholderImage:info.avatarImage];
 }

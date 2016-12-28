@@ -13,7 +13,7 @@
 
 @interface NIMMessageMaker : NSObject
 
-+ (NIMMessage *)msgWithText:(NSString *)text;
++ (NIMMessage*)msgWithText:(NSString*)text;
 
 + (NIMMessage *)msgWithAudio:(NSString *)filePath;
 
