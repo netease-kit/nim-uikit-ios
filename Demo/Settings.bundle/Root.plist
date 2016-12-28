@@ -76,16 +76,16 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-            <string>禁用贴耳自动切换听筒模式</string>
-            <key>Key</key>
-            <string>disable_proxmity_monitor</string>
-            <key>DefaultValue</key>
-            <false/>
-        </dict>
-        <dict>
-            <key>Type</key>
-            <string>PSToggleSwitchSpecifier</string>
-            <key>Title</key>
+			<string>禁用贴耳自动切换听筒模式</string>
+			<key>Key</key>
+			<string>disable_proxmity_monitor</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>支持旋转(需要重启)</string>
 			<key>Key</key>
 			<string>enable_rotate</string>
@@ -289,6 +289,16 @@
 			<string>videochat_voice_detect</string>
 			<key>DefaultValue</key>
 			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>期望高清语音</string>
+			<key>Key</key>
+			<string>videochat_prefer_hd_audio</string>
+			<key>DefaultValue</key>
+			<false/>
 		</dict>
 	</array>
 </dict>
