@@ -15,6 +15,7 @@
 
 @interface NIMSessionLayoutImpl(){
     NSMutableArray *_inserts;
+    CGFloat _inputViewHeight;
 }
 
 @property (nonatomic,strong)  UITableView *tableView;
@@ -50,14 +51,15 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)reloadTable
+{
+    [self.tableView reloadData];
+}
 
 - (void)resetLayout
 {
-    BOOL isFirstLayout = CGRectEqualToRect(self.viewRect, CGRectZero);
-    if (isFirstLayout) {
-        [self.tableView nim_scrollToBottom:NO];
-    }
     [self setViewRect:self.tableView.superview.frame];
+    [self adjustTableView];
 }
 
 - (void)layoutAfterRefresh
@@ -72,13 +74,17 @@
 
 - (void)changeLayout:(CGFloat)inputViewHeight
 {
-    [UIView animateWithDuration:0.3 animations:^{
-        CGRect rect = [_tableView frame];
-        rect.origin.y = 0;
-        rect.size.height = self.viewRect.size.height - inputViewHeight;
-        [_tableView setFrame:rect];
-        [_tableView nim_scrollToBottom:NO];
-    }];
+    _inputViewHeight = inputViewHeight;
+    [self adjustTableView];
+}
+
+- (void)adjustTableView
+{
+    CGRect rect = [_tableView frame];
+    rect.origin.y = 0;
+    rect.size.height = self.viewRect.size.height - _inputViewHeight;
+    [_tableView setFrame:rect];
+    [_tableView nim_scrollToBottom:NO];
 }
 
 #pragma mark - Notification
@@ -99,9 +105,6 @@
 {
     if (!indexPaths.count) {
         return;
-    }
-    if (self.tableView.isDecelerating || self.tableView.isDragging){
-        
     }
 
     NSMutableArray *addIndexPathes = [NSMutableArray array];

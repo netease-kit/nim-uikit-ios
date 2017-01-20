@@ -658,7 +658,8 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 
 - (void)fillUserSetting:(NIMRTSOption *)option
 {
-    option.disableRecord = ![[NTESBundleSetting sharedConfig] serverRecordAudio];
+    option.serverRecordAudio = [[NTESBundleSetting sharedConfig] serverRecordAudio];
+    option.serverRecordData = [[NTESBundleSetting sharedConfig] serverRecordWhiteboardData];
     option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];

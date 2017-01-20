@@ -45,10 +45,6 @@
 
 @property (nonatomic,copy)   NSString *placeholder;
 
-@property (nonatomic,assign) CGFloat topInputViewHeight;
-
-@property (nonatomic,assign) CGFloat bottomInputViewHeight;
-
 @end
 
 @interface NIMKitBubbleConfig : NSObject

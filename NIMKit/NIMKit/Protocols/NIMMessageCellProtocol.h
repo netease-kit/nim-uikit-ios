@@ -17,15 +17,13 @@
 
 @optional
 
-- (void)onTapCell:(NIMKitEvent *)event;
+- (BOOL)onTapCell:(NIMKitEvent *)event;
 
-- (void)onLongPressCell:(NIMMessage *)message
+- (BOOL)onLongPressCell:(NIMMessage *)message
                  inView:(UIView *)view;
 
+- (BOOL)onTapAvatar:(NSString *)userId;
+
 - (void)onRetryMessage:(NIMMessage *)message;
-
-- (void)onTapAvatar:(NSString *)userId;
-
-- (void)onTapLinkData:(id)linkData;
 
 @end

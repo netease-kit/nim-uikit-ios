@@ -62,13 +62,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
 }
 
-- (void)reload{
+- (void)refresh:(BOOL)reload{
     if (!self.recentSessions.count) {
         self.tableView.hidden = YES;
     }else{
         self.tableView.hidden = NO;
     }
-    [self.tableView reloadData];
+    if (reload) {
+        [self.tableView reloadData];
+    }
 }
 
 #pragma mark - UITableViewDelegate
@@ -124,7 +126,7 @@
            totalUnreadCount:(NSInteger)totalUnreadCount{
     [self.recentSessions addObject:recentSession];
     [self sort];
-    [self reload];
+    [self refresh:YES];
 }
 
 
@@ -138,17 +140,35 @@
     }
     NSInteger insert = [self findInsertPlace:recentSession];
     [self.recentSessions insertObject:recentSession atIndex:insert];
-    [self reload];
+    [self refresh:YES];
+}
+
+- (void)didRemoveRecentSession:(NIMRecentSession *)recentSession totalUnreadCount:(NSInteger)totalUnreadCount
+{
+    //清理本地数据
+    NSInteger index = [self.recentSessions indexOfObject:recentSession];
+    [self.recentSessions removeObjectAtIndex:index];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
+    if (self.autoRemoveRemoteSession)
+    {
+        [[NIMSDK sharedSDK].conversationManager deleteRemoteSessions:@[recentSession.session]
+                           completion:nil];
+    }
+    
+    [self refresh:NO];
 }
 
 - (void)messagesDeletedInSession:(NIMSession *)session{
     _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
-    [self reload];
+    [self refresh:YES];
 }
 
 - (void)allMessagesDeleted{
     _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
-    [self reload];
+    [self refresh:YES];
 }
 
 
@@ -156,7 +176,7 @@
 - (void)onLogin:(NIMLoginStep)step
 {
     if (step == NIMLoginStepSyncOK) {
-        [self reload];
+        [self refresh:YES];
     }
 }
 
@@ -171,19 +191,7 @@
 
 - (void)onDeleteRecentAtIndexPath:(NIMRecentSession *)recent atIndexPath:(NSIndexPath *)indexPath{
     id<NIMConversationManager> manager = [[NIMSDK sharedSDK] conversationManager];
-    
     [manager deleteRecentSession:recent];
-    
-    //清理本地数据
-    [self.recentSessions removeObjectAtIndex:indexPath.row];
-    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
-    //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
-    if (self.autoRemoveRemoteSession)
-    {
-        [manager deleteRemoteSessions:@[recent.session]
-                           completion:nil];
-    }
 }
 
 
@@ -313,15 +321,15 @@
 
 #pragma mark - Notification
 - (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification{
-    [self reload];
+    [self refresh:YES];
 }
 
 - (void)onTeamInfoHasUpdatedNotification:(NSNotification *)notification{
-    [self reload];
+    [self refresh:YES];
 }
 
 - (void)onTeamMembersHasUpdatedNotification:(NSNotification *)notification{
-    [self reload];
+    [self refresh:YES];
 }
 
 

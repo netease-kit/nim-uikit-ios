@@ -331,13 +331,12 @@
 #pragma mark - NIMPlayAudioUIDelegate
 - (void)startPlayingAudioUI
 {
-    //更新DB
-    NIMMessage * message = self.model.message;
-    if (!message.isPlayed)
-    {
-        message.isPlayed  = YES;
-        [self refreshData:self.model];
-    }
+    [self refreshData:self.model];
+}
+
+- (void)retryDownloadMsg
+{
+    [self onRetryMessage:nil];
 }
 
 

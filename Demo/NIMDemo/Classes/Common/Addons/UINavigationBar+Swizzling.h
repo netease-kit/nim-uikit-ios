@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UINavigationBar (Swizzling)
+@interface UINavigationBar ()
 
 @end

@@ -96,6 +96,12 @@
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"server_record_video"] boolValue];
 }
 
+- (BOOL)serverRecordWhiteboardData
+{
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"server_record_whiteboard_data"] boolValue];
+}
+
+
 - (BOOL)videochatDisableAutoCropping
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_disable_auto_cropping"] boolValue];
@@ -219,6 +225,7 @@
                 "ignore_team_types %@ \n" \
                 "server_record_audio %d\n" \
                 "server_record_video %d\n" \
+                "server_record_whiteboard_data %d\n" \
                 "videochat_disable_auto_cropping %d\n" \
                 "videochat_auto_rotate_remote_video %d \n" \
                 "videochat_preferred_video_quality %zd\n" \
@@ -242,6 +249,7 @@
                 [self ignoreTeamNotificationTypes],
                 [self serverRecordAudio],
                 [self serverRecordVideo],
+                [self serverRecordWhiteboardData],
                 [self videochatDisableAutoCropping],
                 [self videochatAutoRotateRemoteVideo],
                 [self preferredVideoQuality],

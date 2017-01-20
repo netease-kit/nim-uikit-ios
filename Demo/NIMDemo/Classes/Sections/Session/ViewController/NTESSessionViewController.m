@@ -54,7 +54,7 @@
 <UIImagePickerControllerDelegate,
 UINavigationControllerDelegate,
 NIMSystemNotificationManagerDelegate,
-NIMMediaManagerDelgate,
+NIMMediaManagerDelegate,
 NTESTimerHolderDelegate,
 NIMContactSelectDelegate>
 
@@ -340,9 +340,9 @@ NIMContactSelectDelegate>
 }
 
 #pragma mark - Cell事件
-- (void)onTapCell:(NIMKitEvent *)event
+- (BOOL)onTapCell:(NIMKitEvent *)event
 {
-    BOOL handled = NO;
+    BOOL handled = [super onTapCell:event];
     NSString *eventName = event.eventName;
     if ([eventName isEqualToString:NIMKitEventNameTapContent])
     {
@@ -370,7 +370,7 @@ NIMContactSelectDelegate>
         NIMCustomObject *object = event.messageModel.message.messageObject;
         NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
         if(attachment.isFired){
-            return;
+            return handled;
         }
         UIView *sender = event.data;
         self.currentSingleSnapView = [NTESGalleryViewController alertSingleSnapViewWithMessage:object.message baseView:sender];
@@ -385,7 +385,7 @@ NIMContactSelectDelegate>
         
         NTESSnapchatAttachment *attachment = (NTESSnapchatAttachment *)object.attachment;
         if(attachment.isFired){
-            return;
+            return handled;
         }
         attachment.isFired  = YES;
         NIMMessage *message = object.message;
@@ -405,18 +405,13 @@ NIMContactSelectDelegate>
     if (!handled) {
         NSAssert(0, @"invalid event");
     }
+    return handled;
 }
 
-- (void)onLongPressCell:(NIMMessage *)message inView:(UIView *)view
-{
-    [super onLongPressCell:message
-                    inView:view];
-}
-
-
-- (void)onTapAvatar:(NSString *)userId{
+- (BOOL)onTapAvatar:(NSString *)userId{
     UIViewController *vc = [[NTESPersonalCardViewController alloc] initWithUserId:userId];
     [self.navigationController pushViewController:vc animated:YES];
+    return YES;
 }
 
 

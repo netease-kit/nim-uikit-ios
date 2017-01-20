@@ -42,7 +42,10 @@
 
 - (BOOL)serverRecordVideo;                          //服务器录制视频
 
-- (BOOL)videochatDisableAutoCropping;                      //禁用自动裁剪画面
+- (BOOL)serverRecordWhiteboardData;                 //服务器录制白板数据
+
+
+- (BOOL)videochatDisableAutoCropping;               //禁用自动裁剪画面
 
 - (BOOL)videochatAutoRotateRemoteVideo;             //自动旋转视频聊天远端画面
 

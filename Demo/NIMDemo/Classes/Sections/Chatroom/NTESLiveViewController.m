@@ -59,7 +59,7 @@ NTES_USE_CLEAR_BAR
     [self.view addSubview:self.actionView];
     [self.actionView reloadData];
     self.currentChildViewController = self.chatroomViewController;
-    [self revertInputView];
+    [self adjustInputView];
     [self setupBackBarButtonItem];
     
     
@@ -79,7 +79,6 @@ NTES_USE_CLEAR_BAR
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault
                                                 animated:NO];
     [self.currentChildViewController beginAppearanceTransition:NO animated:animated];
-    [self revertInputView];
 }
 
 
@@ -137,7 +136,7 @@ NTES_USE_CLEAR_BAR
         self.currentChildViewController = child;
         [lastChild endAppearanceTransition];
         [child endAppearanceTransition];
-        [self revertInputView];
+        self.chatroomViewController.sessionInputView.hidden = self.currentChildViewController != self.chatroomViewController;
     });
 }
 
@@ -221,7 +220,7 @@ NTES_USE_CLEAR_BAR
 }
 
 //这个视图是替换一下聊天室的输入框，为了在多行输入显示时，输入框可以遮住上层的直播图
-- (void)revertInputView
+- (void)adjustInputView
 {
     UIView *inputView  = self.chatroomViewController.sessionInputView;
     UIView *revertView;
@@ -230,9 +229,9 @@ NTES_USE_CLEAR_BAR
     }else{
         revertView = self.chatroomViewController.view;
     }
-    CGFloat height = revertView.height;
+    CGRect frame = [inputView.superview convertRect:inputView.frame toView:revertView];
+    inputView.frame = frame;
     [revertView addSubview:inputView];
-    inputView.bottom = height;
 }
 
 - (void)setupBackBarButtonItem

@@ -7,7 +7,6 @@
 //
 
 #import "NIMSessionConfigurateProtocol.h"
-#import "NIMInputTextView.h"
 #import "NIMKit.h"
 #import "NIMMessageCellProtocol.h"
 #import "NIMMessageModel.h"
@@ -21,7 +20,7 @@
 #import "NIMSessionConfigurator.h"
 #import "NIMKitInfoFetchOption.h"
 
-@interface NIMSessionViewController ()<NIMMediaManagerDelgate,NIMInputDelegate>
+@interface NIMSessionViewController ()<NIMMediaManagerDelegate,NIMInputDelegate>
 
 @property (nonatomic,readwrite) NIMMessage *messageForMenu;
 
@@ -65,11 +64,8 @@
     [self setupConfigurator];
     //添加监听
     [self addListener];
-    
     //进入会话时，标记所有消息已读，并发送已读回执
-    [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
-    [self sendMessageReceipt:self.interactor.items];
-    
+    [self markRead];
     //更新已读位置
     [self uiCheckReceipt];    
 }
@@ -92,29 +88,24 @@
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     [self.view addSubview:self.tableView];
-    
-    
 }
 
 
 - (void)setupInputView
 {
-    CGRect inputViewRect = CGRectMake(0, 0, self.view.nim_width, [[[NIMKitUIConfig sharedConfig] globalConfig] topInputViewHeight]);
     BOOL disableInputView = NO;
     if ([self.sessionConfig respondsToSelector:@selector(disableInputView)]) {
         disableInputView = [self.sessionConfig disableInputView];
     }
     if (!disableInputView) {
-        self.sessionInputView = [[NIMInputView alloc] initWithFrame:inputViewRect];
-        self.sessionInputView.nim_bottom = _tableView.nim_height;
-        
+        self.sessionInputView = [[NIMInputView alloc] initWithFrame:CGRectMake(0, 0, self.view.nim_width,0) config:self.sessionConfig];
+        [self.sessionInputView refreshStatus:NIMInputStatusText];
         [self.sessionInputView setSession:self.session];
-        [self.sessionInputView setInputConfig:self.sessionConfig];
         [self.sessionInputView setInputDelegate:self];
         [self.sessionInputView setInputActionDelegate:self];
         [self.view addSubview:_sessionInputView];
         
-        self.tableView.nim_height -= self.sessionInputView.nim_height;
+        self.tableView.nim_height -= self.sessionInputView.toolBar.nim_height;
     }
 }
 
@@ -129,18 +120,24 @@
 {
     _configurator = [[NIMSessionConfigurator alloc] init];
     [_configurator setup:self];
+    
+    BOOL needProximityMonitor = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableProximityMonitor)]) {
+        needProximityMonitor = !self.sessionConfig.disableProximityMonitor;
+    }
+    [[NIMSDK sharedSDK].mediaManager setNeedProximityMonitor:needProximityMonitor];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    //fix bug: 竖屏进入会话界面，然后右上角进入群信息，再横屏，左上角返回，横屏的会话界面显示的就是竖屏时的大小
-    [self.interactor cleanCache];
-    [self.tableView reloadData];
+    [self.interactor onViewWillAppear];
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
+    [self.interactor onViewDidDisappear];
+    
     [self.sessionInputView endEditing:YES];
 }
 
@@ -236,7 +233,7 @@
 }
 
 //发送进度
--(void)sendMessage:(NIMMessage *)message progress:(CGFloat)progress
+-(void)sendMessage:(NIMMessage *)message progress:(float)progress
 {
     if ([message.session isEqual:_session]) {
         [self.interactor updateMessage:message];
@@ -259,7 +256,7 @@
 }
 
 
-- (void)fetchMessageAttachment:(NIMMessage *)message progress:(CGFloat)progress
+- (void)fetchMessageAttachment:(NIMMessage *)message progress:(float)progress
 {
     if ([message.session isEqual:_session]) {
         [self.interactor updateMessage:message];
@@ -435,8 +432,17 @@
                                      duration:duration];
 }
 
-#pragma mark - CellActionDelegate
-- (void)onTapCell:(NIMKitEvent *)message{}
+#pragma mark - NIMMessageCellDelegate
+- (BOOL)onTapCell:(NIMKitEvent *)event{
+    BOOL handle = NO;
+    NSString *eventName = event.eventName;
+    if ([eventName isEqualToString:NIMKitEventNameTapAudio])
+    {
+        [self.interactor mediaAudioPressed:event.messageModel];
+        handle = YES;
+    }
+    return handle;
+}
 
 - (void)onRetryMessage:(NIMMessage *)message
 {
@@ -449,9 +455,10 @@
     }
 }
 
-- (void)onLongPressCell:(NIMMessage *)message
+- (BOOL)onLongPressCell:(NIMMessage *)message
                  inView:(UIView *)view
 {
+    BOOL handle = NO;
     NSArray *items = [self menusItems:message];
     if ([items count] && [self becomeFirstResponder]) {
         UIMenuController *controller = [UIMenuController sharedMenuController];
@@ -459,8 +466,9 @@
         _messageForMenu = message;
         [controller setTargetRect:view.bounds inView:view];
         [controller setMenuVisible:YES animated:YES];
-        
+        handle = YES;
     }
+    return handle;
 }
 
 #pragma mark - 配置项
@@ -587,9 +595,20 @@
          {
              [[NIMSDK sharedSDK].mediaManager cancelRecord];
              [wself.interactor cleanCache];
+             [wself.sessionInputView reset];
              [wself.tableView reloadData];
              [wself.tableView scrollToRowAtIndexPath:wself.lastVisibleIndexPathBeforeRotation atScrollPosition:UITableViewScrollPositionBottom animated:NO];
          } completion:nil];
+    }
+}
+
+
+#pragma mark - 标记已读
+- (void)markRead
+{
+    if (![self disableAutoMarkRead]) {
+        [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
+        [self sendMessageReceipt:self.interactor.items];
     }
 }
 
@@ -633,6 +652,13 @@
     return self.session.sessionType == NIMSessionTypeP2P &&
     [self.sessionConfig respondsToSelector:@selector(shouldHandleReceipt)] &&
     [self.sessionConfig shouldHandleReceipt];
+}
+
+
+- (BOOL)disableAutoMarkRead
+{
+    return [self.sessionConfig respondsToSelector:@selector(disableAutoMarkMessageRead)] &&
+    [self.sessionConfig disableAutoMarkMessageRead];
 }
 
 - (id<NIMConversationManager>)conversationManager{

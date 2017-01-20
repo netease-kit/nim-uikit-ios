@@ -118,6 +118,12 @@
     return YES;
 }
 
+//云消息不支持音频轮播
+- (BOOL)disableAutoPlayAudio
+{
+    return YES;
+}
+
 //云消息不显示已读
 - (BOOL)shouldHandleReceipt{
     return NO;

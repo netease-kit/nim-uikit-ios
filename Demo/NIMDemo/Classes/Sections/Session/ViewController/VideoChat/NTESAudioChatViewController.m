@@ -246,21 +246,17 @@
     }
 }
 
-- (void)onCall:(UInt64)callID status:(NIMNetCallStatus)status{
-    if (self.callInfo.callID != callID) {
-        return;
-    }
-    [super onCall:callID status:status];
-    //记时
-    switch (status) {
-        case NIMNetCallStatusConnect:
-            self.durationLabel.hidden = NO;
-            self.durationLabel.text = self.durationDesc;
-            break;
-        default:
-            break;
+
+-(void)onCallEstablished:(UInt64)callID
+{
+    if (self.callInfo.callID == callID) {
+        [super onCallEstablished:callID];
+        
+        self.durationLabel.hidden = NO;
+        self.durationLabel.text = self.durationDesc;
     }
 }
+
 
 - (void)onNetStatus:(NIMNetCallNetStatus)status user:(NSString *)user
 {

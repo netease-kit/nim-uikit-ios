@@ -68,7 +68,7 @@
 - (void)downLoadFile{
     NSString *url = self.fileObject.url;
     __weak typeof(self) wself = self;
-    [[NIMSDK sharedSDK].resourceManager download:url filepath:self.fileObject.path progress:^(CGFloat progress) {
+    [[NIMSDK sharedSDK].resourceManager download:url filepath:self.fileObject.path progress:^(float progress) {
         wself.isDownLoading = YES;
         wself.progressView.hidden = NO;
         wself.progressView.progress = progress;

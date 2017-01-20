@@ -41,7 +41,7 @@
     __weak typeof(self) wself = self;
     NSString *uid  = [[NIMSDK sharedSDK].loginManager currentAccount];
     NIMUser *me    = [[NIMSDK sharedSDK].userManager userInfo:uid];
-    self.nick      = me.userInfo.nickName;
+    self.nick      = me.userInfo.nickName? me.userInfo.nickName : @"";
     [self buildData];
     self.delegator = [[NIMCommonTableDelegate alloc] initWithTableData:^NSArray *{
         return wself.data;

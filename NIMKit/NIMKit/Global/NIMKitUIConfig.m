@@ -218,10 +218,6 @@
         
         _placeholder     = globalSetting[@"Placeholder"];
         _maxLength       = [globalSetting[@"Max_Length"] integerValue];
-        
-        _topInputViewHeight = [globalSetting[@"Top_Input_Height"] doubleValue];
-        _bottomInputViewHeight = [globalSetting[@"Bottom_Input_Height"] doubleValue];
-
     }
     return self;
 }

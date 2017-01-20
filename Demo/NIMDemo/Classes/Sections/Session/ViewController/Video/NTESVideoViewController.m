@@ -85,7 +85,7 @@
 - (void)downLoadVideo:(void(^)(NSError *error))handler{
     [SVProgressHUD show];
     __weak typeof(self) wself = self;
-    [[NIMSDK sharedSDK].resourceManager download:self.videoObject.url filepath:self.videoObject.path progress:^(CGFloat progress) {
+    [[NIMSDK sharedSDK].resourceManager download:self.videoObject.url filepath:self.videoObject.path progress:^(float progress) {
         [SVProgressHUD showProgress:progress];
     } completion:^(NSError *error) {
         if (wself) {

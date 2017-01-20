@@ -90,7 +90,7 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     UINavigationController *nav = [NTESMainTabController instance].selectedViewController;
     BOOL needPlay = YES;
     for (UIViewController *vc in nav.viewControllers) {
-        if ([vc isKindOfClass:[NIMSessionViewController class]] ||  [vc isKindOfClass:[NTESLiveViewController class]])
+        if ([vc isKindOfClass:[NIMSessionViewController class]] ||  [vc isKindOfClass:[NTESLiveViewController class]] || [vc isKindOfClass:[NTESNetChatViewController class]])
         {
             needPlay = NO;
             break;

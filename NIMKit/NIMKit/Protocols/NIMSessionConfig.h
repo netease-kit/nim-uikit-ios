@@ -40,6 +40,11 @@
 - (BOOL)disableInputView;
 
 
+/*
+ *  是否禁用音频轮播
+ */
+- (BOOL)disableAutoPlayAudio;
+
 /**
  *  是否禁掉语音未读红点
  */
@@ -76,6 +81,12 @@
  *  @return 是否需要
  */
 - (BOOL)shouldHandleReceiptForMessage:(NIMMessage *)message;
+
+/**
+ *  是否禁用进入会话自动标记会话已读，如果禁用，请自行调用 SDK markAllMessagesReadInSession 接口维护未读数。
+ *
+ */
+- (BOOL)disableAutoMarkMessageRead;
 
 /**
  *  录音类型

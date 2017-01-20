@@ -8,6 +8,7 @@
 
 #import "NTESSessionListViewController.h"
 #import "NTESSessionViewController.h"
+#import "NTESSessionPeekViewController.h"
 #import "UIView+NTES.h"
 #import "NTESBundleSetting.h"
 #import "NTESListHeader.h"
@@ -21,11 +22,16 @@
 
 #define SessionListTitle @"云信 Demo"
 
-@interface NTESSessionListViewController ()<NIMLoginManagerDelegate,NTESListHeaderDelegate>
+@interface NTESSessionListViewController ()<NIMLoginManagerDelegate,NTESListHeaderDelegate,UIViewControllerPreviewingDelegate>
 
 @property (nonatomic,strong) UILabel *titleLabel;
 
 @property (nonatomic,strong) NTESListHeader *header;
+
+@property (nonatomic,assign) BOOL supportsForceTouch;
+
+@property (nonatomic,strong) NSMutableDictionary *previews;
+
 @end
 
 @implementation NTESSessionListViewController
@@ -33,6 +39,7 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        _previews = [[NSMutableDictionary alloc] init];
         self.autoRemoveRemoteSession = [[NTESBundleSetting sharedConfig] autoRemoveRemoteSession];
     }
     return self;
@@ -45,6 +52,8 @@
 
 - (void)viewDidLoad{
     [super viewDidLoad];
+    self.supportsForceTouch = [self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
+    
     [[NIMSDK sharedSDK].loginManager addDelegate:self];
     self.header = [[NTESListHeader alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 0)];
     self.header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -61,8 +70,8 @@
     self.navigationItem.titleView  = [self titleView:userID];
 }
 
-- (void)reload{
-    [super reload];
+- (void)refresh:(BOOL)reload{
+    [super refresh:reload];
     self.emptyTipLabel.hidden = self.recentSessions.count;
 }
 
@@ -79,9 +88,9 @@
     }
 }
 
+
 - (void)onDeleteRecentAtIndexPath:(NIMRecentSession *)recent atIndexPath:(NSIndexPath *)indexPath{
     [super onDeleteRecentAtIndexPath:recent atIndexPath:indexPath];
-    self.emptyTipLabel.hidden = self.recentSessions.count;
 }
 
 - (void)viewDidLayoutSubviews{
@@ -144,6 +153,50 @@
     [self.header refreshWithType:ListHeaderTypeLoginClients value:[NIMSDK sharedSDK].loginManager.currentLoginClients];
     [self.view setNeedsLayout];
 }
+
+
+
+#pragma mark - UITableViewDelegate
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.supportsForceTouch) {
+        id<UIViewControllerPreviewing> preview = [self registerForPreviewingWithDelegate:self sourceView:cell];
+        [self.previews setObject:preview forKey:@(indexPath.row)];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.supportsForceTouch) {
+        id<UIViewControllerPreviewing> preview = [self.previews objectForKey:@(indexPath.row)];
+        [self unregisterForPreviewingWithContext:preview];
+        [self.previews removeObjectForKey:@(indexPath.row)];
+    }
+}
+
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)context viewControllerForLocation:(CGPoint)point {
+    UITableViewCell *touchCell = (UITableViewCell *)context.sourceView;
+    if ([touchCell isKindOfClass:[UITableViewCell class]]) {
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:touchCell];
+        NIMRecentSession *recent = self.recentSessions[indexPath.row];
+        NTESSessionPeekNavigationViewController *nav = [NTESSessionPeekNavigationViewController instance:recent.session];
+        return nav;
+    }
+    return nil;
+}
+
+- (void)previewingContext:(id <UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
+{
+    UITableViewCell *touchCell = (UITableViewCell *)previewingContext.sourceView;
+    if ([touchCell isKindOfClass:[UITableViewCell class]]) {
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:touchCell];
+        NIMRecentSession *recent = self.recentSessions[indexPath.row];
+        NTESSessionViewController *vc = [[NTESSessionViewController alloc] initWithSession:recent.session];
+        [self.navigationController showViewController:vc sender:nil];
+    }
+}
+
 
 #pragma mark - Private 
 - (void)refreshSubview{

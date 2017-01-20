@@ -14,6 +14,7 @@
 #import "NIMKitMediaFetcher.h"
 #import "NIMMessageMaker.h"
 #import "NIMLocationViewController.h"
+#import "NIMKitAudioCenter.h"
 
 static const void * const NTESDispatchMessageDataPrepareSpecificKey = &NTESDispatchMessageDataPrepareSpecificKey;
 dispatch_queue_t NTESMessageDataPrepareQueue()
@@ -28,7 +29,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 }
 
 
-@interface NIMSessionInteractorImpl()<NIMChatManagerDelegate,NIMConversationManagerDelegate,NIMLocationViewControllerDelegate>
+@interface NIMSessionInteractorImpl()<NIMLocationViewControllerDelegate,NIMMediaManagerDelegate>
 
 @property (nonatomic,strong) NIMSession  *session;
 
@@ -37,6 +38,9 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 @property (nonatomic,strong) NIMKitMediaFetcher *mediaFetcher;
 
 @property (nonatomic,strong) NSMutableArray *pendingChatroomModels;
+
+@property (nonatomic,strong) NSMutableArray *pendingAudioMessages;
+
 @end
 
 @implementation NIMSessionInteractorImpl
@@ -56,7 +60,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NIMSDK sharedSDK].mediaManager stopPlay];
+    [self removeListenner];
 }
 
 - (NSArray *)items
@@ -302,6 +307,19 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 
 #pragma mark - NIMMeidaButton
+- (void)mediaAudioPressed:(NIMMessageModel *)messageModel
+{
+    if (![[NIMSDK sharedSDK].mediaManager isPlaying]) {
+        [[NIMSDK sharedSDK].mediaManager switchAudioOutputDevice:NIMAudioOutputDeviceSpeaker];
+        self.pendingAudioMessages = [self findRemainAudioMessages:messageModel.message];
+        [[NIMKitAudioCenter instance] play:messageModel.message];
+        
+    } else {
+        self.pendingAudioMessages = nil;
+        [[NIMSDK sharedSDK].mediaManager stopPlay];
+    }
+}
+
 - (void)mediaPicturePressed
 {
     __weak typeof(self) weakSelf = self;
@@ -360,6 +378,46 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 }
 
 
+- (void)onViewWillAppear
+{
+    //fix bug: 竖屏进入会话界面，然后右上角进入群信息，再横屏，左上角返回，横屏的会话界面显示的就是竖屏时的大小
+    [self cleanCache];
+    [self.layout reloadTable];
+    
+    [[NIMSDK sharedSDK].mediaManager addDelegate:self];
+}
+
+- (void)onViewDidDisappear
+{
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
+}
+
+
+#pragma mark - NIMMediaManagerDelegate
+
+- (void)playAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
+{
+    if (!error)
+    {
+        BOOL disable = [self.sessionConfig respondsToSelector:@selector(disableAutoPlayAudio)] && [self.sessionConfig disableAutoPlayAudio];
+        if (!disable)
+        {
+            [self playNextAudio];
+        }
+    }
+}
+
+- (void)playNextAudio
+{
+    NIMMessage *message = self.pendingAudioMessages.lastObject;
+    if (self.pendingAudioMessages.count) {
+        [self.pendingAudioMessages removeLastObject];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NIMKitAudioCenter instance] play:message];
+        });
+    }
+}
+
 
 #pragma mark - Private
 - (NIMKitMediaFetcher *)mediaFetcher
@@ -372,6 +430,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 - (void)addListener
 {
+    //声音的监听放在 viewWillApear 回调里，不在这里添加
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vcBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     if (self.session.sessionType == NIMSessionTypeTeam) {
         extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
@@ -383,6 +442,36 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     
     extern NSString *const NIMKitUserInfoHasUpdatedNotification;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+}
+
+- (void)removeListenner
+{
+    //声音的监听放在 viewDidDisappear 回调里，不在这里移除
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (NSMutableArray *)findRemainAudioMessages:(NIMMessage *)message
+{
+    if (message.isPlayed || [message.from isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
+        //如果这条音频消息被播放过了 或者这条消息是属于自己的消息，则不进行轮播
+        return nil;
+    }
+    NSMutableArray *messages = [[NSMutableArray alloc] init];
+    [self.dataSource.items enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[NIMMessageModel class]]) {
+            NIMMessageModel *model = (NIMMessageModel *)obj;
+            BOOL isFromMe = [model.message.from isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]];
+            if ([model.message.messageId isEqualToString:message.messageId])
+            {
+                *stop = YES;
+            }
+            else if (model.message.messageType == NIMMessageTypeAudio && !isFromMe && !model.message.isPlayed)
+            {
+                [messages addObject:model.message];
+            }
+        }
+    }];
+    return messages;
 }
 
 - (void)processChatroomMessageModels

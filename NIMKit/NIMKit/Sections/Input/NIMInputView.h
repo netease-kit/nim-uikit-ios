@@ -7,20 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMInputTextView.h"
 #import "NIMInputProtocol.h"
 #import "NIMSessionConfig.h"
+#import "NIMInputToolBar.h"
 
 @class NIMInputMoreContainerView;
 @class NIMInputEmoticonContainerView;
-@class NIMInputToolBar;
 
-typedef NS_ENUM(NSInteger, NIMInputType){
-    InputTypeText = 1,
-    InputTypeEmot = 2,
-    InputTypeAudio = 3,
-    InputTypeMedia = 4,
-};
+
 
 typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
     AudioRecordPhaseStart,
@@ -28,6 +22,15 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
     AudioRecordPhaseCancelling,
     AudioRecordPhaseEnd
 };
+
+typedef NS_ENUM(NSInteger,NIMInputStatus)
+{
+    NIMInputStatusText,
+    NIMInputStatusAudio,
+    NIMInputStatusEmoticon,
+    NIMInputStatusMore
+};
+
 
 
 @protocol NIMInputDelegate <NSObject>
@@ -46,7 +49,6 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 @property (nonatomic, strong) NIMSession             *session;
 
 @property (nonatomic, assign) NSInteger              maxTextLength;
-@property (nonatomic, assign) CGFloat                inputBottomViewHeight;
 
 @property (assign, nonatomic, getter=isRecording)    BOOL recording;
 
@@ -54,13 +56,17 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 @property (strong, nonatomic)  NIMInputMoreContainerView *moreContainer;
 @property (strong, nonatomic)  NIMInputEmoticonContainerView *emoticonContainer;
 
-- (instancetype)initWithFrame:(CGRect)frame;
+- (instancetype)initWithFrame:(CGRect)frame
+                       config:(id<NIMSessionConfig>)config;
+
+- (void)reset;
+
+- (void)refreshStatus:(NIMInputStatus)status;
 
 - (void)setInputDelegate:(id<NIMInputDelegate>)delegate;
 
 //外部设置
 - (void)setInputActionDelegate:(id<NIMInputActionDelegate>)actionDelegate;
-- (void)setInputConfig:(id<NIMSessionConfig>)config;
 
 - (void)setInputTextPlaceHolder:(NSString*)placeHolder;
 - (void)updateAudioRecordTime:(NSTimeInterval)time;

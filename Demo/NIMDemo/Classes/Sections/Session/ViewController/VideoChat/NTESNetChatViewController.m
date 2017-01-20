@@ -307,11 +307,17 @@ NTES_FORBID_INTERACTIVE_POP
 #pragma mark - NIMNetCallManagerDelegate
 - (void)onControl:(UInt64)callID
              from:(NSString *)user
-             type:(NIMNetCallControlType)control;{
+             type:(NIMNetCallControlType)control{
+    
+    if (user == [[NIMSDK sharedSDK].loginManager currentAccount]) {
+        //多端登录时，自己会收到自己发出的控制指令，这里忽略他
+        return;
+    }
+    
     switch (control) {
         case NIMNetCallControlTypeFeedabck:{
             NSMutableArray *room = self.chatRoom;
-            if (room && !room.count) {
+            if (room && !room.count && !_userHangup) {
                 [self playSenderRing];
                 [room addObject:self.callInfo.caller];
                 //40秒之后查看一下房间状态，如果房间还在一个人的话，就播放铃声超时
@@ -335,6 +341,8 @@ NTES_FORBID_INTERACTIVE_POP
         }
         case NIMNetCallControlTypeBusyLine: {
             [self playOnCallRing];
+            _userHangup = YES;
+            [[NIMSDK sharedSDK].netCallManager hangup:callID];
             __weak typeof(self) wself = self;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [wself dismiss:nil];
@@ -373,40 +381,36 @@ NTES_FORBID_INTERACTIVE_POP
     }
 }
 
-- (void)onCall:(UInt64)callID status:(NIMNetCallStatus)status{
-    if (self.callInfo.callID != callID) {
-        return;
+-(void)onCallEstablished:(UInt64)callID
+{
+    if (self.callInfo.callID == callID) {
+        self.callInfo.startTime = [NSDate date].timeIntervalSince1970;
+        [self.timer startTimer:0.5 delegate:self repeats:YES];
     }
-    //记时
-    switch (status) {
-        case NIMNetCallStatusConnect:
-            //开始计时
-            self.callInfo.startTime = [NSDate date].timeIntervalSince1970;
-            [self.timer startTimer:0.5 delegate:self repeats:YES];
-            break;
-        case NIMNetCallStatusDisconnect:
-            //结束计时
-            [self.timer stopTimer];
-            [self dismiss:nil];
-            self.chatRoom = nil;
-            break;
-        default:
-            break;
+}
+
+- (void)onCallDisconnected:(UInt64)callID withError:(NSError *)error
+{
+    if (self.callInfo.callID == callID) {
+        [self.timer stopTimer];
+        [self dismiss:nil];
+        self.chatRoom = nil;
     }
 }
 
 
 - (void)onResponsedByOther:(UInt64)callID
                   accepted:(BOOL)accepted{
-    [self.view makeToast:@"已在其他端处理"
-                duration:2
-                position:CSToastPositionCenter];
+    [self.view.window makeToast:@"已在其他端处理"
+                       duration:2
+                       position:CSToastPositionCenter];
     [self dismiss:nil];
 }
 
 - (void)onHangup:(UInt64)callID
               by:(NSString *)user{
     if (self.callInfo.callID == callID) {
+        [self.player stop];
         if (self.callInfo.localRecording) {
             __weak typeof(self) wself = self;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

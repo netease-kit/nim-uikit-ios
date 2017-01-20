@@ -66,6 +66,8 @@
 
 - (void)layoutConfig:(NIMMessageModel *)model;
 
+- (void)reloadTable;
+
 - (void)resetLayout;
 
 - (void)changeLayout:(CGFloat)inputViewHeight;

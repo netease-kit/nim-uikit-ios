@@ -54,6 +54,7 @@
 
 
 //排版接口
+
 - (void)resetLayout;
 
 - (void)changeLayout:(CGFloat)inputHeight;
@@ -64,11 +65,19 @@
 
 
 //按钮响应接口
+- (void)mediaAudioPressed:(NIMMessageModel *)messageModel;
+
 - (void)mediaPicturePressed;
 
 - (void)mediaShootPressed;
 
 - (void)mediaLocationPressed;
+
+//页面状态同步接口
+
+- (void)onViewWillAppear;
+
+- (void)onViewDidDisappear;
 
 @end
 

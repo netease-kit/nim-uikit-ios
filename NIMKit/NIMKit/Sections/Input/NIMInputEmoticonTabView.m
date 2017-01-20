@@ -56,6 +56,11 @@ const CGFloat InputLineBoarder = .5f;
 
 - (void)loadCatalogs:(NSArray*)emoticonCatalogs
 {
+    for (UIView *subView in [_tabs arrayByAddingObjectsFromArray:_seps]) {
+        [subView removeFromSuperview];
+    }
+    [_tabs removeAllObjects];
+    [_seps removeAllObjects];
     for (NIMInputEmoticonCatalog * catelog in emoticonCatalogs) {
         UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
         [button setImage:[UIImage nim_fetchImage:catelog.icon] forState:UIControlStateNormal];

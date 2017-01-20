@@ -8,7 +8,32 @@
 
 #import <UIKit/UIKit.h>
 
-@class NIMInputTextView;
+typedef NS_ENUM(NSInteger, NIMInputType){
+    InputTypeText = 1,
+    InputTypeEmot = 2,
+    InputTypeAudio = 3,
+    InputTypeMedia = 4,
+};
+
+@protocol NIMInputToolBarDelegate <NSObject>
+
+@optional
+
+- (BOOL)textViewShouldBeginEditing;
+
+- (void)textViewDidEndEditing;
+
+- (BOOL)shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText;
+
+- (void)textViewDidChange;
+
+- (void)toolBarWillChangeHeight:(CGFloat)height;
+
+- (void)toolBarDidChangeHeight:(CGFloat)height;
+
+@end
+
+
 @interface NIMInputToolBar : UIView
 
 @property (nonatomic,strong) UIButton    *voiceBtn;
@@ -21,10 +46,26 @@
 
 @property (nonatomic,strong) UIImageView *inputTextBkgImage;
 
-@property (nonatomic,strong) NIMInputTextView *inputTextView;
+@property (nonatomic,copy) NSString *contentText;
 
-- (void)setInputBarItemTypes:(NSArray<NSNumber *> *)types;
+@property (nonatomic,weak) id<NIMInputToolBarDelegate> delegate;
 
-- (void)resetInputTextView;
+@property (nonatomic,assign) BOOL showsKeyboard;
+
+@property (nonatomic,assign) NSArray *inputBarItemTypes;
+
+- (void)update:(NIMInputType)inputType;
+
+@end
+
+@interface NIMInputToolBar(InputText)
+
+- (NSRange)selectedRange;
+
+- (void)setPlaceHolder:(NSString *)placeHolder;
+
+- (void)insertText:(NSString *)text;
+
+- (void)deleteText:(NSRange)range;
 
 @end

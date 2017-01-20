@@ -11,6 +11,7 @@
 #import "NIMMessageModel.h"
 #import "UIImage+NIM.h"
 #import "NIMKitUIConfig.h"
+#import "NIMKitAudioCenter.h"
 
 @interface NIMSessionAudioContentView()<NIMMediaManagerDelgate>
 
@@ -26,6 +27,7 @@
     self = [super initSessionMessageContentView];
     if (self) {
         [self addVoiceView];
+        [[NIMSDK sharedSDK].mediaManager addDelegate:self];
     }
     return self;
 }
@@ -74,6 +76,8 @@
     self.durationLabel.textColor = config.contentTextColor;
     
     [self.durationLabel sizeToFit];
+    
+    [self setPlaying:self.isPlaying];
 }
 
 
@@ -101,33 +105,26 @@
         return;
     }
     if ([self.model.message attachmentDownloadState] == NIMMessageAttachmentDownloadStateDownloaded) {
-        if (![[NIMSDK sharedSDK].mediaManager isPlaying]) {
-            [[NIMSDK sharedSDK].mediaManager switchAudioOutputDevice:NIMAudioOutputDeviceSpeaker];
-            NIMAudioObject *audioObject = (NIMAudioObject*)self.model.message.messageObject;
-            BOOL needProximityMonitor = YES;
-            if ([self.model.sessionConfig respondsToSelector:@selector(disableProximityMonitor)]) {
-                needProximityMonitor = !self.model.sessionConfig.disableProximityMonitor;
-            }
-            [[NIMSDK sharedSDK].mediaManager setNeedProximityMonitor:needProximityMonitor];
-            [[NIMSDK sharedSDK].mediaManager addDelegate:self];
-            [[NIMSDK sharedSDK].mediaManager play:audioObject.path];
-        } else {
-            [[NIMSDK sharedSDK].mediaManager stopPlay];
+        
+        if ([[NIMSDK sharedSDK].mediaManager isPlaying]) {
             [self stopPlayingUI];
         }
+        
+        NIMKitEvent *event = [[NIMKitEvent alloc] init];
+        event.eventName = NIMKitEventNameTapAudio;
+        event.messageModel = self.model;
+        [self.delegate onCatchEvent:event];
+
     }
 }
 
-#pragma mark - NIMMediaManagerDelgate
+#pragma mark - NIMMediaManagerDelegate
 
 - (void)playAudio:(NSString *)filePath didBeganWithError:(NSError *)error {
     if(filePath && !error) {
-        NIMAudioObject *audioObject = (NIMAudioObject*)self.model.message.messageObject;
-        
-        if ([audioObject.path isEqualToString:filePath] && [self.audioUIDelegate respondsToSelector:@selector(startPlayingAudioUI)]) {
+        if (self.isPlaying && [self.audioUIDelegate respondsToSelector:@selector(startPlayingAudioUI)]) {
             [self.audioUIDelegate startPlayingAudioUI];
-            [self setPlaying:YES];
-        }
+        }        
     }
 }
 
@@ -141,4 +138,11 @@
 {
     [self setPlaying:NO];
 }
+
+- (BOOL)isPlaying
+{
+    return [NIMKitAudioCenter instance].currentPlayingMessage == self.model.message; //对比是否是同一条消息，严格同一条，不能是相同ID，防止进了会话又进云端消息界面，导致同一个ID的云消息也在动画
+}
+
+
 @end
