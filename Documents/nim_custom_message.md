@@ -32,7 +32,7 @@
 - (NSString *)encodeAttachment;
 ```
 
-通过实现这个方法，最终将 `id<NIMCustomAttachmetn>` 转换为数据流，并由云信 SDK 进行投递。在实际场景下，一条自定义消息往往会附带多媒体信息，如图片，音频等，同样 `NIMCustomAttachment` 也提供了相应的接口，开发只需要实现相应接口，所有的上传下载操作都可以由云信 SDK 完成。
+通过实现这个方法，最终将 `id<NIMCustomAttachment>` 转换为数据流，并由云信 SDK 进行投递。在实际场景下，一条自定义消息往往会附带多媒体信息，如图片，音频等，同样 `NIMCustomAttachment` 也提供了相应的接口，开发只需要实现相应接口，所有的上传下载操作都可以由云信 SDK 完成。
 
 **上传**
 
