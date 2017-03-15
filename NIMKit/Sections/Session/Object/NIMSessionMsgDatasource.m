@@ -230,7 +230,7 @@
     return dels;
 }
 
-- (NSArray<NSNumber *> *)deleteModels:(NSRange)range
+- (NSArray<NSIndexPath *> *)deleteModels:(NSRange)range
 {
     NSArray *models = [self.items subarrayWithRange:range];
     NSMutableArray *dels = [NSMutableArray array];
@@ -246,13 +246,15 @@
             if ([all[delMsgIndex-1] isKindOfClass:[NIMTimestampModel class]] && delMsgIsSingle) {
                 delTimeIndex = delMsgIndex-1;
                 [self.items removeObjectAtIndex:delTimeIndex];
-                [dels addObject:@(delTimeIndex)];
+                NSIndexPath *indexpath = [NSIndexPath indexPathForRow:delTimeIndex inSection:0];
+                [dels addObject:indexpath];
             }
         }
         if (delMsgIndex > -1) {
             [self.items removeObject:model];
             [_msgIdDict removeObjectForKey:model.message.messageId];
-            [dels addObject:@(delMsgIndex)];
+            NSIndexPath *indexpath = [NSIndexPath indexPathForRow:delMsgIndex inSection:0];
+            [dels addObject:indexpath];
         }
     }
     return dels;

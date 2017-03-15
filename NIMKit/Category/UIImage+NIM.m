@@ -93,13 +93,15 @@
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
     NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
-    return [UIImage imageNamed:name];
+    UIImage *image = [UIImage imageNamed:name];
+    return image? image : [UIImage imageNamed:imageName];
 }
 
 + (UIImage *)nim_emoticonInKit:(NSString *)imageName
 {
     NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
-    return [UIImage imageNamed:name];
+    UIImage *image = [UIImage imageNamed:name];
+    return image? image : [UIImage imageNamed:imageName];
 }
 
 - (UIImage *)nim_imageForAvatarUpload

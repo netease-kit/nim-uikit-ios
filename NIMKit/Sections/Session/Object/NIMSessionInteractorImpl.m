@@ -499,6 +499,16 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         BOOL animated = leftPendingMessageCount== 0;
         NIMSessionMessageOperateResult *result = [self.dataSource addMessageModels:insert];
         [self.layout insert:result.indexpaths animated:animated];
+        
+        //聊天室消息最大保存消息量，超过这个消息量则把消息列表的前一半挪出内存。
+        static NSInteger NTESMaxChatroomMessageCount = 200;
+        NSInteger count = self.dataSource.items.count;
+        if (count > NTESMaxChatroomMessageCount) {
+            NSRange deleteRange = NSMakeRange(0, count/2);
+            NSArray *delete = [self.dataSource deleteModels:deleteRange];
+            [self.layout remove:delete];
+        }
+
         [self processChatroomMessageModels];
     }
     else
@@ -511,6 +521,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         });
     }
 }
+
 
 
 
