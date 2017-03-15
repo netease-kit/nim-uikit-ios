@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "NTESTimerHolder.h"
+#import "NTESRecordSelectView.h"
+
 @class NetCallChatInfo;
 @class AVAudioPlayer;
 
 
-@interface NTESNetChatViewController : UIViewController<NIMNetCallManagerDelegate,NTESTimerHolderDelegate>
+@interface NTESNetChatViewController : UIViewController<NIMNetCallManagerDelegate,NTESTimerHolderDelegate,NTESRecordSelectViewDelegate>
 
 @property (nonatomic,strong) NetCallChatInfo *callInfo;
 
@@ -42,12 +44,31 @@
 //退出界面
 - (void)dismiss:(void (^)(void))completion;
 
+//开始语音对话录制
+- (BOOL)startAudioRecording;
 //开始本地录制
 - (BOOL)startLocalRecording;
+//开始对方录制
+- (BOOL)startOtherSideRecording;
+//结束语音对话录制
+-(void)stopAudioRecording;
 //结束本地录制
 - (BOOL)stopLocalRecording;
+//结束对方录制
+- (BOOL)stopOtherSideRecording;
+//结束所有录制任务
+- (void)stopRecordTaskWithVideo:(BOOL)isVideo;
+//所有录制是否结束
+- (BOOL)allRecordsStopped;
+
 //低空间警告
 - (void)udpateLowSpaceWarning:(BOOL)show;
+
+//选择类型进行录制
+- (void)recordWithAudioConversation:(BOOL)audioConversationOn myMedia:(BOOL)myMediaOn otherSideMedia:(BOOL)otherSideMediaOn video:(BOOL)isVideo;
+
+//显示录制选择框
+-(void)showRecordSelectView:(BOOL)isVideo;
 
 
 #pragma mark - Ring

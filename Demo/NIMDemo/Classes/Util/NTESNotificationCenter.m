@@ -55,8 +55,8 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
         _player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
 
         [[NIMSDK sharedSDK].systemNotificationManager addDelegate:self];
-        [[NIMSDK sharedSDK].netCallManager addDelegate:self];
-        [[NIMSDK sharedSDK].rtsManager addDelegate:self];
+        [[NIMAVChatSDK sharedSDK].netCallManager addDelegate:self];
+        [[NIMAVChatSDK sharedSDK].rtsManager addDelegate:self];
         [[NIMSDK sharedSDK].chatManager addDelegate:self];
     }
     return self;
@@ -65,8 +65,8 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
 
 - (void)dealloc{
     [[NIMSDK sharedSDK].systemNotificationManager removeDelegate:self];
-    [[NIMSDK sharedSDK].netCallManager removeDelegate:self];
-    [[NIMSDK sharedSDK].rtsManager removeDelegate:self];
+    [[NIMAVChatSDK sharedSDK].netCallManager removeDelegate:self];
+    [[NIMAVChatSDK sharedSDK].rtsManager removeDelegate:self];
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
 }
 
@@ -187,14 +187,14 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
 }
 
 #pragma mark - NIMNetCallManagerDelegate
-- (void)onReceive:(UInt64)callID from:(NSString *)caller type:(NIMNetCallType)type message:(NSString *)extendMessage{
+- (void)onReceive:(UInt64)callID from:(NSString *)caller type:(NIMNetCallMediaType)type message:(NSString *)extendMessage{
     
     NTESMainTabController *tabVC = [NTESMainTabController instance];
     [tabVC.view endEditing:YES];
     UINavigationController *nav = tabVC.selectedViewController;
 
     if ([self shouldResponseBusy]){
-        [[NIMSDK sharedSDK].netCallManager control:callID type:NIMNetCallControlTypeBusyLine];
+        [[NIMAVChatSDK sharedSDK].netCallManager control:callID type:NIMNetCallControlTypeBusyLine];
     }
     else {
         UIViewController *vc;
@@ -238,7 +238,7 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if ([self shouldResponseBusy]) {
-            [[NIMSDK sharedSDK].rtsManager responseRTS:sessionID accept:NO option:nil completion:nil];
+            [[NIMAVChatSDK sharedSDK].rtsManager responseRTS:sessionID accept:NO option:nil completion:nil];
         }
         else {
             NTESWhiteboardViewController *vc = [[NTESWhiteboardViewController alloc] initWithSessionID:sessionID

@@ -7,7 +7,6 @@
 //
 
 #import "NTESNetDetectViewController.h"
-#import "NIMAVChat.h"
 
 @interface NTESNetDetectViewController ()
 @property (weak, nonatomic) IBOutlet UITextView *netDetectResultTextView;
@@ -38,7 +37,7 @@
     
     if (self.taskId == 0) {
         __weak typeof (self) wself = self;
-        self.taskId = [[NIMSDK sharedSDK].avchatNetDetectManager startDetectTask:^(NIMAVChatNetDetectResult * _Nonnull result) {
+        self.taskId = [[NIMAVChatSDK sharedSDK].avchatNetDetectManager startDetectTask:^(NIMAVChatNetDetectResult * _Nonnull result) {
             wself.netDetectResultTextView.text = [NSString stringWithFormat:@"%@net detect result:\n%@\n------------\n", wself.netDetectResultTextView.text, result];
             wself.taskId = 0;
             [wself updateDetectButton];
@@ -47,7 +46,7 @@
     }
     else {
         self.netDetectResultTextView.text = [self.netDetectResultTextView.text stringByAppendingString:[NSString stringWithFormat:@"stop net detect task id %llu \n------------\n", self.taskId]];
-        [[NIMSDK sharedSDK].avchatNetDetectManager stopDetectTask:self.taskId];
+        [[NIMAVChatSDK sharedSDK].avchatNetDetectManager stopDetectTask:self.taskId];
         self.taskId = 0;
     }
     

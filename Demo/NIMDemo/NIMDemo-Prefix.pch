@@ -12,8 +12,8 @@
 #ifdef __OBJC__
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
-#import "NIMSDK.h"
-#import "NIMAVChat.h"
+#import <NIMSDK/NIMSDK.h>
+#import <NIMAVChat/NIMAVChat.h>
 #import "NTESGlobalMacro.h"
 #import "NIMKit.h"
 

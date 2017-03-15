@@ -14,6 +14,8 @@
 #import "NTESBundleSetting.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/ALAssetsLibrary.h>
+#import <Photos/Photos.h>
+#import "UIView+NTES.h"
 
 //十秒之后如果还是没有收到对方响应的control字段，则自己发起一个假的control，用来激活铃声并自己先进入房间
 #define DelaySelfStartControlTime 10
@@ -41,6 +43,9 @@
 @property (nonatomic, strong) NTESTimerHolder *calleeResponseTimer; //被叫等待用户响应接听或者拒绝的时间
 @property (nonatomic, assign) BOOL calleeResponsed;
 
+@property (nonatomic, assign) int successRecords;
+
+@property (nonatomic, strong) NTESRecordSelectView * recordView;
 @end
 
 @implementation NTESNetChatViewController
@@ -79,7 +84,7 @@ NTES_FORBID_INTERACTIVE_POP
         _timer = [[NTESTimerHolder alloc] init];
         _diskCheckTimer = [[NTESTimerHolder alloc] init];
         //防止应用在后台状态，此时呼入，会走init但是不会走viewDidLoad,此时呼叫方挂断，导致被叫监听不到，界面无法消去的问题。
-        id<NIMNetCallManager> manager = [NIMSDK sharedSDK].netCallManager;
+        id<NIMNetCallManager> manager = [NIMAVChatSDK sharedSDK].netCallManager;
         [manager addDelegate:self];
     }
     return self;
@@ -87,7 +92,7 @@ NTES_FORBID_INTERACTIVE_POP
 
 - (void)dealloc{
     DDLogDebug(@"vc dealloc info : %@",self);
-    [[NIMSDK sharedSDK].netCallManager removeDelegate:self];
+    [[NIMAVChatSDK sharedSDK].netCallManager removeDelegate:self];
 }
 
 - (void)viewDidLoad {
@@ -100,7 +105,7 @@ NTES_FORBID_INTERACTIVE_POP
             //用户禁用服务，干掉界面
             if (wself.callInfo.callID) {
                 //说明是被叫方
-                [[NIMSDK sharedSDK].netCallManager response:wself.callInfo.callID accept:NO option:nil completion:nil];
+                [[NIMAVChatSDK sharedSDK].netCallManager response:wself.callInfo.callID accept:NO option:nil completion:nil];
             }
             [wself dismiss:nil];
         }
@@ -143,47 +148,63 @@ NTES_FORBID_INTERACTIVE_POP
 
 #pragma mark - Subclass Impl
 - (void)startByCaller{
-    [self playConnnetRing];
-    __weak typeof(self) wself = self;
-    //等铃声播完再打过去，太快的话很假
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (!wself) {
-            return;
-        }
-        if (wself.userHangup) {
-            DDLogError(@"Netcall request was cancelled before, ignore it.");
-            return;
-        }
-        wself.callInfo.isStart = YES;
-        NSArray *callees = [NSArray arrayWithObjects:wself.callInfo.callee, nil];
-        
-        NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
-        option.extendMessage = @"音视频请求扩展信息";
-        option.apnsContent = [NSString stringWithFormat:@"%@请求", wself.callInfo.callType == NIMNetCallTypeAudio ? @"网络通话" : @"视频聊天"];
-        option.apnsSound = @"video_chat_tip_receiver.aac";
-        [self fillUserSetting:option];
-        [[NIMSDK sharedSDK].netCallManager start:callees type:wself.callInfo.callType option:option completion:^(NSError *error, UInt64 callID) {
-            if (!error && wself) {
-                wself.callInfo.callID = callID;
-                wself.chatRoom = [[NSMutableArray alloc]init];
-                //十秒之后如果还是没有收到对方响应的control字段，则自己发起一个假的control，用来激活铃声并自己先进入房间
-                NSTimeInterval delayTime = DelaySelfStartControlTime;
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [wself onControl:callID from:wself.callInfo.callee type:NIMNetCallControlTypeFeedabck];
-                });
-            }else{
-                if (error) {
-                    [wself.navigationController.view makeToast:@"连接失败"
-                                                      duration:2
-                                                      position:CSToastPositionCenter];
-                }else{
-                    //说明在start的过程中把页面关了。。
-                    [[NIMSDK sharedSDK].netCallManager hangup:callID];
-                }
-                [wself dismiss:nil];
+    
+    if (self.callInfo.callType == NIMNetCallTypeVideo) {
+        //视频呼叫马上发起
+        [self doStartByCaller];
+    }
+    else {
+        //语音呼叫先播放一断提示音，然后再发起
+        [self playConnnetRing];
+        __weak typeof(self) wself = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!wself) {
+                return;
             }
-        }];
-    });
+            if (wself.userHangup) {
+                DDLogError(@"Netcall request was cancelled before, ignore it.");
+                return;
+            }
+            
+            [wself doStartByCaller];
+        });
+    }
+}
+
+- (void)doStartByCaller
+{
+    self.callInfo.isStart = YES;
+    NSArray *callees = [NSArray arrayWithObjects:self.callInfo.callee, nil];
+    
+    NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
+    option.extendMessage = @"音视频请求扩展信息";
+    option.apnsContent = [NSString stringWithFormat:@"%@请求", self.callInfo.callType == NIMNetCallTypeAudio ? @"网络通话" : @"视频聊天"];
+    option.apnsSound = @"video_chat_tip_receiver.aac";
+    [self fillUserSetting:option];
+
+    __weak typeof(self) wself = self;
+
+    [[NIMAVChatSDK sharedSDK].netCallManager start:callees type:wself.callInfo.callType option:option completion:^(NSError *error, UInt64 callID) {
+        if (!error && wself) {
+            wself.callInfo.callID = callID;
+            wself.chatRoom = [[NSMutableArray alloc]init];
+            //十秒之后如果还是没有收到对方响应的control字段，则自己发起一个假的control，用来激活铃声并自己先进入房间
+            NSTimeInterval delayTime = DelaySelfStartControlTime;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [wself onControl:callID from:wself.callInfo.callee type:NIMNetCallControlTypeFeedabck];
+            });
+        }else{
+            if (error) {
+                [wself.navigationController.view makeToast:@"连接失败"
+                                                  duration:2
+                                                  position:CSToastPositionCenter];
+            }else{
+                //说明在start的过程中把页面关了。。
+                [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
+            }
+            [wself dismiss:nil];
+        }
+    }];
 }
 
 - (void)startByCallee{
@@ -192,7 +213,7 @@ NTES_FORBID_INTERACTIVE_POP
     NSMutableArray *room = [[NSMutableArray alloc] init];
     [room addObject:self.callInfo.caller];
     self.chatRoom = room;
-    [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeFeedabck];
+    [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeFeedabck];
     [self playReceiverRing];
     _calleeResponseTimer = [[NTESTimerHolder alloc] init];
     [_calleeResponseTimer startTimer:NoBodyResponseTimeOut delegate:self repeats:NO];
@@ -201,7 +222,7 @@ NTES_FORBID_INTERACTIVE_POP
 
 - (void)hangup{
     _userHangup = YES;
-    [[NIMSDK sharedSDK].netCallManager hangup:self.callInfo.callID];
+    [[NIMAVChatSDK sharedSDK].netCallManager hangup:self.callInfo.callID];
     
     if (self.callInfo.localRecording) {
         __weak typeof(self) wself = self;
@@ -225,7 +246,7 @@ NTES_FORBID_INTERACTIVE_POP
     
     __weak typeof(self) wself = self;
 
-    [[NIMSDK sharedSDK].netCallManager response:self.callInfo.callID accept:accept option:option completion:^(NSError *error, UInt64 callID) {
+    [[NIMAVChatSDK sharedSDK].netCallManager response:self.callInfo.callID accept:accept option:option completion:^(NSError *error, UInt64 callID) {
         if (!error) {
                 [wself onCalling];
                 [wself.player stop];
@@ -281,27 +302,232 @@ NTES_FORBID_INTERACTIVE_POP
     //子类重写
 }
 
+-(BOOL)startAudioRecording
+{
+    UInt64 timestamp =[[NSDate date]timeIntervalSince1970]*1000;
+    NSString * pathComponent = [NSString stringWithFormat:@"record_audio%@_%llu",[[NIMSDK sharedSDK].loginManager currentAccount],timestamp];
+    NSURL *filePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:pathComponent];
 
+    return [[NIMAVChatSDK sharedSDK].netCallManager startAudioRecording:filePath error:nil];
+}
 - (BOOL)startLocalRecording
 {
-    NSString *fileName = [NSString stringWithFormat:@"videochat_record_%llu.mp4", self.callInfo.callID];
-    NSURL *filePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:fileName];
+    UInt64 timestamp =[[NSDate date]timeIntervalSince1970]*1000;
+    NSString * pathComponent = [NSString stringWithFormat:@"record_%@_%llu.mp4",[[NIMSDK sharedSDK].loginManager currentAccount],timestamp];
+    NSURL *filePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:pathComponent];
     
     BOOL startAccepted;
-    startAccepted = [[NIMSDK sharedSDK].netCallManager startLocalRecording:filePath
-                                                              videoBitrate:(UInt32)[[NTESBundleSetting sharedConfig] localRecordVideoKbps] * 1000];
+    startAccepted = [[NIMAVChatSDK sharedSDK].netCallManager startRecording:filePath
+                                                               videoBitrate:(UInt32)[[NTESBundleSetting sharedConfig] localRecordVideoKbps] * 1000
+                                                                        uid:[[NIMSDK sharedSDK].loginManager currentAccount]
+];
     return startAccepted;
 }
 
+- (BOOL)startOtherSideRecording
+{
+    UInt64 timestamp =[[NSDate date]timeIntervalSince1970]*1000;
+    NSString * pathComponent = [NSString stringWithFormat:@"record_%@_%llu.mp4",self.peerUid,timestamp];
+    NSURL *filePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:pathComponent];
+
+    
+    BOOL startAccepted;
+    startAccepted = [[NIMAVChatSDK sharedSDK].netCallManager startRecording:filePath
+                                                               videoBitrate:(UInt32)[[NTESBundleSetting sharedConfig] localRecordVideoKbps] * 1000
+                                                                        uid:self.peerUid
+                     ];
+    return startAccepted;
+}
+
+-(void)stopAudioRecording
+{
+    [[NIMAVChatSDK sharedSDK].netCallManager stopAudioRecording];
+    self.callInfo.audioConversation = NO;
+}
 
 - (BOOL)stopLocalRecording
 {
-    return [[NIMSDK sharedSDK].netCallManager stopLocalRecording];
+    return [[NIMAVChatSDK sharedSDK].netCallManager stopRecordingWithUid:[[NIMSDK sharedSDK].loginManager currentAccount]];
+}
+
+- (BOOL)stopOtherSideRecording
+{
+    return [[NIMAVChatSDK sharedSDK].netCallManager stopRecordingWithUid:self.peerUid];
 }
 
 - (void)udpateLowSpaceWarning:(BOOL)show
 {
     //子类重写
+}
+
+-(void)recordWithAudioConversation:(BOOL)audioConversationOn myMedia:(BOOL)myMediaOn otherSideMedia:(BOOL)otherSideMediaOn video:(BOOL)isVideo
+{
+    NSString *toastText = @"";
+    int records = 0;
+    _successRecords = 0;//不包括语音对话
+    //语音对话
+    if (audioConversationOn) {
+        records++;
+        if (!self.callInfo.audioConversation) {
+            toastText =@"语音对话开始失败";
+        }
+    }
+    //自己音视频
+    if (myMediaOn) {
+        records++;
+        if (![self startLocalRecording]) {
+            if(isVideo)
+            {
+                toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"自己音视频开始失败":@",自己音视频开始失败"];
+            }
+            else
+            {
+                toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"自己音频开始失败":@",自己音频开始失败"];
+            }
+            
+        }
+        else
+        _successRecords++;
+
+    }
+    //对方音视频
+    if (otherSideMediaOn) {
+        records++;
+        if (![self startOtherSideRecording]) {
+            if (isVideo) {
+                toastText =[toastText stringByAppendingString:[toastText isEqualToString:@""] ?@"对方音视频开始失败":@",对方音视频开始失败"];
+            }
+            else
+            {
+                toastText =[toastText stringByAppendingString:[toastText isEqualToString:@""] ?@"对方音频开始失败":@",对方音频开始失败"];
+            }
+
+        }
+        else
+            _successRecords++;
+
+    }
+    
+    //判断是否需要提示
+    if (![toastText isEqualToString:@""]) {
+        if ([toastText componentsSeparatedByString:@","].count == records) {
+            [self.view makeToast:@"开始录制失败"
+                        duration:2
+                        position:CSToastPositionCenter];
+        }
+        else
+        {
+            [self.view makeToast:toastText
+                        duration:2
+                        position:CSToastPositionCenter];
+        }
+    }
+
+}
+
+- (void)stopRecordTaskWithVideo:(BOOL)isVideo
+{
+    NSString *toastText = @"";
+    int records = 0;
+
+    //结束自己音视频
+    if (self.callInfo.localRecording) {
+        records++;
+        if (![self stopLocalRecording]) {
+            if (isVideo) {
+                toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"自己音视频结束失败":@",自己音视频结束失败"];
+            }
+            else
+            {
+                toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"自己音频结束失败":@",自己音频结束失败"];
+            }
+
+        }
+    }
+    //结束对方音视频
+    if (self.callInfo.otherSideRecording) {
+        records++;
+        if (![self stopOtherSideRecording]) {
+            if (isVideo) {
+                toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"对方音视频结束失败":@",对方音视频结束失败"];
+            }
+            else
+            {
+                 toastText = [toastText stringByAppendingString: [toastText isEqualToString:@""] ?@"对方音频结束失败":@",对方音频结束失败"];
+            }
+
+        }
+    }
+    //判断是否要提示
+    if (![toastText isEqualToString:@""]) {
+        if ([toastText componentsSeparatedByString:@","].count == records) {
+            [self.view makeToast:@"结束录制失败"
+                        duration:3
+                        position:CSToastPositionCenter];
+        }
+        else
+        {
+            [self.view makeToast:toastText
+                        duration:3
+                        position:CSToastPositionCenter];
+        }
+    }
+
+
+}
+
+-(BOOL)allRecordsStopped
+{
+    //当前没有录制任务
+    if (!self.callInfo.localRecording&&!self.callInfo.otherSideRecording&&!self.callInfo.audioConversation) {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
+
+-(BOOL)allRecordsSucceeed
+{
+    int num = self.callInfo.localRecording + self.callInfo.otherSideRecording;
+    if (num == _successRecords) {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
+
+-(NSString *)peerUid
+{
+    if (_peerUid) {
+        return _peerUid;
+    }
+    else
+    {
+        if ([_callInfo.callee isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
+            _peerUid =  _callInfo.caller;
+            return _callInfo.caller;
+        }
+        else
+        {
+            _peerUid =  _callInfo.callee;
+            return _callInfo.callee;
+        }
+    }
+}
+
+-(void)showRecordSelectView:(BOOL)isVideo
+{
+    if (!_recordView) {
+        _recordView = [[NTESRecordSelectView alloc]initWithFrame:CGRectMake(0, 0, 250, 250) Video:isVideo];
+        _recordView.delegate = self;
+        _recordView.centerX = self.view.width/2;
+        _recordView.centerY = self.view.height/2;
+    }
+    [self.view addSubview:_recordView];
 }
 
 #pragma mark - NIMNetCallManagerDelegate
@@ -311,6 +537,10 @@ NTES_FORBID_INTERACTIVE_POP
     
     if (user == [[NIMSDK sharedSDK].loginManager currentAccount]) {
         //多端登录时，自己会收到自己发出的控制指令，这里忽略他
+        return;
+    }
+    
+    if (callID != self.callInfo.callID) {
         return;
     }
     
@@ -327,7 +557,7 @@ NTES_FORBID_INTERACTIVE_POP
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     NSMutableArray *room = wself.chatRoom;
                     if (wself && room && room.count == 1) {
-                        [[NIMSDK sharedSDK].netCallManager hangup:callId];
+                        [[NIMAVChatSDK sharedSDK].netCallManager hangup:callId];
                         wself.chatRoom = nil;
                         [wself playTimeoutRing];
                         [wself.navigationController.view makeToast:@"无人接听"
@@ -342,20 +572,20 @@ NTES_FORBID_INTERACTIVE_POP
         case NIMNetCallControlTypeBusyLine: {
             [self playOnCallRing];
             _userHangup = YES;
-            [[NIMSDK sharedSDK].netCallManager hangup:callID];
+            [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
             __weak typeof(self) wself = self;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [wself dismiss:nil];
             });
             break;
         }
-        case NIMNetCallControlTypeStartLocalRecord:
-            [self.view makeToast:@"对方开始了本地录制"
+        case NIMNetCallControlTypeStartRecord:
+            [self.view makeToast:@"对方开始了录制"
                         duration:1
                         position:CSToastPositionCenter];
             break;
-        case NIMNetCallControlTypeStopLocalRecord:
-            [self.view makeToast:@"对方结束了本地录制"
+        case NIMNetCallControlTypeStopRecord:
+            [self.view makeToast:@"对方结束了录制"
                         duration:1
                         position:CSToastPositionCenter];
             break;
@@ -372,7 +602,11 @@ NTES_FORBID_INTERACTIVE_POP
                                              duration:2
                                              position:CSToastPositionCenter];
             [self playHangUpRing];
-            [self dismiss:nil];
+            __weak typeof(self) wself = self;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [wself dismiss:nil];
+            });
+
         }else{
             [self.player stop];
             [self onCalling];
@@ -423,18 +657,22 @@ NTES_FORBID_INTERACTIVE_POP
     }
 }
 
-- (void)onLocalRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL
+- (void)onRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL                                 uid:(NSString *)userId
 {
     if (self.callInfo.callID == callID) {
-        self.callInfo.localRecording = YES;
-        [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID
-                                              type:NIMNetCallControlTypeStartLocalRecord];
+        if ([userId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
+            self.callInfo.localRecording = YES;
+        }
+        if ([userId isEqualToString:self.peerUid]) {
+            self.callInfo.otherSideRecording = YES;
+        }
     }
 }
 
 
-- (void)onLocalRecordError:(NSError *)error
+- (void)onRecordError:(NSError *)error
                     callID:(UInt64)callID
+                       uid:(NSString *)userId
 {
     DDLogError(@"Local record error %@ (%zd)", error.localizedDescription, error.code);
     
@@ -444,7 +682,13 @@ NTES_FORBID_INTERACTIVE_POP
                     duration:2
                     position:CSToastPositionCenter];
 
-        self.callInfo.localRecording = NO;
+        if ([userId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
+            self.callInfo.localRecording = NO;
+        }
+        if ([userId isEqualToString:self.peerUid]) {
+            self.callInfo.otherSideRecording = NO;
+        }
+
     }
     
     if (error.code == NIMLocalErrorCodeRecordWillStopForLackSpace) {
@@ -452,18 +696,28 @@ NTES_FORBID_INTERACTIVE_POP
     }
 }
 
-- (void) onLocalRecordStopped:(UInt64)callID
+- (void) onRecordStopped:(UInt64)callID
                       fileURL:(NSURL *)fileURL
+                          uid:(NSString *)userId
 {
     if (self.callInfo.callID == callID) {
-        self.callInfo.localRecording = NO;
-        [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID
-                                              type:NIMNetCallControlTypeStopLocalRecord];
+        if ([userId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
+            self.callInfo.localRecording = NO;
+        }
+        if ([userId isEqualToString:self.peerUid]) {
+            self.callInfo.otherSideRecording = NO;
+        }
         //辅助验证: 写到系统相册
-        [self saveToPhotosAlbum:fileURL];
+        [self requestAuthorizationSaveToPhotosAlbum:fileURL];
     }
 }
 
+#pragma mark - NTESRecordSelectViewDelegate
+
+-(void)onRecordWithAudioConversation:(BOOL)audioConversationOn myMedia:(BOOL)myMediaOn otherSideMedia:(BOOL)otherSideMediaOn
+{
+    //子类重写
+}
 
 #pragma mark - M80TimerHolderDelegate
 - (void)onNTESTimerFired:(NTESTimerHolder *)holder{
@@ -529,29 +783,76 @@ NTES_FORBID_INTERACTIVE_POP
                                                 animated:NO];
 }
 
+- (void)requestAuthorizationSaveToPhotosAlbum:(NSURL *)fileURL
+{
+    __weak typeof(self) wself = self;
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusRestricted || status == PHAuthorizationStatusDenied)
+            {
+                //没有权限
+                dispatch_async_main_safe(^{
+                                             [wself.navigationController.view makeToast:@"保存失败,没有相册权限"
+                                                                               duration:3
+                                                                               position:CSToastPositionCenter];
+                                         });
+            }
+            else if (status == PHAuthorizationStatusAuthorized)
+            {
+                //有权限
+                [wself saveToPhotosAlbum:fileURL];
+            }
+        }];
+    }
+    else
+    {
+        [self saveToPhotosAlbum:fileURL];
+    }
+    
+}
+
 - (void)saveToPhotosAlbum:(NSURL *)fileURL
 {
     if (fileURL) {
         __weak typeof(self) wself = self;
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeVideoAtPathToSavedPhotosAlbum:fileURL
-                                    completionBlock:^(NSURL *assetURL, NSError *error) {
-            
-            NSString *toast = _recordWillStopForLackSpace ? @"你的手机内存不足，录制已结束\n" : @"录制已结束\n";
-                                        
-            if (error) {
-                toast = [NSString stringWithFormat:@"%@保存至系统相册失败:%zd", toast, error.code];
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0) {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeVideoAtPathToSavedPhotosAlbum:fileURL
+                                        completionBlock:^(NSURL *assetURL, NSError *error) {
+                                            [wself checkVideoSaveToAlbum:error];
+                                        }];
+        }
+        else
+        {
+            [[PHPhotoLibrary sharedPhotoLibrary]performChanges:^{
+                [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
             }
-            else {
-                toast = [toast stringByAppendingString:@"录制文件已保存至系统相册"];
-            }
-            
-            [wself.navigationController.view makeToast:toast
-                                              duration:3
-                                              position:CSToastPositionCenter];
-        }];
-
+                                             completionHandler:^(BOOL success, NSError * _Nullable error) {
+                                                 dispatch_async_main_safe(^{
+                                                     [wself checkVideoSaveToAlbum:error];
+                                                 });
+                                             }];
+        }
     }
+}
+
+- (void)checkVideoSaveToAlbum:(NSError *)error
+{
+    NSString *toast = _recordWillStopForLackSpace ? @"你的手机内存不足，录制已结束\n" : @"录制已结束\n";
+    
+    if (error) {
+        toast = [NSString stringWithFormat:@"%@保存至系统相册失败:%zd", toast, error.code];
+    }
+    else {
+        toast = [toast stringByAppendingString:@"录制文件已保存至系统相册"];
+    }
+    
+    if (!self.callInfo.localRecording&&!self.callInfo.otherSideRecording&&_successRecords==1) {
+        [self.navigationController.view makeToast:toast
+                                          duration:3
+                                          position:CSToastPositionCenter];
+    }
+    _successRecords--;
 }
 
 - (void)checkFreeDiskSpace{

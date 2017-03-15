@@ -16,7 +16,7 @@
 
 @property(nonatomic,assign) UInt64 callID;
 
-@property(nonatomic,assign) NIMNetCallType callType;
+@property(nonatomic,assign) NIMNetCallMediaType callType;
 
 @property(nonatomic,assign) NSTimeInterval startTime;
 
@@ -29,5 +29,9 @@
 @property(nonatomic,assign) BOOL disableCammera;
 
 @property(nonatomic,assign) BOOL localRecording;
+
+@property(nonatomic,assign) BOOL otherSideRecording;
+
+@property(nonatomic,assign) BOOL audioConversation;
 
 @end

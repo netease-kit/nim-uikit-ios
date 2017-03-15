@@ -15,9 +15,10 @@
 #import "UIView+Toast.h"
 #import "UIAlertView+NTESBlock.h"
 #import "NTESVideoChatNetStatusView.h"
+#import "NTESRecordSelectView.h"
+#import "UIView+NTES.h"
 
 @interface NTESAudioChatViewController ()
-
 @end
 
 @implementation NTESAudioChatViewController
@@ -28,7 +29,7 @@
         self.callInfo.isMute = NO;
         self.callInfo.disableCammera = NO;
         self.callInfo.useSpeaker = NO;
-        [[NIMSDK sharedSDK].netCallManager switchType:NIMNetCallTypeAudio];
+        [[NIMAVChatSDK sharedSDK].netCallManager switchType:NIMNetCallMediaTypeAudio];
     }
     return self;
 }
@@ -131,7 +132,7 @@
     
     NSString *peerUid = ([[NIMSDK sharedSDK].loginManager currentAccount] == self.callInfo.caller) ? self.callInfo.callee : self.callInfo.caller;
     
-    NIMNetCallNetStatus status = [[NIMSDK sharedSDK].netCallManager netStatus:peerUid];
+    NIMNetCallNetStatus status = [[NIMAVChatSDK sharedSDK].netCallManager netStatus:peerUid];
     [self.netStatusView refreshWithNetState:status];
     self.hangUpBtn.hidden  = NO;
     self.muteBtn.hidden    = NO;
@@ -144,8 +145,8 @@
     self.acceptBtn.hidden = YES;
     self.muteBtn.selected    = self.callInfo.isMute;
     self.speakerBtn.selected = self.callInfo.useSpeaker;
-    self.localRecordBtn.selected = self.callInfo.localRecording;
-    self.localRecordingView.hidden = !self.callInfo.localRecording;
+    self.localRecordBtn.selected =![self allRecordsStopped];
+    self.localRecordingView.hidden = [self allRecordsStopped];
     self.lowMemoryView.hidden = YES;
 }
 
@@ -182,46 +183,57 @@
 - (IBAction)mute:(id)sender{
     self.callInfo.isMute  = !self.callInfo.isMute;
     self.muteBtn.selected = self.callInfo.isMute;
-    [[NIMSDK sharedSDK].netCallManager setMute:self.callInfo.isMute];
+    [[NIMAVChatSDK sharedSDK].netCallManager setMute:self.callInfo.isMute];
 }
 
 - (IBAction)userSpeaker:(id)sender{
     self.callInfo.useSpeaker = !self.callInfo.useSpeaker;
     self.speakerBtn.selected = self.callInfo.useSpeaker;
-    [[NIMSDK sharedSDK].netCallManager setSpeaker:self.callInfo.useSpeaker];
+    [[NIMAVChatSDK sharedSDK].netCallManager setSpeaker:self.callInfo.useSpeaker];
 }
 
 - (IBAction)switchToVideoMode:(id)sender {
     [self.view makeToast:@"已发送转换请求，请等待对方应答..."
                 duration:2
                 position:CSToastPositionCenter];
-    [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeToVideo];
+    [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeToVideo];
 }
 
 - (IBAction)localRecord:(id)sender {
-    
-    if (self.callInfo.localRecording) {
-        if (![self stopLocalRecording]) {
-            [self.view makeToast:@"无法结束录制"
-                        duration:3
-                        position:CSToastPositionCenter];
-        }
+    //出现录制选择框
+    if ([self allRecordsStopped]) {
+        [self showRecordSelectView:NO];
     }
-    else {
-        NSString *toastText;
-        if ([self startLocalRecording]) {
-            toastText = @"仅录制你说话的内容";
+    //同时停止所有录制
+    else
+    {
+        if (self.callInfo.audioConversation) {
+            [self stopAudioRecording];
+            if([self allRecordsStopped])
+            {
+                self.localRecordBtn.selected = NO;
+                self.localRecordingView.hidden = YES;
+                self.lowMemoryView.hidden = YES;
+            }
         }
-        else {
-            toastText = @"无法开始录制";
-        }
-        [self.view makeToast:toastText
-                    duration:3
-                    position:CSToastPositionCenter];
+        [self stopRecordTaskWithVideo:NO];
     }
-
 }
 
+#pragma mark - NTESRecordSelectViewDelegate
+-(void)onRecordWithAudioConversation:(BOOL)audioConversationOn myMedia:(BOOL)myMediaOn otherSideMedia:(BOOL)otherSideMediaOn
+{
+    if (audioConversationOn) {
+        //开始语音对话
+        if ([self startAudioRecording]) {
+            self.callInfo.audioConversation = YES;
+            self.localRecordBtn.selected = YES;
+            self.localRecordingView.hidden = NO;
+            self.lowMemoryView.hidden = YES;
+        }
+    }
+    [self recordWithAudioConversation:audioConversationOn myMedia:myMediaOn otherSideMedia:otherSideMediaOn video:NO];
+}
 
 #pragma mark - NIMNetCallManagerDelegate
 
@@ -265,9 +277,9 @@
     }
 }
 
-- (void)onLocalRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL
+- (void)onRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL                          uid:(NSString *)userId;
 {
-    [super onLocalRecordStarted:callID fileURL:fileURL];
+    [super onRecordStarted:callID fileURL:fileURL uid:userId];
     if (self.callInfo.callID == callID) {
         self.localRecordBtn.selected = YES;
         self.localRecordingView.hidden = NO;
@@ -276,22 +288,24 @@
 }
 
 
-- (void)onLocalRecordError:(NSError *)error
+- (void)onRecordError:(NSError *)error
                     callID:(UInt64)callID
+                       uid:(NSString *)userId;
 {
-    [super onLocalRecordError:error callID:callID];
-    if (self.callInfo.callID == callID) {
-        self.localRecordBtn.selected = NO;
+    [super onRecordError:error callID:callID uid:userId];
+    if (self.callInfo.callID == callID && !self.callInfo.localRecording&&!self.callInfo.otherSideRecording) {
+            self.localRecordBtn.selected = NO;
         self.localRecordingView.hidden = YES;
         self.lowMemoryView.hidden = YES;
     }
 }
 
-- (void) onLocalRecordStopped:(UInt64)callID
+- (void)onRecordStopped:(UInt64)callID
                       fileURL:(NSURL *)fileURL
+                          uid:(NSString *)userId;
 {
-    [super onLocalRecordStopped:callID fileURL:fileURL];
-    if (self.callInfo.callID == callID) {
+    [super onRecordStopped:callID fileURL:fileURL uid:userId];
+    if (self.callInfo.callID == callID&&!self.callInfo.localRecording&& !self.callInfo.otherSideRecording) {
         self.localRecordBtn.selected = NO;
         self.localRecordingView.hidden = YES;
         self.lowMemoryView.hidden = YES;
@@ -321,13 +335,13 @@
     [alert showAlertWithCompletionHandler:^(NSInteger idx) {
         switch (idx) {
             case 0:
-                [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeRejectToVideo];
+                [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeRejectToVideo];
                 [self.view makeToast:@"已拒绝"
                             duration:2
                             position:CSToastPositionCenter];
                 break;
             case 1:
-                [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeAgreeToVideo];
+                [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeAgreeToVideo];
                 [self videoCallingInterface];
                 break;
             default:

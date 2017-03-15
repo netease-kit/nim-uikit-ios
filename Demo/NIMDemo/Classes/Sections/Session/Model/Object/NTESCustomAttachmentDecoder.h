@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMSDK.h"
 
 @interface NTESCustomAttachmentDecoder : NSObject<NIMCustomAttachmentCoding>
 

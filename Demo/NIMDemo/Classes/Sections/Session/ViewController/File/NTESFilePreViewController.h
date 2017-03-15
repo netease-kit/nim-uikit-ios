@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NIMFileObject.h"
 @interface NTESFilePreViewController : UIViewController
 
 @property(nonatomic,strong) IBOutlet UIButton *actionBtn;

@@ -10,7 +10,6 @@
 #import "NTESAppDelegate.h"
 #import "NTESSessionListViewController.h"
 #import "NTESContactViewController.h"
-#import "NIMSDK.h"
 #import "UIImage+NTESColor.h"
 #import "NTESCustomNotificationDB.h"
 #import "NTESNotificationCenter.h"

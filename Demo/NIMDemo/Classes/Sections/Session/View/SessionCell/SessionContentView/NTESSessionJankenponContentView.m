@@ -8,7 +8,6 @@
 
 #import "NTESSessionJankenponContentView.h"
 #import "UIView+NTES.h"
-#import "NIMSDK.h"
 #import "NTESJanKenPonAttachment.h"
 #import "NTESSessionUtil.h"
 

@@ -16,9 +16,10 @@
 //通话过程中，从语音聊天切到视频聊天
 - (instancetype)initWithCallInfo:(NetCallChatInfo *)callInfo;
 
-@property (nonatomic,strong) IBOutlet UIImageView *remoteView;
+@property (weak, nonatomic) IBOutlet UIImageView *bigVideoView;
 
-@property (nonatomic,strong) IBOutlet UIView   *localView;
+
+@property (weak, nonatomic) IBOutlet UIView *smallVideoView;
 
 @property (nonatomic,strong) IBOutlet UIButton *hungUpBtn;   //挂断按钮
 
@@ -49,6 +50,5 @@
 @property (weak, nonatomic) IBOutlet UIView *lowMemoryView;
 
 @property (weak, nonatomic) IBOutlet UIView *lowMemoryRedPoint;
-
 
 @end

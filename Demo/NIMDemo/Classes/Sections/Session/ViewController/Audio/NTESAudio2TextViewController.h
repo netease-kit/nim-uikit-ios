@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NIMSDK.h"
 
 
 @interface NTESAudio2TextViewController : UIViewController

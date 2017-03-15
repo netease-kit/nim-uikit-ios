@@ -8,7 +8,6 @@
 
 #import "NTESSessionChartletContentView.h"
 #import "UIView+NTES.h"
-#import "NIMSDK.h"
 #import "NTESChartletAttachment.h"
 #import "NTESSessionUtil.h"
 

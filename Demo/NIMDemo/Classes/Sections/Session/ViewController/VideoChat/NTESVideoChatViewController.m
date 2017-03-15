@@ -16,11 +16,12 @@
 #import "NTESVideoChatNetStatusView.h"
 #import "NTESGLView.h"
 #import "NTESBundleSetting.h"
+#import "NTESRecordSelectView.h"
+#import "UIView+NTES.h"
 
 #define NTESUseGLView
 
 @interface NTESVideoChatViewController ()
-
 @property (nonatomic,assign) NIMNetCallCamera cameraType;
 
 @property (nonatomic,strong) CALayer *localVideoLayer;
@@ -30,6 +31,8 @@
 #if defined (NTESUseGLView)
 @property (nonatomic, strong) NTESGLView *remoteGLView;
 #endif
+
+@property (nonatomic,weak) UIView   *localView;
 
 @end
 
@@ -45,9 +48,9 @@
         self.callInfo.disableCammera = NO;
         if (!self.localVideoLayer) {
             //没有的话，尝试去取一把预览层（从视频切到语音再切回来的情况下是会有的）
-            self.localVideoLayer = [NIMSDK sharedSDK].netCallManager.localPreviewLayer;
+            self.localVideoLayer = [NIMAVChatSDK sharedSDK].netCallManager.localPreviewLayer;
         }
-        [[NIMSDK sharedSDK].netCallManager switchType:NIMNetCallTypeVideo];
+        [[NIMAVChatSDK sharedSDK].netCallManager switchType:NIMNetCallMediaTypeVideo];
     }
     return self;
 }
@@ -63,6 +66,7 @@
 }
 
 - (void)viewDidLoad {
+    self.localView = self.smallVideoView;
     [super viewDidLoad];
     if (self.localVideoLayer) {
         [self.localView.layer addSublayer:self.localVideoLayer];
@@ -85,11 +89,11 @@
 
 - (void)initRemoteGLView {
 #if defined (NTESUseGLView)
-    _remoteGLView = [[NTESGLView alloc] initWithFrame:_remoteView.bounds];
+    _remoteGLView = [[NTESGLView alloc] initWithFrame:_bigVideoView.bounds];
     [_remoteGLView setContentMode:UIViewContentModeScaleAspectFit];
     [_remoteGLView setBackgroundColor:[UIColor clearColor]];
     _remoteGLView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [_remoteView addSubview:_remoteGLView];
+    [_bigVideoView addSubview:_remoteGLView];
 #endif
 }
 
@@ -123,14 +127,19 @@
     self.connectingLabel.hidden = NO;
     self.connectingLabel.text = @"正在呼叫，请稍候...";
     self.switchModelBtn.hidden = YES;
-    self.switchCameraBtn.hidden = YES;
-    self.muteBtn.hidden = YES;
-    self.disableCameraBtn.hidden = YES;
-    self.localRecordBtn.hidden = YES;
+    self.switchCameraBtn.hidden = NO;
+    self.muteBtn.hidden = NO;
+    self.disableCameraBtn.hidden = NO;
+    self.localRecordBtn.hidden = NO;
+    self.muteBtn.enabled = NO;
+    self.disableCameraBtn.enabled = NO;
+    self.localRecordBtn.enabled = NO;
+    
     self.localRecordingView.hidden = YES;
     self.lowMemoryView.hidden = YES;
     [self.hungUpBtn removeTarget:self action:NULL forControlEvents:UIControlEventTouchUpInside];
     [self.hungUpBtn addTarget:self action:@selector(hangup) forControlEvents:UIControlEventTouchUpInside];
+    self.localView = self.bigVideoView;
 }
 
 //选择是否接听界面
@@ -170,7 +179,7 @@
 //接听中界面(视频)
 - (void)videoCallingInterface{
     
-    NIMNetCallNetStatus status = [[NIMSDK sharedSDK].netCallManager netStatus:self.peerUid];
+    NIMNetCallNetStatus status = [[NIMAVChatSDK sharedSDK].netCallManager netStatus:self.peerUid];
     [self.netStatusView refreshWithNetState:status];
     self.acceptBtn.hidden = YES;
     self.refuseBtn.hidden   = YES;
@@ -181,10 +190,17 @@
     self.disableCameraBtn.hidden = NO;
     self.localRecordBtn.hidden = NO;
     self.switchModelBtn.hidden = NO;
+    
+    self.muteBtn.enabled = YES;
+    self.disableCameraBtn.enabled = YES;
+    self.localRecordBtn.enabled = YES;
+    
     self.muteBtn.selected = self.callInfo.isMute;
     self.disableCameraBtn.selected = self.callInfo.disableCammera;
-    self.localRecordBtn.selected = self.callInfo.localRecording;
-    self.localRecordingView.hidden = !self.callInfo.localRecording;
+    self.localRecordBtn.selected = ![self allRecordsStopped];
+;
+    self.localRecordingView.hidden = [self allRecordsStopped];
+;
     self.lowMemoryView.hidden = YES;
     [self.switchModelBtn setTitle:@"语音模式" forState:UIControlStateNormal];
     [self.hungUpBtn removeTarget:self action:NULL forControlEvents:UIControlEventTouchUpInside];
@@ -224,7 +240,7 @@
 - (IBAction)mute:(BOOL)sender{
     self.callInfo.isMute = !self.callInfo.isMute;
     self.player.volume = !self.callInfo.isMute;
-    [[NIMSDK sharedSDK].netCallManager setMute:self.callInfo.isMute];
+    [[NIMAVChatSDK sharedSDK].netCallManager setMute:self.callInfo.isMute];
     self.muteBtn.selected = self.callInfo.isMute;
 }
 
@@ -234,51 +250,68 @@
     }else{
         self.cameraType = NIMNetCallCameraFront;
     }
-    [[NIMSDK sharedSDK].netCallManager switchCamera:self.cameraType];
+    [[NIMAVChatSDK sharedSDK].netCallManager switchCamera:self.cameraType];
     self.switchCameraBtn.selected = (self.cameraType == NIMNetCallCameraBack);
 }
 
 
 - (IBAction)disableCammera:(id)sender{
     self.callInfo.disableCammera = !self.callInfo.disableCammera;
-    [[NIMSDK sharedSDK].netCallManager setCameraDisable:self.callInfo.disableCammera];
+    [[NIMAVChatSDK sharedSDK].netCallManager setCameraDisable:self.callInfo.disableCammera];
     self.disableCameraBtn.selected = self.callInfo.disableCammera;
     if (self.callInfo.disableCammera) {
         [self.localVideoLayer removeFromSuperlayer];
-        [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeCloseVideo];
+        [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeCloseVideo];
     }else{
         [self.localView.layer addSublayer:self.localVideoLayer];
-        [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeOpenVideo];
+        [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeOpenVideo];
     }
 }
 
 - (IBAction)localRecord:(id)sender {
-    
-    if (self.callInfo.localRecording) {
-        if (![self stopLocalRecording]) {
-            [self.view makeToast:@"无法结束录制"
-                        duration:3
-                        position:CSToastPositionCenter];
-        }
+    //出现录制选择框
+    if ([self allRecordsStopped]) {
+        [self showRecordSelectView:YES];
     }
-    else {
-        NSString *toastText;
-        if ([self startLocalRecording]) {
-            toastText = @"仅录制你的声音和图像";
+    //同时停止所有录制
+    else
+    {
+        //结束语音对话
+        if (self.callInfo.audioConversation) {
+            [self stopAudioRecording];
+            if([self allRecordsStopped])
+            {
+                self.localRecordBtn.selected = NO;
+                self.localRecordingView.hidden = YES;
+                self.lowMemoryView.hidden = YES;
+            }
         }
-        else {
-            toastText = @"无法开始录制";
-        }
-        [self.view makeToast:toastText
-                    duration:3
-                    position:CSToastPositionCenter];
+        [self stopRecordTaskWithVideo:YES];
     }
+
 }
 
 
 - (IBAction)switchCallingModel:(id)sender{
-    [[NIMSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeToAudio];
+    [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeToAudio];
     [self switchToAudio];
+}
+
+
+#pragma mark - NTESRecordSelectViewDelegate
+
+-(void)onRecordWithAudioConversation:(BOOL)audioConversationOn myMedia:(BOOL)myMediaOn otherSideMedia:(BOOL)otherSideMediaOn
+{
+    if (audioConversationOn) {
+        //开始语音对话
+        if ([self startAudioRecording]) {
+            self.callInfo.audioConversation = YES;
+            self.localRecordBtn.selected = YES;
+            self.localRecordingView.hidden = NO;
+            self.lowMemoryView.hidden = YES;
+        }
+    }
+    [self recordWithAudioConversation:audioConversationOn myMedia:myMediaOn otherSideMedia:otherSideMediaOn video:YES];
 }
 
 
@@ -316,8 +349,8 @@
     if (self.oppositeCloseVideo) {
         return;
     }
-    self.remoteView.contentMode = UIViewContentModeScaleAspectFill;
-    self.remoteView.image = [UIImage imageWithCGImage:image];
+    self.bigVideoView.contentMode = UIViewContentModeScaleAspectFill;
+    self.bigVideoView.image = [UIImage imageWithCGImage:image];
 }
 #endif
 
@@ -355,6 +388,14 @@
         
         self.durationLabel.hidden = NO;
         self.durationLabel.text = self.durationDesc;
+        
+        if (self.localView == self.bigVideoView) {
+            self.localView = self.smallVideoView;
+            
+            if (self.localVideoLayer) {
+                [self onLocalPreviewReady:self.localVideoLayer];
+            }
+        }
     }
 }
 
@@ -366,9 +407,9 @@
 }
 
 
-- (void)onLocalRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL
+- (void)onRecordStarted:(UInt64)callID fileURL:(NSURL *)fileURL                          uid:(NSString *)userId
 {
-    [super onLocalRecordStarted:callID fileURL:fileURL];
+    [super onRecordStarted:callID fileURL:fileURL uid:userId];
     if (self.callInfo.callID == callID) {
         self.localRecordBtn.selected = YES;
         self.localRecordingView.hidden = NO;
@@ -377,25 +418,36 @@
 }
 
 
-- (void)onLocalRecordError:(NSError *)error
+- (void)onRecordError:(NSError *)error
                     callID:(UInt64)callID
+                       uid:(NSString *)userId;
+
 {
-    [super onLocalRecordError:error callID:callID];
+    [super onRecordError:error callID:callID uid:userId];
     if (self.callInfo.callID == callID) {
-        self.localRecordBtn.selected = NO;
-        self.localRecordingView.hidden = YES;
-        self.lowMemoryView.hidden = YES;
+        //判断是否全部结束
+        if([self allRecordsStopped])
+        {
+            self.localRecordBtn.selected = NO;
+            self.localRecordingView.hidden = YES;
+            self.lowMemoryView.hidden = YES;
+        }
     }
 }
 
-- (void) onLocalRecordStopped:(UInt64)callID
+- (void) onRecordStopped:(UInt64)callID
                       fileURL:(NSURL *)fileURL
+                          uid:(NSString *)userId;
+
 {
-    [super onLocalRecordStopped:callID fileURL:fileURL];
+    [super onRecordStopped:callID fileURL:fileURL uid:userId];
     if (self.callInfo.callID == callID) {
-        self.localRecordBtn.selected = NO;
-        self.localRecordingView.hidden = YES;
-        self.lowMemoryView.hidden = YES;
+        if([self allRecordsStopped])
+        {
+            self.localRecordBtn.selected = NO;
+            self.localRecordingView.hidden = YES;
+            self.lowMemoryView.hidden = YES;
+        }
     }
 }
 
@@ -425,7 +477,7 @@
     [self.remoteGLView render:nil width:0 height:0];
 #endif
 
-    self.remoteView.image = [UIImage imageNamed:@"netcall_bkg.jpg"];
+    self.bigVideoView.image = [UIImage imageNamed:@"netcall_bkg.png"];
 }
 
 @end

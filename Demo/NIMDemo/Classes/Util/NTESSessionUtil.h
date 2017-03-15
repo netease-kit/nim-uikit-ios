@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "NIMSDK.h"
 
 @interface NTESSessionUtil : NSObject
 

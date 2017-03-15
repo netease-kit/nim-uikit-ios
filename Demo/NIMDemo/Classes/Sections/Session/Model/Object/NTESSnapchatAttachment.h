@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMSDK.h"
 #import "NTESCustomAttachmentDefines.h"
 
 @interface NTESSnapchatAttachment : NSObject<NIMCustomAttachment,NTESCustomAttachmentInfo>

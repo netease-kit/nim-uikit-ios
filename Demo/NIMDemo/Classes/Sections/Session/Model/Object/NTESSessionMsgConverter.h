@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "NIMSDK.h"
 
 @class NTESJanKenPonAttachment;
 @class NTESSnapchatAttachment;

@@ -8,7 +8,6 @@
 
 #import "NTESTeamListViewController.h"
 #import "NTESSessionViewController.h"
-#import "NIMSDK.h"
 
 @interface NTESTeamListViewController () <UITableViewDelegate, UITableViewDataSource,NIMTeamManagerDelegate> {
 }

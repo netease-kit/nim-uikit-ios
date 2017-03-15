@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NIMSDK.h"
+#import <NIMSDK/NIMSDK.h>
 @interface Attachment : NSObject<NIMCustomAttachment>
 
 @property (nonatomic,copy) NSString *title;

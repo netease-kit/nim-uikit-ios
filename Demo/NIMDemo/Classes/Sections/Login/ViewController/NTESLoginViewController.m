@@ -9,7 +9,6 @@
 #import "NTESLoginViewController.h"
 #import "NTESSessionViewController.h"
 #import "NTESSessionUtil.h"
-#import "NIMSDK.h"
 #import "NTESMainTabController.h"
 #import "UIView+Toast.h"
 #import "SVProgressHUD.h"

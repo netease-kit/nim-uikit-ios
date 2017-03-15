@@ -8,7 +8,6 @@
 
 #import "NTESLogManager.h"
 #import "NTESLogViewController.h"
-#import "NIMSDK.h"
 #import "NTESBundleSetting.h"
 
 @interface NTESLogManager () {
@@ -66,7 +65,7 @@
 
 - (UIViewController *)sdkNetCallLogViewController
 {
-    NSString *filepath = [[NIMSDK sharedSDK].netCallManager netCallLogFilepath];
+    NSString *filepath = [[NIMAVChatSDK sharedSDK].netCallManager netCallLogFilepath];
     NTESLogViewController *vc = [[NTESLogViewController alloc] initWithFilepath:filepath];
     vc.title = @"NetCall Log";
     return vc;
@@ -74,7 +73,7 @@
 
 - (UIViewController *)sdkNetDetectLogViewController
 {
-    NSString *filepath = [[NIMSDK sharedSDK].avchatNetDetectManager logFilepath];
+    NSString *filepath = [[NIMAVChatSDK sharedSDK].avchatNetDetectManager logFilepath];
     NTESLogViewController *vc = [[NTESLogViewController alloc] initWithFilepath:filepath];
     vc.title = @"Net Detect Log";
     return vc;

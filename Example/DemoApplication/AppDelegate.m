@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "NIMSDK.h"
+#import <NIMSDK/NIMSDK.h>
 #import "DataProvider.h"
 #import "CellLayoutConfig.h"
 #import "AttachmentDecoder.h"

@@ -7,7 +7,6 @@
 //
 
 #import "NTESClientsTableViewController.h"
-#import "NIMSDK.h"
 #import "NTESSessionUtil.h"
 #import "UIView+NTES.h"
 #import "NTESMutiClientsCell.h"

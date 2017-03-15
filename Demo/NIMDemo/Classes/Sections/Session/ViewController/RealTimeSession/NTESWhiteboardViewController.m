@@ -7,7 +7,6 @@
 //
 
 #import "NTESWhiteboardViewController.h"
-#import "NIMSDK.h"
 #import "NTESWhiteboardDrawView.h"
 #import "NTESTimerHolder.h"
 #import "UIView+Toast.h"
@@ -15,7 +14,6 @@
 #import "NIMAvatarImageView.h"
 #import "NTESWhiteboardAttachment.h"
 #import "NTESSessionMsgConverter.h"
-#import "NIMRTSRecordingInfo.h"
 #import "NTESDevice.h"
 #import "NTESBundleSetting.h"
 
@@ -106,7 +104,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    id<NIMRTSManager> manager = [NIMSDK sharedSDK].rtsManager;
+    id<NIMRTSManager> manager = [NIMAVChatSDK sharedSDK].rtsManager;
     [manager addDelegate:self];
     [self updateButton];
     
@@ -174,9 +172,9 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 - (IBAction)onAcceptButtonPressed:(id)sender {
     
     if (_types & NIMRTSServiceAudio) {
-        UInt64 currentNetcall = [[NIMSDK sharedSDK].netCallManager currentCallID];
+        UInt64 currentNetcall = [[NIMAVChatSDK sharedSDK].netCallManager currentCallID];
         if (currentNetcall) {
-            [[NIMSDK sharedSDK].netCallManager hangup:currentNetcall];
+            [[NIMAVChatSDK sharedSDK].netCallManager hangup:currentNetcall];
         }
     }
     
@@ -186,13 +184,13 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 - (IBAction)onMuteButtonPressed:(id)sender {
     _mute = !_mute;
     [self updateButton];
-    [[NIMSDK sharedSDK].rtsManager setMute:_mute];
-    [[NIMSDK sharedSDK].rtsManager sendRTSControl:_mute ? @"关闭了声音" : @"打开了声音" forSession:_sessionID];
+    [[NIMAVChatSDK sharedSDK].rtsManager setMute:_mute];
+    [[NIMAVChatSDK sharedSDK].rtsManager sendRTSControl:_mute ? @"关闭了声音" : @"打开了声音" forSession:_sessionID];
 }
 - (IBAction)onSpeakerButtonPressed:(id)sender {
     _speaker = !_speaker;
     [self updateButton];
-    [[NIMSDK sharedSDK].rtsManager setSpeaker:_speaker];
+    [[NIMAVChatSDK sharedSDK].rtsManager setSpeaker:_speaker];
 }
 - (IBAction)onCloseButtonPressed:(id)sender {
     
@@ -286,7 +284,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     else if (type == NIMRTSServiceAudio) {
         _audioConnected = (status == NIMRTSStatusConnect) ? YES : NO;
         if (_audioConnected) {
-            [[NIMSDK sharedSDK].rtsManager setMute:_mute];
+            [[NIMAVChatSDK sharedSDK].rtsManager setMute:_mute];
         }
         else {
             DDLogInfo(@"已断开音频服务: %zd", error.code);
@@ -415,7 +413,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     [self fillUserSetting:option];
     
     __weak typeof(self) wself = self;
-    _sessionID = [[NIMSDK sharedSDK].rtsManager requestRTS:[NSArray arrayWithObject:_peerID]
+    _sessionID = [[NIMAVChatSDK sharedSDK].rtsManager requestRTS:[NSArray arrayWithObject:_peerID]
                                                   services:_types
                                                     option:option
                                                 completion:^(NSError *error, NSString *sessionID, UInt64 channelID)
@@ -441,7 +439,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     [self fillUserSetting:option];
 
     __weak typeof(self) wself = self;
-    [[NIMSDK sharedSDK].rtsManager responseRTS:_sessionID
+    [[NIMAVChatSDK sharedSDK].rtsManager responseRTS:_sessionID
                                         accept:accepted
                                         option:option
                                     completion:^(NSError *error, NSString *sessionID, UInt64 channelID) {
@@ -460,7 +458,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 {
     if (_needTerminateRTS) {
         _needTerminateRTS = NO;
-        [[NIMSDK sharedSDK].rtsManager terminateRTS:_sessionID];
+        [[NIMAVChatSDK sharedSDK].rtsManager terminateRTS:_sessionID];
     }
 }
 
@@ -504,7 +502,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 
 - (void)sendRTSData:(NSString *)data
 {
-    BOOL success = [[NIMSDK sharedSDK].rtsManager sendRTSData:[data dataUsingEncoding:NSUTF8StringEncoding]
+    BOOL success = [[NIMAVChatSDK sharedSDK].rtsManager sendRTSData:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                         from:_sessionID
                                                            to:(_isCaller ? nil : _peerID) //单播和广播发送示例
                                                         with:NIMRTSServiceReliableTransfer];
@@ -612,7 +610,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
         return;
     }
     _dismissed = YES;
-    id<NIMRTSManager> manager = [NIMSDK sharedSDK].rtsManager;
+    id<NIMRTSManager> manager = [NIMAVChatSDK sharedSDK].rtsManager;
     [manager removeDelegate:self];
     
     NTESWhiteboardAttachment *attachment = [[NTESWhiteboardAttachment alloc] init];

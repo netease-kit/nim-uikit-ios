@@ -9,7 +9,6 @@
 #import "NTESSystemNotificationCell.h"
 #import "NTESSessionUtil.h"
 #import "UIView+NTES.h"
-#import "NIMSDK.h"
 #import "NIMAvatarImageView.h"
 
 @interface NTESSystemNotificationCell ()

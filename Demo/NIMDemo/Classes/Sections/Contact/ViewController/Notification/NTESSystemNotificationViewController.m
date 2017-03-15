@@ -7,7 +7,6 @@
 //
 
 #import "NTESSystemNotificationViewController.h"
-#import "NIMSDK.h"
 #import "NTESSystemNotificationCell.h"
 #import "UIView+Toast.h"
 

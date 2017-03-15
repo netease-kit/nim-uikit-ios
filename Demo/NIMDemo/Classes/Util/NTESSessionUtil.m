@@ -311,28 +311,21 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
 
 + (void)addRecentSessionAtMark:(NIMSession *)session
 {
-    NSArray *recents = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
-    NIMRecentSession *recent;
-    for (recent in recents) {
-        if ([recent.session isEqual:session]) {
-            break;
-        }
+    NIMRecentSession *recent = [[NIMSDK sharedSDK].conversationManager recentSessionBySession:session];
+    if (recent)
+    {
+        NSDictionary *localExt = recent.localExt?:@{};
+        NSMutableDictionary *dict = [localExt mutableCopy];
+        [dict setObject:@(YES) forKey:NTESRecentSessionAtMark];
+        [[NIMSDK sharedSDK].conversationManager updateRecentLocalExt:dict recentSession:recent];
     }
-    NSDictionary *localExt = recent.localExt?:@{};
-    NSMutableDictionary *dict = [localExt mutableCopy];
-    [dict setObject:@(YES) forKey:NTESRecentSessionAtMark];
-    [[NIMSDK sharedSDK].conversationManager updateRecentLocalExt:dict recentSession:recent];
+
+
 }
 
 + (void)removeRecentSessionAtMark:(NIMSession *)session
 {
-    NSArray *recents = [NIMSDK sharedSDK].conversationManager.allRecentSessions;
-    NIMRecentSession *recent;
-    for (recent in recents) {
-        if ([recent.session isEqual:session]) {
-            break;
-        }
-    }
+    NIMRecentSession *recent = [[NIMSDK sharedSDK].conversationManager recentSessionBySession:session];
     if (recent) {
         NSMutableDictionary *localExt = [recent.localExt mutableCopy];
         [localExt removeObjectForKey:NTESRecentSessionAtMark];
