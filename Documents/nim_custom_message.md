@@ -210,7 +210,7 @@
 @end
 ```
 
-2.新建自定义消息气泡布局配置,配置需要实现 `NIMCellLayoutConfig` 协议。这里除了自定义消息歪，其他消息沿用内置配置，所以配置类继承基类 `NIMCellLayoutConfig` 。
+2.新建自定义消息气泡布局配置,配置需要实现 `NIMCellLayoutConfig` 协议。这里除自定义消息外，其他消息沿用内置配置，所以配置类继承基类 `NIMCellLayoutConfig` 。
 
 ```objc
 @interface CellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
