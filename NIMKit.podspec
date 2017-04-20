@@ -1,4 +1,4 @@
-Pod::Spec.new do |s| 
+"Pod::Spec.new do |s| 
  s.name = 'NIMKit' 
  s.version = '$version' 
  s.summary = 'Netease IM UI Kit' 
@@ -10,9 +10,9 @@ Pod::Spec.new do |s|
  s.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
  s.libraries = 'sqlite3.0', 'z', 'c++' 
  s.subspec 'Full' do |cs| 
- \s\s\s cs.source_files = 'NIMKit/NIMKit/**/*.{h,m}' 
- \s\s\s cs.dependency 'NIMKit/Core' 
- \s\s\s cs.dependency 'NIMSDK', '~> $version' 
+ cs.source_files = 'NIMKit/NIMKit/**/*.{h,m}' 
+ cs.dependency 'NIMKit/Core' 
+ cs.dependency 'NIMSDK', '~> $version' 
  end 
  s.subspec 'Lite' do |cs| 
  cs.source_files = 'NIMKit/NIMKit/**/*.{h,m}' 
