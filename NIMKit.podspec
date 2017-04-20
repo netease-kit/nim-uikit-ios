@@ -29,4 +29,4 @@
  end 
  s.default_subspec = 'Lite' 
  end 
-
+ "
