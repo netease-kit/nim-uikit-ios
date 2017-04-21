@@ -32,4 +32,4 @@ Pod::Spec.new do |s|
 
   s.default_subspec = 'Lite'  
 
- end 
+end 
