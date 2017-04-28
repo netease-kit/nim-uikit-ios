@@ -44,6 +44,8 @@
 //退出界面
 - (void)dismiss:(void (^)(void))completion;
 
+- (void)onCalleeBusy;
+
 //开始语音对话录制
 - (BOOL)startAudioRecording;
 //开始本地录制

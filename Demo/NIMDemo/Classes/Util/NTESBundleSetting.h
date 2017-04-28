@@ -43,9 +43,11 @@
 - (BOOL)serverRecordWhiteboardData;                 //服务器录制白板数据
 
 
-- (BOOL)videochatDisableAutoCropping;               //禁用自动裁剪画面
+- (NIMNetCallVideoCrop)videochatVideoCrop;          //视频画面裁剪比例
 
 - (BOOL)videochatAutoRotateRemoteVideo;             //自动旋转视频聊天远端画面
+
+- (UIViewContentMode)videochatRemoteVideoContentMode; //对端画面的填充模式
 
 - (NIMNetCallVideoQuality)preferredVideoQuality;    //期望的视频发送清晰度
 

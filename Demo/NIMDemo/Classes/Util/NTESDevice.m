@@ -17,7 +17,7 @@
 
 @interface NTESDevice ()
 
-@property (nonatomic,strong)    NSDictionary    *networkTypes;
+@property (nonatomic,copy)      NSDictionary    *networkTypes;
 
 @end
 
@@ -57,6 +57,7 @@
                           CTRadioAccessTechnologyeHRPD:@(NTESNetworkType3G),
                           CTRadioAccessTechnologyLTE:@(NTESNetworkType4G),
                      };
+    
 }
 
 
@@ -95,6 +96,21 @@
         }
         default:
             return NTESNetworkTypeUnknown;
+    }
+}
+
+
+- (NSString *)networkStatus:(NTESNetworkType)networkType
+{
+    switch (networkType) {
+        case NTESNetworkType2G:
+            return @"2G";
+        case NTESNetworkType3G:
+            return @"3G";
+        case NTESNetworkType4G:
+            return @"4G";
+        default:
+            return @"WIFI";
     }
 }
 

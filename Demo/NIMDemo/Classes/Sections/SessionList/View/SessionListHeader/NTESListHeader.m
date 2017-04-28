@@ -74,6 +74,7 @@
     NSString *text = nil;
     switch (step) {
         case NIMLoginStepLinkFailed:
+        case NIMLoginStepLoseConnection:
             text = @"当前网络不可用，请检查网络设置";
             break;
         case NIMLoginStepLoginFailed:

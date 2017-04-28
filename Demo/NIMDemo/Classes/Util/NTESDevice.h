@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger,NTESNetworkType) {
 - (BOOL)isInBackground;
 
 - (NTESNetworkType)currentNetworkType;
+- (NSString *)networkStatus:(NTESNetworkType)networkType;
 
 - (NSInteger)cpuCount;
 

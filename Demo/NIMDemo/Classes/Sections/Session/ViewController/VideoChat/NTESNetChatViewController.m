@@ -181,6 +181,8 @@ NTES_FORBID_INTERACTIVE_POP
     option.apnsContent = [NSString stringWithFormat:@"%@请求", self.callInfo.callType == NIMNetCallTypeAudio ? @"网络通话" : @"视频聊天"];
     option.apnsSound = @"video_chat_tip_receiver.aac";
     [self fillUserSetting:option];
+    
+    option.videoCaptureParam.startWithCameraOn = (self.callInfo.callType == NIMNetCallTypeVideo);
 
     __weak typeof(self) wself = self;
 
@@ -299,6 +301,11 @@ NTES_FORBID_INTERACTIVE_POP
 }
 
 - (void)waitForConnectiong{
+    //子类重写
+}
+
+- (void)onCalleeBusy
+{
     //子类重写
 }
 
@@ -570,6 +577,7 @@ NTES_FORBID_INTERACTIVE_POP
             break;
         }
         case NIMNetCallControlTypeBusyLine: {
+            [self onCalleeBusy];
             [self playOnCallRing];
             _userHangup = YES;
             [[NIMAVChatSDK sharedSDK].netCallManager hangup:callID];
@@ -874,19 +882,28 @@ NTES_FORBID_INTERACTIVE_POP
 
 - (void)fillUserSetting:(NIMNetCallOption *)option
 {
-    option.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
-    option.disableVideoCropping  = [[NTESBundleSetting sharedConfig] videochatDisableAutoCropping];
+    option.videoCrop  = [[NTESBundleSetting sharedConfig] videochatVideoCrop];
     option.autoRotateRemoteVideo = [[NTESBundleSetting sharedConfig] videochatAutoRotateRemoteVideo];
     option.serverRecordAudio     = [[NTESBundleSetting sharedConfig] serverRecordAudio];
     option.serverRecordVideo     = [[NTESBundleSetting sharedConfig] serverRecordVideo];
     option.preferredVideoEncoder = [[NTESBundleSetting sharedConfig] perferredVideoEncoder];
     option.preferredVideoDecoder = [[NTESBundleSetting sharedConfig] perferredVideoDecoder];
     option.videoMaxEncodeBitrate = [[NTESBundleSetting sharedConfig] videoMaxEncodeKbps] * 1000;
-    option.startWithBackCamera   = [[NTESBundleSetting sharedConfig] startWithBackCamera];
     option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
     option.preferHDAudio =  [[NTESBundleSetting sharedConfig] preferHDAudio];
+    
+    NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
+    [self fillVideoCaptureSetting:param];
+    option.videoCaptureParam = param;
+
+}
+
+- (void)fillVideoCaptureSetting:(NIMNetCallVideoCaptureParam *)param
+{
+    param.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
+    param.startWithBackCamera   = [[NTESBundleSetting sharedConfig] startWithBackCamera];
 
 }
 

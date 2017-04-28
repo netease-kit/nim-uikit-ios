@@ -102,14 +102,20 @@
 }
 
 
-- (BOOL)videochatDisableAutoCropping
+- (NIMNetCallVideoCrop)videochatVideoCrop
 {
-    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_disable_auto_cropping"] boolValue];
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_video_crop"] integerValue];
 }
 
 - (BOOL)videochatAutoRotateRemoteVideo
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_auto_rotate_remote_video"] boolValue];
+}
+
+- (UIViewContentMode)videochatRemoteVideoContentMode
+{
+    NSInteger setting = [[[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_remote_video_content_mode"] integerValue];
+    return (setting == 0) ? UIViewContentModeScaleAspectFill : UIViewContentModeScaleAspectFit;
 }
 
 - (NIMNetCallVideoQuality)preferredVideoQuality
@@ -226,7 +232,7 @@
                 "server_record_audio %d\n" \
                 "server_record_video %d\n" \
                 "server_record_whiteboard_data %d\n" \
-                "videochat_disable_auto_cropping %d\n" \
+                "videochat_video_crop %zd\n" \
                 "videochat_auto_rotate_remote_video %d \n" \
                 "videochat_preferred_video_quality %zd\n" \
                 "videochat_start_with_back_camera %zd\n" \
@@ -250,7 +256,7 @@
                 [self serverRecordAudio],
                 [self serverRecordVideo],
                 [self serverRecordWhiteboardData],
-                [self videochatDisableAutoCropping],
+                [self videochatVideoCrop],
                 [self videochatAutoRotateRemoteVideo],
                 [self preferredVideoQuality],
                 [self startWithBackCamera],

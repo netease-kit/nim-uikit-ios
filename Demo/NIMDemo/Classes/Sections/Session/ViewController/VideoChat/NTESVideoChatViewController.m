@@ -34,6 +34,8 @@
 
 @property (nonatomic,weak) UIView   *localView;
 
+@property (nonatomic, assign) BOOL calleeBasy;
+
 @end
 
 @implementation NTESVideoChatViewController
@@ -69,6 +71,7 @@
     self.localView = self.smallVideoView;
     [super viewDidLoad];
     if (self.localVideoLayer) {
+        self.localVideoLayer.frame = self.localView.bounds;
         [self.localView.layer addSublayer:self.localVideoLayer];
     }
     [self initUI];
@@ -90,7 +93,7 @@
 - (void)initRemoteGLView {
 #if defined (NTESUseGLView)
     _remoteGLView = [[NTESGLView alloc] initWithFrame:_bigVideoView.bounds];
-    [_remoteGLView setContentMode:UIViewContentModeScaleAspectFit];
+    [_remoteGLView setContentMode:[[NTESBundleSetting sharedConfig] videochatRemoteVideoContentMode]];
     [_remoteGLView setBackgroundColor:[UIColor clearColor]];
     _remoteGLView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [_bigVideoView addSubview:_remoteGLView];
@@ -116,6 +119,14 @@
 - (void)waitForConnectiong{
     [super waitForConnectiong];
     [self connectingInterface];
+}
+
+- (void)onCalleeBusy
+{
+    _calleeBasy = YES;
+    if (_localVideoLayer) {
+        [_localVideoLayer removeFromSuperlayer];
+    }
 }
 
 #pragma mark - Interface
@@ -322,6 +333,9 @@
 }
 
 - (void)onLocalPreviewReady:(CALayer *)layer{
+    if (_calleeBasy) {
+        return;
+    }
     if (self.localVideoLayer) {
         [self.localVideoLayer removeFromSuperlayer];
     }

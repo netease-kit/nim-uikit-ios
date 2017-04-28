@@ -22,7 +22,7 @@
 
 #define SessionListTitle @"云信 Demo"
 
-@interface NTESSessionListViewController ()<NIMLoginManagerDelegate,NTESListHeaderDelegate,UIViewControllerPreviewingDelegate>
+@interface NTESSessionListViewController ()<NIMLoginManagerDelegate,NTESListHeaderDelegate,NIMEventSubscribeManagerDelegate,UIViewControllerPreviewingDelegate>
 
 @property (nonatomic,strong) UILabel *titleLabel;
 
@@ -55,6 +55,8 @@
     self.supportsForceTouch = [self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
     
     [[NIMSDK sharedSDK].loginManager addDelegate:self];
+    [[NIMSDK sharedSDK].subscribeManager addDelegate:self];
+    
     self.header = [[NTESListHeader alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 0)];
     self.header.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.header.delegate = self;
@@ -198,7 +200,33 @@
 }
 
 
-#pragma mark - Private 
+#pragma mark - NIMEventSubscribeManagerDelegate
+
+- (void)onRecvSubscribeEvents:(NSArray *)events
+{
+    NSMutableSet *ids = [[NSMutableSet alloc] init];
+    for (NIMSubscribeEvent *event in events) {
+        [ids addObject:event.from];
+    }
+    
+    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+    for (NSIndexPath *indexPath in self.tableView.indexPathsForVisibleRows) {
+        NIMRecentSession *recent = self.recentSessions[indexPath.row];
+        if (recent.session.sessionType == NIMSessionTypeP2P) {
+            NSString *from = recent.session.sessionId;
+            if ([ids containsObject:from]) {
+                [indexPaths addObject:indexPath];
+            }
+        }
+    }
+    
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+}
+
+
+
+#pragma mark - Private
+
 - (void)refreshSubview{
     [self.titleLabel sizeToFit];
     self.titleLabel.centerX   = self.navigationItem.titleView.width * .5f;
@@ -265,6 +293,7 @@
     }
     NSMutableAttributedString *attContent = [[NSMutableAttributedString alloc] initWithAttributedString:content];
     [self checkNeedAtTip:recent content:attContent];
+    [self checkOnlineState:recent content:attContent];
     return attContent;
 }
 
@@ -275,6 +304,19 @@
         NSAttributedString *atTip = [[NSAttributedString alloc] initWithString:@"[有人@你] " attributes:@{NSForegroundColorAttributeName:[UIColor redColor]}];
         [content insertAttributedString:atTip atIndex:0];
     }
+}
+
+- (void)checkOnlineState:(NIMRecentSession *)recent content:(NSMutableAttributedString *)content
+{
+    if (recent.session.sessionType == NIMSessionTypeP2P) {
+        NSString *state  = [NTESSessionUtil onlineState:recent.session.sessionId detail:NO];
+        if (state.length) {
+            NSString *format = [NSString stringWithFormat:@"[%@] ",state];
+            NSAttributedString *atTip = [[NSAttributedString alloc] initWithString:format attributes:nil];
+            [content insertAttributedString:atTip atIndex:0];
+        }
+    }
+    
 }
 
 @end

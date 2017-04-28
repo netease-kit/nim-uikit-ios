@@ -41,4 +41,8 @@
 
 + (BOOL)recentSessionIsAtMark:(NIMRecentSession *)recent;
 
++ (NSString *)onlineState:(NSString *)userId detail:(BOOL)detail;
+
++ (NSString *)formatAutoLoginMessage:(NSError *)error;
+
 @end

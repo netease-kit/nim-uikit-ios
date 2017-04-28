@@ -78,8 +78,9 @@
         CGFloat offset = 44.f;
         if (self.tableView.contentOffset.y <= -offset && !_isRefreshing && self.tableView.isDragging) {
             _isRefreshing = YES;
-            [self.refreshControl beginRefreshing];
-            [self.refreshControl sendActionsForControlEvents:UIControlEventValueChanged];
+            UIRefreshControl *refreshControl = [self findRefreshControl];
+            [refreshControl beginRefreshing];
+            [refreshControl sendActionsForControlEvents:UIControlEventValueChanged];
             [self.tableView endEditing:YES];
         }
         else if(self.tableView.contentOffset.y >= 0)
@@ -87,6 +88,16 @@
             _isRefreshing = NO;
         }
     }
+}
+
+- (UIRefreshControl *)findRefreshControl
+{
+    for (UIRefreshControl *subView in self.tableView.subviews) {
+        if ([subView isKindOfClass:[UIRefreshControl class]]) {
+            return subView;
+        }
+    }
+    return nil;
 }
 
 #pragma mark - Get

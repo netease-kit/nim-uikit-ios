@@ -76,6 +76,7 @@
     switch (self.flag) {
         case CustomWhiteboardFlagInvite:{
             M80AttributedLabel *label = [[M80AttributedLabel alloc] initWithFrame:CGRectZero];
+            label.autoDetectLinks = NO;
             label.font = [UIFont systemFontOfSize:Message_Font_Size];
             [label setText:self.formatedMessage];
             UIImage *image   = [UIImage imageNamed:@"icon_whiteboard_session_msg"];

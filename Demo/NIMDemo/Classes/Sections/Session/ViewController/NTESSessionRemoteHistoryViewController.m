@@ -29,6 +29,7 @@
         _config = [[NTESRemoteSessionConfig alloc] initWithSession:session];
         _config.delegate = self;
         self.disableCommandTyping = YES;
+        self.disableOnlineState = YES;
     }
     return self;
 }
@@ -49,6 +50,11 @@
 
 - (NSString *)sessionTitle{
     return @"云消息记录";
+}
+
+- (NSString *)sessionSubTitle
+{
+    return @"";
 }
 
 - (id<NIMSessionConfig>)sessionConfig{

@@ -209,12 +209,6 @@ typedef NS_ENUM(NSInteger,NTESMainTabType) {
     return UIStatusBarStyleDefault;
 }
 
-#pragma mark - NTESNavigationGestureHandlerDataSource
-- (UINavigationController *)navigationController
-{
-    return self.selectedViewController;
-}
-
 
 #pragma mark - Rotate
 

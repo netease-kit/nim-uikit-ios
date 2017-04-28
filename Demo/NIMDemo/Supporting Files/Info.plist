@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh_CN</string>
 	<key>CFBundleDisplayName</key>
-	<string>网易云信</string>
+	<string>${XCCONFIG_BUNDLE_NAME}</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -28,12 +28,12 @@
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>云信想使用您的摄像头</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>云信想使用您的地理位置信息</string>
 	<key>NSLocationWhenInUseDescription</key>
 	<string>云信想使用您的地理位置信息</string>
+	<key>NSCameraUsageDescription</key>
+	<string>云信想使用您的摄像头</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>云信想使用您的麦克风</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -42,8 +42,6 @@
 	<array>
 		<string>audio</string>
 	</array>
-	<key>UIFileSharingEnabled</key>
-	<true/>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -57,5 +55,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>

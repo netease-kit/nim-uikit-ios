@@ -214,7 +214,7 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
             return;
         }
         
-        //由于音视频聊天里头有音频和视频聊天界面的切换，直接用present的话页面过渡会不太自然，这里还是用push，然后做出present的效果
+        // 由于音视频聊天里头有音频和视频聊天界面的切换，直接用present的话页面过渡会不太自然，这里还是用push，然后做出present的效果
         CATransition *transition = [CATransition animation];
         transition.duration = 0.25;
         transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
@@ -222,6 +222,10 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
         transition.subtype = kCATransitionFromTop;
         [nav.view.layer addAnimation:transition forKey:nil];
         nav.navigationBarHidden = YES;
+        if (nav.presentedViewController) {
+            // fix bug MMC-1431
+            [nav.presentedViewController dismissViewControllerAnimated:NO completion:nil];
+        }
         [nav pushViewController:vc animated:NO];
     }
 
@@ -236,25 +240,23 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     
     [tabVC.view endEditing:YES];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if ([self shouldResponseBusy]) {
-            [[NIMAVChatSDK sharedSDK].rtsManager responseRTS:sessionID accept:NO option:nil completion:nil];
+    if ([self shouldResponseBusy]) {
+        [[NIMAVChatSDK sharedSDK].rtsManager responseRTS:sessionID accept:NO option:nil completion:nil];
+    }
+    else {
+        NTESWhiteboardViewController *vc = [[NTESWhiteboardViewController alloc] initWithSessionID:sessionID
+                                                                                            peerID:caller
+                                                                                             types:types
+                                                                                              info:info];
+        if (tabVC.presentedViewController) {
+            __weak NTESMainTabController *wtabVC = (NTESMainTabController *)tabVC;
+            [tabVC.presentedViewController dismissViewControllerAnimated:NO completion:^{
+                [wtabVC presentViewController:vc animated:NO completion:nil];
+            }];
+        }else{
+            [tabVC presentViewController:vc animated:NO completion:nil];
         }
-        else {
-            NTESWhiteboardViewController *vc = [[NTESWhiteboardViewController alloc] initWithSessionID:sessionID
-                                                                                                peerID:caller
-                                                                                                 types:types
-                                                                                                  info:info];
-            if (tabVC.presentedViewController) {
-                __weak NTESMainTabController *wtabVC = (NTESMainTabController *)tabVC;
-                [tabVC.presentedViewController dismissViewControllerAnimated:NO completion:^{
-                    [wtabVC presentViewController:vc animated:NO completion:nil];
-                }];
-            }else{
-                [tabVC presentViewController:vc animated:NO completion:nil];
-            }
-        }
-    });
+    }
 }
 
 - (BOOL)shouldResponseBusy

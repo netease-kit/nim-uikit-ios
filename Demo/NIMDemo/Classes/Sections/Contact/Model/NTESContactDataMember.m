@@ -26,7 +26,7 @@
 }
 
 - (NSString *)cellName{
-    return @"NIMContactDataCell";
+    return @"NTESContactDataCell";
 }
 
 - (NSString *)badge{

@@ -22,15 +22,17 @@
 #import "UIAlertView+NTESBlock.h"
 #import "SVProgressHUD.h"
 #import "NTESContactUtilCell.h"
-#import "NIMContactDataCell.h"
+#import "NTESContactDataCell.h"
 #import "NIMContactSelectViewController.h"
 #import "NTESUserUtil.h"
+
 
 @interface NTESContactViewController ()<NIMUserManagerDelegate,
 NIMSystemNotificationManagerDelegate,
 NTESContactUtilCellDelegate,
 NIMContactDataCellDelegate,
-NIMLoginManagerDelegate> {
+NIMLoginManagerDelegate,
+NIMEventSubscribeManagerDelegate> {
     UIRefreshControl *_refreshControl;
     NTESGroupedContacts *_contacts;
 }
@@ -50,9 +52,10 @@ NIMLoginManagerDelegate> {
 
 - (void)dealloc{
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[[NIMSDK sharedSDK] systemNotificationManager] removeDelegate:self];
-    [[[NIMSDK sharedSDK] loginManager] removeDelegate:self];
-    [[[NIMSDK sharedSDK] userManager] removeDelegate:self];
+    [[NIMSDK sharedSDK].systemNotificationManager removeDelegate:self];
+    [[NIMSDK sharedSDK].loginManager removeDelegate:self];
+    [[NIMSDK sharedSDK].userManager removeDelegate:self];
+    [[NIMSDK sharedSDK].subscribeManager removeDelegate:self];
 }
 
 - (void)viewDidLoad {
@@ -64,10 +67,13 @@ NIMLoginManagerDelegate> {
     self.tableView.separatorInset = separatorInset;
     self.tableView.sectionIndexBackgroundColor = [UIColor clearColor];
     self.tableView.tableFooterView = [[UIView alloc] init];
+    
     [self prepareData];
-    [[[NIMSDK sharedSDK] systemNotificationManager] addDelegate:self];
-    [[[NIMSDK sharedSDK] loginManager] addDelegate:self];
-    [[[NIMSDK sharedSDK] userManager] addDelegate:self];
+    
+    [[NIMSDK sharedSDK].systemNotificationManager addDelegate:self];
+    [[NIMSDK sharedSDK].loginManager addDelegate:self];
+    [[NIMSDK sharedSDK].userManager addDelegate:self];
+    [[NIMSDK sharedSDK].subscribeManager addDelegate:self];
 }
 
 - (void)setUpNavItem{
@@ -142,7 +148,6 @@ NIMLoginManagerDelegate> {
     
     [_contacts addGroupAboveWithTitle:@"" members:contactUtil.members];
 }
-
 
 #pragma mark - Action
 - (void)onEnterMyComputer{
@@ -272,8 +277,8 @@ NIMLoginManagerDelegate> {
         [(NTESContactUtilCell *)cell refreshWithContactItem:contactItem];
         [(NTESContactUtilCell *)cell setDelegate:self];
     }else{
-        [(NIMContactDataCell *)cell refreshUser:contactItem];
-        [(NIMContactDataCell *)cell setDelegate:self];
+        [(NTESContactDataCell *)cell refreshUser:contactItem];
+        [(NTESContactDataCell *)cell setDelegate:self];
     }
     return cell;
 }
@@ -373,6 +378,33 @@ NIMLoginManagerDelegate> {
     [self prepareData];
     [self.tableView reloadData];
 }
+
+
+#pragma mark - NIMEventSubscribeManagerDelegate
+
+- (void)onRecvSubscribeEvents:(NSArray *)events
+{
+    NSMutableSet *ids = [[NSMutableSet alloc] init];
+    for (NIMSubscribeEvent *event in events) {
+        [ids addObject:event.from];
+    }
+    
+    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+    for (NSIndexPath *indexPath in self.tableView.indexPathsForVisibleRows) {
+        
+        id<NTESContactItem> contactItem = (id<NTESContactItem>)[_contacts memberOfIndex:indexPath];
+        if([contactItem respondsToSelector:@selector(userId)]){
+            NSString * friendId   = contactItem.userId;
+            if ([ids containsObject:friendId]) {
+                [indexPaths addObject:indexPath];
+            }
+        }
+    }
+    
+    [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+}
+
+
 
 #pragma mark - Private
 - (void)enterPersonalCard:(NSString *)userId{

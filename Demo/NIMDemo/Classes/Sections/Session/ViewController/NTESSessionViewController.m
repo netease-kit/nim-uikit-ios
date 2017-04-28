@@ -49,6 +49,7 @@
 #import "NIMKitLocationPoint.h"
 #import "NIMLocationViewController.h"
 #import "NIMKitInfoFetchOption.h"
+#import "NTESSubscribeManager.h"
 
 @interface NTESSessionViewController ()
 <UIImagePickerControllerDelegate,
@@ -56,7 +57,8 @@ UINavigationControllerDelegate,
 NIMSystemNotificationManagerDelegate,
 NIMMediaManagerDelegate,
 NTESTimerHolderDelegate,
-NIMContactSelectDelegate>
+NIMContactSelectDelegate,
+NIMEventSubscribeManagerDelegate>
 
 @property (nonatomic,strong)    NTESCustomSysNotificationSender *notificaionSender;
 @property (nonatomic,strong)    NTESSessionConfig       *sessionConfig;
@@ -79,9 +81,9 @@ NIMContactSelectDelegate>
     BOOL disableCommandTyping = self.disableCommandTyping || (self.session.sessionType == NIMSessionTypeP2P &&[[NIMSDK sharedSDK].userManager isUserInBlackList:self.session.sessionId]);
     if (!disableCommandTyping) {
         _titleTimer = [[NTESTimerHolder alloc] init];
-        [[[NIMSDK sharedSDK] systemNotificationManager] addDelegate:self];
+        [[NIMSDK sharedSDK].systemNotificationManager addDelegate:self];
     }
-    
+
     if ([[NTESBundleSetting sharedConfig] showFps])
     {
         self.fpsLabel = [[NTESFPSLabel alloc] initWithFrame:CGRectZero];
@@ -90,13 +92,26 @@ NIMContactSelectDelegate>
         self.fpsLabel.top   = self.tableView.top + self.tableView.contentInset.top;
     }
     
+    if (self.session.sessionType == NIMSessionTypeP2P && !self.disableOnlineState)
+    {
+        //临时订阅这个人的在线状态
+        [[NTESSubscribeManager sharedInstance] subscribeTempUserOnlineState:self.session.sessionId];
+        [[NIMSDK sharedSDK].subscribeManager addDelegate:self];
+    }
+    
     //删除最近会话列表中有人@你的标记
     [NTESSessionUtil removeRecentSessionAtMark:self.session];
+    
 }
 
 - (void)dealloc
 {
-    [[[NIMSDK sharedSDK] systemNotificationManager] removeDelegate:self];
+    [[NIMSDK sharedSDK].systemNotificationManager removeDelegate:self];
+    if (self.session.sessionType == NIMSessionTypeP2P && !self.disableOnlineState)
+    {
+        [[NIMSDK sharedSDK].subscribeManager removeDelegate:self];
+        [[NTESSubscribeManager sharedInstance] unsubscribeTempUserOnlineState:self.session.sessionId];
+    }
     [_fpsLabel invalidate];
 }
 
@@ -122,8 +137,16 @@ NIMContactSelectDelegate>
     return _sessionConfig;
 }
 
-
-#pragma mark - NIMSystemNotificationManagerProcol
+#pragma mark - NIMEventSubscribeManagerDelegate
+- (void)onRecvSubscribeEvents:(NSArray *)events
+{
+    for (NIMSubscribeEvent *event in events) {
+        if ([event.from isEqualToString:self.session.sessionId]) {
+            [self refreshSessionSubTitle:[NTESSessionUtil onlineState:self.session.sessionId detail:YES]];
+        }
+    }
+}
+#pragma mark - NIMSystemNotificationManagerDelegate
 - (void)onReceiveCustomSystemNotification:(NIMCustomSystemNotification *)notification
 {
     if (!notification.sendToOnlineUsersOnly) {
@@ -136,7 +159,7 @@ NIMContactSelectDelegate>
                                                                error:nil];
         if ([dict jsonInteger:NTESNotifyID] == NTESCommandTyping && self.session.sessionType == NIMSessionTypeP2P && [notification.sender isEqualToString:self.session.sessionId])
         {
-            self.title = @"正在输入...";
+            [self refreshSessionTitle:@"正在输入..."];
             [_titleTimer startTimer:5
                            delegate:self
                             repeats:NO];
@@ -148,15 +171,24 @@ NIMContactSelectDelegate>
 
 - (void)onNTESTimerFired:(NTESTimerHolder *)holder
 {
-    self.title = [self sessionTitle];
+    [self refreshSessionTitle:self.sessionTitle];
 }
 
 
-- (NSString *)sessionTitle{
+- (NSString *)sessionTitle
+{
     if ([self.session.sessionId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
         return  @"我的电脑";
     }
     return [super sessionTitle];
+}
+
+- (NSString *)sessionSubTitle
+{
+    if (self.session.sessionType == NIMSessionTypeP2P && ![self.session.sessionId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
+        return [NTESSessionUtil onlineState:self.session.sessionId detail:YES];
+    }
+    return @"";
 }
 
 - (void)onTextChanged:(id)sender

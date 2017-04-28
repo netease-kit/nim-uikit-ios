@@ -26,6 +26,7 @@
     if (self = [super initSessionMessageContentView]) {
         //
         _textLabel = [[M80AttributedLabel alloc] initWithFrame:CGRectZero];
+        _textLabel.autoDetectLinks = NO;
         _textLabel.numberOfLines = 0;
         _textLabel.lineBreakMode = NSLineBreakByWordWrapping;
         _textLabel.font = [UIFont systemFontOfSize:14.f];
