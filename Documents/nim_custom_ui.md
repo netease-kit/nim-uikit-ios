@@ -46,44 +46,44 @@ UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此�
    
    
    |**名称** | **定义** | 
-	|:----- | :-----|
-	|**Message_Interval** | 每隔多久显示一条时间戳，秒为单位 |
-	|**Message_Limit** | 每次抓取消息的数量限制，用于分页 |
-	|**Record\_Max\_Duration** | 最大录音时长 |
-	|**Placeholder**  | 输入框中的占位提示文字 |
-	|**Max_Length**   | 输入框字符最大长度 |
-	|**Bubble**  | 消息气泡的通用背景 |
+   |:----- | :-----|
+   |**Message_Interval** | 每隔多久显示一条时间戳，秒为单位 |
+   |**Message_Limit** | 每次抓取消息的数量限制，用于分页 |
+   |**Record\_Max\_Duration** | 最大录音时长 |
+   |**Placeholder**  | 输入框中的占位提示文字 |
+   |**Max_Length**   | 输入框字符最大长度 |
+   |**Bubble**  | 消息气泡的通用背景 |
      
    * 气泡配置文件 `NIMKitBubbleSetting.plist`
     
     其中 `Root` 下的 `key` 为内置消息类型，不可更改。
 
     具体为
-    
-    |**名称** | **定义** | 
-	|:----- | :-----|
-	|**Text** | 文本消息 |
-	|**Audio** | 音频消息 |
-	|**Video** | 视频消息 |
-	|**File**  | 文件消息 |
-	|**Image** | 图片消息 |
-	|**Location** | 位置消息 |
-	|**Tip** | 提醒消息 |
-	|**Team_Notification** | 群通知消息 |
-	|**Chatroom_Notification** | 聊天室通知消息 |
-	|**Netcall_Notification** | 网络电话通知消息 |
-	|**Unsupport** | 未知类型消息 |
+
+|**名称** | **定义** | 
+|:----- | :-----|
+|**Text** | 文本消息 |
+|**Audio** | 音频消息 |
+|**Video** | 视频消息 |
+|**File**  | 文件消息 |
+|**Image** | 图片消息 |
+|**Location** | 位置消息 |
+|**Tip** | 提醒消息 |
+|**Team_Notification** | 群通知消息 |
+|**Chatroom_Notification** | 聊天室通知消息 |
+|**Netcall_Notification** | 网络电话通知消息 |
+|**Unsupport** | 未知类型消息 |
 	
 	
-	具体配置参数为
-	
-	|**名称** | **定义** | 
-	|:----- | :-----|
-	|**Content_Insets** | 消息内容距离气泡的内边距 |
-	|**Content_Color**  | 消息文本的颜色 |
-	|**Content\_Font\_Size** | 消息文本字体大小 |
-	|**Show_Avatar**  | 是否显示头像 |
-	|**Bubble**  | 消息气泡的背景 |
+    具体配置参数为
+
+|**名称** | **定义** | 
+|:----- | :-----|
+|**Content_Insets** | 消息内容距离气泡的内边距 |
+|**Content_Color**  | 消息文本的颜色 |
+|**Content\_Font\_Size** | 消息文本字体大小 |
+|**Show_Avatar**  | 是否显示头像 |
+|**Bubble**  | 消息气泡的背景 |
 
 	
 
