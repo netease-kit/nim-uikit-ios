@@ -64,9 +64,15 @@ pod 'NIMKit'
   pod 'NIMKit/Full'
   ```
 
+### Swift 集成
+
+由于使用 Swift 开发的第三方库不支持编译为静态库，`NIMKit` 和这些库同时使用 [Cocoapods](https://cocoapods.org/) 的时候会出现一些问题，具体解决方案可以参考这个[文档](./Documents/nim_swift.md)。
+
+
 ### 手动集成
 
 我们`强烈`不推荐你使用手动导入的方式来集成 `NIMKit`，但如果你一定要这么做，可以参考这个[文档](./Documents/nim_mi.md)。
+
 
 
 ## 快速使用
