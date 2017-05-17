@@ -11,7 +11,7 @@
 #import "NIMKitFileLocationHelper.h"
 #import "NIMMessageMaker.h"
 #import "NIMGlobalMacro.h"
-#import "TZImagePickerController.h"
+#import "NIMKitDependency.h"
 #import "TZImageManager.h"
 
 @interface NIMKitMediaPickerController : TZImagePickerController
@@ -65,6 +65,7 @@
         NSAssert(0, @"not supported");
 #elif TARGET_OS_IPHONE
         self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
+        self.imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
         [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:self.imagePicker animated:YES completion:nil];
 #endif
     }

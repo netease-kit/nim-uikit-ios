@@ -15,7 +15,7 @@
 #import "NIMSessionAudioContentView.h"
 #import "UIView+NIM.h"
 #import "NIMKitUIConfig.h"
-#import "M80AttributedLabel.h"
+#import "NIMKitDependency.h"
 #import "UIImage+NIM.h"
 #import "NIMSessionUnknowContentView.h"
 #import "NIMKitUIConfig.h"

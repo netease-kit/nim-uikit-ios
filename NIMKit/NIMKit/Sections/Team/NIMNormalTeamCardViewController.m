@@ -10,7 +10,7 @@
 #import "NIMNormalTeamCardViewController.h"
 #import "NIMCardMemberItem.h"
 #import "NIMTeamCardOperationItem.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 #import "NIMTeamCardRowItem.h"
 #import "NIMTeamCardHeaderCell.h"
 #import "NIMTeamMemberCardViewController.h"
@@ -21,7 +21,6 @@
 #import "NIMTeamSwitchTableViewCell.h"
 #import "NIMContactSelectConfig.h"
 #import "NIMContactSelectViewController.h"
-#import "SVProgressHUD.h"
 #import "NIMGlobalMacro.h"
 
 #define TableCellReuseId        @"tableCell"

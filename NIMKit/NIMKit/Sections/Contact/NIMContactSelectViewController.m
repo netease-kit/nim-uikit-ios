@@ -14,7 +14,7 @@
 #import "NIMContactDataCell.h"
 #import "UIView+NIM.h"
 #import "NIMKit.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 
 @interface NIMContactSelectViewController ()<UITableViewDataSource, UITableViewDelegate, NIMContactPickedViewDelegate>{
     NSMutableArray *_selectecContacts;
@@ -61,10 +61,44 @@
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    self.navigationItem.title = [self.config respondsToSelector:@selector(title)] ? [self.config title] : @"选择联系人";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBtnClick:)];
+    
+    [self setUpNav];
+    
     self.selectIndicatorView.pickedView.delegate = self;
     [self.selectIndicatorView.doneButton addTarget:self action:@selector(onDoneBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)setUpNav
+{
+    self.navigationItem.title = [self.config respondsToSelector:@selector(title)] ? [self.config title] : @"选择联系人";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBtnClick:)];
+    if ([self.config respondsToSelector:@selector(showSelectDetail)] && self.config.showSelectDetail) {
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:label];
+        [label setText:self.detailTitle];
+        [label sizeToFit];
+    }
+}
+
+- (void)refreshDetailTitle
+{
+    UILabel *label = (UILabel *)self.navigationItem.rightBarButtonItem.customView;
+    [label setText:self.detailTitle];
+    [label sizeToFit];
+}
+
+- (NSString *)detailTitle
+{
+    NSString *detail = @"";
+    if ([self.config respondsToSelector:@selector(maxSelectedNum)])
+    {
+        detail = [NSString stringWithFormat:@"%zd/%zd",_selectecContacts.count,_maxSelectCount];
+    }
+    else
+    {
+        detail = [NSString stringWithFormat:@"已选%zd人",_selectecContacts.count];
+    }
+    return detail;
 }
 
 - (void)viewDidLayoutSubviews{
@@ -301,6 +335,7 @@
         [self.selectIndicatorView.pickedView addMemberInfo:info];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    [self refreshDetailTitle];
 }
 
 #pragma mark - ContactPickedViewDelegate

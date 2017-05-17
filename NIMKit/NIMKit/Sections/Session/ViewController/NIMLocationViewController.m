@@ -6,7 +6,7 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 #import "NIMLocationViewController.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 #import "NIMKitLocationPoint.h"
 #import <AddressBookUI/AddressBookUI.h>
 #import <CoreLocation/CoreLocation.h>

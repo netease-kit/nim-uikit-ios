@@ -206,7 +206,7 @@
 
 - (NSAttributedString *)contentForRecentSession:(NIMRecentSession *)recent{
     NSString *content = [self messageContent:recent.lastMessage];
-    return [[NSAttributedString alloc] initWithString:content];
+    return [[NSAttributedString alloc] initWithString:content ?: @""];
 }
 
 - (NSString *)timestampDescriptionForRecentSession:(NIMRecentSession *)recent{

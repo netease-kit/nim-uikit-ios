@@ -7,7 +7,7 @@
 //
 
 #import "NIMSessionMessageContentView.h"
-#import "M80AttributedLabel.h"
+#import "NIMKitDependency.h"
 
 @interface NIMSessionNetChatNotifyContentView : NIMSessionMessageContentView
 

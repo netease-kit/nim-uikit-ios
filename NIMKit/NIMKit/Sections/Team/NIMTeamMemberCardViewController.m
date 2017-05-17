@@ -13,7 +13,7 @@
 #import "NIMCardMemberItem.h"
 #import "NIMUsrInfoData.h"
 #import "NIMKitUtil.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 #import "NIMKit.h"
 #import "UIView+NIM.h"
 #import "NIMKitColorButtonCell.h"

@@ -59,6 +59,11 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
  */
 - (NSString *)teamId;
 
+/**
+ *  显示具体选择人数
+ */
+- (BOOL)showSelectDetail;
+
 @end
 
 /**
@@ -68,9 +73,13 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
 
 @property (nonatomic,assign) BOOL needMutiSelected;
 
+@property (nonatomic,assign) NSInteger maxSelectMemberCount;
+
 @property (nonatomic,copy) NSArray *alreadySelectedMemberId;
 
 @property (nonatomic,copy) NSArray *filterIds;
+
+@property (nonatomic,assign) BOOL showSelectDetail;
 
 @end
 
@@ -83,9 +92,13 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
 
 @property (nonatomic,assign) BOOL needMutiSelected;
 
+@property (nonatomic,assign) NSInteger maxSelectMemberCount;
+
 @property (nonatomic,copy) NSArray *alreadySelectedMemberId;
 
 @property (nonatomic,copy) NSArray *filterIds;
+
+@property (nonatomic,assign) BOOL showSelectDetail;
 
 @end
 
@@ -97,8 +110,12 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
 
 @property (nonatomic,assign) BOOL needMutiSelected;
 
+@property (nonatomic,assign) NSInteger maxSelectMemberCount;
+
 @property (nonatomic,copy) NSArray *alreadySelectedMemberId;
 
 @property (nonatomic,copy) NSArray *filterIds;
+
+@property (nonatomic,assign) BOOL showSelectDetail;
 
 @end

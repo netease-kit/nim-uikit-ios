@@ -12,7 +12,7 @@
 #import "UIImage+NIM.h"
 #import "NIMKitColorButtonCell.h"
 #import "NIMAdvancedTeamMemberCell.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 #import "NIMTeamMemberCardViewController.h"
 #import "NIMCardMemberItem.h"
 #import "NIMContactSelectViewController.h"
@@ -22,7 +22,7 @@
 #import "NIMKitUtil.h"
 #import "NIMTeamSwitchTableViewCell.h"
 #import "NIMAvatarImageView.h"
-#import "SVProgressHUD.h"
+
 
 #pragma mark - Team Header View
 #define CardHeaderHeight 89

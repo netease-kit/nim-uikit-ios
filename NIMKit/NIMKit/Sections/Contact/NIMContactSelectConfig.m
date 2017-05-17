@@ -26,7 +26,7 @@
 
 - (NSInteger)maxSelectedNum{
     if (self.needMutiSelected) {
-        return NSIntegerMax;
+        return self.maxSelectMemberCount? self.maxSelectMemberCount : NSIntegerMax;
     }else{
         return 1;
     }
@@ -48,7 +48,7 @@
 
 - (NSInteger)maxSelectedNum{
     if (self.needMutiSelected) {
-        return NSIntegerMax;
+        return self.maxSelectMemberCount? self.maxSelectMemberCount : NSIntegerMax;
     }else{
         return 1;
     }
@@ -79,7 +79,7 @@
 
 - (NSInteger)maxSelectedNum{
     if (self.needMutiSelected) {
-        return NSIntegerMax;
+        return self.maxSelectMemberCount? self.maxSelectMemberCount : NSIntegerMax;
     }else{
         return 1;
     }

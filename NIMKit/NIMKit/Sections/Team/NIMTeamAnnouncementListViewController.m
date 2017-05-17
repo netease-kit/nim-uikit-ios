@@ -10,8 +10,7 @@
 #import "NIMUsrInfoData.h"
 #import "NIMCreateTeamAnnouncement.h"
 #import "NIMTeamAnnouncementListCell.h"
-#import "UIView+Toast.h"
-#import "SVProgressHUD.h"
+#import "NIMKitDependency.h"
 
 typedef NS_ENUM(NSInteger, TeamAnnouncementSectionType) {
     TeamAnnouncementSectionTitle = 1,
