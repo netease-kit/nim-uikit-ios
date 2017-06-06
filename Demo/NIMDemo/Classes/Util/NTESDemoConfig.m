@@ -29,14 +29,11 @@
     {
         _appKey = @"45c6af3c98409b18a84451215d0bdd6e";
         _apiURL = @"https://app.netease.im/api";
-        _cerName= @"ENTERPRISE";
+        _apnsCername = @"ENTERPRISE";
+        _pkCername = @"DEMO_PUSH_KIT";
+        
     }
     return self;
-}
-
-- (NSString *)appKey
-{
-    return _appKey;
 }
 
 - (NSString *)apiURL
@@ -45,10 +42,6 @@
     return _apiURL;
 }
 
-- (NSString *)cerName
-{
-    return _cerName;
-}
 
 
 @end

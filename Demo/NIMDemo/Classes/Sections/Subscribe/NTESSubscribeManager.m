@@ -13,6 +13,8 @@
 
 #define NTESSubscribeExpiry 60 * 60 * 24 * 1 //订阅有效期为 1 天
 
+#define NTESSubscribeEnable [NIMSDK sharedSDK].isUsingDemoAppKey //仅在使用 Demo App 的时候，将订阅能力开启，开发者可以根据自身应用订阅功能开启状态控制此开关。
+
 NSString *const NTESSubscribeNetState = @"net_state";
 
 NSString *const NTESSubscribeOnlineState = @"online_state";
@@ -30,14 +32,21 @@ NSString *const NTESSubscribeOnlineState = @"online_state";
 
 @implementation NTESSubscribeManager
 
-+ (instancetype)sharedInstance
++ (instancetype)sharedManager
 {
-    static NTESSubscribeManager *instance;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        instance = [[NTESSubscribeManager alloc] init];
-    });
-    return instance;
+    if (NTESSubscribeEnable)
+    {
+        static NTESSubscribeManager *instance;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            instance = [[NTESSubscribeManager alloc] init];
+        });
+        return instance;
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 - (instancetype)init

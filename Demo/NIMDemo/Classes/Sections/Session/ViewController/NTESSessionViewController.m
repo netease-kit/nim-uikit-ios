@@ -50,6 +50,9 @@
 #import "NIMLocationViewController.h"
 #import "NIMKitInfoFetchOption.h"
 #import "NTESSubscribeManager.h"
+#import "NTESTeamMeetingViewController.h"
+#import "NTESTeamMeetingCallerInfo.h"
+#import "NIMInputAtCache.h"
 
 @interface NTESSessionViewController ()
 <UIImagePickerControllerDelegate,
@@ -95,7 +98,7 @@ NIMEventSubscribeManagerDelegate>
     if (self.session.sessionType == NIMSessionTypeP2P && !self.disableOnlineState)
     {
         //临时订阅这个人的在线状态
-        [[NTESSubscribeManager sharedInstance] subscribeTempUserOnlineState:self.session.sessionId];
+        [[NTESSubscribeManager sharedManager] subscribeTempUserOnlineState:self.session.sessionId];
         [[NIMSDK sharedSDK].subscribeManager addDelegate:self];
     }
     
@@ -110,7 +113,7 @@ NIMEventSubscribeManagerDelegate>
     if (self.session.sessionType == NIMSessionTypeP2P && !self.disableOnlineState)
     {
         [[NIMSDK sharedSDK].subscribeManager removeDelegate:self];
-        [[NTESSubscribeManager sharedInstance] unsubscribeTempUserOnlineState:self.session.sessionId];
+        [[NTESSubscribeManager sharedManager] unsubscribeTempUserOnlineState:self.session.sessionId];
     }
     [_fpsLabel invalidate];
 }
@@ -217,7 +220,7 @@ NIMEventSubscribeManagerDelegate>
 #pragma mark - 实时语音
 - (void)onTapMediaItemAudioChat:(NIMMediaItem *)item
 {
-    if ([self checkCondition]) {
+    if ([self checkRTSCondition]) {
         //由于音视频聊天里头有音频和视频聊天界面的切换，直接用present的话页面过渡会不太自然，这里还是用push，然后做出present的效果
         NTESAudioChatViewController *vc = [[NTESAudioChatViewController alloc] initWithCallee:self.session.sessionId];
         CATransition *transition = [CATransition animation];
@@ -234,7 +237,7 @@ NIMEventSubscribeManagerDelegate>
 #pragma mark - 视频聊天
 - (void)onTapMediaItemVideoChat:(NIMMediaItem *)item
 {
-    if ([self checkCondition]) {
+    if ([self checkRTSCondition]) {
         //由于音视频聊天里头有音频和视频聊天界面的切换，直接用present的话页面过渡会不太自然，这里还是用push，然后做出present的效果
         NTESVideoChatViewController *vc = [[NTESVideoChatViewController alloc] initWithCallee:self.session.sessionId];
         CATransition *transition = [CATransition animation];
@@ -247,6 +250,34 @@ NIMEventSubscribeManagerDelegate>
         [self.navigationController pushViewController:vc animated:NO];
     }
 }
+
+#pragma mark - 群组会议
+- (void)onTapMediaItemTeamMeeting:(NIMMediaItem *)item
+{
+    if ([self checkRTSCondition])
+    {
+        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:self.session.sessionId];
+        NSString *currentUserID = [[[NIMSDK sharedSDK] loginManager] currentAccount];
+        NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
+        config.teamId = team.teamId;
+        config.filterIds = @[currentUserID];
+        config.needMutiSelected = YES;
+        config.maxSelectMemberCount = 8;
+        config.showSelectDetail = YES;
+        NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+        __weak typeof(self) weakSelf = self;
+        vc.finshBlock = ^(NSArray * memeber){
+            NSString *me = [NIMSDK sharedSDK].loginManager.currentAccount;
+            NTESTeamMeetingCallerInfo *info = [[NTESTeamMeetingCallerInfo alloc] init];
+            info.members = [@[me] arrayByAddingObjectsFromArray:memeber];
+            info.teamId = team.teamId;
+            NTESTeamMeetingViewController *vc = [[NTESTeamMeetingViewController alloc] initWithCallerInfo:info];
+            [weakSelf presentViewController:vc animated:NO completion:nil];
+        };;
+        [vc show];
+    }
+}
+
 
 #pragma mark - 文件传输
 - (void)onTapMediaItemFileTrans:(NIMMediaItem *)item
@@ -445,6 +476,29 @@ NIMEventSubscribeManagerDelegate>
     [self.navigationController pushViewController:vc animated:YES];
     return YES;
 }
+
+
+- (BOOL)onLongPressAvatar:(NSString *)userId
+{
+    if (self.session.sessionType == NIMSessionTypeTeam)
+    {
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = self.session;
+        option.forbidaAlias = YES;
+        
+        NSString *nick = [[NIMKit sharedKit].provider infoByUser:userId option:option].showName;
+        NSString *text = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,nick,NIMInputAtEndChar];
+        
+        NIMInputAtItem *item = [[NIMInputAtItem alloc] init];
+        item.uid  = userId;
+        item.name = nick;
+        [self.sessionInputView.atCache addAtItem:item];
+        
+        [self.sessionInputView.toolBar insertText:text];
+    }
+    return YES;
+}
+
 
 
 #pragma mark - Cell Actions
@@ -694,18 +748,30 @@ NIMEventSubscribeManagerDelegate>
 }
 
 
-- (BOOL)checkCondition
+- (BOOL)checkRTSCondition
 {
     BOOL result = YES;
     
-    if (![[Reachability reachabilityForInternetConnection] isReachable]) {
+    if (![[Reachability reachabilityForInternetConnection] isReachable])
+    {
         [self.view makeToast:@"请检查网络" duration:2.0 position:CSToastPositionCenter];
         result = NO;
     }
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
-    if ([currentAccount isEqualToString:self.session.sessionId]) {
+    if (self.session.sessionType == NIMSessionTypeP2P && [currentAccount isEqualToString:self.session.sessionId])
+    {
         [self.view makeToast:@"不能和自己通话哦" duration:2.0 position:CSToastPositionCenter];
         result = NO;
+    }
+    if (self.session.sessionType == NIMSessionTypeTeam)
+    {
+        NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:self.session.sessionId];
+        NSInteger memberNumber = team.memberNumber;
+        if (memberNumber < 2)
+        {
+            [self.view makeToast:@"无法发起，群人数少于2人" duration:2.0 position:CSToastPositionCenter];
+            result = NO;
+        }
     }
     return result;
 }

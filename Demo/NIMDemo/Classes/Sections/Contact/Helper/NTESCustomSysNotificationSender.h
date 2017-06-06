@@ -8,16 +8,24 @@
 
 #import <Foundation/Foundation.h>
 #define NTESNotifyID        @"id"
-#define NTESCustomContent  @"content"
+#define NTESCustomContent   @"content"
+#define NTESTeamMeetingMembers   @"members"
+#define NTESTeamMeetingTeamId    @"teamId"
+#define NTESTeamMeetingTeamName  @"teamName"
+#define NTESTeamMeetingName      @"room"
 
-#define NTESCommandTyping  (1)
-#define NTESCustom         (2)
-
+#define NTESCommandTyping   (1)
+#define NTESCustom          (2)
+#define NTESTeamMeetingCall (3)
 
 @interface NTESCustomSysNotificationSender : NSObject
 
 - (void)sendCustomContent:(NSString *)content toSession:(NIMSession *)session;
 
 - (void)sendTypingState:(NIMSession *)session;
+
+- (void)sendCallNotification:(NSString *)teamId
+                    roomName:(NSString *)roomName
+                     members:(NSArray *)members;
 
 @end

@@ -14,6 +14,7 @@
 #import "NTESChatroomManager.h"
 #import "NTESDemoService.h"
 #import "UIView+Toast.h"
+#import "NTESBundleSetting.h"
 
 static NSString *ChatroomListReuseIdentity = @"ChatroomListReuseIdentity";
 
@@ -101,6 +102,7 @@ static NSString *ChatroomListReuseIdentity = @"ChatroomListReuseIdentity";
     request.roomId = chatroom.roomId;
     request.roomNickname = user.userInfo.nickName;
     request.roomAvatar = user.userInfo.avatarUrl;
+    request.retryCount = [[NTESBundleSetting sharedConfig] chatroomRetryCount];
     [SVProgressHUD show];
     self.enteringChatroom = YES;
     __weak typeof(self) wself = self;

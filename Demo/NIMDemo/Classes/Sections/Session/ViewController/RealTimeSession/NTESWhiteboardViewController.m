@@ -161,6 +161,17 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 }
 - (void)dealloc
 {
+    id<NIMRTSManager> manager = [NIMAVChatSDK sharedSDK].rtsManager;
+    [manager removeDelegate:self];
+    
+    NTESWhiteboardAttachment *attachment = [[NTESWhiteboardAttachment alloc] init];
+    attachment.flag = CustomWhiteboardFlagClose;
+    NIMMessage *message = [NTESSessionMsgConverter msgWithWhiteboardAttachment:attachment];
+    [[[NIMSDK sharedSDK] conversationManager] saveMessage:message
+                                               forSession:[NIMSession session:_peerID type:NIMSessionTypeP2P]
+                                               completion:nil];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+    
     [self termimateRTS];
 }
 
@@ -368,6 +379,12 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
 //    [self sendMessage:[NTESSessionMsgConverter msgWithText:[NSString stringWithFormat:@"%@:%@", fileType, info.recordFileName]]];
 }
 
+- (void)onRTSAudioNetStatus:(NIMNetCallNetStatus)status
+                       user:(NSString *)user
+{
+    DDLogInfo(@"RTS audio netstatus: user %@, stat %@", user,@(status));
+}
+
 
 #pragma mark UIResponder
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -420,7 +437,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     {
         if (error) {
             DDLogInfo(@"RTSDemo: send request failed %zd!!!", error.code);
-            NSString *errToast = (error.code == NIMRemoteErrorCodeCalleeOffline) ? @"对方不在线" : [NSString stringWithFormat:@"发起失败:%zd", error.code];
+            NSString *errToast = (error.code == NIMAVRemoteErrorCodeCalleeOffline) ? @"对方不在线" : [NSString stringWithFormat:@"发起失败:%zd", error.code];
             [wself makeToast:errToast];
             [wself dismissAfter:2];
         }
@@ -610,16 +627,6 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
         return;
     }
     _dismissed = YES;
-    id<NIMRTSManager> manager = [NIMAVChatSDK sharedSDK].rtsManager;
-    [manager removeDelegate:self];
-    
-    NTESWhiteboardAttachment *attachment = [[NTESWhiteboardAttachment alloc] init];
-    attachment.flag = CustomWhiteboardFlagClose;
-    NIMMessage *message = [NTESSessionMsgConverter msgWithWhiteboardAttachment:attachment];
-    [[[NIMSDK sharedSDK] conversationManager] saveMessage:message
-                                               forSession:[NIMSession session:_peerID type:NIMSessionTypeP2P]
-                                                           completion:nil];
-    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
     [self dismissViewControllerAnimated:NO completion:^{
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:NO];
     }];

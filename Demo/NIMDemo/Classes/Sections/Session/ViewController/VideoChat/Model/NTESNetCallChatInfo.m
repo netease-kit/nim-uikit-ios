@@ -6,8 +6,8 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NetCallChatInfo.h"
+#import "NTESNetCallChatInfo.h"
 
-@implementation NetCallChatInfo
+@implementation NTESNetCallChatInfo
 
 @end

@@ -1,5 +1,5 @@
 //
-//  NetCallChatInfo.h
+//  NTESNetCallChatInfo.h
 //  NIM
 //
 //  Created by chris on 15/5/12.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NetCallChatInfo : NSObject
+@interface NTESNetCallChatInfo : NSObject
 
 @property(nonatomic,strong) NSString *caller;
 

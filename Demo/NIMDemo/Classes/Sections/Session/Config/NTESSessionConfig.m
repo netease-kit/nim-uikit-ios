@@ -49,6 +49,11 @@
                                     selectedImage:[UIImage imageNamed:@"btn_bk_media_video_chat_pressed"]
                                             title:@"视频聊天"];
     
+    NIMMediaItem *teamMeeting =  [NIMMediaItem item:@"onTapMediaItemTeamMeeting:"
+                                      normalImage:[UIImage imageNamed:@"btn_media_telphone_message_normal"]
+                                    selectedImage:[UIImage imageNamed:@"btn_media_telphone_message_pressed"]
+                                            title:@"视频通话"];
+    
     NIMMediaItem *snapChat =   [NIMMediaItem item:@"onTapMediaItemSnapChat:"
                                       normalImage:[UIImage imageNamed:@"bk_media_snap_normal"]
                                     selectedImage:[UIImage imageNamed:@"bk_media_snap_pressed"]
@@ -63,14 +68,20 @@
     BOOL isMe   = _session.sessionType == NIMSessionTypeP2P
     && [_session.sessionId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]];
     NSArray *items = @[];
-    if (_session.sessionType != NIMSessionTypeTeam && !isMe)
-    {
-        items = @[janKenPon,audioChat,videoChat,fileTrans,snapChat,whiteBoard,tip];
-    }
-    else
+    
+    if (isMe)
     {
         items = @[janKenPon,fileTrans,tip];
     }
+    else if(_session.sessionType == NIMSessionTypeTeam)
+    {
+        items = @[janKenPon,teamMeeting,fileTrans,tip];
+    }
+    else
+    {
+        items = @[janKenPon,audioChat,videoChat,fileTrans,snapChat,whiteBoard,tip];
+    }
+    
 
     return [defaultMediaItems arrayByAddingObjectsFromArray:items];
     

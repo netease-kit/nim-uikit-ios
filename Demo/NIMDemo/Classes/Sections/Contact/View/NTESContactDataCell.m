@@ -14,7 +14,16 @@
 {
     [super refreshUser:member];
     NSString *state = [NTESSessionUtil onlineState:self.memberId detail:NO];
-    NSString *title = [NSString stringWithFormat:@"[%@] %@",state,member.showName];
+    NSString *title = @"";
+    if (state.length)
+    {
+        title = [NSString stringWithFormat:@"[%@] %@",state,member.showName];
+    }
+    else
+    {
+        title = [NSString stringWithFormat:@"%@",member.showName];
+    }
+    
     self.textLabel.text = title;
 }
 

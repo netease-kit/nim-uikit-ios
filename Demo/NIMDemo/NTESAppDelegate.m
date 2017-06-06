@@ -23,9 +23,10 @@
 #import "NTESSDKConfigDelegate.h"
 #import "NTESCellLayoutConfig.h"
 #import "NTESSubscribeManager.h"
+@import PushKit;
 
 NSString *NTESNotificationLogout = @"NTESNotificationLogout";
-@interface NTESAppDelegate ()<NIMLoginManagerDelegate>
+@interface NTESAppDelegate ()<NIMLoginManagerDelegate,PKPushRegistryDelegate>
 
 @property (nonatomic,strong) NTESSDKConfigDelegate *sdkConfigDelegate;
 
@@ -39,7 +40,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 
     [self setupNIMSDK];
     [self setupServices];
-    [self registerAPNs];
+    [self registerPushService];
     [self commonInitListenEvents];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -50,7 +51,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     [self setupMainViewController];
     
     
-    
+    DDLogInfo(@"launch with options %@",launchOptions);
     return YES;
 }
 
@@ -94,16 +95,47 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     DDLogError(@"fail to get apns token :%@",error);
 }
 
+#pragma mark PKPushRegistryDelegate
+- (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type
+{
+    if ([type isEqualToString:PKPushTypeVoIP])
+    {
+        [[NIMSDK sharedSDK] updatePushKitToken:credentials.token];
+    }
+}
+
+- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type
+{
+    DDLogInfo(@"receive payload %@ type %@",payload.dictionaryPayload,type);
+    NSNumber *badge = payload.dictionaryPayload[@"aps"][@"badge"];
+    if ([badge isKindOfClass:[NSNumber class]]) {
+        [UIApplication sharedApplication].applicationIconBadgeNumber = [badge integerValue];
+    }
+}
+
+- (void)pushRegistry:(PKPushRegistry *)registry didInvalidatePushTokenForType:(NSString *)type
+{
+    DDLogInfo(@"registry %@ invalidate %@",registry,type);
+}
+
+
 
 #pragma mark - misc
-- (void)registerAPNs
+- (void)registerPushService
 {
+    //apns
     [[UIApplication sharedApplication] registerForRemoteNotifications];
     
     UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
     UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:types
                                                                              categories:nil];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    
+    //pushkit
+    PKPushRegistry *pushRegistry = [[PKPushRegistry alloc] initWithQueue:dispatch_get_main_queue()];
+    pushRegistry.delegate = self;
+    pushRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
+
 }
 
 - (void)setupMainViewController
@@ -142,6 +174,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 
 - (void)setupLoginViewController
 {
+    [self.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
     NTESLoginViewController *loginController = [[NTESLoginViewController alloc] init];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:loginController];
     self.window.rootViewController = nav;
@@ -198,7 +231,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 {
     [[NTESLogManager sharedManager] start];
     [[NTESNotificationCenter sharedCenter] start];
-    [[NTESSubscribeManager sharedInstance] start];
+    [[NTESSubscribeManager sharedManager] start];
 }
 
 - (void)setupNIMSDK
@@ -213,10 +246,11 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     //appkey 是应用的标识，不同应用之间的数据（用户、消息、群组等）是完全隔离的。
     //如需打网易云信 Demo 包，请勿修改 appkey ，开发自己的应用时，请替换为自己的 appkey 。
     //并请对应更换 Demo 代码中的获取好友列表、个人信息等网易云信 SDK 未提供的接口。
-    NSString *appKey = [[NTESDemoConfig sharedConfig] appKey];
-    NSString *cerName= [[NTESDemoConfig sharedConfig] cerName];
-    [[NIMSDK sharedSDK] registerWithAppID:appKey
-                                  cerName:cerName];
+    NSString *appKey        = [[NTESDemoConfig sharedConfig] appKey];
+    NIMSDKOption *option    = [NIMSDKOption optionWithAppKey:appKey];
+    option.apnsCername      = [[NTESDemoConfig sharedConfig] apnsCername];
+    option.pkCername        = [[NTESDemoConfig sharedConfig] pkCername];
+    [[NIMSDK sharedSDK] registerWithOption:option];
     
     
     //注册自定义消息的解析器

@@ -11,7 +11,7 @@
 #import "NTESTimerHolder.h"
 #import "NTESAudioChatViewController.h"
 #import "NTESMainTabController.h"
-#import "NetCallChatInfo.h"
+#import "NTESNetCallChatInfo.h"
 #import "NTESSessionUtil.h"
 #import "NTESVideoChatNetStatusView.h"
 #import "NTESGLView.h"
@@ -40,7 +40,7 @@
 
 @implementation NTESVideoChatViewController
 
-- (instancetype)initWithCallInfo:(NetCallChatInfo *)callInfo
+- (instancetype)initWithCallInfo:(NTESNetCallChatInfo *)callInfo
 {
     self = [self initWithNibName:nil bundle:nil];
     if (self) {

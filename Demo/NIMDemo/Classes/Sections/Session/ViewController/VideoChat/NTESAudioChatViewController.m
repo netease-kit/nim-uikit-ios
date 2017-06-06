@@ -9,7 +9,7 @@
 #import "NTESAudioChatViewController.h"
 #import "NTESVideoChatViewController.h"
 #import "NTESTimerHolder.h"
-#import "NetCallChatInfo.h"
+#import "NTESNetCallChatInfo.h"
 #import "NTESMainTabController.h"
 #import "NTESSessionUtil.h"
 #import "UIView+Toast.h"
@@ -22,7 +22,7 @@
 @end
 
 @implementation NTESAudioChatViewController
-- (instancetype)initWithCallInfo:(NetCallChatInfo *)callInfo{
+- (instancetype)initWithCallInfo:(NTESNetCallChatInfo *)callInfo{
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
         self.callInfo = callInfo;

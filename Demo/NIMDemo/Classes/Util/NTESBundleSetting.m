@@ -216,6 +216,13 @@
     }
 }
 
+- (NSInteger)chatroomRetryCount
+{
+    id count = [[NSUserDefaults standardUserDefaults] objectForKey:@"chatroom_enter_retry_count"];
+    return count == nil ? 3 : [count integerValue];
+}
+    
+
 
 - (NSString *)description
 {
@@ -243,7 +250,8 @@
                 "videochat_auto_disable_audiosession %zd\n" \
                 "videochat_audio_denoise %zd\n" \
                 "videochat_voice_detect %zd\n" \
-                "videochat_prefer_hd_audio %zd\n" \
+                "videochat_prefer_hd_audio %zd\n"\
+                "chatroom_retry_count %zd\n"\
                 "\n\n\n",
                 [self removeSessionWheDeleteMessages],
                 [self localSearchOrderByTimeDesc],
@@ -267,7 +275,8 @@
                 [self autoDeactivateAudioSession],
                 [self audioDenoise],
                 [self voiceDetect],
-                [self preferHDAudio]
+                [self preferHDAudio],
+                [self chatroomRetryCount]
             ];
 }
 @end

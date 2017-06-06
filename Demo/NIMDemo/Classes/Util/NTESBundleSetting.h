@@ -69,4 +69,6 @@
 
 - (BOOL)preferHDAudio;                              //期望高清语音
 
+- (NSInteger)chatroomRetryCount;                    //进聊天室重试次数
+
 @end

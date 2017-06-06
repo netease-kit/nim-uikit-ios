@@ -8,12 +8,12 @@
 
 #import "NTESNetChatViewController.h"
 
-@class NetCallChatInfo;
+@class NTESNetCallChatInfo;
 @class NTESVideoChatNetStatusView;
 
 @interface NTESAudioChatViewController : NTESNetChatViewController
 
-- (instancetype)initWithCallInfo:(NetCallChatInfo *)callInfo;
+- (instancetype)initWithCallInfo:(NTESNetCallChatInfo *)callInfo;
 
 @property (nonatomic,strong) IBOutlet UILabel *durationLabel;
 

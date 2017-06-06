@@ -10,13 +10,13 @@
 #import "NTESTimerHolder.h"
 #import "NTESRecordSelectView.h"
 
-@class NetCallChatInfo;
+@class NTESNetCallChatInfo;
 @class AVAudioPlayer;
 
 
 @interface NTESNetChatViewController : UIViewController<NIMNetCallManagerDelegate,NTESTimerHolderDelegate,NTESRecordSelectViewDelegate>
 
-@property (nonatomic,strong) NetCallChatInfo *callInfo;
+@property (nonatomic,strong) NTESNetCallChatInfo *callInfo;
 
 @property (nonatomic,strong) AVAudioPlayer *player; //播放提示音
 

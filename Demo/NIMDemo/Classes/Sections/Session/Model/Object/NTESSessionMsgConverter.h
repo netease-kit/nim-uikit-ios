@@ -40,4 +40,5 @@
 
 + (NIMMessage *)msgWithTip:(NSString *)tip;
 
+
 @end

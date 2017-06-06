@@ -8,13 +8,13 @@
 
 #import "NTESNetChatViewController.h"
 
-@class NetCallChatInfo;
+@class NTESNetCallChatInfo;
 @class NTESVideoChatNetStatusView;
 
 @interface NTESVideoChatViewController : NTESNetChatViewController
 
 //通话过程中，从语音聊天切到视频聊天
-- (instancetype)initWithCallInfo:(NetCallChatInfo *)callInfo;
+- (instancetype)initWithCallInfo:(NTESNetCallChatInfo *)callInfo;
 
 @property (weak, nonatomic) IBOutlet UIImageView *bigVideoView;
 

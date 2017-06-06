@@ -10,7 +10,7 @@
 
 @interface NTESSubscribeManager : NSObject
 
-+ (instancetype)sharedInstance;
++ (instancetype)sharedManager;
 
 - (void)start;
 

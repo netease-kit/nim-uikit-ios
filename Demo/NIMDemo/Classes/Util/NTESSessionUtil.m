@@ -349,7 +349,13 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
 + (NSString *)onlineState:(NSString *)userId detail:(BOOL)detail
 {
     NSString *state = @"";
-    NSDictionary *dict = [[NTESSubscribeManager sharedInstance] eventsForType:NIMSubscribeSystemEventTypeOnline];
+    if (![NTESSubscribeManager sharedManager])
+    {
+        //没有开启订阅服务
+        return state;
+    }
+    
+    NSDictionary *dict = [[NTESSubscribeManager sharedManager] eventsForType:NIMSubscribeSystemEventTypeOnline];
     NIMSubscribeEvent *event = [dict objectForKey:userId];
     NIMSubscribeOnlineInfo *info = event.subscribeInfo;
     if ([info isKindOfClass:[NIMSubscribeOnlineInfo class]] && info.senderClientTypes.count)
