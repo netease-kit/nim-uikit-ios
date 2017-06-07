@@ -1,6 +1,6 @@
 Pod::Spec.new do |s| 
   s.name = 'NIMKit' 
-  s.version = '1.5.0' 
+  s.version = '1.5.1' 
   s.summary = 'Netease IM UI Kit' 
   s.homepage = 'http://netease.im' 
   s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2017 Netease '} 
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.subspec 'Lite' do |cs|  
     cs.source_files = 'NIMKit/NIMKit/**/*.{h,m}'  
     cs.dependency 'NIMKit/Core'  
-    cs.dependency 'NIMSDK_LITE', '~> 3.8.0'  
+    cs.dependency 'NIMSDK_LITE', '~> 3.8.1'  
   end  
 
   s.subspec 'Core' do |os|     
