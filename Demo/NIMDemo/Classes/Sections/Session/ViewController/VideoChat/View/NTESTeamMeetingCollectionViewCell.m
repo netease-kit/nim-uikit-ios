@@ -115,17 +115,13 @@
     [self.glView render:yuvData width:width height:height];
 }
 
-- (void)refreshWidthCameraLayer:(CALayer *)layer
+- (void)refreshWidthCameraPreview:(UIView *)preview
 {
     self.cameraView.hidden = NO;
     self.glView.hidden = YES;
     self.avatarImageView.hidden = YES;
-    for (CALayer *layer in self.cameraView.layer.sublayers)
-    {
-        [layer removeFromSuperlayer];
-    }
-    layer.frame = self.cameraView.layer.bounds;
-    [self.cameraView.layer addSublayer:layer];
+    preview.frame = self.cameraView.bounds;
+    [self.cameraView addSubview:preview];
 }
 
 - (void)refreshWidthVolume:(UInt16)volume

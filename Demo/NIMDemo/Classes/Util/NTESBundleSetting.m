@@ -216,12 +216,35 @@
     }
 }
 
+- (NIMAVChatScene)scene
+{
+    id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"avchat_scene"];
+    
+    if (setting) {
+        return [setting unsignedIntegerValue];
+    }
+    else {
+        return NIMAVChatSceneDefault;
+    }
+}
+
 - (NSInteger)chatroomRetryCount
 {
     id count = [[NSUserDefaults standardUserDefaults] objectForKey:@"chatroom_enter_retry_count"];
     return count == nil ? 3 : [count integerValue];
 }
     
+- (BOOL)webrtcCompatible
+{
+    id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"webrtc_compatible"];
+    
+    if (setting) {
+        return [setting boolValue];
+    }
+    else {
+        return NO;
+    }
+}
 
 
 - (NSString *)description
@@ -251,7 +274,9 @@
                 "videochat_audio_denoise %zd\n" \
                 "videochat_voice_detect %zd\n" \
                 "videochat_prefer_hd_audio %zd\n"\
+                "avchat_scene %zd\n"\
                 "chatroom_retry_count %zd\n"\
+                "webrtc_compatible %zd\n" \
                 "\n\n\n",
                 [self removeSessionWheDeleteMessages],
                 [self localSearchOrderByTimeDesc],
@@ -276,7 +301,9 @@
                 [self audioDenoise],
                 [self voiceDetect],
                 [self preferHDAudio],
-                [self chatroomRetryCount]
+                [self scene],
+                [self chatroomRetryCount],
+                [self webrtcCompatible]
             ];
 }
 @end

@@ -22,7 +22,7 @@
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
 
-
+#define NTESDefaultContainerHeight 216.f
 
 @interface NIMInputView()<NIMInputToolBarDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate>
 {
@@ -54,7 +54,7 @@
         _recordPhase = AudioRecordPhaseEnd;
         _atCache = [[NIMInputAtCache alloc] init];
         _inputConfig = config;
-        _containerHeight = 216.f;
+        _containerHeight = NTESDefaultContainerHeight;
         self.backgroundColor = [UIColor whiteColor];
         [self addListenEvents];
     }
@@ -68,9 +68,11 @@
 
 - (CGSize)sizeThatFits:(CGSize)size
 {
-    CGFloat toolBarHeight = self.toolBar.nim_height;
-    CGFloat containerHeight = self.moreContainer.nim_height > self.emoticonContainer.nim_height? self.moreContainer.nim_height : self.emoticonContainer.nim_height;
+    //这里不做.语法 get 操作，会提前初始化组件导致卡顿
+    CGFloat toolBarHeight = _toolBar.nim_height;
+    CGFloat containerHeight = _moreContainer.nim_height > _emoticonContainer.nim_height? _moreContainer.nim_height : _emoticonContainer.nim_height;
     CGFloat height = toolBarHeight + containerHeight;
+    height = NTESDefaultContainerHeight > height ? NTESDefaultContainerHeight : height;
     CGFloat width = self.superview? self.superview.nim_width : self.nim_width;
     return CGSizeMake(width, height);
 }
@@ -311,8 +313,9 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    self.moreContainer.nim_top     = self.toolBar.nim_bottom;
-    self.emoticonContainer.nim_top = self.toolBar.nim_bottom;
+    //这里不做.语法 get 操作，会提前初始化组件导致卡顿
+    _moreContainer.nim_top     = self.toolBar.nim_bottom;
+    _emoticonContainer.nim_top = self.toolBar.nim_bottom;
 }
 
 

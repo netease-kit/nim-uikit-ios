@@ -69,6 +69,10 @@
 
 - (BOOL)preferHDAudio;                              //期望高清语音
 
+- (NIMAVChatScene)scene;                            //音视频场景设置
+
 - (NSInteger)chatroomRetryCount;                    //进聊天室重试次数
+
+- (BOOL)webrtcCompatible;                           //兼容 webrtc
 
 @end
