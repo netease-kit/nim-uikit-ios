@@ -2220,6 +2220,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../NIMKit/NIMKit/**",
+					"$(SRCROOT)/NIMDemo/Classes/Sections/Session/ViewController/VideoChat/View/",
 				);
 				INFOPLIST_FILE = "NIMDemo/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2267,6 +2268,7 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../NIMKit/NIMKit/**",
+					"$(SRCROOT)/NIMDemo/Classes/Sections/Session/ViewController/VideoChat/View/",
 				);
 				INFOPLIST_FILE = "NIMDemo/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
