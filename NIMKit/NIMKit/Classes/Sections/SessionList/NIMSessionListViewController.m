@@ -145,12 +145,6 @@
 
 - (void)didRemoveRecentSession:(NIMRecentSession *)recentSession totalUnreadCount:(NSInteger)totalUnreadCount
 {
-    //清理本地数据
-    NSInteger index = [self.recentSessions indexOfObject:recentSession];
-    [self.recentSessions removeObjectAtIndex:index];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
     //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
     if (self.autoRemoveRemoteSession)
     {
@@ -190,6 +184,17 @@
 }
 
 - (void)onDeleteRecentAtIndexPath:(NIMRecentSession *)recent atIndexPath:(NSIndexPath *)indexPath{
+    //清理本地数据
+    NSInteger index = indexPath.row;
+    //如果 recent 在 recentSessions 中的下标就是 indexPath.row，那么就可以避免使用 NSArray indexOfObject: 函数而提高效率
+    if (recent != [self.recentSessions objectAtIndex:indexPath.row]) {
+        index = [self.recentSessions indexOfObject:recent];
+    }
+    
+    [self.recentSessions removeObjectAtIndex:index];
+    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    //删除 NIMSDK 中的数据
     id<NIMConversationManager> manager = [[NIMSDK sharedSDK] conversationManager];
     [manager deleteRecentSession:recent];
 }
