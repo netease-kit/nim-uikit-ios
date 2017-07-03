@@ -21,6 +21,7 @@
 #import "NTESTeamMeetingMutesViewController.h"
 #import "UIAlertView+NTESBlock.h"
 #import "UIView+Toast.h"
+#import "NTESBundleSetting.h"
 
 typedef NS_ENUM(NSInteger,NTESTeamMeetingRoleType) {
     NTESTeamMeetingRoleCaller,
@@ -365,13 +366,13 @@ typedef NS_ENUM(NSInteger,NTESTeamMeetingRoleType) {
     [self dismiss];
 }
 
-- (void)onLocalPreviewReady:(CALayer *)layer
+- (void)onLocalDisplayviewReady:(UIView *)displayView
 {
     NSIndexPath *indexPath = [self findIndexPath:[NIMSDK sharedSDK].loginManager.currentAccount];
     if (indexPath)
     {
         NTESTeamMeetingCollectionViewCell *cell = (NTESTeamMeetingCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-        [cell refreshWidthCameraLayer:layer];
+        [cell refreshWidthCameraPreview:displayView];
     }
 }
 
@@ -496,9 +497,13 @@ typedef NS_ENUM(NSInteger,NTESTeamMeetingRoleType) {
     meeting.actor = YES;
     
     NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
+    param.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
+    param.videoCrop = NIMNetCallVideoCrop1x1;
     NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
     option.videoCaptureParam = param;
-    option.videoCrop = NIMNetCallVideoCrop1x1;
+    option.preferHDAudio = [[NTESBundleSetting sharedConfig] preferHDAudio];
+    option.scene = [[NTESBundleSetting sharedConfig] scene];
+    option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];
     meeting.option = option;
     
     return meeting;

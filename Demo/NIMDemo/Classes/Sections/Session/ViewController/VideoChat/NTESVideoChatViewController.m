@@ -34,6 +34,9 @@
 
 @property (nonatomic,weak) UIView   *localView;
 
+@property (nonatomic,weak) UIView   *localPreView;
+
+
 @property (nonatomic, assign) BOOL calleeBasy;
 
 @end
@@ -48,9 +51,9 @@
         self.callInfo.isMute = NO;
         self.callInfo.useSpeaker = NO;
         self.callInfo.disableCammera = NO;
-        if (!self.localVideoLayer) {
+        if (!self.localPreView) {
             //没有的话，尝试去取一把预览层（从视频切到语音再切回来的情况下是会有的）
-            self.localVideoLayer = [NIMAVChatSDK sharedSDK].netCallManager.localPreviewLayer;
+            self.localPreView = [NIMAVChatSDK sharedSDK].netCallManager.localPreview;
         }
         [[NIMAVChatSDK sharedSDK].netCallManager switchType:NIMNetCallMediaTypeVideo];
     }
@@ -70,10 +73,12 @@
 - (void)viewDidLoad {
     self.localView = self.smallVideoView;
     [super viewDidLoad];
-    if (self.localVideoLayer) {
-        self.localVideoLayer.frame = self.localView.bounds;
-        [self.localView.layer addSublayer:self.localVideoLayer];
+    
+    if (self.localPreView) {
+        self.localPreView.frame = self.localView.bounds;
+        [self.localView addSubview:self.localPreView];
     }
+    
     [self initUI];
 }
 
@@ -124,8 +129,9 @@
 - (void)onCalleeBusy
 {
     _calleeBasy = YES;
-    if (_localVideoLayer) {
-        [_localVideoLayer removeFromSuperlayer];
+    if (_localPreView)
+    {
+        [_localPreView removeFromSuperview];
     }
 }
 
@@ -216,7 +222,8 @@
     [self.switchModelBtn setTitle:@"语音模式" forState:UIControlStateNormal];
     [self.hungUpBtn removeTarget:self action:NULL forControlEvents:UIControlEventTouchUpInside];
     [self.hungUpBtn addTarget:self action:@selector(hangup) forControlEvents:UIControlEventTouchUpInside];
-    self.localVideoLayer.hidden = NO;
+//    self.localVideoLayer.hidden = NO;
+    self.localPreView.hidden = NO;
 }
 
 //切换接听中界面(语音)
@@ -271,10 +278,11 @@
     [[NIMAVChatSDK sharedSDK].netCallManager setCameraDisable:self.callInfo.disableCammera];
     self.disableCameraBtn.selected = self.callInfo.disableCammera;
     if (self.callInfo.disableCammera) {
-        [self.localVideoLayer removeFromSuperlayer];
+        [self.localPreView removeFromSuperview];
         [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeCloseVideo];
     }else{
-        [self.localView.layer addSublayer:self.localVideoLayer];
+        [self.localView addSubview:self.localPreView];
+
         [[NIMAVChatSDK sharedSDK].netCallManager control:self.callInfo.callID type:NIMNetCallControlTypeOpenVideo];
     }
 }
@@ -327,21 +335,20 @@
 
 
 #pragma mark - NIMNetCallManagerDelegate
-
-- (void)setLocalVideoLayer:(CALayer *)localVideoLayer{
-    _localVideoLayer = localVideoLayer;
-}
-
-- (void)onLocalPreviewReady:(CALayer *)layer{
+- (void)onLocalDisplayviewReady:(UIView *)displayView
+{
     if (_calleeBasy) {
         return;
     }
-    if (self.localVideoLayer) {
-        [self.localVideoLayer removeFromSuperlayer];
+    
+    if (self.localPreView) {
+        [self.localPreView removeFromSuperview];
     }
-    self.localVideoLayer = layer;
-    layer.frame = self.localView.bounds;
-    [self.localView.layer addSublayer:layer];
+    
+    self.localPreView = displayView;
+    displayView.frame = self.localView.bounds;
+
+    [self.localView addSubview:displayView];
 }
 
 #if defined(NTESUseGLView)
@@ -406,8 +413,8 @@
         if (self.localView == self.bigVideoView) {
             self.localView = self.smallVideoView;
             
-            if (self.localVideoLayer) {
-                [self onLocalPreviewReady:self.localVideoLayer];
+            if (self.localPreView) {
+                [self onLocalDisplayviewReady:self.localPreView];
             }
         }
     }

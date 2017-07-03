@@ -2,13 +2,13 @@
 //  NTESGLView.h
 //  NIM
 //
-//  Created by fenric on 15/9/1.
-//  Copyright (c) 2015年 Netease. All rights reserved.
+//  Created by fenric on 16/8/30.
+//  Copyright © 2016年 Netease. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "IJKSDLGLView.h"
 
-@interface NTESGLView : UIView
+@interface NTESGLView : NTESIJKSDLGLView
 
 - (void) render: (NSData *)yuvData
           width:(NSUInteger)width

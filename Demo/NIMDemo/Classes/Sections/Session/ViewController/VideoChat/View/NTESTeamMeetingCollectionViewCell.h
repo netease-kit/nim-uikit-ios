@@ -26,7 +26,7 @@
                   width:(NSUInteger)width
                  height:(NSUInteger)height;
 
-- (void)refreshWidthCameraLayer:(CALayer *)layer;
+- (void)refreshWidthCameraPreview:(UIView *)preview;
 
 - (void)refreshWidthVolume:(UInt16)volume;
 

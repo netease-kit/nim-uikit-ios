@@ -882,7 +882,6 @@ NTES_FORBID_INTERACTIVE_POP
 
 - (void)fillUserSetting:(NIMNetCallOption *)option
 {
-    option.videoCrop  = [[NTESBundleSetting sharedConfig] videochatVideoCrop];
     option.autoRotateRemoteVideo = [[NTESBundleSetting sharedConfig] videochatAutoRotateRemoteVideo];
     option.serverRecordAudio     = [[NTESBundleSetting sharedConfig] serverRecordAudio];
     option.serverRecordVideo     = [[NTESBundleSetting sharedConfig] serverRecordVideo];
@@ -893,6 +892,8 @@ NTES_FORBID_INTERACTIVE_POP
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
     option.preferHDAudio =  [[NTESBundleSetting sharedConfig] preferHDAudio];
+    option.scene = [[NTESBundleSetting sharedConfig] scene];
+    option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];
     
     NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
     [self fillVideoCaptureSetting:param];
@@ -903,6 +904,7 @@ NTES_FORBID_INTERACTIVE_POP
 - (void)fillVideoCaptureSetting:(NIMNetCallVideoCaptureParam *)param
 {
     param.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
+    param.videoCrop  = [[NTESBundleSetting sharedConfig] videochatVideoCrop];
     param.startWithBackCamera   = [[NTESBundleSetting sharedConfig] startWithBackCamera];
 
 }
