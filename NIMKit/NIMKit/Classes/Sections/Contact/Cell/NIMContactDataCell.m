@@ -10,7 +10,7 @@
 #import "NIMAvatarImageView.h"
 #import "UIView+NIM.h"
 #import "NIMKit.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMContactDataCell()
 

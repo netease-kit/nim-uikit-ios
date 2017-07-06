@@ -9,7 +9,7 @@
 #import "NIMInputToolBar.h"
 #import "NIMGrowingTextView.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMInputBarItemType.h"
 
 @interface NIMInputToolBar()<NIMGrowingTextViewDelegate>

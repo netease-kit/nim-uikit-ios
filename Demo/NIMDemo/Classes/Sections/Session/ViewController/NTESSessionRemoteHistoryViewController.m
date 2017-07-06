@@ -41,9 +41,9 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     //注册 NIMKit 自定义排版配置
-    [[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig class]];
+    [[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig new]];
 
-    self.navigationItem.leftBarButtonItems = @[];
+    self.navigationItem.leftBarButtonItems  = @[];
     self.navigationItem.rightBarButtonItems = @[];
     [SVProgressHUD show];
 }
@@ -56,6 +56,8 @@
 {
     return @"";
 }
+
+- (void)sendMessage:(NIMMessage *)message{};
 
 - (id<NIMSessionConfig>)sessionConfig{
     return self.config;

@@ -9,7 +9,7 @@
 #import "NIMContactPickedView.h"
 #import "NIMKit.h"
 #import "NIMAvatarImageView.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 #define avatarWidth 35
 #define blank 10

@@ -171,6 +171,7 @@
         option.fromIds       = uids;
         option.limit         = SearchLimit;
         option.order         = [NTESBundleSetting sharedConfig].localSearchOrderByTimeDesc? NIMMessageSearchOrderDesc: NIMMessageSearchOrderAsc;
+        option.allMessageTypes = YES;
         self.lastOption      = option;
         [self.searchController setActive:NO];
         [self showSearchData:option loadMore:YES];

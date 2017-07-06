@@ -12,6 +12,7 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
     NIMContactSelectTypeFriend,
     NIMContactSelectTypeTeamMember,
     NIMContactSelectTypeTeam,
+    NIMContactSelectTypeRobot,
 };
 
 
@@ -64,12 +65,36 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
  */
 - (BOOL)showSelectDetail;
 
+/**
+ *  是否要加入机器人
+ */
+- (BOOL)enableRobot;
+
 @end
 
 /**
  *  内置配置-选择好友
  */
 @interface NIMContactFriendSelectConfig : NSObject<NIMContactSelectConfig>
+
+@property (nonatomic,assign) BOOL needMutiSelected;
+
+@property (nonatomic,assign) NSInteger maxSelectMemberCount;
+
+@property (nonatomic,copy) NSArray *alreadySelectedMemberId;
+
+@property (nonatomic,copy) NSArray *filterIds;
+
+@property (nonatomic,assign) BOOL showSelectDetail;
+
+@property (nonatomic,assign) BOOL enableRobot;
+
+@end
+
+/**
+ *  内置配置-选择机器人
+ */
+@interface NIMContactRobotSelectConfig : NSObject<NIMContactSelectConfig>
 
 @property (nonatomic,assign) BOOL needMutiSelected;
 
@@ -100,6 +125,8 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
 
 @property (nonatomic,assign) BOOL showSelectDetail;
 
+@property (nonatomic,assign) BOOL enableRobot;
+
 @end
 
 
@@ -117,5 +144,7 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
 @property (nonatomic,copy) NSArray *filterIds;
 
 @property (nonatomic,assign) BOOL showSelectDetail;
+
+@property (nonatomic,assign) BOOL enableRobot;
 
 @end

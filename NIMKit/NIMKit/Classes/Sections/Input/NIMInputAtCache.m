@@ -37,8 +37,8 @@
     }
     return [NSArray arrayWithArray:uids];
 }
-    
-    
+
+
 - (void)clean
 {
     [self.items removeAllObjects];
@@ -54,7 +54,8 @@
     __block NIMInputAtItem *item;
     [_items enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NIMInputAtItem *object = obj;
-        if ([object.name isEqualToString:name]) {
+        if ([object.name isEqualToString:name])
+        {
             item = object;
             *stop = YES;
         }
@@ -93,6 +94,7 @@
     }
     return matchs;
 }
+
 
 @end
 

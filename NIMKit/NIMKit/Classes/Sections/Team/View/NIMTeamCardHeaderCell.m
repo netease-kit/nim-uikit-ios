@@ -10,7 +10,7 @@
 #import "NIMAvatarImageView.h"
 #import "UIView+NIM.h"
 #import "NIMCardMemberItem.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMTeamCardHeaderCell()
 

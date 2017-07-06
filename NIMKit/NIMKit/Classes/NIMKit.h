@@ -55,6 +55,11 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 #import "NIMSessionListViewController.h"
 
+/*
+ *  机器人消息模板解析器
+ */
+#import "NIMKitRobotDefaultTemplateParser.h"
+
 
 @interface NIMKit : NSObject
 
@@ -63,7 +68,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  *  注册自定义的排版配置，通过注册自定义排版配置来实现自定义消息的定制化排版
  */
-- (void)registerLayoutConfig:(Class)layoutConfigClass;
+- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfigClass;
 
 /**
  *  返回当前的排版配置
@@ -90,6 +95,10 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 @property (nonatomic,copy)      NSString *settingBundleName;
 
+/**
+ *  机器人消息模板解析器
+ */
+@property (nonatomic,strong)    NIMKitRobotDefaultTemplateParser *robotTemplateParser;
 
 /**
  *  用户信息变更通知接口

@@ -9,7 +9,7 @@
 #import "NIMSessionLocationContentView.h"
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMKitUIConfig.h"
 
 @interface NIMSessionLocationContentView()

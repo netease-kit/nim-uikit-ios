@@ -10,7 +10,7 @@
 #import "NIMKit.h"
 #import "NIMKitDataProviderImpl.h"
 #import "NIMKitInfoFetchOption.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMKitDataRequest : NSObject
 
@@ -71,8 +71,15 @@
 
 - (NIMKitInfo *)infoByUser:(NSString *)userId option:(NIMKitInfoFetchOption *)option
 {
+    if ([[NIMSDK sharedSDK].robotManager isValidRobot:userId])
+    {
+        NIMKitInfo *robotInfo = [self infoByRobot:userId];
+        if (robotInfo)
+        {
+            return robotInfo;
+        }
+    }
     if (option.message) {
-        NSAssert([userId isEqualToString:option.message.from], @"user id should be same with message from");
         return [self infoByUser:userId message:option.message option:option];
     }
     return [self infoByUser:userId session:option.session option:option];
@@ -168,6 +175,22 @@
                         session:message.session
                          option:option];
     }
+}
+
+
+- (NIMKitInfo *)infoByRobot:(NSString *)userId
+{
+    NIMRobot *robot = [[NIMSDK sharedSDK].robotManager robotInfo:userId];
+    NIMKitInfo *info;
+    if (robot)
+    {
+        info = [[NIMKitInfo alloc] init];
+        info.infoId   = userId;
+        info.showName = robot.nickname;
+        info.avatarUrlString = robot.thumbAvatarUrl;
+        info.avatarImage = self.defaultUserAvatar;
+    }
+    return info;
 }
 
 

@@ -9,7 +9,7 @@
 #import "NIMAdvancedTeamCardViewController.h"
 #import "NIMTeamCardRowItem.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMKitColorButtonCell.h"
 #import "NIMAdvancedTeamMemberCell.h"
 #import "NIMKitDependency.h"

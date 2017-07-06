@@ -86,6 +86,13 @@ NSString *const NTESSubscribeOnlineState = @"online_state";
 
 - (void)subscribeTempUserOnlineState:(NSString *)userId
 {
+    BOOL isRobot = [[NIMSDK sharedSDK].robotManager isValidRobot:userId];
+    BOOL isMe    = [[NIMSDK sharedSDK].loginManager.currentAccount isEqualToString:userId];
+    if (isRobot || isMe) {
+        DDLogInfo(@"user can not subscribe temp publisher: %@",userId);
+        //自己或者机器人，则不需要订阅
+        return;
+    }
     NIMSubscribeRequest *request = [self generateRequest];
     request.publishers = @[userId];
     [self.tempSubscribeIds addObject:userId];
@@ -287,7 +294,9 @@ NSString *const NTESSubscribeOnlineState = @"online_state";
     NSMutableSet *ids = [[NSMutableSet alloc] init];
     NSString *me = [NIMSDK sharedSDK].loginManager.currentAccount;
     for (NIMRecentSession *recent in [NIMSDK sharedSDK].conversationManager.allRecentSessions) {
-        if (recent.session.sessionType == NIMSessionTypeP2P && ![recent.session.sessionId isEqualToString:me]) {
+        BOOL isRobot = [[NIMSDK sharedSDK].robotManager isValidRobot:recent.session.sessionId];
+        if (recent.session.sessionType == NIMSessionTypeP2P && !isRobot && ![recent.session.sessionId isEqualToString:me])
+        {
             [ids addObject:recent.session.sessionId];
         }
     }

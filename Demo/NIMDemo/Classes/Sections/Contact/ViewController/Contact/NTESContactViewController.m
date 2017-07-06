@@ -117,6 +117,11 @@ NIMEventSubscribeManagerDelegate> {
                   contactCellUtilVC:@"NTESNormalTeamListViewController"
                 },
               @{
+                  contactCellUtilIcon:@"icon_robot_normal",
+                  contactCellUtilTitle:@"智能机器人",
+                  contactCellUtilVC:@"NTESRobotListViewController"
+                  },
+              @{
                   contactCellUtilIcon:@"icon_blacklist_normal",
                   contactCellUtilTitle:@"黑名单",
                   contactCellUtilVC:@"NTESBlackListViewController"

@@ -53,6 +53,7 @@
 #import "NTESTeamMeetingViewController.h"
 #import "NTESTeamMeetingCallerInfo.h"
 #import "NIMInputAtCache.h"
+#import "NTESRobotCardViewController.h"
 
 @interface NTESSessionViewController ()
 <UIImagePickerControllerDelegate,
@@ -117,6 +118,8 @@ NIMEventSubscribeManagerDelegate>
     }
     [_fpsLabel invalidate];
 }
+
+
 
 - (void)viewDidLayoutSubviews{
     [super viewDidLayoutSubviews];
@@ -423,9 +426,7 @@ NIMEventSubscribeManagerDelegate>
     else if([eventName isEqualToString:NIMKitEventNameTapLabelLink])
     {
         NSString *link = event.data;
-        [self.view makeToast:[NSString stringWithFormat:@"tap link : %@",link]
-                    duration:2
-                    position:CSToastPositionCenter];
+        [self openSafari:link];
         handled = YES;
     }
     else if([eventName isEqualToString:NIMDemoEventNameOpenSnapPicture])
@@ -455,7 +456,6 @@ NIMEventSubscribeManagerDelegate>
         if ([NTESBundleSetting sharedConfig].autoRemoveSnapMessage) {
             [[NIMSDK sharedSDK].conversationManager deleteMessage:message];
             [self uiDeleteMessage:message];
-            
         }else{
             [[NIMSDK sharedSDK].conversationManager updateMessage:message forSession:message.session completion:nil];
             [self uiUpdateMessage:message];
@@ -464,7 +464,12 @@ NIMEventSubscribeManagerDelegate>
         handled = YES;
         self.currentSingleSnapView = nil;
     }
-
+    else if([eventName isEqualToString:NIMKitEventNameTapRobotLink])
+    {
+        NSString *link = event.data;
+        [self openSafari:link];
+        handled = YES;
+    }
     if (!handled) {
         NSAssert(0, @"invalid event");
     }
@@ -472,7 +477,16 @@ NIMEventSubscribeManagerDelegate>
 }
 
 - (BOOL)onTapAvatar:(NSString *)userId{
-    UIViewController *vc = [[NTESPersonalCardViewController alloc] initWithUserId:userId];
+    UIViewController *vc = nil;
+    if ([[NIMSDK sharedSDK].robotManager isValidRobot:userId])
+    {
+        vc = [[NTESRobotCardViewController alloc] initWithUserId:userId];
+    }
+    else
+    {
+        vc = [[NTESPersonalCardViewController alloc] initWithUserId:userId];
+    }
+    
     [self.navigationController pushViewController:vc animated:YES];
     return YES;
 }
@@ -480,7 +494,7 @@ NIMEventSubscribeManagerDelegate>
 
 - (BOOL)onLongPressAvatar:(NSString *)userId
 {
-    if (self.session.sessionType == NIMSessionTypeTeam)
+    if (self.session.sessionType == NIMSessionTypeTeam && ![userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount])
     {
         NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
         option.session = self.session;
@@ -558,10 +572,29 @@ NIMEventSubscribeManagerDelegate>
    //普通的自定义消息点击事件可以在这里做哦~
 }
 
+- (void)openSafari:(NSString *)link
+{
+    NSURLComponents *components = [[NSURLComponents alloc] initWithString:link];
+    if (components)
+    {
+        if (!components.scheme)
+        {
+            //默认添加 http
+            components.scheme = @"http";
+        }
+        [[UIApplication sharedApplication] openURL:[components URL]];
+    }
+}
+
 
 #pragma mark - 导航按钮
-- (void)onTouchUpInfoBtn:(id)sender{
+- (void)enterPersonInfoCard:(id)sender{
     NTESSessionCardViewController *vc = [[NTESSessionCardViewController alloc] initWithSession:self.session];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)enterRobotInfoCard:(id)sender{
+    NTESRobotCardViewController *vc = [[NTESRobotCardViewController alloc] initWithUserId:self.session.sessionId];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -714,8 +747,7 @@ NIMEventSubscribeManagerDelegate>
     }];
 }
 
-
-- (void)forwardMessage:(NIMMessage *)message toSession:(NIMSession *)session
+ - (void)forwardMessage:(NIMMessage *)message toSession:(NIMSession *)session
 {
     NSString *name;
     if (session.sessionType == NIMSessionTypeP2P)
@@ -733,8 +765,17 @@ NIMEventSubscribeManagerDelegate>
     
     __weak typeof(self) weakSelf = self;
     [alert showAlertWithCompletionHandler:^(NSInteger index) {
-        if(index == 1){
-            [[NIMSDK sharedSDK].chatManager forwardMessage:message toSession:session error:nil];
+        if(index == 1)
+        {
+            if (message.messageType == NIMMessageTypeRobot)
+            {
+                NIMMessage *forwardMessage = [NTESSessionMsgConverter msgWithText:message.text];
+                [[NIMSDK sharedSDK].chatManager sendMessage:forwardMessage toSession:session error:nil];
+            }
+            else
+            {
+                [[NIMSDK sharedSDK].chatManager forwardMessage:message toSession:session error:nil];
+            }
             [weakSelf.view makeToast:@"已发送" duration:2.0 position:CSToastPositionCenter];
         }
     }];
@@ -809,7 +850,7 @@ NIMEventSubscribeManagerDelegate>
     UIBarButtonItem *enterTeamCardItem = [[UIBarButtonItem alloc] initWithCustomView:enterTeamCard];
     
     UIButton *infoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [infoBtn addTarget:self action:@selector(onTouchUpInfoBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [infoBtn addTarget:self action:@selector(enterPersonInfoCard:) forControlEvents:UIControlEventTouchUpInside];
     [infoBtn setImage:[UIImage imageNamed:@"icon_session_info_normal"] forState:UIControlStateNormal];
     [infoBtn setImage:[UIImage imageNamed:@"icon_session_info_pressed"] forState:UIControlStateHighlighted];
     [infoBtn sizeToFit];
@@ -823,13 +864,30 @@ NIMEventSubscribeManagerDelegate>
     UIBarButtonItem *historyButtonItem = [[UIBarButtonItem alloc] initWithCustomView:historyBtn];
     
     
+    UIButton *robotInfoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [robotInfoBtn addTarget:self action:@selector(enterRobotInfoCard:) forControlEvents:UIControlEventTouchUpInside];
+    [robotInfoBtn setImage:[UIImage imageNamed:@"icon_robot_card_normal"] forState:UIControlStateNormal];
+    [robotInfoBtn setImage:[UIImage imageNamed:@"icon_robot_card_pressed"] forState:UIControlStateHighlighted];
+    [robotInfoBtn sizeToFit];
+    UIBarButtonItem *robotInfoButtonItem = [[UIBarButtonItem alloc] initWithCustomView:robotInfoBtn];
+
     
-    if (self.session.sessionType == NIMSessionTypeTeam) {
+    if (self.session.sessionType == NIMSessionTypeTeam)
+    {
         self.navigationItem.rightBarButtonItems  = @[enterTeamCardItem,historyButtonItem];
-    }else if(self.session.sessionType == NIMSessionTypeP2P){
-        if ([self.session.sessionId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
+    }
+    else if(self.session.sessionType == NIMSessionTypeP2P)
+    {
+        if ([self.session.sessionId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]])
+        {
             self.navigationItem.rightBarButtonItems = @[historyButtonItem];
-        }else{
+        }
+        else if([[NIMSDK sharedSDK].robotManager isValidRobot:self.session.sessionId])
+        {
+            self.navigationItem.rightBarButtonItems = @[historyButtonItem,robotInfoButtonItem];
+        }
+        else
+        {
             self.navigationItem.rightBarButtonItems = @[enterUInfoItem,historyButtonItem];
         }
     }

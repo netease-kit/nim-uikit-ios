@@ -37,6 +37,7 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         _provider = [[NIMKitDataProviderImpl alloc] init];   //默认使用 NIMKit 的实现
 
         _layoutConfig = [[NIMCellLayoutConfig alloc] init];
+        _robotTemplateParser = [[NIMKitRobotDefaultTemplateParser alloc] init];
     }
     return self;
 }
@@ -51,18 +52,18 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     return instance;
 }
 
-- (void)registerLayoutConfig:(Class)layoutConfigClass
+- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfigClass
 {
-    id instance = [[layoutConfigClass alloc] init];
-    if ([instance isKindOfClass:[NIMCellLayoutConfig class]])
+    if ([layoutConfigClass isKindOfClass:[NIMCellLayoutConfig class]])
     {
-        self.layoutConfig = instance;
+        self.layoutConfig = layoutConfigClass;
     }
     else
     {
         NSAssert(0, @"class should be subclass of NIMLayoutConfig");
     }
 }
+
 
 - (id<NIMCellLayoutConfig>)layoutConfig
 {

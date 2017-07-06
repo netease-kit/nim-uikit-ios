@@ -9,7 +9,7 @@
 #import "NIMInputEmoticonTabView.h"
 #import "NIMInputEmoticonManager.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMGlobalMacro.h"
 
 const NSInteger NIMInputEmoticonTabViewHeight = 35;

@@ -93,9 +93,7 @@
 
 /**
  *  重新加载所有数据，调用时必须先调用父类方法
- *
- *  @param reload 是否刷新列表
  */
-- (void)refresh:(BOOL)reload;
+- (void)refresh;
 
 @end

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class NIMAvatarImageView;
-@class ContactDataMember;
+@class NTESContactDataMember;
 
 
 @protocol NTESUserListCellDelegate <NSObject>
@@ -24,6 +24,6 @@
 
 @property (nonatomic,weak) id<NTESUserListCellDelegate> delegate;
 
-- (void)refreshWithMember:(ContactDataMember *)member;
+- (void)refreshWithMember:(NTESContactDataMember *)member;
 
 @end

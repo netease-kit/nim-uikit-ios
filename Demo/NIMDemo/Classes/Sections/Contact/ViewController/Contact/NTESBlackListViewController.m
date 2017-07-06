@@ -80,7 +80,7 @@
         cell = [[NTESUserListCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identity];
         cell.delegate = self;
     }
-    ContactDataMember *member = self.data[indexPath.row];
+    NTESContactDataMember *member = self.data[indexPath.row];
     [cell refreshWithMember:member];
     return cell;
 }

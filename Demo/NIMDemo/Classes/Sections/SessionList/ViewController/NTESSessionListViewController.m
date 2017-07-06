@@ -19,6 +19,7 @@
 #import "NTESWhiteboardAttachment.h"
 #import "NTESSessionUtil.h"
 #import "NTESPersonalCardViewController.h"
+#import "NTESRobotCardViewController.h"
 
 #define SessionListTitle @"云信 Demo"
 
@@ -72,8 +73,8 @@
     self.navigationItem.titleView  = [self titleView:userID];
 }
 
-- (void)refresh:(BOOL)reload{
-    [super refresh:reload];
+- (void)refresh{
+    [super refresh];
     self.emptyTipLabel.hidden = self.recentSessions.count;
 }
 
@@ -85,8 +86,16 @@
 - (void)onSelectedAvatar:(NIMRecentSession *)recent
              atIndexPath:(NSIndexPath *)indexPath{
     if (recent.session.sessionType == NIMSessionTypeP2P) {
-       NTESPersonalCardViewController *vc = [[NTESPersonalCardViewController alloc] initWithUserId:recent.session.sessionId];
-      [self.navigationController pushViewController:vc animated:YES];
+        UIViewController *vc;
+        if ([[NIMSDK sharedSDK].robotManager isValidRobot:recent.session.sessionId])
+        {
+            vc = [[NTESRobotCardViewController alloc] initWithUserId:recent.session.sessionId];
+        }
+        else
+        {
+            vc = [[NTESPersonalCardViewController alloc] initWithUserId:recent.session.sessionId];
+        }
+        [self.navigationController pushViewController:vc animated:YES];
     }
 }
 

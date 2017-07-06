@@ -7,7 +7,7 @@
 //
 
 #import "NIMImageContentConfig.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMKitUIConfig.h"
 
 @implementation NIMImageContentConfig

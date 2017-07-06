@@ -7,7 +7,7 @@
 //
 
 #import "NIMInputAudioRecordIndicatorView.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 #define NIMKit_ViewWidth 160
 #define NIMKit_ViewHeight 110

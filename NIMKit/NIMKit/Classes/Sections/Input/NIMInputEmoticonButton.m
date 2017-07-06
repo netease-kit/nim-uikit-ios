@@ -7,7 +7,7 @@
 //
 
 #import "NIMInputEmoticonButton.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMInputEmoticonManager.h"
 
 @implementation NIMInputEmoticonButton

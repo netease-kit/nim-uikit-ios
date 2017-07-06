@@ -9,7 +9,7 @@
 #import "NIMSessionAudioContentView.h"
 #import "UIView+NIM.h"
 #import "NIMMessageModel.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMKitUIConfig.h"
 #import "NIMKitAudioCenter.h"
 

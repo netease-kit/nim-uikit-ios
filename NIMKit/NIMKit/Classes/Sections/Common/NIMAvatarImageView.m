@@ -120,7 +120,20 @@ CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
 {
     NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
     option.message = message;
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:message.from option:option];
+    NSString *from = nil;
+    if (message.messageType == NIMMessageTypeRobot)
+    {
+        NIMRobotObject *object = (NIMRobotObject *)message.messageObject;
+        if (object.isFromRobot)
+        {
+            from = object.robotId;
+        }
+    }
+    if (!from)
+    {
+        from = message.from;
+    }
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:from option:option];
     NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
     [self nim_setImageWithURL:url placeholderImage:info.avatarImage];
 }

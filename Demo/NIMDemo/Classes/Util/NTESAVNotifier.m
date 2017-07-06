@@ -53,8 +53,7 @@ static void VibrateCompletion(SystemSoundID soundID, void *data)
     {
         return;
     }
-    [self stop];
-    
+    [self stop];     
     _vibrateCount = 0;
     _shouldStopVibrate = NO;
     [self raiseNotification:text];

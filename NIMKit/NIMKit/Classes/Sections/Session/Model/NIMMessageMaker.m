@@ -9,6 +9,8 @@
 #import "NIMMessageMaker.h"
 #import "NSString+NIMKit.h"
 #import "NIMKitLocationPoint.h"
+#import "NIMKit.h"
+#import "NIMInputAtCache.h"
 
 @implementation NIMMessageMaker
 
@@ -77,6 +79,34 @@
     message.messageObject             = locationObject;
     message.apnsContent = @"发来了一条位置信息";
     return message;
+}
+
++ (NIMMessage *)msgWithRobotQuery:(NSString *)text
+                          toRobot:(NSString *)robotId
+{
+    NIMMessage *queryMessage = [[NIMMessage alloc] init];
+    //要在界面上显示的消息
+    queryMessage.text        = text;
+    
+    NSString *robotContent = [[NIMKit sharedKit] infoByUser:robotId option:nil].showName;
+    NSString *content = [text stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@%@",robotContent,NIMInputAtEndChar] withString:@""];
+    
+    NIMRobotObject *object     = [[NIMRobotObject alloc] initWithRobot:content robotId:robotId];
+    queryMessage.messageObject = object;
+    
+    return queryMessage;
+}
+
++ (NIMMessage *)msgWithRobotSelect:(NSString *)text
+                            target:(NSString *)target
+                            params:(NSString *)params
+                           toRobot:(NSString *)robotId
+{
+    NIMMessage *queryMessage   = [[NIMMessage alloc] init];
+    NIMRobotObject *object     = [[NIMRobotObject alloc] initWithRobotId:robotId target:target param:params];
+    queryMessage.messageObject = object;
+    queryMessage.text        = text;
+    return queryMessage;
 }
 
 

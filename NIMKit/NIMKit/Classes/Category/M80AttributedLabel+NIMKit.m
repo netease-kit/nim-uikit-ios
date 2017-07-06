@@ -9,7 +9,7 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "NIMInputEmoticonParser.h"
 #import "NIMInputEmoticonManager.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @implementation M80AttributedLabel (NIMKit)
 - (void)nim_setText:(NSString *)text

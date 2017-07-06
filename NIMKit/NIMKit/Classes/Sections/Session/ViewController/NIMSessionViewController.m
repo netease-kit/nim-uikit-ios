@@ -49,7 +49,8 @@
 - (void)dealloc
 {
     [self removeListener];
-
+    [[NIMKit sharedKit].robotTemplateParser clean];
+    
     _tableView.delegate = nil;
     _tableView.dataSource = nil;
 }
@@ -375,8 +376,25 @@
 
 - (void)onSendText:(NSString *)text atUsers:(NSArray *)atUsers
 {
-    NIMMessage *message = [NIMMessageMaker msgWithText:text];
-    if (atUsers.count) {
+    NSMutableSet *users = [NSMutableSet setWithArray:atUsers];
+    if (self.session.sessionType == NIMSessionTypeP2P)
+    {
+        [users addObject:self.session.sessionId];
+    }
+    NSString *robotsToSend = [self robotsToSend:users];
+    
+    NIMMessage *message = nil;
+    if (robotsToSend.length)
+    {
+        message = [NIMMessageMaker msgWithRobotQuery:text toRobot:robotsToSend];
+    }
+    else
+    {
+        message = [NIMMessageMaker msgWithText:text];
+    }
+    
+    if (atUsers.count)
+    {
         NIMMessageApnsMemberOption *apnsOption = [[NIMMessageApnsMemberOption alloc] init];
         apnsOption.userIds = atUsers;
         apnsOption.forcePush = YES;
@@ -390,6 +408,19 @@
     }
     [self sendMessage:message];
 }
+
+- (NSString *)robotsToSend:(NSSet *)atUsers
+{
+    for (NSString *userId in atUsers)
+    {
+        if ([[NIMSDK sharedSDK].robotManager isValidRobot:userId])
+        {
+            return userId;
+        }
+    }
+    return nil;
+}
+
 
 - (void)onSelectChartlet:(NSString *)chartletId
                  catalog:(NSString *)catalogId{}
@@ -431,6 +462,27 @@
         [self.interactor mediaAudioPressed:event.messageModel];
         handle = YES;
     }
+    if ([eventName isEqualToString:NIMKitEventNameTapRobotBlock]) {
+        NSDictionary *param = event.data;
+        NIMMessage *message = [NIMMessageMaker msgWithRobotSelect:param[@"text"] target:param[@"target"] params:param[@"param"] toRobot:param[@"robotId"]];
+        [self sendMessage:message];
+        handle = YES;
+    }
+    if ([eventName isEqualToString:NIMKitEventNameTapRobotContinueSession]) {
+        NIMRobotObject *robotObject = (NIMRobotObject *)event.messageModel.message.messageObject;
+        NIMRobot *robot = [[NIMSDK sharedSDK].robotManager robotInfo:robotObject.robotId];
+        NSString *text = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,robot.nickname,NIMInputAtEndChar];
+        
+        NIMInputAtItem *item = [[NIMInputAtItem alloc] init];
+        item.uid  = robot.userId;
+        item.name = robot.nickname;
+        [self.sessionInputView.atCache addAtItem:item];
+        
+        [self.sessionInputView.toolBar insertText:text];
+
+        handle = YES;
+    }
+    
     return handle;
 }
 
@@ -472,7 +524,17 @@
 {
     NSMutableArray *items = [NSMutableArray array];
     
-    if (message.messageType == NIMMessageTypeText) {
+    BOOL copyText = NO;
+    if (message.messageType == NIMMessageTypeText)
+    {
+        copyText = YES;
+    }
+    if (message.messageType == NIMMessageTypeRobot)
+    {
+        NIMRobotObject *robotObject = (NIMRobotObject *)message.messageObject;
+        copyText = !robotObject.isFromRobot;
+    }
+    if (copyText) {
         [items addObject:[[UIMenuItem alloc] initWithTitle:@"复制"
                                                     action:@selector(copyText:)]];
     }

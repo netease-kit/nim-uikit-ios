@@ -36,6 +36,35 @@
     return @"选择超限";
 }
 
+@end
+
+@implementation NIMContactRobotSelectConfig
+
+- (NIMContactSelectType)selectType{
+    return NIMContactSelectTypeRobot;
+}
+
+
+- (BOOL)isMutiSelected{
+    return self.needMutiSelected;
+}
+
+- (NSString *)title{
+    return @"选择机器人";
+}
+
+
+- (NSInteger)maxSelectedNum{
+    if (self.needMutiSelected) {
+        return self.maxSelectMemberCount? self.maxSelectMemberCount : NSIntegerMax;
+    }else{
+        return 1;
+    }
+}
+
+- (NSString *)selectedOverFlowTip{
+    return @"选择超限";
+}
 
 @end
 

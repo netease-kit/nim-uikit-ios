@@ -23,6 +23,7 @@
 #import "NTESSDKConfigDelegate.h"
 #import "NTESCellLayoutConfig.h"
 #import "NTESSubscribeManager.h"
+
 @import PushKit;
 
 NSString *NTESNotificationLogout = @"NTESNotificationLogout";
@@ -257,7 +258,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     [NIMCustomObject registerCustomDecoder:[NTESCustomAttachmentDecoder new]];
     
     //注册 NIMKit 自定义排版配置
-    [[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig class]];
+    [[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig new]];
 }
 
 #pragma mark - 登录错误回调

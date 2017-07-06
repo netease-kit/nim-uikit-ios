@@ -91,6 +91,22 @@
     return YES;
 }
 
+- (NSArray<NSNumber *> *)inputBarItemTypes{
+    if (self.session.sessionType == NIMSessionTypeP2P && [[NIMSDK sharedSDK].robotManager isValidRobot:self.session.sessionId])
+    {
+        //和机器人 点对点 聊天
+        return @[
+                 @(NIMInputBarItemTypeTextAndRecord),
+                ];
+    }
+    return @[
+             @(NIMInputBarItemTypeVoice),
+             @(NIMInputBarItemTypeTextAndRecord),
+             @(NIMInputBarItemTypeEmoticon),
+             @(NIMInputBarItemTypeMore)
+            ];
+}
+
 - (BOOL)shouldHandleReceiptForMessage:(NIMMessage *)message
 {
     //文字，语音，图片，视频，文件，地址位置和自定义消息都支持已读回执，其他的不支持

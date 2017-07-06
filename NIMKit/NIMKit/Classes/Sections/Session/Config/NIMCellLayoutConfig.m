@@ -11,7 +11,7 @@
 #import "NIMSessionUnknowContentView.h"
 #import "M80AttributedLabel+NIMKit.h"
 #import "NIMKitUtil.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMMessageModel.h"
 #import "NIMBaseSessionContentConfig.h"
 

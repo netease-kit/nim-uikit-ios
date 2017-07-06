@@ -9,7 +9,7 @@
 #import "NIMKitUIConfig.h"
 #import "NIMKit.h"
 #import "NSString+NIMKit.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMKitConfigHelper : NSObject
 
@@ -138,6 +138,7 @@
                                   @(NIMMessageTypeFile) : @"File",
                                   @(NIMMessageTypeLocation) : @"Location",
                                   @(NIMMessageTypeTip)  : @"Tip",
+                                  @(NIMMessageTypeRobot): @"Robot",
                                   };
     
     NSDictionary *notificationDict = @{
@@ -150,7 +151,22 @@
     if (message.messageType == NIMMessageTypeNotification) {
         NIMNotificationObject *object = (NIMNotificationObject *)message.messageObject;
         return notificationDict[@(object.notificationType)];
-    }else{
+    }
+    else if (message.messageType == NIMMessageTypeRobot)
+    {
+        NIMRobotObject *object = (NIMRobotObject *)message.messageObject;
+        if (object.isFromRobot)
+        {
+            return messageDict[@(message.messageType)];
+        }
+        else
+        {
+            //自己发的消息按文本来
+            return messageDict[@(NIMMessageTypeText)];
+        }
+    }
+    else
+    {
         return messageDict[@(message.messageType)];
     }
 }

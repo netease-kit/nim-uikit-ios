@@ -13,7 +13,7 @@
 #import "NIMInputEmoticonManager.h"
 #import "NIMInputEmoticonTabView.h"
 #import "NIMInputEmoticonDefine.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMKitUIConfig.h"
 
 NSInteger NIMCustomPageControlHeight = 36;

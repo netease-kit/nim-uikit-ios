@@ -1,17 +1,19 @@
 //
-//  UIImage+NIM.m
+//  UIImage+NIMKit.m
 //  NIMKit
 //
 //  Created by chris.
 //  Copyright (c) 2015年 NetEase. All rights reserved.
 //
 
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMInputEmoticonDefine.h"
 #import "NIMKit.h"
 #import "NIMKitDevice.h"
 
 @implementation UIImage (NIMKit)
+
+
 
 + (UIImage *)nim_fetchEmoticon:(NSString *)imageNameOrPath{
     UIImage *image = [UIImage nim_emoticonInKit:imageNameOrPath];

@@ -11,7 +11,7 @@
 #import "UIView+NIM.h"
 #import "NIMTimestampModel.h"
 #import "NIMKitUtil.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMSessionTimestampCell()
 

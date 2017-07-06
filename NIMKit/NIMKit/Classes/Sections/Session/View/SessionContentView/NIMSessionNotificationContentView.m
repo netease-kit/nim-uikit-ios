@@ -11,7 +11,7 @@
 #import "UIView+NIM.h"
 #import "NIMKitUtil.h"
 #import "NIMKitUIConfig.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @implementation NIMSessionNotificationContentView
 

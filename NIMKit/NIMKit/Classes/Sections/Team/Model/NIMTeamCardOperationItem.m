@@ -7,7 +7,7 @@
 //
 
 #import "NIMTeamCardOperationItem.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMTeamCardOperationItem()
 

@@ -62,15 +62,13 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
 }
 
-- (void)refresh:(BOOL)reload{
+- (void)refresh{
     if (!self.recentSessions.count) {
         self.tableView.hidden = YES;
     }else{
         self.tableView.hidden = NO;
     }
-    if (reload) {
-        [self.tableView reloadData];
-    }
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDelegate
@@ -95,6 +93,9 @@
     }
 }
 #pragma mark - UITableViewDataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.recentSessions.count;
@@ -126,7 +127,7 @@
            totalUnreadCount:(NSInteger)totalUnreadCount{
     [self.recentSessions addObject:recentSession];
     [self sort];
-    [self refresh:YES];
+    [self refresh];
 }
 
 
@@ -140,16 +141,15 @@
     }
     NSInteger insert = [self findInsertPlace:recentSession];
     [self.recentSessions insertObject:recentSession atIndex:insert];
-    [self refresh:YES];
+    [self refresh];
 }
 
-- (void)didRemoveRecentSession:(NIMRecentSession *)recentSession totalUnreadCount:(NSInteger)totalUnreadCount
+- (void)didRemoveRecentSession:(NIMRecentSession *)recentSession
+              totalUnreadCount:(NSInteger)totalUnreadCount
 {
     //清理本地数据
     NSInteger index = [self.recentSessions indexOfObject:recentSession];
     [self.recentSessions removeObjectAtIndex:index];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-    [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     
     //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
     if (self.autoRemoveRemoteSession)
@@ -157,18 +157,17 @@
         [[NIMSDK sharedSDK].conversationManager deleteRemoteSessions:@[recentSession.session]
                            completion:nil];
     }
-    
-    [self refresh:NO];
+    [self refresh];
 }
 
 - (void)messagesDeletedInSession:(NIMSession *)session{
     _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
-    [self refresh:YES];
+    [self refresh];
 }
 
 - (void)allMessagesDeleted{
     _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
-    [self refresh:YES];
+    [self refresh];
 }
 
 
@@ -176,7 +175,7 @@
 - (void)onLogin:(NIMLoginStep)step
 {
     if (step == NIMLoginStepSyncOK) {
-        [self refresh:YES];
+        [self refresh];
     }
 }
 
@@ -288,6 +287,9 @@
         case NIMMessageTypeTip:
             text = lastMessage.text;
             break;
+        case NIMMessageTypeRobot:
+            text = [self robotMessageContent:lastMessage];
+            break;
         default:
             text = @"[未知消息]";
     }
@@ -319,17 +321,30 @@
     return @"[未知消息]";
 }
 
+- (NSString *)robotMessageContent:(NIMMessage *)lastMessage{
+    NIMRobotObject *object = lastMessage.messageObject;
+    if (object.isFromRobot)
+    {
+        return @"[机器人消息]";
+    }
+    else
+    {
+        return lastMessage.text;
+    }
+}
+
+
 #pragma mark - Notification
 - (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification{
-    [self refresh:YES];
+    [self refresh];
 }
 
 - (void)onTeamInfoHasUpdatedNotification:(NSNotification *)notification{
-    [self refresh:YES];
+    [self refresh];
 }
 
 - (void)onTeamMembersHasUpdatedNotification:(NSNotification *)notification{
-    [self refresh:YES];
+    [self refresh];
 }
 
 

@@ -9,7 +9,7 @@
 #import "NIMSessionVideoContentView.h"
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMLoadProgressView.h"
 
 @interface NIMSessionVideoContentView()

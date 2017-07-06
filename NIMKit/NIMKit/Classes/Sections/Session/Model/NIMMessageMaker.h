@@ -13,7 +13,7 @@
 
 @interface NIMMessageMaker : NSObject
 
-+ (NIMMessage*)msgWithText:(NSString*)text;
++ (NIMMessage*)msgWithText:(NSString *)text;
 
 + (NIMMessage *)msgWithAudio:(NSString *)filePath;
 
@@ -23,6 +23,14 @@
 
 + (NIMMessage *)msgWithVideo:(NSString *)filePath;
 
-+ (NIMMessage *)msgWithLocation:(NIMKitLocationPoint*)locationPoint;
++ (NIMMessage *)msgWithLocation:(NIMKitLocationPoint *)locationPoint;
+
++ (NIMMessage *)msgWithRobotQuery:(NSString *)text
+                          toRobot:(NSString *)robotId;
+
++ (NIMMessage *)msgWithRobotSelect:(NSString *)text
+                            target:(NSString *)target
+                            params:(NSString *)params
+                           toRobot:(NSString *)robotId;
 
 @end

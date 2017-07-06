@@ -29,6 +29,13 @@
     }
     NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
     option.message = message;
+    if (message.messageType == NIMMessageTypeRobot)
+    {
+        NIMRobotObject *object = (NIMRobotObject *)message.messageObject;
+        if (object.isFromRobot) {
+            return [[NIMKit sharedKit] infoByUser:object.robotId option:option].showName;
+        }
+    }
     return [[NIMKit sharedKit] infoByUser:uid option:option].showName;
 }
 

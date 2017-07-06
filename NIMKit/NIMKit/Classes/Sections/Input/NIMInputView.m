@@ -15,7 +15,7 @@
 #import "NIMInputEmoticonDefine.h"
 #import "NIMInputEmoticonManager.h"
 #import "NIMInputToolBar.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKitUIConfig.h"
 #import "NIMContactSelectViewController.h"
@@ -460,20 +460,46 @@
         return NO;
     }
     if ([text isEqualToString:@""] && range.length == 1 ) {//非选择删除
-        [self onTextDelete];
-        return NO;
+        return [self onTextDelete];
     }
-    if ([text isEqualToString:NIMInputAtStartChar] && self.session.sessionType == NIMSessionTypeTeam) {
-        NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
-        config.needMutiSelected = NO;
-        config.teamId = self.session.sessionId;
-        config.filterIds = @[[NIMSDK sharedSDK].loginManager.currentAccount];
-        NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
-        vc.delegate = self;
-        dispatch_async(dispatch_get_main_queue(), ^{
-           [vc show];
-        });
-        
+    if ([text isEqualToString:NIMInputAtStartChar]) {
+        switch (self.session.sessionType) {
+            case NIMSessionTypeTeam:{
+                NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
+                if ([self.inputConfig respondsToSelector:@selector(enableRobot)])
+                {
+                    config.enableRobot = [self.inputConfig enableRobot];
+                }
+                else
+                {
+                    config.enableRobot = YES;
+                }
+                config.needMutiSelected = NO;
+                config.teamId = self.session.sessionId;
+                config.filterIds = @[[NIMSDK sharedSDK].loginManager.currentAccount];
+                NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+                vc.delegate = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [vc show];
+                });
+            }
+                break;
+            case NIMSessionTypeP2P:{
+                if (([self.inputConfig respondsToSelector:@selector(enableRobot)] && self.inputConfig.enableRobot) || [NIMSDK sharedSDK].isUsingDemoAppKey)
+                {
+                    NIMContactRobotSelectConfig *config = [[NIMContactRobotSelectConfig alloc] init];
+                    config.needMutiSelected = NO;
+                    NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+                    vc.delegate = self;
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [vc show];
+                    });
+                }
+            }
+                break;
+            default:
+                break;
+        }
     }
     NSString *str = [self.toolBar.contentText stringByAppendingString:text];
     if (str.length > self.maxTextLength) {
@@ -553,17 +579,23 @@
 
 
 
-- (void)onTextDelete
+- (BOOL)onTextDelete
 {
     NSRange range = [self delRangeForEmoticon];
-    if (range.length == 1) {
+    if (range.length == 1)
+    {
         //删的不是表情，可能是@
         NIMInputAtItem *item = [self delRangeForAt];
         if (item) {
             range = item.range;
         }
     }
+    if (range.length == 1) {
+        //自动删除
+        return YES;
+    }
     [self.toolBar deleteText:range];
+    return NO;
 }
 
 - (NSRange)delRangeForEmoticon

@@ -9,7 +9,7 @@
 #import "NIMContactSelectTabView.h"
 #import "NIMContactPickedView.h"
 #import "UIView+NIM.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @implementation NIMContactSelectTabView
 

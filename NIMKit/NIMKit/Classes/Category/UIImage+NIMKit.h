@@ -1,5 +1,5 @@
 //
-//  UIImage+NIM.h
+//  UIImage+NIMKit.h
 //  NIMKit
 //
 //  Created by chris.

@@ -16,7 +16,8 @@
 #import "UIView+NIM.h"
 #import "NIMKitUIConfig.h"
 #import "NIMKitDependency.h"
-#import "UIImage+NIM.h"
+#import "M80AttributedLabel.h"
+#import "UIImage+NIMKit.h"
 #import "NIMSessionUnknowContentView.h"
 #import "NIMKitUIConfig.h"
 #import "NIMKit.h"
@@ -439,7 +440,8 @@
 
 - (void)onTapAvatar:(id)sender{
     if ([self.delegate respondsToSelector:@selector(onTapAvatar:)]) {
-        [self.delegate onTapAvatar:self.model.message.from];
+        NSString *source = [self messageSendSource:self.model.message];
+        [self.delegate onTapAvatar:source];
     }
 }
 
@@ -448,10 +450,30 @@
     if ([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]] &&
         gestureRecognizer.state == UIGestureRecognizerStateBegan)
     {
-        if ([self.delegate respondsToSelector:@selector(onLongPressAvatar:)]) {
-            [self.delegate onLongPressAvatar:self.model.message.from];
+        if ([self.delegate respondsToSelector:@selector(onLongPressAvatar:)])
+        {
+            NSString *source = [self messageSendSource:self.model.message];
+            [self.delegate onLongPressAvatar:source];
         }
     }
+}
+
+- (NSString *)messageSendSource:(NIMMessage *)message
+{
+    NSString *from = nil;
+    if (self.model.message.messageType == NIMMessageTypeRobot)
+    {
+        NIMRobotObject *object = (NIMRobotObject *)self.model.message.messageObject;
+        if (object.isFromRobot)
+        {
+            from = object.robotId;
+        }
+    }
+    if (!from)
+    {
+        from = self.model.message.from;
+    }
+    return from;
 }
 
 @end

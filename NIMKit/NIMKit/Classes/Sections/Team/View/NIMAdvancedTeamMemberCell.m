@@ -12,7 +12,7 @@
 #import "NIMAvatarImageView.h"
 #import "NIMKitUtil.h"
 #import "NIMKit.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMAdvancedTeamMemberView : UIView{
 

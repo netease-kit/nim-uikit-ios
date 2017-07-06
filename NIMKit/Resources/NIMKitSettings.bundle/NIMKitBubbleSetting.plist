@@ -161,6 +161,27 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>Robot</key>
+	<dict>
+		<key>Content_Insets</key>
+		<dict>
+			<key>Left</key>
+			<string>{0,15,0,10}</string>
+			<key>Right</key>
+			<string>{0,11,0,15}</string>
+		</dict>
+		<key>Content_Color</key>
+		<dict>
+			<key>Left</key>
+			<string>#000000</string>
+			<key>Right</key>
+			<string>#FFFFFF</string>
+		</dict>
+		<key>Content_Font_Size</key>
+		<integer>14</integer>
+		<key>Show_Avatar</key>
+		<true/>
+	</dict>
 	<key>Unsupport</key>
 	<dict>
 		<key>Content_Insets</key>

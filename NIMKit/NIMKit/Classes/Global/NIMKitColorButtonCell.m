@@ -9,7 +9,7 @@
 #import "NIMKitColorButtonCell.h"
 #import "UIView+NIM.h"
 #import "NIMCommonTableData.h"
-#import "UIImage+NIM.h"
+#import "UIImage+NIMKit.h"
 
 @interface NIMKitColorButtonCell()
 
