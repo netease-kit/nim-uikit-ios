@@ -1,105 +1,53 @@
-# 聊天界面排版自定义
+# 机器人消息排版
 
 ## 前言
 
-针对开发者对组件的不同定制需求，云信 iOS UI 组件提供了大量配置可以让开发者便捷的修改或自定义排版。根据定制的深度，大体可以分为两种：
+机器人消息作为云信内置的一种基本消息，有其不一样的特殊性如下：
 
- * **聊天气泡的简单布局定制**
+ * **机器人的上下行消息**
+ 
+   机器人的消息分上行和下行两种。用户发给机器人的消息称为上行消息，通常以纯文本形式展现，在组件中，复用了和文本消息同样的配置；机器人发给用户的消息称为下行消息，消息在界面上的表现形式比较繁多，通常会以文本，图片，按钮的形式进行随机组合。
+   
+ * **机器人消息交互层面的迷惑性**
+   
+   机器人消息经常会和文本消息有一定的类似，特定的交互形式下，两者还会由于用户的输入进行改变，以组件的交互举例：
+   * 当用户在输入框中 @ 的用户不包括机器人时，组件认为这是一条文本，以文本消息形式发出。
+   * 当用户在输入框中 @ 的用户包括机器人时，组件认为这是一段需要和机器人交互的内容，会自动以机器人消息形式发出。
 
-   关于内置聊天气泡的各种内间距，组件均已提出并组成 `plist` 配置文件供开发者直接设置。开发者不需要关心具体的界面实现代码，只需要在配置文件上改一些间距值，即可进行界面调试。
+   虽然在界面展示形式上都是一个气泡中包含了一些文字，但由于 @ 的对象不同，实际上消息类型是有一定差异的。
    
-   这种定制适用于开发者满足于内置的消息类型，并不需要对消息气泡的界面布局做出很大改变的情况。
+ * **机器人下行消息模板界面**
    
- * **聊天界面的深度定制**
-   
-   有的时候，需要根据具体的消息类型并结合业务逻辑的上下文定制聊天界面，这个时候一个简单的配置文件就不再适用了。UI 组件提供一个全局的排版控制器注入接口 `- (void)registerLayoutConfig:(Class)layoutConfigClass` 来让上层开发者自行注入排版配置器。
-   
-   排版配置器需要实现 `NIMCellLayoutConfig` 协议。
+   机器人消息模板由用户在管理后台，机器人知识库中自行配置。一般以 xml 布局文件形式下发到客户端，这个时候客户端需要解析整个模板数据，构造出适合的布局模型，再传入视图进行渲染。
 
  
-## NIMMessageCell
+## 机器人模板布局数据解析
 
-UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此，了解 `NIMMessageCell` 的大致组成，对排版是很有帮助的。
-
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell.jpg" width="550" height="210" />
-
-    * 蓝色区域：为具体内容 ContentView，如文字 UILabel ,图片 UIImageView 等。
-
-    * 绿色区域：为消息的气泡，具体的内容和气泡之间会有一定的内间距，这里为 contentViewInsets 。
-
-    * 紫色区域：为整个 UITableViewCell ，具体的气泡和整个cell会有一定的内间距，这里为 cellInsets 。
-
-    * 红色区域：为用户的头像。
-    
- 在刷新数据时，会调用方法并 `-(void)refresh` 将界面模型 `NIMMessageModel` 传入。
-    
- 当第一次调用这个方法（即不是复用生成），会调用 `- (void)addContentViewIfNotExist` 方法，根据 `NIMMessageModel` 找到对应的布局配置(如果找不到则按未知类型消息处理)。
- 
- Tips：开发者在第一次接入的时候，可能由于协议实现不全或者注入布局配置有误等原因，导致消息在界面上显示为 `未知类型消息`，这个时候可以尝试从 `NIMMessageCell` 的 `- (void)addContentViewIfNotExist` 方法入手调试，查看`NIMMessageModel` 对应的布局配置以及协议的返回值是否正确。
-
-
-## 聊天气泡的简单布局定制
+   由于机器人后台可提供的数据形式比较灵活，数据可以由后台内置的类型机型有限的组合，也可以由开发者进行完全的自定义。这里组件针对前一种有限组合的情况，提供了一套快速集成的模板数据转换到视图的方案。
    
-   通过修改组件中的配置文件可以进行简单的布局定制，配置文件分为全局配置和气泡配置。
-   
-   * 全局配置文件 `NIMKitGlobalSetting.plist`
-   
-   
-   |**名称** | **定义** | 
-   |:----- | :-----|
-   |**Message_Interval** | 每隔多久显示一条时间戳，秒为单位 |
-   |**Message_Limit** | 每次抓取消息的数量限制，用于分页 |
-   |**Record\_Max\_Duration** | 最大录音时长 |
-   |**Placeholder**  | 输入框中的占位提示文字 |
-   |**Max_Length**   | 输入框字符最大长度 |
-   |**Bubble**  | 消息气泡的通用背景 |
-     
-   * 气泡配置文件 `NIMKitBubbleSetting.plist`
-    
-    其中 `Root` 下的 `key` 为内置消息类型，不可更改。
-
-    具体为
-
-|**名称** | **定义** | 
-|:----- | :-----|
-|**Text** | 文本消息 |
-|**Audio** | 音频消息 |
-|**Video** | 视频消息 |
-|**File**  | 文件消息 |
-|**Image** | 图片消息 |
-|**Location** | 位置消息 |
-|**Tip** | 提醒消息 |
-|**Team_Notification** | 群通知消息 |
-|**Chatroom_Notification** | 聊天室通知消息 |
-|**Netcall_Notification** | 网络电话通知消息 |
-|**Unsupport** | 未知类型消息 |
-	
-	
-    具体配置参数为
-
-|**名称** | **定义** | 
-|:----- | :-----|
-|**Content_Insets** | 消息内容距离气泡的内边距 |
-|**Content_Color**  | 消息文本的颜色 |
-|**Content\_Font\_Size** | 消息文本字体大小 |
-|**Show_Avatar**  | 是否显示头像 |
-|**Bubble**  | 消息气泡的背景 |
-
-	
-
-## 聊天界面的深度定制
-   如果需要结合一些上下文定制聊天界面，就需要采用深度定制。在进入会话页之前，注入布局布局配置到 `NIMKit` 即可
+   总体数据转换能力由 `NIMKit.h` 中定义的 `robotTemplateParser` 提供。通过给定消息（必须为机器人下行消息）输出布局模型数据来实现。
    
    ```objc
-//注册 NIMKit 自定义排版配置
-[[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig class]];
-   ```  
+   - (NIMKitRobotTemplate *)robotTemplate:(NIMMessage *)message;
+   ```
    
-   布局配置器可以选择实现 `NIMCellLayoutConfig` 接口所定义的方法，不实现的接口，会采用内置的默认布局参数进行处理。
+   `robotTemplateParser` 默认实现为 `NIMKitRobotDefaultTemplateParser` 类，如果开发者需要微调的话，只需要继承这个类，重写其中的部分方法，然后赋值到 `NIMKit` 单例中即可。
    
-   在很多场景下，只是在特殊消息场景下需要修正一下排版配置，其他情况还是沿用默认配置，因此强烈建议自定义的排版控制器继承内置的排版实现 `NIMCellLayoutConfig` 协议。这样在开发者需要自定义布局的场景下，填入自定义配置，其他情况只需调用 `super` 方法即可。
+   `robotTemplateParser` 会缓存每个机器人消息的数据解析，数据缓存会在退出会话界面的时候清除。
    
-   具体实现逻辑示范见 Demo 中 `NTESCellLayoutConfig` 类。
+   机器人视图数据配置定义在 `NIMRobotContentConfig` 中。
    
+   机器人下行数据视图定义在 `NIMSessionRobotContentView` 中。
+   
+### 模板模型数据
+
+   * 解析数据的模型为 单条机器人下行消息对应一个 `NIMKitRobotTemplate`。
+   * `NIMKitRobotTemplate` 中包含多个 `NIMKitRobotTemplateLayout` 数据。
+   * `NIMKitRobotTemplateLayout` 包含多个 `NIMKitRobotTemplateItem`
+   * 当 `NIMKitRobotTemplateItem` 为 NIMKitRobotTemplateItemTypeLinkURL 或者 NIMKitRobotTemplateItemTypeLinkBlock 类型时，可包含其他 `NIMKitRobotTemplateItem`，此时 UI 表现形式为包含了文字或者图片的按钮。
+   * 当 `NIMKitRobotTemplateItem` 为 其他形式时，表型形式为文字或者图片。
+   * 每个 `NIMKitRobotTemplateItem` 为单独一行。
+
+ 
    
  

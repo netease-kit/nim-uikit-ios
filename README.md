@@ -130,3 +130,5 @@ NIMSessionListViewController *vc = [[NIMSessionListViewController alloc] init];
 
 4.[《用户信息自定义》](./Documents/nim_userinfo.md)
 
+5.[《机器人消息排版指南》](./Documents/nim_robot.md)
+
