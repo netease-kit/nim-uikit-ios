@@ -1,108 +1,53 @@
-# NIMKit 概述
+# 机器人消息排版
 
 ## 前言
 
-正所谓工欲善其事必先利其器，先要更好地使用 `NIMKit` 组件，了解其整体架构和构建思路是前提。这篇文章主要从架构设计的角度来解释 `NIMKit` 中的各个组成部分是如何协作，开发者应该如何进行流程跟踪。
+机器人消息作为云信内置的一种基本消息，有其不一样的特殊性如下：
 
-
-## 组件结构
-
-```
-├── NIMSessionViewController                   # 核心会话类
-│   ├── NIMSession                             # 所属会话
-│   ├── UITableView                            # 聊天气泡聊表
-│   ├── NIMSessionInteractor                   # 会话行为逻辑协议
-│   ├── NIMSessionConfig                       # 会话参数配置协议
-│   ├── NIMInputView                           # 输入框
-│   └── UIRefreshControl                       # 下拉刷新控件
-│
-├── NIMSessionListViewController               # 最近会话列表页
-│   ├── NSMutableArray<NIMRecentSession>       # 最近会话数据集合
-│   └── UITableView                            # 最近会话列表
-|
-├── NIMContactSelectViewController             # 联系人选择器
-│   ├── UITableView                            # 联系人选择器列表
-│   └── NIMContactSelectConfig                 # 联系人选择器数据配置协议
-│       ├── NIMContactFriendSelectConfig       # 内置配置 - 好友选择器
-│       ├── NIMContactTeamMemberSelectConfig   # 内置配置 - 群成员选择器
-│       └── NIMContactTeamSelectConfig         # 内置配置 - 群选择器
-│
-├── NIMNormalTeamCardViewController            # 普通群群名片
-└── NIMAdvancedTeamCardViewController          # 高级群群名片
-
-```
-
-### 会话界面
-* **概述**
-
-	会话界面 `NIMSessionViewController` 继承 `UIViewController` ，由 `UITableView`(界面)，`NIMSessionConfig` (会话配置)， `NIMSessionInteractor` (逻辑控制器) 作为基本构成。
-	
-* **结构**
-
-``` 
-	 ┌──────────────────────────────────────────────┐
-	 │                                              │               ┌────DataSource
-	 │                                   ┌────────Interactor────────┤
-	 │                                   │                          └────Layout
-	 │                                   │
-	SessionController────Configurator────┤
-	 │      │                            │
-	 │      │                            │      
-	 │      │                            │                            
-	 │   TableView                       └────────TableAdapter                           
-	 │      │                                       │                            
-	 │      └───────────────────────────────────────┘
-	 │                                        
-	Config───────MessageProvider
-	 
-```
-
-* 会话类 `SessionController` 操作 `Interactor` 接口。
-* `Configurator` 类为接口连接器，用来将接口与具体实现类相关联，实现与会话控制器的解耦。
-     * 注入 `NIMSessionInteractor` 的具体实现类( 组件中为 `NIMSessionInteractorImpl`)
-     * 注入 `UITableDataSource` 以及 `UITableDelegate` 的具体实现类 ( 组件中为 `NIMSessionTableAdapter`)
-
-* **会话配置类**
-   
-   为了让开发者尽量少的修改源码，组件抽象出一些常用的配置接口以便于开发者简单修改界面。配置类不是必须实现的，如果不实现，则使用默认配置。
-   
-   配置类具体注入步骤为:
-   * 继承会话类 `NIMSessionViewController` 。
-   * 创建配置类，实现协议 `NIMSessionConfig`。
-     * 协议接口都是选择实现的可以根据需求实现部分方法。
-     * 具体实现还可以参考 Demo 中的配置类 `NTESSessionConfig` 。
-   * 在继承的会话类中，重写父类接口 `- (id<NIMSessionConfig>)sessionConfig` 方法，返回创建的配置类。
+ * **机器人的上下行消息**
  
+   机器人的消息分上行和下行两种。用户发给机器人的消息称为上行消息，通常以纯文本形式展现，在组件中，复用了和文本消息同样的配置；机器人发给用户的消息称为下行消息，消息在界面上的表现形式比较繁多，通常会以文本，图片，按钮的形式进行随机组合。
+   
+ * **机器人消息交互层面的迷惑性**
+   
+   机器人消息经常会和文本消息有一定的类似，特定的交互形式下，两者还会由于用户的输入进行改变，以组件的交互举例：
+   * 当用户在输入框中 @ 的用户不包括机器人时，组件认为这是一条文本，以文本消息形式发出。
+   * 当用户在输入框中 @ 的用户包括机器人时，组件认为这是一段需要和机器人交互的内容，会自动以机器人消息形式发出。
+
+   虽然在界面展示形式上都是一个气泡中包含了一些文字，但由于 @ 的对象不同，实际上消息类型是有一定差异的。
+   
+ * **机器人下行消息模板界面**
+   
+   机器人消息模板由用户在管理后台，机器人知识库中自行配置。一般以 xml 布局文件形式下发到客户端，这个时候客户端需要解析整个模板数据，构造出适合的布局模型，再传入视图进行渲染。
+
  
-   * 配置类结构
-   
-	  ```
-	├── NIMSessionConfig                      
-	│   ├── #录音，文本，表情，更多 四个按钮的隐藏与排列
-	│   ├── #自定义动作菜单                        
-	│   ├── #禁用贴图                 
-	│   ├── #禁用语音红点                 
-	│   ├── #是否在贴耳的时候自动切换成听筒模式
-	│   ├── #进入会话的时候自动获取消息         
-	│   ├── #是否处理已读回执
-	│   ├── #录音类型
-	│   └── #消息数据提供器,需要实现 NIMKitMessageProvider 
-	│         ├── # 下拉时，提供的自定义历史数据
-	│         └── # 是否需要显示时间戳
+## 机器人模板布局数据解析
 
-	  ```
+   由于机器人后台可提供的数据形式比较灵活，数据可以由后台内置的类型机型有限的组合，也可以由开发者进行完全的自定义。这里组件针对前一种有限组合的情况，提供了一套快速集成的模板数据转换到视图的方案。
    
-   * 关于 消息数据提供器 NIMKitMessageProvider 的补充说明
-     
-     * 消息数据提供器用于一些对历史数据有特殊要求的界面场景。这些界面和正常的聊天界面非常相似，但是并不是用来聊天，只是用来展示一些特殊的消息数据，比如 Demo 中的云端历史聊天消息界面 ( `NTESSessionRemoteHistoryViewController` )。
-     * 如果不实现数据提供方法 `- (void)pullDown:(NIMMessage *)firstMessage handler:(NIMKitDataProvideHandler)handler` , 则会默认抓取本地数据库中的历史消息数据。
-
-* **逻辑实现类**
-
-	由于会话界面比较复杂，组件抽象出了逻辑实现类接口 `NIMSessionInteractor`， 此接口在组件中的实现为 `NIMSessionInteractorImpl`。
-	
-	* `NIMSessionInteractorImpl` 由 数据逻辑 `NIMSessionDataSource` 和 排版逻辑 `NIMSessionLayout` 两部分接口组成。
-	* 数据逻辑和排版逻辑接口的具体实现，在组件中分别是 `NIMSessionDataSourceImpl` 和 `NIMSessionLayoutImpl`，通过配置器 `NIMSessionConfigurator` 将实现类与接口注入关联。
-	* 数据逻辑 `NIMSessionDataSource` 主要用于会话的数据的增删改查，作为界面的数据源，并缓存一些计算的中间数据，避免重复运算，提高性能。
-	* 排版逻辑 `NIMSessionLayout` 主要用于会话的排版操作， `NIMSessionLayout` 不关心具体数据，只根据上层控制，对界面排版做出调整。
+   总体数据转换能力由 `NIMKit.h` 中定义的 `robotTemplateParser` 提供。通过给定消息（必须为机器人下行消息）输出布局模型数据来实现。
    
+   ```objc
+   - (NIMKitRobotTemplate *)robotTemplate:(NIMMessage *)message;
+   ```
+   
+   `robotTemplateParser` 默认实现为 `NIMKitRobotDefaultTemplateParser` 类，如果开发者需要微调的话，只需要继承这个类，重写其中的部分方法，然后赋值到 `NIMKit` 单例中即可。
+   
+   `robotTemplateParser` 会缓存每个机器人消息的数据解析，数据缓存会在退出会话界面的时候清除。
+   
+   机器人视图数据配置定义在 `NIMRobotContentConfig` 中。
+   
+   机器人下行数据视图定义在 `NIMSessionRobotContentView` 中。
+   
+### 模板模型数据
+
+   * 解析数据的模型为 单条机器人下行消息对应一个 `NIMKitRobotTemplate`。
+   * `NIMKitRobotTemplate` 中包含多个 `NIMKitRobotTemplateLayout` 数据。
+   * `NIMKitRobotTemplateLayout` 包含多个 `NIMKitRobotTemplateItem`
+   * 当 `NIMKitRobotTemplateItem` 为 NIMKitRobotTemplateItemTypeLinkURL 或者 NIMKitRobotTemplateItemTypeLinkBlock 类型时，可包含其他 `NIMKitRobotTemplateItem`，此时 UI 表现形式为包含了文字或者图片的按钮。
+   * 当 `NIMKitRobotTemplateItem` 为 其他形式时，表型形式为文字或者图片。
+   * 每个 `NIMKitRobotTemplateItem` 为单独一行。
+
+ 
+   
+ 
