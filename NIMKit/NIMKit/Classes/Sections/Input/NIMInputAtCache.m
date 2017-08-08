@@ -31,7 +31,8 @@
     NSMutableArray *uids = [[NSMutableArray alloc] init];
     for (NSString *name in names) {
         NIMInputAtItem *item = [self item:name];
-        if (item) {
+        if (item)
+        {
             [uids addObject:item.uid];
         }
     }

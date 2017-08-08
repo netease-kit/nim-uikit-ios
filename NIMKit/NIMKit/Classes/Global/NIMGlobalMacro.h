@@ -50,5 +50,9 @@ block();\
 dispatch_async(dispatch_get_main_queue(), block);\
 }
 
+/* weak reference */
+#define NIMKit_WEAK_SELF(weakSelf) __weak __typeof(&*self) weakSelf = self;
+#define NIMKit_STRONG_SELF(strongSelf) __strong __typeof(&*weakSelf) strongSelf = weakSelf;
+
 
 #endif

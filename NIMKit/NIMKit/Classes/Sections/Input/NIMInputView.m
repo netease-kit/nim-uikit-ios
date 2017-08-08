@@ -276,7 +276,7 @@
     NSDictionary *userInfo = notification.userInfo;
     CGRect endFrame   = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGRect beginFrame = [userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
-    self.keyBoardFrameTop = endFrame.origin.y;
+    self.keyBoardFrameTop = self.superview.nim_height - endFrame.size.height;
     [self willShowKeyboardFromFrame:beginFrame toFrame:endFrame];
 }
 

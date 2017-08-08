@@ -10,11 +10,12 @@
 #import "NIMContactSelectTabView.h"
 #import "NIMContactPickedView.h"
 #import "NIMGroupedUsrInfo.h"
-#import "NIMGroupedDataCollection.h"
+#import "NIMGroupedData.h"
 #import "NIMContactDataCell.h"
 #import "UIView+NIM.h"
 #import "NIMKit.h"
 #import "NIMKitDependency.h"
+#import "NIMGlobalMacro.h"
 
 @interface NIMContactSelectViewController ()<UITableViewDataSource, UITableViewDelegate, NIMContactPickedViewDelegate>{
     NSMutableArray *_selectecContacts;
@@ -25,15 +26,9 @@
 
 @property (nonatomic, assign) NSInteger maxSelectCount;
 
-@property (nonatomic, assign) NIMContactSelectType selectType;
+@property(nonatomic, strong) NSDictionary *contentDic;
 
-@property (nonatomic, strong) NIMGroupedDataCollection *data;
-
-@property(nonatomic, strong) NIMGroupedDataCollection *robotData;
-
-@property(nonatomic, strong) NSMutableArray<NSString *> *sectionTitles;
-
-@property(nonatomic, strong) NSMutableDictionary *contentDic;
+@property(nonatomic, strong) NSArray *sectionTitles;
 
 @end
 
@@ -123,6 +118,8 @@
     _config = config;
     if ([config respondsToSelector:@selector(maxSelectedNum)]) {
         _maxSelectCount = [config maxSelectedNum];
+        _contentDic = @{}.mutableCopy;
+        _sectionTitles = @[].mutableCopy;
     }
     [self makeData];
 }
@@ -161,77 +158,15 @@
     }
 }
 
-
 - (void)makeData{
-    self.selectType = NIMContactSelectTypeFriend;
-    if ([self.config respondsToSelector:@selector(selectType)]) {
-        self.selectType = [self.config selectType];
-    }
-    if ([self.config respondsToSelector:@selector(enableRobot)] && self.config.enableRobot)
-    {
-        //FIX ME:选择的contact添加robot数据,以及初始化
-        self.robotData = [self makeRobotInfoData];
-    }
-    
-    switch (self.selectType) {
-        case NIMContactSelectTypeFriend:{
-            NSMutableArray *data = [[NIMSDK sharedSDK].userManager.myFriends mutableCopy];
-            NSMutableArray *myFriendArray = [[NSMutableArray alloc] init];
-            for (NIMUser *user in data) {
-                [myFriendArray addObject:user.userId];
-            }
-            NSArray *uids = [self filterData:myFriendArray];
-            self.data = [self makeUserInfoData:uids];
-            [self getContactList];
-            [self.tableView reloadData];
-            break;
-        }
-        case NIMContactSelectTypeRobot:{
-            NSMutableArray *data = [[NIMSDK sharedSDK].robotManager.allRobots mutableCopy];
-            NSMutableArray *robotsArray = [[NSMutableArray alloc] init];
-            for (NIMRobot *robot in data) {
-                [robotsArray addObject:robot.userId];
-            }
-            NSArray *uids = [self filterData:robotsArray];
-            self.data = [self makeUserInfoData:uids];
-            [self getContactList];
-            [self.tableView reloadData];
-            break;
-        }
-        case NIMContactSelectTypeTeamMember:{
-            if ([self.config respondsToSelector:@selector(teamId)]) {
-                NSString *teamId = [self.config teamId];
-                __weak typeof(self) wself = self;
-                [[NIMSDK sharedSDK].teamManager fetchTeamMembers:teamId completion:^(NSError *error, NSArray *members) {
-                    if (!error) {
-                        NSMutableArray *data = [[NSMutableArray alloc] init];
-                        for (NIMTeamMember *member in members) {
-                            [data addObject:member.userId];
-                        }
-                        NSArray *uids = [wself filterData:data];
-                        wself.data = [wself makeTeamMemberInfoData:uids teamId:teamId];
-                        [self getContactList];
-                        [wself.tableView reloadData];
-                    }
-                }];
-            }
-            break;
-        }
-        case NIMContactSelectTypeTeam:{
-            NSMutableArray *teams = [[NSMutableArray alloc] init];
-            NSMutableArray *data = [[NIMSDK sharedSDK].teamManager.allMyTeams mutableCopy];
-            for (NIMTeam *team in data) {
-                [teams addObject:team.teamId];
-            }
-            NSArray *uids = [self filterData:teams];
-            self.data = [self makeTeamInfoData:uids];
-            [self getContactList];
-            [self.tableView reloadData];
-            break;
-        }
-        default:
-            break;
-    }
+    NIMKit_WEAK_SELF(weakSelf);
+    [self.config getContactData:^(NSDictionary *contentDic, NSArray *titles) {
+        self.contentDic = contentDic;
+        self.sectionTitles = titles;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.tableView reloadData];
+        });
+    }];
     if ([self.config respondsToSelector:@selector(alreadySelectedMemberId)])
     {
         _selectecContacts = [[self.config alreadySelectedMemberId] mutableCopy];
@@ -240,76 +175,9 @@
     _selectecContacts = _selectecContacts.count ? _selectecContacts : [NSMutableArray array];
     for (NSString *selectId in _selectecContacts) {
         NIMKitInfo *info;
-        if (self.selectType == NIMContactSelectTypeTeam) {
-            info = [[NIMKit sharedKit] infoByTeam:selectId option:nil];
-        }else{
-            info = [[NIMKit sharedKit] infoByUser:selectId option:nil];
-        }
+        info = [self.config getInfoById:selectId];
         [self.selectIndicatorView.pickedView addMemberInfo:info];
     }
-
-}
-
-- (NSArray *)filterData:(NSMutableArray *)data{
-    if (data) {
-        if ([self.config respondsToSelector:@selector(filterIds)]) {
-            NSArray *ids = [self.config filterIds];
-            [data removeObjectsInArray:ids];
-        }
-        return data;
-    }
-    return nil;
-}
-
-- (NIMGroupedDataCollection *)makeUserInfoData:(NSArray *)uids{
-    NIMGroupedDataCollection *collection = [[NIMGroupedDataCollection alloc] init];
-    NSMutableArray *members = [[NSMutableArray alloc] init];
-    for (NSString *uid in uids) {
-        NIMGroupUser *user = [[NIMGroupUser alloc] initWithUserId:uid];
-        [members addObject:user];
-    }
-    collection.members = members;
-    return collection;
-}
-
-- (NIMGroupedDataCollection *)makeTeamMemberInfoData:(NSArray *)uids teamId:(NSString *)teamId{
-    NIMGroupedDataCollection *collection = [[NIMGroupedDataCollection alloc] init];
-    NSMutableArray *members = [[NSMutableArray alloc] init];
-    for (NSString *uid in uids) {
-        NIMGroupTeamMember *user = [[NIMGroupTeamMember alloc] initWithUserId:uid teamId:teamId];
-        [members addObject:user];
-    }
-    collection.members = members;
-    return collection;
-}
-
-- (NIMGroupedDataCollection *)makeTeamInfoData:(NSArray *)teamIds{
-    NIMGroupedDataCollection *collection = [[NIMGroupedDataCollection alloc] init];
-    NSMutableArray *members = [[NSMutableArray alloc] init];
-    for (NSString *teamId in teamIds) {
-        NIMGroupTeam *team = [[NIMGroupTeam alloc] initWithTeam:teamId];
-        [members addObject:team];
-    }
-    collection.members = members;
-    return collection;
-}
-
-- (NIMGroupedDataCollection *)makeRobotInfoData {
-    
-    NSArray *robots = [NIMSDK sharedSDK].robotManager.allRobots;
-    NSMutableArray *members = [[NSMutableArray alloc] init];
-    for (NIMRobot *robot in robots)
-    {
-        NIMGroupUser *user = [[NIMGroupUser alloc] initWithUserId:robot.userId];
-        [members addObject:user];
-    }
-    if (members.count)
-    {
-        NIMGroupedDataCollection *collection = [[NIMGroupedDataCollection alloc] init];
-        collection.members = members;
-        return collection;
-    }
-    return nil;
 }
 
 
@@ -328,7 +196,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if (self.robotData && section == 0) {
+    if ([self.sectionTitles[0] isEqualToString:@"$"] && section == 0) {
         return @"机器人";
     }else {
         return self.sectionTitles[section];
@@ -347,16 +215,13 @@
     }
     cell.accessoryBtn.hidden = NO;
     cell.accessoryBtn.selected = [_selectecContacts containsObject:[contactItem memberId]];
-    if (self.selectType == NIMContactSelectTypeTeam) {
-        [cell refreshTeam:contactItem];
-    }else{
-        [cell refreshUser:contactItem];
-    }
+    NIMKitInfo *info = [self.config getInfoById:[contactItem memberId]];
+    [cell refreshItem:contactItem withMemberInfo:info];
     return cell;
 }
 
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
-    return self.sectionTitles;
+    return [self.sectionTitles mutableCopy];
 }
 
 #pragma mark - UITableViewDelegate
@@ -376,11 +241,7 @@
     NSString *memberId = [(id<NIMGroupMemberProtocol>)member memberId];
     NIMContactDataCell *cell = (NIMContactDataCell *)[tableView cellForRowAtIndexPath:indexPath];
     NIMKitInfo *info;
-    if (self.selectType == NIMContactSelectTypeTeam) {
-        info = [[NIMKit sharedKit] infoByTeam:memberId option:nil];
-    }else{
-        info = [[NIMKit sharedKit] infoByUser:memberId option:nil];
-    }
+    info = [self.config getInfoById:memberId];
     if([_selectecContacts containsObject:memberId]) {
         [_selectecContacts removeObject:memberId];
         cell.accessoryBtn.selected = NO;
@@ -408,7 +269,6 @@
     [self refreshDetailTitle];
 }
 
-
 #pragma mark - Private
 
 - (NIMContactSelectTabView *)selectIndicatorView{
@@ -419,42 +279,6 @@
     CGFloat tabWidth  = 320.f;
     _selectIndicatorView = [[NIMContactSelectTabView alloc] initWithFrame:CGRectMake(0, 0, tabWidth, tabHeight)];
     return _selectIndicatorView;
-}
-
-- (void)getContactList {
-    _sectionTitles = @[].mutableCopy;
-    _contentDic = @{}.mutableCopy;
-    
-    if (self.robotData) {
-        [_sectionTitles addObject:@"$"];
-        for (int i = 0; i < self.robotData.groupCount; i++) {
-            NSArray *tempArr = [self.robotData membersOfGroup:i];
-            [tempArr enumerateObjectsUsingBlock:^(id<NIMGroupMemberProtocol>member, NSUInteger idx, BOOL * _Nonnull stop) {
-                //存放member的数组
-                NSMutableArray *arr = [self.contentDic valueForKey:@"$"];
-                if (!arr) {
-                    arr = @[].mutableCopy;
-                    [self.contentDic setObject:arr forKey:@"$"];
-                }
-                [arr addObject:member];
-            }];
-        }
-    }
-    
-    for (int i = 0; i < self.data.groupCount; ++i) {
-        NSString *title = [self.data titleOfGroup:i];
-        [_sectionTitles addObject:title];
-        NSArray *tempArr = [self.data membersOfGroup:i];
-        [tempArr enumerateObjectsUsingBlock:^(id<NIMGroupMemberProtocol>member, NSUInteger idx, BOOL * _Nonnull stop) {
-            //存放member的数组
-            NSMutableArray *arr = [self.contentDic valueForKey:title];
-            if (!arr) {
-                arr = @[].mutableCopy;
-                [self.contentDic setObject:arr forKey:title];
-            }
-            [arr addObject:member];
-        }];
-    }
 }
 
 @end

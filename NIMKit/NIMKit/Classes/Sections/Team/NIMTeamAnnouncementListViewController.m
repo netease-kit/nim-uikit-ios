@@ -11,6 +11,7 @@
 #import "NIMCreateTeamAnnouncement.h"
 #import "NIMTeamAnnouncementListCell.h"
 #import "NIMKitDependency.h"
+#import "NIMKitProgressHUD.h"
 
 typedef NS_ENUM(NSInteger, TeamAnnouncementSectionType) {
     TeamAnnouncementSectionTitle = 1,
@@ -97,9 +98,9 @@ NSString *NTESCreatAnnouncementNotification = @"NTESCreatAnnouncementNotificatio
         self.team.announcement = nil;
     }
     __weak typeof(self) wself = self;
-    [SVProgressHUD show];
+    [NIMKitProgressHUD show];
     [[NIMSDK sharedSDK].teamManager updateTeamAnnouncement:[self.team.announcement copy] teamId:self.team.teamId completion:^(NSError *error) {
-        [SVProgressHUD dismiss];
+        [NIMKitProgressHUD dismiss];
         if(!error && wself) {
             [wself.view makeToast:@"创建成功"];
             if (self.team.announcement.length) {

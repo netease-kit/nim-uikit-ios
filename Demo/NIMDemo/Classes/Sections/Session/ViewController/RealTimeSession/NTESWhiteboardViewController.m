@@ -668,6 +668,7 @@ static const NSTimeInterval SendCmdIntervalSeconds = 0.06;
     option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
+    option.audioHowlingSuppress = [[NTESBundleSetting sharedConfig] audioHowlingSuppress];
     option.preferHDAudio =  [[NTESBundleSetting sharedConfig] preferHDAudio];
     option.scene = [[NTESBundleSetting sharedConfig] scene];
     option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];

@@ -13,6 +13,7 @@
 #import "NTESWhiteboardAttachment.h"
 #import "NTESBundleSetting.h"
 #import "NIMKitUIConfig.h"
+#import "NSString+NTES.h"
 
 @interface NTESSessionConfig()
 
@@ -64,6 +65,11 @@
                                     selectedImage:[UIImage imageNamed:@"btn_whiteboard_invite_pressed"]
                                             title:@"白板"];
     
+    NIMMediaItem *redPacket  = [NIMMediaItem item:@"onTapMediaItemRedPacket:"
+                                      normalImage:[UIImage imageNamed:@"icon_redpacket_normal"]
+                                    selectedImage:[UIImage imageNamed:@"icon_redpacket_pressed"]
+                                            title:@"红包"];
+    
     
     BOOL isMe   = _session.sessionType == NIMSessionTypeP2P
     && [_session.sessionId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]];
@@ -75,11 +81,11 @@
     }
     else if(_session.sessionType == NIMSessionTypeTeam)
     {
-        items = @[janKenPon,teamMeeting,fileTrans,tip];
+        items = @[janKenPon,teamMeeting,fileTrans,tip,redPacket];
     }
     else
     {
-        items = @[janKenPon,audioChat,videoChat,fileTrans,snapChat,whiteBoard,tip];
+        items = @[janKenPon,audioChat,videoChat,fileTrans,snapChat,whiteBoard,tip,redPacket];
     }
     
 
@@ -131,6 +137,11 @@
            type == NIMMessageTypeCustom;
 }
 
+- (NSArray<NIMInputEmoticonCatalog *> *)charlets
+{
+    return [self loadChartletEmoticonCatalog];
+}
+
 - (BOOL)disableProximityMonitor{
     return [[NTESBundleSetting sharedConfig] disableProximityMonitor];
 }
@@ -139,5 +150,44 @@
 {
     return [[NTESBundleSetting sharedConfig] usingAmr] ? NIMAudioTypeAMR : NIMAudioTypeAAC;
 }
+
+
+- (NSArray *)loadChartletEmoticonCatalog{
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"NIMDemoChartlet.bundle"
+                                         withExtension:nil];
+    NSBundle *bundle = [NSBundle bundleWithURL:url];
+    NSArray  *paths   = [bundle pathsForResourcesOfType:nil inDirectory:@""];
+    NSMutableArray *res = [[NSMutableArray alloc] init];
+    for (NSString *path in paths) {
+        BOOL isDirectory = NO;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && isDirectory) {
+            NIMInputEmoticonCatalog *catalog = [[NIMInputEmoticonCatalog alloc]init];
+            catalog.catalogID = path.lastPathComponent;
+            NSArray *resources = [NSBundle pathsForResourcesOfType:nil inDirectory:[path stringByAppendingPathComponent:@"content"]];
+            NSMutableArray *array = [[NSMutableArray alloc] init];
+            for (NSString *path in resources) {
+                NSString *name  = path.lastPathComponent.stringByDeletingPathExtension;
+                NIMInputEmoticon *icon  = [[NIMInputEmoticon alloc] init];
+                icon.emoticonID = name.stringByDeletingPictureResolution;
+                icon.filename   = path;
+                [array addObject:icon];
+            }
+            catalog.emoticons = array;
+            
+            NSArray *icons     = [NSBundle pathsForResourcesOfType:nil inDirectory:[path stringByAppendingPathComponent:@"icon"]];
+            for (NSString *path in icons) {
+                NSString *name  = path.lastPathComponent.stringByDeletingPathExtension.stringByDeletingPictureResolution;
+                if ([name hasSuffix:@"normal"]) {
+                    catalog.icon = path;
+                }else if([name hasSuffix:@"highlighted"]){
+                    catalog.iconPressed = path;
+                }
+            }
+            [res addObject:catalog];
+        }
+    }
+    return res;
+}
+
 
 @end

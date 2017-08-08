@@ -22,6 +22,7 @@
 #import "NIMContactSelectConfig.h"
 #import "NIMContactSelectViewController.h"
 #import "NIMGlobalMacro.h"
+#import "NIMKitProgressHUD.h"
 
 #define TableCellReuseId        @"tableCell"
 #define TableButtonCellReuseId  @"tableButtonCell"
@@ -181,12 +182,12 @@
         __weak typeof(self) wself = self;
         switch (self.currentOpera) {
             case CardHeaderOpeatorAdd:{
-                [SVProgressHUD show];
+                [NIMKitProgressHUD show];
                 [[NIMSDK sharedSDK].teamManager addUsers:selectedContacts
                                                   toTeam:self.team.teamId
                                               postscript:@"邀请你加入讨论组"
                                               completion:^(NSError *error,NSArray *members) {
-                    [SVProgressHUD dismiss];
+                    [NIMKitProgressHUD dismiss];
                     if (!error) {
                         if (self.team.type == NIMTeamTypeNormal) {
                             [wself addHeaderDatas:members];
@@ -448,9 +449,9 @@
 #pragma mark - NIMMemberGroupViewDelegate
 - (void)didSelectRemoveButtonWithMemberId:(NSString *)uid{
     __weak typeof(self) wself = self;
-    [SVProgressHUD show];
+    [NIMKitProgressHUD show];
     [[NIMSDK sharedSDK].teamManager kickUsers:@[uid] fromTeam:self.team.teamId completion:^(NSError *error) {
-        [SVProgressHUD dismiss];
+        [NIMKitProgressHUD dismiss];
         if (!error) {
             [wself removeMembers:@[uid]];
             [wself refreshTableHeader:self.view.nim_width];

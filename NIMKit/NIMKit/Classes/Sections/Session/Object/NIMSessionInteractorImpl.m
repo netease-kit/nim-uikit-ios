@@ -97,6 +97,10 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 {
     NSMutableArray *models = [[NSMutableArray alloc] init];
     for (NIMMessage *message in messages) {
+        if (message.isDeleted)
+        {
+            continue;
+        }
         NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
         [models addObject:model];
     }
@@ -117,6 +121,10 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         NSMutableArray *models = [[NSMutableArray alloc] init];
         for (NIMMessage *message in messages)
         {
+            if (message.isDeleted)
+            {
+                continue;
+            }
             NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
             [weakSelf.layout layoutConfig:model];
             [models addObject:model];

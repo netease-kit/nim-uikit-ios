@@ -11,6 +11,7 @@
 #import "NIMCommonTableData.h"
 #import "SVProgressHUD.h"
 #import "UIView+Toast.h"
+#import "NTESRedPacketManager.h"
 
 @interface NTESNickNameSettingViewController ()
 
@@ -92,6 +93,7 @@
     [[NIMSDK sharedSDK].userManager updateMyUserInfo:@{@(NIMUserInfoUpdateTagNick) : self.nick} completion:^(NSError *error) {
         [SVProgressHUD dismiss];
         if (!error) {
+            [[NTESRedPacketManager sharedManager] updateUserInfo];
             [wself.navigationController.view makeToast:@"昵称设置成功"
                          duration:2
                          position:CSToastPositionCenter];

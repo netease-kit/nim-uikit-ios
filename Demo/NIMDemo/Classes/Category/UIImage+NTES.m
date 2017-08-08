@@ -9,8 +9,8 @@
 #import "UIImage+NTES.h"
 #import "NTESDevice.h"
 
+#define ChartletBundle              @"NIMDemoChartlet.bundle"
 #define EmojiCatalog                @"default"
-#define ChartletChartletCatalogPath @"Chartlet"
 #define ChartletChartletCatalogContentPath @"content"
 #define ChartletChartletCatalogIconPath    @"icon"
 #define ChartletChartletCatalogIconsSuffixNormal    @"normal"
@@ -30,9 +30,9 @@
     if ([chartletId isEqualToString:EmojiCatalog]) {
         return [UIImage imageNamed:imageName];
     }
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:[NIMKit sharedKit].emoticonBundleName ofType:nil];
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:ChartletBundle ofType:nil];
 
-    NSString *subDirectory = [NSString stringWithFormat:@"%@/%@/%@",ChartletChartletCatalogPath,chartletId,ChartletChartletCatalogContentPath];
+    NSString *subDirectory = [NSString stringWithFormat:@"/%@/%@",chartletId,ChartletChartletCatalogContentPath];
     //先拿2倍图
     NSString *doubleImage  = [imageName stringByAppendingString:@"@2x"];
     NSString *tribleImage  = [imageName stringByAppendingString:@"@3x"];

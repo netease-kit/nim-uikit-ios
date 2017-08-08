@@ -234,6 +234,8 @@
         
         _placeholder     = globalSetting[@"Placeholder"];
         _maxLength       = [globalSetting[@"Max_Length"] integerValue];
+        
+        _backgroundColor = [globalSetting[@"Row_Background_Color"] nim_hexToColor];
     }
     return self;
 }

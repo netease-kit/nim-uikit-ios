@@ -32,6 +32,7 @@
         _apnsCername = @"ENTERPRISE";
         _pkCername = @"DEMO_PUSH_KIT";
         
+        _redPacketConfig = [[NTESRedPacketConfig alloc] init];        
     }
     return self;
 }
@@ -43,5 +44,23 @@
 }
 
 
+
+@end
+
+
+
+@implementation NTESRedPacketConfig
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        _useOnlineEnv = YES;
+        _aliPaySchemeUrl = @"alipay052969";
+        _weChatSchemeUrl = @"wx2a5538052969956e";
+    }
+    return self;
+}
 
 @end

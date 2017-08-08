@@ -45,6 +45,8 @@
 
 @property (nonatomic,copy)   NSString *placeholder;
 
+@property (nonatomic,strong) UIColor *backgroundColor;
+
 @end
 
 @interface NIMKitBubbleConfig : NSObject

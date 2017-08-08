@@ -278,20 +278,20 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
     if (!message.isReceivedMsg && message.deliveryState == NIMMessageDeliveryStateFailed) {
         return NO;
     }
-    id<NIMMessageObject> messageobject = message.messageObject;
-    if ([messageobject isKindOfClass:[NIMCustomObject class]]
-        && ([[(NIMCustomObject *)messageobject attachment] isKindOfClass:[NTESSnapchatAttachment class]]
-            || [[(NIMCustomObject *)messageobject attachment] isKindOfClass:[NTESWhiteboardAttachment class]])) {
-            return NO;
-        }
-    if ([messageobject isKindOfClass:[NIMNotificationObject class]]) {
+    id<NIMMessageObject> messageObject = message.messageObject;
+    if ([messageObject isKindOfClass:[NIMCustomObject class]])
+    {
+        id<NTESCustomAttachmentInfo> attach = (id<NTESCustomAttachmentInfo>)[(NIMCustomObject *)message.messageObject attachment];
+        return [attach canBeForwarded];
+    }
+    if ([messageObject isKindOfClass:[NIMNotificationObject class]]) {
         return NO;
     }
-    if ([messageobject isKindOfClass:[NIMTipObject class]]) {
+    if ([messageObject isKindOfClass:[NIMTipObject class]]) {
         return NO;
     }
-    if ([messageobject isKindOfClass:[NIMRobotObject class]]) {
-        NIMRobotObject *robotObject = (NIMRobotObject *)messageobject;
+    if ([messageObject isKindOfClass:[NIMRobotObject class]]) {
+        NIMRobotObject *robotObject = (NIMRobotObject *)messageObject;
         return !robotObject.isFromRobot;
     }
     return YES;
@@ -305,17 +305,18 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
     if (!isFromMe || isToMe || isDeliverFailed) {
         return NO;
     }
-    id<NIMMessageObject> messageobject = message.messageObject;
-    if ([messageobject isKindOfClass:[NIMTipObject class]]
-        || [messageobject isKindOfClass:[NIMNotificationObject class]]) {
+    id<NIMMessageObject> messageObject = message.messageObject;
+    if ([messageObject isKindOfClass:[NIMTipObject class]]
+        || [messageObject isKindOfClass:[NIMNotificationObject class]]) {
         return NO;
     }
-    if ([messageobject isKindOfClass:[NIMCustomObject class]]
-        && ([[(NIMCustomObject *)messageobject attachment] isKindOfClass:[NTESWhiteboardAttachment class]])) {
-            return NO;
+    if ([messageObject isKindOfClass:[NIMCustomObject class]])
+    {
+        id<NTESCustomAttachmentInfo> attach = (id<NTESCustomAttachmentInfo>)[(NIMCustomObject *)message.messageObject attachment];
+        return [attach canBeRevoked];
     }
-    if ([messageobject isKindOfClass:[NIMRobotObject class]]) {
-        NIMRobotObject *robotObject = (NIMRobotObject *)messageobject;
+    if ([messageObject isKindOfClass:[NIMRobotObject class]]) {
+        NIMRobotObject *robotObject = (NIMRobotObject *)messageObject;
         return !robotObject.isFromRobot;
     }
     return YES;
@@ -402,7 +403,7 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
 
 + (NIMLoginClientType)resolveShowClientType:(NSArray *)senderClientTypes
 {
-    NSArray *clients = @[@(NIMLoginClientTypePC),@(NIMLoginClientTypeiOS),@(NIMLoginClientTypeAOS),@(NIMLoginClientTypeWeb),@(NIMLoginClientTypeWP)]; //显示优先级
+    NSArray *clients = @[@(NIMLoginClientTypePC),@(NIMLoginClientTypemacOS),@(NIMLoginClientTypeiOS),@(NIMLoginClientTypeAOS),@(NIMLoginClientTypeWeb),@(NIMLoginClientTypeWP)]; //显示优先级
     for (NSNumber *type in clients) {
         NIMLoginClientType client = type.integerValue;
         if ([senderClientTypes containsObject:@(client)]) {
@@ -415,7 +416,8 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
 + (NSString *)resolveOnlineClientName:(NIMLoginClientType )client
 {
     NSDictionary *formats  = @{
-                              @(NIMLoginClientTypePC) : @"电脑",
+                              @(NIMLoginClientTypePC) : @"PC",
+                              @(NIMLoginClientTypemacOS) : @"Mac",
                               @(NIMLoginClientTypeiOS): @"iOS",
                               @(NIMLoginClientTypeAOS): @"Android",
                               @(NIMLoginClientTypeWeb): @"Web",
@@ -438,7 +440,9 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
         switch (onlineState) {
             case NTESOnlineStateNormal:
             {
-                if (client == NIMLoginClientTypePC || client == NIMLoginClientTypeWeb)
+                if (client == NIMLoginClientTypePC ||
+                    client == NIMLoginClientTypeWeb ||
+                    client == NIMLoginClientTypemacOS)
                 {
                     //桌面端不显示网络状态，只显示端
                     return [NSString stringWithFormat:@"%@在线",clientName];

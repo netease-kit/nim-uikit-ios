@@ -52,5 +52,4 @@
 - (NIMInputEmoticon *)emoticonByCatalogID:(NSString *)catalogID
                            emoticonID:(NSString *)emoticonID;
 
-- (NSArray *)loadChartletEmoticonCatalog;
 @end

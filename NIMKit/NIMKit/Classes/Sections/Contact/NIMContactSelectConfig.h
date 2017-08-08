@@ -7,24 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NIMKitInfo.h"
 
-typedef NS_ENUM(NSInteger, NIMContactSelectType) {
-    NIMContactSelectTypeFriend,
-    NIMContactSelectTypeTeamMember,
-    NIMContactSelectTypeTeam,
-    NIMContactSelectTypeRobot,
-};
-
+/**
+ *  联系人选择器数据回调
+ */
+typedef void(^NIMContactDataProviderHandler)(NSDictionary *contentDic, NSArray *titles);
 
 @protocol NIMContactSelectConfig <NSObject>
-
-@required
-/**
- *  联系人选择器中的数据源类型
- *  当是群组时，需要设置群组id
- */
-- (NIMContactSelectType)selectType;
-
 
 @optional
 
@@ -69,6 +59,16 @@ typedef NS_ENUM(NSInteger, NIMContactSelectType) {
  *  是否要加入机器人
  */
 - (BOOL)enableRobot;
+
+/**
+ *  提供联系人选择期的昵称，title信息
+ */
+- (void)getContactData:(NIMContactDataProviderHandler)handler;
+
+/**
+ *  提供联系人id、显示名、头像等信息
+ */
+- (NIMKitInfo *)getInfoById:(NSString *)selectedId;
 
 @end
 

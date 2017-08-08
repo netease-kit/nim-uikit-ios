@@ -108,12 +108,17 @@ NSString *Identifier = @"client_cell";
     NIMLoginClient *client = [_clients objectAtIndex:[indexPath row]];
     __weak typeof(self) wself = self;
     [[NIMSDK sharedSDK].loginManager kickOtherClient:client completion:^(NSError *error) {
-        if (error) {
+        if (error)
+        {
+            DDLogError(@"on kick error : %@", error);
             [wself.view makeToast:@"踢出失败"
                          duration:2
                          position:CSToastPositionCenter];
         }
-        [wself reload];
+        else
+        {
+            [wself reload];
+        }
     }];
 }
 

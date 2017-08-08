@@ -22,7 +22,7 @@
 #import "NIMKitUtil.h"
 #import "NIMTeamSwitchTableViewCell.h"
 #import "NIMAvatarImageView.h"
-
+#import "NIMKitProgressHUD.h"
 
 #pragma mark - Team Header View
 #define CardHeaderHeight 89
@@ -1053,9 +1053,9 @@
     BOOL success = data && [data writeToFile:filePath atomically:YES];
     __weak typeof(self) wself = self;
     if (success) {
-        [SVProgressHUD show];
+        [NIMKitProgressHUD show];
         [[NIMSDK sharedSDK].resourceManager upload:filePath progress:nil completion:^(NSString *urlString, NSError *error) {
-            [SVProgressHUD dismiss];
+            [NIMKitProgressHUD dismiss];
             if (!error && wself) {
                 [[NIMSDK sharedSDK].teamManager updateTeamAvatar:urlString teamId:wself.team.teamId completion:^(NSError *error) {
                     if (!error) {

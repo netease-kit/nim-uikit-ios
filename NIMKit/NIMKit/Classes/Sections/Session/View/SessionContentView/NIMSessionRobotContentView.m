@@ -99,7 +99,10 @@
     //一定是机器人下行消息
     [self recycleAllSubViews:self];
     NIMKitRobotTemplate *template = [[NIMKit sharedKit].robotTemplateParser robotTemplate:data.message];
-    NSAssert([template.version isEqualToString:@"0.1"], @"robot template version incompatible!");
+    if (![template.version isEqualToString:@"0.1"])
+    {
+        NSLog(@"robot template version incompatible!");
+    }
     for (NIMKitRobotTemplateLayout *layout in template.items)
     {
         for (NIMKitRobotTemplateItem *item in layout.items)

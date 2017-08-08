@@ -21,8 +21,14 @@
 }
 
 
-- (BOOL)removeSessionWheDeleteMessages{
+- (BOOL)removeSessionWhenDeleteMessages{
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled_remove_recent_session"] boolValue];
+}
+
+- (BOOL)dropTableWhenDeleteMessages
+{
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled_drop_msg_table"] boolValue];
+    
 }
 
 - (BOOL)localSearchOrderByTimeDesc{
@@ -61,6 +67,11 @@
 - (BOOL)usingAmr
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"using_amr"] boolValue];
+}
+
+- (BOOL)enableSyncWhenFetchRemoteMessages
+{
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"sync_when_remote_fetch_messages"] boolValue];
 }
 
 - (NSArray *)ignoreTeamNotificationTypes
@@ -191,6 +202,19 @@
     
 }
 
+- (BOOL)audioHowlingSuppress
+{
+    id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_audio_howling_suppress"];
+    
+    if (setting) {
+        return [setting boolValue];
+    }
+    else {
+        return NO;
+    }
+}
+
+
 - (BOOL)voiceDetect
 {
     id setting = [[NSUserDefaults standardUserDefaults] objectForKey:@"videochat_voice_detect"];
@@ -273,12 +297,14 @@
                 "videochat_auto_disable_audiosession %zd\n" \
                 "videochat_audio_denoise %zd\n" \
                 "videochat_voice_detect %zd\n" \
+                "videochat_audio_howling_suppress %zd\n" \
                 "videochat_prefer_hd_audio %zd\n"\
                 "avchat_scene %zd\n"\
                 "chatroom_retry_count %zd\n"\
                 "webrtc_compatible %zd\n" \
+                "sync_when_remote_fetch_messages %zd\n"\
                 "\n\n\n",
-                [self removeSessionWheDeleteMessages],
+                [self removeSessionWhenDeleteMessages],
                 [self localSearchOrderByTimeDesc],
                 [self autoRemoveRemoteSession],
                 [self autoRemoveSnapMessage],
@@ -300,10 +326,12 @@
                 [self autoDeactivateAudioSession],
                 [self audioDenoise],
                 [self voiceDetect],
+                [self audioHowlingSuppress],
                 [self preferHDAudio],
                 [self scene],
                 [self chatroomRetryCount],
-                [self webrtcCompatible]
+                [self webrtcCompatible],
+                [self enableSyncWhenFetchRemoteMessages]
             ];
 }
 @end

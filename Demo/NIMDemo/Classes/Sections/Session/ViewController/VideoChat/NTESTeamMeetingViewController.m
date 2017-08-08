@@ -444,7 +444,7 @@ typedef NS_ENUM(NSInteger,NTESTeamMeetingRoleType) {
     NSInteger hour = _meetingSeconds / 3600;
     NSInteger minute = (_meetingSeconds % 3600) / 60;
     NSInteger second = (_meetingSeconds % 3600) % 60;
-    self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld:%02ld",hour,minute,second];
+    self.durationLabel.text = [NSString stringWithFormat:@"%02zd:%02zd:%02zd",hour,minute,second];
 }
 
 #pragma mark - NTESVideoDataTimeoutProtocol
@@ -496,18 +496,43 @@ typedef NS_ENUM(NSInteger,NTESTeamMeetingRoleType) {
     meeting.type = NIMNetCallMediaTypeVideo;
     meeting.actor = YES;
     
-    NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
-    param.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
-    param.videoCrop = NIMNetCallVideoCrop1x1;
     NIMNetCallOption *option = [[NIMNetCallOption alloc] init];
-    option.videoCaptureParam = param;
-    option.preferHDAudio = [[NTESBundleSetting sharedConfig] preferHDAudio];
-    option.scene = [[NTESBundleSetting sharedConfig] scene];
-    option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];
+    [self fillUserSetting:option];
+    option.videoCaptureParam.videoCrop = NIMNetCallVideoCrop1x1;
     meeting.option = option;
-    
+
     return meeting;
 }
+
+
+- (void)fillUserSetting:(NIMNetCallOption *)option
+{
+    option.autoRotateRemoteVideo = [[NTESBundleSetting sharedConfig] videochatAutoRotateRemoteVideo];
+    option.serverRecordAudio     = [[NTESBundleSetting sharedConfig] serverRecordAudio];
+    option.serverRecordVideo     = [[NTESBundleSetting sharedConfig] serverRecordVideo];
+    option.preferredVideoEncoder = [[NTESBundleSetting sharedConfig] perferredVideoEncoder];
+    option.preferredVideoDecoder = [[NTESBundleSetting sharedConfig] perferredVideoDecoder];
+    option.videoMaxEncodeBitrate = [[NTESBundleSetting sharedConfig] videoMaxEncodeKbps] * 1000;
+    option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
+    option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
+    option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
+    option.audioHowlingSuppress = [[NTESBundleSetting sharedConfig] audioHowlingSuppress];
+    option.preferHDAudio =  [[NTESBundleSetting sharedConfig] preferHDAudio];
+    option.scene = [[NTESBundleSetting sharedConfig] scene];
+    option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];
+    
+    NIMNetCallVideoCaptureParam *param = [[NIMNetCallVideoCaptureParam alloc] init];
+    [self fillVideoCaptureSetting:param];
+    option.videoCaptureParam = param;
+    
+}
+
+- (void)fillVideoCaptureSetting:(NIMNetCallVideoCaptureParam *)param
+{
+    param.preferredVideoQuality = [[NTESBundleSetting sharedConfig] preferredVideoQuality];
+    param.startWithBackCamera   = [[NTESBundleSetting sharedConfig] startWithBackCamera];
+}
+
 
 - (void)checkForTimeoutCallee
 {

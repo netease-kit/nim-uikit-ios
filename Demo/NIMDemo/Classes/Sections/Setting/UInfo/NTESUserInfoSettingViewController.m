@@ -22,6 +22,7 @@
 #import "UIImage+NTES.h"
 #import "NTESFileLocationHelper.h"
 #import "SDWebImageManager.h"
+#import "NTESRedPacketManager.h"
 
 @interface NTESUserInfoSettingViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate,NIMUserManagerDelegate>
 
@@ -71,23 +72,23 @@
                           HeaderTitle:@"",
                           RowContent :@[
                                   @{
-                                      Title      :@"昵称",
-                                      DetailTitle:me.userInfo.nickName.length ? me.userInfo.nickName : @"未设置",
-                                      CellAction :@"onTouchNickSetting:",
+                                      Title      : @"昵称",
+                                      DetailTitle: me.userInfo.nickName.length ? me.userInfo.nickName : @"未设置",
+                                      CellAction : @"onTouchNickSetting:",
                                       RowHeight     : @(50),
                                       ShowAccessory : @(YES),
                                       },
                                   @{
-                                      Title      :@"性别",
-                                      DetailTitle:[NTESUserUtil genderString:me.userInfo.gender],
-                                      CellAction :@"onTouchGenderSetting:",
+                                      Title      : @"性别",
+                                      DetailTitle: [NTESUserUtil genderString:me.userInfo.gender],
+                                      CellAction : @"onTouchGenderSetting:",
                                       RowHeight     : @(50),
                                       ShowAccessory : @(YES)
                                       },
                                   @{
-                                      Title      :@"生日",
-                                      DetailTitle:me.userInfo.birth.length ? me.userInfo.birth : @"未设置",
-                                      CellAction :@"onTouchBirthSetting:",
+                                      Title       : @"生日",
+                                      DetailTitle : me.userInfo.birth.length ? me.userInfo.birth : @"未设置",
+                                      CellAction  : @"onTouchBirthSetting:",
                                       RowHeight     : @(50),
                                       ShowAccessory : @(YES)
                                       },
@@ -230,6 +231,7 @@
             if (!error && wself) {
                 [[NIMSDK sharedSDK].userManager updateMyUserInfo:@{@(NIMUserInfoUpdateTagAvatar):urlString} completion:^(NSError *error) {
                     if (!error) {
+                        [[NTESRedPacketManager sharedManager] updateUserInfo];
                         [[SDWebImageManager sharedManager] saveImageToCache:imageForAvatarUpload forURL:[NSURL URLWithString:urlString]];
                         [wself refresh];
                     }else{

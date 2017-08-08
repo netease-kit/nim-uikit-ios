@@ -28,6 +28,7 @@
 #import "NTESLogUploader.h"
 #import "NTESNetDetectViewController.h"
 #import "NTESSessionUtil.h"
+#import "JRMFHeader.h"
 
 @interface NTESSettingViewController ()<NIMUserManagerDelegate>
 
@@ -103,6 +104,16 @@
                                        ],
                           FooterTitle:@""
                        },
+                      @{
+                          HeaderTitle:@"",
+                          RowContent :@[
+                                  @{
+                                      Title         : @"我的钱包",
+                                      CellAction    : @"onTouchMyWallet:",
+                                      ShowAccessory : @(YES),
+                                      },
+                                  ],
+                          },
                        @{
                           HeaderTitle:@"",
                           RowContent :@[
@@ -242,13 +253,25 @@
     }];
 }
 
+- (void)onTouchMyWallet:(id)sender
+{
+    JrmfWalletSDK * jrmf = [[JrmfWalletSDK alloc] init];
+    NSString *userId = [[NIMSDK sharedSDK].loginManager currentAccount];
+    NIMKitInfo *userInfo = [[NIMKit sharedKit] infoByUser:userId option:nil];
+    [jrmf doPresentJrmfWalletPageWithBaseViewController:self userId:userId userName:userInfo.showName userHeadLink:userInfo.avatarUrlString thirdToken:[JRMFSington GetPacketSington].JrmfThirdToken];
+}
+
 - (void)onTouchCleanAllChatRecord:(id)sender{
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"确定清空所有聊天记录？" delegate:nil cancelButtonTitle:@"取消" destructiveButtonTitle:@"确定" otherButtonTitles:nil, nil];
     [sheet showInView:self.view completionHandler:^(NSInteger index) {
         switch (index) {
             case 0:{
-                BOOL removeRecentSession = [NTESBundleSetting sharedConfig].removeSessionWheDeleteMessages;
-                [[NIMSDK sharedSDK].conversationManager deleteAllMessages:removeRecentSession];
+                BOOL removeRecentSessions = [NTESBundleSetting sharedConfig].removeSessionWhenDeleteMessages;
+                BOOL removeTables = [NTESBundleSetting sharedConfig].dropTableWhenDeleteMessages;
+                NIMDeleteMessagesOption *option = [[NIMDeleteMessagesOption alloc] init];
+                option.removeSession = removeRecentSessions;
+                option.removeTable = removeTables;
+                [[NIMSDK sharedSDK].conversationManager deleteAllMessages:option];
                 for (NIMRecentSession *recent in [NIMSDK sharedSDK].conversationManager.allRecentSessions) {
                     [NTESSessionUtil removeRecentSessionAtMark:recent.session];
                 }

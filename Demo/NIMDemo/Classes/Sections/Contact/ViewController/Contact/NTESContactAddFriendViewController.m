@@ -76,6 +76,7 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     NSString *userId = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (userId.length) {
+        userId = [userId lowercaseString];
         [self addFriend:userId];
     }
     return YES;

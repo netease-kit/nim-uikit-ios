@@ -891,6 +891,7 @@ NTES_FORBID_INTERACTIVE_POP
     option.autoDeactivateAudioSession = [[NTESBundleSetting sharedConfig] autoDeactivateAudioSession];
     option.audioDenoise = [[NTESBundleSetting sharedConfig] audioDenoise];
     option.voiceDetect = [[NTESBundleSetting sharedConfig] voiceDetect];
+    option.audioHowlingSuppress = [[NTESBundleSetting sharedConfig] audioHowlingSuppress];
     option.preferHDAudio =  [[NTESBundleSetting sharedConfig] preferHDAudio];
     option.scene = [[NTESBundleSetting sharedConfig] scene];
     option.webrtcCompatible = [[NTESBundleSetting sharedConfig] webrtcCompatible];

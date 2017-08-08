@@ -17,6 +17,7 @@
         case NIMLoginClientTypeWP:
             return @"移动";
         case NIMLoginClientTypePC:
+        case NIMLoginClientTypemacOS:
             return @"电脑";
         case NIMLoginClientTypeWeb:
             return @"网页";

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "NIMContactDefines.h"
+#import "NIMKitInfo.h"
 
 @protocol NIMContactDataCellDelegate <NSObject>
 
@@ -30,5 +31,7 @@
 - (void)refreshUser:(id<NIMGroupMemberProtocol>)member;
 
 - (void)refreshTeam:(id<NIMGroupMemberProtocol>)member;
+
+- (void)refreshItem:(id<NIMGroupMemberProtocol>)member withMemberInfo:(NIMKitInfo *)info;
 
 @end

@@ -54,6 +54,11 @@
 #import "NTESTeamMeetingCallerInfo.h"
 #import "NIMInputAtCache.h"
 #import "NTESRobotCardViewController.h"
+#import "NTESRedPacketManager.h"
+#import "NTESSessionRedPacketContentView.h"
+#import "NTESSessionRedPacketTipContentView.h"
+#import "NTESRedPacketAttachment.h"
+#import "NTESRedPacketTipAttachment.h"
 
 @interface NTESSessionViewController ()
 <UIImagePickerControllerDelegate,
@@ -385,6 +390,13 @@ NIMEventSubscribeManagerDelegate>
     }];
 }
 
+#pragma mark - 红包
+- (void)onTapMediaItemRedPacket:(NIMMediaItem *)item
+{
+    [[NTESRedPacketManager sharedManager] sendRedPacket:self.session];
+}
+
+
 #pragma mark - 录音事件
 - (void)onRecordFailed:(NSError *)error
 {
@@ -461,13 +473,27 @@ NIMEventSubscribeManagerDelegate>
             [self uiUpdateMessage:message];
         }
         [[NSFileManager defaultManager] removeItemAtPath:attachment.filepath error:nil];
-        handled = YES;
         self.currentSingleSnapView = nil;
+        handled = YES;
     }
     else if([eventName isEqualToString:NIMKitEventNameTapRobotLink])
     {
         NSString *link = event.data;
         [self openSafari:link];
+        handled = YES;
+    }
+    else if([eventName isEqualToString:NIMDemoEventNameOpenRedPacket])
+    {
+        NIMCustomObject *object = event.messageModel.message.messageObject;
+        NTESRedPacketAttachment *attachment = (NTESRedPacketAttachment *)object.attachment;
+        [[NTESRedPacketManager sharedManager] openRedPacket:attachment.redPacketId from:event.messageModel.message.from session:self.session];
+        handled = YES;
+    }
+    else if([eventName isEqualToString:NTESShowRedPacketDetailEvent])
+    {
+        NIMCustomObject *object = event.messageModel.message.messageObject;
+        NTESRedPacketTipAttachment *attachment = (NTESRedPacketTipAttachment *)object.attachment;
+        [[NTESRedPacketManager sharedManager] showRedPacketDetail:attachment.packetId];
         handled = YES;
     }
     if (!handled) {
@@ -618,8 +644,13 @@ NIMEventSubscribeManagerDelegate>
                 __weak UIActionSheet *wSheet;
                 [sheet showInView:self.view completionHandler:^(NSInteger index) {
                     if (index == wSheet.destructiveButtonIndex) {
-                        BOOL removeRecentSession = [NTESBundleSetting sharedConfig].removeSessionWheDeleteMessages;
-                        [[NIMSDK sharedSDK].conversationManager deleteAllmessagesInSession:self.session removeRecentSession:removeRecentSession];
+                        BOOL removeRecentSession = [NTESBundleSetting sharedConfig].removeSessionWhenDeleteMessages;
+                        BOOL removeTable = [NTESBundleSetting sharedConfig].dropTableWhenDeleteMessages;
+                        NIMDeleteMessagesOption *option = [[NIMDeleteMessagesOption alloc] init];
+                        option.removeSession = removeRecentSession;
+                        option.removeTable = removeTable;
+                        [[NIMSDK sharedSDK].conversationManager deleteAllmessagesInSession:self.session
+                                                                                    option:option];
                     }
                 }];
                 break;

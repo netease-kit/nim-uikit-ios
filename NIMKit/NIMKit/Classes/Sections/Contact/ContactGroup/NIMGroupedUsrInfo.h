@@ -6,7 +6,7 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMGroupedDataCollection.h"
+#import "NIMContactDefines.h"
 
 
 @interface NIMGroupUser:NSObject<NIMGroupMemberProtocol>

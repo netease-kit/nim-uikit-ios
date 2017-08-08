@@ -57,7 +57,7 @@ static NSString *DefaultTableCell = @"UITableViewCell";
         cell = [[clazz alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identity];
         UIView *sep = [[UIView alloc] initWithFrame:CGRectZero];
         sep.tag = SepViewTag;
-        sep.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        sep.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         sep.backgroundColor = [UIColor lightGrayColor];
         [cell addSubview:sep];
     }

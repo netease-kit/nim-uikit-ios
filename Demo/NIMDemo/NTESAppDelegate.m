@@ -23,6 +23,8 @@
 #import "NTESSDKConfigDelegate.h"
 #import "NTESCellLayoutConfig.h"
 #import "NTESSubscribeManager.h"
+#import "NTESRedPacketManager.h"
+
 
 @import PushKit;
 
@@ -51,7 +53,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 
     [self setupMainViewController];
     
-    
+    [[NTESRedPacketManager sharedManager] application:application didFinishLaunchingWithOptions:launchOptions];
     DDLogInfo(@"launch with options %@",launchOptions);
     return YES;
 }
@@ -119,6 +121,25 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     DDLogInfo(@"registry %@ invalidate %@",registry,type);
 }
 
+
+#pragma mark - openURL
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    [[NTESRedPacketManager sharedManager] application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString*, id> *)options
+{
+    [[NTESRedPacketManager sharedManager] application:app openURL:url options:options];
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    //目前只有红包跳转
+    return [[NTESRedPacketManager sharedManager] application:application handleOpenURL:url];
+}
 
 
 #pragma mark - misc
@@ -233,6 +254,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
     [[NTESLogManager sharedManager] start];
     [[NTESNotificationCenter sharedCenter] start];
     [[NTESSubscribeManager sharedManager] start];
+    [[NTESRedPacketManager sharedManager] start];
 }
 
 - (void)setupNIMSDK

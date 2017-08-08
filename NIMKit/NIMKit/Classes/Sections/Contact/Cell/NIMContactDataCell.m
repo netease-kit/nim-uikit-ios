@@ -36,6 +36,12 @@
     return self;
 }
 
+- (void)refreshItem:(id<NIMGroupMemberProtocol>)member withMemberInfo:(NIMKitInfo *)info {
+    [self refreshTitle:member.showName];
+    self.memberId = [member memberId];
+    [self refreshAvatar:info];
+}
+
 - (void)refreshUser:(id<NIMGroupMemberProtocol>)member{
     [self refreshTitle:member.showName];
     self.memberId = [member memberId];

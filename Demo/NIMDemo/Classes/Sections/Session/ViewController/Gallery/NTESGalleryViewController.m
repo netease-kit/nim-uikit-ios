@@ -94,12 +94,12 @@
 }
 
 + (void)downloadImage:(NSString *)url imageView:(SingleSnapView *)imageView{
-    __weak typeof(imageView) wImageView = imageView;
-    [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:nil options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+    __weak typeof(imageView) wImageView = imageView;    
+    [imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:nil options:SDWebImageCacheMemoryOnly progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
         dispatch_async_main_safe(^{
             wImageView.progress = (CGFloat)receivedSize / expectedSize;
         });
-    } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+    } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         if (error) {
             [wImageView makeToast:@"下载图片失败"
                          duration:2

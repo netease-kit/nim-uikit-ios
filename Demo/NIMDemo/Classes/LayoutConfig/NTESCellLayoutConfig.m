@@ -10,6 +10,7 @@
 #import "NTESSessionCustomContentConfig.h"
 #import "NTESChatroomTextContentConfig.h"
 #import "NTESWhiteboardAttachment.h"
+#import "NTESRedPacketTipAttachment.h"
 
 @interface NTESCellLayoutConfig ()
 @property (nonatomic,strong)    NSArray    *types;
@@ -27,7 +28,9 @@
                    @"NTESJanKenPonAttachment",
                    @"NTESSnapchatAttachment",
                    @"NTESChartletAttachment",
-                   @"NTESWhiteboardAttachment"
+                   @"NTESWhiteboardAttachment",
+                   @"NTESRedPacketAttachment",
+                   @"NTESRedPacketTipAttachment"
                    ];
         _sessionCustomconfig = [[NTESSessionCustomContentConfig alloc] init];
         _chatroomTextConfig = [[NTESChatroomTextContentConfig alloc] init];
@@ -113,6 +116,9 @@
     if ([self isWhiteboardCloseNotificationMessage:model.message]){
         return NO;
     }
+    if ([self isRedpacketTip:model.message]) {
+        return NO;
+    }
     return [super shouldShowAvatar:model];
 }
 
@@ -127,6 +133,9 @@
 - (BOOL)shouldShowNickName:(NIMMessageModel *)model{
     if ([self isSupportedChatroomMessage:model.message]) {
         return YES;
+    }
+    if ([self isRedpacketTip:model.message]) {
+        return NO;
     }
     return [super shouldShowNickName:model];
 }
@@ -211,6 +220,17 @@
         NIMCustomObject *object = message.messageObject;
         if ([object.attachment isKindOfClass:[NTESWhiteboardAttachment class]]) {
             return [(NTESWhiteboardAttachment *)object.attachment flag] == CustomWhiteboardFlagClose;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)isRedpacketTip:(NIMMessage *)message
+{
+    if (message.messageType == NIMMessageTypeCustom) {
+        NIMCustomObject *object = message.messageObject;
+        if ([object.attachment isKindOfClass:[NTESRedPacketTipAttachment class]]) {
+            return YES;
         }
     }
     return NO;

@@ -15,7 +15,9 @@
 
 + (instancetype)sharedConfig;
 
-- (BOOL)removeSessionWheDeleteMessages;             //删除消息时是否同时删除会话项
+- (BOOL)removeSessionWhenDeleteMessages;             //删除消息时是否同时删除会话项
+
+- (BOOL)dropTableWhenDeleteMessages;                //删除消息的同时是否删除消息表
 
 - (BOOL)localSearchOrderByTimeDesc;                 //本地搜索消息顺序 YES表示按时间戳逆序搜索,NO表示按照时间戳顺序搜索
 
@@ -34,6 +36,8 @@
 - (BOOL)usingAmr;                                   //使用amr作为录音
 
 - (NSArray *)ignoreTeamNotificationTypes;           //需要忽略的群通知类型
+
+- (BOOL)enableSyncWhenFetchRemoteMessages;          //拉取云消息时是否需要存储到本地
 
 #pragma mark - 网络通话和白板
 - (BOOL)serverRecordAudio;                          //服务器录制语音
@@ -66,6 +70,8 @@
 - (BOOL)audioDenoise;                               //降噪开关
 
 - (BOOL)voiceDetect;                                //语音检测开关
+
+- (BOOL)audioHowlingSuppress;                       //啸叫抑制
 
 - (BOOL)preferHDAudio;                              //期望高清语音
 

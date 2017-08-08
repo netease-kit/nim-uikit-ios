@@ -26,6 +26,7 @@
 #import "NTESTeamMeetingCalleeInfo.h"
 #import "NTESTeamMeetingViewController.h"
 #import "NTESAVNotifier.h"
+#import "NTESRedPacketTipAttachment.h"
 
 NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChanged";
 
@@ -78,18 +79,22 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
 }
 
 #pragma mark - NIMChatManagerDelegate
-- (void)onRecvMessages:(NSArray *)messages
+- (void)onRecvMessages:(NSArray *)recvMessages
 {
-    static BOOL isPlaying = NO;
-    if (isPlaying) {
-        return;
+    NSArray *messages = [self filterMessages:recvMessages];
+    if (messages.count)
+    {
+        static BOOL isPlaying = NO;
+        if (isPlaying) {
+            return;
+        }
+        isPlaying = YES;
+        [self playMessageAudioTip];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            isPlaying = NO;
+        });
+        [self checkMessageAt:messages];
     }
-    isPlaying = YES;
-    [self playMessageAudioTip];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        isPlaying = NO;
-    });
-    [self checkMessageAt:messages];
 }
 
 - (void)playMessageAudioTip
@@ -110,20 +115,16 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     }
 }
 
-- (void)checkMessageAt:(NSArray *)messages
+- (void)checkMessageAt:(NSArray<NIMMessage *> *)messages
 {
-    //同个 session 的消息
+    //一定是同个 session 的消息
     NIMSession *session = [messages.firstObject session];
-    UINavigationController *nav = [NTESMainTabController instance].selectedViewController;
-    for (UIViewController *vc in nav.viewControllers) {
-        if ([vc isKindOfClass:[NIMSessionViewController class]])
-        {
-            //只有在@所属会话页外面才需要标记有人@你
-            if ([[(NIMSessionViewController*)vc session] isEqual:session]) {
-                return;
-            };
-        }
+    if ([self.currentSessionViewController.session isEqual:session])
+    {
+        //只有在@所属会话页外面才需要标记有人@你
+        return;
     }
+
     NSString *me = [[NIMSDK sharedSDK].loginManager currentAccount];
     
     for (NIMMessage *message in messages) {
@@ -132,6 +133,42 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
             return;
         }
     }
+}
+
+
+- (NSArray *)filterMessages:(NSArray *)messages
+{
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    for (NIMMessage *message in messages)
+    {
+        if ([self checkRedPacketTip:message] && ![self canSaveMessageRedPacketTip:message])
+        {
+            [[NIMSDK  sharedSDK].conversationManager deleteMessage:message];
+            [self.currentSessionViewController uiDeleteMessage:message];
+            continue;
+        }
+        [array addObject:message];
+    }
+    return [NSArray arrayWithArray:array];
+}
+
+
+- (BOOL)checkRedPacketTip:(NIMMessage *)message
+{
+    NIMCustomObject *object = message.messageObject;
+    if ([object isKindOfClass:[NIMCustomObject class]] && [object.attachment isKindOfClass:[NTESRedPacketTipAttachment class]])
+    {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)canSaveMessageRedPacketTip:(NIMMessage *)message
+{
+    NIMCustomObject *object = message.messageObject;
+    NTESRedPacketTipAttachment *attach = (NTESRedPacketTipAttachment *)object.attachment;
+    NSString *me = [NIMSDK sharedSDK].loginManager.currentAccount;
+    return [attach.sendPacketId isEqualToString:me] || [attach.openPacketId isEqualToString:me];
 }
 
 - (void)onRecvRevokeMessageNotification:(NIMRevokeMessageNotification *)notification
@@ -393,5 +430,19 @@ NSString *NTESCustomNotificationCountChanged = @"NTESCustomNotificationCountChan
     return should;
 }
 
+
+#pragma mark - Misc
+- (NIMSessionViewController *)currentSessionViewController
+{
+    UINavigationController *nav = [NTESMainTabController instance].selectedViewController;
+    for (UIViewController *vc in nav.viewControllers)
+    {
+        if ([vc isKindOfClass:[NIMSessionViewController class]])
+        {
+            return (NIMSessionViewController *)vc;
+        }
+    }
+    return nil;
+}
 
 @end

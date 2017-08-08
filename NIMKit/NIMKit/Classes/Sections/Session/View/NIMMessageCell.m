@@ -38,8 +38,7 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
-        self.selectionStyle = UITableViewCellSelectionStyleNone;
-        self.backgroundColor = NIMKit_UIColorFromRGB(0xe4e7ec);
+        self.selectionStyle = UITableViewCellSelectionStyleNone;        
         [self makeComponents];
         [self makeGesture];
     }
@@ -114,18 +113,11 @@
 }
 
 
-- (void)setModel:(NIMMessageModel *)model{
-    _model = model;
-}
-
-- (void)injected
-{
-    [self refreshData:_model];
-}
-
 - (void)refresh{
     [self addContentViewIfNotExist];
     [self addUserCustomViews];
+    
+    self.backgroundColor = [NIMKitUIConfig sharedConfig].globalConfig.backgroundColor;
     
     if ([self needShowAvatar])
     {

@@ -83,11 +83,7 @@ NSInteger NIMCustomPageViewHeight    = 159;
 - (NSArray *)loadCatalogAndChartlet
 {
     NIMInputEmoticonCatalog * defaultCatalog = [self loadDefaultCatalog];
-    BOOL disableCharlet = NO;
-    if ([self.config respondsToSelector:@selector(disableCharlet)]) {
-        disableCharlet = [self.config disableCharlet];
-    }
-    NSArray *charlets = disableCharlet ? nil : [self loadChartlet];
+    NSArray *charlets = [self loadChartlet];
     NSArray *catalogs = defaultCatalog? [@[defaultCatalog] arrayByAddingObjectsFromArray:charlets] : charlets;
     return catalogs;
 }
@@ -219,11 +215,15 @@ NSInteger NIMCustomPageViewHeight    = 159;
 
 
 - (NSArray *)loadChartlet{
-    NSArray *chatlets = [[NIMInputEmoticonManager sharedManager] loadChartletEmoticonCatalog];
-    for (NIMInputEmoticonCatalog *item in chatlets) {
-        NIMInputEmoticonLayout *layout = [[NIMInputEmoticonLayout alloc] initCharletLayout:self.nim_width];
-        item.layout = layout;
-        item.pagesCount = [self numberOfPagesWithEmoticon:item];
+    NSArray *chatlets = nil;
+    if ([self.config respondsToSelector:@selector(charlets)])
+    {
+        chatlets = [self.config charlets];
+        for (NIMInputEmoticonCatalog *item in chatlets) {
+            NIMInputEmoticonLayout *layout = [[NIMInputEmoticonLayout alloc] initCharletLayout:self.nim_width];
+            item.layout = layout;
+            item.pagesCount = [self numberOfPagesWithEmoticon:item];
+        }
     }
     return chatlets;
 }

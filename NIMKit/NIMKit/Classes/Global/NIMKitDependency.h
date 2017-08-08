@@ -28,6 +28,7 @@
 #else
 #import "SDWebImageManager.h"
 #import "UIView+WebCacheOperation.h"
+#import "uiview+WebCache.h"
 #endif
 
 
@@ -37,12 +38,6 @@
 #import "UIView+Toast.h"
 #endif
 
-
-#if __has_include(<SVProgressHUD/SVProgressHUD.h>)
-#import <SVProgressHUD/SVProgressHUD.h>
-#else
-#import "SVProgressHUD.h"
-#endif
 
 #if __has_include(<TZImagePickerController/TZImagePickerController.h>)
 #import <TZImagePickerController/TZImagePickerController.h>

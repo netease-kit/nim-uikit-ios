@@ -223,7 +223,8 @@
 - (UIImageView *)connectingImageView
 {
     if (!_connectingImageView) {
-        UIImage *image = [UIImage sd_animatedGIFNamed:@"icon_meeting_connecting"];
+        NSData *data = [NSData dataWithContentsOfFile:@"icon_meeting_connecting"];
+        UIImage *image = [UIImage sd_animatedGIFWithData:data];
         _connectingImageView = [[UIImageView alloc] initWithImage:image];
         _connectingImageView.hidden = YES;
         [self.contentView addSubview:_connectingImageView];

@@ -89,7 +89,6 @@
     self.tableView.backgroundColor = NIMKit_UIColorFromRGB(0xe4e7ec);
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    
     [self.view addSubview:self.tableView];
 }
 
@@ -376,7 +375,7 @@
 
 - (void)onSendText:(NSString *)text atUsers:(NSArray *)atUsers
 {
-    NSMutableSet *users = [NSMutableSet setWithArray:atUsers];
+    NSMutableArray *users = [NSMutableArray arrayWithArray:atUsers];
     if (self.session.sessionType == NIMSessionTypeP2P)
     {
         [users addObject:self.session.sessionId];
@@ -409,7 +408,7 @@
     [self sendMessage:message];
 }
 
-- (NSString *)robotsToSend:(NSSet *)atUsers
+- (NSString *)robotsToSend:(NSArray *)atUsers
 {
     for (NSString *userId in atUsers)
     {

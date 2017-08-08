@@ -144,45 +144,6 @@
     return emoticon;
 }
 
-
-
-- (NSArray *)loadChartletEmoticonCatalog{
-    NSURL *url = [[NSBundle mainBundle] URLForResource:[NIMKit sharedKit].emoticonBundleName
-                                         withExtension:nil];
-    NSBundle *bundle = [NSBundle bundleWithURL:url];    
-    NSArray  *paths   = [bundle pathsForResourcesOfType:nil inDirectory:NIMKit_ChartletChartletCatalogPath];
-    NSMutableArray *res = [[NSMutableArray alloc] init];
-    for (NSString *path in paths) {
-        BOOL isDirectory = NO;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && isDirectory) {
-            NIMInputEmoticonCatalog *catalog = [[NIMInputEmoticonCatalog alloc]init];
-            catalog.catalogID = path.lastPathComponent;
-            NSArray *resources = [NSBundle pathsForResourcesOfType:nil inDirectory:[path stringByAppendingPathComponent:NIMKit_ChartletChartletCatalogContentPath]];
-            NSMutableArray *array = [[NSMutableArray alloc] init];
-            for (NSString *path in resources) {
-                NSString *name  = path.lastPathComponent.stringByDeletingPathExtension;
-                NIMInputEmoticon *icon  = [[NIMInputEmoticon alloc] init];
-                icon.emoticonID = name.nim_stringByDeletingPictureResolution;
-                icon.filename   = path;
-                [array addObject:icon];
-            }
-            catalog.emoticons = array;
-            
-            NSArray *icons     = [NSBundle pathsForResourcesOfType:nil inDirectory:[path stringByAppendingPathComponent:NIMKit_ChartletChartletCatalogIconPath]];
-            for (NSString *path in icons) {
-                NSString *name  = path.lastPathComponent.stringByDeletingPathExtension.nim_stringByDeletingPictureResolution;
-                if ([name hasSuffix:NIMKit_ChartletChartletCatalogIconsSuffixNormal]) {
-                    catalog.icon = path;
-                }else if([name hasSuffix:NIMKit_ChartletChartletCatalogIconsSuffixHighLight]){
-                    catalog.iconPressed = path;
-                }
-            }
-            [res addObject:catalog];
-        }
-    }
-    return res;
-}
-
 - (void)parsePlist
 {
     NSMutableArray *catalogs = [NSMutableArray array];

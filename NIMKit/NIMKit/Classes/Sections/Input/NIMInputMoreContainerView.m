@@ -179,7 +179,7 @@ NSInteger NIMButtonBegintLeftX = 11;
 #pragma mark - button actions
 - (void)onTouchButton:(id)sender
 {
-    NSInteger index = [sender tag];
+    NSInteger index = [(UIButton *)sender tag];
     NIMMediaItem *item = _mediaItems[index];
     if (_actionDelegate && [_actionDelegate respondsToSelector:@selector(onTapMediaItem:)]) {
         BOOL handled = [_actionDelegate onTapMediaItem:item];

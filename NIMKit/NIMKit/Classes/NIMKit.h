@@ -103,14 +103,14 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  *  用户信息变更通知接口
  *
- *  @param userId 用户id
+ *  @param userIds 用户id
  */
 - (void)notfiyUserInfoChanged:(NSArray *)userIds;
 
 /**
  *  群信息变更通知接口
  *
- *  @param teamId 群id
+ *  @param teamIds 群id
  */
 - (void)notifyTeamInfoChanged:(NSArray *)teamIds;
 
@@ -118,7 +118,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  *  群成员变更通知接口
  *
- *  @param teamId 群id
+ *  @param teamIds 群id
  */
 - (void)notifyTeamMemebersChanged:(NSArray *)teamIds;
 

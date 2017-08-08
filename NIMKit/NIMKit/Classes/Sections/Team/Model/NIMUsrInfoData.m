@@ -7,7 +7,6 @@
 //
 
 #import "NIMUsrInfoData.h"
-#import "NIMGroupedDataCollection.h"
 #import "NIMSpellingCenter.h"
 #import "NIMKit.h"
 

@@ -179,7 +179,7 @@
     searchOpt.endTime    = message.timestamp;
     searchOpt.currentMessage = message;
     searchOpt.limit      = self.limit;
-    searchOpt.sync       = NO;
+    searchOpt.sync       =  [NTESBundleSetting sharedConfig].enableSyncWhenFetchRemoteMessages;
     [[NIMSDK sharedSDK].conversationManager fetchMessageHistory:self.session option:searchOpt result:^(NSError *error, NSArray *messages) {
         if (handler) {
             handler(error,messages.reverseObjectEnumerator.allObjects);

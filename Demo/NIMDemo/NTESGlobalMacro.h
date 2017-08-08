@@ -53,6 +53,9 @@ block();\
 dispatch_async(dispatch_get_main_queue(), block);\
 }
 
+/* weakSelf strongSelf reference */
+#define WEAK_SELF(weakSelf) __weak __typeof(&*self) weakSelf = self;
+#define STRONG_SELF(strongSelf) __strong __typeof(&*weakSelf) strongSelf = weakSelf;
 
 
 #endif

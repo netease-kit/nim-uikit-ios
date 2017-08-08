@@ -12,6 +12,8 @@
 	<string>请输入消息</string>
 	<key>Max_Length</key>
 	<integer>1000</integer>
+    <key>Row_Background_Color</key>
+    <string>#E4E7EC</string>
 	<key>Bubble</key>
 	<dict>
 		<key>Left</key>

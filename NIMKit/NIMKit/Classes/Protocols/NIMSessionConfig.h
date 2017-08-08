@@ -11,7 +11,7 @@
 #import "NIMCellConfig.h"
 #import "NIMKitMessageProvider.h"
 #import "NIMInputBarItemType.h"
-
+#import "NIMInputEmoticonManager.h"
 
 @protocol NIMSessionConfig <NSObject>
 @optional
@@ -31,7 +31,7 @@
 /**
  *  禁用贴图表情
  */
-- (BOOL)disableCharlet;
+- (NSArray<NIMInputEmoticonCatalog *> *)charlets;
 
 
 /**

@@ -95,8 +95,13 @@
     CGRect rect = [_tableView frame];
     rect.origin.y = 0;
     rect.size.height = self.viewRect.size.height - _inputViewHeight;
+    BOOL changed = !CGRectEqualToRect(_tableView.frame, rect);
     [_tableView setFrame:rect];
-    [_tableView nim_scrollToBottom:NO];
+    
+    if (changed)
+    {
+        [_tableView nim_scrollToBottom:NO];
+    }
 }
 
 
@@ -132,7 +137,8 @@
 
 - (void)insert:(NSArray<NSIndexPath *> *)indexPaths animated:(BOOL)animated
 {
-    if (!indexPaths.count) {
+    if (!indexPaths.count)
+    {
         return;
     }
 
