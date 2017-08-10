@@ -10,6 +10,14 @@
 		611FE9EE1BB02320005E8E45 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		61530BE71BABAD3B00FE50CC /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 61530BE61BABAD3B00FE50CC /* libsqlite3.0.tbd */; };
 		61530BEB1BABAD8200FE50CC /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 61530BEA1BABAD8200FE50CC /* libz.tbd */; };
+		618364BB1F3CBCD0003DE7A4 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6130F7F31F3CBA2E004B5DAA /* CoreMotion.framework */; };
+		618364BD1F3CCD33003DE7A4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364BC1F3CCD33003DE7A4 /* Security.framework */; };
+		618364BF1F3CCD4E003DE7A4 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364BE1F3CCD4E003DE7A4 /* CFNetwork.framework */; };
+		618364C11F3CCD7A003DE7A4 /* libstdc++.6.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364C01F3CCD7A003DE7A4 /* libstdc++.6.tbd */; };
+		618364C31F3CCDAA003DE7A4 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364C21F3CCDAA003DE7A4 /* CoreLocation.framework */; };
+		618364C51F3CCDAF003DE7A4 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364C41F3CCDAF003DE7A4 /* MapKit.framework */; };
+		618364C71F3CCDC7003DE7A4 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364C61F3CCDC7003DE7A4 /* MobileCoreServices.framework */; };
+		618364C91F3CCDDF003DE7A4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618364C81F3CCDDF003DE7A4 /* SystemConfiguration.framework */; };
 		834538D01F39CBC700C7096D /* NSData+NTES.m in Sources */ = {isa = PBXBuildFile; fileRef = 834536AE1F39CBC600C7096D /* NSData+NTES.m */; };
 		834538D11F39CBC700C7096D /* NSDictionary+NTESJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 834536B01F39CBC600C7096D /* NSDictionary+NTESJson.m */; };
 		834538D21F39CBC700C7096D /* NSString+NTES.m in Sources */ = {isa = PBXBuildFile; fileRef = 834536B21F39CBC600C7096D /* NSString+NTES.m */; };
@@ -265,8 +273,16 @@
 
 /* Begin PBXFileReference section */
 		5547789437E720A2E5468BCE /* libPods-NIM.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NIM.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6130F7F31F3CBA2E004B5DAA /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		61530BE61BABAD3B00FE50CC /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		61530BEA1BABAD8200FE50CC /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		618364BC1F3CCD33003DE7A4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		618364BE1F3CCD4E003DE7A4 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		618364C01F3CCD7A003DE7A4 /* libstdc++.6.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.6.tbd"; path = "usr/lib/libstdc++.6.tbd"; sourceTree = SDKROOT; };
+		618364C21F3CCDAA003DE7A4 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		618364C41F3CCDAF003DE7A4 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		618364C61F3CCDC7003DE7A4 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		618364C81F3CCDDF003DE7A4 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		61AE12851DD95947005980B5 /* libNIMKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libNIMKit.a; path = "../../Library/Developer/Xcode/DerivedData/NIM-dgcpmwyjurnubraszivacbojoxmy/Build/Products/Debug-iphonesimulator/libNIMKit.a"; sourceTree = "<group>"; };
 		74D3CBBCCF66D9A6D453BB43 /* libPods-NIMDemo-NIM.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NIMDemo-NIM.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		834536AD1F39CBC600C7096D /* NSData+NTES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+NTES.h"; sourceTree = "<group>"; };
@@ -751,6 +767,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				618364C91F3CCDDF003DE7A4 /* SystemConfiguration.framework in Frameworks */,
+				618364C71F3CCDC7003DE7A4 /* MobileCoreServices.framework in Frameworks */,
+				618364C51F3CCDAF003DE7A4 /* MapKit.framework in Frameworks */,
+				618364C31F3CCDAA003DE7A4 /* CoreLocation.framework in Frameworks */,
+				618364C11F3CCD7A003DE7A4 /* libstdc++.6.tbd in Frameworks */,
+				618364BF1F3CCD4E003DE7A4 /* CFNetwork.framework in Frameworks */,
+				618364BD1F3CCD33003DE7A4 /* Security.framework in Frameworks */,
 				834539AC1F39CBC800C7096D /* libWeChatSDK.a in Frameworks */,
 				834539AA1F39CBC800C7096D /* libSPaySDK.a in Frameworks */,
 				BD73C07F1D9905D200F1C436 /* libc++.tbd in Frameworks */,
@@ -765,6 +788,7 @@
 				C1CAEFCC67BEFBF0A459D8F7 /* libPods-NIM.a in Frameworks */,
 				834539A61F39CBC800C7096D /* JrmfWalletKit.framework in Frameworks */,
 				834539A11F39CBC800C7096D /* AlipaySDK.framework in Frameworks */,
+				618364BB1F3CBCD0003DE7A4 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -785,6 +809,14 @@
 		5176189D0086B38FE643A26A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				618364C81F3CCDDF003DE7A4 /* SystemConfiguration.framework */,
+				618364C61F3CCDC7003DE7A4 /* MobileCoreServices.framework */,
+				618364C41F3CCDAF003DE7A4 /* MapKit.framework */,
+				618364C21F3CCDAA003DE7A4 /* CoreLocation.framework */,
+				618364C01F3CCD7A003DE7A4 /* libstdc++.6.tbd */,
+				618364BE1F3CCD4E003DE7A4 /* CFNetwork.framework */,
+				618364BC1F3CCD33003DE7A4 /* Security.framework */,
+				6130F7F31F3CBA2E004B5DAA /* CoreMotion.framework */,
 				61AE12851DD95947005980B5 /* libNIMKit.a */,
 				BD73C07E1D9905D200F1C436 /* libc++.tbd */,
 				BDA64F191CA38A3800BCF04D /* VideoToolbox.framework */,
@@ -2123,7 +2155,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		F9916A5271EB9BF1BF131F21 /* [CP] Embed Pods Frameworks */ = {
@@ -2341,6 +2373,7 @@
 /* Begin XCBuildConfiguration section */
 		AE5883061A6F47E10070536A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 834538BB1F39CBC700C7096D /* nim_debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -2394,6 +2427,7 @@
 		};
 		AE5883071A6F47E10070536A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 834538BC1F39CBC700C7096D /* nim_release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
