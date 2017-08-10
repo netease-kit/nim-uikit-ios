@@ -24,7 +24,7 @@ typedef void (^NIMKitDataProvideHandler)(NSError *error, NSArray<NIMMessage *> *
 
 /**
  *  下拉加载数据
- *  @param hanlder 返回消息结果集的回调
+ *  @param handler 返回消息结果集的回调
  *  @param firstMessage 最上部的一条消息，
  *  @discussion 当开始没有数据时，也会触发此回调，firstMessage为nil。
  */
