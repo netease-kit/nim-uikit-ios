@@ -33,36 +33,40 @@
  *  上层提供用户信息的接口
  *
  *  @param userId  用户ID
- *  @param session 所在的会话
+ *  @param option  获取选项
  *
  *  @return 用户信息
  */
 - (NIMKitInfo *)infoByUser:(NSString *)userId
-                 inSession:(NIMSession *)session;
+                    option:(NIMKitInfoFetchOption *)option;
 
-/**
- *  上层提供用户信息的接口
- *
- *  @param userId  用户ID
- *  @param message 所在的消息
- *
- *  @return 用户信息
- */
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-               withMessage:(NIMMessage *)message;
 
 /**
  *  上层提供群组信息的接口
  *
  *  @param teamId 群组ID
+ *  @param option 获取选项
  *
  *  @return 群组信息
  */
-- (NIMKitInfo *)infoByTeam:(NSString *)teamId;
+- (NIMKitInfo *)infoByTeam:(NSString *)teamId
+                    option:(NIMKitInfoFetchOption *)option;
+                    
 
 @end
 
 ```
+
+其中，`NIMKitInfoFetchOption` 为抓取选项，定义了需要抓取信息所属的会话，或者所属的消息，是否需要屏蔽备注名等等，字段非必填，此对象在抓取时自行创建，并根据场景需求赋值。
+
+例如，在最近会话列表中，需要显示用户的头像，这个时候只需要在 `NIMKitInfoFetchOption` 里定义所属会话即可。
+
+```objc
+NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+option.session = session;
+NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:fromUid option:option];
+```
+
 
 在使用 `NIMKit` 进行用户信息显示时，`NIMKit` 将回调相应协议，从上层获取到相应的信息 `NIMKitInfo` 进行显示。在理想状态下，我们认为 App 都应该合理缓存用户信息，在收到回调时能够立刻返回。但实际环境下，由于各个 App 缓存用户信息策略不同，网络状况影响等多种原因将影响用户信息的同步获取。这意味着，App 需要在被回调时立刻提供一份 `占位信息` 供界面使用，并通过一定手动进行用户信息的获取，并在获取后通知 `NIMKit`。`NIMKit` 在 `NIMKit` 这个类中提供了如下接口用于用户信息的更新通知。
 
@@ -70,18 +74,18 @@
 /**
  *  用户信息变更通知接口
  *
- *  @param userId 用户id
+ *  @param userIds 用户 id 集合
  */
-- (void)notfiyUserInfoChanged:(NSString *)userId;
+- (void)notfiyUserInfoChanged:(NSArray *)userIds;
 
 /**
  *  群信息变更通知接口
  *
- *  @param teamId 群id
+ *  @param teamIds 群 id 集合
  */
-- (void)notfiyTeamInfoChanged:(NSString *)teamId;
+- (void)notifyTeamInfoChanged:(NSArray *)teamIds;
 
 ```
 
-需要注意的是，由于界面刷新可能比较频繁，如果开发者每收到回调且发现信息缺失时就进行异步请求，有可能导致单位时间内用户信息请求过多，导致自身应用服务器承受不住压力。推荐参考 `NIMKit` 中 `NIMKitDefaultDataProvider` 的写法。
+需要注意的是，由于界面刷新可能比较频繁，如果开发者每收到回调且发现信息缺失时就进行异步请求，有可能导致单位时间内用户信息请求过多，导致自身应用服务器承受不住压力。推荐参考 `NIMKit` 中 `NIMKitDataProviderImpl` 的写法。
 
