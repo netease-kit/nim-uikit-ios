@@ -276,3 +276,60 @@
    ...
 - }
 ```
+
+## 自定义消息事件传递
+在自定义消息中，常常会有一些按钮点击，长按等事件，在父类 NIMSessionMessageContentView 中，已经预置好一些事件，不再需要额外在子类中添加事件按钮实现,子类重写这些方法即可。
+
+```objc
+/**
+ *  手指从contentView内部抬起
+ */
+- (void)onTouchUpInside:(id)sender;
+
+
+/**
+ *  手指从contentView外部抬起
+ */
+- (void)onTouchUpOutside:(id)sender;
+
+/**
+ *  手指按下contentView
+ */
+- (void)onTouchDown:(id)sender;
+```
+
+
+
+有的时候，需要将事件传递给视图控制器做业务处理，如预览大图，页面跳转等等。推荐的事件传递方式为:
+
+ * 在需要传递事件的 MessageContentView 中定义点击事件
+ 
+   ```objc
+   //ExampleMessageContentView.h
+   
+   extern NSString *const NIMDemoEventNameExample;
+   
+   ```
+   
+   ```objc
+   //ExampleMessageContentView.m
+   
+   NSString *const NIMDemoEventNameExample  = @"NIMDemoEventNameExample";
+   
+   ```
+
+   
+* MessageContentView 的父类有事件上抛引用 delegate 。点击事件触发时，通过 delegate 发起 `onCatchEvent` 回调
+
+  ```objc
+    NIMKitEvent *event = [[NIMKitEvent alloc] init];
+    event.eventName = NIMDemoEventNameExample;
+    event.messageModel = self.model;
+    event.data = self;
+    [self.delegate onCatchEvent:event];
+  ```
+  推荐 NIMKitEvent 的 messageModel 中将消息 model 传入， data 中将需要的数据传入
+
+* 回调传递到 NIMMemssageCell ，Cell 会自动发起 onTapCell: 回调
+* 在对应的 SessionViewController 进行处理回调即可，具体可以参考 NTESSessionViewController 的 `onTapCell:` 方法
+
