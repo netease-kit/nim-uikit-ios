@@ -1,5 +1,5 @@
 //
-//  NIMKitDefaultDataProvider.m
+//  NIMKitDataProviderImpl.m
 //  NIMKit
 //
 //  Created by chris on 2016/10/31.

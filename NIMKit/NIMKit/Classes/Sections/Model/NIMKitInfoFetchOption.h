@@ -14,17 +14,17 @@
 @interface NIMKitInfoFetchOption : NSObject
 
 /**
- *  所属会话
+ *  所属会话，非必填选项
  */
 @property (nonatomic,strong)  NIMSession *session;
 
 /**
- *  所属消息
+ *  所属消息，非必填选项
  */
 @property (nonatomic,strong)  NIMMessage *message;
 
 /**
- *  屏蔽备注名
+ *  屏蔽备注名，非必填选项
  */
 @property (nonatomic,assign) BOOL forbidaAlias;
 

@@ -19,8 +19,8 @@
         _pickedView = [[NIMContactPickedView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
         [self addSubview:_pickedView];
         _doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        UIImage *doneButtonNormal      = [UIImage nim_imageInKit:@"contact_select_normal"];
-        UIImage *doneButtonHighlighted = [UIImage nim_imageInKit:@"contact_select_pressed"];
+        UIImage *doneButtonNormal      = [UIImage nim_imageInKit:@"icon_cell_blue_normal"];
+        UIImage *doneButtonHighlighted = [UIImage nim_imageInKit:@"icon_cell_blue_normal"];
         [_doneButton setBackgroundImage:doneButtonNormal forState:UIControlStateNormal];
         [_doneButton setBackgroundImage:doneButtonHighlighted forState:UIControlStateHighlighted];
         [_doneButton setTitle:@"确定" forState:UIControlStateNormal];
