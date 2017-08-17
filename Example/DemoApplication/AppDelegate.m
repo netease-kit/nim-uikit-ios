@@ -30,7 +30,7 @@
     [NIMCustomObject registerCustomDecoder:[[AttachmentDecoder alloc]init]];
     
     //注入 NIMKit 布局管理器
-    [[NIMKit sharedKit] registerLayoutConfig:[CellLayoutConfig class]];
+    [[NIMKit sharedKit] registerLayoutConfig:[CellLayoutConfig new]];
     
     return YES;
 }
