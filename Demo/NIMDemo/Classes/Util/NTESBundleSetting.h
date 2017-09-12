@@ -39,6 +39,10 @@
 
 - (BOOL)enableSyncWhenFetchRemoteMessages;          //拉取云消息时是否需要存储到本地
 
+- (BOOL)countTeamNotification;                      //是否将群通知计入未读
+
+- (NSInteger)maximumLogDays;                        //日志最大存在天数
+
 #pragma mark - 网络通话和白板
 - (BOOL)serverRecordAudio;                          //服务器录制语音
 

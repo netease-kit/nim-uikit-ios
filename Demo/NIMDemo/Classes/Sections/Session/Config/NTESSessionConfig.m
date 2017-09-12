@@ -38,7 +38,7 @@
     NIMMediaItem *tip       = [NIMMediaItem item:@"onTapMediaItemTip:"
                                      normalImage:[UIImage imageNamed:@"bk_media_tip_normal"]
                                    selectedImage:[UIImage imageNamed:@"bk_media_tip_pressed"]
-                                           title:@"提醒消息"];
+                                           title:@"提示消息"];
     
     NIMMediaItem *audioChat =  [NIMMediaItem item:@"onTapMediaItemAudioChat:"
                                       normalImage:[UIImage imageNamed:@"btn_media_telphone_message_normal"]

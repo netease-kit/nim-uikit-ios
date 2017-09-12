@@ -24,6 +24,7 @@
 #import "NTESCellLayoutConfig.h"
 #import "NTESSubscribeManager.h"
 #import "NTESRedPacketManager.h"
+#import "NTESBundleSetting.h"
 
 
 @import PushKit;
@@ -111,7 +112,8 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 {
     DDLogInfo(@"receive payload %@ type %@",payload.dictionaryPayload,type);
     NSNumber *badge = payload.dictionaryPayload[@"aps"][@"badge"];
-    if ([badge isKindOfClass:[NSNumber class]]) {
+    if ([badge isKindOfClass:[NSNumber class]])
+    {
         [UIApplication sharedApplication].applicationIconBadgeNumber = [badge integerValue];
     }
 }
@@ -203,7 +205,7 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 }
 
 #pragma mark - 注销
--(void)logout:(NSNotification*)note
+-(void)logout:(NSNotification *)note
 {
     [self doLogout];
 }
@@ -259,11 +261,13 @@ NSString *NTESNotificationLogout = @"NTESNotificationLogout";
 
 - (void)setupNIMSDK
 {
-    //在注册 NIMSDK appKey 之前先进行配置信息的注册，如是否使用新路径,是否要忽略某些通知，是否需要多端同步未读数
+    //在注册 NIMSDK appKey 之前先进行配置信息的注册，如是否使用新路径,是否要忽略某些通知，是否需要多端同步未读数等
     self.sdkConfigDelegate = [[NTESSDKConfigDelegate alloc] init];
     [[NIMSDKConfig sharedConfig] setDelegate:self.sdkConfigDelegate];
     [[NIMSDKConfig sharedConfig] setShouldSyncUnreadCount:YES];
     [[NIMSDKConfig sharedConfig] setMaxAutoLoginRetryTimes:10];
+    [[NIMSDKConfig sharedConfig] setMaximumLogDays:[[NTESBundleSetting sharedConfig] maximumLogDays]];
+    [[NIMSDKConfig sharedConfig] setShouldCountTeamNotification:[[NTESBundleSetting sharedConfig] countTeamNotification]];
     
     
     //appkey 是应用的标识，不同应用之间的数据（用户、消息、群组等）是完全隔离的。

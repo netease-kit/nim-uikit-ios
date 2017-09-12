@@ -9,6 +9,7 @@
 #import "NTESCellLayoutConfig.h"
 #import "NTESSessionCustomContentConfig.h"
 #import "NTESChatroomTextContentConfig.h"
+#import "NTESChatroomRobotContentConfig.h"
 #import "NTESWhiteboardAttachment.h"
 #import "NTESRedPacketTipAttachment.h"
 
@@ -16,6 +17,7 @@
 @property (nonatomic,strong)    NSArray    *types;
 @property (nonatomic,strong)    NTESSessionCustomContentConfig  *sessionCustomconfig;
 @property (nonatomic,strong)    NTESChatroomTextContentConfig   *chatroomTextConfig;
+@property (nonatomic,strong)    NTESChatroomRobotContentConfig  *chatroomRobotConfig;
 @end
 
 @implementation NTESCellLayoutConfig
@@ -33,23 +35,31 @@
                    @"NTESRedPacketTipAttachment"
                    ];
         _sessionCustomconfig = [[NTESSessionCustomContentConfig alloc] init];
-        _chatroomTextConfig = [[NTESChatroomTextContentConfig alloc] init];
+        _chatroomTextConfig  = [[NTESChatroomTextContentConfig alloc] init];
+        _chatroomRobotConfig = [[NTESChatroomRobotContentConfig alloc] init];
     }
     return self;
 }
-
 #pragma mark - NIMCellLayoutConfig
 - (CGSize)contentSize:(NIMMessageModel *)model cellWidth:(CGFloat)width{
     
     NIMMessage *message = model.message;
     //检查是不是当前支持的自定义消息类型
-    if ([self isSupportedCustomMessage:message]) {
+    if ([self isSupportedCustomMessage:message])
+    {
         return [_sessionCustomconfig contentSize:width message:message];
     }
 
     //检查是不是聊天室文本消息
-    if ([self isChatroomTextMessage:message]) {
+    if ([self isChatroomTextMessage:message])
+    {
         return [_chatroomTextConfig contentSize:width message:message];
+    }
+    
+    //检查是不是聊天室机器人消息
+    if ([self isChatroomRobotMessage:message])
+    {
+        return [_chatroomRobotConfig contentSize:width message:message];
     }
     
     //如果没有特殊需求，就走默认处理流程
@@ -71,6 +81,12 @@
         return [_chatroomTextConfig cellContent:message];
     }
     
+    //检查是不是聊天室机器人消息
+    if ([self isChatroomRobotMessage:message])
+    {
+        return [_chatroomRobotConfig cellContent:message];
+    }
+    
     //如果没有特殊需求，就走默认处理流程
     return [super cellContent:model];
 }
@@ -86,6 +102,12 @@
     //检查是不是聊天室文本消息
     if ([self isChatroomTextMessage:message]) {
         return [_chatroomTextConfig contentViewInsets:message];
+    }
+    
+    //检查是不是聊天室机器人消息
+    if ([self isChatroomRobotMessage:message])
+    {
+        return [_chatroomRobotConfig contentViewInsets:message];
     }
     
     //如果没有特殊需求，就走默认处理流程
@@ -164,16 +186,28 @@
         NSDictionary *ext = model.message.remoteExt;
         NIMChatroomMemberType type = [ext[@"type"] integerValue];
         NSString *imageName;
-        switch (type) {
-            case NIMChatroomMemberTypeManager:
-                imageName = @"chatroom_role_manager";
-                break;
-            case NIMChatroomMemberTypeCreator:
-                imageName = @"chatroom_role_master";
-                break;
-            default:
-                break;
+        
+        BOOL isFromRobot = NO;
+        if (model.message.messageType == NIMMessageTypeRobot)
+        {
+            NIMRobotObject *robot = model.message.messageObject;
+            isFromRobot = robot.isFromRobot;
         }
+        if (!isFromRobot)
+        {
+            switch (type)
+            {
+                case NIMChatroomMemberTypeManager:
+                    imageName = @"chatroom_role_manager";
+                    break;
+                case NIMChatroomMemberTypeCreator:
+                    imageName = @"chatroom_role_master";
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         UIImageView *imageView;
         if (imageName.length) {
             UIImage *image = [UIImage imageNamed:imageName];
@@ -204,14 +238,21 @@
 - (BOOL)isSupportedChatroomMessage:(NIMMessage *)message
 {
     return message.session.sessionType == NIMSessionTypeChatroom &&
-    (message.messageType == NIMMessageTypeText || [self isSupportedCustomMessage:message]);
+    (message.messageType == NIMMessageTypeText || message.messageType == NIMMessageTypeRobot || [self isSupportedCustomMessage:message]);
 }
 
 - (BOOL)isChatroomTextMessage:(NIMMessage *)message
 {
     return message.session.sessionType == NIMSessionTypeChatroom &&
-    message.messageObject == NIMMessageTypeText;
+    message.messageType == NIMMessageTypeText;
 }
+
+- (BOOL)isChatroomRobotMessage:(NIMMessage *)message
+{
+    return message.session.sessionType == NIMSessionTypeChatroom &&
+    message.messageType == NIMMessageTypeRobot;
+}
+
 
 
 - (BOOL)isWhiteboardCloseNotificationMessage:(NIMMessage *)message

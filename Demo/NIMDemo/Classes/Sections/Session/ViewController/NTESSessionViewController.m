@@ -370,7 +370,7 @@ NIMEventSubscribeManagerDelegate>
 
 
 
-#pragma mark - 提醒消息
+#pragma mark - 提示消息
 - (void)onTapMediaItemTip:(NIMMediaItem *)item
 {
     UIAlertView *alert =[[UIAlertView alloc] initWithTitle:nil message:@"输入提醒" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];

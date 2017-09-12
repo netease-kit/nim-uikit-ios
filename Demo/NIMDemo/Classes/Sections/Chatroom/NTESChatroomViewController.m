@@ -49,6 +49,25 @@
 }
 
 
+- (BOOL)onTapCell:(NIMKitEvent *)event
+{
+    BOOL handled = [super onTapCell:event];
+    NSString *eventName = event.eventName;
+    if([eventName isEqualToString:NIMKitEventNameTapLabelLink] || [eventName isEqualToString:NIMKitEventNameTapRobotLink])
+    {
+       NSString *link = event.data;
+       [self openSafari:link];
+       handled = YES;
+    }
+    
+    if (!handled)
+    {
+        NSAssert(0, @"invalid event");
+    }
+    return handled;
+}
+
+
 - (BOOL)onTapMediaItem:(NIMMediaItem *)item
 {
     SEL  sel = item.selctor;
@@ -99,6 +118,22 @@
     }
     return nil;
 }
+
+
+- (void)openSafari:(NSString *)link
+{
+    NSURLComponents *components = [[NSURLComponents alloc] initWithString:link];
+    if (components)
+    {
+        if (!components.scheme)
+        {
+            //默认添加 http
+            components.scheme = @"http";
+        }
+        [[UIApplication sharedApplication] openURL:[components URL]];
+    }
+}
+
 
 #pragma mark - Get
 - (NTESChatroomConfig *)config{

@@ -142,7 +142,8 @@
     [SVProgressHUD show];
     [[NIMSDK sharedSDK].teamManager createTeam:option
                                          users:users
-                                    completion:^(NSError *error, NSString *teamId) {
+                                    completion:^(NSError * _Nullable error, NSString * _Nullable teamId, NSArray<NSString *> * _Nullable failedUserIds){
+                                    
                                         [SVProgressHUD dismiss];
                                         if (!error) {
                                             NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];

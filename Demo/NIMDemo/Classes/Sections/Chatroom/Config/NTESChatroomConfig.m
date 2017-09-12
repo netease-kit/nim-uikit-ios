@@ -49,8 +49,8 @@
 }
 
 
-- (BOOL)disableCharlet{
-    return YES;
+- (NSArray<NIMInputEmoticonCatalog *> *)charlets{
+    return nil;
 }
 
 - (BOOL)autoFetchWhenOpenSession

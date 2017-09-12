@@ -43,6 +43,13 @@
     return _apiURL;
 }
 
+- (void)registerConfig:(NSDictionary *)config
+{
+    if (config[@"red_packet_online"])
+    {
+        _redPacketConfig.useOnlineEnv = [config[@"red_packet_online"] boolValue];
+    }
+}
 
 
 @end

@@ -74,6 +74,12 @@
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"sync_when_remote_fetch_messages"] boolValue];
 }
 
+- (BOOL)countTeamNotification
+{
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"count_team_notification"] boolValue];
+}
+
+
 - (NSArray *)ignoreTeamNotificationTypes
 {
     static NSArray *types = nil;
@@ -110,6 +116,14 @@
 - (BOOL)serverRecordWhiteboardData
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey:@"server_record_whiteboard_data"] boolValue];
+}
+
+
+- (NSInteger)maximumLogDays
+{
+    id object = [[NSUserDefaults standardUserDefaults] objectForKey:@"maximum_log_days"];
+    NSInteger days = object? [object integerValue]: 7;
+    return days;
 }
 
 
@@ -281,6 +295,7 @@
                 "auto_remove_snap_message %d\n" \
                 "add_friend_need_verify %d\n" \
                 "show app %d\n" \
+                "maximum log days %zd\n" \
                 "using amr %d\n" \
                 "ignore_team_types %@ \n" \
                 "server_record_audio %d\n" \
@@ -310,6 +325,7 @@
                 [self autoRemoveSnapMessage],
                 [self needVerifyForFriend],
                 [self showFps],
+                [self maximumLogDays],
                 [self usingAmr],
                 [self ignoreTeamNotificationTypes],
                 [self serverRecordAudio],

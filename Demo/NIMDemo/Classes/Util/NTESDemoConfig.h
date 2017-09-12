@@ -20,6 +20,8 @@
 @property (nonatomic,copy)    NSString    *apnsCername;
 @property (nonatomic,copy)    NSString    *pkCername;
 @property (nonatomic,strong)  NTESRedPacketConfig *redPacketConfig;
+
+- (void)registerConfig:(NSDictionary *)config;
 @end
 
 

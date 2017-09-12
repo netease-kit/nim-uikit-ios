@@ -266,7 +266,7 @@ static NSString *const NTESRecentSessionAtMark = @"NTESRecentSessionAtMark";
             }
                 break;
             default:
-                    break;
+                break;
         }
     }
     return [NSString stringWithFormat:@"%@撤回了一条消息",tip];

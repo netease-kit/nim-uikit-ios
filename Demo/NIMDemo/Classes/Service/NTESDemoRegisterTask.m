@@ -45,7 +45,8 @@
                                                            userInfo:nil];
         errMsg = dict[@"errmsg"];
     }
-    if (_handler) {
+    if (_handler)
+    {
         _handler(resultError,errMsg);
     }
     
