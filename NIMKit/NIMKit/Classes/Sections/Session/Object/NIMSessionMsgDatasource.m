@@ -97,7 +97,7 @@
 /**
  *  从后插入消息
  *
- *  @param messages 消息集合
+ *  @param models 消息集合
  *
  *  @return 插入的消息的index
  */

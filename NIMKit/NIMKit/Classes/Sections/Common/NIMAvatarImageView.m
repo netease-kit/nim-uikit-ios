@@ -217,7 +217,7 @@ CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
         dispatch_main_async_safe(^{
             [self sd_removeActivityIndicator];
             if (completedBlock) {
-                NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
+                NSError *error = [NSError errorWithDomain:@"SDWebImageErrorDomain" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
                 completedBlock(nil, error, SDImageCacheTypeNone, url);
             }
         });

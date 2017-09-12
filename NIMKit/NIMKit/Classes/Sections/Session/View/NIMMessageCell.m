@@ -33,6 +33,8 @@
 
 @end
 
+
+
 @implementation NIMMessageCell
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -52,10 +54,15 @@
 
 - (void)makeComponents
 {
+    static UIImage *NIMRetryButtonImage;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NIMRetryButtonImage = [UIImage nim_imageInKit:@"icon_message_cell_error"];
+    });
     //retyrBtn
     _retryButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_retryButton setImage:[UIImage nim_imageInKit:@"icon_message_cell_error"] forState:UIControlStateNormal];
-    [_retryButton setImage:[UIImage nim_imageInKit:@"icon_message_cell_error"] forState:UIControlStateHighlighted];
+    [_retryButton setImage:NIMRetryButtonImage forState:UIControlStateNormal];
+    [_retryButton setImage:NIMRetryButtonImage forState:UIControlStateHighlighted];
     [_retryButton setFrame:CGRectMake(0, 0, 20, 20)];
     [_retryButton addTarget:self action:@selector(onRetryMessage:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:_retryButton];

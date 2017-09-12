@@ -12,6 +12,7 @@
 #import "NIMGlobalMacro.h"
 #import "NIMKitUIConfig.h"
 #import "NIMSessionTableAdapter.h"
+#import "UIView+NIM.h"
 
 @interface NIMSessionLayoutImpl(){
     NSMutableArray *_inserts;
@@ -146,12 +147,14 @@
     [indexPaths enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [addIndexPathes addObject:[NSIndexPath indexPathForRow:[obj integerValue] inSection:0]];
     }];
+
     [self.tableView beginUpdates];
     [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
     [self.tableView endUpdates];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.tableView nim_scrollToBottom:animated];
-    });
+    
+    self.tableView.contentSize = [self.tableView sizeThatFits:CGSizeMake(self.tableView.nim_width, CGFLOAT_MAX)];
+    
+    [self.tableView nim_scrollToBottom:animated];
 }
 
 - (void)remove:(NSArray<NSIndexPath *> *)indexPaths

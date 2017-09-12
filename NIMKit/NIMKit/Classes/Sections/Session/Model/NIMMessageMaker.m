@@ -89,11 +89,11 @@
     queryMessage.text        = text;
     
     NSString *robotContent = [[NIMKit sharedKit] infoByUser:robotId option:nil].showName;
-    NSString *content = [text stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@%@",robotContent,NIMInputAtEndChar] withString:@""];
-    
+    NSString *content = [text stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,robotContent,NIMInputAtEndChar] withString:@""];
+    // bot 服务不接受空字符串，当上层没有查询的时候，发送长度为 1 的空格 （这个由上层交互自己定义）
+    content = content.length? content : @" ";
     NIMRobotObject *object     = [[NIMRobotObject alloc] initWithRobot:content robotId:robotId];
     queryMessage.messageObject = object;
-    
     return queryMessage;
 }
 

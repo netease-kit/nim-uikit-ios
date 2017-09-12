@@ -484,7 +484,8 @@
                 });
             }
                 break;
-            case NIMSessionTypeP2P:{
+            case NIMSessionTypeP2P:
+            case NIMSessionTypeChatroom:{
                 if (([self.inputConfig respondsToSelector:@selector(enableRobot)] && self.inputConfig.enableRobot) || [NIMSDK sharedSDK].isUsingDemoAppKey)
                 {
                     NIMContactRobotSelectConfig *config = [[NIMContactRobotSelectConfig alloc] init];

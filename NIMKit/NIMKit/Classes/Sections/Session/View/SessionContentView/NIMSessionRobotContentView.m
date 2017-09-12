@@ -139,7 +139,9 @@
         case NIMKitRobotTemplateItemTypeImage:
         {
             UIImageView *imageView = [self genImageView];
-            imageView.nim_size = CGSizeMake(item.width.floatValue, item.height.floatValue);
+            CGFloat defaultImageWidth  = 75.f;
+            CGFloat defaultImageHeight = 75.f;
+            imageView.nim_size = CGSizeMake(item.width.floatValue?:defaultImageWidth, item.height.floatValue?:defaultImageHeight);
             imageView.image = nil;
             if (item.url.length)
             {
@@ -151,8 +153,8 @@
         case NIMKitRobotTemplateItemTypeLinkURL:
         case NIMKitRobotTemplateItemTypeLinkBlock:
         {
-            NIMSessionRobotButton *button = [[NIMSessionRobotButton alloc] initWithFrame:CGRectMake(0, 0, width, 0)];
-            [button addTarget:self action:@selector(onTouchButton:) forControlEvents:UIControlEventTouchUpInside];
+            NIMSessionRobotButton *button = [self genButton];
+            button.nim_width = width;
             NIMKitRobotTemplateLinkItem *link = (NIMKitRobotTemplateLinkItem *)item;
             button.target = link.target;
             button.param  = link.params;
@@ -312,9 +314,9 @@
     return label;
 }
 
-- (UIButton *)genButton
+- (NIMSessionRobotButton *)genButton
 {
-    UIButton *button = nil;
+    NIMSessionRobotButton *button = nil;
     if (self.buttons.count)
     {
         button = self.buttons.anyObject;
@@ -322,9 +324,10 @@
     }
     else
     {
-        button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button = [[NIMSessionRobotButton alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
         button.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     }
+    [button addTarget:self action:@selector(onTouchButton:) forControlEvents:UIControlEventTouchUpInside];
     return button;
 }
 

@@ -95,11 +95,7 @@
 
 - (void)setupInputView
 {
-    BOOL disableInputView = NO;
-    if ([self.sessionConfig respondsToSelector:@selector(disableInputView)]) {
-        disableInputView = [self.sessionConfig disableInputView];
-    }
-    if (!disableInputView) {
+    if ([self shouldShowInputView]) {
         self.sessionInputView = [[NIMInputView alloc] initWithFrame:CGRectMake(0, 0, self.view.nim_width,0) config:self.sessionConfig];
         [self.sessionInputView refreshStatus:NIMInputStatusText];
         [self.sessionInputView setSession:self.session];
@@ -117,10 +113,7 @@
     _configurator = [[NIMSessionConfigurator alloc] init];
     [_configurator setup:self];
     
-    BOOL needProximityMonitor = YES;
-    if ([self.sessionConfig respondsToSelector:@selector(disableProximityMonitor)]) {
-        needProximityMonitor = !self.sessionConfig.disableProximityMonitor;
-    }
+    BOOL needProximityMonitor = [self needProximityMonitor];
     [[NIMSDK sharedSDK].mediaManager setNeedProximityMonitor:needProximityMonitor];
 }
 
@@ -438,12 +431,7 @@
 {
     _sessionInputView.recording = YES;
     
-    NIMAudioType type = NIMAudioTypeAAC;
-    if ([self.sessionConfig respondsToSelector:@selector(recordType)])
-    {
-        type = [self.sessionConfig recordType];
-    }
-    
+    NIMAudioType type = [self recordAudioType];
     NSTimeInterval duration = [NIMKitUIConfig sharedConfig].globalConfig.recordMaxDuration;
     
     [[NIMSDK sharedSDK].mediaManager addDelegate:self];
@@ -515,8 +503,61 @@
 #pragma mark - 配置项
 - (id<NIMSessionConfig>)sessionConfig
 {
-    return nil;
+    return nil; //使用默认配置
 }
+
+#pragma mark - 配置项列表
+//是否需要监听新消息通知 : 某些场景不需要监听新消息，如浏览服务器消息历史界面
+- (BOOL)shouldAddListenerForNewMsg
+{
+    BOOL should = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableReceiveNewMessages)]) {
+        should = ![self.sessionConfig disableReceiveNewMessages];
+    }
+    return should;
+}
+
+//是否需要开启自动设置所有消息已读 ： 某些场景不需要自动设置消息已读，如使用 3D touch 的场景预览会话界面内容
+- (BOOL)shouldAutoMarkRead
+{
+    BOOL should = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableAutoMarkMessageRead)]) {
+        should = ![self.sessionConfig disableAutoMarkMessageRead];
+    }
+    return should;
+}
+
+//是否需要显示输入框 : 某些场景不需要显示输入框，如使用 3D touch 的场景预览会话界面内容
+- (BOOL)shouldShowInputView
+{
+    BOOL should = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableInputView)]) {
+        should = ![self.sessionConfig disableInputView];
+    }
+    return should;
+}
+
+
+//当前录音格式 : NIMSDK 支持 aac 和 amr 两种格式
+- (NIMAudioType)recordAudioType
+{
+    NIMAudioType type = NIMAudioTypeAAC;
+    if ([self.sessionConfig respondsToSelector:@selector(recordType)]) {
+        type = [self.sessionConfig recordType];
+    }
+    return type;
+}
+
+//是否需要监听感应器事件
+- (BOOL)needProximityMonitor
+{
+    BOOL needProximityMonitor = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableProximityMonitor)]) {
+        needProximityMonitor = !self.sessionConfig.disableProximityMonitor;
+    }
+    return needProximityMonitor;
+}
+
 
 #pragma mark - 菜单
 - (NSArray *)menusItems:(NIMMessage *)message
@@ -657,7 +698,7 @@
 #pragma mark - 标记已读
 - (void)markRead
 {
-    if (![self disableAutoMarkRead]) {
+    if ([self shouldAutoMarkRead]) {
         [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
         [self sendMessageReceipt:self.interactor.items];
     }
@@ -676,9 +717,7 @@
 
 - (void)addListener
 {
-    
-    if (![self.sessionConfig respondsToSelector:@selector(disableReceiveNewMessages)]
-        || ![self.sessionConfig disableReceiveNewMessages]) {
+    if ([self shouldAddListenerForNewMsg]) {
         [[NIMSDK sharedSDK].chatManager addDelegate:self];
     }
     [[NIMSDK sharedSDK].conversationManager addDelegate:self];
@@ -704,11 +743,6 @@
 }
 
 
-- (BOOL)disableAutoMarkRead
-{
-    return [self.sessionConfig respondsToSelector:@selector(disableAutoMarkMessageRead)] &&
-    [self.sessionConfig disableAutoMarkMessageRead];
-}
 
 - (id<NIMConversationManager>)conversationManager{
     switch (self.session.sessionType) {

@@ -56,10 +56,13 @@
 - (NSArray *)parseToken:(NSString *)text
 {
     NSMutableArray *tokens = [NSMutableArray array];
-    
-    NSRegularExpression *exp = [NSRegularExpression regularExpressionWithPattern:@"\\[[a-zA-Z0-9\\u4e00-\\u9fa5]+\\]"
-                                                                         options:NSRegularExpressionCaseInsensitive
-                                                                           error:nil];
+    static NSRegularExpression *exp;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        exp = [NSRegularExpression regularExpressionWithPattern:@"\\[[a-zA-Z0-9\\u4e00-\\u9fa5]+\\]"
+                                                        options:NSRegularExpressionCaseInsensitive
+                                                          error:nil];
+    });
     __block NSInteger index = 0;
     [exp enumerateMatchesInString:text
                           options:0

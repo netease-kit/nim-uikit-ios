@@ -155,6 +155,7 @@
     switch (sessionType) {
         case NIMSessionTypeP2P:
         case NIMSessionTypeTeam:
+        case NIMSessionTypeChatroom:
         {
             NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
             NIMUserInfo *userInfo = user.userInfo;
@@ -179,10 +180,7 @@
                 needFetchInfo = YES;
             }
         }
-            break;
-        case NIMSessionTypeChatroom:
-            NSAssert(0, @"invalid type"); //聊天室的Info不会通过这个回调请求
-            break;
+            break;        
         default:
             NSAssert(0, @"invalid type");
             break;
