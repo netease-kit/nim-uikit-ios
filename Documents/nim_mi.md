@@ -24,11 +24,11 @@
 
 除 `NIMSDK` 外，`NIMKit` 还依赖如下第三方库，需要手动进行添加
 
-* [SDWebImage](https://github.com/rs/SDWebImage) v3.8.2
+* [SDWebImage](https://github.com/rs/SDWebImage) v4.0.0
 * [Toast](https://github.com/scalessec/Toast) v3.0
 * [SVProgressHUD](https://github.com/SVProgressHUD/SVProgressHUD) v2.0.3
 * [M80AttributedLabel](https://github.com/xiangwangfeng/M80AttributedLabel) v1.6.3
-* [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) v1.7.7
+* [TZImagePickerController](https://github.com/banchichen/TZImagePickerController) v1.9.0
 
 为防止文档更新不够及时，推荐在导入第三方库时参考当前的 [podspec](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/NIMKit.podspec) 内指定的版本号。
 
