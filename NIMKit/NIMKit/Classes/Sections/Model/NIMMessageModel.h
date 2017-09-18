@@ -25,12 +25,7 @@
  *              messageTime 和 message.timestamp 会有一定的误差。
  */
 @property (nonatomic,readonly) NSTimeInterval messageTime;
-/**
- *  消息对应的session配置
- */
-@property (nonatomic,strong) id<NIMSessionConfig>  sessionConfig;
 
-@property (nonatomic, readonly) CGSize     contentSize;
 
 @property (nonatomic, readonly) UIEdgeInsets  contentViewInsets;
 
@@ -48,12 +43,6 @@
 
 @property (nonatomic) BOOL shouldShowReadLabel;
 
-/**
- *  计算内容大小
- *
- *  @param width 内容宽度
- */
-- (void)calculateContent:(CGFloat)width force:(BOOL)force;
 
 /**
  *  NIMMessage封装成NIMMessageModel的方法
@@ -68,5 +57,11 @@
  *  清楚缓存的排版数据
  */
 - (void)cleanCache;
+
+
+/**
+ *  计算内容大小
+ */
+- (CGSize)contentSize:(CGFloat)width;
 
 @end

@@ -43,10 +43,6 @@
 
 - (NIMSessionMessageOperateResult *)addMessageModels:(NSArray *)models
 {
-    for (NIMMessageModel *model in models)
-    {
-        model.sessionConfig = self.sessionConfig;
-    }
     NSArray *indexpaths = [self.dataSource appendMessageModels:models];
     NIMSessionMessageOperateResult *result = [[NIMSessionMessageOperateResult alloc] init];
     result.indexpaths = indexpaths;
@@ -56,10 +52,6 @@
 
 - (NIMSessionMessageOperateResult *)insertMessageModels:(NSArray *)models
 {
-    for (NIMMessageModel *model in models)
-    {
-        model.sessionConfig = self.sessionConfig;
-    }
     NSArray *indexpaths = [self.dataSource insertMessageModels:models];
     NIMSessionMessageOperateResult *result = [[NIMSessionMessageOperateResult alloc] init];
     result.indexpaths = indexpaths;

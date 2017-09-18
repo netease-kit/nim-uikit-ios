@@ -71,7 +71,7 @@
 
 - (BOOL)canInsertChatroomMessages;
 
-- (void)layoutConfig:(NIMMessageModel *)model;
+- (void)calculateContent:(NIMMessageModel *)model;
 
 - (void)reloadTable;
 

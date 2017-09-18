@@ -35,7 +35,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)data{
+- (void)refresh:(NIMMessageModel *)data
+{
     [super refresh:data];
     NIMImageObject * imageObject = (NIMImageObject*)self.model.message.messageObject;
     UIImage * image              = [UIImage imageWithContentsOfFile:imageObject.thumbPath];
@@ -49,7 +50,8 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentSize = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentSize = [self.model contentSize:tableViewWidth];
     CGRect imageViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentSize.width, contentSize.height);
     self.imageView.frame  = imageViewFrame;
     _progressView.frame   = self.bounds;

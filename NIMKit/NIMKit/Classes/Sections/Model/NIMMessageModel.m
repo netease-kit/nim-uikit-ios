@@ -12,11 +12,12 @@
 
 @interface NIMMessageModel()
 
+@property (nonatomic,strong) NSMutableDictionary *contentSizeInfo;
+
 @end
 
 @implementation NIMMessageModel
 
-@synthesize contentSize        = _contentSize;
 @synthesize contentViewInsets  = _contentViewInsets;
 @synthesize bubbleViewInsets   = _bubbleViewInsets;
 @synthesize shouldShowAvatar   = _shouldShowAvatar;
@@ -31,13 +32,14 @@
     {
         _message = message;
         _messageTime = message.timestamp;
+        _contentSizeInfo = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
 - (void)cleanCache
 {
-    _contentSize = CGSizeZero;
+    [_contentSizeInfo removeAllObjects];
     _contentViewInsets = UIEdgeInsetsZero;
     _bubbleViewInsets = UIEdgeInsetsZero;
 }
@@ -59,13 +61,17 @@
     }
 }
 
-- (void)calculateContent:(CGFloat)width force:(BOOL)force{
-    if (CGSizeEqualToSize(_contentSize, CGSizeZero) || force)
+- (CGSize)contentSize:(CGFloat)width
+{
+    CGSize size = [self.contentSizeInfo[@(width)] CGSizeValue];
+    if (CGSizeEqualToSize(size, CGSizeZero))
     {
         [self updateLayoutConfig];
         id<NIMCellLayoutConfig> layoutConfig = [[NIMKit sharedKit] layoutConfig];
-        _contentSize = [layoutConfig contentSize:self cellWidth:width];
+        size = [layoutConfig contentSize:self cellWidth:width];
+        [self.contentSizeInfo setObject:[NSValue valueWithCGSize:size] forKey:@(width)];
     }
+    return size;
 }
 
 

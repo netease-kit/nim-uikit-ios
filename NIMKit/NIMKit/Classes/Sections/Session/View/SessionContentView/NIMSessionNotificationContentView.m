@@ -25,7 +25,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)model{
+- (void)refresh:(NIMMessageModel *)model
+{
     [super refresh:model];
     self.label.text = [NIMKitUtil messageTipContent:model.message];
     NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:model.message];

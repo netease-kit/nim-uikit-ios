@@ -86,8 +86,9 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize size = self.model.contentSize;
-    CGRect bkgViewFrame = CGRectMake(contentInsets.left, contentInsets.top, size.width, size.height);
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentSize  = [self.model contentSize:tableViewWidth];
+    CGRect bkgViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentSize.width, contentSize.height);
     self.bkgView.frame = bkgViewFrame;
 
     CGFloat fileTransMessageIconLeft        = 15.f;

@@ -37,6 +37,7 @@
  *  刷新方法
  *
  *  @param data 刷新数据
+ *
  */
 - (void)refresh:(NIMMessageModel*)data;
 

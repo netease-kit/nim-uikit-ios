@@ -12,6 +12,7 @@
 #import "NIMSessionAudioContentView.h"
 #import "NIMKit.h"
 #import "NIMKitAudioCenter.h"
+#import "UIView+NIM.h"
 
 @interface NIMMessageCellFactory()
 
@@ -42,8 +43,7 @@
         NSString *clz = @"NIMMessageCell";
         [tableView registerClass:NSClassFromString(clz) forCellReuseIdentifier:identity];
         cell = [tableView dequeueReusableCellWithIdentifier:identity];
-    }
-    [cell refreshData:model];
+    }    
     return (NIMMessageCell *)cell;
 }
 

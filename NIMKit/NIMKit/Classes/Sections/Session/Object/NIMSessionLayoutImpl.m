@@ -65,7 +65,6 @@
 
 - (void)resetLayout
 {
-    [self setViewRect:self.tableView.superview.frame];
     [self adjustTableView];
 }
 
@@ -93,14 +92,18 @@
 
 - (void)adjustTableView
 {
+    BOOL viewRectChanged = !CGRectEqualToRect(_viewRect, self.tableView.superview.frame);
+    [self setViewRect:self.tableView.superview.frame];
+    
     CGRect rect = [_tableView frame];
     rect.origin.y = 0;
     rect.size.height = self.viewRect.size.height - _inputViewHeight;
-    BOOL changed = !CGRectEqualToRect(_tableView.frame, rect);
+    BOOL tableChanged = !CGRectEqualToRect(_tableView.frame, rect);
     [_tableView setFrame:rect];
     
-    if (changed)
+    if (tableChanged || viewRectChanged)
     {
+        [_tableView reloadData];
         [_tableView nim_scrollToBottom:NO];
     }
 }
@@ -114,9 +117,8 @@
 
 #pragma mark - Private
 
-- (void)layoutConfig:(NIMMessageModel *)model{
-    [model calculateContent:self.tableView.frame.size.width
-                      force:NO];
+- (void)calculateContent:(NIMMessageModel *)model{
+    [model contentSize:self.tableView.nim_width];
 }
 
 - (void)setupRefreshControl
@@ -145,16 +147,15 @@
 
     NSMutableArray *addIndexPathes = [NSMutableArray array];
     [indexPaths enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        [addIndexPathes addObject:[NSIndexPath indexPathForRow:[obj integerValue] inSection:0]];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[obj integerValue] inSection:0];
+        [addIndexPathes addObject:indexPath];
     }];
-
+    
     [self.tableView beginUpdates];
-    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
+    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
     [self.tableView endUpdates];
-    
-    self.tableView.contentSize = [self.tableView sizeThatFits:CGSizeMake(self.tableView.nim_width, CGFLOAT_MAX)];
-    
     [self.tableView nim_scrollToBottom:animated];
+
 }
 
 - (void)remove:(NSArray<NSIndexPath *> *)indexPaths

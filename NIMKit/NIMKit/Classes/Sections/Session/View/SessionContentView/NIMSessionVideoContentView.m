@@ -60,7 +60,10 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentsize = self.model.contentSize;
+    
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentsize = [self.model contentSize:tableViewWidth];
+    
     CGRect imageViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentsize.width, contentsize.height);
     self.imageView.frame  = imageViewFrame;
     _progressView.frame   = self.bounds;

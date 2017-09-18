@@ -32,6 +32,7 @@
         self.robotModel.message = message;
         self.robotContentView.nim_width = msgBubbleMaxWidth;
         [self.robotContentView setupRobot:self.robotModel];
+        [self.robotContentView layoutIfNeeded];
         
         CGSize size = [self.robotContentView sizeThatFits:CGSizeMake(msgBubbleMaxWidth, CGFLOAT_MAX)];
         return size;

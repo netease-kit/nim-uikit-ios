@@ -44,8 +44,6 @@
 
 - (NIMMessageModel *)findMessageModel:(NIMMessage *)message;
 
-- (NIMMessageModel *)makeMessageModel:(NIMMessage *)message;
-
 - (BOOL)shouldHandleReceipt;
 
 - (void)checkReceipt;
@@ -62,8 +60,6 @@
 - (void)changeLayout:(CGFloat)inputHeight;
 
 - (void)cleanCache;
-
-- (void)checkLayoutConfig:(NIMMessageModel *)messageModel;
 
 
 //按钮响应接口

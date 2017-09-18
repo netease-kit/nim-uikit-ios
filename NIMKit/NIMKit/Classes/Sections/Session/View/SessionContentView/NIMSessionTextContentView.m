@@ -11,6 +11,7 @@
 #import "NIMMessageModel.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKitUIConfig.h"
+#import "UIView+NIM.h"
 
 NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
 
@@ -47,7 +48,9 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentsize         = self.model.contentSize;
+    
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentsize         = [self.model contentSize:tableViewWidth];
     CGRect labelFrame = CGRectMake(contentInsets.left, contentInsets.top, contentsize.width, contentsize.height);
     self.textLabel.frame = labelFrame;
 }

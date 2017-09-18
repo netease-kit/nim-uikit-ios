@@ -46,7 +46,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)data{
+- (void)refresh:(NIMMessageModel *)data
+{
     [super refresh:data];
     NIMLocationObject * locationObject = (NIMLocationObject*)self.model.message.messageObject;
     self.titleLabel.text = locationObject.title;
@@ -71,7 +72,10 @@
     self.titleLabel.nim_centerY = 90.f;
     self.titleLabel.nim_centerX = self.nim_width * .5f;
     UIEdgeInsets contentInsets  = self.model.contentViewInsets;
-    CGSize contentsize          = self.model.contentSize;
+    
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentsize          = [self.model contentSize:tableViewWidth];
+    
     CGRect imageViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentsize.width, contentsize.height);
     self.imageView.frame  = imageViewFrame;
 }

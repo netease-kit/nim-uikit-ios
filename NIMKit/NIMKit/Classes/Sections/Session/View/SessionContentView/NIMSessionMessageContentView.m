@@ -10,6 +10,7 @@
 #import "NIMMessageModel.h"
 #import "UIImage+NIMKit.h"
 #import "NIMKitUIConfig.h"
+#import "UIView+NIM.h"
 
 @interface NIMSessionMessageContentView()
 
@@ -32,21 +33,18 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel*)data{
+- (void)refresh:(NIMMessageModel*)data
+{
     _model = data;
-    
-    CGSize size = [self bubbleViewSize:data];
-    self.bounds = CGRectMake(0, 0, size.width, size.height);
     [_bubbleImageView setImage:[self chatBubbleImageForState:UIControlStateNormal outgoing:data.message.isOutgoingMsg]];
     [_bubbleImageView setHighlightedImage:[self chatBubbleImageForState:UIControlStateHighlighted outgoing:data.message.isOutgoingMsg]];
-    _bubbleImageView.frame = self.bounds;
-
     [self setNeedsLayout];
 }
 
 
 - (void)layoutSubviews{
     [super layoutSubviews];
+    _bubbleImageView.frame = self.bounds;
 }
 
 
@@ -75,17 +73,6 @@
     
     NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:self.model.message];
     return [config bubbleImage:state];
-}
-
-
-- (CGSize)bubbleViewSize:(NIMMessageModel *)model
-{
-    CGSize bubbleSize;
-    CGSize contentSize  = model.contentSize;
-    UIEdgeInsets insets = model.contentViewInsets;
-    bubbleSize.width  = contentSize.width + insets.left + insets.right;
-    bubbleSize.height = contentSize.height + insets.top + insets.bottom;
-    return bubbleSize;
 }
 
 

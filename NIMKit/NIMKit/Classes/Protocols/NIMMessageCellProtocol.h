@@ -17,6 +17,7 @@
 
 @optional
 
+#pragma mark - 点击事件
 - (BOOL)onTapCell:(NIMKitEvent *)event;
 
 - (BOOL)onLongPressCell:(NIMMessage *)message
@@ -27,5 +28,10 @@
 - (BOOL)onLongPressAvatar:(NSString *)userId;
 
 - (void)onRetryMessage:(NIMMessage *)message;
+
+
+
+#pragma mark - 样式设置
+- (BOOL)disableAudioPlayedStatusIcon:(NIMMessage *)message;
 
 @end

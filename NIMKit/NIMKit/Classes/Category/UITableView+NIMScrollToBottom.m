@@ -12,11 +12,14 @@
 
 - (void)nim_scrollToBottom:(BOOL)animation
 {
-    if (self.contentSize.height + self.contentInset.top > self.frame.size.height)
-    {
-        CGPoint offset = CGPointMake(0, self.contentSize.height - self.frame.size.height);
-        [self setContentOffset:offset animated:animation];
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSInteger row = [self numberOfRowsInSection:0] - 1;
+        if (row > 0)
+        {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+            [self scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:animation];
+        }
+    });
 }
 
 

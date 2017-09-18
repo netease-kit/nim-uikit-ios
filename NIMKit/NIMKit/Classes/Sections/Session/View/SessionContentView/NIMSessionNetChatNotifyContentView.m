@@ -11,6 +11,7 @@
 #import "NIMMessageModel.h"
 #import "NIMKitUtil.h"
 #import "NIMKitUIConfig.h"
+#import "UIView+NIM.h"
 
 @implementation NIMSessionNetChatNotifyContentView
 
@@ -26,7 +27,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)data{
+- (void)refresh:(NIMMessageModel *)data
+{
     [super refresh:data];
     NSString *text = [NIMKitUtil messageTipContent:data.message];
     [self.textLabel nim_setText:text];
@@ -40,7 +42,8 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentsize = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.nim_width;
+    CGSize contentsize = [self.model contentSize:tableViewWidth];
     CGRect labelFrame = CGRectMake(contentInsets.left, contentInsets.top, contentsize.width, contentsize.height);
     self.textLabel.frame = labelFrame;
 }

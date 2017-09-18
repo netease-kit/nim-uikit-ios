@@ -162,6 +162,7 @@
     if (!_toolBar)
     {
         _toolBar = [[NIMInputToolBar alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, 0)];
+        
         [self addSubview:_toolBar];
         
         //设置placeholder

@@ -87,9 +87,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         [models addObject:model];
     }
     NIMSessionMessageOperateResult *result = [self.dataSource insertMessageModels:models];
-    for (NIMMessageModel *model in result.messageModels) {
-        [self.layout layoutConfig:model];
-    }
     [self.layout insert:result.indexpaths animated:YES];
 }
 
@@ -105,9 +102,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         [models addObject:model];
     }
     NIMSessionMessageOperateResult *result = [self.dataSource addMessageModels:models];
-    for (NIMMessageModel *model in result.messageModels) {
-        [self.layout layoutConfig:model];
-    }
     [self.layout insert:result.indexpaths animated:YES];
 }
 
@@ -126,7 +120,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
                 continue;
             }
             NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
-            [weakSelf.layout layoutConfig:model];
+            [weakSelf.layout calculateContent:model];
             [models addObject:model];
         }
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -152,7 +146,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     if (model) {
         NIMSessionMessageOperateResult *result = [self.dataSource updateMessageModel:model];
         NSInteger index = [result.indexpaths.firstObject row];
-        [self checkLayoutConfig:model];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
         [self.layout update:indexPath];
     }
@@ -165,16 +158,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         return [self.dataSource findModel:message];
     }
     return nil;
-}
-
-- (NIMMessageModel *)makeMessageModel:(NIMMessage *)message
-{
-    NIMMessageModel *model = [self.dataSource findModel:message];
-    if (!model) {
-        model = [[NIMMessageModel alloc] initWithMessage:message];
-    }
-    [self checkLayoutConfig:model];
-    return model;
 }
 
 - (void)checkReceipt
@@ -218,11 +201,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     [self.dataSource cleanCache];
 }
 
-- (void)checkLayoutConfig:(NIMMessageModel *)messageModel
-{
-    messageModel.sessionConfig = self.sessionConfig;
-    [self.layout layoutConfig:messageModel];
-}
 
 - (void)loadMessages:(void (^)(NSArray *messages, NSError *error))handler
 {
@@ -397,8 +375,10 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 {
     //fix bug: 竖屏进入会话界面，然后右上角进入群信息，再横屏，左上角返回，横屏的会话界面显示的就是竖屏时的大小
     [self cleanCache];
-    [self.layout reloadTable];
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.layout reloadTable];
+    });
+
     [[NIMSDK sharedSDK].mediaManager addDelegate:self];
 }
 

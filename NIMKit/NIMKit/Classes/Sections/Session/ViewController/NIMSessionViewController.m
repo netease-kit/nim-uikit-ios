@@ -88,6 +88,9 @@
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     self.tableView.backgroundColor = NIMKit_UIColorFromRGB(0xe4e7ec);
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.estimatedRowHeight = 0;
+    self.tableView.estimatedSectionHeaderHeight = 0;
+    self.tableView.estimatedSectionFooterHeight = 0;
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.tableView];
 }
@@ -97,6 +100,7 @@
 {
     if ([self shouldShowInputView]) {
         self.sessionInputView = [[NIMInputView alloc] initWithFrame:CGRectMake(0, 0, self.view.nim_width,0) config:self.sessionConfig];
+        self.sessionInputView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         [self.sessionInputView refreshStatus:NIMInputStatusText];
         [self.sessionInputView setSession:self.session];
         [self.sessionInputView setInputDelegate:self];
@@ -251,7 +255,7 @@
     if ([message.session isEqual:_session]) {
         NIMMessageModel *model = [self.interactor findMessageModel:message];
         //下完缩略图之后，因为比例有变化，重新刷下宽高。
-        [model calculateContent:self.tableView.frame.size.width force:YES];
+        [model cleanCache];
         [self.interactor updateMessage:message];
     }
 }
@@ -498,6 +502,16 @@
         handle = YES;
     }
     return handle;
+}
+
+- (BOOL)disableAudioPlayedStatusIcon:(NIMMessage *)message
+{
+    BOOL disable = NO;
+    if ([self.sessionConfig respondsToSelector:@selector(disableAudioPlayedStatusIcon)])
+    {
+        disable = [self.sessionConfig disableAudioPlayedStatusIcon];
+    }
+    return disable;
 }
 
 #pragma mark - 配置项

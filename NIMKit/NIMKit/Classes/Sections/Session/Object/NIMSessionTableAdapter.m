@@ -47,6 +47,7 @@
         cell = [self.cellFactory cellInTable:tableView
                                    forMessageMode:model];
         [(NIMMessageCell *)cell setDelegate:self.delegate];
+        [(NIMMessageCell *)cell refreshData:model];
     }
     else if ([model isKindOfClass:[NIMTimestampModel class]])
     {
@@ -67,11 +68,9 @@
     if ([modelInArray isKindOfClass:[NIMMessageModel class]])
     {
         NIMMessageModel *model = (NIMMessageModel *)modelInArray;
-        NSAssert([model respondsToSelector:@selector(contentSize)], @"config must have a cell height value!!!");
         
-        [self.interactor checkLayoutConfig:model];
+        CGSize size = [model contentSize:tableView.nim_width];
         
-        CGSize size = model.contentSize;
         UIEdgeInsets contentViewInsets = model.contentViewInsets;
         UIEdgeInsets bubbleViewInsets  = model.bubbleViewInsets;
         cellHeight = size.height + contentViewInsets.top + contentViewInsets.bottom + bubbleViewInsets.top + bubbleViewInsets.bottom;
