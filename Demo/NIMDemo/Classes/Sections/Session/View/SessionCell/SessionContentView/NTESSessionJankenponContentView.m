@@ -29,7 +29,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)data{
+- (void)refresh:(NIMMessageModel *)data
+{
     [super refresh:data];
     NIMCustomObject *customObject = (NIMCustomObject*)data.message.messageObject;
     id attachment = customObject.attachment;
@@ -42,7 +43,9 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentSize = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.width;
+    CGSize contentSize = [self.model contentSize:tableViewWidth];
+    
     CGRect imageViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentSize.width, contentSize.height);
     self.imageView.frame  = imageViewFrame;
     CALayer *maskLayer = [CALayer layer];

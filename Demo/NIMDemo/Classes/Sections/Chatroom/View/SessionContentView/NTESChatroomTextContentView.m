@@ -10,6 +10,7 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "NIMMessageModel.h"
 #import "NIMGlobalMacro.h"
+#import "UIView+NTES.h"
 
 @interface NTESChatroomTextContentView()<M80AttributedLabelDelegate>
 
@@ -33,7 +34,8 @@
     return self;
 }
 
-- (void)refresh:(NIMMessageModel *)model{
+- (void)refresh:(NIMMessageModel *)model
+{
     [super refresh:model];
     NSString *text = self.model.message.text;
     [_textLabel nim_setText:text];
@@ -42,7 +44,8 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentsize         = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.width;
+    CGSize contentsize         = [self.model contentSize:tableViewWidth];
     CGRect labelFrame    = CGRectMake(contentInsets.left, contentInsets.top, contentsize.width, contentsize.height);
     self.textLabel.frame = labelFrame;
 }

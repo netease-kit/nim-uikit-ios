@@ -57,6 +57,11 @@
     return @"";
 }
 
+- (BOOL)disableAudioPlayedStatusIcon:(NIMMessage *)message
+{
+    return YES;
+}
+
 - (void)sendMessage:(NIMMessage *)message{};
 
 - (id<NIMSessionConfig>)sessionConfig{
@@ -112,10 +117,6 @@
 
 - (id<NIMKitMessageProvider>)messageDataProvider{
     return self.provider;
-}
-
-- (BOOL)disableAudioPlayedStatusIcon{
-    return YES;
 }
 
 - (BOOL)disableProximityMonitor{

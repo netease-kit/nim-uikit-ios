@@ -43,7 +43,8 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentSize = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.width;
+    CGSize contentSize = [self.model contentSize:tableViewWidth];
     CGRect imageViewFrame = CGRectMake(contentInsets.left, contentInsets.top, contentSize.width, contentSize.height);
     self.imageView.frame  = imageViewFrame;
     CALayer *maskLayer = [CALayer layer];

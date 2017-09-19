@@ -55,7 +55,8 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    CGSize contentSize = self.model.contentSize;
+    CGFloat tableViewWidth = self.superview.width;
+    CGSize contentSize = [self.model contentSize:tableViewWidth];
     self.imageView.left = contentInsets.left;
     self.imageView.centerY = self.height * .5f;
     CGFloat customWhiteBorardMessageImageRightToText = 5.f;

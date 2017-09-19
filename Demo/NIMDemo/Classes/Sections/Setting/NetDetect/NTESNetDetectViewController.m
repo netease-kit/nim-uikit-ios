@@ -36,13 +36,16 @@
 - (void)onDetect:(id)sender {
     
     if (self.taskId == 0) {
+        static BOOL videoDetect = YES;
         __weak typeof (self) wself = self;
-        self.taskId = [[NIMAVChatSDK sharedSDK].avchatNetDetectManager startDetectTask:^(NIMAVChatNetDetectResult * _Nonnull result) {
+        self.taskId = [[NIMAVChatSDK sharedSDK].avchatNetDetectManager startDetectTaskForVideo:YES
+                                                                                    completion:^(NIMAVChatNetDetectResult * _Nonnull result) {
             wself.netDetectResultTextView.text = [NSString stringWithFormat:@"%@net detect result:\n%@\n------------\n", wself.netDetectResultTextView.text, result];
             wself.taskId = 0;
             [wself updateDetectButton];
         }];
-        self.netDetectResultTextView.text = [self.netDetectResultTextView.text stringByAppendingString:[NSString stringWithFormat:@"start net detect task id %llu \n------------\n", self.taskId]];
+        self.netDetectResultTextView.text = [self.netDetectResultTextView.text stringByAppendingString:[NSString stringWithFormat:@"start %@ net detect task id %llu \n------------\n", videoDetect ? @"video" : @"audio", self.taskId]];
+        videoDetect = !videoDetect;
     }
     else {
         self.netDetectResultTextView.text = [self.netDetectResultTextView.text stringByAppendingString:[NSString stringWithFormat:@"stop net detect task id %llu \n------------\n", self.taskId]];

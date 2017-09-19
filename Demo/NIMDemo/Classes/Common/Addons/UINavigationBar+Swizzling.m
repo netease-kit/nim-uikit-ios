@@ -58,8 +58,9 @@
     CGFloat maxWidth   = right - left - 2 * TitleMargin;
     UIView *view = navigationItem.titleView;
     view.width   = view.width > maxWidth ? maxWidth : view.width;
-    view.centerX = self.width  * .5f;
-    view.centerY = self.height * .5f;
+    UIView *superView = view.superview;
+    view.centerX = superView.width  * .5f;
+    view.centerY = superView.height * .5f;
 }
 
 
