@@ -61,9 +61,6 @@
         case NIMNetCallNetStatusGood:
             netState = @"网络正常:";
             break;
-        case NIMNetCallNetStatusPoor:
-            netState = @"网络一般:";
-            break;
         case NIMNetCallNetStatusBad:
             netState = @"网络较差:";
             break;
