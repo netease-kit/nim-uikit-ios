@@ -8,6 +8,7 @@
 
 #import "NIMKitProgressHUD.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 @interface NIMKitProgressHUD()
 
@@ -36,8 +37,8 @@
         UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
         UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
         blurView.frame = self.bounds;
-        [self addSubview:blurView];
-
+        [self.contentView addSubview:blurView];
+        
         self.backgroundColor  = [UIColor whiteColor];
         self.layer.cornerRadius = 14.f;
         self.alpha = 0.8;
@@ -53,7 +54,7 @@
 
 + (void)dismiss
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         [[NIMKitProgressHUD sharedView] removeFromSuperview];
         [[NIMKitProgressHUD sharedView].indefiniteAnimatedLayer removeFromSuperlayer];
     });
@@ -91,10 +92,10 @@
         CALayer *maskLayer = [CALayer layer];
         
         NSBundle *bundle = [NSBundle bundleForClass:[NIMKitProgressHUD class]];
-        NSURL *url = [bundle URLForResource:@"SVProgressHUD" withExtension:@"bundle"];
+        NSURL *url = [bundle URLForResource:[NIMKit sharedKit].resourceBundleName withExtension:nil];
         NSBundle *imageBundle = [NSBundle bundleWithURL:url];
         
-        NSString *path = [imageBundle pathForResource:@"angle-mask" ofType:@"png"];
+        NSString *path = [imageBundle pathForResource:@"bk_angle_mask" ofType:@"png"];
         
         maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
         maskLayer.frame = _indefiniteAnimatedLayer.bounds;
@@ -144,3 +145,4 @@
 
 
 @end
+
