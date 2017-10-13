@@ -165,11 +165,13 @@
     if (!assets.count) {
         return;
     }
+    
     __weak typeof(self) weakSelf = self;
     [NIMKitProgressHUD show];
     [self requestAsset:assets.firstObject handler:^(NSString *path, PHAssetMediaType type) {
         [NIMKitProgressHUD dismiss];
-        if (weakSelf.libraryResultHandler) {
+        if (weakSelf.libraryResultHandler)
+        {
             weakSelf.libraryResultHandler(nil,path,type);
         }
         NIMKit_Dispatch_Async_Main(^{

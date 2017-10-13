@@ -25,4 +25,6 @@
 
 @property(nonatomic,assign) BOOL switchOn;
 
+@property(nonatomic,strong) id value;
+
 @end

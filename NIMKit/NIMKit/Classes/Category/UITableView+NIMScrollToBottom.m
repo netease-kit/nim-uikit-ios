@@ -17,7 +17,7 @@
         if (row > 0)
         {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
-            [self scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:animation];
+            [self scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:animation];
         }
     });
 }

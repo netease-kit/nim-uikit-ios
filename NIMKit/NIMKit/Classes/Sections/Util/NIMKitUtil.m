@@ -67,15 +67,18 @@
     {
         hour = hour - 12;
     }
-    if(nowDateComponents.day == msgDateComponents.day) //同一天,显示时间
+    
+    BOOL isSameMonth = (nowDateComponents.year == msgDateComponents.year) && (nowDateComponents.month == msgDateComponents.month);
+    
+    if(isSameMonth && (nowDateComponents.day == msgDateComponents.day)) //同一天,显示时间
     {
         result = [[NSString alloc] initWithFormat:@"%@ %zd:%02d",result,hour,(int)msgDateComponents.minute];
     }
-    else if(nowDateComponents.day == (msgDateComponents.day+1))//昨天
+    else if(isSameMonth && (nowDateComponents.day == (msgDateComponents.day+1)))//昨天
     {
         result = showDetail?  [[NSString alloc] initWithFormat:@"昨天%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : @"昨天";
     }
-    else if(nowDateComponents.day == (msgDateComponents.day+2)) //前天
+    else if(isSameMonth && (nowDateComponents.day == (msgDateComponents.day+2))) //前天
     {
         result = showDetail? [[NSString alloc] initWithFormat:@"前天%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : @"前天";
     }

@@ -60,6 +60,10 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 #import "NIMKitRobotDefaultTemplateParser.h"
 
+/*
+ *  独立聊天室模式下需注入的信息
+ */
+#import "NIMKitIndependentModeExtraInfo.h"
 
 @interface NIMKit : NSObject
 
@@ -81,6 +85,14 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 @property (nonatomic,strong)    id<NIMKitDataProvider> provider;
 
 /**
+ *  由于在独立聊天室模式下, IM 部分服务不可用，需要上层注入一些额外信息供组件显示使用。 默认为 nil，上层在独立聊天室模式下注入，注入时需要创建此对象并注入对象相关字段信息。
+ *
+ *  此字段需要配合默认的 NIMKitDataProvider ( NIMKitDataProviderImpl ) 使用，如果上层自己定义了 provider ， 则忽略此字段。
+ */
+@property (nonatomic,strong)  NIMKitIndependentModeExtraInfo *independentModeExtraInfo;
+
+
+/**
  *  NIMKit图片资源所在的 bundle 名称。
  */
 @property (nonatomic,copy)      NSString *resourceBundleName;
@@ -99,6 +111,9 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *  机器人消息模板解析器
  */
 @property (nonatomic,strong)    NIMKitRobotDefaultTemplateParser *robotTemplateParser;
+
+
+
 
 /**
  *  用户信息变更通知接口

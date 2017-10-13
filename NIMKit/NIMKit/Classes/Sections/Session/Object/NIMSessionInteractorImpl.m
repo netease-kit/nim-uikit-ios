@@ -325,7 +325,18 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
                     [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
                 }
                 if (path) {
-                    NIMMessage *message = [NIMMessageMaker msgWithImagePath:path];
+                    NIMMessage *message;
+                    if ([path.pathExtension isEqualToString:@"HEIC"])
+                    {
+                        //iOS 11 苹果采用了新的图片格式 HEIC ，如果采用原图会导致其他设备的兼容问题，在上层做好格式的兼容转换,压成 jpeg
+                        UIImage *image = [UIImage imageWithContentsOfFile:path];
+                        message = [NIMMessageMaker msgWithImage:image];
+                    }
+                    else
+                    {
+                        message = [NIMMessageMaker msgWithImagePath:path];
+                    }
+                    
                     [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
                 }
             }

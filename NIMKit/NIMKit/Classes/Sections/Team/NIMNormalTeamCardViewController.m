@@ -140,7 +140,8 @@
     
     NIMTeamCardRowItem *teamNotify = [[NIMTeamCardRowItem alloc] init];
     teamNotify.title            = @"消息提醒";
-    teamNotify.switchOn         = [self.team notifyForNewMsg];
+    //普通群没有只接受管理员
+    teamNotify.switchOn         = [self.team notifyStateForNewMsg] == NIMTeamNotifyStateAll;
     teamNotify.rowHeight        = 50.f;
     teamNotify.type             = TeamCardRowItemTypeSwitch;
 
@@ -217,7 +218,8 @@
 - (void)onStateChanged:(BOOL)on
 {
     __weak typeof(self) weakSelf = self;
-    [[[NIMSDK sharedSDK] teamManager] updateNotifyState:on
+    NIMTeamNotifyState state = on? NIMTeamNotifyStateAll : NIMTeamNotifyStateNone;
+    [[[NIMSDK sharedSDK] teamManager] updateNotifyState:state
                                                  inTeam:[self.team teamId]
                                              completion:^(NSError *error) {
                                                  [weakSelf refreshTableBody];

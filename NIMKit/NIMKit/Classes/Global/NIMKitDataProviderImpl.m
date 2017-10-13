@@ -122,8 +122,8 @@
     NIMKitInfo *info = [self infoByRobot:userId];
     if (info == nil)
     {
-        info = option.message ? [self infoByUser:userId message:option.message option:option]
-        : [self infoByUser:userId session:option.session option:option];
+        NIMSession *session = option.message.session?:option.session;
+        info = [self infoByUser:userId session:session option:option];
     }
     return info;
 }
@@ -147,38 +147,23 @@
                    session:(NIMSession *)session
                     option:(NIMKitInfoFetchOption *)option
 {
-    BOOL needFetchInfo = NO;
     NIMSessionType sessionType = session.sessionType;
-    NIMKitInfo *info = [[NIMKitInfo alloc] init];
-    info.infoId = userId;
-    info.showName = userId; //默认值
+    NIMKitInfo *info;
+    
     switch (sessionType) {
         case NIMSessionTypeP2P:
+        {
+            info = [self userInfoInP2P:userId option:option];
+        }
+            break;
         case NIMSessionTypeTeam:
+        {
+            info = [self userInfo:userId inTeam:session.sessionId option:option];
+        }
+            break;
         case NIMSessionTypeChatroom:
         {
-            NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
-            NIMUserInfo *userInfo = user.userInfo;
-            NIMTeamMember *member = nil;
-            if (sessionType == NIMSessionTypeTeam)
-            {
-                member = [[NIMSDK sharedSDK].teamManager teamMember:userId
-                                                             inTeam:session.sessionId];
-            }
-            NSString *name = [self nickname:user
-                                 memberInfo:member
-                                     option:option];
-            if (name)
-            {
-                info.showName = name;
-            }
-            info.avatarUrlString = userInfo.thumbAvatarUrl;
-            info.avatarImage = self.defaultUserAvatar;
-            
-            if (userInfo == nil)
-            {
-                needFetchInfo = YES;
-            }
+            info = [self userInfo:userId inChatroom:session.sessionId option:option];
         }
             break;        
         default:
@@ -186,42 +171,113 @@
             break;
     }
     
-    if (needFetchInfo)
+    if (!info)
     {
         [self.request requestUserIds:@[userId]];
+        NIMKitInfo *info = [[NIMKitInfo alloc] init];
+        info.infoId = userId;
+        info.showName = userId; //默认值
+        info.avatarImage = self.defaultUserAvatar;
     }
     return info;
 }
 
 
-//消息中用户信息
-- (NIMKitInfo *)infoByUser:(NSString *)userId
-                   message:(NIMMessage *)message
-                    option:(NIMKitInfoFetchOption *)option
+
+#pragma mark - P2P 用户信息
+- (NIMKitInfo *)userInfoInP2P:(NSString *)userId
+                       option:(NIMKitInfoFetchOption *)option
 {
-    if (message.session.sessionType == NIMSessionTypeChatroom)
+    NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
+    NIMUserInfo *userInfo = user.userInfo;
+    NIMKitInfo *info;
+    if (userInfo)
     {
-        NIMKitInfo *info = [[NIMKitInfo alloc] init];
+        info = [[NIMKitInfo alloc] init];
         info.infoId = userId;
-        if ([userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
-            NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
-            info.showName        = user.userInfo.nickName;
-            info.avatarUrlString = user.userInfo.thumbAvatarUrl;
-        }else{
-            NIMMessageChatroomExtension *ext = [message.messageExt isKindOfClass:[NIMMessageChatroomExtension class]] ?
-            (NIMMessageChatroomExtension *)message.messageExt : nil;
-            info.showName = ext.roomNickname;
-            info.avatarUrlString = ext.roomAvatar;
-        }
+        NSString *name = [self nickname:user
+                             memberInfo:nil
+                                 option:option];
+        info.showName = name?:userId;
+        info.avatarUrlString = userInfo.thumbAvatarUrl;
         info.avatarImage = self.defaultUserAvatar;
-        return info;
+    }
+    return info;
+}
+
+
+#pragma mark - 群组用户信息
+- (NIMKitInfo *)userInfo:(NSString *)userId
+                  inTeam:(NSString *)teamId
+                  option:(NIMKitInfoFetchOption *)option
+{
+    NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
+    NIMUserInfo *userInfo = user.userInfo;
+    NIMTeamMember *member =  [[NIMSDK sharedSDK].teamManager teamMember:userId
+                                                                 inTeam:teamId];
+    
+    NIMKitInfo *info;
+    
+    if (userInfo || member)
+    {
+        info = [[NIMKitInfo alloc] init];
+        info.infoId = userId;
+        
+        NSString *name = [self nickname:user
+                             memberInfo:member
+                                 option:option];
+        info.showName = name?:userId;
+        info.avatarUrlString = userInfo.thumbAvatarUrl;
+        info.avatarImage = self.defaultUserAvatar;
+    }
+    return  info;
+}
+
+
+#pragma mark - 聊天室用户信息
+- (NIMKitInfo *)userInfo:(NSString *)userId
+              inChatroom:(NSString *)roomId
+                  option:(NIMKitInfoFetchOption *)option
+{
+    NIMKitInfo *info = [[NIMKitInfo alloc] init];
+    info.infoId = userId;
+
+    if ([userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount])
+    {
+        
+        switch ([NIMSDK sharedSDK].loginManager.currentAuthMode) {
+            case NIMSDKAuthModeChatroom:
+            {
+                NSAssert([NIMKit sharedKit].independentModeExtraInfo, @"in mode NIMSDKAuthModeChatroom , must has independentModeExtraInfo");
+                info.showName        = [NIMKit sharedKit].independentModeExtraInfo.myChatroomNickname;
+                info.avatarUrlString = [NIMKit sharedKit].independentModeExtraInfo.myChatroomAvatar;
+            }
+                break;
+            case NIMSDKAuthModeIM:
+            {
+                NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
+                info.showName        = user.userInfo.nickName;
+                info.avatarUrlString = user.userInfo.thumbAvatarUrl;
+            }
+                break;
+            default:
+            {
+                NSAssert(0, @"invalid mode");
+            }
+                break;
+        }
+        
     }
     else
     {
-        return [self infoByUser:userId
-                        session:message.session
-                         option:option];
+        NSAssert(option.message, @"message must has value in chatroom");
+        NIMMessageChatroomExtension *ext = [option.message.messageExt isKindOfClass:[NIMMessageChatroomExtension class]] ?
+        (NIMMessageChatroomExtension *)option.message.messageExt : nil;
+        info.showName = ext.roomNickname;
+        info.avatarUrlString = ext.roomAvatar;
     }
+    info.avatarImage = self.defaultUserAvatar;
+    return info;
 }
 
 

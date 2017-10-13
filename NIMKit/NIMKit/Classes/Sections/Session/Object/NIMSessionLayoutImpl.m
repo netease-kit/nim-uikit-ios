@@ -99,12 +99,14 @@
     rect.origin.y = 0;
     rect.size.height = self.viewRect.size.height - _inputViewHeight;
     BOOL tableChanged = !CGRectEqualToRect(_tableView.frame, rect);
-    [_tableView setFrame:rect];
-    
+    if (tableChanged)
+    {
+        [_tableView setFrame:rect];
+    }
     if (tableChanged || viewRectChanged)
     {
         [_tableView reloadData];
-        [_tableView nim_scrollToBottom:NO];
+        [_tableView nim_scrollToBottom:YES];
     }
 }
 

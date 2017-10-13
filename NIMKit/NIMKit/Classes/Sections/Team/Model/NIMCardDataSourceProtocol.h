@@ -22,6 +22,7 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
     TeamCardRowItemTypeRedButton,
     TeamCardRowItemTypeBlueButton,
     TeamCardRowItemTypeSwitch,
+    TeamCardRowItemTypeCheckMark,
 };
 
 
@@ -58,5 +59,7 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
 - (BOOL)actionDisabled;
 
 - (BOOL)switchOn;
+
+- (id)value;
 
 @end

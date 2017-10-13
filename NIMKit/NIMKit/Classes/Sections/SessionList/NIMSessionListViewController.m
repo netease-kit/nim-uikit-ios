@@ -170,6 +170,11 @@
     [self refresh];
 }
 
+- (void)allMessagesRead
+{
+    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
+    [self refresh];
+}
 
 #pragma mark - NIMLoginManagerDelegate
 - (void)onLogin:(NIMLoginStep)step
