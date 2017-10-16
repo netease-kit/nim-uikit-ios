@@ -1,5 +1,5 @@
 //
-//  DataProvider.h
+//  NTESDataProvider.h
 //  DemoApplication
 //
 //  Created by chris on 15/10/7.
@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "NIMKit.h"
 
-@interface DataProvider : NSObject<NIMKitDataProvider>
+@interface NTESDataProvider : NSObject<NIMKitDataProvider>
 
 @end

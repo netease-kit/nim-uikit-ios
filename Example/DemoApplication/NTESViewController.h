@@ -1,5 +1,5 @@
 //
-//  AppDelegate.h
+//  NTESViewController.h
 //  DemoApplication
 //
 //  Created by chris on 15/10/7.
@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow *window;
+@interface NTESViewController : UIViewController
 
 
 @end

@@ -1,5 +1,5 @@
 //
-//  AttachmentDecoder.h
+//  NTESCellLayoutConfig.h
 //  DemoApplication
 //
 //  Created by chris on 15/11/1.
@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <NIMSDK/NIMSDK.h>
+#import "NIMKit.h"
 
-@interface AttachmentDecoder : NSObject<NIMCustomAttachmentCoding>
+@interface NTESCellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
+
 
 
 @end

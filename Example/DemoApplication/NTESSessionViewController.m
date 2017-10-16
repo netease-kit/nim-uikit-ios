@@ -1,28 +1,28 @@
 //
-//  SessionViewController.m
+//  NTESSessionViewController.m
 //  DemoApplication
 //
 //  Created by chris on 15/10/7.
 //  Copyright © 2015年 chris. All rights reserved.
 //
 
-#import "SessionViewController.h"
-#import "SessionConfig.h"
-#import "Attachment.h"
+#import "NTESSessionViewController.h"
+#import "NTESSessionConfig.h"
+#import "NTESAttachment.h"
 
-@interface SessionViewController ()
+@interface NTESSessionViewController ()
 
-@property (nonatomic,strong) SessionConfig *config;
+@property (nonatomic,strong) NTESSessionConfig *config;
 
 @end
 
-@implementation SessionViewController
+@implementation NTESSessionViewController
 
 - (instancetype)initWithSession:(NIMSession *)session
 {
     self = [super initWithSession:session];
     if (self) {
-        _config = [[SessionConfig alloc] init];
+        _config = [[NTESSessionConfig alloc] init];
     }
     return self;
 }
@@ -43,7 +43,7 @@
 #pragma mark - Private
 - (void)sendCustomMessage{
     //构造自定义内容
-    Attachment *attachment = [[Attachment alloc] init];
+    NTESAttachment *attachment = [[NTESAttachment alloc] init];
     attachment.title = @"这是一条自定义消息";
     attachment.subTitle = @"这是自定义消息的副标题";
     

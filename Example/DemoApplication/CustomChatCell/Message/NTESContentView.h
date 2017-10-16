@@ -1,5 +1,5 @@
 //
-//  ContentView.h
+//  NTESContentView.h
 //  DemoApplication
 //
 //  Created by chris on 15/11/1.
@@ -9,7 +9,7 @@
 #import "NIMKit.h"
 #import "NIMSessionMessageContentView.h"
 
-@interface ContentView : NIMSessionMessageContentView
+@interface NTESContentView : NIMSessionMessageContentView
 
 @property (nonatomic,strong) UILabel *titleLabel;
 

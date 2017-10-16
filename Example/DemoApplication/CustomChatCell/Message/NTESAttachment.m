@@ -6,9 +6,9 @@
 //  Copyright © 2015年 chris. All rights reserved.
 //
 
-#import "Attachment.h"
+#import "NTESAttachment.h"
 
-@implementation Attachment
+@implementation NTESAttachment
 
 - (NSString *)encodeAttachment{
     NSDictionary *dict = @{@"title":self.title,@"subTitle":self.subTitle};

@@ -1,16 +1,16 @@
 //
-//  SessionConfig.m
+//  NTESSessionConfig.m
 //  DemoApplication
 //
 //  Created by chris on 15/11/1.
 //  Copyright © 2015年 chris. All rights reserved.
 //
 
-#import "SessionConfig.h"
+#import "NTESSessionConfig.h"
 #import "NIMMediaItem.h"
-#import "CellLayoutConfig.h"
+#import "NTESCellLayoutConfig.h"
 
-@implementation SessionConfig
+@implementation NTESSessionConfig
 
 - (NSArray *)mediaItems{
     NIMMediaItem* custom =

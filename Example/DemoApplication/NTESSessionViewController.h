@@ -1,5 +1,5 @@
 //
-//  SessionViewController.h
+//  NTESSessionViewController.h
 //  DemoApplication
 //
 //  Created by chris on 15/10/7.
@@ -8,6 +8,6 @@
 
 #import "NIMSessionViewController.h"
 
-@interface SessionViewController : NIMSessionViewController
+@interface NTESSessionViewController : NIMSessionViewController
 
 @end

@@ -1,15 +1,15 @@
 //
-//  ContentView.m
+//  NTESContentView.m
 //  DemoApplication
 //
 //  Created by chris on 15/11/1.
 //  Copyright © 2015年 chris. All rights reserved.
 //
 
-#import "ContentView.h"
-#import "Attachment.h"
+#import "NTESContentView.h"
+#import "NTESAttachment.h"
 
-@implementation ContentView
+@implementation NTESContentView
 
 - (instancetype)initSessionMessageContentView{
     self = [super initSessionMessageContentView];
@@ -28,7 +28,7 @@
     //务必调用super方法
     [super refresh:data];
     NIMCustomObject *object = data.message.messageObject;
-    Attachment *attachment = object.attachment;
+    NTESAttachment *attachment = object.attachment;
     
     self.titleLabel.text = attachment.title;
     self.subTitleLabel.text = attachment.subTitle;
