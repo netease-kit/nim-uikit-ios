@@ -23,9 +23,10 @@
 		61F16E831BC567F700ABEE57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 61F16E821BC567F700ABEE57 /* Assets.xcassets */; };
 		61F16E861BC567F700ABEE57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 61F16E841BC567F700ABEE57 /* LaunchScreen.storyboard */; };
 		61F16ED91BC56DE000ABEE57 /* NTESSessionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16ED81BC56DE000ABEE57 /* NTESSessionViewController.m */; };
-		61F16EDC1BC5719C00ABEE57 /* NTESDataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F16EDB1BC5719C00ABEE57 /* NTESDataProvider.m */; };
 		61F16EDF1BC5769100ABEE57 /* DefaultAvatar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 61F16EDD1BC5769100ABEE57 /* DefaultAvatar@2x.png */; };
 		61F16EE01BC5769100ABEE57 /* DefaultAvatar@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 61F16EDE1BC5769100ABEE57 /* DefaultAvatar@3x.png */; };
+		83F81D231F945C410054A63B /* NTESSessionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F81D221F945C410054A63B /* NTESSessionListViewController.m */; };
+		83F81D261F945EC60054A63B /* NTESContactViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F81D251F945EC60054A63B /* NTESContactViewController.m */; };
 		CFB88BDE1A761FB5D6CE5489 /* libPods-DemoApplication.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 929F48A09A546FE64E215530 /* libPods-DemoApplication.a */; };
 /* End PBXBuildFile section */
 
@@ -57,10 +58,12 @@
 		61F16E871BC567F700ABEE57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		61F16ED71BC56DE000ABEE57 /* NTESSessionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTESSessionViewController.h; sourceTree = "<group>"; };
 		61F16ED81BC56DE000ABEE57 /* NTESSessionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTESSessionViewController.m; sourceTree = "<group>"; };
-		61F16EDA1BC5719C00ABEE57 /* NTESDataProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTESDataProvider.h; sourceTree = "<group>"; };
-		61F16EDB1BC5719C00ABEE57 /* NTESDataProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTESDataProvider.m; sourceTree = "<group>"; };
 		61F16EDD1BC5769100ABEE57 /* DefaultAvatar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DefaultAvatar@2x.png"; sourceTree = "<group>"; };
 		61F16EDE1BC5769100ABEE57 /* DefaultAvatar@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DefaultAvatar@3x.png"; sourceTree = "<group>"; };
+		83F81D211F945C410054A63B /* NTESSessionListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NTESSessionListViewController.h; sourceTree = "<group>"; };
+		83F81D221F945C410054A63B /* NTESSessionListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NTESSessionListViewController.m; sourceTree = "<group>"; };
+		83F81D241F945EC60054A63B /* NTESContactViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NTESContactViewController.h; sourceTree = "<group>"; };
+		83F81D251F945EC60054A63B /* NTESContactViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NTESContactViewController.m; sourceTree = "<group>"; };
 		929F48A09A546FE64E215530 /* libPods-DemoApplication.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DemoApplication.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96B8D4920413100CF9B6F36D /* Pods-DemoApplication.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DemoApplication.release.xcconfig"; path = "Pods/Target Support Files/Pods-DemoApplication/Pods-DemoApplication.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -144,8 +147,10 @@
 				61F16E7D1BC567F700ABEE57 /* NTESViewController.m */,
 				61F16ED71BC56DE000ABEE57 /* NTESSessionViewController.h */,
 				61F16ED81BC56DE000ABEE57 /* NTESSessionViewController.m */,
-				61F16EDA1BC5719C00ABEE57 /* NTESDataProvider.h */,
-				61F16EDB1BC5719C00ABEE57 /* NTESDataProvider.m */,
+				83F81D211F945C410054A63B /* NTESSessionListViewController.h */,
+				83F81D221F945C410054A63B /* NTESSessionListViewController.m */,
+				83F81D241F945EC60054A63B /* NTESContactViewController.h */,
+				83F81D251F945EC60054A63B /* NTESContactViewController.m */,
 				61F16E791BC567F700ABEE57 /* NTESAppDelegate.h */,
 				61F16E7A1BC567F700ABEE57 /* NTESAppDelegate.m */,
 				61F16E7F1BC567F700ABEE57 /* Main.storyboard */,
@@ -311,6 +316,8 @@
 			files = (
 				61F16E7E1BC567F700ABEE57 /* NTESViewController.m in Sources */,
 				61F16ED91BC56DE000ABEE57 /* NTESSessionViewController.m in Sources */,
+				83F81D231F945C410054A63B /* NTESSessionListViewController.m in Sources */,
+				83F81D261F945EC60054A63B /* NTESContactViewController.m in Sources */,
 				6152C79F1BE5EE5F005E028F /* NTESContentView.m in Sources */,
 				6152C78B1BE5DCBF005E028F /* NTESAttachment.m in Sources */,
 				6152C78E1BE5DF7A005E028F /* NTESAttachmentDecoder.m in Sources */,
@@ -318,7 +325,6 @@
 				61F16E7B1BC567F700ABEE57 /* NTESAppDelegate.m in Sources */,
 				6152C79C1BE5E6EF005E028F /* NTESCellLayoutConfig.m in Sources */,
 				61F16E781BC567F700ABEE57 /* main.m in Sources */,
-				61F16EDC1BC5719C00ABEE57 /* NTESDataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,6 +15,8 @@
 #pragma mark - kit data request
 @interface NIMKitDataRequest : NSObject
 
+@property (nonatomic,strong) NSMutableSet *failedUserIds;
+
 @property (nonatomic,assign) NSInteger maxMergeCount; //最大合并数
 
 - (void)requestUserIds:(NSArray *)userIds;
@@ -30,6 +32,7 @@
 - (instancetype)init{
     self = [super init];
     if (self) {
+        _failedUserIds = [[NSMutableSet alloc] init];
         _requstUserIdArray = [[NSMutableArray alloc] init];
     }
     return self;
@@ -40,7 +43,7 @@
 {
     for (NSString *userId in userIds)
     {
-        if (![_requstUserIdArray containsObject:userId])
+        if (![_requstUserIdArray containsObject:userId] && ![_failedUserIds containsObject:userId])
         {
             [_requstUserIdArray addObject:userId];
         }
@@ -63,8 +66,13 @@
     [[NIMSDK sharedSDK].userManager fetchUserInfos:userIds
                                         completion:^(NSArray *users, NSError *error) {
                                             [weakSelf afterReuquest:userIds];
-                                            if (!error) {
+                                            if (!error && users.count)
+                                            {
                                                 [[NIMKit sharedKit] notfiyUserInfoChanged:userIds];
+                                            }
+                                            else if ([weakSelf shouldAddToFailedUsers:error])
+                                            {
+                                                [weakSelf.failedUserIds addObjectsFromArray:userIds];
                                             }
                                         }];
 }
@@ -75,6 +83,12 @@
     [_requstUserIdArray removeObjectsInArray:userIds];
     [self request];
     
+}
+
+- (BOOL)shouldAddToFailedUsers:(NSError *)error
+{
+    //没有错误这种异常情况走到这个路径里也不对，不再请求
+    return error.code != NIMRemoteErrorCodeTimeoutError || !error;
 }
 
 @end
@@ -174,7 +188,7 @@
     if (!info)
     {
         [self.request requestUserIds:@[userId]];
-        NIMKitInfo *info = [[NIMKitInfo alloc] init];
+        info = [[NIMKitInfo alloc] init];
         info.infoId = userId;
         info.showName = userId; //默认值
         info.avatarImage = self.defaultUserAvatar;
