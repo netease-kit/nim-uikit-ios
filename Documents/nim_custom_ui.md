@@ -17,6 +17,22 @@
 排版配置器需要实现 `NIMCellLayoutConfig` 协议。
 
 
+# 界面属性
+
+消息气泡具体属性
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_1.jpg" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_2.jpg" width="550" height="210" />
+
+
+输入框
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_input_view.jpg" width="550" height="210" />
+
+
+
+
 ## NIMMessageCell
 
 UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此，了解 `NIMMessageCell` 的大致组成，对排版是很有帮助的。
