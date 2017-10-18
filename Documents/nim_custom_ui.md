@@ -21,14 +21,14 @@
 
 消息气泡具体属性
 
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_1.jpg" width="550" height="210" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_1.jpg" width="550" height="400" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_2.jpg" width="550" height="210" />
 
 
 输入框
 
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_input_view.jpg" width="550" height="210" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_input_view.jpg" width="660" height="300" />
 
 
 
