@@ -17,22 +17,6 @@
 排版配置器需要实现 `NIMCellLayoutConfig` 协议。
 
 
-# 界面属性
-
-消息气泡具体属性
-
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_1.jpg" width="550" height="210" />
-
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_2.jpg" width="550" height="210" />
-
-
-输入框
-
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_input_view.jpg" width="550" height="210" />
-
-
-
-
 ## NIMMessageCell
 
 UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此，了解 `NIMMessageCell` 的大致组成，对排版是很有帮助的。
@@ -52,6 +36,23 @@ UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此�
 当第一次调用这个方法（即不是复用生成），会调用 `- (void)addContentViewIfNotExist` 方法，根据 `NIMMessageModel` 找到对应的布局配置(如果找不到则按未知类型消息处理)。
 
 Tips：开发者在第一次接入的时候，可能由于协议实现不全或者注入布局配置有误等原因，导致消息在界面上显示为 `未知类型消息`，这个时候可以尝试从 `NIMMessageCell` 的 `- (void)addContentViewIfNotExist` 方法入手调试，查看`NIMMessageModel` 对应的布局配置以及协议的返回值是否正确。
+
+
+# 界面属性
+
+消息气泡具体属性
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_1.jpg" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_2.jpg" width="550" height="210" />
+
+
+输入框
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_input_view.jpg" width="550" height="210" />
+
+
+
 
 
 ## 聊天气泡的简单布局定制
