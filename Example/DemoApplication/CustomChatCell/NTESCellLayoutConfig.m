@@ -20,7 +20,7 @@
 - (NSString *)cellContent:(NIMMessageModel *)model{
     if ([self canLayout:model]) {
         //填入自定义的气泡contentView
-        return @"ContentView";
+        return @"NTESContentView";
     }
     return [super cellContent:model];
 }

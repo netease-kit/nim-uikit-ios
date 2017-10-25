@@ -13,12 +13,13 @@
 @implementation NTESSessionConfig
 
 - (NSArray *)mediaItems{
+    NSArray *defaultMediaItems = [NIMKitUIConfig sharedConfig].defaultMediaItems;
     NIMMediaItem* custom =
              [NIMMediaItem item:@"sendCustomMessage"
                     normalImage:[UIImage imageNamed:@"icon_custom_normal"]
                   selectedImage:[UIImage imageNamed:@"icon_custom_pressed"]
                           title:@"自定义消息"];
-    return @[custom];
+    return [defaultMediaItems arrayByAddingObject:custom];
 }
 
 - (BOOL)disableCharlet
