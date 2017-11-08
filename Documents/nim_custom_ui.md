@@ -12,7 +12,7 @@
 
 * **聊天界面的深度定制**
 
-有的时候，需要根据具体的消息类型并结合业务逻辑的上下文定制聊天界面，这个时候一个简单的配置文件就不再适用了。UI 组件提供一个全局的排版控制器注入接口 `- (void)registerLayoutConfig:(Class)layoutConfigClass` 来让上层开发者自行注入排版配置器。
+有的时候，需要根据具体的消息类型并结合业务逻辑的上下文定制聊天界面，这个时候一个简单的配置文件就不再适用了。UI 组件提供一个全局的排版控制器注入接口 `- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfig` 来让上层开发者自行注入排版配置器。
 
 排版配置器需要实现 `NIMCellLayoutConfig` 协议。
 
