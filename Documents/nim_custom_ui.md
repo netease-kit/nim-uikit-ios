@@ -6,7 +6,7 @@
 
 * **聊天气泡的简单布局定制**
 
-关于内置聊天气泡的各种内间距，组件均已提出并组成 `plist` 配置文件供开发者直接设置。开发者不需要关心具体的界面实现代码，只需要在配置文件上改一些间距值，即可进行界面调试。
+关于内置聊天气泡的各种内间距，组件均已提对应的接口供开发者直接设置。开发者不需要关心具体的界面实现代码，只需要实现相关接口，即可自定义布局界面。
 
 这种定制适用于开发者满足于内置的消息类型，并不需要对消息气泡的界面布局做出很大改变的情况。
 
@@ -221,23 +221,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 //单条
 - (BOOL)shouldHandleReceiptForMessage:(NIMMessage *)message
 {
-    //NIM Demo 支持文字，语音，图片，视频，文件，地址位置和自定义消息都已读，其他的不支持
-    NIMMessageType type = message.messageType;
-    if (type == NIMMessageTypeCustom) {
-        NIMCustomObject *object = (NIMCustomObject *)message.messageObject;
-        id attachment = object.attachment;
-        
-        if ([attachment isKindOfClass:[NTESWhiteboardAttachment class]]) {
-            return NO;
-        }
-    }
-    return type == NIMMessageTypeText ||
-           type == NIMMessageTypeAudio ||
-           type == NIMMessageTypeImage ||
-           type == NIMMessageTypeVideo ||
-           type == NIMMessageTypeFile ||
-           type == NIMMessageTypeLocation ||
-           type == NIMMessageTypeCustom;
+    return YES;
 }
 @end
 ```
