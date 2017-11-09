@@ -336,6 +336,22 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 @end
 ```
 【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+
+* 昵称字体和颜色配置
+
+```objc
+@implementation TestAppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //...
+    [NIMKit sharedKit].config.nickFont = [UIFont fontWithName:@"Arial" size:14.f];
+    [NIMKit sharedKit].config.nickColor = [UIColor yellowColor];
+    //...
+}
+
+@end
+```
+
 #### <p id="component_retry"> 5）重试按钮配置 </p>
 
 ```Objective-C
@@ -654,18 +670,76 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
 ```
 
 ## 聊天界面的深度定制
-如果需要结合一些上下文定制聊天界面，就需要采用深度定制。在进入会话页之前，注入布局布局配置到 `NIMKit` 即可
+### <p id = "customize"> 输入框深度定制 </p>
+#### <p id = "custom_more"> 1）更多按钮弹出视图自定义 </p>
+通过自定义更多按钮弹出的视图，然后赋值给 NIMInputView 的 moreContainer 视图，实现视图定制
 
 ```objc
-//注册 NIMKit 自定义排版配置
-[[NIMKit sharedKit] registerLayoutConfig:[NTESCellLayoutConfig class]];
-```  
+@interface TestMoreContainerView : UIView
 
-布局配置器可以选择实现 `NIMCellLayoutConfig` 接口所定义的方法，不实现的接口，会采用内置的默认布局参数进行处理。
+@end
 
-在很多场景下，只是在特殊消息场景下需要修正一下排版配置，其他情况还是沿用默认配置，因此强烈建议自定义的排版控制器继承内置的排版实现 `NIMCellLayoutConfig` 协议。这样在开发者需要自定义布局的场景下，填入自定义配置，其他情况只需调用 `super` 方法即可。
+@implementation TestMoreContainerView
 
-具体实现逻辑示范见 Demo 中 `NTESCellLayoutConfig` 类。
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.backgroundColor = [UIColor yellowColor];
+    }
+    return self;
+}
+
+- (CGSize)sizeThatFits:(CGSize)size
+{
+    return CGSizeMake(size.width, 216.f);
+}
+
+@end
+
+@implementation NIMSessionViewController
+
+- (void)setupInputView
+{
+    //...
+    CGRect rect = CGRectMake(0, 0, 120, 120);
+    UIView *moreView = [[TestMoreContainerView alloc] initWithFrame:rect];
+    self.sessionInputView.moreContainer = moreView;
+    //...
+}
+
+@end
+```
+#### <p id = "custom_"> 2）添加表情视图自定义 </p>
+通过自定义表情按钮弹出的视图，然后赋值给 NIMInputView 的 emoticonContainer 视图，实现视图定制
+
+```objc
+@implementation TestEmoticonContainerView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.backgroundColor = [UIColor yellowColor];
+    }
+    return self;
+}
+
+- (CGSize)sizeThatFits:(CGSize)size
+{
+    return CGSizeMake(size.width, 216.f);
+}
+@end
+
+@implementation NIMSessionViewController
+
+- (void)setupInputView
+{
+    //...
+    CGRect rect = CGRectMake(0, 0, 120, 120);
+    UIView *emoticonContainer = [[TestEmoticonContainerView alloc] initWithFrame:rect];
+    self.sessionInputView.emoticonContainer = emoticonContainer;
+    //...
+}
+@end
+```
+
 
 
 
