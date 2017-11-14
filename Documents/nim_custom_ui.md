@@ -176,7 +176,8 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_cell_2.jpg" width="550" height="210" />
 
-### <p id="session_title"> 1. 聊天界面标题 </p>
+### <p id="session_interface"> 1. 聊天界面 </p>
+#### <p id = "interface_title"> 1）聊天界面标题 </p>
 包括聊天页面主标题和子标题更改以及字体和字号设置  
 
 ```objc
@@ -204,6 +205,39 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
+#### <p id = "interface_title"> 2）聊天界面背景 </p>
+通过实现 NIMSessionConfig 相关接口进行实现，示例代码如下：
+
+```objc
+@interface TestSessionConfig : NSObject<NIMSessionConfig>
+@end
+
+@implementation TestSessionConfig
+
+- (UIImage *)SessionBackgroundImage {
+    return [UIImage imageNamed:@"test"];
+}
+
+@end
+
+@interface TestSessionViewController()
+@property (nonatomic,strong) TestSessionConfig *sessionConfig;
+@end
+
+@implementation TestSessionViewController
+
+- (void)viewDidLoad {
+    //注意 cell 背景色透明
+    [NIMKit sharedKit].config.cellBackgroundColor = [UIColor clearColor];
+    UIImageView *imgView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    imgView.image = self.sessionConfig.SessionBackgroundImage;
+    imgView.contentMode = UIViewContentModeScaleAspectFill;
+    self.tableView.backgroundView = imgView;
+}
+
+@end
+```
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
 
 ### <p id="session_component"> 2. 聊天气泡具体组件 </p>
 #### <p id="component_read"> 1）已读回执配置 </p>
@@ -275,6 +309,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
 
 * 头像位置配置
+包括左边距和上边距的自定义
 
 ```objc
 //实现 NIMCellLayoutConfig 协议，继承 NIMCellLayoutConfig 类
@@ -283,13 +318,46 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @implementation TestCellLayoutConfig
 
-- (CGPoint)avatarMargin:(NIMMessageModel *)model
+- (CGPoint)avatarMargin:(NIMMessageModel *)model 
 {
-    //自定义头像控件 origin
+    //自定义头像距离 NIMMessageCell 边框距离
 }
 
 @end
 ```
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+
+* 头像形状配置
+头像的形状包括矩形直角头像、圆形头像、圆角头像三种类型，具体弧度大小若想更改，可见<a href = "#customize_cell">下文</a>的 NIMMessageCell 深度定制部分
+
+```objc
+@implementation TestAppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //...
+    [NIMKit sharedKit].config.avatarType = NIMKitAvatarTypeRounded;
+    //...
+}
+
+@end
+```
+* 头像大小配置
+
+```objc
+@interface TestCellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
+@end
+
+@implementation TestCellLayoutConfig
+
+- (CGSize)avatarSize
+{
+    //自定义头像大小
+}
+
+@end
+```
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+
 * 点击头像的响应事件
  
 ```objc
@@ -322,7 +390,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 @end
 ```
 * 昵称位置配置
-
+包括上边距和左边距配置
 ```objc
 @interface TestCellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
 @end
@@ -330,7 +398,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 @implementation TestCellLayoutConfig
 
 - (CGPoint)nickNameMargin:(NIMMessageModel *)model {
-   //自定义头像控件 origin
+    //自定义头像控件 origin
 }
 
 @end
@@ -395,7 +463,31 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 | teamNotificationSetting | 群组通知类型消息设置 |
 | chatroomNotificationSetting | 聊天室类型消息设置 |
 | netcallNotificationSetting | 网络电话类型通知消息设置 |
-具体默认设置见 NIMKitConfig，这里不一一列举
+具体默认设置见 NIMKitConfig，这里不一一列举，画出每种类型对应的 cell 的样式图：
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_text.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_audio.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_video.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_file.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_img.png" width="550" height="300" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_location.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_tip.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_robot.png" width="550" height="550" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_unsupported.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_group.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_chatroom.png" width="550" height="210" />
+
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_netecall.png" width="550" height="210" />
 
 * 气泡大小与位置更改
 气泡根据发消息者是本人或者他人，位置布局不同，分为 leftBubbleSettings 和 rightBubbleSettings 进行配置，配置方式见<a href = "#config">第二步</a> NIMKitConfig 配置方式
@@ -670,8 +762,8 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
 ```
 
 ## 聊天界面的深度定制
-### <p id = "customize"> 输入框深度定制 </p>
-#### <p id = "custom_more"> 1）更多按钮弹出视图自定义 </p>
+### <p id = "customize_type"> 1. 输入框深度定制 </p>
+#### <p id = "type_more"> 1）更多按钮弹出视图自定义 </p>
 通过自定义更多按钮弹出的视图，然后赋值给 NIMInputView 的 moreContainer 视图，实现视图定制
 
 ```objc
@@ -708,7 +800,7 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
 
 @end
 ```
-#### <p id = "custom_"> 2）添加表情视图自定义 </p>
+#### <p id = "type_emo"> 2）添加表情视图自定义 </p>
 通过自定义表情按钮弹出的视图，然后赋值给 NIMInputView 的 emoticonContainer 视图，实现视图定制
 
 ```objc
@@ -739,6 +831,21 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
 }
 @end
 ```
+
+### <p id = "customize_cell"> 2. NIMMessageCell 深度定制 </p>
+NIMMessageCellDelegate 里加了 `- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath` 回调，让开发者在自定义的 TestSessionViewController 中有一个接口获取 cell 进行深度定制；可自行定制聊天气泡的样式，或者已有样式的各类参数，例如头像的圆角弧度。
+
+
+```objc
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([cell isKindOfClass: TestMessageCell]) {
+        //自定义 cell 样式
+        cell.data = ...
+    }
+}
+```
+
+
 
 
 
