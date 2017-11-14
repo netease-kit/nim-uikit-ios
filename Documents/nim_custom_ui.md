@@ -283,9 +283,9 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @implementation TestCellLayoutConfig
 
-- (CGFloat)avatarMargin:(NIMMessageModel *)model
+- (CGPoint)avatarMargin:(NIMMessageModel *)model
 {
-    //自定义头像距离 NIMMessageCell 边框宽度
+    //自定义头像控件 origin
 }
 
 @end
@@ -329,8 +329,8 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @implementation TestCellLayoutConfig
 
-- (CGFloat)nickNameMargin:(NIMMessageModel *)model {
-   //自定义
+- (CGPoint)nickNameMargin:(NIMMessageModel *)model {
+   //自定义头像控件 origin
 }
 
 @end
