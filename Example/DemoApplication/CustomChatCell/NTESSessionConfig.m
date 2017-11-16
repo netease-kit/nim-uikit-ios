@@ -13,7 +13,7 @@
 @implementation NTESSessionConfig
 
 - (NSArray *)mediaItems{
-    NSArray *defaultMediaItems = [NIMKitUIConfig sharedConfig].defaultMediaItems;
+    NSArray *defaultMediaItems = [NIMKit sharedKit].config.defaultMediaItems;
     NIMMediaItem* custom =
              [NIMMediaItem item:@"sendCustomMessage"
                     normalImage:[UIImage imageNamed:@"icon_custom_normal"]
