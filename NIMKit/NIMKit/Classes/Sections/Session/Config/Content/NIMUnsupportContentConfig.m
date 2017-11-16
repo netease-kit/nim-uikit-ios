@@ -7,7 +7,7 @@
 //
 
 #import "NIMUnsupportContentConfig.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @implementation NIMUnsupportContentConfig
 - (CGSize)contentSize:(CGFloat)cellWidth message:(NIMMessage *)message
@@ -22,8 +22,8 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    NIMKitSettings *settings = message.isOutgoingMsg? [NIMKit sharedKit].config.rightBubbleSettings : [NIMKit sharedKit].config.leftBubbleSettings;
+    return settings.unsupportSetting.contentInsets;
 }
 
 @end

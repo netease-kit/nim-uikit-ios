@@ -7,7 +7,7 @@
 //
 
 #import "NIMAudioContentConfig.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @implementation NIMAudioContentConfig
 
@@ -32,8 +32,7 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
 @end

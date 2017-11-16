@@ -9,8 +9,8 @@
 #import "NIMInputMoreContainerView.h"
 #import "NIMPageView.h"
 #import "NIMMediaItem.h"
-#import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 NSInteger NIMMaxItemCountInPage = 8;
 NSInteger NIMButtonItemWidth = 75;
@@ -38,8 +38,7 @@ NSInteger NIMButtonBegintLeftX = 11;
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _pageView = [[NIMPageView alloc] initWithFrame:self.bounds];
-        _pageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _pageView = [[NIMPageView alloc] initWithFrame:CGRectZero];
         _pageView.dataSource = self;
         [self addSubview:_pageView];
     }
@@ -54,14 +53,23 @@ NSInteger NIMButtonBegintLeftX = 11;
 }
 
 
+- (CGSize)sizeThatFits:(CGSize)size
+{
+    return CGSizeMake(size.width, 216.f);
+}
+
+
 - (void)genMediaButtons
 {
     NSMutableArray *mediaButtons = [NSMutableArray array];
     NSMutableArray *mediaItems = [NSMutableArray array];
     NSArray *items;
-    if (!self.config) {
-        items = [NIMKitUIConfig sharedConfig].defaultMediaItems;
-    }else if([self.config respondsToSelector:@selector(mediaItems)]){
+    if (!self.config)
+    {
+        items = [NIMKit sharedKit].config.defaultMediaItems;
+    }
+    else if([self.config respondsToSelector:@selector(mediaItems)])
+    {
         items = [self.config mediaItems];
     }
     [items enumerateObjectsUsingBlock:^(NIMMediaItem *item, NSUInteger idx, BOOL *stop) {
@@ -86,7 +94,9 @@ NSInteger NIMButtonBegintLeftX = 11;
 - (void)setFrame:(CGRect)frame{
     CGFloat originalWidth = self.frame.size.width;
     [super setFrame:frame];
-    if (originalWidth != frame.size.width) {
+    if (originalWidth != frame.size.width)
+    {
+        self.pageView.frame = self.bounds;
         [self.pageView reloadData];
     }
 }

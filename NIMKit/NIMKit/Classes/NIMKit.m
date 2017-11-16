@@ -11,7 +11,6 @@
 #import "NIMKitNotificationFirer.h"
 #import "NIMKitDataProviderImpl.h"
 #import "NIMCellLayoutConfig.h"
-#import "NIMKitUIConfig.h"
 #import "NIMKitInfoFetchOption.h"
 
 extern NSString *const NIMKitUserInfoHasUpdatedNotification;
@@ -32,10 +31,10 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     if (self = [super init]) {
         _resourceBundleName  = @"NIMKitResource.bundle";
         _emoticonBundleName  = @"NIMKitEmoticon.bundle";
-        _settingBundleName   = @"NIMKitSettings.bundle";
+        
         _firer = [[NIMKitNotificationFirer alloc] init];
         _provider = [[NIMKitDataProviderImpl alloc] init];   //默认使用 NIMKit 的实现
-
+        
         _layoutConfig = [[NIMCellLayoutConfig alloc] init];
         _robotTemplateParser = [[NIMKitRobotDefaultTemplateParser alloc] init];
     }
@@ -52,11 +51,11 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     return instance;
 }
 
-- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfigClass
+- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfig
 {
-    if ([layoutConfigClass isKindOfClass:[NIMCellLayoutConfig class]])
+    if ([layoutConfig isKindOfClass:[NIMCellLayoutConfig class]])
     {
-        self.layoutConfig = layoutConfigClass;
+        self.layoutConfig = layoutConfig;
     }
     else
     {
@@ -68,6 +67,16 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 - (id<NIMCellLayoutConfig>)layoutConfig
 {
     return _layoutConfig;
+}
+
+- (NIMKitConfig *)config
+{
+    //不要放在 NIMKit 初始化里面，因为 UIConfig 初始化会使用 NIMKit, 防止死循环
+    if (!_config)
+    {
+        _config = [[NIMKitConfig alloc] init];
+    }
+    return _config;
 }
 
 - (void)notfiyUserInfoChanged:(NSArray *)userIds{
@@ -84,22 +93,30 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 }
 
 - (void)notifyTeamInfoChanged:(NSArray *)teamIds{
-    if (teamIds.count) {
-        for (NSString *teamId in teamIds) {
+    if (teamIds.count)
+    {
+        for (NSString *teamId in teamIds)
+        {
             [self notifyTeam:teamId];
         }
-    }else{
+    }
+    else
+    {
         [self notifyTeam:nil];
     }
 }
 
 - (void)notifyTeamMemebersChanged:(NSArray *)teamIds
 {
-    if (teamIds.count) {
-        for (NSString *teamId in teamIds) {
+    if (teamIds.count)
+    {
+        for (NSString *teamId in teamIds)
+        {
             [self notifyTeamMemebers:teamId];
         }
-    }else{
+    }
+    else
+    {
         [self notifyTeamMemebers:nil];
     }
 }

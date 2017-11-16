@@ -88,8 +88,9 @@
             }
             if (status == PHAuthorizationStatusAuthorized) {
                 NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:self.limit delegate:weakSelf];
-                vc.navigationBar.barTintColor = [UIColor whiteColor];
-                vc.barItemTextColor = [UIColor blackColor];
+                vc.naviBgColor = [UIColor blackColor];
+                vc.naviTitleColor = [UIColor whiteColor];
+                vc.barItemTextColor = [UIColor whiteColor];
                 vc.navigationBar.barStyle = UIBarStyleDefault;
                 vc.allowPickingVideo = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
                 if(handler) handler(vc);

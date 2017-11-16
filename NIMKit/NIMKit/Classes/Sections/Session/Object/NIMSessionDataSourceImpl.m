@@ -120,7 +120,8 @@
 }
 
 - (void)checkAttachmentState:(NSArray *)messages{
-    for (id item in messages) {
+    NSArray *items = [NSArray arrayWithArray:messages];
+    for (id item in items) {
         NIMMessage *message;
         if ([item isKindOfClass:[NIMMessage class]]) {
             message = item;

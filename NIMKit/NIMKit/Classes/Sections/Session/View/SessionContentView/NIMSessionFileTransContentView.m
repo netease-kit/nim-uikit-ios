@@ -10,7 +10,7 @@
 #import "UIView+NIM.h"
 #import "NIMMessageModel.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @interface NIMSessionFileTransContentView()
 
@@ -62,13 +62,11 @@
     [super refresh:data];
     NIMFileObject *fileObject = (NIMFileObject *)self.model.message.messageObject;
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
-    
-    self.titleLabel.font = config.contentTextFont;
+    self.titleLabel.font = [[NIMKit sharedKit].config setting:data.message].font;
     self.titleLabel.text = fileObject.displayName;
     [self.titleLabel sizeToFit];
     
-    self.sizeLabel.font = config.contentTextFont;
+    self.sizeLabel.font = [[NIMKit sharedKit].config setting:data.message].font;
     long long size = fileObject.fileLength/1024;
     self.sizeLabel.text = [NSString stringWithFormat:@"%zdKB",size?: 1];
     [self.sizeLabel sizeToFit];

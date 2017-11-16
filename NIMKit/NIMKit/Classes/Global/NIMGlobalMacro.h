@@ -9,7 +9,7 @@
 #ifndef NIMKit_GlobalMacro_h
 #define NIMKit_GlobalMacro_h
 
-#define NIMKit_IOS8            ([[[UIDevice currentDevice] systemVersion] doubleValue] >= 8.0)
+#define NIMKit_IOS11            ([[[UIDevice currentDevice] systemVersion] doubleValue] >= 11.0)
 #define NIMKit_UIScreenWidth   [UIScreen mainScreen].bounds.size.width
 #define NIMKit_UIScreenHeight  [UIScreen mainScreen].bounds.size.height
 

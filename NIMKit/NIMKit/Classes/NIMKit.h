@@ -46,6 +46,11 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 #import "NIMSessionMessageContentView.h"
 
 /**
+ *  UI 配置器
+ */
+#import "NIMKitConfig.h"
+
+/**
  *  会话页
  */
 #import "NIMSessionViewController.h"
@@ -72,12 +77,17 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  *  注册自定义的排版配置，通过注册自定义排版配置来实现自定义消息的定制化排版
  */
-- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfigClass;
+- (void)registerLayoutConfig:(NIMCellLayoutConfig *)layoutConfig;
 
 /**
  *  返回当前的排版配置
  */
 - (id<NIMCellLayoutConfig>)layoutConfig;
+
+/**
+ *  UI 配置器
+ */
+@property (nonatomic,strong) NIMKitConfig *config;
 
 /**
  *  内容提供者，由上层开发者注入。如果没有则使用默认 provider
@@ -102,10 +112,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 @property (nonatomic,copy)      NSString *emoticonBundleName;
 
-/**
- *  NIMKit设置资源所在的 bundle 名称。
- */
-@property (nonatomic,copy)      NSString *settingBundleName;
 
 /**
  *  机器人消息模板解析器

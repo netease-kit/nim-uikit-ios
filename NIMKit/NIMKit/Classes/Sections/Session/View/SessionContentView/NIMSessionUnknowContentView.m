@@ -10,7 +10,7 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "UIView+NIM.h"
 #import "NIMMessageModel.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @interface NIMSessionUnknowContentView()
 
@@ -34,10 +34,11 @@
 - (void)refresh:(NIMMessageModel *)data{
     [super refresh:data];
     NSString *text = @"未知类型消息";
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
+    
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
 
-    self.label.textColor = config.contentTextColor;
-    self.label.font = config.contentTextFont;
+    self.label.textColor = setting.textColor;
+    self.label.font = setting.font;
     [self.label setText:text];
     [self.label sizeToFit];
 }

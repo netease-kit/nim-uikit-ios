@@ -10,8 +10,8 @@
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
 #import "NIMKitUtil.h"
-#import "NIMKitUIConfig.h"
 #import "UIImage+NIMKit.h"
+#import "NIMKit.h"
 
 @implementation NIMSessionNotificationContentView
 
@@ -29,16 +29,16 @@
 {
     [super refresh:model];
     self.label.text = [NIMKitUtil messageTipContent:model.message];
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:model.message];
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:model.message];
     
-    self.label.textColor = config.contentTextColor;
-    self.label.font = config.contentTextFont;
+    self.label.textColor = setting.textColor;
+    self.label.font = setting.font;
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    CGFloat padding = [NIMKitUIConfig sharedConfig].maxNotificationTipPadding;
+    CGFloat padding = [NIMKit sharedKit].config.maxNotificationTipPadding;
     self.label.nim_size = [self.label sizeThatFits:CGSizeMake(self.nim_width - 2 * padding, CGFLOAT_MAX)];
     self.label.nim_centerX = self.nim_width * .5f;
     self.label.nim_centerY = self.nim_height * .5f;

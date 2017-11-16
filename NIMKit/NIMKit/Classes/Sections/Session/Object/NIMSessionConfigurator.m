@@ -11,7 +11,6 @@
 #import "NIMSessionInteractorImpl.h"
 #import "NIMCustomLeftBarView.h"
 #import "UIView+NIM.h"
-#import "NIMKitUIConfig.h"
 #import "NIMMessageModel.h"
 #import "NIMGlobalMacro.h"
 #import "NIMSessionInteractorImpl.h"
@@ -59,11 +58,13 @@
 {
     NIMSession *session    = vc.session;
     id<NIMSessionConfig> sessionConfig = vc.sessionConfig;
-    UITableView *tableView = vc.tableView;
+    UITableView *tableView  = vc.tableView;
+    NIMInputView *inputView = vc.sessionInputView;
     
     NIMSessionDataSourceImpl *datasource = [[NIMSessionDataSourceImpl alloc] initWithSession:session config:sessionConfig];
-    NIMSessionLayoutImpl *layout         = [[NIMSessionLayoutImpl alloc] initWithSession:session tableView:tableView config:sessionConfig];
-    
+    NIMSessionLayoutImpl *layout         = [[NIMSessionLayoutImpl alloc] initWithSession:session config:sessionConfig];
+    layout.tableView = tableView;
+    layout.inputView = inputView;
     
     
     _interactor                          = [[NIMSessionInteractorImpl alloc] initWithSession:session config:sessionConfig];

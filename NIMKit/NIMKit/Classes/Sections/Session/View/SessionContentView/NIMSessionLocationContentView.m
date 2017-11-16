@@ -10,7 +10,7 @@
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @interface NIMSessionLocationContentView()
 
@@ -52,9 +52,10 @@
     NIMLocationObject * locationObject = (NIMLocationObject*)self.model.message.messageObject;
     self.titleLabel.text = locationObject.title;
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
-    self.titleLabel.textColor  = config.contentTextColor;
-    self.titleLabel.font       = config.contentTextFont;
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
+
+    self.titleLabel.textColor  = setting.textColor;
+    self.titleLabel.font       = setting.font;
 }
 
 - (void)onTouchUpInside:(id)sender

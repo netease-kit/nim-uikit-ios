@@ -10,8 +10,8 @@
 #import "UIView+NIM.h"
 #import "NIMMessageModel.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
 #import "NIMKitAudioCenter.h"
+#import "NIMKit.h"
 
 @interface NIMSessionAudioContentView()<NIMMediaManagerDelegate>
 
@@ -70,10 +70,10 @@
     NIMAudioObject *object = self.model.message.messageObject;
     self.durationLabel.text = [NSString stringWithFormat:@"%zd\"",(object.duration+500)/1000];//四舍五入
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
 
-    self.durationLabel.font = config.contentTextFont;
-    self.durationLabel.textColor = config.contentTextColor;
+    self.durationLabel.font      = setting.font;
+    self.durationLabel.textColor = setting.textColor;
     
     [self.durationLabel sizeToFit];
     

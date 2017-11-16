@@ -7,7 +7,6 @@
 //
 
 #import "NIMMessageModel.h"
-#import "NIMKitUIConfig.h"
 #import "NIMKit.h"
 
 @interface NIMMessageModel()
@@ -25,6 +24,7 @@
 @synthesize shouldShowLeft     = _shouldShowLeft;
 @synthesize avatarMargin       = _avatarMargin;
 @synthesize nickNameMargin     = _nickNameMargin;
+@synthesize avatarSize         = _avatarSize;
 
 - (instancetype)initWithMessage:(NIMMessage*)message
 {
@@ -102,6 +102,7 @@
     _shouldShowLeft         = [layoutConfig shouldShowLeft:self];
     _avatarMargin           = [layoutConfig avatarMargin:self];
     _nickNameMargin         = [layoutConfig nickNameMargin:self];
+    _avatarSize             = [layoutConfig avatarSize:self];
 }
 
 

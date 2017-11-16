@@ -7,7 +7,6 @@
 //
 
 #import "NIMCellConfig.h"
-#import "NIMKitUIConfig.h"
 
 @interface NIMCellLayoutConfig : NSObject<NIMCellLayoutConfig>
 

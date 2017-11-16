@@ -11,7 +11,7 @@
 #import "NIMMessageModel.h"
 #import "NIMTimestampModel.h"
 #import "NIMGlobalMacro.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @interface NIMSessionMsgDatasource()
 
@@ -35,8 +35,8 @@
         _sessionConfig     = sessionConfig;
         id<NIMKitMessageProvider> dataProvider = [_sessionConfig respondsToSelector:@selector(messageDataProvider)] ? [_sessionConfig messageDataProvider] : nil;
         
-        NSInteger limit = [[[NIMKitUIConfig sharedConfig] globalConfig] messageLimit];
-        NSTimeInterval showTimestampInterval =[[[NIMKitUIConfig sharedConfig] globalConfig] messageInterval];
+        NSInteger limit = [NIMKit sharedKit].config.messageLimit;
+        NSTimeInterval showTimestampInterval = [NIMKit sharedKit].config.messageInterval;
         
         _dataProvider      = dataProvider;
         _messageLimit      = limit;

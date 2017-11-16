@@ -9,8 +9,8 @@
 #import "NIMSessionMessageContentView.h"
 #import "NIMMessageModel.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 @interface NIMSessionMessageContentView()
 
@@ -69,10 +69,18 @@
 
 
 #pragma mark - Private
-- (UIImage *)chatBubbleImageForState:(UIControlState)state outgoing:(BOOL)outgoing{
+- (UIImage *)chatBubbleImageForState:(UIControlState)state outgoing:(BOOL)outgoing
+{
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:self.model.message];
-    return [config bubbleImage:state];
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:self.model.message];
+    if (state == UIControlStateNormal)
+    {
+        return setting.normalBackgroundImage;
+    }
+    else
+    {
+        return setting.highLightBackgroundImage;
+    }
 }
 
 

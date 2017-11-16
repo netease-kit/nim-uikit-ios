@@ -8,8 +8,7 @@
 
 #import "NIMTipContentConfig.h"
 #import "NIMKitUtil.h"
-#import "NIMKitUIConfig.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @implementation NIMTipContentConfig
 
@@ -20,7 +19,7 @@
     label.text  = [NIMKitUtil messageTipContent:message];
     label.font = [UIFont boldSystemFontOfSize:NIMKit_Notification_Font_Size];
     label.numberOfLines = 0;
-    CGFloat padding = [NIMKitUIConfig sharedConfig].maxNotificationTipPadding;
+    CGFloat padding = [NIMKit sharedKit].config.maxNotificationTipPadding;
     CGSize size = [label sizeThatFits:CGSizeMake(cellWidth - 2 * padding, CGFLOAT_MAX)];
     CGFloat cellPadding = 11.f;
     CGSize contentSize = CGSizeMake(messageWidth, size.height + 2 * cellPadding);;
@@ -34,8 +33,7 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
 @end

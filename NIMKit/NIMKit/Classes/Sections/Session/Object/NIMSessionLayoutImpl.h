@@ -11,8 +11,11 @@
 
 @interface NIMSessionLayoutImpl : NSObject<NIMSessionLayout>
 
+@property (nonatomic,strong)  UITableView *tableView;
+
+@property (nonatomic,strong)  NIMInputView *inputView;
+
 - (instancetype)initWithSession:(NIMSession *)session
-                      tableView:(UITableView *)tableView
                          config:(id<NIMSessionConfig>)sessionConfig;
 
 @end

@@ -43,9 +43,14 @@
 
 
 /**
- *  左对齐的气泡，头像到左边的距离
+ *  左对齐的气泡，头像控件的 origin 点
  */
-- (CGFloat)avatarMargin:(NIMMessageModel *)model;
+- (CGPoint)avatarMargin:(NIMMessageModel *)model;
+
+/**
+ *  左对齐的气泡，头像控件的 size
+ */
+- (CGSize)avatarSize:(NIMMessageModel *)model;
 
 /**
  *  是否显示姓名
@@ -53,9 +58,9 @@
 - (BOOL)shouldShowNickName:(NIMMessageModel *)model;
 
 /**
- *  左对齐的气泡，昵称到左边的距离
+ *  左对齐的气泡，昵称控件的 origin 点
  */
-- (CGFloat)nickNameMargin:(NIMMessageModel *)model;
+- (CGPoint)nickNameMargin:(NIMMessageModel *)model;
 
 
 /**
@@ -68,6 +73,12 @@
  *  需要添加到Cell上的自定义视图
  */
 - (NSArray *)customViews:(NIMMessageModel *)model;
+
+
+/**
+ *  是否开启重试叹号开关
+ */
+- (BOOL)disableRetryButton:(NIMMessageModel *)model;
 
 
 @end

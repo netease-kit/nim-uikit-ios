@@ -33,10 +33,10 @@
     if (self) {
         [self setBackgroundColor:[UIColor whiteColor]];
         
-        _voiceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_voiceBtn setImage:[UIImage nim_imageInKit:@"icon_toolview_voice_normal"] forState:UIControlStateNormal];
-        [_voiceBtn setImage:[UIImage nim_imageInKit:@"icon_toolview_voice_pressed"] forState:UIControlStateHighlighted];
-        [_voiceBtn sizeToFit];
+        _voiceButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_voiceButton setImage:[UIImage nim_imageInKit:@"icon_toolview_voice_normal"] forState:UIControlStateNormal];
+        [_voiceButton setImage:[UIImage nim_imageInKit:@"icon_toolview_voice_pressed"] forState:UIControlStateHighlighted];
+        [_voiceButton sizeToFit];
         
         
         _emoticonBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -61,7 +61,7 @@
         
         _inputTextView = [[NIMGrowingTextView alloc] initWithFrame:CGRectZero];
         _inputTextView.font = [UIFont systemFontOfSize:14.0f];
-        _inputTextView.maxNumberOfLines = 4;
+        _inputTextView.maxNumberOfLines = _maxNumberOfInputLines?:4;
         _inputTextView.minNumberOfLines = 1;
         _inputTextView.textColor = [UIColor blackColor];
         _inputTextView.backgroundColor = [UIColor clearColor];
@@ -240,8 +240,8 @@
 
 - (void)updateVoiceBtnImages:(BOOL)selected
 {
-    [self.voiceBtn setImage:selected?[UIImage nim_imageInKit:@"icon_toolview_voice_normal"]:[UIImage nim_imageInKit:@"icon_toolview_keyboard_normal"] forState:UIControlStateNormal];
-    [self.voiceBtn setImage:selected?[UIImage nim_imageInKit:@"icon_toolview_voice_pressed"]:[UIImage nim_imageInKit:@"icon_toolview_keyboard_pressed"] forState:UIControlStateHighlighted];
+    [self.voiceButton setImage:selected?[UIImage nim_imageInKit:@"icon_toolview_voice_normal"]:[UIImage nim_imageInKit:@"icon_toolview_keyboard_normal"] forState:UIControlStateNormal];
+    [self.voiceButton setImage:selected?[UIImage nim_imageInKit:@"icon_toolview_voice_pressed"]:[UIImage nim_imageInKit:@"icon_toolview_keyboard_pressed"] forState:UIControlStateHighlighted];
 }
 
 - (void)updateEmotAndTextBtnImages:(BOOL)selected
@@ -307,7 +307,7 @@
 - (UIView *)subViewForType:(NIMInputBarItemType)type{
     if (!_dict) {
         _dict = @{
-                  @(NIMInputBarItemTypeVoice) : self.voiceBtn,
+                  @(NIMInputBarItemTypeVoice) : self.voiceButton,
                   @(NIMInputBarItemTypeTextAndRecord)  : self.inputTextBkgImage,
                   @(NIMInputBarItemTypeEmoticon) : self.emoticonBtn,
                   @(NIMInputBarItemTypeMore)     : self.moreMediaBtn

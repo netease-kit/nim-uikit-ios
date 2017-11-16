@@ -31,9 +31,11 @@
 
 @property (nonatomic, readonly) UIEdgeInsets  bubbleViewInsets;
 
-@property (nonatomic, readonly) CGFloat avatarMargin;
+@property (nonatomic, readonly) CGPoint avatarMargin;
 
-@property (nonatomic, readonly) CGFloat nickNameMargin;
+@property (nonatomic, readonly) CGPoint nickNameMargin;
+
+@property(nonatomic, readonly) CGSize avatarSize;
 
 @property (nonatomic, readonly) BOOL shouldShowAvatar;
 

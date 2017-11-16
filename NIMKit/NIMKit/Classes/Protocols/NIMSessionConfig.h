@@ -88,6 +88,13 @@
  */
 - (BOOL)disableAutoMarkMessageRead;
 
+
+/**
+ *  输入框是否禁用 @ 功能
+ *
+ */
+- (BOOL)disableAt;
+
 /**
  *  录音类型
  *
@@ -108,5 +115,9 @@
  */
 - (BOOL)enableRobot;
 
+/**
+ *  会话聊天背景更换接口
+ */
+- (UIImage *)sessionBackgroundImage;
 
 @end

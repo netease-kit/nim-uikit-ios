@@ -179,7 +179,7 @@
         {
             info = [self userInfo:userId inChatroom:session.sessionId option:option];
         }
-            break;        
+            break;
         default:
             NSAssert(0, @"invalid type");
             break;
@@ -255,7 +255,7 @@
 {
     NIMKitInfo *info = [[NIMKitInfo alloc] init];
     info.infoId = userId;
-
+    
     if ([userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount])
     {
         

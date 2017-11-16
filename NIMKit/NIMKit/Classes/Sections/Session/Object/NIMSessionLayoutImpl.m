@@ -10,22 +10,18 @@
 #import "UITableView+NIMScrollToBottom.h"
 #import "NIMMessageCell.h"
 #import "NIMGlobalMacro.h"
-#import "NIMKitUIConfig.h"
 #import "NIMSessionTableAdapter.h"
 #import "UIView+NIM.h"
+#import "NIMKitKeyboardInfo.h"
 
 @interface NIMSessionLayoutImpl(){
     NSMutableArray *_inserts;
     CGFloat _inputViewHeight;
 }
 
-@property (nonatomic,strong)  UITableView *tableView;
-
 @property (nonatomic,strong)  UIRefreshControl *refreshControl;
 
 @property (nonatomic,strong)  NIMSession  *session;
-
-@property (nonatomic,assign)  CGRect viewRect;
 
 @property (nonatomic,strong)  id<NIMSessionConfig> sessionConfig;
 
@@ -36,12 +32,10 @@
 @implementation NIMSessionLayoutImpl
 
 - (instancetype)initWithSession:(NIMSession *)session
-                      tableView:(UITableView *)tableView
                          config:(id<NIMSessionConfig>)sessionConfig
 {
     self = [super init];
     if (self) {
-        _tableView     = tableView;
         _sessionConfig = sessionConfig;
         _session       = session;
         _inserts       = [[NSMutableArray alloc] init];
@@ -49,6 +43,7 @@
         [self setupRefreshControl];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:NIMKitKeyboardWillChangeFrameNotification object:nil];
     }
     return self;
 }
@@ -65,6 +60,7 @@
 
 - (void)resetLayout
 {
+    [self adjustInputView];
     [self adjustTableView];
 }
 
@@ -80,33 +76,91 @@
     [self.tableView setContentOffset:point animated:NO];
 }
 
+
 - (void)changeLayout:(CGFloat)inputViewHeight
 {
     BOOL change = _inputViewHeight != inputViewHeight;
     if (change)
     {
         _inputViewHeight = inputViewHeight;
+        [self adjustInputView];
         [self adjustTableView];
     }
 }
 
+
+- (void)adjustInputView
+{
+    self.inputView.nim_bottom = self.inputView.superview.nim_height;
+}
+
 - (void)adjustTableView
 {
-    BOOL viewRectChanged = !CGRectEqualToRect(_viewRect, self.tableView.superview.frame);
-    [self setViewRect:self.tableView.superview.frame];
+    //输入框是否弹起
+    BOOL inputViewUp = NO;
+    switch (self.inputView.status)
+    {
+        case NIMInputStatusText:
+            inputViewUp = [NIMKitKeyboardInfo instance].isVisiable;
+            break;
+        case NIMInputStatusAudio:
+            inputViewUp = NO;
+            break;
+        case NIMInputStatusMore:
+        case NIMInputStatusEmoticon:
+            inputViewUp = YES;
+        default:
+            break;
+    }
+    self.tableView.userInteractionEnabled = !inputViewUp;
+    CGRect rect = self.tableView.frame;
+    rect.size.height = self.tableView.superview.frame.size.height - self.inputView.toolBar.nim_height;
     
-    CGRect rect = [_tableView frame];
-    rect.origin.y = 0;
-    rect.size.height = self.viewRect.size.height - _inputViewHeight;
-    BOOL tableChanged = !CGRectEqualToRect(_tableView.frame, rect);
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    CGFloat visiableHeight = 0;
+    if (@available(iOS 11.0, *))
+    {
+        insets = self.tableView.adjustedContentInset;
+    }
+    else
+    {
+        insets = self.tableView.contentInset;
+        visiableHeight = [self fixVisiableHeightBelowIOS11:visiableHeight];
+    }
+    
+    //如果气泡过少，少于总高度，输入框视图需要顶到最后一个气泡的下面。
+    visiableHeight = visiableHeight + self.tableView.contentSize.height + insets.top + insets.bottom;
+    visiableHeight = MIN(visiableHeight, rect.size.height);
+    
+    
+    
+    rect.origin.y    = self.tableView.superview.frame.size.height - visiableHeight - self.inputView.nim_height;
+    rect.origin.y    = rect.origin.y > 0? 0 : rect.origin.y;
+    
+    
+    BOOL tableChanged = !CGRectEqualToRect(self.tableView.frame, rect);
     if (tableChanged)
     {
         [_tableView setFrame:rect];
-    }
-    if (tableChanged || viewRectChanged)
-    {
-        [_tableView reloadData];
         [_tableView nim_scrollToBottom:YES];
+    }
+}
+
+
+- (CGFloat)fixVisiableHeightBelowIOS11:(CGFloat)visiableHeight
+{
+    //iOS11 以下，当插入数据后不会立即改变 contentSize 的大小，所以需要手动添加最后一个数据的高度
+    NSInteger section = self.tableView.numberOfSections - 1;
+    NSInteger row     = [self.tableView numberOfRowsInSection:section] - 1;
+    if (section >=0 && row >=0)
+    {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
+        CGFloat height = [self.tableView.delegate tableView:self.tableView heightForRowAtIndexPath:indexPath];
+        return visiableHeight + height;
+    }
+    else
+    {
+        return visiableHeight;
     }
 }
 
@@ -116,6 +170,20 @@
 {
     [UIMenuController sharedMenuController].menuItems = nil;
 }
+
+
+- (void)keyboardWillChangeFrame:(NSNotification *)notification
+{
+    if (!self.tableView.window)
+    {
+        //如果当前视图不是顶部视图，则不需要监听
+        return;
+    }
+    [self.inputView sizeToFit];
+}
+
+
+
 
 #pragma mark - Private
 
@@ -154,10 +222,14 @@
     }];
     
     [self.tableView beginUpdates];
-    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationBottom];
     [self.tableView endUpdates];
-    [self.tableView nim_scrollToBottom:animated];
+    
 
+    [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
+        [self resetLayout];
+    } completion:nil];
+    [self.tableView nim_scrollToBottom:YES];
 }
 
 - (void)remove:(NSArray<NSIndexPath *> *)indexPaths

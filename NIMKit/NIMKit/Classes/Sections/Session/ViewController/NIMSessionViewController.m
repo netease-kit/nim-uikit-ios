@@ -15,10 +15,11 @@
 #import "NIMBadgeView.h"
 #import "UITableView+NIMScrollToBottom.h"
 #import "NIMMessageMaker.h"
-#import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
 #import "NIMSessionConfigurator.h"
 #import "NIMKitInfoFetchOption.h"
+#import "NIMKitTitleView.h"
+#import "NIMKitKeyboardInfo.h"
 
 @interface NIMSessionViewController ()<NIMMediaManagerDelegate,NIMInputDelegate>
 
@@ -78,7 +79,8 @@
     [self setUpTitleView];
     NIMCustomLeftBarView *leftBarView = [[NIMCustomLeftBarView alloc] init];
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarView];
-    self.navigationItem.leftBarButtonItems = @[leftItem];
+    NSMutableArray *items = [NSMutableArray arrayWithObject:leftItem];
+    self.navigationItem.leftBarButtonItems = items;
     self.navigationItem.leftItemsSupplementBackButton = YES;
 }
 
@@ -92,6 +94,12 @@
     self.tableView.estimatedSectionHeaderHeight = 0;
     self.tableView.estimatedSectionFooterHeight = 0;
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    if ([self.sessionConfig respondsToSelector:@selector(sessionBackgroundImage)] && [self.sessionConfig sessionBackgroundImage]) {
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:self.view.bounds];
+        imgView.image = [self.sessionConfig sessionBackgroundImage];
+        imgView.contentMode = UIViewContentModeScaleAspectFill;
+        self.tableView.backgroundView = imgView;
+    }
     [self.view addSubview:self.tableView];
 }
 
@@ -127,7 +135,8 @@
     [self.interactor onViewWillAppear];
 }
 
-- (void)viewDidDisappear:(BOOL)animated{
+- (void)viewDidDisappear:(BOOL)animated
+{
     [super viewDidDisappear:animated];
     [self.interactor onViewDidDisappear];
     
@@ -135,7 +144,8 @@
 }
 
 
-- (void)viewDidLayoutSubviews{
+- (void)viewDidLayoutSubviews
+{
     [self changeLeftBarBadge:self.conversationManager.allUnreadCount];
     [self.interactor resetLayout];
 }
@@ -214,7 +224,8 @@
 //发送结果
 - (void)sendMessage:(NIMMessage *)message didCompleteWithError:(NSError *)error
 {
-    if ([message.session isEqual:_session]) {
+    if ([message.session isEqual:_session])
+    {
         [self.interactor updateMessage:message];
     }
 }
@@ -230,29 +241,35 @@
 //接收消息
 - (void)onRecvMessages:(NSArray *)messages
 {
-    NIMMessage *message = messages.firstObject;
-    NIMSession *session = message.session;
-    if (![session isEqual:self.session] || !messages.count){
-        return;
+    if ([self shouldAddListenerForNewMsg])
+    {
+        NIMMessage *message = messages.firstObject;
+        NIMSession *session = message.session;
+        if (![session isEqual:self.session] || !messages.count)
+        {
+            return;
+        }
+        
+        [self uiAddMessages:messages];
+        [self sendMessageReceipt:messages];
+        
+        [self.conversationManager markAllMessagesReadInSession:self.session];
     }
-    
-    [self uiAddMessages:messages];
-    [self sendMessageReceipt:messages];
-    
-    [self.conversationManager markAllMessagesReadInSession:self.session];
 }
 
 
 - (void)fetchMessageAttachment:(NIMMessage *)message progress:(float)progress
 {
-    if ([message.session isEqual:_session]) {
+    if ([message.session isEqual:_session])
+    {
         [self.interactor updateMessage:message];
     }
 }
 
 - (void)fetchMessageAttachment:(NIMMessage *)message didCompleteWithError:(NSError *)error
 {
-    if ([message.session isEqual:_session]) {
+    if ([message.session isEqual:_session])
+    {
         NIMMessageModel *model = [self.interactor findMessageModel:message];
         //下完缩略图之后，因为比例有变化，重新刷下宽高。
         [model cleanCache];
@@ -262,8 +279,11 @@
 
 - (void)onRecvMessageReceipt:(NIMMessageReceipt *)receipt
 {
-    if ([receipt.session isEqual:self.session] && [self shouldHandleReceipt]) {
-        [self uiCheckReceipt];
+    if ([self shouldAddListenerForNewMsg])
+    {
+        if ([receipt.session isEqual:self.session] && [self shouldHandleReceipt]) {
+            [self uiCheckReceipt];
+        }
     }
 }
 
@@ -341,20 +361,10 @@
 - (void)showRecordFileNotSendReason{}
 
 #pragma mark - NIMInputDelegate
-- (void)showInputView
-{
-    [self.tableView setUserInteractionEnabled:NO];
-}
 
-- (void)hideInputView
+- (void)didChangeInputHeight:(CGFloat)inputHeight
 {
-    [self.tableView setUserInteractionEnabled:YES];
-}
-
-- (void)inputViewSizeToHeight:(CGFloat)height showInputView:(BOOL)show
-{
-    [self.tableView setUserInteractionEnabled:!show];
-    [self.interactor changeLayout:height];
+    [self.interactor changeLayout:inputHeight];
 }
 
 #pragma mark - NIMInputActionDelegate
@@ -436,7 +446,7 @@
     _sessionInputView.recording = YES;
     
     NIMAudioType type = [self recordAudioType];
-    NSTimeInterval duration = [NIMKitUIConfig sharedConfig].globalConfig.recordMaxDuration;
+    NSTimeInterval duration = [NIMKit sharedKit].config.recordMaxDuration;
     
     [[NIMSDK sharedSDK].mediaManager addDelegate:self];
     
@@ -731,9 +741,7 @@
 
 - (void)addListener
 {
-    if ([self shouldAddListenerForNewMsg]) {
-        [[NIMSDK sharedSDK].chatManager addDelegate:self];
-    }
+    [[NIMSDK sharedSDK].chatManager addDelegate:self];
     [[NIMSDK sharedSDK].conversationManager addDelegate:self];
 }
 
@@ -773,59 +781,28 @@
 
 - (void)setUpTitleView
 {
-    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.titleLabel.font = [UIFont boldSystemFontOfSize:15.f];
-    self.titleLabel.text = self.sessionTitle;
- 
-    self.titleLabel.textAlignment = NSTextAlignmentCenter;
-    
-    self.subTitleLabel  = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.subTitleLabel.textColor = [UIColor grayColor];
-    self.subTitleLabel.font = [UIFont systemFontOfSize:12.f];
-    self.subTitleLabel.text = self.sessionSubTitle;
-    self.subTitleLabel.textAlignment = NSTextAlignmentCenter;
-    
-    UIView *titleView = [[UIView alloc] init];
-    [titleView addSubview:self.titleLabel];
-    [titleView addSubview:self.subTitleLabel];
-    
-    self.navigationItem.titleView = titleView;
-    
-    [self layoutTitleView];
-    
+    NIMKitTitleView *titleView = (NIMKitTitleView *)self.navigationItem.titleView;
+    if (!titleView || [titleView isKindOfClass:[NIMKitTitleView class]])
+    {
+        titleView = [[NIMKitTitleView alloc] initWithFrame:CGRectZero];
+        self.navigationItem.titleView = titleView;
+    }
+    titleView.titleLabel.text = self.sessionTitle;
+    titleView.subtitleLabel.text = self.sessionSubTitle;
+    [titleView sizeToFit];
 }
-
-- (void)layoutTitleView
-{
-    CGFloat maxLabelWidth = 150.f;
-    [self.titleLabel sizeToFit];
-    self.titleLabel.nim_width = maxLabelWidth;
-    
-    [self.subTitleLabel sizeToFit];
-    self.subTitleLabel.nim_width = maxLabelWidth;
-    
-    
-    UIView *titleView = self.navigationItem.titleView;
-    
-    titleView.nim_width  = MAX(self.titleLabel.nim_width, self.subTitleLabel.nim_width);
-    titleView.nim_height = self.titleLabel.nim_height + self.subTitleLabel.nim_height;
-    
-    self.subTitleLabel.nim_bottom  = titleView.nim_height;
-}
-
-
 
 - (void)refreshSessionTitle:(NSString *)title
 {
     self.titleLabel.text = title;
-    [self layoutTitleView];
+    [self setUpTitleView];
 }
 
 
 - (void)refreshSessionSubTitle:(NSString *)title
 {
     self.subTitleLabel.text = title;
-    [self layoutTitleView];
+    [self setUpTitleView];
 }
 
 

@@ -14,7 +14,6 @@
 #import "NIMInputEmoticonTabView.h"
 #import "NIMInputEmoticonDefine.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
 
 NSInteger NIMCustomPageControlHeight = 36;
 NSInteger NIMCustomPageViewHeight    = 159;
@@ -45,6 +44,12 @@ NSInteger NIMCustomPageViewHeight    = 159;
     [self loadUIComponents];
     [self reloadData];
 }
+
+- (CGSize)sizeThatFits:(CGSize)size
+{
+    return CGSizeMake(size.width, 216.f);
+}
+
 
 
 

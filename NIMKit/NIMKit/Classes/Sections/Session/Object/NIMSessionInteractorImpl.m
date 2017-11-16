@@ -9,7 +9,6 @@
 #import "NIMSessionInteractorImpl.h"
 #import <NIMSDK/NIMSDK.h>
 #import "NIMMessageModel.h"
-#import "NIMKitUIConfig.h"
 #import "NIMSessionTableAdapter.h"
 #import "NIMKitMediaFetcher.h"
 #import "NIMMessageMaker.h"
@@ -236,6 +235,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
             if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
             {
                 [weakSelf.delegate didFetchMessageData];
+                [weakSelf.dataSource checkAttachmentState:weakSelf.items];
             }
         }];
     }
@@ -245,7 +245,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (void)setDataSource:(id<NIMSessionDataSource>)dataSource
 {
     _dataSource = dataSource;
-    [self.dataSource checkAttachmentState:self.items];
     [self autoFetchMessages];
 }
 

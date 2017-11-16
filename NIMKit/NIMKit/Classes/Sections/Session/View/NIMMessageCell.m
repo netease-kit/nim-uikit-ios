@@ -14,12 +14,11 @@
 #import "NIMKitUtil.h"
 #import "NIMSessionAudioContentView.h"
 #import "UIView+NIM.h"
-#import "NIMKitUIConfig.h"
 #import "NIMKitDependency.h"
 #import "M80AttributedLabel.h"
 #import "UIImage+NIMKit.h"
 #import "NIMSessionUnknowContentView.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKitConfig.h"
 #import "NIMKit.h"
 
 @interface NIMMessageCell()<NIMPlayAudioUIDelegate,NIMMessageContentViewDelegate>
@@ -87,8 +86,8 @@
     _nameLabel = [[UILabel alloc] init];
     _nameLabel.backgroundColor = [UIColor clearColor];
     _nameLabel.opaque = YES;
-    _nameLabel.font = [UIFont systemFontOfSize:13.0];
-    [_nameLabel setTextColor:[UIColor darkGrayColor]];
+    _nameLabel.font   = [NIMKit sharedKit].config.nickFont;
+    _nameLabel.textColor = [NIMKit sharedKit].config.nickColor;
     [_nameLabel setHidden:YES];
     [self.contentView addSubview:_nameLabel];
     
@@ -96,11 +95,11 @@
     _readLabel = [[UILabel alloc] init];
     _readLabel.backgroundColor = [UIColor clearColor];
     _readLabel.opaque = YES;
-    _readLabel.font = [UIFont systemFontOfSize:13.0];
-    [_readLabel setTextColor:[UIColor darkGrayColor]];
+    _readLabel.font   = [NIMKit sharedKit].config.receiptFont;
+    _readLabel.textColor = [NIMKit sharedKit].config.receiptColor;
     [_readLabel setHidden:YES];
     [_readLabel setText:NSLocalizedString(@"已读", nil)];
-    [_readLabel setBounds:CGRectMake(0, 0, 28, 20.0)];
+    [_readLabel sizeToFit];
     [self.contentView addSubview:_readLabel];
 }
 
@@ -128,7 +127,7 @@
     [self addContentViewIfNotExist];
     [self addUserCustomViews];
     
-    self.backgroundColor = [NIMKitUIConfig sharedConfig].globalConfig.backgroundColor;
+    self.backgroundColor = [NIMKit sharedKit].config.cellBackgroundColor;
     
     if ([self needShowAvatar])
     {
@@ -222,13 +221,13 @@
 - (void)layoutNameLabel
 {
     if ([self needShowNickName]) {
-        CGFloat otherBubbleOriginX  = self.cellPaddingToNick;
-        CGFloat otherBubbleOriginy  = -3.f;
+        CGFloat otherBubbleOriginX  = self.cellPaddingToNick.x;
+        CGFloat otherBubbleOriginy  = self.cellPaddingToNick.y;
         CGFloat otherNickNameWidth  = 200.f;
         CGFloat otherNickNameHeight = 20.f;
-        CGFloat cellPaddingToProtrait = self.cellPaddingToProtrait;
+        CGFloat cellPaddingToProtrait = self.cellPaddingToAvatar.x;
         CGFloat avatarWidth = self.headImageView.nim_width;
-        CGFloat myBubbleOriginX = self.nim_width - cellPaddingToProtrait - avatarWidth - self.cellPaddingToNick;
+        CGFloat myBubbleOriginX = self.nim_width - cellPaddingToProtrait - avatarWidth - self.cellPaddingToNick.x;
         _nameLabel.frame = self.model.shouldShowLeft ? CGRectMake(otherBubbleOriginX,otherBubbleOriginy,
                                                                   otherNickNameWidth, otherNickNameHeight) :        CGRectMake(myBubbleOriginX,otherBubbleOriginy,                   otherNickNameWidth,otherNickNameHeight) ;
     }
@@ -359,9 +358,10 @@
 - (CGRect)avatarViewRect
 {
     CGFloat cellWidth = self.bounds.size.width;
-    CGFloat protraitImageWidth    = 42;//头像宽
-    CGFloat selfProtraitOriginX   = (cellWidth - self.cellPaddingToProtrait - protraitImageWidth);
-    return self.model.shouldShowLeft ? CGRectMake(self.cellPaddingToProtrait,0,protraitImageWidth, protraitImageWidth) :  CGRectMake(selfProtraitOriginX, 0,protraitImageWidth,protraitImageWidth);
+    CGFloat protraitImageWidth = [self avatarSize].width;
+    CGFloat protraitImageHeight = [self avatarSize].height;
+    CGFloat selfProtraitOriginX   = (cellWidth - self.cellPaddingToAvatar.x - protraitImageWidth);
+    return self.model.shouldShowLeft ? CGRectMake(self.cellPaddingToAvatar.x,self.cellPaddingToAvatar.y,protraitImageWidth, protraitImageHeight) :  CGRectMake(selfProtraitOriginX, self.cellPaddingToAvatar.y,protraitImageWidth,protraitImageHeight);
 }
 
 - (BOOL)needShowAvatar
@@ -377,12 +377,13 @@
 
 - (BOOL)retryButtonHidden
 {
-    if (!self.model.message.isReceivedMsg) {
-        return self.model.message.deliveryState != NIMMessageDeliveryStateFailed;
-    } else
+    id<NIMCellLayoutConfig> layoutConfig = [[NIMKit sharedKit] layoutConfig];
+    BOOL disable = NO;
+    if ([layoutConfig respondsToSelector:@selector(disableRetryButton:)])
     {
-        return self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateFailed;
+        disable = [layoutConfig disableRetryButton:self.model];
     }
+    return disable;    
 }
 
 - (CGFloat)retryButtonBubblePadding {
@@ -407,7 +408,8 @@
 
 
 - (BOOL)unreadHidden {
-    if (self.model.message.messageType == NIMMessageTypeAudio) { //音频
+    if (self.model.message.messageType == NIMMessageTypeAudio) 
+    { //音频
         BOOL disable = NO;
         if ([self.delegate respondsToSelector:@selector(disableAudioPlayedStatusIcon:)]) {
             disable = [self.delegate disableAudioPlayedStatusIcon:self.model.message];
@@ -440,14 +442,18 @@
     return 2.0;
 }
 
-- (CGFloat)cellPaddingToProtrait
+- (CGPoint)cellPaddingToAvatar
 {
     return self.model.avatarMargin;
 }
 
-- (CGFloat)cellPaddingToNick
+- (CGPoint)cellPaddingToNick
 {
     return self.model.nickNameMargin;
+}
+
+- (CGSize)avatarSize {
+    return self.model.avatarSize;
 }
 
 - (void)onTapAvatar:(id)sender{

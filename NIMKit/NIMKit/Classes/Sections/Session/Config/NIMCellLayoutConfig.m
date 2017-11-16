@@ -14,6 +14,7 @@
 #import "UIImage+NIMKit.h"
 #import "NIMMessageModel.h"
 #import "NIMBaseSessionContentConfig.h"
+#import "NIMKit.h"
 
 @interface NIMCellLayoutConfig()
 
@@ -62,8 +63,7 @@
 
 - (BOOL)shouldShowAvatar:(NIMMessageModel *)model
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:model.message];
-    return config.showAvatar;
+    return [[NIMKit sharedKit].config setting:model.message].showAvatar;
 }
 
 
@@ -88,14 +88,19 @@
     return !model.message.isOutgoingMsg;
 }
 
-- (CGFloat)avatarMargin:(NIMMessageModel *)model
+- (CGPoint)avatarMargin:(NIMMessageModel *)model
 {
-    return 8.f;
+    return CGPointMake(8.f, 0.f);
 }
 
-- (CGFloat)nickNameMargin:(NIMMessageModel *)model
+- (CGSize)avatarSize:(NIMMessageModel *)model
 {
-    return [self shouldShowAvatar:model] ? 57.f : 10.f;
+    return CGSizeMake(42, 42);
+}
+
+- (CGPoint)nickNameMargin:(NIMMessageModel *)model
+{
+    return [self shouldShowAvatar:model] ? CGPointMake(57.f, -3.f) : CGPointMake(10.f, -3.f);
 }
 
 
@@ -104,6 +109,16 @@
     return nil;
 }
 
-#pragma mark - Private
+- (BOOL)disableRetryButton:(NIMMessageModel *)model
+{
+    if (!model.message.isReceivedMsg)
+    {
+        return model.message.deliveryState != NIMMessageDeliveryStateFailed;
+    }
+    else
+    {
+        return model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateFailed;
+    }
+}
 
 @end

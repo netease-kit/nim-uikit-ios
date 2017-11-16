@@ -17,6 +17,12 @@
 
 @optional
 
+#pragma mark - cell 样式更改
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
+
+- (BOOL)disableAudioPlayedStatusIcon:(NIMMessage *)message;
+
 #pragma mark - 点击事件
 - (BOOL)onTapCell:(NIMKitEvent *)event;
 
@@ -29,9 +35,5 @@
 
 - (void)onRetryMessage:(NIMMessage *)message;
 
-
-
-#pragma mark - 样式设置
-- (BOOL)disableAudioPlayedStatusIcon:(NIMMessage *)message;
 
 @end

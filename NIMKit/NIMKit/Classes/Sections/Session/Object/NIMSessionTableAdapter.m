@@ -10,7 +10,6 @@
 #import "NIMMessageModel.h"
 #import "NIMMessageCellFactory.h"
 #import "UIView+NIM.h"
-#import "NIMKitUIConfig.h"
 
 @interface NIMSessionTableAdapter()
 
@@ -39,7 +38,7 @@
     return [self.interactor items].count;
 }
 
--(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = nil;
     id model = [[self.interactor items] objectAtIndex:indexPath.row];
@@ -59,6 +58,14 @@
         NSAssert(0, @"not support model");
     }
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self.delegate respondsToSelector:@selector(tableView:willDisplayCell:forRowAtIndexPath:)])
+    {
+        [self.delegate tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

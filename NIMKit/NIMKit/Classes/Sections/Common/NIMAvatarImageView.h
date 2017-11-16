@@ -12,7 +12,7 @@
 
 @interface NIMAvatarImageView : UIControl
 @property (nonatomic,strong)    UIImage *image;
-@property (nonatomic,assign)    BOOL    clipPath;
+@property (nonatomic,assign)    CGFloat cornerRadius;
 
 - (void)setAvatarBySession:(NIMSession *)session;
 - (void)setAvatarByMessage:(NIMMessage *)message;

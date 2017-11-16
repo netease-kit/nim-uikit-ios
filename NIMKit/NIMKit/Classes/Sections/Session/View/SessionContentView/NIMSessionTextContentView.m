@@ -10,8 +10,8 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "NIMMessageModel.h"
 #import "NIMGlobalMacro.h"
-#import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
 
@@ -38,10 +38,10 @@ NSString *const NIMTextMessageLabelLinkData = @"NIMTextMessageLabelLinkData";
     [super refresh:data];
     NSString *text = self.model.message.text;
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
 
-    self.textLabel.textColor = config.contentTextColor;
-    self.textLabel.font = config.contentTextFont;
+    self.textLabel.textColor = setting.textColor;
+    self.textLabel.font = setting.font;
     [self.textLabel nim_setText:text];
 }
 

@@ -10,8 +10,8 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "NIMMessageModel.h"
 #import "NIMKitUtil.h"
-#import "NIMKitUIConfig.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 @implementation NIMSessionNetChatNotifyContentView
 
@@ -33,10 +33,10 @@
     NSString *text = [NIMKitUtil messageTipContent:data.message];
     [self.textLabel nim_setText:text];
     
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
     
-    self.textLabel.textColor = config.contentTextColor;;
-    self.textLabel.font      = config.contentTextFont;
+    self.textLabel.textColor = setting.textColor;;
+    self.textLabel.font      = setting.font;
 }
 
 - (void)layoutSubviews{

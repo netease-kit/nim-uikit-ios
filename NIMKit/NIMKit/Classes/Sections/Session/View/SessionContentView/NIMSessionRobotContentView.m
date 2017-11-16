@@ -13,7 +13,7 @@
 #import "M80AttributedLabel+NIMKit.h"
 #import "UIImageView+WebCache.h"
 #import "NIMGlobalMacro.h"
-
+#import "NIMKit.h"
 
 @interface NIMSessionRobotButton : UIButton
 
@@ -87,8 +87,9 @@
     {
         [self.continueButton removeFromSuperview];
     }
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:data.message];
-    self.continueButton.titleLabel.font = [UIFont systemFontOfSize:config.textFontSize];
+    
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
+    self.continueButton.titleLabel.font = setting.font;
     [self.continueButton sizeToFit];
 }
 
@@ -344,9 +345,9 @@
 
     }
 
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:self.model.message];
-    label.textColor = config.contentTextColor;
-    label.font = config.contentTextFont;
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:self.model.message];
+    label.textColor = setting.textColor;
+    label.font = setting.font;
     
     return label;
 }

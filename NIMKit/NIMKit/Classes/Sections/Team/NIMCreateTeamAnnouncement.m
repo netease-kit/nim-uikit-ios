@@ -9,6 +9,7 @@
 #import "NIMCreateTeamAnnouncement.h"
 #import "UIView+NIM.h"
 #import "NIMGlobalMacro.h"
+#import "NIMKitKeyboardInfo.h"
 
 @interface NIMCreateTeamAnnouncement () <UITextFieldDelegate, UITextViewDelegate>
 @property (strong, nonatomic) UITextField *titleTextField;
@@ -62,7 +63,7 @@
     self.edgesForExtendedLayout = UIRectEdgeNone;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStylePlain target:self action:@selector(onSave:)];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:NIMKitKeyboardWillChangeFrameNotification object:nil];
 }
 
 - (void)dealloc{

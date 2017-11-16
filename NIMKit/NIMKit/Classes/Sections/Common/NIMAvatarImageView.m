@@ -26,9 +26,7 @@ static char imageURLKey;
     self = [super initWithFrame:frame];
     if (self)
     {
-        self.backgroundColor = [UIColor clearColor];
-        self.layer.geometryFlipped = YES;
-        self.clipPath = YES;
+        [self setup];
     }
     return self;
 }
@@ -38,11 +36,35 @@ static char imageURLKey;
 {
     if (self = [super initWithCoder:aDecoder])
     {
-        self.backgroundColor = [UIColor clearColor];
-        self.layer.geometryFlipped = YES;
-        self.clipPath = YES;
+        [self setup];
     }
     return self;
+}
+
+- (void)setup
+{
+    self.backgroundColor = [UIColor clearColor];
+    self.layer.geometryFlipped = YES;
+    [self setupRadius];
+}
+
+
+- (void)setupRadius
+{
+    switch ([NIMKit sharedKit].config.avatarType)
+    {
+        case NIMKitAvatarTypeNone:
+            _cornerRadius = 0;
+            break;
+        case NIMKitAvatarTypeRounded:
+            _cornerRadius = self.nim_width *.5f;
+            break;
+        case NIMKitAvatarTypeRadiusCorner:
+            _cornerRadius = 6.f;
+            break;
+        default:
+            break;
+    }
 }
 
 
@@ -59,25 +81,26 @@ static char imageURLKey;
 - (CGPathRef)path
 {
     return [[UIBezierPath bezierPathWithRoundedRect:self.bounds
-                                       cornerRadius:CGRectGetWidth(self.bounds) / 2] CGPath];
+                                       cornerRadius:self.cornerRadius] CGPath];
 }
 
 
-#pragma mark Draw
+
+
 - (void)drawRect:(CGRect)rect
 {
     if (!self.nim_width || !self.nim_height) {
         return;
     }
-    
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGContextSaveGState(context);
-    if (_clipPath)
+    if (_cornerRadius > 0)
     {
         CGContextAddPath(context, [self path]);
         CGContextClip(context);
     }
+    
     UIImage *image = _image;
     if (image && image.size.height && image.size.width)
     {
@@ -95,9 +118,13 @@ static char imageURLKey;
     CGContextRestoreGState(context);
 }
 
+
 CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
     return CGRectMake(center.x - (size.width/2), center.y - (size.height/2), size.width, size.height);
 }
+
+
+
 
 - (void)setAvatarBySession:(NIMSession *)session
 {

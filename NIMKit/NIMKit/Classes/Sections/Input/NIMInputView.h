@@ -26,17 +26,12 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 
 
 
-
-
 @protocol NIMInputDelegate <NSObject>
 
 @optional
 
-- (void)showInputView;
-- (void)hideInputView;
+- (void)didChangeInputHeight:(CGFloat)inputHeight;
 
-- (void)inputViewSizeToHeight:(CGFloat)toHeight
-                showInputView:(BOOL)show;
 @end
 
 @interface NIMInputView : UIView
@@ -48,9 +43,10 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 @property (assign, nonatomic, getter=isRecording)    BOOL recording;
 
 @property (strong, nonatomic)  NIMInputToolBar *toolBar;
-@property (strong, nonatomic)  NIMInputMoreContainerView *moreContainer;
-@property (strong, nonatomic)  NIMInputEmoticonContainerView *emoticonContainer;
+@property (strong, nonatomic)  UIView *moreContainer;
+@property (strong, nonatomic)  UIView *emoticonContainer;
 
+@property (nonatomic, assign) NIMInputStatus status;
 @property (nonatomic, strong) NIMInputAtCache *atCache;
 
 - (instancetype)initWithFrame:(CGRect)frame

@@ -7,9 +7,10 @@
 //
 
 #import "NIMFileContentConfig.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @implementation NIMFileContentConfig
+
 - (CGSize)contentSize:(CGFloat)cellWidth message:(NIMMessage *)message
 {
     return CGSizeMake(220, 110);
@@ -22,8 +23,7 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
 

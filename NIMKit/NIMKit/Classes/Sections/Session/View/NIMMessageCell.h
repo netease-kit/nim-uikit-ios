@@ -17,7 +17,7 @@
 @interface NIMMessageCell : UITableViewCell
 
 @property (nonatomic, strong) NIMAvatarImageView *headImageView;
-@property (nonatomic, strong) UILabel *nameLabel;                                 //姓名（群显示 个人不显示）
+@property (nonatomic, strong) UILabel *nameLabel;                                 //姓名
 @property (nonatomic, strong) NIMSessionMessageContentView *bubbleView;           //内容区域
 @property (nonatomic, strong) UIActivityIndicatorView *traningActivityIndicator;  //发送loading
 @property (nonatomic, strong) UIButton *retryButton;                              //重试

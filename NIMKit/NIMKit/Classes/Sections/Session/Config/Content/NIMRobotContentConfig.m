@@ -8,9 +8,9 @@
 
 #import "NIMRobotContentConfig.h"
 #import "M80AttributedLabel+NIMKit.h"
-#import "NIMKitUIConfig.h"
 #import "NIMSessionRobotContentView.h"
 #import "UIView+NIM.h"
+#import "NIMKit.h"
 
 @interface NIMRobotContentConfig()
 
@@ -63,8 +63,7 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
 

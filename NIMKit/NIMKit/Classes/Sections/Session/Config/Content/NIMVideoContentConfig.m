@@ -8,7 +8,7 @@
 
 #import "NIMVideoContentConfig.h"
 #import "UIImage+NIMKit.h"
-#import "NIMKitUIConfig.h"
+#import "NIMKit.h"
 
 @implementation NIMVideoContentConfig
 - (CGSize)contentSize:(CGFloat)cellWidth message:(NIMMessage *)message
@@ -40,8 +40,7 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message
 {
-    NIMKitBubbleConfig *config = [[NIMKitUIConfig sharedConfig] bubbleConfig:message];
-    return config.contentInset;
+    return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
 @end
