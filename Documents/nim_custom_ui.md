@@ -472,7 +472,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_img.png" width="364" height="247" />
 
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_location.png" width="364" height="247" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_location.png" width="364" height="168" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_tip.png" width="363" height="73" />
 
