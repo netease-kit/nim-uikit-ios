@@ -484,7 +484,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_chatroom.png" width="364" height="111" />
 
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_netecall.png" width="364" height="132" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_netcall.png" width="364" height="132" />
 
 * 气泡大小与位置更改
 气泡根据发消息者是本人或者他人，位置布局不同，分为 leftBubbleSettings 和 rightBubbleSettings 进行配置，配置方式见<a href = "#config">第二步</a> NIMKitConfig 配置方式
