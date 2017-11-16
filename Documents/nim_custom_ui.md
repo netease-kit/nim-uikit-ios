@@ -205,7 +205,19 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-#### <p id = "interface_title"> 2）聊天界面背景 </p>
+#### <p id = "interface_title"> 2）聊天界面背景图 </p>
+
+在全局设置中，先将会话 cell 的背景色设置成透明
+
+```objc
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions 
+{
+   ...
+   [NIMKit sharedKit].config.cellBackgroundColor = [UIColor clearColor];
+   ...
+}
+```
+
 通过实现 NIMSessionConfig 相关接口进行实现，示例代码如下：
 
 ```objc
@@ -220,22 +232,6 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 
-@interface TestSessionViewController()
-@property (nonatomic,strong) TestSessionConfig *sessionConfig;
-@end
-
-@implementation TestSessionViewController
-
-- (void)viewDidLoad {
-    //注意 cell 背景色透明
-    [NIMKit sharedKit].config.cellBackgroundColor = [UIColor clearColor];
-    UIImageView *imgView = [[UIImageView alloc] initWithFrame:self.view.bounds];
-    imgView.image = self.sessionConfig.SessionBackgroundImage;
-    imgView.contentMode = UIViewContentModeScaleAspectFill;
-    self.tableView.backgroundView = imgView;
-}
-
-@end
 ```
 【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
 
