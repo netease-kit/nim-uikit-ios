@@ -828,17 +828,47 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
 @end
 ```
 
-### <p id = "customize_cell"> 2. NIMMessageCell 深度定制 </p>
-NIMMessageCellDelegate 里加了 `- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath` 回调，让开发者在自定义的 TestSessionViewController 中有一个接口获取 cell 进行深度定制；可自行定制聊天气泡的样式，或者已有样式的各类参数，例如头像的圆角弧度。
+### <p id = "customize_cell"> 2. NIMMessageCell 的属性自定义 </p>
 
+会话类 `NIMSessionViewController` 本质上是一个包含 `UITableView` 的视图控制器，每个聊天气泡由继承自 `UITableViewCell` 的 `NIMMessageCell`类承载。 `NIMSessionViewController`实现了 `NIMMessageCellDelegate` 协议，用于处理各种 cell 的信息。
+
+
+其中协议方法
 
 ```objc
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([cell isKindOfClass: TestMessageCell]) {
-        //自定义 cell 样式
-        cell.data = ...
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath;
+```
+
+会和普通 `UITableViewDelegate` 回调一样，在 cell 即将展示时回调给视图控制器。此方法只可能回调 `NIMMessageCell` (消息气泡) 和 `NIMSessionTimestampCell` (消息时间戳) 两种 cell 。 开发者只需要在自己继承自 `NIMSessionViewController` 的视图控制器上重写这个方法，就可以自行定制 `NIMMessageCell` 里各种子控件的属性。
+
+示例：
+
+```objc
+@implementation YourSessionViewController
+
+...
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    // 此回调的 UITableViewCell 只可能回调 `NIMMessageCell` 和 `NIMSessionTimestampCell` 两种 cell 
+    if ([cell isKindOfClass:[NIMMessageCell class]]) 
+    {
+        //自定义 消息气泡 样式
+       
+        cell.headImageView.cornerRadius = 3.0f;  //修改头像圆角
+        cell.nameLabel.textColor = [UIColor redColor];  //修改气泡昵称字体颜色        
+        ...
     }
+    if ([cell isKindOfClass:[NIMSessionTimestampCell class]]) 
+    {
+        //自定义 消息时间戳 样式
+        ...
+    }    
 }
+
+...
+
+@end
 ```
 
 
