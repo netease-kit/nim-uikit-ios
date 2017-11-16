@@ -38,8 +38,7 @@ UI 组件的消息绘制都是统一由 `NIMMessageCell` 类完成的，因此�
 
 Tips：开发者在第一次接入的时候，可能由于协议实现不全或者注入布局配置有误等原因，导致消息在界面上显示为 `未知类型消息`，这个时候可以尝试从 `NIMMessageCell` 的 `- (void)addContentViewIfNotExist` 方法入手调试，查看`NIMMessageModel` 对应的布局配置以及协议的返回值是否正确。
 
-
-## 聊天组件的注入配置
+## <p id = "config"> 聊天组件的注入配置 </p>
 NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行聊天相关的排版布局和功能逻辑的扩展。
 通过以下四个协议的注入配置，可实现聊天界面的基本设置。
 
@@ -233,7 +232,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 @end
 
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中会话视图控制器的相关注入配置
 
 ### <p id="session_component"> 2. 聊天气泡具体组件 </p>
 #### <p id="component_read"> 1）已读回执配置 </p>
@@ -255,7 +254,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 }
 @end
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中会话视图控制器的相关注入配置
 #### <p id="component_timeStamp"> 2）时间戳配置 </p>
 通过实现 NIMKitMessageProvider 相关协议进行时间戳显示与否的配置，以及两条时间戳显示间隔的配置
 
@@ -271,7 +270,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中会话视图控制器的相关注入配置
 
 ```objc
 @implementation TestAppDelegate
@@ -303,7 +302,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 
 * 头像位置配置
 包括左边距和上边距的自定义
@@ -323,7 +322,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 @end
 ```
 
-【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 
 * 头像形状配置
 头像的形状包括矩形直角头像、圆形头像、圆角头像三种类型，具体弧度大小若想更改，可见<a href = "#customize_cell">下文</a>的 NIMMessageCell 深度定制部分
@@ -354,11 +353,11 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 
 * 点击头像的响应事件
  
- 具体实现方式为开发者继承 NIMSessionViewController 的子类实现 NIMMessageCellDelegate 相关代理，示例代码如下：
+具体实现方式为开发者继承 NIMSessionViewController 的子类并实现 NIMMessageCellDelegate 相关代理，示例代码如下：
  
 ```objc
 - (BOOL)onTapAvatar:(NSString *)userId{
@@ -404,7 +403,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 
 * 昵称字体和颜色配置
 
@@ -435,7 +434,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 #### <p id="component_bubble"> 6）消息气泡配置 </p>
 * 气泡布局可更改属性在 NIMKitSetting 类中
 
@@ -489,10 +488,10 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_netcall.png" width="364" height="132" />
 
 * 气泡大小与位置更改
-气泡根据发消息者是本人或者他人，位置布局不同，分为 leftBubbleSettings 和 rightBubbleSettings 进行配置，配置方式见<a href = "#config">第二步</a> NIMKitConfig 配置方式
+气泡根据发消息者是本人或者他人，位置布局不同，分为 leftBubbleSettings 和 rightBubbleSettings 进行配置，配置方式见<a href = "#config">聊天组件的注入配置</a> NIMKitConfig 配置方式
 
 #### <p id="component_event"> 7）点击事件处理 </p>
-实现 NIMMessageCellDelegate 代理相关方法
+具体实现方式为开发者继承 NIMSessionViewController 的子类并实现 NIMMessageCellDelegate 相关点击事件代理，示例代码如下：
 
 * 点击气泡事件
 
@@ -559,7 +558,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中会话视图控制器的相关注入配置
 
 ### <p id="session_input"> 4. 输入相关配置 </p>
 
@@ -634,7 +633,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中会话视图控制器的相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中会话视图控制器的相关注入配置
 
 * 自定义贴图点击事件
 通过实现 NIMInputActionDelegate 代理相关方法
@@ -716,7 +715,7 @@ NIMSession 提供录音相关接口有如下几个，开发者通过实现相关
     return NO;
 }
 ```
-【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
+【注】这里实现 NIMSessionConfig 协议之后，需要确保<a href="#config">聊天组件的注入配置</a>中相关注入配置
 
 #### <p id = "record_max"> 2）录音最大时长配置 </p>
 录音时长的配置在 NIMKitConfig 中，可通过如下方式配置
