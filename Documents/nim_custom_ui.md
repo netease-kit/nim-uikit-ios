@@ -279,6 +279,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     //...
     //时间间隔放在合适的位置全局配置，示例放在 AppDelegate
+    //注意这里是 秒数*60 的结果 480 = 8s * 60
     [NIMKit sharedKit].config.messageInterval = 480;
     //...
 }
@@ -321,6 +322,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @end
 ```
+
 【注】这里实现 NIMCellLayoutConfig 协议之后，需要确保<a href="#config">第二步</a>中相关注入配置
 
 * 头像形状配置
@@ -345,7 +347,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 @implementation TestCellLayoutConfig
 
-- (CGSize)avatarSize
+- (CGSize)avatarSize:(NIMMessageModel *)model
 {
     //自定义头像大小
 }
@@ -356,9 +358,11 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 * 点击头像的响应事件
  
+ 具体实现方式为开发者继承 NIMSessionViewController 的子类实现 NIMMessageCellDelegate 相关代理，示例代码如下：
+ 
 ```objc
 - (BOOL)onTapAvatar:(NSString *)userId{
-    //设置 NIMMessageCellDelegate 代理，并重写该方法
+    //记得添加 NIMMessageCellDelegate 代理，并重写该方法
 }
 ```
 
@@ -387,6 +391,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 ```
 * 昵称位置配置
 包括上边距和左边距配置
+
 ```objc
 @interface TestCellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
 @end
@@ -418,7 +423,7 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 #### <p id="component_retry"> 5）重试按钮配置 </p>
 
-```Objective-C
+```Objc
 @interface TestCellLayoutConfig : NIMCellLayoutConfig<NIMCellLayoutConfig>
 @end
 
@@ -457,7 +462,6 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 |   robotSetting   |  机器人类型消息设置  |
 | unsupportSetting | 无法识别类型消息设置 |
 | teamNotificationSetting | 群组通知类型消息设置 |
-| chatroomNotificationSetting | 聊天室类型消息设置 |
 | netcallNotificationSetting | 网络电话类型通知消息设置 |
 
 具体默认设置见 NIMKitConfig，这里不一一列举，画出每种类型对应的 cell 的样式图：
@@ -474,15 +478,13 @@ NIMKit 的聊天组件需要开发者通过注入一系列协议接口来进行�
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_location.png" width="364" height="198" />
 
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_tip.png" width="363" height="73" />
+<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_tip.png" width="363" height="57" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_robot.png" width="360" height="549" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_unsupported.png" width="364" height="133" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_group.png" width="364" height="124" />
-
-<img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_chatroom.png" width="364" height="111" />
 
 <img src="https://github.com/netease-im/NIM_Resources/blob/master/iOS/Images/nimkit_netcall.png" width="364" height="132" />
 
