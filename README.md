@@ -132,3 +132,8 @@ NIMSessionListViewController *vc = [[NIMSessionListViewController alloc] init];
 
 5.[《机器人消息排版指南》](./Documents/nim_robot.md)
 
+
+## 更新日志
+
+你可以在 [这里]((./Documents/nim_changelog.md)) 查看组件 2.1.0 版本之后的所有更新信息
+
