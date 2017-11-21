@@ -135,5 +135,5 @@ NIMSessionListViewController *vc = [[NIMSessionListViewController alloc] init];
 
 ## 更新日志
 
-你可以在 [这里]((./Documents/nim_changelog.md)) 查看组件 2.1.0 版本之后的所有更新信息
+你可以在 [这里](./Documents/nim_changelog.md) 查看组件 2.1.0 版本之后的所有更新信息
 
