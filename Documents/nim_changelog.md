@@ -22,13 +22,13 @@
 * 移除 NIMKitBubleSetting.plist 和 NIMKitSetting.plist
 * 气泡配置和全局配置从 plist 配置转为对象属性设置，设置的具体接口整理在 NIMKitConfig 中。
   
-  你可以通过例如 
+  你可以通过以下示例来对组件个性化配置。具体支持的功能请参考[界面排版自定义](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/Documents/nim_custom_ui.md)
   
 ```objc
 /*设置圆角头像*/
  [NIMKit sharedKit].config.avatarType = NIMKitAvatarTypeRadiusCorner 
 ```
-  的形式来对组件个性化配置。具体支持的功能请参考[界面排版自定义](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/Documents/nim_custom_ui.md)
+
 
 
 
