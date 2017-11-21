@@ -40,8 +40,6 @@
         _session       = session;
         _inserts       = [[NSMutableArray alloc] init];
         
-        [self setupRefreshControl];
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(menuDidHide:) name:UIMenuControllerDidHideMenuNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:NIMKitKeyboardWillChangeFrameNotification object:nil];
     }
@@ -56,6 +54,16 @@
 - (void)reloadTable
 {
     [self.tableView reloadData];
+}
+
+- (void)setTableView:(UITableView *)tableView
+{
+    BOOL change = _tableView != tableView;
+    if (change)
+    {
+        _tableView = tableView;
+        [self setupRefreshControl];
+    }
 }
 
 - (void)resetLayout
@@ -194,7 +202,17 @@
 - (void)setupRefreshControl
 {
     self.refreshControl = [[UIRefreshControl alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
-    [self.tableView addSubview:_refreshControl];
+
+    
+    if (@available(iOS 10.0, *))
+    {
+        self.tableView.refreshControl = self.refreshControl;
+    }
+    else
+    {
+        [self.tableView addSubview: self.refreshControl];
+    }
+    
     [self.refreshControl addTarget:self action:@selector(headerRereshing:) forControlEvents:UIControlEventValueChanged];
 }
 
