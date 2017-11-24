@@ -1,4 +1,8 @@
 # iOS UI 组件更新日志
+## [2.2.0] - 2017-11-23
+### 变更
+* 组件的云信 SDK 依赖升级为 4.5.0
+
 
 ## [2.1.1] - 2017-11-21
 ### 修正
@@ -19,6 +23,7 @@
 
 ### 变更
 
+* 组件的云信 SDK 依赖升级为 4.4.0
 * 移除 NIMKitBubleSetting.plist 和 NIMKitSetting.plist
 * 气泡配置和全局配置从 plist 配置转为对象属性设置，设置的具体接口整理在 NIMKitConfig 中。
   你可以通过以下示例来对组件个性化配置。具体支持的功能请参考[界面排版自定义](https://github.com/netease-im/NIM_iOS_UIKit/blob/master/Documents/nim_custom_ui.md)
