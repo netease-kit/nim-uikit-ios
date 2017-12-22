@@ -14,6 +14,8 @@
 
      [《机器人消息排版指南》](./Documents/nim_robot.md)
 
+- [] 我已经阅读了[常见问题](http://dev.netease.im/docs/product/%E9%80%9A%E7%94%A8/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98?#iOS%E7%89%88SDK), 但是找不到相关解决方案。
+
 - [ ] 我已经阅读了[SDK 文档](http://dev.netease.im/docs/product/IM%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF/SDK%E5%BC%80%E5%8F%91%E9%9B%86%E6%88%90/iOS%E5%BC%80%E5%8F%91%E9%9B%86%E6%88%90/%E6%A6%82%E8%A6%81%E4%BB%8B%E7%BB%8D), 但是找不到相关解决方案。
      
 - [ ] 我已经搜索了[当前问题](https://github.com/netease-im/NIM_iOS_UIKit/issues?utf8=✓&q=is%3Aissue), 但是找不到相关解决方案。
