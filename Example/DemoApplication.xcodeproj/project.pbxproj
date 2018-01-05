@@ -280,7 +280,6 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-DemoApplication/Pods-DemoApplication-resources.sh",
 				"${PODS_ROOT}/../../NIMKit/Resources/NIMKitEmoticon.bundle",
 				"${PODS_ROOT}/../../NIMKit/Resources/NIMKitResource.bundle",
-				"${PODS_ROOT}/../../NIMKit/Resources/NIMKitSettings.bundle",
 				"${PODS_ROOT}/TZImagePickerController/TZImagePickerController/TZImagePickerController/TZImagePickerController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
