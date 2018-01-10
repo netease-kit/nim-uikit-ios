@@ -28,7 +28,7 @@
 #else
 #import "SDWebImageManager.h"
 #import "UIView+WebCacheOperation.h"
-#import "uiview+WebCache.h"
+#import "UIView+WebCache.h"
 #endif
 
 
