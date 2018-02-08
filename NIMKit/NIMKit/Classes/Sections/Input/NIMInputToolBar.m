@@ -16,8 +16,6 @@
 
 @property (nonatomic,copy)  NSArray<NSNumber *> *types;
 
-@property (nonatomic,strong) UIView *sep;
-
 @property (nonatomic,copy)  NSDictionary *dict;
 
 @property (nonatomic,strong) NIMGrowingTextView *inputTextView;
@@ -77,9 +75,9 @@
         [self addSubview:sep];
         
         //底部分割线
-        _sep = [[UIView alloc] initWithFrame:CGRectZero];
-        _sep.backgroundColor = [UIColor lightGrayColor];
-        [self addSubview:_sep];
+        _bottomSep = [[UIView alloc] initWithFrame:CGRectZero];
+        _bottomSep.backgroundColor = [UIColor lightGrayColor];
+        [self addSubview:_bottomSep];
         
         self.types = @[
                          @(NIMInputBarItemTypeVoice),
@@ -171,8 +169,8 @@
     
     //底部分割线
     CGFloat sepHeight = .5f;
-    _sep.nim_size     = CGSizeMake(self.nim_width, sepHeight);
-    _sep.nim_bottom   = self.nim_height - sepHeight;
+    _bottomSep.nim_size     = CGSizeMake(self.nim_width, sepHeight);
+    _bottomSep.nim_bottom   = self.nim_height - sepHeight;
 }
 
 

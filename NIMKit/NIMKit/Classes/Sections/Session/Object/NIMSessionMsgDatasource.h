@@ -32,6 +32,9 @@
 //数据对外接口
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index , NSArray *messages ,NSError *error))handler;
 
+//数据load接口
+- (void)loadPullUpMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages, NSError *error))handler;
+
 //添加消息，会根据时间戳插入到相应位置
 - (NSArray<NSNumber *> *)insertMessageModels:(NSArray*)models;
 

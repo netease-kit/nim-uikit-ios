@@ -163,40 +163,38 @@
     if (!_toolBar)
     {
         _toolBar = [[NIMInputToolBar alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, 0)];
-        
-        [self addSubview:_toolBar];
-        
-        //设置placeholder
-        NSString *placeholder = [NIMKit sharedKit].config.placeholder;
-        [_toolBar setPlaceHolder:placeholder];
-        
-        //设置input bar 上的按钮
-        if ([_inputConfig respondsToSelector:@selector(inputBarItemTypes)]) {
-            NSArray *types = [_inputConfig inputBarItemTypes];
-            [_toolBar setInputBarItemTypes:types];
-        }
-        
-        _toolBar.delegate = self;
-        [_toolBar.emoticonBtn addTarget:self action:@selector(onTouchEmoticonBtn:) forControlEvents:UIControlEventTouchUpInside];
-        [_toolBar.moreMediaBtn addTarget:self action:@selector(onTouchMoreBtn:) forControlEvents:UIControlEventTouchUpInside];
-        [_toolBar.voiceButton addTarget:self action:@selector(onTouchVoiceBtn:) forControlEvents:UIControlEventTouchUpInside];
-        [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDown:) forControlEvents:UIControlEventTouchDown];
-        [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDragInside:) forControlEvents:UIControlEventTouchDragInside];
-        [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDragOutside:) forControlEvents:UIControlEventTouchDragOutside];
-        [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpInside:) forControlEvents:UIControlEventTouchUpInside];
-        [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
-        _toolBar.nim_size = [_toolBar sizeThatFits:CGSizeMake(self.nim_width, CGFLOAT_MAX)];
-        _toolBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [_toolBar.recordButton setTitle:@"按住说话" forState:UIControlStateNormal];
-        [_toolBar.recordButton setHidden:YES];
-        
-        //设置最大输入字数
-        NSInteger textInputLength = [NIMKit sharedKit].config.inputMaxLength;
-        self.maxTextLength = textInputLength;
-        
-        [self refreshStatus:NIMInputStatusText];
-        [self sizeToFit];
     }
+    [self addSubview:_toolBar];
+    //设置placeholder
+    NSString *placeholder = [NIMKit sharedKit].config.placeholder;
+    [_toolBar setPlaceHolder:placeholder];
+    
+    //设置input bar 上的按钮
+    if ([_inputConfig respondsToSelector:@selector(inputBarItemTypes)]) {
+        NSArray *types = [_inputConfig inputBarItemTypes];
+        [_toolBar setInputBarItemTypes:types];
+    }
+    
+    _toolBar.delegate = self;
+    [_toolBar.emoticonBtn addTarget:self action:@selector(onTouchEmoticonBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [_toolBar.moreMediaBtn addTarget:self action:@selector(onTouchMoreBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [_toolBar.voiceButton addTarget:self action:@selector(onTouchVoiceBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDown:) forControlEvents:UIControlEventTouchDown];
+    [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDragInside:) forControlEvents:UIControlEventTouchDragInside];
+    [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnDragOutside:) forControlEvents:UIControlEventTouchDragOutside];
+    [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
+    _toolBar.nim_size = [_toolBar sizeThatFits:CGSizeMake(self.nim_width, CGFLOAT_MAX)];
+    _toolBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [_toolBar.recordButton setTitle:@"按住说话" forState:UIControlStateNormal];
+    [_toolBar.recordButton setHidden:YES];
+    
+    //设置最大输入字数
+    NSInteger textInputLength = [NIMKit sharedKit].config.inputMaxLength;
+    self.maxTextLength = textInputLength;
+    
+    [self refreshStatus:NIMInputStatusText];
+    [self sizeToFit];
 }
 
 - (void)checkMoreContainer

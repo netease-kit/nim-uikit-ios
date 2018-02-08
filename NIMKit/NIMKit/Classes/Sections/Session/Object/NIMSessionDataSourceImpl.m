@@ -119,6 +119,10 @@
     [self.dataSource loadHistoryMessagesWithComplete:handler];
 }
 
+- (void)loadNewMessagesWithComplete:(void (^)(NSInteger, NSArray *, NSError *))handler {
+    [self.dataSource loadPullUpMessagesWithComplete:handler];
+}
+
 - (void)checkAttachmentState:(NSArray *)messages{
     NSArray *items = [NSArray arrayWithArray:messages];
     for (id item in items) {

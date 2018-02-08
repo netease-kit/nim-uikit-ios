@@ -182,6 +182,8 @@
     [self.tableView reloadData];
 }
 
+- (void)didPullUpMessageData {}
+
 #pragma mark - 会话title
 - (NSString *)sessionTitle
 {
@@ -288,7 +290,7 @@
 
 #pragma mark - NIMConversationManagerDelegate
 - (void)messagesDeletedInSession:(NIMSession *)session{
-    [self.interactor resetMessages];
+    [self.interactor resetMessages:nil];
     [self.tableView reloadData];
 }
 
@@ -781,13 +783,18 @@
 - (void)setUpTitleView
 {
     NIMKitTitleView *titleView = (NIMKitTitleView *)self.navigationItem.titleView;
-    if (!titleView || [titleView isKindOfClass:[NIMKitTitleView class]])
+    if (!titleView || ![titleView isKindOfClass:[NIMKitTitleView class]])
     {
         titleView = [[NIMKitTitleView alloc] initWithFrame:CGRectZero];
         self.navigationItem.titleView = titleView;
+        
+        titleView.titleLabel.text = self.sessionTitle;
+        titleView.subtitleLabel.text = self.sessionSubTitle;
+        
+        self.titleLabel    = titleView.titleLabel;
+        self.subTitleLabel = titleView.subtitleLabel;
     }
-    titleView.titleLabel.text = self.sessionTitle;
-    titleView.subtitleLabel.text = self.sessionSubTitle;
+
     [titleView sizeToFit];
 }
 

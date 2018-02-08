@@ -14,7 +14,8 @@
 #import "UIView+NIM.h"
 #import "NIMKitKeyboardInfo.h"
 
-@interface NIMSessionLayoutImpl(){
+@interface NIMSessionLayoutImpl()
+{
     NSMutableArray *_inserts;
     CGFloat _inputViewHeight;
 }
@@ -75,9 +76,11 @@
 - (void)layoutAfterRefresh
 {
     [self.refreshControl endRefreshing];
-    
-    CGFloat offset  = self.tableView.contentSize.height - self.tableView.contentOffset.y;
     [self.tableView reloadData];
+}
+
+- (void)adjustOffset {
+    CGFloat offset  = self.tableView.contentSize.height - self.tableView.contentOffset.y;
     CGFloat offsetYAfterLoad = self.tableView.contentSize.height - offset;
     CGPoint point  = self.tableView.contentOffset;
     point.y = offsetYAfterLoad;
@@ -178,7 +181,7 @@
 {
     //iOS11 以下，当插入数据后不会立即改变 contentSize 的大小，所以需要手动添加最后一个数据的高度
     NSInteger section = self.tableView.numberOfSections - 1;
-    NSInteger row     = [self.tableView numberOfRowsInSection:section] - 1;
+    NSInteger row     = [self.tableView.dataSource tableView:self.tableView numberOfRowsInSection:section] - 1;
     if (section >=0 && row >=0)
     {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
@@ -222,7 +225,6 @@
 {
     self.refreshControl = [[UIRefreshControl alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
 
-    
     if (@available(iOS 10.0, *))
     {
         self.tableView.refreshControl = self.refreshControl;
@@ -233,6 +235,7 @@
     }
     
     [self.refreshControl addTarget:self action:@selector(headerRereshing:) forControlEvents:UIControlEventValueChanged];
+    
 }
 
 - (void)headerRereshing:(id)sender
@@ -242,8 +245,6 @@
         [self.delegate onRefresh];
     }
 }
-
-
 
 - (void)insert:(NSArray<NSIndexPath *> *)indexPaths animated:(BOOL)animated
 {
@@ -262,10 +263,10 @@
     [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationBottom];
     [self.tableView endUpdates];
     
-
     [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
         [self resetLayout];
     } completion:nil];
+    
     [self.tableView nim_scrollToBottom:YES];
 }
 

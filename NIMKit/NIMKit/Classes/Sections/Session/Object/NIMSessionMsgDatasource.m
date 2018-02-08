@@ -93,7 +93,6 @@
     return currentIndex - count;
 }
 
-
 /**
  *  从后插入消息
  *
@@ -207,6 +206,27 @@
             });
         }
     }
+}
+
+- (void)loadPullUpMessagesWithComplete:(void (^)(NSInteger, NSArray *, NSError *))handler {
+    __block NIMMessageModel *currentNewestMsg = self.items.lastObject;
+    __block NSInteger index = 0;
+    NIMMessageSearchOption *option = [NIMMessageSearchOption new];
+    option.startTime = currentNewestMsg.messageTime - 0.1;
+    option.limit = [NIMKit sharedKit].config.messageLimit;
+    option.allMessageTypes = YES;
+    option.order = NIMMessageSearchOrderAsc;
+    __weak typeof(self) wself = self;
+    [[NIMSDK sharedSDK].conversationManager searchMessages:_currentSession
+                                                    option:option
+                                                    result:^(NSError * _Nullable error, NSArray<NIMMessage *> * _Nullable messages) {
+                                                        index = [wself appendMessageModels:[self modelsWithMessages:messages]].count;
+                                                        if (handler) {
+                                                            NIMKit_Dispatch_Async_Main(^{
+                                                                handler(index,messages,nil);
+                                                            });
+                                                        }
+                                                    }];
 }
 
 - (NSArray*)deleteMessageModel:(NIMMessageModel *)msgModel

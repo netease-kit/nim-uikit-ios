@@ -18,6 +18,8 @@
 
 - (void)didRefreshMessageData;
 
+- (void)didPullUpMessageData;
+
 
 @end
 
@@ -48,9 +50,11 @@
 
 - (void)checkReceipt;
 
-- (void)resetMessages;
+- (void)resetMessages:(void (^)(NSError *error))handler;
 
 - (void)loadMessages:(void (^)(NSArray *messages, NSError *error))handler;
+
+- (void)pullUpMessages:(void(^)(NSArray *messages, NSError *error))handler;
 
 
 //排版接口
@@ -60,6 +64,8 @@
 - (void)changeLayout:(CGFloat)inputHeight;
 
 - (void)cleanCache;
+
+- (void)pullUp;
 
 
 //按钮响应接口

@@ -20,7 +20,6 @@
 
 
 UIKIT_EXTERN NSNotificationName const NIMKitKeyboardWillChangeFrameNotification;
-UIKIT_EXTERN NSNotificationName const NIMKitKeyboardWillShowNotification;
 UIKIT_EXTERN NSNotificationName const NIMKitKeyboardWillHideNotification;
 
 

@@ -48,6 +48,8 @@ typedef NS_ENUM(NSInteger,NIMInputStatus)
 
 @property (nonatomic,strong) UIImageView *inputTextBkgImage;
 
+@property (nonatomic,strong) UIView *bottomSep;
+
 @property (nonatomic,copy) NSString *contentText;
 
 @property (nonatomic,weak) id<NIMInputToolBarDelegate> delegate;

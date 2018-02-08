@@ -45,7 +45,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 @implementation NIMSessionInteractorImpl
 
 - (instancetype)initWithSession:(NIMSession *)session
-                         config:(id<NIMSessionConfig>)sessionConfig;
+                         config:(id<NIMSessionConfig>)sessionConfig
 {
     self = [super init];
     if (self) {
@@ -207,6 +207,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     [self.dataSource loadHistoryMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
         if (messages.count) {
             [wself.layout layoutAfterRefresh];
+            [wself.layout adjustOffset];
             [wself.dataSource checkAttachmentState:messages];
         }
         if (handler) {
@@ -215,13 +216,35 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     }];
 }
 
-- (void)resetMessages
+- (void)pullUp {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didPullUpMessageData)]) {
+        [self.delegate didPullUpMessageData];
+    }
+}
+
+- (void)pullUpMessages:(void(^)(NSArray *messages, NSError *error))handler {
+    __weak typeof(self) wself = self;
+    [self.dataSource loadNewMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
+        if (messages.count) {
+            [wself.layout layoutAfterRefresh];
+            [wself.dataSource checkAttachmentState:messages];
+        }
+        if (handler) {
+            handler(messages, error);
+        }
+    }];
+}
+
+- (void)resetMessages:(void (^)(NSError *error))handler
 {
     __weak typeof(self) weakSelf = self;
     [self.dataSource resetMessages:^(NSError *error) {
         if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
         {
             [weakSelf.delegate didFetchMessageData];
+            if (handler) {
+                handler(error);
+            }
         }
     }];
 }
@@ -240,7 +263,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         }];
     }
 }
-
 
 - (void)setDataSource:(id<NIMSessionDataSource>)dataSource
 {
@@ -404,6 +426,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     __weak typeof(self) wself = self;
     [self loadMessages:^(NSArray *messages, NSError *error) {
         [wself.layout layoutAfterRefresh];
+        [wself.layout adjustOffset];
         if ([wself shouldHandleReceipt] && messages.count) {
             [wself checkReceipt];
         }

@@ -44,6 +44,8 @@
 
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler;
 
+- (void)loadNewMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler;
+
 - (void)checkAttachmentState:(NSArray *)messages;
 
 - (NSDictionary *)checkReceipt;
@@ -82,6 +84,8 @@
 - (void)setDelegate:(id<NIMSessionLayoutDelegate>)delegate;
 
 - (void)layoutAfterRefresh;
+
+- (void)adjustOffset;
 
 @end
 
