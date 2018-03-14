@@ -14,7 +14,6 @@
 
 * `NIMKitResource.bundle` （主要资源文件） 
 * `NIMKitEmoticon.bundle`	  (表情资源文件）
-* `NIMKitSettings.bundle`  (配置资源文件)
 
 ### 手动添加 NIMSDK
 
