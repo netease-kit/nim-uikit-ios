@@ -271,7 +271,7 @@
    ...
    
     //注册 NIMKit 自定义排版配置
-    [[NIMKit sharedKit] registerLayoutConfig:[CellLayoutConfig class]];
+    [[NIMKit sharedKit] registerLayoutConfig:[CellLayoutConfig new]];
     
    ...
 - }
