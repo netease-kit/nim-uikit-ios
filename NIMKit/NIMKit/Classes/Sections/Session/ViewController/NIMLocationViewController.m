@@ -67,7 +67,7 @@
         [self.locationManager requestWhenInUseAuthorization];
         self.locationManager.delegate = self;
         if ([CLLocationManager locationServicesEnabled]) {
-            [_locationManager requestLocation];
+            [_locationManager requestWhenInUseAuthorization];
             CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
             if (status == kCLAuthorizationStatusRestricted || status == kCLAuthorizationStatusDenied) {
                 [self.view makeToast:@"请在设置-隐私里允许程序使用地理位置服务"

@@ -92,19 +92,18 @@
     [self.contentView addSubview:_nameLabel];
     
     //readlabel
-    _readLabel = [[UILabel alloc] init];
-    _readLabel.backgroundColor = [UIColor clearColor];
-    _readLabel.opaque = YES;
-    _readLabel.font   = [NIMKit sharedKit].config.receiptFont;
-    _readLabel.textColor = [NIMKit sharedKit].config.receiptColor;
-    [_readLabel setHidden:YES];
-    [_readLabel setText:NSLocalizedString(@"已读", nil)];
-    [_readLabel sizeToFit];
-    [self.contentView addSubview:_readLabel];
+    _readButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _readButton.opaque = YES;
+    _readButton.titleLabel.font   = [NIMKit sharedKit].config.receiptFont;
+    [_readButton setTitleColor:[NIMKit sharedKit].config.receiptColor forState:UIControlStateNormal];
+    [_readButton setTitleColor:[NIMKit sharedKit].config.receiptColor forState:UIControlStateHighlighted];
+    [_readButton setHidden:YES];
+    [_readButton addTarget:self action:@selector(onPressReadButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:_readButton];
 }
 
 - (void)makeGesture{
-    _longPressGesture= [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longGesturePress:)];
+    _longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longGesturePress:)];
     [self addGestureRecognizer:_longPressGesture];
 }
 
@@ -157,9 +156,30 @@
     [_traningActivityIndicator setHidden:isActivityIndicatorHidden];
     [_retryButton setHidden:[self retryButtonHidden]];
     [_audioPlayedIcon setHidden:[self unreadHidden]];
-    [_readLabel setHidden:[self readLabelHidden]];
+    
+    [self refreshReadButton];
     
     [self setNeedsLayout];
+}
+
+
+- (void)refreshReadButton
+{
+    BOOL hidden = [self readLabelHidden];
+    [_readButton setHidden:hidden];
+    if (!hidden)
+    {
+        if (self.model.message.session.sessionType == NIMSessionTypeP2P)
+        {
+            [_readButton setTitle:@"已读" forState:UIControlStateNormal];
+            [_readButton sizeToFit];
+        }
+        else if(self.model.message.session.sessionType == NIMSessionTypeTeam)
+        {
+            [_readButton setTitle:[NSString stringWithFormat:@"%zd人未读",self.model.message.teamReceiptInfo.unreadCount] forState:UIControlStateNormal];
+            [_readButton sizeToFit];
+        }
+    }
 }
 
 - (void)addContentViewIfNotExist
@@ -204,7 +224,7 @@
     [self layoutRetryButton];
     [self layoutAudioPlayedIcon];
     [self layoutActivityIndicator];
-    [self layoutReadLabel];
+    [self layoutReadButton];
 }
 
 
@@ -301,15 +321,15 @@
     }
 }
 
-- (void)layoutReadLabel{
+- (void)layoutReadButton{
     
-    if (!_readLabel.isHidden) {
+    if (!_readButton.isHidden) {
         
         CGFloat left = _bubbleView.nim_left;
         CGFloat bottom = _bubbleView.nim_bottom;
         
-        _readLabel.nim_left = left - CGRectGetWidth(_readLabel.bounds) - [self readLabelBubblePadding];
-        _readLabel.nim_bottom = bottom;
+        _readButton.nim_left = left - CGRectGetWidth(_readButton.bounds) - [self readButtonBubblePadding];
+        _readButton.nim_bottom = bottom;
 
     }
 }
@@ -426,6 +446,7 @@
 {
     if (self.model.shouldShowReadLabel &&
         [self activityIndicatorHidden] &&
+        [self retryButtonHidden] &&
         [self unreadHidden])
     {
         return NO;
@@ -438,7 +459,7 @@
     return 10.0;
 }
 
-- (CGFloat)readLabelBubblePadding{
+- (CGFloat)readButtonBubblePadding{
     return 2.0;
 }
 
@@ -474,5 +495,14 @@
         }
     }
 }
+
+- (void)onPressReadButton:(id)sender
+{
+    if ([self.delegate respondsToSelector:@selector(onPressReadLabel:)])
+    {
+        [self.delegate onPressReadLabel:self.model.message];
+    }
+}
+
 
 @end

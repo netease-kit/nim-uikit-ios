@@ -108,7 +108,15 @@
 
 - (BOOL)shouldShowReadLabel
 {
-    return _shouldShowReadLabel && self.message.isRemoteRead;
+    if (self.message.session.sessionType == NIMSessionTypeP2P)
+    {
+        return _shouldShowReadLabel && self.message.isRemoteRead;
+    }
+    else
+    {
+        return _shouldShowReadLabel;
+    }
+    
 }
 
 @end

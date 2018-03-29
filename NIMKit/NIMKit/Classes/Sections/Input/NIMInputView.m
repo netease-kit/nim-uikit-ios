@@ -322,6 +322,9 @@
 - (void)onTouchVoiceBtn:(id)sender {
     // image change
     if (self.status!= NIMInputStatusAudio) {
+        if ([self.actionDelegate respondsToSelector:@selector(onTapVoiceBtn:)]) {
+            [self.actionDelegate onTapVoiceBtn:sender];
+        }
         __weak typeof(self) weakSelf = self;
         if ([[AVAudioSession sharedInstance] respondsToSelector:@selector(requestRecordPermission:)]) {
             [[AVAudioSession sharedInstance] performSelector:@selector(requestRecordPermission:) withObject:^(BOOL granted) {
@@ -382,6 +385,9 @@
 - (void)onTouchEmoticonBtn:(id)sender
 {
     if (self.status != NIMInputStatusEmoticon) {
+        if ([self.actionDelegate respondsToSelector:@selector(onTapEmoticonBtn:)]) {
+            [self.actionDelegate onTapEmoticonBtn:sender];
+        }
         [self checkEmoticonContainer];
         [self bringSubviewToFront:self.emoticonContainer];
         [self.emoticonContainer setHidden:NO];
@@ -405,6 +411,9 @@
 - (void)onTouchMoreBtn:(id)sender {
     if (self.status != NIMInputStatusMore)
     {
+        if ([self.actionDelegate respondsToSelector:@selector(onTapMoreBtn:)]) {
+            [self.actionDelegate onTapMoreBtn:sender];
+        }
         [self checkMoreContainer];
         [self bringSubviewToFront:self.moreContainer];
         [self.moreContainer setHidden:NO];

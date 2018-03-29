@@ -48,7 +48,7 @@
 
 - (void)checkAttachmentState:(NSArray *)messages;
 
-- (NSDictionary *)checkReceipt;
+- (NSDictionary *)checkReceipts:(NSArray<NIMMessageReceipt *> *)receipts;
 
 - (void)sendMessageReceipt:(NSArray *)messages;
 
@@ -85,7 +85,7 @@
 
 - (void)layoutAfterRefresh;
 
-- (void)adjustOffset;
+- (void)adjustOffset:(NSInteger)row;
 
 @end
 

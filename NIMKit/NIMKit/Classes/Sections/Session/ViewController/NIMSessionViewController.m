@@ -71,7 +71,7 @@
     //进入会话时，标记所有消息已读，并发送已读回执
     [self markRead];
     //更新已读位置
-    [self uiCheckReceipt];    
+    [self uiCheckReceipts:nil];
 }
 
 - (void)setupNav
@@ -79,8 +79,10 @@
     [self setUpTitleView];
     NIMCustomLeftBarView *leftBarView = [[NIMCustomLeftBarView alloc] init];
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarView];
-    NSMutableArray *items = [NSMutableArray arrayWithObject:leftItem];
-    self.navigationItem.leftBarButtonItems = items;
+    if (@available(iOS 11.0, *)) {
+        leftBarView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    self.navigationItem.leftBarButtonItems = @[leftItem];
     self.navigationItem.leftItemsSupplementBackButton = YES;
 }
 
@@ -134,12 +136,17 @@
     [self.interactor onViewWillAppear];
 }
 
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.sessionInputView endEditing:YES];
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     [self.interactor onViewDidDisappear];
-    
-    [self.sessionInputView endEditing:YES];
 }
 
 
@@ -170,7 +177,7 @@
 
 - (void)didFetchMessageData
 {
-    [self uiCheckReceipt];
+    [self uiCheckReceipts:nil];
     [self.tableView reloadData];
     [self.tableView nim_scrollToBottom:NO];
 }
@@ -228,7 +235,13 @@
     if ([message.session isEqual:_session])
     {
         [self.interactor updateMessage:message];
-    }
+        if (message.session.sessionType == NIMSessionTypeTeam)
+        {
+            //如果是群的话需要检查一下回执显示情况
+            NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
+            [self.interactor checkReceipts:@[receipt]];
+        }
+    }    
 }
 
 //发送进度
@@ -252,9 +265,7 @@
         }
         
         [self uiAddMessages:messages];
-        [self sendMessageReceipt:messages];
-        
-        [self.conversationManager markAllMessagesReadInSession:self.session];
+        [self.interactor markRead];
     }
 }
 
@@ -278,12 +289,20 @@
     }
 }
 
-- (void)onRecvMessageReceipt:(NIMMessageReceipt *)receipt
+- (void)onRecvMessageReceipts:(NSArray<NIMMessageReceipt *> *)receipts
 {
     if ([self shouldAddListenerForNewMsg])
     {
-        if ([receipt.session isEqual:self.session] && [self shouldHandleReceipt]) {
-            [self uiCheckReceipt];
+        NSMutableArray *handledReceipts = [[NSMutableArray alloc] init];
+        for (NIMMessageReceipt *receipt in receipts) {
+            if ([receipt.session isEqual:self.session])
+            {
+                [handledReceipts addObject:receipt];
+            }
+        }
+        if (handledReceipts.count)
+        {
+            [self uiCheckReceipts:handledReceipts];
         }
     }
 }
@@ -542,15 +561,7 @@
     return should;
 }
 
-//是否需要开启自动设置所有消息已读 ： 某些场景不需要自动设置消息已读，如使用 3D touch 的场景预览会话界面内容
-- (BOOL)shouldAutoMarkRead
-{
-    BOOL should = YES;
-    if ([self.sessionConfig respondsToSelector:@selector(disableAutoMarkMessageRead)]) {
-        should = ![self.sessionConfig disableAutoMarkMessageRead];
-    }
-    return should;
-}
+
 
 //是否需要显示输入框 : 某些场景不需要显示输入框，如使用 3D touch 的场景预览会话界面内容
 - (BOOL)shouldShowInputView
@@ -666,9 +677,9 @@
 
 - (NIMMessageModel *)uiDeleteMessage:(NIMMessage *)message{
     NIMMessageModel *model = [self.interactor deleteMessage:message];
-    if (model.shouldShowReadLabel)
+    if (model.shouldShowReadLabel && model.message.session.sessionType == NIMSessionTypeP2P)
     {
-        [self uiCheckReceipt];
+        [self uiCheckReceipts:nil];
     }
     return model;
 }
@@ -677,11 +688,9 @@
     [self.interactor updateMessage:message];
 }
 
-- (void)uiCheckReceipt
+- (void)uiCheckReceipts:(NSArray<NIMMessageReceipt *> *)receipts
 {
-    if ([self shouldHandleReceipt]) {
-        [self.interactor checkReceipt];
-    }
+    [self.interactor checkReceipts:receipts];
 }
 
 #pragma mark - NIMMeidaButton
@@ -723,18 +732,7 @@
 #pragma mark - 标记已读
 - (void)markRead
 {
-    if ([self shouldAutoMarkRead]) {
-        [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
-        [self sendMessageReceipt:self.interactor.items];
-    }
-}
-
-#pragma mark - 已读回执
-- (void)sendMessageReceipt:(NSArray *)messages
-{
-    if ([self shouldHandleReceipt]) {
-        [self.interactor sendMessageReceipt:messages];
-    }
+    [self.interactor markRead];
 }
 
 
@@ -758,13 +756,6 @@
     leftBarView.badgeView.badgeValue = @(unreadCount).stringValue;
     leftBarView.badgeView.hidden = !unreadCount;
 }
-
-
-- (BOOL)shouldHandleReceipt
-{
-    return [self.interactor shouldHandleReceipt];
-}
-
 
 
 - (id<NIMConversationManager>)conversationManager{

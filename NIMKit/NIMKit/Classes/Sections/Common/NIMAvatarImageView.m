@@ -17,6 +17,9 @@ static char imageURLKey;
 
 
 @interface NIMAvatarImageView()
+
+@property (nonatomic,strong) UIImageView *imageView;
+
 @end
 
 @implementation NIMAvatarImageView
@@ -43,8 +46,11 @@ static char imageURLKey;
 
 - (void)setup
 {
+    _imageView = [[UIImageView alloc] initWithFrame:self.bounds];
+    _imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [self addSubview:_imageView];
+    
     self.backgroundColor = [UIColor clearColor];
-    self.layer.geometryFlipped = YES;
     [self setupRadius];
 }
 
@@ -73,8 +79,25 @@ static char imageURLKey;
     if (_image != image)
     {
         _image = image;
-        [self setNeedsDisplay];
+        UIImage *fixedImage  = [self imageAddCornerWithRadius:_cornerRadius andSize:self.bounds.size];
+        self.imageView.image = fixedImage;
     }
+}
+
+- (UIImage*)imageAddCornerWithRadius:(CGFloat)radius andSize:(CGSize)size
+{
+    CGRect rect = CGRectMake(0, 0, size.width, size.height);
+    
+    UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGPathRef path = self.path;
+    CGContextAddPath(ctx,path);
+    CGContextClip(ctx);
+    [self.image drawInRect:rect];
+    CGContextDrawPath(ctx, kCGPathFillStroke);
+    UIImage * newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
 }
 
 
@@ -84,44 +107,6 @@ static char imageURLKey;
                                        cornerRadius:self.cornerRadius] CGPath];
 }
 
-
-
-
-- (void)drawRect:(CGRect)rect
-{
-    if (!self.nim_width || !self.nim_height) {
-        return;
-    }
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGContextSaveGState(context);
-    if (_cornerRadius > 0)
-    {
-        CGContextAddPath(context, [self path]);
-        CGContextClip(context);
-    }
-    
-    UIImage *image = _image;
-    if (image && image.size.height && image.size.width)
-    {
-        //ScaleAspectFill模式
-        CGPoint center   = CGPointMake(self.nim_width * .5f, self.nim_height * .5f);
-        //哪个小按哪个缩
-        CGFloat scaleW   = image.size.width  / self.nim_width;
-        CGFloat scaleH   = image.size.height / self.nim_height;
-        CGFloat scale    = scaleW < scaleH ? scaleW : scaleH;
-        CGSize  size     = CGSizeMake(image.size.width / scale, image.size.height / scale);
-        CGRect  drawRect = NIMKit_CGRectWithCenterAndSize(center, size);
-        CGContextDrawImage(context, drawRect, image.CGImage);
-        
-    }
-    CGContextRestoreGState(context);
-}
-
-
-CGRect NIMKit_CGRectWithCenterAndSize(CGPoint center, CGSize size){
-    return CGRectMake(center.x - (size.width/2), center.y - (size.height/2), size.width, size.height);
-}
 
 
 
