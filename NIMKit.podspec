@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
     os.dependency 'SDWebImage', '~> 4.2.2'  
     os.dependency 'Toast', '~> 3.0'         
     os.dependency 'M80AttributedLabel', '~> 1.6.3'       
-    os.dependency 'TZImagePickerController', '~> 1.9.0'  
+
   end   
 
   s.default_subspec = 'Lite'  
