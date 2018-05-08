@@ -29,6 +29,12 @@ Pod::Spec.new do |s|
     os.dependency 'TZImagePickerController', '~> 1.9.0'  
   end   
 
+  # https://github.com/CocoaPods/CocoaPods/issues/2926
+  s.pod_target_xcconfig = {
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/NIMSDK',
+    'OTHER_LDFLAGS'          => '$(inherited) -undefined dynamic_lookup'
+  }
+
   s.default_subspec = 'Lite'  
 
 end 
