@@ -1,7 +1,29 @@
 # iOS UI 组件更新日志
-## [2.5.0] - 2018-05-17
+## [2.7.0] - 2018-05-17
 ### 修正
 * 上层开发自定义字体大小导致的消息气泡显示异常问题
+
+## [2.6.0] - 2018-02-11
+* 组件的云信 SDK 依赖升级为 4.9.0
+
+## [2.5.0] - 2018-02-08
+### 新增
+* 组件新增下拉加载更多支持
+  
+  数据源 `NIMSessionMsgDatasource` 新增上拉数据接口
+  
+  ```objc
+  - (void)loadPullUpMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages, NSError *error))handler;
+  ```
+  
+### 修正
+* 修复会话组件在某些情况下无法修改标题和子标题的问题
+
+
+### 变更
+* 组件的云信 SDK 依赖升级为 4.8.0
+
+>>>>>>> ef55f5a69e2fe4872b8bc7eaf0f906ab51b7c9e5
 
 ## [2.4.0] - 2018-01-12
 ### 变更

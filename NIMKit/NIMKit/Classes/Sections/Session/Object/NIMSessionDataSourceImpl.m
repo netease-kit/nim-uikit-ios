@@ -119,6 +119,10 @@
     [self.dataSource loadHistoryMessagesWithComplete:handler];
 }
 
+- (void)loadNewMessagesWithComplete:(void (^)(NSInteger, NSArray *, NSError *))handler {
+    [self.dataSource loadPullUpMessagesWithComplete:handler];
+}
+
 - (void)checkAttachmentState:(NSArray *)messages{
     NSArray *items = [NSArray arrayWithArray:messages];
     for (id item in items) {
@@ -129,13 +133,27 @@
         if ([item isKindOfClass:[NIMMessageModel class]]) {
             message = [(NIMMessageModel *)item message];
         }
-        if (message && message.attachmentDownloadState == NIMMessageAttachmentDownloadStateNeedDownload) {
+        if (message && !message.isOutgoingMsg && message.attachmentDownloadState == NIMMessageAttachmentDownloadStateNeedDownload)
+        {
             [[NIMSDK sharedSDK].chatManager fetchMessageAttachment:message error:nil];
         }
     }
 }
 
-- (NSDictionary *)checkReceipt
+- (NSDictionary *)checkReceipts:(NSArray<NIMMessageReceipt *> *)receipts
+{
+    if (self.session.sessionType == NIMSessionTypeP2P)
+    {
+        return [self checkP2PReceipts:receipts];
+    }
+    else
+    {
+        return [self checkTeamReceipts:receipts];
+    }
+    
+}
+
+- (NSDictionary *)checkP2PReceipts:(NSArray<NIMMessageReceipt *> *)receipts
 {
     BOOL hasConfig = self.sessionConfig && [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -174,42 +192,140 @@
     return dict;
 }
 
+- (NSDictionary *)checkTeamReceipts:(NSArray<NIMMessageReceipt *> *)receipts
+{
+    NSMutableSet *filtedMessaegeIds = nil;
+    if (receipts.count)
+    {
+        //说明只要局部更新
+        filtedMessaegeIds = [[NSMutableSet alloc] init];
+        for (NIMMessageReceipt *receipt in receipts)
+        {
+            [filtedMessaegeIds addObject:receipt.messageId];
+        }
+    }
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    BOOL hasConfig = self.sessionConfig && [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)];
+    NSMutableArray *queryMessages = [NSMutableArray array];
+    for (NSInteger i = [[self.dataSource items] count] - 1; i >= 0; i--)
+    {
+        id item = [[self.dataSource items] objectAtIndex:i];
+        if ([item isKindOfClass:[NIMMessageModel class]])
+        {
+            NIMMessageModel *model = (NIMMessageModel *)item;
+            NIMMessage *message = [model message];
+            if (filtedMessaegeIds && ![filtedMessaegeIds containsObject:message.messageId])
+            {
+                //本次刷新不包含此消息，略过
+                continue;
+            }
+            if (!receipts)
+            {
+                //说明是全部刷新，这个时候消息的回执数可能是过期的，查刷一下
+                [queryMessages addObject:message];
+            }
+
+            if (message.isOutgoingMsg)
+            {
+                if (message.setting.teamReceiptEnabled &&
+                    hasConfig &&
+                    [self.sessionConfig shouldHandleReceiptForMessage:message])
+                {
+                    model.shouldShowReadLabel = YES;
+                    dict[@(i)] = model;
+                }
+            }
+        }
+    }
+    if ([queryMessages count])
+    {
+        [[NIMSDK sharedSDK].chatManager refreshTeamMessageReceipts:queryMessages];
+    }
+
+
+    
+    return dict;
+}
+
 
 - (void)sendMessageReceipt:(NSArray *)messages
 {
     //只有在当前 Application 是激活的状态下才发送已读回执
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive)
     {
-        //找到最后一个需要发送已读回执的消息标记为已读
-        for (NSInteger i = [messages count] - 1; i >= 0; i--) {
-            id item = [messages objectAtIndex:i];
-            NIMMessage *message = nil;
-            if ([item isKindOfClass:[NIMMessage class]])
+        if (self.session.sessionType == NIMSessionTypeP2P)
+        {
+            [self sendP2PMessageReceipt:messages];
+        }
+        if (self.session.sessionType == NIMSessionTypeTeam)
+        {
+            [self sendTeamMessageReceipt:messages];
+        }
+    }
+}
+
+- (void)sendP2PMessageReceipt:(NSArray *)messages
+{
+    //找到最后一个需要发送已读回执的消息标记为已读
+    for (NSInteger i = [messages count] - 1; i >= 0; i--) {
+        id item = [messages objectAtIndex:i];
+        NIMMessage *message = nil;
+        if ([item isKindOfClass:[NIMMessage class]])
+        {
+            message = item;
+        }
+        else if ([item isKindOfClass:[NIMMessageModel class]])
+        {
+            message = [(NIMMessageModel *)item message];
+        }
+        if (message)
+        {
+            if (!message.isOutgoingMsg &&
+                self.sessionConfig &&
+                [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)] &&
+                [self.sessionConfig shouldHandleReceiptForMessage:message])
             {
-                message = item;
-            }
-            else if ([item isKindOfClass:[NIMMessageModel class]])
-            {
-                message = [(NIMMessageModel *)item message];
-            }
-            if (message)
-            {
-                if (!message.isOutgoingMsg &&
-                    self.sessionConfig &&
-                    [self.sessionConfig respondsToSelector:@selector(shouldHandleReceiptForMessage:)] &&
-                    [self.sessionConfig shouldHandleReceiptForMessage:message])
-                {
-                    
-                    NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
-                    
-                    [[[NIMSDK sharedSDK] chatManager] sendMessageReceipt:receipt
-                                                              completion:nil];  //忽略错误,如果失败下次再发即可
-                    return;
-                }
+                
+                NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
+                
+                [[[NIMSDK sharedSDK] chatManager] sendMessageReceipt:receipt
+                                                          completion:nil];  //忽略错误,如果失败下次再发即可
+                return;
             }
         }
     }
 }
+
+- (void)sendTeamMessageReceipt:(NSArray *)messages
+{
+    NSMutableArray *receipts = [NSMutableArray array];
+    for (NIMMessage *item in messages)
+    {
+        NIMMessage *message = nil;
+        if ([item isKindOfClass:[NIMMessage class]])
+        {
+            message = item;
+        }
+        else if ([item isKindOfClass:[NIMMessageModel class]])
+        {
+            message = [(NIMMessageModel *)item message];
+        }
+        if (message)
+        {
+            if (!message.isOutgoingMsg && message.setting.teamReceiptEnabled)
+            {
+                NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
+                [receipts addObject:receipt];
+            }
+        }
+    }
+    if([receipts count])
+    {
+        [[[NIMSDK sharedSDK] chatManager] sendTeamMessageReceipts:receipts
+                                                       completion:nil];
+    }
+}
+
 
 
 @end

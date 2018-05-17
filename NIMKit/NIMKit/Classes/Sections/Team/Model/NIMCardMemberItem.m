@@ -35,6 +35,10 @@
     return [obj.memberId isEqualToString:self.memberId];
 }
 
+- (NSUInteger)hash {
+    return [self.member.userId hash];
+}
+
 - (NSString *)imageUrl{
     return [[NIMKit sharedKit] infoByUser:_member.userId option:nil].avatarUrlString;
 }
@@ -100,6 +104,10 @@
     }
     NIMUserCardMemberItem *obj = (NIMUserCardMemberItem*)object;
     return [obj.memberId isEqualToString:self.memberId];
+}
+
+- (NSUInteger)hash {
+    return [self.memberId hash];
 }
 
 #pragma mark - TeamCardHeaderData

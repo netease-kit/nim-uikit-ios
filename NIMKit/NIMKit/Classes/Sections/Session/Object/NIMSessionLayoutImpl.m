@@ -14,7 +14,8 @@
 #import "UIView+NIM.h"
 #import "NIMKitKeyboardInfo.h"
 
-@interface NIMSessionLayoutImpl(){
+@interface NIMSessionLayoutImpl()
+{
     NSMutableArray *_inserts;
     CGFloat _inputViewHeight;
 }
@@ -75,13 +76,16 @@
 - (void)layoutAfterRefresh
 {
     [self.refreshControl endRefreshing];
-    
-    CGFloat offset  = self.tableView.contentSize.height - self.tableView.contentOffset.y;
     [self.tableView reloadData];
-    CGFloat offsetYAfterLoad = self.tableView.contentSize.height - offset;
-    CGPoint point  = self.tableView.contentOffset;
-    point.y = offsetYAfterLoad;
-    [self.tableView setContentOffset:point animated:NO];
+}
+
+- (void)adjustOffset:(NSInteger)row {
+    if (row >= 0) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+            [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        });
+    }
 }
 
 
@@ -152,8 +156,8 @@
     else
     {
         contentInsets = self.tableView.contentInset;
-        visiableHeight = [self fixVisiableHeightBelowIOS11:visiableHeight];
     }
+    [self.tableView reloadData];
     
     //如果气泡过少，少于总高度，输入框视图需要顶到最后一个气泡的下面。
     visiableHeight = visiableHeight + self.tableView.contentSize.height + contentInsets.top + contentInsets.bottom;
@@ -172,25 +176,6 @@
         [self.tableView nim_scrollToBottom:YES];
     }
 }
-
-
-- (CGFloat)fixVisiableHeightBelowIOS11:(CGFloat)visiableHeight
-{
-    //iOS11 以下，当插入数据后不会立即改变 contentSize 的大小，所以需要手动添加最后一个数据的高度
-    NSInteger section = self.tableView.numberOfSections - 1;
-    NSInteger row     = [self.tableView numberOfRowsInSection:section] - 1;
-    if (section >=0 && row >=0)
-    {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
-        CGFloat height = [self.tableView.delegate tableView:self.tableView heightForRowAtIndexPath:indexPath];
-        return visiableHeight + height;
-    }
-    else
-    {
-        return visiableHeight;
-    }
-}
-
 
 #pragma mark - Notification
 - (void)menuDidHide:(NSNotification *)notification
@@ -222,7 +207,6 @@
 {
     self.refreshControl = [[UIRefreshControl alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
 
-    
     if (@available(iOS 10.0, *))
     {
         self.tableView.refreshControl = self.refreshControl;
@@ -233,6 +217,7 @@
     }
     
     [self.refreshControl addTarget:self action:@selector(headerRereshing:) forControlEvents:UIControlEventValueChanged];
+    
 }
 
 - (void)headerRereshing:(id)sender
@@ -242,8 +227,6 @@
         [self.delegate onRefresh];
     }
 }
-
-
 
 - (void)insert:(NSArray<NSIndexPath *> *)indexPaths animated:(BOOL)animated
 {
@@ -262,10 +245,10 @@
     [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationBottom];
     [self.tableView endUpdates];
     
-
     [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
         [self resetLayout];
     } completion:nil];
+    
     [self.tableView nim_scrollToBottom:YES];
 }
 

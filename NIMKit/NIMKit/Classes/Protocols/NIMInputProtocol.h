@@ -30,5 +30,11 @@
 
 - (void)onStartRecording;
 
+- (void)onTapMoreBtn:(id)sender;
+
+- (void)onTapEmoticonBtn:(id)sender;
+
+- (void)onTapVoiceBtn:(id)sender;
+
 @end
 

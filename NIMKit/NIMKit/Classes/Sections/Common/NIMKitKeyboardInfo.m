@@ -9,7 +9,6 @@
 #import "NIMKitKeyboardInfo.h"
 
 NSNotificationName const NIMKitKeyboardWillChangeFrameNotification = @"NIMKitKeyboardWillChangeFrameNotification";
-NSNotificationName const NIMKitKeyboardWillShowNotification        = @"NIMKitKeyboardWillShowNotification";
 NSNotificationName const NIMKitKeyboardWillHideNotification        = @"NIMKitKeyboardWillHideNotification";
 
 @implementation NIMKitKeyboardInfo
@@ -33,6 +32,7 @@ NSNotificationName const NIMKitKeyboardWillHideNotification        = @"NIMKitKey
     if (self)
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
 }
@@ -48,15 +48,11 @@ NSNotificationName const NIMKitKeyboardWillHideNotification        = @"NIMKitKey
 }
 
 
-- (void)keyboardWillShow:(NSNotification *)notification
-{
-    _isVisiable = YES;
-    [[NSNotificationCenter defaultCenter] postNotificationName:NIMKitKeyboardWillShowNotification object:nil userInfo:notification.userInfo];
-}
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
     _isVisiable = NO;
+    _keyboardHeight = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:NIMKitKeyboardWillHideNotification object:nil userInfo:notification.userInfo];
 }
 

@@ -45,7 +45,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 @implementation NIMSessionInteractorImpl
 
 - (instancetype)initWithSession:(NIMSession *)session
-                         config:(id<NIMSessionConfig>)sessionConfig;
+                         config:(id<NIMSessionConfig>)sessionConfig
 {
     self = [super init];
     if (self) {
@@ -66,6 +66,19 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (NSArray *)items
 {
     return [self.dataSource items];
+}
+
+- (void)markRead
+{
+    if ([self shouldAutoMarkRead])
+    {
+        [[NIMSDK sharedSDK].conversationManager markAllMessagesReadInSession:self.session];
+        
+        if ([self shouldHandleReceipt])
+        {
+            [self sendMessageReceipt:self.items];
+        }
+    }
 }
 
 - (void)addMessages:(NSArray *)messages
@@ -96,7 +109,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         if (message.isDeleted)
         {
             continue;
-        }
+        }        
         NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
         [models addObject:model];
     }
@@ -142,7 +155,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (NIMMessageModel *)updateMessage:(NIMMessage *)message
 {
     NIMMessageModel *model = [self findMessageModel:message];
-    if (model) {
+    if (model)
+    {
         NIMSessionMessageOperateResult *result = [self.dataSource updateMessageModel:model];
         NSInteger index = [result.indexpaths.firstObject row];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
@@ -159,19 +173,29 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     return nil;
 }
 
-- (void)checkReceipt
+- (NSInteger)findMessageIndex:(NIMMessage *)message {
+    if ([message isKindOfClass:[NIMMessage class]]) {
+        NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
+        return [self.dataSource indexAtModelArray:model];
+    }
+    return -1;
+}
+
+- (void)checkReceipts:(NSArray<NIMMessageReceipt *> *)receipts
 {
-    NSDictionary *models = [self.dataSource checkReceipt];
-    for (NSNumber *index in models.allKeys) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index.integerValue inSection:0];
-        [self.layout update:indexPath];
+    if ([self shouldHandleReceipt])
+    {
+        NSDictionary *models = [self.dataSource checkReceipts:receipts];
+        for (NSNumber *index in models.allKeys) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index.integerValue inSection:0];
+            [self.layout update:indexPath];
+        }
     }
 }
 
 - (BOOL)shouldHandleReceipt
 {
-    return self.session.sessionType == NIMSessionTypeP2P &&
-    [self.sessionConfig respondsToSelector:@selector(shouldHandleReceipt)] &&
+    return    [self.sessionConfig respondsToSelector:@selector(shouldHandleReceipt)] &&
     [self.sessionConfig shouldHandleReceipt];
 }
 
@@ -207,6 +231,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     [self.dataSource loadHistoryMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
         if (messages.count) {
             [wself.layout layoutAfterRefresh];
+            NSInteger firstRow = [self findMessageIndex:messages[0]] - 1;
+            [wself.layout adjustOffset:firstRow];
             [wself.dataSource checkAttachmentState:messages];
         }
         if (handler) {
@@ -215,13 +241,35 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     }];
 }
 
-- (void)resetMessages
+- (void)pullUp {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didPullUpMessageData)]) {
+        [self.delegate didPullUpMessageData];
+    }
+}
+
+- (void)pullUpMessages:(void(^)(NSArray *messages, NSError *error))handler {
+    __weak typeof(self) wself = self;
+    [self.dataSource loadNewMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
+        if (messages.count) {
+            [wself.layout layoutAfterRefresh];
+            [wself.dataSource checkAttachmentState:messages];
+        }
+        if (handler) {
+            handler(messages, error);
+        }
+    }];
+}
+
+- (void)resetMessages:(void (^)(NSError *error))handler
 {
     __weak typeof(self) weakSelf = self;
     [self.dataSource resetMessages:^(NSError *error) {
         if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
         {
             [weakSelf.delegate didFetchMessageData];
+            if (handler) {
+                handler(error);
+            }
         }
     }];
 }
@@ -240,7 +288,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         }];
     }
 }
-
 
 - (void)setDataSource:(id<NIMSessionDataSource>)dataSource
 {
@@ -404,11 +451,16 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     __weak typeof(self) wself = self;
     [self loadMessages:^(NSArray *messages, NSError *error) {
         [wself.layout layoutAfterRefresh];
-        if ([wself shouldHandleReceipt] && messages.count) {
-            [wself checkReceipt];
+        if (messages.count) {
+            NSInteger row = [self findMessageIndex:messages[0]] - 1;
+            [wself.layout adjustOffset:row];
+        }
+        if (messages.count)
+        {
+            [wself checkReceipts:nil];
+            [wself markRead];
         }
     }];
-
 }
 
 #pragma mark - NIMMediaManagerDelegate
@@ -438,6 +490,17 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 
 #pragma mark - Private
+
+//是否需要开启自动设置所有消息已读 ： 某些场景不需要自动设置消息已读，如使用 3D touch 的场景预览会话界面内容
+- (BOOL)shouldAutoMarkRead
+{
+    BOOL should = YES;
+    if ([self.sessionConfig respondsToSelector:@selector(disableAutoMarkMessageRead)]) {
+        should = ![self.sessionConfig disableAutoMarkMessageRead];
+    }
+    return should;
+}
+
 - (NIMKitMediaFetcher *)mediaFetcher
 {
     if (!_mediaFetcher) {

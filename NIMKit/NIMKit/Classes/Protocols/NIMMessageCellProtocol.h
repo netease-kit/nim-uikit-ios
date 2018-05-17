@@ -33,6 +33,8 @@
 
 - (BOOL)onLongPressAvatar:(NIMMessage *)message;
 
+- (BOOL)onPressReadLabel:(NIMMessage *)message;
+
 - (void)onRetryMessage:(NIMMessage *)message;
 
 

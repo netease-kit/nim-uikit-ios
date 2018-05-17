@@ -240,9 +240,9 @@
                                 formatedMessage = [NSString stringWithFormat:@"%@更新了群资料修改权限",source];
                                 break;
                             case NIMTeamUpdateTagMuteMode:{
-                                NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:message.session.sessionId];
-                                BOOL inAllMuteMode = [team inAllMuteMode];
-                                formatedMessage = inAllMuteMode? [NSString stringWithFormat:@"%@设置了群全体禁言",source]: [NSString stringWithFormat:@"%@取消了全体禁言",source];
+                                NSString *muteState = teamAttachment.values.allValues.firstObject;
+                                BOOL muted = [muteState isEqualToString:@"0"] ? NO : YES;
+                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言",source]: [NSString stringWithFormat:@"%@取消了全体禁言",source];
                                 break;
                             }
                             default:

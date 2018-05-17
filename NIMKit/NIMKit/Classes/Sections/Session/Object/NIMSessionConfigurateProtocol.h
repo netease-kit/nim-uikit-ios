@@ -18,6 +18,8 @@
 
 - (void)didRefreshMessageData;
 
+- (void)didPullUpMessageData;
+
 
 @end
 
@@ -42,15 +44,21 @@
 //数据接口
 - (NSArray *)items;
 
+- (void)markRead;
+
 - (NIMMessageModel *)findMessageModel:(NIMMessage *)message;
 
 - (BOOL)shouldHandleReceipt;
 
-- (void)checkReceipt;
+- (void)checkReceipts:(NSArray<NIMMessageReceipt *> *)receipts;
 
-- (void)resetMessages;
+- (void)resetMessages:(void (^)(NSError *error))handler;
 
 - (void)loadMessages:(void (^)(NSArray *messages, NSError *error))handler;
+
+- (void)pullUpMessages:(void(^)(NSArray *messages, NSError *error))handler;
+
+- (NSInteger)findMessageIndex:(NIMMessage *)message;
 
 
 //排版接口
@@ -60,6 +68,8 @@
 - (void)changeLayout:(CGFloat)inputHeight;
 
 - (void)cleanCache;
+
+- (void)pullUp;
 
 
 //按钮响应接口

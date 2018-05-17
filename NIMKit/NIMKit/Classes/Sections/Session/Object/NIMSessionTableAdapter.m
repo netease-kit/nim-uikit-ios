@@ -93,10 +93,13 @@
     return cellHeight;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     [[UIMenuController sharedMenuController] setMenuVisible:NO animated:YES];
+    CGFloat currentOffsetY = scrollView.contentOffset.y;
+    if (currentOffsetY + scrollView.frame.size.height  > scrollView.contentSize.height\
+        && scrollView.frame.size.height <= scrollView.contentSize.height && scrollView.isDragging) {
+        [self.interactor pullUp];
+    }
 }
-
-
 
 @end
