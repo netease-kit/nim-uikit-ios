@@ -202,7 +202,7 @@
              atIndexPath:(NSIndexPath *)indexPath{};
 
 - (void)onSelectedRecent:(NIMRecentSession *)recentSession atIndexPath:(NSIndexPath *)indexPath{
-    NIMSessionViewController *vc = [[NIMSessionViewController alloc] initWithSession:recentSession.session];
+    NIMSessionViewController *v/Users/emily/Documents/NIM/NIM/NIMScript/Spec/NIMSDK_LITE.podspecc = [[NIMSessionViewController alloc] initWithSession:recentSession.session];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
