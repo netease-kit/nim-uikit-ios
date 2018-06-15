@@ -19,7 +19,7 @@
 /**
  *  最近会话集合
  */
-@property (nonatomic,readonly) NSMutableArray * recentSessions;
+@property (nonatomic,strong) NSMutableArray * recentSessions;
 
 /**
  *  删除会话时是不是也同时删除服务器会话 (防止漫游)
@@ -47,15 +47,6 @@
 - (void)onSelectedAvatar:(NIMRecentSession *)recent
              atIndexPath:(NSIndexPath *)indexPath;
 
-/**
- *  删除某一条最近会话时触发的事件回调
- *
- *  @param recent    最近会话
- *  @param indexPath 最近会话cell所在的位置
- *  @discussion      默认将删除会话，并检查是否需要删除服务器的会话（防止漫游）
- */
-- (void)onDeleteRecentAtIndexPath:(NIMRecentSession *)recent
-                      atIndexPath:(NSIndexPath *)indexPath;
 
 /**
  *  cell显示的会话名
@@ -95,5 +86,10 @@
  *  重新加载所有数据，调用时必须先调用父类方法
  */
 - (void)refresh;
+
+/**
+ *  自定义最近会话排序，上层可以重写这个方法对最近会话重新排序
+ */
+- (NSMutableArray *)customSortRecents:(NSMutableArray *)recentSessions;
 
 @end

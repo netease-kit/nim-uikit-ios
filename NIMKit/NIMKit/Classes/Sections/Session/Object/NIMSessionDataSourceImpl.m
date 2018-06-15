@@ -133,7 +133,9 @@
         if ([item isKindOfClass:[NIMMessageModel class]]) {
             message = [(NIMMessageModel *)item message];
         }
-        if (message && !message.isOutgoingMsg && message.attachmentDownloadState == NIMMessageAttachmentDownloadStateNeedDownload)
+        if (message && !message.isOutgoingMsg
+            && message.attachmentDownloadState == NIMMessageAttachmentDownloadStateNeedDownload
+            && message.messageType != NIMMessageTypeFile)
         {
             [[NIMSDK sharedSDK].chatManager fetchMessageAttachment:message error:nil];
         }

@@ -17,7 +17,7 @@
     CGFloat messageWidth  = cellWidth;
     UILabel *label = [[UILabel alloc] init];
     label.text  = [NIMKitUtil messageTipContent:message];
-    label.font = [UIFont boldSystemFontOfSize:NIMKit_Notification_Font_Size];
+    label.font = [[NIMKit sharedKit].config setting:message].font;
     label.numberOfLines = 0;
     CGFloat padding = [NIMKit sharedKit].config.maxNotificationTipPadding;
     CGSize size = [label sizeThatFits:CGSizeMake(cellWidth - 2 * padding, CGFLOAT_MAX)];

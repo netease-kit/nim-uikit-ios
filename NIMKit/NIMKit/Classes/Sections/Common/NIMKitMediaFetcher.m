@@ -188,11 +188,12 @@
     if (asset.mediaType == PHAssetMediaTypeVideo) {
         
         PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-        options.version = PHImageRequestOptionsVersionCurrent;
+        options.version = PHVideoRequestOptionsVersionCurrent;
         options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
         
-        [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPresetMediumQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
-            
+
+        [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
+
             NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
             NSString *outputPath = [NIMKitFileLocationHelper filepathForVideo:outputFileName];
 
