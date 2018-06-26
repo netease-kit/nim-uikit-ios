@@ -215,7 +215,7 @@
 - (NSString *)sessionSubTitle{return @"";};
 
 #pragma mark - NIMChatManagerDelegate
-
+//开始发送
 - (void)willSendMessage:(NIMMessage *)message
 {
     id<NIMSessionInteractor> interactor = self.interactor;
@@ -228,6 +228,14 @@
         }
     }
 }
+
+//上传资源文件成功
+- (void)uploadAttachmentSuccess:(NSString *)urlString
+                     forMessage:(NIMMessage *)message
+{
+    //如果需要使用富文本推送，可以在这里进行 message apns payload 的设置
+}
+
 
 //发送结果
 - (void)sendMessage:(NIMMessage *)message didCompleteWithError:(NSError *)error

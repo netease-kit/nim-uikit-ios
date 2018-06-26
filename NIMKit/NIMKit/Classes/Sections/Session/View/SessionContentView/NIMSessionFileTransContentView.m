@@ -68,7 +68,7 @@
     
     self.sizeLabel.font = [[NIMKit sharedKit].config setting:data.message].font;
     long long size = fileObject.fileLength/1024;
-    self.sizeLabel.text = [NSString stringWithFormat:@"%zdKB",size?: 1];
+    self.sizeLabel.text = [NSString stringWithFormat:@"%lldKB",size?: 1LL];
     [self.sizeLabel sizeToFit];
     
     if (self.model.message.deliveryState == NIMMessageDeliveryStateDelivering) {
