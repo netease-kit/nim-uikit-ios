@@ -9,8 +9,6 @@ Pod::Spec.new do |s|
   s.platform = :ios, '8.0' 
   s.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
   s.libraries  = 'sqlite3.0', 'z', 'c++' 
-  s.static_framework = true
-
   s.subspec 'Full' do |cs|	
     cs.source_files = 'NIMKit/NIMKit/**/*.{h,m}' 
     cs.dependency 'NIMKit/Core' 
@@ -30,7 +28,6 @@ Pod::Spec.new do |s|
     os.dependency 'M80AttributedLabel', '~> 1.6.3'       
     os.dependency 'TZImagePickerController', '~> 1.9.0'  
   end   
-
 
   s.default_subspec = 'Lite'  
 

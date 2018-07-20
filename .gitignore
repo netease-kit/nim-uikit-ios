@@ -19,4 +19,3 @@ DerivedData
 *.xcuserstate
 Pods/
 Podfile.lock
-IDEWorkspaceChecks.plist
