@@ -1,0 +1,8 @@
+platform :ios, '8.0'
+use_frameworks!
+
+target 'SwiftDemo' do
+
+  pod 'NIMKit', :path => '../'
+
+end
