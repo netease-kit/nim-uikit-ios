@@ -233,7 +233,11 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
             [wself.layout layoutAfterRefresh];
             NSInteger firstRow = [self findMessageIndex:messages[0]] - 1;
             [wself.layout adjustOffset:firstRow];
-            [wself.dataSource checkAttachmentState:messages];
+            
+            if (![self.sessionConfig respondsToSelector:@selector(autoFetchAttachment)]
+                || self.sessionConfig.autoFetchAttachment) {
+                [wself.dataSource checkAttachmentState:messages];
+            }
         }
         if (handler) {
             handler(messages,error);
@@ -252,7 +256,10 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     [self.dataSource loadNewMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
         if (messages.count) {
             [wself.layout layoutAfterRefresh];
-            [wself.dataSource checkAttachmentState:messages];
+            if (![self.sessionConfig respondsToSelector:@selector(autoFetchAttachment)]
+                || self.sessionConfig.autoFetchAttachment) {
+                [wself.dataSource checkAttachmentState:messages];
+            }
         }
         if (handler) {
             handler(messages, error);
@@ -283,7 +290,11 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
             if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
             {
                 [weakSelf.delegate didFetchMessageData];
-                [weakSelf.dataSource checkAttachmentState:weakSelf.items];
+                
+                if (![self.sessionConfig respondsToSelector:@selector(autoFetchAttachment)]
+                    || self.sessionConfig.autoFetchAttachment) {
+                    [weakSelf.dataSource checkAttachmentState:weakSelf.items];
+                }
             }
         }];
     }

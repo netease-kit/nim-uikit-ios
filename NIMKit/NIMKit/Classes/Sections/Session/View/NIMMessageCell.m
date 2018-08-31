@@ -435,9 +435,9 @@
             disable = [self.delegate disableAudioPlayedStatusIcon:self.model.message];
         }
         
-        BOOL hideIcon = self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateDownloaded || disable;
+        //BOOL hideIcon = self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateDownloaded || disable;
 
-        return (hideIcon || self.model.message.isOutgoingMsg || [self.model.message isPlayed]);
+        return (disable || self.model.message.isOutgoingMsg || [self.model.message isPlayed]);
     }
     return YES;
 }

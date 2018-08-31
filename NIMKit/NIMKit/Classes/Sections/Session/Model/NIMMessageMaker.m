@@ -27,6 +27,9 @@
     NIMMessage *message = [[NIMMessage alloc] init];
     message.messageObject = audioObject;
     message.text = @"发来了一段语音";
+    NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
+    setting.scene = NIMNOSSceneTypeMessage;
+    message.setting = setting;
     return message;
 }
 
@@ -40,6 +43,9 @@
     NIMMessage *message = [[NIMMessage alloc] init];
     message.messageObject = videoObject;
     message.apnsContent = @"发来了一段视频";
+    NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
+    setting.scene = NIMNOSSceneTypeMessage;
+    message.setting = setting;
     return message;
 }
 
@@ -67,6 +73,9 @@
     NIMMessage *message     = [[NIMMessage alloc] init];
     message.messageObject   = imageObject;
     message.apnsContent = @"发来了一张图片";
+    NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
+    setting.scene = NIMNOSSceneTypeMessage;
+    message.setting = setting;
     return message;
 }
 

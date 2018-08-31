@@ -63,6 +63,11 @@
 - (BOOL)autoFetchWhenOpenSession;
 
 /**
+ 自动下载附件。（接收消息，刷新消息，自动拿历史消息时）
+ */
+- (BOOL)autoFetchAttachment;
+
+/**
  *  会话页是否禁止显示新到的消息，用于显示消息历史的特定会话页，默认不禁止
  */
 - (BOOL)disableReceiveNewMessages;

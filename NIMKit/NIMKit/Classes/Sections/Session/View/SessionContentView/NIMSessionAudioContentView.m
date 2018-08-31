@@ -98,7 +98,8 @@
 
 -(void)onTouchUpInside:(id)sender
 {
-    if ([self.model.message attachmentDownloadState]== NIMMessageAttachmentDownloadStateFailed) {
+    if ([self.model.message attachmentDownloadState]== NIMMessageAttachmentDownloadStateFailed
+        || [self.model.message attachmentDownloadState] == NIMMessageAttachmentDownloadStateNeedDownload) {
         if (self.audioUIDelegate && [self.audioUIDelegate respondsToSelector:@selector(retryDownloadMsg)]) {
             [self.audioUIDelegate retryDownloadMsg];
         }
