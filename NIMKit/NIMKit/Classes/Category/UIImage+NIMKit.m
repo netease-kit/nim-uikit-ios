@@ -97,6 +97,9 @@
     NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
     UIImage *image = [UIImage imageNamed:imageName];
     //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
+    if (image == nil) {
+        image = [UIImage imageNamed:name inBundle:[NSBundle bundleForClass:NIMKit.class] compatibleWithTraitCollection:nil];
+    }
     return image? image : [UIImage imageNamed:name];
 }
 
@@ -104,6 +107,10 @@
 {
     NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
     UIImage *image = [UIImage imageNamed:name];
+    if (image == nil) {
+        NSString *emojiName = [NSString stringWithFormat:@"%@/Emoji/%@", [[NIMKit sharedKit] emoticonBundleName], imageName];
+        image = [UIImage imageNamed:emojiName inBundle:[NSBundle bundleForClass:NIMKit.class] compatibleWithTraitCollection:nil];
+    }
     return image;
 }
 
