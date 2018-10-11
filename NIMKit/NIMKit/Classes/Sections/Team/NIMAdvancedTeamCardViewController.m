@@ -176,6 +176,8 @@
 
 @property(nonatomic,copy) NSArray *memberData;
 
+@property (nonatomic,strong) NSDictionary *exConfig;
+
 @end
 
 @implementation NIMAdvancedTeamCardViewController
@@ -188,6 +190,15 @@
     return self;
 }
 
+- (instancetype)initWithTeam:(NIMTeam *)team
+                    exConfig:(NSDictionary *)exConfig {
+    self = [self initWithNibName:nil bundle:nil];
+    if (self) {
+        _team = team;
+        _exConfig = exConfig;
+    }
+    return self;
+}
 
 - (void)dealloc
 {
@@ -305,7 +316,6 @@
     teamAnnouncement.rowHeight = 50.f;
     teamAnnouncement.type   = TeamCardRowItemTypeCommon;
     
-    
     NIMTeamCardRowItem *teamNotify = [[NIMTeamCardRowItem alloc] init];
     teamNotify.title  = @"消息提醒";
     teamNotify.action = @selector(updateTeamNotify);
@@ -357,12 +367,20 @@
     itemBeInvite.rowHeight = 60.f;
     itemBeInvite.type   = TeamCardRowItemTypeCommon;
     
-
+    BOOL isTop = NO;
+    if (_exConfig && _exConfig[kNIMAdvancedTeamCardConfigTopKey]) {
+        isTop = [_exConfig[kNIMAdvancedTeamCardConfigTopKey] boolValue];
+    }
+    NIMTeamCardRowItem *itemTop = [[NIMTeamCardRowItem alloc] init];
+    itemTop.title            = @"聊天置顶";
+    itemTop.switchOn         = isTop;
+    itemTop.rowHeight        = 50.f;
+    itemTop.type             = TeamCardRowItemTypeSwitch;
     
     if (isOwner) {
         self.bodyData = @[
                   @[teamMember],
-                  @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
+                  @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify, itemTop],
                   @[itemAuth],
                   @[itemInvite,itemUpdateInfo,itemBeInvite],
                   @[itemDismiss],
@@ -370,7 +388,7 @@
     }else if(isManager){
         self.bodyData = @[
                  @[teamMember],
-                 @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
+                 @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify, itemTop],
                  @[itemAuth],
                  @[itemInvite,itemUpdateInfo,itemBeInvite],
                  @[itemQuit],
@@ -378,7 +396,7 @@
     }else{
         self.bodyData = @[
                           @[teamMember],
-                          @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify],
+                          @[teamName,teamNick,teamIntro,teamAnnouncement,teamNotify, itemTop],
                           @[itemQuit],
                           ];
     }
@@ -676,19 +694,25 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)onStateChanged:(BOOL)on
+- (void)cell:(NIMTeamSwitchTableViewCell *)cell onStateChanged:(BOOL)on
 {
     __weak typeof(self) weakSelf = self;
-    [[[NIMSDK sharedSDK] teamManager] updateNotifyState:on
-                                                 inTeam:[self.team teamId]
-                                             completion:^(NSError *error) {
-                                                 if (error) {
-                                                     [weakSelf.view makeToast:[NSString stringWithFormat:@"修改失败  error:%zd",error.code]
-                                                                            duration:2
-                                                                            position:CSToastPositionCenter];
-                                                 }
-                                                 [weakSelf reloadData];
-                                             }];
+    if ([cell.textLabel.text isEqualToString:@"聊天置顶"]) {
+        if (_delegate && [_delegate respondsToSelector:@selector(NIMAdvancedTeamCardVCDidSetTop:)]) {
+            [_delegate NIMAdvancedTeamCardVCDidSetTop:on];
+        }
+    } else {
+        [[[NIMSDK sharedSDK] teamManager] updateNotifyState:on
+                                                     inTeam:[self.team teamId]
+                                                 completion:^(NSError *error) {
+                                                     if (error) {
+                                                         [weakSelf.view makeToast:[NSString stringWithFormat:@"修改失败  error:%zd",error.code]
+                                                                         duration:2
+                                                                         position:CSToastPositionCenter];
+                                                     }
+                                                     [weakSelf reloadData];
+                                                 }];
+    }
 }
 
 

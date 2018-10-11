@@ -19,6 +19,8 @@
 
 @property (nonatomic,assign) CGRect previousFrame;
 
+@property (nonatomic,assign) double previousTextHeight;
+
 @end
 
 @implementation NIMGrowingTextView
@@ -127,6 +129,9 @@
     [self addSubview:self.textView];
     self.minHeight = self.frame.size.height;
     self.maxNumberOfLines = 3;
+    [self.textView setScrollEnabled:YES];
+    self.textView.userInteractionEnabled = YES;
+    self.textView.showsVerticalScrollIndicator = YES;
 }
 
 - (CGFloat)simulateHeight:(NSInteger)line
@@ -154,26 +159,33 @@
 }
 
 - (void)fitToScrollView{
-    BOOL scrollToBottom = self.contentOffset.y == self.contentSize.height - self.frame.size.height;
+    BOOL scrollToBottom = self.textView.contentOffset.y == self.textView.contentSize.height - self.textView.frame.size.height;
     CGSize actualTextViewSize = [self measureTextViewSize];
     CGRect oldScrollViewFrame = self.frame;
-    
-    CGRect frame = self.bounds;
-    frame.origin = CGPointZero;
-    frame.size.height = actualTextViewSize.height;
-    self.textView.frame = frame;
-    self.contentSize = frame.size;
-    
     CGRect newScrollViewFrame = [self measureFrame:actualTextViewSize];
     
-    if(oldScrollViewFrame.size.height != newScrollViewFrame.size.height && newScrollViewFrame.size.height <= self.maxHeight) {
-        [self flashScrollIndicators];
-        if ([self.textViewDelegate respondsToSelector:@selector(willChangeHeight:)]) {
-            [self.textViewDelegate willChangeHeight:newScrollViewFrame.size.height];
+    if (newScrollViewFrame.size.height <= self.maxHeight && _previousTextHeight == 0) {
+        if(oldScrollViewFrame.size.height != newScrollViewFrame.size.height) {
+            if ([self.textViewDelegate respondsToSelector:@selector(willChangeHeight:)]) {
+                [self.textViewDelegate willChangeHeight:newScrollViewFrame.size.height];
+            }
+            if (newScrollViewFrame.size.height == self.maxHeight) {
+                _previousTextHeight = newScrollViewFrame.size.height;
+            } else {
+                _previousTextHeight = 0;
+            }
+        }
+    } else {
+        if (_previousTextHeight != _textView.contentSize.height) {
+            [self.textView flashScrollIndicators];
+            _previousTextHeight = _textView.contentSize.height;
         }
     }
-    self.frame = newScrollViewFrame;
     
+    self.frame = newScrollViewFrame;
+    self.textView.frame = CGRectMake(0, 0, newScrollViewFrame.size.width, newScrollViewFrame.size.height);
+    self.contentSize = newScrollViewFrame.size;
+
     if(scrollToBottom) {
         [self scrollToBottom];
     }
@@ -209,7 +221,7 @@
 
 - (void)scrollToBottom{
     CGPoint offset = self.contentOffset;
-    self.contentOffset = CGPointMake(offset.x, self.contentSize.height - self.frame.size.height);
+    self.textView.contentOffset = CGPointMake(offset.x, self.textView.contentSize.height - self.textView.frame.size.height);
 }
 
 

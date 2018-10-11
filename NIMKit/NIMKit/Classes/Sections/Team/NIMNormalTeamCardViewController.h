@@ -9,8 +9,19 @@
 #import <UIKit/UIKit.h>
 #import <NIMSDK/NIMSDK.h>
 
+#define kNIMNormalTeamCardConfigTopKey @"kNormalTeamCardConfigTopKey"
+
+@protocol NIMNormalTeamCardVCProtocol <NSObject>
+@optional
+- (void)NIMNormalTeamCardVCDidSetTop:(BOOL)isTop;
+@end
+
 @interface NIMNormalTeamCardViewController : UIViewController
 
+@property (nonatomic, weak) id <NIMNormalTeamCardVCProtocol> delegate;
+
 - (instancetype)initWithTeam:(NIMTeam *)team;
+
+- (instancetype)initWithTeam:(NIMTeam *)team exConfig:(NSDictionary *)exConfig;
 
 @end
