@@ -32,7 +32,7 @@
     //先拿2倍图
     NSString *doubleImage  = [imageName stringByAppendingString:@"@2x"];
     NSString *tribleImage  = [imageName stringByAppendingString:@"@3x"];
-    NSString *bundlePath   = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:subDirectory];
+    NSString *bundlePath   = [[NSBundle bundleForClass:NIMKit.class].bundlePath stringByAppendingPathComponent:subDirectory];
     NSString *path = nil;
     
     NSArray *array = [NSBundle pathsForResourcesOfType:nil inDirectory:bundlePath];
@@ -92,13 +92,15 @@
     return size;
 }
 
-
-+ (UIImage *)nim_imageInKit:(NSString *)imageName{
++ (UIImage *)nim_imageInKit:(NSString *)imageName
+{
     NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
     UIImage *image = [UIImage imageNamed:imageName];
     //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
     if (image == nil) {
-        image = [UIImage imageNamed:name inBundle:[NSBundle bundleForClass:NIMKit.class] compatibleWithTraitCollection:nil];
+        NSURL *url = [[NSBundle bundleForClass:NIMKit.class] URLForResource:[[NIMKit sharedKit] resourceBundleName] withExtension:nil];
+        NSBundle *bundle = [NSBundle bundleWithURL:url];
+        image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
     }
     return image? image : [UIImage imageNamed:name];
 }
@@ -108,8 +110,9 @@
     NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
     UIImage *image = [UIImage imageNamed:name];
     if (image == nil) {
-        NSString *emojiName = [NSString stringWithFormat:@"%@/Emoji/%@", [[NIMKit sharedKit] emoticonBundleName], imageName];
-        image = [UIImage imageNamed:emojiName inBundle:[NSBundle bundleForClass:NIMKit.class] compatibleWithTraitCollection:nil];
+        NSURL *url = [[NSBundle bundleForClass:NIMKit.class] URLForResource:[[NIMKit sharedKit] emoticonBundleName] withExtension:nil];
+        NSBundle *bundle = [NSBundle bundleWithURL:url];
+        image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
     }
     return image;
 }
