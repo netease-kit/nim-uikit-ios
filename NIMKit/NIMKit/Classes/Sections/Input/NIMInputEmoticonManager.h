@@ -52,4 +52,6 @@
 - (NIMInputEmoticon *)emoticonByCatalogID:(NSString *)catalogID
                            emoticonID:(NSString *)emoticonID;
 
+- (void)preloadEmoticonResource;
+
 @end
