@@ -74,7 +74,7 @@
             self.currentPlayingMessage = nil;
             [self resetRetryCount];
         }
-        
+
     }
     else
     {

@@ -157,7 +157,6 @@
     {
         contentInsets = self.tableView.contentInset;
     }
-    [self.tableView reloadData];
     
     //如果气泡过少，少于总高度，输入框视图需要顶到最后一个气泡的下面。
     visiableHeight = visiableHeight + self.tableView.contentSize.height + contentInsets.top + contentInsets.bottom;

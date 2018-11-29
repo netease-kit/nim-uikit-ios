@@ -13,6 +13,7 @@
 @property (nonatomic,strong)    NSString    *emoticonID;
 @property (nonatomic,strong)    NSString    *tag;
 @property (nonatomic,strong)    NSString    *filename;
+@property (nonatomic,copy)      NSString    *unicode;
 @end
 
 @interface NIMInputEmoticonLayout : NSObject

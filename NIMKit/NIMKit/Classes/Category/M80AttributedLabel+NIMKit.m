@@ -21,11 +21,20 @@
         if (token.type == NIMInputTokenTypeEmoticon)
         {
             NIMInputEmoticon *emoticon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:token.text];
-            UIImage *image = [UIImage nim_emoticonInKit:emoticon.filename];
-            if (image)
-            {
-                [self appendImage:image
-                          maxSize:CGSizeMake(18, 18)];
+            UIImage *image = nil; ;
+
+            if(emoticon.unicode && emoticon.unicode.length>0) {
+                [self appendText:emoticon.unicode];
+            }else if(emoticon.filename &&
+                     emoticon.filename.length>0 &&
+                     (image = [UIImage nim_emoticonInKit:emoticon.filename])!= nil) {
+                if (image)
+                {
+                    [self appendImage:image
+                              maxSize:CGSizeMake(18, 18)];
+                }
+            }else {
+                [self appendText:@"[?]"];
             }
         }
         else

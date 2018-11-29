@@ -16,7 +16,6 @@
     NIMInputEmoticonButton* icon = [[NIMInputEmoticonButton alloc] init];
     [icon addTarget:icon action:@selector(onIconSelected:) forControlEvents:UIControlEventTouchUpInside];
     
-    UIImage *image = [UIImage nim_fetchEmoticon:data.filename];
     
     icon.emoticonData    = data;
     icon.catalogID              = catalogID;
@@ -24,8 +23,15 @@
     icon.exclusiveTouch         = YES;
     icon.contentMode            = UIViewContentModeScaleToFill;
     icon.delegate               = delegate;
-    [icon setImage:image forState:UIControlStateNormal];
-    [icon setImage:image forState:UIControlStateHighlighted];
+    if(data.unicode && data.unicode.length>0) {
+        [icon setTitle:data.unicode forState:UIControlStateNormal];
+        [icon setTitle:data.unicode forState:UIControlStateHighlighted];
+        icon.titleLabel.font = [UIFont systemFontOfSize:32];
+    }else if(data.filename && data.filename.length>0){
+        UIImage *image = [UIImage nim_fetchEmoticon:data.filename];
+        [icon setImage:image forState:UIControlStateNormal];
+        [icon setImage:image forState:UIControlStateHighlighted];
+    }
     return icon;
 }
 
