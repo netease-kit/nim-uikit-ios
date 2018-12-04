@@ -157,13 +157,10 @@
     {
         contentInsets = self.tableView.contentInset;
     }
-    [self.tableView reloadData];
     
     //如果气泡过少，少于总高度，输入框视图需要顶到最后一个气泡的下面。
     visiableHeight = visiableHeight + self.tableView.contentSize.height + contentInsets.top + contentInsets.bottom;
     visiableHeight = MIN(visiableHeight, rect.size.height);
-    
-    
     
     rect.origin.y    = containerSafeHeight - visiableHeight - self.inputView.nim_height;
     rect.origin.y    = rect.origin.y > 0? 0 : rect.origin.y;
@@ -257,6 +254,12 @@
     [self.tableView beginUpdates];
     [self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
     [self.tableView endUpdates];
+    NSInteger row = [self.tableView numberOfRowsInSection:0] - 1;
+    if (row > 0)
+    {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
+        [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
 }
 
 

@@ -50,6 +50,8 @@
 
 @property (nonatomic,strong) NSArray *bodyData;   //表身数据
 
+@property (nonatomic,strong) NSDictionary *exConfig; //外部配置
+
 @end
 
 @implementation NIMNormalTeamCardViewController
@@ -67,6 +69,16 @@
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
         _team = team;
+    }
+    return self;
+}
+
+- (instancetype)initWithTeam:(NIMTeam *)team
+                    exConfig:(NSDictionary *)exConfig {
+    self = [self initWithNibName:nil bundle:nil];
+    if (self) {
+        _team = team;
+        _exConfig = exConfig;
     }
     return self;
 }
@@ -151,7 +163,16 @@
     itemQuit.rowHeight        = 60.f;
     itemQuit.type             = TeamCardRowItemTypeRedButton;
     
-    return @[@[itemName,teamNotify,],@[itemQuit]];
+    BOOL isTop = NO;
+    if (_exConfig && _exConfig[kNIMNormalTeamCardConfigTopKey]) {
+        isTop = [_exConfig[kNIMNormalTeamCardConfigTopKey] boolValue];
+    }
+    NIMTeamCardRowItem *itemTop = [[NIMTeamCardRowItem alloc] init];
+    itemTop.title            = @"聊天置顶";
+    itemTop.switchOn         = isTop;
+    itemTop.rowHeight        = 50.f;
+    itemTop.type             = TeamCardRowItemTypeSwitch;
+    return @[@[itemName,teamNotify,itemTop],@[itemQuit]];
 }
 
 
@@ -215,15 +236,21 @@
 }
 
 #pragma mark - TeamSwitchProtocol
-- (void)onStateChanged:(BOOL)on
+- (void)cell:(NIMTeamSwitchTableViewCell *)cell onStateChanged:(BOOL)on
 {
     __weak typeof(self) weakSelf = self;
-    NIMTeamNotifyState state = on? NIMTeamNotifyStateAll : NIMTeamNotifyStateNone;
-    [[[NIMSDK sharedSDK] teamManager] updateNotifyState:state
-                                                 inTeam:[self.team teamId]
-                                             completion:^(NSError *error) {
-                                                 [weakSelf refreshTableBody];
-                                             }];
+    if ([cell.textLabel.text isEqualToString:@"消息提醒"]) {
+        NIMTeamNotifyState state = on? NIMTeamNotifyStateAll : NIMTeamNotifyStateNone;
+        [[[NIMSDK sharedSDK] teamManager] updateNotifyState:state
+                                                     inTeam:[self.team teamId]
+                                                 completion:^(NSError *error) {
+                                                     [weakSelf refreshTableBody];
+                                                 }];
+    } else if ([cell.textLabel.text isEqualToString:@"聊天置顶"]) {
+        if (_delegate && [_delegate respondsToSelector:@selector(NIMNormalTeamCardVCDidSetTop:)]) {
+            [_delegate NIMNormalTeamCardVCDidSetTop:on];
+        }
+    } else {}
 }
 
 

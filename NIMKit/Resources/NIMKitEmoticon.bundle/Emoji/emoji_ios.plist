@@ -12,6 +12,8 @@
 				<string>emoticon_emoji_01</string>
 				<key>tag</key>
 				<string>[可爱]</string>
+				<key>unicode</key>
+				<string>😊</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -20,6 +22,8 @@
 				<string>emoticon_emoji_0</string>
 				<key>tag</key>
 				<string>[大笑]</string>
+				<key>unicode</key>
+				<string>😀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -28,6 +32,8 @@
 				<string>emoticon_emoji_02</string>
 				<key>tag</key>
 				<string>[色]</string>
+				<key>unicode</key>
+				<string>😍</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -44,6 +50,8 @@
 				<string>emoticon_emoji_04</string>
 				<key>tag</key>
 				<string>[亲]</string>
+				<key>unicode</key>
+				<string>😚</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -52,6 +60,8 @@
 				<string>emoticon_emoji_05</string>
 				<key>tag</key>
 				<string>[呆]</string>
+				<key>unicode</key>
+				<string>😳</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -68,6 +78,8 @@
 				<string>emoticon_emoji_145</string>
 				<key>tag</key>
 				<string>[汗]</string>
+				<key>unicode</key>
+				<string>😓</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -76,6 +88,8 @@
 				<string>emoticon_emoji_07</string>
 				<key>tag</key>
 				<string>[呲牙]</string>
+				<key>unicode</key>
+				<string>😬</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -84,6 +98,8 @@
 				<string>emoticon_emoji_08</string>
 				<key>tag</key>
 				<string>[鬼脸]</string>
+				<key>unicode</key>
+				<string>😜</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -92,6 +108,8 @@
 				<string>emoticon_emoji_09</string>
 				<key>tag</key>
 				<string>[害羞]</string>
+				<key>unicode</key>
+				<string>☺️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -108,6 +126,8 @@
 				<string>emoticon_emoji_11</string>
 				<key>tag</key>
 				<string>[调皮]</string>
+				<key>unicode</key>
+				<string>😉</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -132,6 +152,8 @@
 				<string>emoticon_emoji_14</string>
 				<key>tag</key>
 				<string>[惊讶]</string>
+				<key>unicode</key>
+				<string>😲</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -140,6 +162,8 @@
 				<string>emoticon_emoji_15</string>
 				<key>tag</key>
 				<string>[流感]</string>
+				<key>unicode</key>
+				<string>😢</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -156,6 +180,8 @@
 				<string>emoticon_emoji_17</string>
 				<key>tag</key>
 				<string>[流泪]</string>
+				<key>unicode</key>
+				<string>😭</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -164,6 +190,8 @@
 				<string>emoticon_emoji_18</string>
 				<key>tag</key>
 				<string>[嚎哭]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -172,6 +200,8 @@
 				<string>emoticon_emoji_19</string>
 				<key>tag</key>
 				<string>[惊恐]</string>
+				<key>unicode</key>
+				<string>😱</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -180,6 +210,8 @@
 				<string>emoticon_emoji_20</string>
 				<key>tag</key>
 				<string>[怒]</string>
+				<key>unicode</key>
+				<string>😡</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -188,6 +220,8 @@
 				<string>emoticon_emoji_21</string>
 				<key>tag</key>
 				<string>[酷]</string>
+				<key>unicode</key>
+				<string>😎</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -196,6 +230,8 @@
 				<string>emoticon_emoji_22</string>
 				<key>tag</key>
 				<string>[不说]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -204,6 +240,8 @@
 				<string>emoticon_emoji_23</string>
 				<key>tag</key>
 				<string>[鄙视]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -212,6 +250,8 @@
 				<string>emoticon_emoji_24</string>
 				<key>tag</key>
 				<string>[阿弥陀佛]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -220,6 +260,8 @@
 				<string>emoticon_emoji_25</string>
 				<key>tag</key>
 				<string>[奸笑]</string>
+				<key>unicode</key>
+				<string>😏</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -228,6 +270,8 @@
 				<string>emoticon_emoji_26</string>
 				<key>tag</key>
 				<string>[睡着]</string>
+				<key>unicode</key>
+				<string>😴</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -236,6 +280,8 @@
 				<string>emoticon_emoji_27</string>
 				<key>tag</key>
 				<string>[口罩]</string>
+				<key>unicode</key>
+				<string>😷</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -244,6 +290,8 @@
 				<string>emoticon_emoji_28</string>
 				<key>tag</key>
 				<string>[努力]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -252,6 +300,8 @@
 				<string>emoticon_emoji_29</string>
 				<key>tag</key>
 				<string>[抠鼻孔]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -260,6 +310,8 @@
 				<string>emoticon_emoji_30</string>
 				<key>tag</key>
 				<string>[疑问]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -268,6 +320,8 @@
 				<string>emoticon_emoji_31</string>
 				<key>tag</key>
 				<string>[怒骂]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -276,6 +330,8 @@
 				<string>emoticon_emoji_32</string>
 				<key>tag</key>
 				<string>[晕]</string>
+				<key>unicode</key>
+				<string>😵</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -284,6 +340,8 @@
 				<string>emoticon_emoji_33</string>
 				<key>tag</key>
 				<string>[呕吐]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -292,6 +350,8 @@
 				<string>emoticon_emoji_160</string>
 				<key>tag</key>
 				<string>[拜一拜]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -300,6 +360,8 @@
 				<string>emoticon_emoji_161</string>
 				<key>tag</key>
 				<string>[惊喜]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -308,6 +370,8 @@
 				<string>emoticon_emoji_162</string>
 				<key>tag</key>
 				<string>[流汗]</string>
+				<key>unicode</key>
+				<string>😅</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -316,6 +380,8 @@
 				<string>emoticon_emoji_163</string>
 				<key>tag</key>
 				<string>[卖萌]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -324,6 +390,8 @@
 				<string>emoticon_emoji_164</string>
 				<key>tag</key>
 				<string>[默契眨眼]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -332,6 +400,8 @@
 				<string>emoticon_emoji_165</string>
 				<key>tag</key>
 				<string>[烧香拜佛]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -340,6 +410,8 @@
 				<string>emoticon_emoji_166</string>
 				<key>tag</key>
 				<string>[晚安]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -348,6 +420,8 @@
 				<string>emoticon_emoji_34</string>
 				<key>tag</key>
 				<string>[强]</string>
+				<key>unicode</key>
+				<string>👍</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -356,6 +430,8 @@
 				<string>emoticon_emoji_35</string>
 				<key>tag</key>
 				<string>[弱]</string>
+				<key>unicode</key>
+				<string>👎</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -364,6 +440,8 @@
 				<string>emoticon_emoji_36</string>
 				<key>tag</key>
 				<string>[OK]</string>
+				<key>unicode</key>
+				<string>👌</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -372,6 +450,8 @@
 				<string>emoticon_emoji_37</string>
 				<key>tag</key>
 				<string>[拳头]</string>
+				<key>unicode</key>
+				<string>✊</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -380,6 +460,8 @@
 				<string>emoticon_emoji_38</string>
 				<key>tag</key>
 				<string>[胜利]</string>
+				<key>unicode</key>
+				<string>✌️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -388,6 +470,8 @@
 				<string>emoticon_emoji_39</string>
 				<key>tag</key>
 				<string>[鼓掌]</string>
+				<key>unicode</key>
+				<string>👏</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -396,6 +480,8 @@
 				<string>emoticon_emoji_200</string>
 				<key>tag</key>
 				<string>[握手]</string>
+				<key>unicode</key>
+				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -404,6 +490,8 @@
 				<string>emoticon_emoji_40</string>
 				<key>tag</key>
 				<string>[发怒]</string>
+				<key>unicode</key>
+				<string>😈</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -412,6 +500,8 @@
 				<string>emoticon_emoji_41</string>
 				<key>tag</key>
 				<string>[骷髅]</string>
+				<key>unicode</key>
+				<string>💀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -420,6 +510,8 @@
 				<string>emoticon_emoji_42</string>
 				<key>tag</key>
 				<string>[便便]</string>
+				<key>unicode</key>
+				<string>💩</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -428,6 +520,8 @@
 				<string>emoticon_emoji_43</string>
 				<key>tag</key>
 				<string>[火]</string>
+				<key>unicode</key>
+				<string>🔥</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -436,6 +530,8 @@
 				<string>emoticon_emoji_44</string>
 				<key>tag</key>
 				<string>[溜]</string>
+				<key>unicode</key>
+				<string>💨</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -444,6 +540,8 @@
 				<string>emoticon_emoji_45</string>
 				<key>tag</key>
 				<string>[爱心]</string>
+				<key>unicode</key>
+				<string>❤️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -452,6 +550,8 @@
 				<string>emoticon_emoji_46</string>
 				<key>tag</key>
 				<string>[心碎]</string>
+				<key>unicode</key>
+				<string>💔</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -460,6 +560,8 @@
 				<string>emoticon_emoji_47</string>
 				<key>tag</key>
 				<string>[钟情]</string>
+				<key>unicode</key>
+				<string>💘</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -468,6 +570,8 @@
 				<string>emoticon_emoji_48</string>
 				<key>tag</key>
 				<string>[唇]</string>
+				<key>unicode</key>
+				<string>💋</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -476,6 +580,8 @@
 				<string>emoticon_emoji_49</string>
 				<key>tag</key>
 				<string>[戒指]</string>
+				<key>unicode</key>
+				<string>💍</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -484,6 +590,8 @@
 				<string>emoticon_emoji_50</string>
 				<key>tag</key>
 				<string>[钻石]</string>
+				<key>unicode</key>
+				<string>💠</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -492,6 +600,8 @@
 				<string>emoticon_emoji_51</string>
 				<key>tag</key>
 				<string>[太阳]</string>
+				<key>unicode</key>
+				<string>☀️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -500,6 +610,8 @@
 				<string>emoticon_emoji_52</string>
 				<key>tag</key>
 				<string>[有时晴]</string>
+				<key>unicode</key>
+				<string>⛅</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -508,6 +620,8 @@
 				<string>emoticon_emoji_53</string>
 				<key>tag</key>
 				<string>[多云]</string>
+				<key>unicode</key>
+				<string>☁️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -516,6 +630,8 @@
 				<string>emoticon_emoji_54</string>
 				<key>tag</key>
 				<string>[雷]</string>
+				<key>unicode</key>
+				<string>⚡</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -532,6 +648,8 @@
 				<string>emoticon_emoji_56</string>
 				<key>tag</key>
 				<string>[雪花]</string>
+				<key>unicode</key>
+				<string>❄️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -540,6 +658,8 @@
 				<string>emoticon_emoji_57</string>
 				<key>tag</key>
 				<string>[爱人]</string>
+				<key>unicode</key>
+				<string>💑</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -548,6 +668,8 @@
 				<string>emoticon_emoji_58</string>
 				<key>tag</key>
 				<string>[帽子]</string>
+				<key>unicode</key>
+				<string>🎩</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -556,6 +678,8 @@
 				<string>emoticon_emoji_59</string>
 				<key>tag</key>
 				<string>[皇冠]</string>
+				<key>unicode</key>
+				<string>👑</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -564,6 +688,8 @@
 				<string>emoticon_emoji_60</string>
 				<key>tag</key>
 				<string>[篮球]</string>
+				<key>unicode</key>
+				<string>🏀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -572,6 +698,8 @@
 				<string>emoticon_emoji_61</string>
 				<key>tag</key>
 				<string>[足球]</string>
+				<key>unicode</key>
+				<string>⚽</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -580,6 +708,8 @@
 				<string>emoticon_emoji_62</string>
 				<key>tag</key>
 				<string>[垒球]</string>
+				<key>unicode</key>
+				<string>⚾</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -588,6 +718,8 @@
 				<string>emoticon_emoji_63</string>
 				<key>tag</key>
 				<string>[网球]</string>
+				<key>unicode</key>
+				<string>🎾</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -596,6 +728,8 @@
 				<string>emoticon_emoji_64</string>
 				<key>tag</key>
 				<string>[台球]</string>
+				<key>unicode</key>
+				<string>🎱</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -604,6 +738,8 @@
 				<string>emoticon_emoji_65</string>
 				<key>tag</key>
 				<string>[咖啡]</string>
+				<key>unicode</key>
+				<string>☕</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -612,6 +748,8 @@
 				<string>emoticon_emoji_66</string>
 				<key>tag</key>
 				<string>[啤酒]</string>
+				<key>unicode</key>
+				<string>🍺</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -620,6 +758,8 @@
 				<string>emoticon_emoji_67</string>
 				<key>tag</key>
 				<string>[干杯]</string>
+				<key>unicode</key>
+				<string>🍻</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -628,6 +768,8 @@
 				<string>emoticon_emoji_68</string>
 				<key>tag</key>
 				<string>[柠檬汁]</string>
+				<key>unicode</key>
+				<string>🍹</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -636,6 +778,8 @@
 				<string>emoticon_emoji_69</string>
 				<key>tag</key>
 				<string>[餐具]</string>
+				<key>unicode</key>
+				<string>🍴</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -644,6 +788,8 @@
 				<string>emoticon_emoji_70</string>
 				<key>tag</key>
 				<string>[汉堡]</string>
+				<key>unicode</key>
+				<string>🍔</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -652,6 +798,8 @@
 				<string>emoticon_emoji_71</string>
 				<key>tag</key>
 				<string>[鸡腿]</string>
+				<key>unicode</key>
+				<string>🍗</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -660,6 +808,8 @@
 				<string>emoticon_emoji_72</string>
 				<key>tag</key>
 				<string>[面条]</string>
+				<key>unicode</key>
+				<string>🍜</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -668,6 +818,8 @@
 				<string>emoticon_emoji_73</string>
 				<key>tag</key>
 				<string>[冰淇淋]</string>
+				<key>unicode</key>
+				<string>🍦</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -676,6 +828,8 @@
 				<string>emoticon_emoji_74</string>
 				<key>tag</key>
 				<string>[沙冰]</string>
+				<key>unicode</key>
+				<string>🍨</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -684,6 +838,8 @@
 				<string>emoticon_emoji_75</string>
 				<key>tag</key>
 				<string>[生日蛋糕]</string>
+				<key>unicode</key>
+				<string>🎂</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -692,6 +848,8 @@
 				<string>emoticon_emoji_76</string>
 				<key>tag</key>
 				<string>[蛋糕]</string>
+				<key>unicode</key>
+				<string>🍰</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -700,6 +858,8 @@
 				<string>emoticon_emoji_77</string>
 				<key>tag</key>
 				<string>[糖果]</string>
+				<key>unicode</key>
+				<string>🍭</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -708,6 +868,8 @@
 				<string>emoticon_emoji_78</string>
 				<key>tag</key>
 				<string>[葡萄]</string>
+				<key>unicode</key>
+				<string>🍇</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -716,6 +878,8 @@
 				<string>emoticon_emoji_79</string>
 				<key>tag</key>
 				<string>[西瓜]</string>
+				<key>unicode</key>
+				<string>🍉</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -724,6 +888,8 @@
 				<string>emoticon_emoji_80</string>
 				<key>tag</key>
 				<string>[光碟]</string>
+				<key>unicode</key>
+				<string>📀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -732,6 +898,8 @@
 				<string>emoticon_emoji_81</string>
 				<key>tag</key>
 				<string>[手机]</string>
+				<key>unicode</key>
+				<string>📱</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -740,6 +908,8 @@
 				<string>emoticon_emoji_82</string>
 				<key>tag</key>
 				<string>[电话]</string>
+				<key>unicode</key>
+				<string>📞</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -748,6 +918,8 @@
 				<string>emoticon_emoji_83</string>
 				<key>tag</key>
 				<string>[电视]</string>
+				<key>unicode</key>
+				<string>📺</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -756,6 +928,8 @@
 				<string>emoticon_emoji_84</string>
 				<key>tag</key>
 				<string>[声音开启]</string>
+				<key>unicode</key>
+				<string>🔊</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -764,6 +938,8 @@
 				<string>emoticon_emoji_85</string>
 				<key>tag</key>
 				<string>[声音关闭]</string>
+				<key>unicode</key>
+				<string>🔇</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -772,6 +948,8 @@
 				<string>emoticon_emoji_86</string>
 				<key>tag</key>
 				<string>[铃铛]</string>
+				<key>unicode</key>
+				<string>🔔</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -780,6 +958,8 @@
 				<string>emoticon_emoji_87</string>
 				<key>tag</key>
 				<string>[锁头]</string>
+				<key>unicode</key>
+				<string>🔒</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -788,6 +968,8 @@
 				<string>emoticon_emoji_88</string>
 				<key>tag</key>
 				<string>[放大镜]</string>
+				<key>unicode</key>
+				<string>🔎</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -796,6 +978,8 @@
 				<string>emoticon_emoji_89</string>
 				<key>tag</key>
 				<string>[灯泡]</string>
+				<key>unicode</key>
+				<string>💡</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -804,6 +988,8 @@
 				<string>emoticon_emoji_90</string>
 				<key>tag</key>
 				<string>[锤头]</string>
+				<key>unicode</key>
+				<string>🔨</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -812,6 +998,8 @@
 				<string>emoticon_emoji_91</string>
 				<key>tag</key>
 				<string>[烟]</string>
+				<key>unicode</key>
+				<string>🚬</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -820,6 +1008,8 @@
 				<string>emoticon_emoji_92</string>
 				<key>tag</key>
 				<string>[炸弹]</string>
+				<key>unicode</key>
+				<string>💣</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -828,6 +1018,8 @@
 				<string>emoticon_emoji_93</string>
 				<key>tag</key>
 				<string>[枪]</string>
+				<key>unicode</key>
+				<string>🔫</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -836,6 +1028,8 @@
 				<string>emoticon_emoji_94</string>
 				<key>tag</key>
 				<string>[刀]</string>
+				<key>unicode</key>
+				<string>🔪</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -844,6 +1038,8 @@
 				<string>emoticon_emoji_95</string>
 				<key>tag</key>
 				<string>[药]</string>
+				<key>unicode</key>
+				<string>💊</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -852,6 +1048,8 @@
 				<string>emoticon_emoji_96</string>
 				<key>tag</key>
 				<string>[打针]</string>
+				<key>unicode</key>
+				<string>💉</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -860,6 +1058,8 @@
 				<string>emoticon_emoji_97</string>
 				<key>tag</key>
 				<string>[钱袋]</string>
+				<key>unicode</key>
+				<string>💰</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -868,6 +1068,8 @@
 				<string>emoticon_emoji_98</string>
 				<key>tag</key>
 				<string>[钞票]</string>
+				<key>unicode</key>
+				<string>💵</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -876,6 +1078,8 @@
 				<string>emoticon_emoji_99</string>
 				<key>tag</key>
 				<string>[银行卡]</string>
+				<key>unicode</key>
+				<string>💳</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -892,6 +1096,8 @@
 				<string>emoticon_emoji_101</string>
 				<key>tag</key>
 				<string>[麻将]</string>
+				<key>unicode</key>
+				<string>🀄</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -900,6 +1106,8 @@
 				<string>emoticon_emoji_102</string>
 				<key>tag</key>
 				<string>[调色板]</string>
+				<key>unicode</key>
+				<string>🎨</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -908,6 +1116,8 @@
 				<string>emoticon_emoji_103</string>
 				<key>tag</key>
 				<string>[电影]</string>
+				<key>unicode</key>
+				<string>🎬</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -916,6 +1126,8 @@
 				<string>emoticon_emoji_104</string>
 				<key>tag</key>
 				<string>[麦克风]</string>
+				<key>unicode</key>
+				<string>🎤</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -924,6 +1136,8 @@
 				<string>emoticon_emoji_105</string>
 				<key>tag</key>
 				<string>[耳机]</string>
+				<key>unicode</key>
+				<string>🎧</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -932,6 +1146,8 @@
 				<string>emoticon_emoji_106</string>
 				<key>tag</key>
 				<string>[音乐]</string>
+				<key>unicode</key>
+				<string>🎵</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -940,6 +1156,8 @@
 				<string>emoticon_emoji_107</string>
 				<key>tag</key>
 				<string>[吉他]</string>
+				<key>unicode</key>
+				<string>🎸</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -948,6 +1166,8 @@
 				<string>emoticon_emoji_108</string>
 				<key>tag</key>
 				<string>[火箭]</string>
+				<key>unicode</key>
+				<string>🚀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -956,6 +1176,8 @@
 				<string>emoticon_emoji_109</string>
 				<key>tag</key>
 				<string>[飞机]</string>
+				<key>unicode</key>
+				<string>✈️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -964,6 +1186,8 @@
 				<string>emoticon_emoji_110</string>
 				<key>tag</key>
 				<string>[火车]</string>
+				<key>unicode</key>
+				<string>🚆</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -972,6 +1196,8 @@
 				<string>emoticon_emoji_111</string>
 				<key>tag</key>
 				<string>[公交]</string>
+				<key>unicode</key>
+				<string>🚌</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -980,6 +1206,8 @@
 				<string>emoticon_emoji_112</string>
 				<key>tag</key>
 				<string>[轿车]</string>
+				<key>unicode</key>
+				<string>🚗</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -988,6 +1216,8 @@
 				<string>emoticon_emoji_113</string>
 				<key>tag</key>
 				<string>[出租车]</string>
+				<key>unicode</key>
+				<string>🚕</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -996,6 +1226,8 @@
 				<string>emoticon_emoji_114</string>
 				<key>tag</key>
 				<string>[警车]</string>
+				<key>unicode</key>
+				<string>🚓</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -1004,6 +1236,8 @@
 				<string>emoticon_emoji_115</string>
 				<key>tag</key>
 				<string>[自行车]</string>
+				<key>unicode</key>
+				<string>🚲</string>
 			</dict>
 		</array>
 		<key>info</key>

@@ -40,11 +40,14 @@
     else
     {
         NSString *text = message.text;
+        self.label.font = [[NIMKit sharedKit].config setting:message].font;
+        
         [self.label nim_setText:text];
         
         CGFloat bubbleLeftToContent  = 14;
         CGFloat contentRightToBubble = 14;
         CGFloat msgContentMaxWidth = (msgBubbleMaxWidth - contentRightToBubble - bubbleLeftToContent);
+
         return [self.label sizeThatFits:CGSizeMake(msgContentMaxWidth, CGFLOAT_MAX)];
     }
 }
@@ -81,7 +84,6 @@
         return _label;
     }
     _label = [[M80AttributedLabel alloc] initWithFrame:CGRectZero];
-    _label.font = [UIFont systemFontOfSize:NIMKit_Message_Font_Size];
     return _label;
 }
 

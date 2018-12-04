@@ -31,12 +31,14 @@
 {
     [super refresh:data];
     NSString *text = [NIMKitUtil messageTipContent:data.message];
-    [self.textLabel nim_setText:text];
-    
+   
     NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
-    
     self.textLabel.textColor = setting.textColor;;
     self.textLabel.font      = setting.font;
+    
+    [self.textLabel nim_setText:text];
+    
+
 }
 
 - (void)layoutSubviews{

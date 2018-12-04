@@ -37,6 +37,8 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         
         _layoutConfig = [[NIMCellLayoutConfig alloc] init];
         _robotTemplateParser = [[NIMKitRobotDefaultTemplateParser alloc] init];
+        
+        [self preloadNIMKitBundleResource];
     }
     return self;
 }
@@ -164,6 +166,11 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 
 }
 
+- (void)preloadNIMKitBundleResource {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NIMInputEmoticonManager sharedManager] preloadEmoticonResource];
+    });
+}
 
 @end
 

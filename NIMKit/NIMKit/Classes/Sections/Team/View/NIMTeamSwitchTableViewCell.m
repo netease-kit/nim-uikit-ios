@@ -22,9 +22,9 @@
 }
 
 - (void)valueChanged:(id)sender {
-    if (_switchDelegate && [_switchDelegate respondsToSelector:@selector(onStateChanged:)])
+    if (_switchDelegate && [_switchDelegate respondsToSelector:@selector(cell:onStateChanged:)])
     {
-        [_switchDelegate onStateChanged:_switcher.on];
+        [_switchDelegate cell:self onStateChanged:_switcher.isOn];
     }
 }
 

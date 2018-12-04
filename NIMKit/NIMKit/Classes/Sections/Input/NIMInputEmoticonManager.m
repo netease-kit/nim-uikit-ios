@@ -10,6 +10,7 @@
 #import "NIMInputEmoticonDefine.h"
 #import "NSString+NIMKit.h"
 #import "NIMKit.h"
+#import "UIImage+NIMKit.h"
 
 @implementation NIMInputEmoticon
 @end
@@ -56,6 +57,7 @@
 
 @interface NIMInputEmoticonManager ()
 @property (nonatomic,strong)    NSArray *catalogs;
+@property (nonatomic, copy)     NSDictionary *bundleEmoticonInfos;
 @end
 
 @implementation NIMInputEmoticonManager
@@ -152,7 +154,7 @@
                                          withExtension:nil];
     NSBundle *bundle = [NSBundle bundleWithURL:url];
     
-    NSString *filepath = [bundle pathForResource:@"emoji" ofType:@"plist" inDirectory:NIMKit_EmojiPath];
+    NSString *filepath = [bundle pathForResource:@"emoji_ios" ofType:@"plist" inDirectory:NIMKit_EmojiPath];
     if (filepath) {
         NSArray *array = [NSArray arrayWithContentsOfFile:filepath];
         for (NSDictionary *dict in array)
@@ -189,10 +191,11 @@
         NIMInputEmoticon *emoticon  = [[NIMInputEmoticon alloc] init];
         emoticon.emoticonID     = emoticonDict[@"id"];
         emoticon.tag            = emoticonDict[@"tag"];
+        emoticon.unicode        = emoticonDict[@"unicode"];
         NSString *fileName      = emoticonDict[@"file"];
         NSString *imageNamePrefix = NIMKit_EmojiPath;
-        
         emoticon.filename = [imageNamePrefix stringByAppendingPathComponent:fileName];
+        
         if (emoticon.emoticonID) {
             [emoticons addObject:emoticon];
             id2Emoticons[emoticon.emoticonID] = emoticon;
@@ -208,5 +211,22 @@
     return catalog;
 }
 
+// HOT FIX for iOS 12 load bundle resource much slower than earlier versions
+- (void)preloadEmoticonResource {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        __block NSMutableDictionary *emoticonInfos = [NSMutableDictionary dictionary];
+        for (NIMInputEmoticonCatalog *catalog in self.catalogs) {
+            NSArray *emoticons = catalog.emoticons;
+            for (NIMInputEmoticon *data in emoticons) {
+                UIImage *image = [UIImage nim_emoticonInKit:data.filename];
+                emoticonInfos[data.filename] = image;
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.bundleEmoticonInfos = emoticonInfos;
+        });
+    });
+}
 
 @end
