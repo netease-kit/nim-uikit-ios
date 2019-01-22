@@ -100,9 +100,8 @@
 {
     if ([self.model.message attachmentDownloadState]== NIMMessageAttachmentDownloadStateFailed
         || [self.model.message attachmentDownloadState] == NIMMessageAttachmentDownloadStateNeedDownload) {
-        if (self.audioUIDelegate && [self.audioUIDelegate respondsToSelector:@selector(retryDownloadMsg)]) {
-            [self.audioUIDelegate retryDownloadMsg];
-        }
+        [[[NIMSDK sharedSDK] chatManager] fetchMessageAttachment:self.model.message
+                                                           error:nil];
         return;
     }
     if ([self.model.message attachmentDownloadState] == NIMMessageAttachmentDownloadStateDownloaded) {

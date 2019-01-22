@@ -97,6 +97,15 @@
  */
 - (void)sendMessage:(NIMMessage *)message;
 
+/**
+ *  异步发送消息
+ *
+ *  @param message 消息
+ @  @param 接口调用完成的回调，通常是所有本地工作完成，准备发送时回调
+ */
+- (void)sendMessage:(NIMMessage *)message completion:(void(^)(NSError * err))completion;
+
+
 #pragma mark - 录音接口
 /**
  *  录音失败回调
