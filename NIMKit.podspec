@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version = '2.11.4' 
   s.summary = 'Netease IM UI Kit' 
   s.homepage = 'http://netease.im' 
-  s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2017 Netease '} 
+  s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2019 Netease '} 
   s.authors = 'Netease IM Team'  
   s.source  = { :git => 'https://github.com/netease-im/NIM_iOS_UIKit.git', :tag => '2.11.4'}  
   s.platform = :ios, '8.0' 
@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
     os.dependency 'SDWebImage', '~> 4.2.2'  
     os.dependency 'Toast', '~> 3.0'         
     os.dependency 'M80AttributedLabel', '~> 1.6.3'       
-    os.dependency 'TZImagePickerController', '~> 1.9.0'  
+    os.dependency 'TZImagePickerController', '~> 3.0.7'  
   end   
 
   s.default_subspec = 'Lite'  
