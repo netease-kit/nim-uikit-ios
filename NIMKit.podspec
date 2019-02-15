@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version = '2.11.5' 
   s.summary = 'Netease IM UI Kit' 
   s.homepage = 'http://netease.im' 
-  s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2017 Netease '} 
+  s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2019 Netease '} 
   s.authors = 'Netease IM Team'  
   s.source  = { :git => 'https://github.com/netease-im/NIM_iOS_UIKit.git', :tag => '2.11.5'}  
   s.platform = :ios, '8.0' 
