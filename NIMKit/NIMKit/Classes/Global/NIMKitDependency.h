@@ -16,34 +16,41 @@
 #import "M80AttributedLabel.h"
 #endif
 
-#if __has_include(<SDWebImageCompat/SDWebImageCompat.h>)
-#import <SDWebImageCompat/SDWebImageCompat.h>
-#else
+#if __has_include(<SDWebImage/SDWebImageCompat.h>)
+#import <SDWebImage/SDWebImageCompat.h>
+#elif __has_include("SDWebImageCompat.h")
 #import "SDWebImageCompat.h"
+#else
+@import SDWebImage;
 #endif
-
 
 #if __has_include(<SDWebImage/SDWebImage.h>)
 #import <SDWebImage/SDWebImage.h>
-#else
-#import "SDWebImageManager.h"
+#elif __has_include("UIView+WebCacheOperation.h")
 #import "UIView+WebCacheOperation.h"
 #import "UIView+WebCache.h"
+#else
+@import SDWebImage;
 #endif
 
 
 #if __has_include(<Toast/Toast.h>)
 #import <Toast/Toast.h>
-#else
+#elif __has_include("UIView+Toast.h")
 #import "UIView+Toast.h"
+#else
+@import Toast;
 #endif
 
 
 #if __has_include(<TZImagePickerController/TZImagePickerController.h>)
 #import <TZImagePickerController/TZImagePickerController.h>
-#else
+#elif __has_include("TZImagePickerController.h")
 #import "TZImagePickerController.h"
+#else
+@import TZImagePickerController;
 #endif
 
 
 #endif /* NIMKitDependency_h */
+
