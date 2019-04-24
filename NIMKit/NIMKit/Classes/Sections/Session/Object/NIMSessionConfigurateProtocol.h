@@ -28,6 +28,8 @@
 //网络接口
 - (void)sendMessage:(NIMMessage *)message;
 
+- (void)sendMessage:(NIMMessage *)message completion:(void(^)(NSError * error))completion;
+
 - (void)sendMessageReceipt:(NSArray *)messages;
 
 

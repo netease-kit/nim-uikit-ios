@@ -309,8 +309,17 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 #pragma mark - 消息收发接口
 - (void)sendMessage:(NIMMessage *)message
-{
+{    
     [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:_session error:nil];
+}
+
+- (void)sendMessage:(NIMMessage *)message completion:(void(^)(NSError *))completion
+{
+    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:_session completion:^(NSError *err) {
+        if(completion) {
+            completion(err);
+        }
+    }];
 }
 
 

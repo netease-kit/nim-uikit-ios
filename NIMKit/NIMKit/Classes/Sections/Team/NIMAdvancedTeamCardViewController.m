@@ -741,7 +741,13 @@
         return;
     }
     NSString *postscript = @"邀请你加入群组";
-    [[NIMSDK sharedSDK].teamManager addUsers:selectedContacts toTeam:self.team.teamId postscript:postscript completion:^(NSError *error, NSArray *members) {
+ 
+    
+    [[NIMSDK sharedSDK].teamManager addUsers:selectedContacts
+                                      toTeam:self.team.teamId
+                                  postscript:postscript
+                                      attach:@"扩展消息"
+                                  completion:^(NSError *error, NSArray *members) {
         if (!error) {
             [self.view makeToast:@"邀请成功"
                                duration:2

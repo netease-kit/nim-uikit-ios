@@ -118,6 +118,11 @@
             [session exportAsynchronouslyWithCompletionHandler:^(void)
              {
                  dispatch_async(dispatch_get_main_queue(), ^{
+                     if (!self.cameraResultHandler)
+                     {
+                         return;
+                     }
+                     
                      if (session.status == AVAssetExportSessionStatusCompleted)
                      {
                          self.cameraResultHandler(outputPath,nil);
@@ -132,7 +137,12 @@
             
         });
         
-    }else{
+    } else {
+        if (!self.cameraResultHandler)
+        {
+            return;
+        }
+        
         UIImage *image = info[UIImagePickerControllerOriginalImage];
         self.cameraResultHandler(nil,image);
         self.cameraResultHandler = nil;

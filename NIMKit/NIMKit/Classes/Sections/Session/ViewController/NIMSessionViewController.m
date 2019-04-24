@@ -164,6 +164,15 @@
     [self.interactor sendMessage:message];
 }
 
+- (void)sendMessage:(NIMMessage *)message completion:(void(^)(NSError * err))completion
+{
+    [self.interactor sendMessage:message completion:^(NSError *err) {
+        if(completion) {
+            completion(err);
+        }
+    }];
+}
+
 
 #pragma mark - Touch Event
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -624,6 +633,8 @@
     }
     [items addObject:[[UIMenuItem alloc] initWithTitle:@"删除"
                                                 action:@selector(deleteMsg:)]];
+    
+    
     return items;
     
 }

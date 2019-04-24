@@ -196,35 +196,70 @@ static char imageURLKey;
             [self sd_addActivityIndicator];
         }
         
+        __block NSURL *targetURL = url;
         __weak __typeof(self)wself = self;
-        id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager loadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+        void(^loadBlock)(NSURL *URL)  =  ^(NSURL *URL) {
             __strong __typeof (wself) sself = wself;
-            [sself sd_removeActivityIndicator];
-            if (!sself) {
-                return;
-            }
-            dispatch_main_async_safe(^{
+            id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager loadImageWithURL:URL options:options progress:progressBlock completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                [sself sd_removeActivityIndicator];
+                if (image && ![URL isEqual:url])
+                {
+                    [SDWebImageManager.sharedManager saveImageToCache:image forURL:url];
+                }
+                
                 if (!sself) {
                     return;
                 }
-                if (image && (options & SDWebImageAvoidAutoSetImage) && completedBlock) {
-                    completedBlock(image, error, cacheType, url);
-                    return;
-                } else if (image) {
-                    [sself nim_setImage:image imageData:data basedOnClassOrViaCustomSetImageBlock:nil];
-                    [sself nim_setNeedsLayout];
-                } else {
-                    if ((options & SDWebImageDelayPlaceholder)) {
-                        [sself nim_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:nil];
-                        [sself nim_setNeedsLayout];
+                dispatch_main_async_safe(^{
+                    if (!sself) {
+                        return;
                     }
+                    
+                    
+                    if (image && (options & SDWebImageAvoidAutoSetImage) && completedBlock) {
+                        completedBlock(image, error, cacheType, url);
+                        return;
+                    } else if (image) {
+                        [sself nim_setImage:image imageData:data basedOnClassOrViaCustomSetImageBlock:nil];
+                        [sself nim_setNeedsLayout];
+                    } else {
+                        if ((options & SDWebImageDelayPlaceholder)) {
+                            [sself nim_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:nil];
+                            [sself nim_setNeedsLayout];
+                        }
+                    }
+                    if (completedBlock && finished) {
+                        completedBlock(image, error, cacheType, url);
+                    }
+                });
+            }];
+            [sself sd_setImageLoadOperation:operation forKey:validOperationKey];
+        };
+
+        [SDWebImageManager.sharedManager cachedImageExistsForURL:url completion:^(BOOL isInCache) {
+            if (!isInCache)
+            {
+                [[NIMSDK sharedSDK].resourceManager fetchNOSURLWithURL:[url absoluteString]
+                                                            completion:^(NSError * _Nullable error, NSString * _Nullable urlString)
+                 {
+                     if (urlString && !error) {
+                         targetURL = [NSURL URLWithString:urlString];
+                     }
+                     if (loadBlock)
+                     {
+                         dispatch_main_async_safe(^{
+                             loadBlock(targetURL);
+                         });
+                     }
+                 }];
+            } else {
+                if (loadBlock)
+                {
+                    loadBlock(targetURL);
                 }
-                if (completedBlock && finished) {
-                    completedBlock(image, error, cacheType, url);
-                }
-            });
+            }
         }];
-        [self sd_setImageLoadOperation:operation forKey:validOperationKey];
+
     } else {
         dispatch_main_async_safe(^{
             [self sd_removeActivityIndicator];
