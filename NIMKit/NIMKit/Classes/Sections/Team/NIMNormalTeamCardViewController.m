@@ -208,7 +208,7 @@
                 [[NIMSDK sharedSDK].teamManager addUsers:selectedContacts
                                                   toTeam:self.team.teamId
                                               postscript:@"邀请你加入讨论组"
-                                                  attach:nil
+                                                  attach:@"邀请扩展消息"
                                               completion:^(NSError *error,NSArray *members) {
                     [NIMKitProgressHUD dismiss];
                     if (!error) {
