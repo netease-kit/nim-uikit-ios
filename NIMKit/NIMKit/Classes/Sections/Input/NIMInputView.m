@@ -299,7 +299,7 @@
         {
             //这个时候需要一个动画来模拟键盘
             [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
-                [_inputDelegate didChangeInputHeight:self.nim_height];
+                [self.inputDelegate didChangeInputHeight:self.nim_height];
             } completion:nil];
         }
         else

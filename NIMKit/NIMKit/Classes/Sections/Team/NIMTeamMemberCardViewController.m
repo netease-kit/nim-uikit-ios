@@ -176,15 +176,18 @@
 - (void)removeManager:(NSString *)memberId{
     __block typeof(self) wself = self;
     [[NIMSDK sharedSDK].teamManager removeManagersFromTeam:self.member.team.teamId users:@[self.member.memberId] completion:^(NSError *error) {
+        typeof(wself) strongSelf = wself;
+        if (!strongSelf) return;
+
         if (!error) {
-            wself.member.type = NIMTeamMemberTypeNormal;
-            [wself.view makeToast:@"修改成功"];
-            [wself refreshData];
-            if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
-                [_delegate onTeamMemberInfoChaneged:wself.member];
+            strongSelf.member.type = NIMTeamMemberTypeNormal;
+            [strongSelf.view makeToast:@"修改成功"];
+            [strongSelf refreshData];
+            if([strongSelf.delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
+                [strongSelf.delegate onTeamMemberInfoChaneged:strongSelf.member];
             }
         }else{
-            [wself.view makeToast:@"修改失败"];
+            [strongSelf.view makeToast:@"修改失败"];
         }
         
     }];
@@ -193,15 +196,18 @@
 - (void)addManager:(NSString *)memberId{
     __block typeof(self) wself = self;
     [[NIMSDK sharedSDK].teamManager addManagersToTeam:self.member.team.teamId users:@[self.member.memberId] completion:^(NSError *error) {
+        typeof(wself) strongSelf = wself;
+        if (!strongSelf) return;
+
         if (!error) {
-            wself.member.type = NIMTeamMemberTypeManager;
-            [wself.view makeToast:@"修改成功"];
-            [wself refreshData];
-            if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
-                [_delegate onTeamMemberInfoChaneged:wself.member];
+            strongSelf.member.type = NIMTeamMemberTypeManager;
+            [strongSelf.view makeToast:@"修改成功"];
+            [strongSelf refreshData];
+            if([strongSelf.delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
+                [strongSelf.delegate onTeamMemberInfoChaneged:strongSelf.member];
             }
         }else{
-            [wself.view makeToast:@"修改失败"];
+            [strongSelf.view makeToast:@"修改失败"];
         }
     }];
 }
@@ -211,15 +217,19 @@
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex{
     if (alertView == _kickAlertView) {
         if(alertView.cancelButtonIndex != buttonIndex) {
+            __weak typeof(self) weakSelf = self;
             [[NIMSDK sharedSDK].teamManager kickUsers:@[self.member.memberId] fromTeam:self.member.team.teamId completion:^(NSError *error) {
+                typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+
                 if(!error) {
-                    [self.view makeToast:@"踢人成功"];
-                    [self.navigationController popViewControllerAnimated:YES];
-                    if([_delegate respondsToSelector:@selector(onTeamMemberKicked:)]) {
-                        [_delegate onTeamMemberKicked:self.member];
+                    [strongSelf.view makeToast:@"踢人成功"];
+                    [strongSelf.navigationController popViewControllerAnimated:YES];
+                    if([strongSelf.delegate respondsToSelector:@selector(onTeamMemberKicked:)]) {
+                        [strongSelf.delegate onTeamMemberKicked:strongSelf.member];
                     }
                 } else {
-                    [self.view makeToast:@"踢人失败"];
+                    [strongSelf.view makeToast:@"踢人失败"];
                 }
             }];
         }
@@ -230,15 +240,19 @@
                 break;
             case 1:{
                 NSString *name = [alertView textFieldAtIndex:0].text;
+                __weak typeof(self) weakSelf = self;
                 [[NIMSDK sharedSDK].teamManager updateUserNick:self.member.memberId newNick:name inTeam:self.member.team.teamId completion:^(NSError *error) {
+                    typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) return;
+
                     if (!error) {
-                        [self.view makeToast:@"修改成功"];
-                        [self refreshData];
-                        if([_delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
-                            [_delegate onTeamMemberInfoChaneged:self.member];
+                        [strongSelf.view makeToast:@"修改成功"];
+                        [strongSelf refreshData];
+                        if([strongSelf.delegate respondsToSelector:@selector(onTeamMemberInfoChaneged:)]) {
+                            [strongSelf.delegate onTeamMemberInfoChaneged:strongSelf.member];
                         }
                     }else{
-                        [self.view makeToast:@"修改失败"];
+                        [strongSelf.view makeToast:@"修改失败"];
                     }
                 }];
                 break;

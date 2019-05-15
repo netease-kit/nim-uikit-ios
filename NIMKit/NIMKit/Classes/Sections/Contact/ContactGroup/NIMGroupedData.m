@@ -78,11 +78,11 @@
         if (groupTitle.length) {
             unichar character = [groupTitle characterAtIndex:0];
             if (character >= 'A' && character <= 'Z') {
-                [_groupTtiles addObject:groupTitle];
+                [self.groupTtiles addObject:groupTitle];
             }else{
-                [_groupTtiles addObject:@"#"];
+                [self.groupTtiles addObject:@"#"];
             }
-            [_groups addObject:[[NIMKitPair alloc] initWithFirst:groupTitle second:groupedMembers]];
+            [self.groups addObject:[[NIMKitPair alloc] initWithFirst:groupTitle second:groupedMembers]];
         }
     }];
     [self sortGroup];
@@ -148,7 +148,7 @@
 {
     [_groupTtiles sortUsingComparator:_groupTitleComparator];
     [_groups sortUsingComparator:^NSComparisonResult(NIMKitPair *pair1, NIMKitPair *pair2) {
-        return _groupTitleComparator(pair1.first, pair2.first);
+        return self.groupTitleComparator(pair1.first, pair2.first);
     }];
 }
 
@@ -157,7 +157,7 @@
     [_groups enumerateObjectsUsingBlock:^(NIMKitPair *obj, NSUInteger idx, BOOL *stop) {
         NSMutableArray *groupedMembers = obj.second;
         [groupedMembers sortUsingComparator:^NSComparisonResult(id<NIMGroupMemberProtocol> member1, id<NIMGroupMemberProtocol> member2) {
-            return _groupMemberComparator([member1 sortKey], [member2 sortKey]);
+            return self.groupMemberComparator([member1 sortKey], [member2 sortKey]);
         }];
     }];
 }

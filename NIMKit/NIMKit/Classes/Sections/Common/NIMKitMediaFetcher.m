@@ -78,6 +78,9 @@
     __weak typeof(self) weakSelf = self;
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status){
         dispatch_async(dispatch_get_main_queue(), ^{
+            typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) return;
+
             if (status == PHAuthorizationStatusRestricted || status == PHAuthorizationStatusDenied) {
                 [[[UIAlertView alloc] initWithTitle:nil
                                             message:@"相册权限受限"
@@ -87,12 +90,12 @@
                 if(handler) handler(nil);
             }
             if (status == PHAuthorizationStatusAuthorized) {
-                NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:self.limit delegate:weakSelf];
+                NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:strongSelf.limit delegate:strongSelf];
                 vc.naviBgColor = [UIColor blackColor];
                 vc.naviTitleColor = [UIColor whiteColor];
                 vc.barItemTextColor = [UIColor whiteColor];
                 vc.navigationBar.barStyle = UIBarStyleDefault;
-                vc.allowPickingVideo = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
+                vc.allowPickingVideo = [strongSelf.mediaTypes containsObject:(NSString *)kUTTypeMovie];
                 if(handler) handler(vc);
             }
         });

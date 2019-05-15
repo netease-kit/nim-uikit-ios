@@ -137,8 +137,8 @@
             self.cancelBlock();
             self.cancelBlock = nil;
         }
-        if([_delegate respondsToSelector:@selector(didCancelledSelect)]) {
-            [_delegate didCancelledSelect];
+        if([self.delegate respondsToSelector:@selector(didCancelledSelect)]) {
+            [self.delegate didCancelledSelect];
         }
     }];
 }
