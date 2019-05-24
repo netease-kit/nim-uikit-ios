@@ -99,6 +99,14 @@
                                       SepLeftEdge   : @(SepLineLeft),
                                     },
                                   @{
+                                      Title         : @"邀请人",
+                                      DetailTitle   : member.inviterAccid ? (member.inviterAccid.length ? member.inviterAccid : member.userId) : @"本地不存在",
+                                      CellAction    : @"",
+                                      ShowAccessory : [self isOwner] && ![self isSelf]? @(YES) : @(NO),
+                                      RowHeight     : @(50),
+                                      SepLeftEdge   : @(SepLineLeft),
+                                      },
+                                  @{
                                       Title         : @"设置禁言",
                                       CellClass     : @"NIMKitSwitcherCell",
                                       CellAction    : @"updateMute:",
