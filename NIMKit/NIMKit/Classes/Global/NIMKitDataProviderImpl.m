@@ -180,6 +180,8 @@
             info = [self userInfo:userId inChatroom:session.sessionId option:option];
         }
             break;
+        case NIMSessionTypeSuperTeam:
+            break;
         default:
             NSAssert(0, @"invalid type");
             break;

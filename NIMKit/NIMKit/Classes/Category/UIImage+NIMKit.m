@@ -95,7 +95,9 @@
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
     NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageNamed:imageName];
+    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:[[NIMKit sharedKit] resourceBundleName] withExtension:nil];
+    NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
+    UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
     //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
     return image? image : [UIImage imageNamed:name];
 }

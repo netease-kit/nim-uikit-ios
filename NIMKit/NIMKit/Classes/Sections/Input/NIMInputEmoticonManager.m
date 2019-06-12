@@ -150,7 +150,7 @@
 {
     NSMutableArray *catalogs = [NSMutableArray array];
     
-    NSURL *url = [[NSBundle mainBundle] URLForResource:[[NIMKit sharedKit] emoticonBundleName]
+    NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:[[NIMKit sharedKit] emoticonBundleName]
                                          withExtension:nil];
     NSBundle *bundle = [NSBundle bundleWithURL:url];
     
