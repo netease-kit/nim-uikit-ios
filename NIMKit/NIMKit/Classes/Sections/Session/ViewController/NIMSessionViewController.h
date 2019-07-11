@@ -75,6 +75,12 @@
 - (void)refreshSessionSubTitle:(NSString *)title;
 
 /**
+ *  刷新消息
+ */
+- (void)refreshMessages;
+
+
+/**
  *  会话页长按消息可以弹出的菜单
  *
  *  @param message 长按的消息

@@ -821,6 +821,11 @@
     [self setUpTitleView];
 }
 
+- (void)refreshMessages
+{
+    [self.interactor resetMessages:nil];
+}
+
 
 @end
 
