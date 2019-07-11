@@ -24,47 +24,47 @@ Pod::Spec.new do |s|
 	 	global.source_files  	= 'NIMKit/NIMKit/Class/Global/*.{h.m}'
 	end
 	
-	cs.subspec 'Protocols' do |Protocols| 
-	 	Protocols.source_files  = 'NIMKit/NIMKit/Class/Protocols/*.{h.m}'
+	cs.subspec 'Protocols' do |protocols| 
+	 	protocols.source_files  = 'NIMKit/NIMKit/Class/Protocols/*.{h.m}'
 	end
 	
-	cs.subspec 'Category' do |Category| 
-	 	Category.source_files  	= 'NIMKit/NIMKit/Class/Category/*.{h.m}'
+	cs.subspec 'Category' do |category| 
+	 	category.source_files  	= 'NIMKit/NIMKit/Class/Category/*.{h.m}'
 	end
 	
-	cs.subspec 'Sections' do |Sections| 
-	 	Sections.source_files  	= 'NIMKit/NIMKit/Class/Sections/*.{h.m}'
+	cs.subspec 'Sections' do |sections| 
+	 	sections.source_files  	= 'NIMKit/NIMKit/Class/Sections/*.{h.m}'
 		
-		Sections.subspec 'Common' do |Common| 
-		 	Common.source_files  	= 'NIMKit/NIMKit/Class/Sections/Common/**/*.{h.m}'
+		sections.subspec 'Common' do |common| 
+		 	common.source_files  	= 'NIMKit/NIMKit/Class/Sections/Common/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Contact' do |Contact| 
-		 	Contact.source_files  	= 'NIMKit/NIMKit/Class/Sections/Contact/**/*.{h.m}'
+		sections.subspec 'Contact' do |contact| 
+		 	contact.source_files  	= 'NIMKit/NIMKit/Class/Sections/Contact/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Input' do |Input| 
-		 	Input.source_files  	= 'NIMKit/NIMKit/Class/Sections/Input/**/*.{h.m}'
+		sections.subspec 'Input' do |input| 
+		 	input.source_files  	= 'NIMKit/NIMKit/Class/Sections/Input/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Model' do |Model| 
-		 	Model.source_files  	= 'NIMKit/NIMKit/Class/Sections/Model/**/*.{h.m}'
+		sections.subspec 'Model' do |model| 
+		 	model.source_files  	= 'NIMKit/NIMKit/Class/Sections/Model/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Session' do |Session| 
-		 	Session.source_files  	= 'NIMKit/NIMKit/Class/Sections/Session/**/*.{h.m}'
+		sections.subspec 'Session' do |session| 
+		 	session.source_files  	= 'NIMKit/NIMKit/Class/Sections/Session/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'SessionList' do |SessionList| 
-		 	SessionList.source_files= 'NIMKit/NIMKit/Class/Sections/SessionList/**/*.{h.m}'
+		sections.subspec 'SessionList' do |sessionList| 
+		 	sessionList.source_files= 'NIMKit/NIMKit/Class/Sections/SessionList/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Team' do |Team| 
-		 	Team.source_files  		= 'NIMKit/NIMKit/Class/Sections/Team/**/*.{h.m}'
+		sections.subspec 'Team' do |team| 
+		 	team.source_files  		= 'NIMKit/NIMKit/Class/Sections/Team/**/*.{h.m}'
 		end
 		
-		Sections.subspec 'Util' do |Util| 
-		 	Util.source_files  		= 'NIMKit/NIMKit/Class/Sections/Util/**/*.{h.m}'
+		sections.subspec 'Util' do |util| 
+		 	util.source_files  		= 'NIMKit/NIMKit/Class/Sections/Util/**/*.{h.m}'
 		end
 	end
 	
