@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
     cs.dependency 'NIMSDK_LITE', '~> 6.6.6'
 	
 	cs.subspec 'Global' do |global| 
-	 	global.source_files  	= 'NIMKit/NIMKit/Classes/Global/*.{h.m}'
+	 	global.source_files  	= 'NIMKit/NIMKit/Classes/Global/**/*.{h.m}'
 	end
 	
 	cs.subspec 'Protocols' do |protocols| 
-	 	protocols.source_files  = 'NIMKit/NIMKit/Classes/Protocols/*.{h.m}'
+	 	protocols.source_files  = 'NIMKit/NIMKit/Classes/Protocols/**/*.{h.m}'
 	end
 	
 	cs.subspec 'Category' do |category| 
