@@ -11,7 +11,7 @@
 #import "NIMKitRobotDefaultTemplateParser.h"
 #import "NIMKit.h"
 #import "M80AttributedLabel+NIMKit.h"
-#import "UIImageView+WebCache.h"
+#import "NIMKitDependency.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKit.h"
 

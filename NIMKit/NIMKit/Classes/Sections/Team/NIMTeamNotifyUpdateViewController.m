@@ -11,7 +11,7 @@
 #import <NIMSDK/NIMSDK.h>
 #import "NIMGlobalMacro.h"
 #import "NIMKitProgressHUD.h"
-#import "UIView+Toast.h"
+#import "NIMKitDependency.h"
 
 @interface NIMTeamNotifyUpdateViewController ()<UITableViewDataSource,UITableViewDelegate>
 

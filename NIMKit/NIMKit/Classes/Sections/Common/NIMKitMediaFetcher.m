@@ -12,7 +12,6 @@
 #import "NIMMessageMaker.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKitDependency.h"
-#import "TZImageManager.h"
 #import "NIMKitProgressHUD.h"
 
 @interface NIMKitMediaPickerController : TZImagePickerController
