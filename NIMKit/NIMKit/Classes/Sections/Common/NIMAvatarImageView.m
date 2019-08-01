@@ -12,9 +12,7 @@
 #import "NIMKitDependency.h"
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
-
-static char imageURLKey;
-
+#import "NIMKitUrlManager.h"
 
 @interface NIMAvatarImageView()
 
@@ -42,6 +40,21 @@ static char imageURLKey;
         [self setup];
     }
     return self;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self setupRadius];
+    
+    if (!CGSizeEqualToSize(self.imageView.nim_size, self.nim_size))
+    {
+        self.imageView.nim_size = self.nim_size;
+        self.imageView.image = [self imageAddCorner:_image
+                                             radius:_cornerRadius
+                                            andSize:self.bounds.size];
+    }
+    
 }
 
 - (void)setup
@@ -79,12 +92,14 @@ static char imageURLKey;
     if (_image != image)
     {
         _image = image;
-        UIImage *fixedImage  = [self imageAddCornerWithRadius:_cornerRadius andSize:self.bounds.size];
+        UIImage *fixedImage  = [self imageAddCorner:_image
+                                             radius:_cornerRadius
+                                            andSize:self.bounds.size];
         self.imageView.image = fixedImage;
     }
 }
 
-- (UIImage*)imageAddCornerWithRadius:(CGFloat)radius andSize:(CGSize)size
+- (UIImage*)imageAddCorner:(UIImage *)image radius:(CGFloat)radius andSize:(CGSize)size
 {
     CGRect rect = CGRectMake(0, 0, size.width, size.height);
     
@@ -93,13 +108,12 @@ static char imageURLKey;
     CGPathRef path = self.path;
     CGContextAddPath(ctx,path);
     CGContextClip(ctx);
-    [self.image drawInRect:rect];
+    [image drawInRect:rect];
     CGContextDrawPath(ctx, kCGPathFillStroke);
     UIImage * newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return newImage;
 }
-
 
 - (CGPathRef)path
 {
@@ -107,205 +121,75 @@ static char imageURLKey;
                                        cornerRadius:self.cornerRadius] CGPath];
 }
 
-
-
-
-
 - (void)setAvatarBySession:(NIMSession *)session
 {
     NIMKitInfo *info = nil;
-    if (session.sessionType == NIMSessionTypeTeam)
-    {
+    if (session.sessionType == NIMSessionTypeTeam) {
         info = [[NIMKit sharedKit] infoByTeam:session.sessionId option:nil];
-    }
-    else
-    {
+    } else if (session.sessionType == NIMSessionTypeSuperTeam) {
+        info = [[NIMKit sharedKit] infoBySuperTeam:session.sessionId option:nil];
+    } else {
         NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
         option.session = session;
         info = [[NIMKit sharedKit] infoByUser:session.sessionId option:option];
     }
-    NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
-    [self nim_setImageWithURL:url placeholderImage:info.avatarImage];
+    [self setImageWithUrlString:info.avatarUrlString placeholderImage:info.avatarImage options:0];
 }
 
 - (void)setAvatarByMessage:(NIMMessage *)message
 {
     NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
     option.message = message;
-    NSString *from = nil;
-    if (message.messageType == NIMMessageTypeRobot)
-    {
-        NIMRobotObject *object = (NIMRobotObject *)message.messageObject;
-        if (object.isFromRobot)
-        {
-            from = object.robotId;
-        }
-    }
-    if (!from)
-    {
-        from = message.from;
-    }
+    NSString *from = message.from;
     NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:from option:option];
-    NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
-    [self nim_setImageWithURL:url placeholderImage:info.avatarImage];
-}
-
-@end
-
-
-@implementation NIMAvatarImageView (SDWebImageCache)
-
-- (void)nim_setImageWithURL:(NSURL *)url {
-    [self nim_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:nil];
+    [self setImageWithUrlString:info.avatarUrlString placeholderImage:info.avatarImage options:0];
 }
 
 - (void)nim_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
-    [self nim_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil];
+    [self setImageWithUrlString:url.absoluteString placeholderImage:placeholder options:0];
 }
 
 - (void)nim_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
-    [self nim_setImageWithURL:url placeholderImage:placeholder options:options progress:nil completed:nil];
+    [self setImageWithUrlString:url.absoluteString placeholderImage:placeholder options:options];
 }
 
-- (void)nim_setImageWithURL:(NSURL *)url completed:(SDExternalCompletionBlock)completedBlock {
-    [self nim_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:completedBlock];
-}
-
-- (void)nim_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDExternalCompletionBlock)completedBlock {
-    [self nim_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:completedBlock];
-}
-
-- (void)nim_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDExternalCompletionBlock)completedBlock {
-    [self nim_setImageWithURL:url placeholderImage:placeholder options:options progress:nil completed:completedBlock];
-}
-
-- (void)nim_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDExternalCompletionBlock)completedBlock {
-    NSString *validOperationKey = NSStringFromClass([self class]);
-    [self sd_cancelImageLoadOperationWithKey:validOperationKey];
-    objc_setAssociatedObject(self, &imageURLKey, url, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
-    if (!(options & SDWebImageDelayPlaceholder)) {
-        dispatch_main_async_safe(^{
-            [self nim_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:nil];
-        });
+- (void)setImageWithUrlString:(NSString *)urlString placeholderImage:(UIImage *)placeholderImage options:(SDWebImageOptions)options {
+    if (placeholderImage) {
+        self.image = placeholderImage;
     }
-    
-    if (url) {
-        // check if activityView is enabled or not
-        if ([self sd_showActivityIndicatorView]) {
-            [self sd_addActivityIndicator];
-        }
-        
-        __block NSURL *targetURL = url;
-        __weak __typeof(self)wself = self;
-        void(^loadBlock)(NSURL *URL)  =  ^(NSURL *URL) {
-            __strong __typeof (wself) sself = wself;
-            id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager loadImageWithURL:URL options:options progress:progressBlock completed:^(UIImage *image, NSData *data, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-                [sself sd_removeActivityIndicator];
-                if (image && ![URL isEqual:url])
-                {
-                    [SDWebImageManager.sharedManager saveImageToCache:image forURL:url];
-                }
-                
-                if (!sself) {
-                    return;
-                }
-                dispatch_main_async_safe(^{
-                    if (!sself) {
-                        return;
-                    }
-                    
-                    
-                    if (image && (options & SDWebImageAvoidAutoSetImage) && completedBlock) {
-                        completedBlock(image, error, cacheType, url);
-                        return;
-                    } else if (image) {
-                        [sself nim_setImage:image imageData:data basedOnClassOrViaCustomSetImageBlock:nil];
-                        [sself nim_setNeedsLayout];
-                    } else {
-                        if ((options & SDWebImageDelayPlaceholder)) {
-                            [sself nim_setImage:placeholder imageData:nil basedOnClassOrViaCustomSetImageBlock:nil];
-                            [sself nim_setNeedsLayout];
-                        }
-                    }
-                    if (completedBlock && finished) {
-                        completedBlock(image, error, cacheType, url);
-                    }
-                });
-            }];
-            [sself sd_setImageLoadOperation:operation forKey:validOperationKey];
-        };
-
-        [SDWebImageManager.sharedManager cachedImageExistsForURL:url completion:^(BOOL isInCache) {
-            if (!isInCache)
-            {
-                [[NIMSDK sharedSDK].resourceManager fetchNOSURLWithURL:[url absoluteString]
-                                                            completion:^(NSError * _Nullable error, NSString * _Nullable urlString)
-                 {
-                     if (urlString && !error) {
-                         targetURL = [NSURL URLWithString:urlString];
-                     }
-                     if (loadBlock)
-                     {
-                         dispatch_main_async_safe(^{
-                             loadBlock(targetURL);
-                         });
-                     }
-                 }];
-            } else {
-                if (loadBlock)
-                {
-                    loadBlock(targetURL);
-                }
-            }
-        }];
-
-    } else {
-        dispatch_main_async_safe(^{
-            [self sd_removeActivityIndicator];
-            if (completedBlock) {
-                NSError *error = [NSError errorWithDomain:@"SDWebImageErrorDomain" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
-                completedBlock(nil, error, SDImageCacheTypeNone, url);
-            }
-        });
-    }
-
-
-}
-
-- (void)nim_setImageWithPreviousCachedImageWithURL:(NSURL *)url andPlaceholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDExternalCompletionBlock)completedBlock {
-    NSString *key = [[SDWebImageManager sharedManager] cacheKeyForURL:url];
-    UIImage *lastPreviousCachedImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:key];
-    
-    [self nim_setImageWithURL:url placeholderImage:lastPreviousCachedImage ?: placeholder options:options progress:progressBlock completed:completedBlock];
-}
-
-- (void)nim_setImage:(UIImage *)image imageData:(NSData *)imageData basedOnClassOrViaCustomSetImageBlock:(SDSetImageBlock)setImageBlock {
-    if (setImageBlock) {
-        setImageBlock(image, imageData);
+    if (urlString.length == 0) {
         return;
     }
-    self.image = image;
+
+    //查询
+    __block NSURL *targetUrl = nil;
+    __weak typeof(self) weakSelf = self;
+    [[NIMKitUrlManager shareManager] queryQriginalUrlWithShortUrl:urlString completion:^(NSString *originalUrl, NSError *error) {
+        if (urlString && !error) {
+            targetUrl = [NSURL URLWithString:originalUrl];
+        } else {
+            targetUrl = [NSURL URLWithString:urlString];
+        }
+        [weakSelf didSetImageUrl:targetUrl placeholderImage:placeholderImage options:options];
+    }];
 }
 
-- (void)nim_setNeedsLayout {
-    [self setNeedsLayout];
+- (void)didSetImageUrl:(NSURL *)url placeholderImage:(UIImage *)placeholderImage options:(SDWebImageOptions)options {
+    if (!url) {
+        return;
+    }
+    __weak typeof(self) weakSelf = self;
+    UIImage *fixedPlaceholderImage  = [self imageAddCorner:placeholderImage
+                                                    radius:_cornerRadius
+                                                   andSize:self.bounds.size];
+    [_imageView sd_setImageWithURL:url
+                  placeholderImage:fixedPlaceholderImage
+                           options:SDWebImageAvoidAutoSetImage|SDWebImageDelayPlaceholder
+                         completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+                             if (image) {
+                                 weakSelf.image = image;
+                             }
+                             
+    }];
 }
-
-
-
-- (NSURL *)nim_imageURL {
-    return objc_getAssociatedObject(self, &imageURLKey);
-}
-
-
-- (void)nim_cancelCurrentImageLoad {
-    [self sd_cancelImageLoadOperationWithKey:@"UIImageViewImageLoad"];
-}
-
-- (void)nim_cancelCurrentAnimationImagesLoad {
-    [self sd_cancelImageLoadOperationWithKey:@"UIImageViewAnimationImages"];
-}
-
-
 @end

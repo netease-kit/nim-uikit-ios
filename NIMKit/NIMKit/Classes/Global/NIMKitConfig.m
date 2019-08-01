@@ -95,8 +95,6 @@
             return settings.fileSetting;
         case NIMMessageTypeTip:
             return settings.tipSetting;
-        case NIMMessageTypeRobot:
-            return settings.robotSetting;
         case NIMMessageTypeNotification:
         {
             NIMNotificationObject *object = (NIMNotificationObject *)message.messageObject;
@@ -104,6 +102,8 @@
             {
                 case NIMNotificationTypeTeam:
                     return settings.teamNotificationSetting;
+                case NIMNotificationTypeSuperTeam:
+                    return settings.superTeamNotificationSetting;
                 case NIMNotificationTypeChatroom:
                     return settings.chatroomNotificationSetting;
                 case NIMNotificationTypeNetCall:
@@ -144,9 +144,9 @@
     [self applyDefaultImageSettings];
     [self applyDefaultLocationSettings];
     [self applyDefaultTipSettings];
-    [self applyDefaultRobotSettings];
     [self applyDefaultUnsupportSettings];
     [self applyDefaultTeamNotificationSettings];
+    [self applyDefaultSuperTeamNotificationSettings];
     [self applyDefaultChatroomNotificationSettings];
     [self applyDefaultNetcallNotificationSettings];
 }
@@ -213,16 +213,6 @@
     _tipSetting.highLightBackgroundImage = backgroundImage;
 }
 
-
-- (void)applyDefaultRobotSettings
-{
-    _robotSetting = [[NIMKitSetting alloc] init:_isRight];
-    _robotSetting.contentInsets = _isRight? UIEdgeInsetsFromString(@"{11,11,9,15}") : UIEdgeInsetsFromString(@"{11,15,9,9}");
-    _robotSetting.textColor = _isRight? NIMKit_UIColorFromRGB(0xFFFFFF) : NIMKit_UIColorFromRGB(0x000000);
-    _robotSetting.font      = [UIFont systemFontOfSize:14];
-    _robotSetting.showAvatar = YES;
-}
-
 - (void)applyDefaultUnsupportSettings
 {
     _unsupportSetting = [[NIMKitSetting alloc] init:_isRight];
@@ -243,6 +233,18 @@
     UIImage *backgroundImage = [[UIImage nim_imageInKit:@"icon_session_time_bg"] resizableImageWithCapInsets:UIEdgeInsetsFromString(@"{8,20,8,20}") resizingMode:UIImageResizingModeStretch];
     _teamNotificationSetting.normalBackgroundImage    = backgroundImage;
     _teamNotificationSetting.highLightBackgroundImage = backgroundImage;
+}
+
+- (void)applyDefaultSuperTeamNotificationSettings
+{
+    _superTeamNotificationSetting = [[NIMKitSetting alloc] init:_isRight];
+    _superTeamNotificationSetting.contentInsets = UIEdgeInsetsZero;
+    _superTeamNotificationSetting.textColor = NIMKit_UIColorFromRGB(0xFFFFFF);
+    _superTeamNotificationSetting.font      = [UIFont systemFontOfSize:10];
+    _superTeamNotificationSetting.showAvatar = NO;
+    UIImage *backgroundImage = [[UIImage nim_imageInKit:@"icon_session_time_bg"] resizableImageWithCapInsets:UIEdgeInsetsFromString(@"{8,20,8,20}") resizingMode:UIImageResizingModeStretch];
+    _superTeamNotificationSetting.normalBackgroundImage    = backgroundImage;
+    _superTeamNotificationSetting.highLightBackgroundImage = backgroundImage;
 }
 
 - (void)applyDefaultChatroomNotificationSettings

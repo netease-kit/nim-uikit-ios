@@ -32,6 +32,6 @@
 
 - (void)refreshTeam:(id<NIMGroupMemberProtocol>)member;
 
-- (void)refreshItem:(id<NIMGroupMemberProtocol>)member withMemberInfo:(NIMKitInfo *)info;
+- (void)refreshItem:(id<NIMGroupMemberProtocol>)member;
 
 @end

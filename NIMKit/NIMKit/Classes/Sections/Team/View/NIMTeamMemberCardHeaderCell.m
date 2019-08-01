@@ -35,16 +35,13 @@
 }
 
 - (void)refreshData:(NIMCommonTableRow *)rowData tableView:(UITableView *)tableView;{
-    NIMUsrInfo *user = rowData.extraInfo[@"user"];
-    NIMTeam *team = rowData.extraInfo[@"team"];
+    NIMKitInfo *userInfo = rowData.extraInfo[@"user"];
     NSURL *avatarURL;
-    if (user.info.avatarUrlString.length) {
-        avatarURL = [NSURL URLWithString:user.info.avatarUrlString];
+    if (userInfo.avatarUrlString.length) {
+        avatarURL = [NSURL URLWithString:userInfo.avatarUrlString];
     }
-    [self.avatarView nim_setImageWithURL:avatarURL placeholderImage:user.info.avatarImage];
-    
-    NIMSession *session = [NIMSession session:team.teamId type:NIMSessionTypeTeam];
-    self.nickLabel.text = [NIMKitUtil showNick:user.info.infoId inSession:session];
+    [self.avatarView nim_setImageWithURL:avatarURL placeholderImage:userInfo.avatarImage];
+    self.nickLabel.text = userInfo.showName;
     [self.nickLabel sizeToFit];
     self.userInteractionEnabled = NO;
 }

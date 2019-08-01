@@ -7,14 +7,12 @@
 //
 
 #import "NIMGroupedUsrInfo.h"
-#import "NIMKit.h"
 #import "NIMSpellingCenter.h"
 #import "NIMKitInfoFetchOption.h"
 
 @interface NIMGroupUser()
 
 @property (nonatomic,copy)   NSString *userId;
-
 @property (nonatomic,strong) NIMKitInfo *info;
 
 @end
@@ -52,23 +50,35 @@
     return [[NIMSpellingCenter sharedCenter] spellingForString:self.info.showName].shortSpelling;
 }
 
+- (UIImage *)avatarImage {
+    return self.info.avatarImage;
+}
+
+
+- (NSString *)avatarUrlString {
+    return self.info.avatarUrlString;
+}
+
+
 @end
-
-
-
 
 @interface NIMGroupTeamMember()
 
-@property (nonatomic,strong) NIMTeamMember *member;
+@property (nonatomic,copy) NSString *userId;
+@property (nonatomic,strong) NIMKitInfo *info;
 
 @end
 
 @implementation NIMGroupTeamMember
 
-- (instancetype)initWithUserId:(NSString *)userId teamId:(NSString *)teamId{
+- (instancetype)initWithUserId:(NSString *)userId
+                       session:(NIMSession *)session {
     self = [super init];
     if (self) {
-        _member = [[NIMSDK sharedSDK].teamManager teamMember:userId inTeam:teamId];
+        _userId = userId;
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = session;
+        _info = [[NIMKit sharedKit] infoByUser:userId option:option];
     }
     return self;
 }
@@ -83,43 +93,53 @@
     }
 }
 
-- (NSString *)memberId{
-    return self.member.userId;
-}
-
 - (id)sortKey{
     return [[NIMSpellingCenter sharedCenter] spellingForString:self.showName].shortSpelling;
 }
 
 - (NSString *)showName{
-    NIMSession *session = [NIMSession session:self.member.teamId type:NIMSessionTypeTeam];
-    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
-    option.session = session;
-    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:self.memberId option:option];
-    return info.showName;
+    return self.info.showName;
 }
 
+- (NSString *)memberId{
+    return self.userId;
+}
+
+- (UIImage *)avatarImage {
+    return self.info.avatarImage;
+}
+
+- (NSString *)avatarUrlString {
+    return self.info.avatarUrlString;
+}
 
 @end
 
 @interface NIMGroupTeam()
 
-@property (nonatomic,strong) NIMTeam *team;
+@property (nonatomic,copy) NSString *teamId;
+@property (nonatomic,strong) NIMKitInfo *info;
 
 @end
 
 @implementation NIMGroupTeam
 
-- (instancetype)initWithTeam:(NSString *)teamId{
+- (instancetype)initWithTeamId:(NSString *)teamId
+                      teamType:(NIMKitTeamType)teamType {
     self = [super init];
     if (self) {
-        _team = [[NIMSDK sharedSDK].teamManager teamById:teamId];
+        _teamId = teamId;
+        if (teamType == NIMKitTeamTypeNomal) {
+            _info = [[NIMKit sharedKit] infoByTeam:teamId option:nil];
+        } else if (teamType == NIMKitTeamTypeSuper) {
+            _info = [[NIMKit sharedKit] infoBySuperTeam:teamId option:nil];
+        }
     }
     return self;
 }
 
 - (NSString *)groupTitle{
-    NSString *title = [[NIMSpellingCenter sharedCenter] firstLetter:self.team.teamName].capitalizedString;
+    NSString *title = [[NIMSpellingCenter sharedCenter] firstLetter:self.showName].capitalizedString;
     unichar character = [title characterAtIndex:0];
     if (character >= 'A' && character <= 'Z') {
         return title;
@@ -128,18 +148,25 @@
     }
 }
 
-- (NSString *)memberId{
-    return self.team.teamId;
-}
-
 - (id)sortKey{
-    return [[NIMSpellingCenter sharedCenter] spellingForString:self.team.teamName].shortSpelling;
+    return [[NIMSpellingCenter sharedCenter] spellingForString:[self showName]].shortSpelling;
 }
 
 - (NSString *)showName{
-    return self.team.teamName;
+    return self.info.showName;
 }
 
+- (NSString *)memberId{
+    return self.teamId;
+}
+
+- (UIImage *)avatarImage {
+    return self.info.avatarImage;
+}
+
+- (NSString *)avatarUrlString {
+    return self.info.avatarUrlString;
+}
 
 @end
 

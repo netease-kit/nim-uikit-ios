@@ -40,6 +40,14 @@
     return self.info.showName;
 }
 
+- (NSString *)avatarUrlString {
+    return self.info.avatarUrlString;
+}
+
+- (UIImage *)avatarImage {
+    return self.info.avatarImage;
+}
+
 - (id)sortKey {
     return [[NIMSpellingCenter sharedCenter] spellingForString:self.info.showName].shortSpelling;
 }

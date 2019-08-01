@@ -503,16 +503,10 @@
             case NIMSessionTypeTeam:
             {
                 NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
-                if ([self.inputConfig respondsToSelector:@selector(enableRobot)])
-                {
-                    config.enableRobot = [self.inputConfig enableRobot];
-                }
-                else
-                {
-                    config.enableRobot = YES;
-                }
+                config.teamType = NIMKitTeamTypeNomal;
                 config.needMutiSelected = NO;
                 config.teamId = self.session.sessionId;
+                config.session = self.session;
                 config.filterIds = @[[NIMSDK sharedSDK].loginManager.currentAccount];
                 NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
                 vc.delegate = self;
@@ -520,6 +514,8 @@
                     [vc show];
                 });
             }
+                break;
+            case NIMSessionTypeSuperTeam: //超大群不支持at
                 break;
             case NIMSessionTypeP2P:
                 break;

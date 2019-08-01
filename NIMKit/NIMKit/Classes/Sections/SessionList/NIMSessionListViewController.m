@@ -93,10 +93,6 @@
 
 
 #pragma mark - UITableViewDataSource
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.recentSessions.count;
 }
@@ -208,12 +204,18 @@
 
 
 
-- (NSString *)nameForRecentSession:(NIMRecentSession *)recent{
+- (NSString *)nameForRecentSession:(NIMRecentSession *)recent {
     if (recent.session.sessionType == NIMSessionTypeP2P) {
         return [NIMKitUtil showNick:recent.session.sessionId inSession:recent.session];
-    }else{
+    } else if (recent.session.sessionType == NIMSessionTypeTeam) {
         NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:recent.session.sessionId];
         return team.teamName;
+    } else if (recent.session.sessionType == NIMSessionTypeSuperTeam) {
+        NIMTeam *superTeam = [[NIMSDK sharedSDK].superTeamManager teamById:recent.session.sessionId];
+        return superTeam.teamName;
+    } else {
+        NSAssert(NO, @"");
+        return nil;
     }
 }
 
@@ -301,9 +303,6 @@
         case NIMMessageTypeTip:
             text = lastMessage.text;
             break;
-        case NIMMessageTypeRobot:
-            text = [self robotMessageContent:lastMessage];
-            break;
         default:
             text = @"[未知消息]";
     }
@@ -314,14 +313,6 @@
     else
     {
         NSString *from = lastMessage.from;
-        if (lastMessage.messageType == NIMMessageTypeRobot)
-        {
-            NIMRobotObject *object = (NIMRobotObject *)lastMessage.messageObject;
-            if (object.isFromRobot)
-            {
-                from = object.robotId;
-            }
-        }
         NSString *nickName = [NIMKitUtil showNick:from inSession:lastMessage.session];
         return nickName.length ? [nickName stringByAppendingFormat:@" : %@",text] : @"";
     }
@@ -344,21 +335,12 @@
             return @"[群信息更新]";
         }
     }
+    
+    if (object.notificationType == NIMNotificationTypeSuperTeam) {
+        return @"[超大群信息更新]";
+    }
     return @"[未知消息]";
 }
-
-- (NSString *)robotMessageContent:(NIMMessage *)lastMessage{
-    NIMRobotObject *object = lastMessage.messageObject;
-    if (object.isFromRobot)
-    {
-        return @"[机器人消息]";
-    }
-    else
-    {
-        return lastMessage.text;
-    }
-}
-
 
 #pragma mark - Notification
 - (void)onUserInfoHasUpdatedNotification:(NSNotification *)notification{

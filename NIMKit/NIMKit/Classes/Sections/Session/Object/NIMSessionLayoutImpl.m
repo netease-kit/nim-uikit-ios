@@ -79,14 +79,6 @@
     [self.tableView reloadData];
 }
 
-- (void)adjustOffset:(NSInteger)row {
-    if (row >= 0) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
-            [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
-        });
-    }
-}
 
 
 - (void)changeLayout:(CGFloat)inputViewHeight
@@ -197,7 +189,9 @@
 #pragma mark - Private
 
 - (void)calculateContent:(NIMMessageModel *)model{
-    [model contentSize:self.tableView.nim_width];
+    NIMKit_Dispatch_Sync_Main(^{
+        [model contentSize:self.tableView.nim_width];
+    });
 }
 
 - (void)setupRefreshControl
@@ -239,14 +233,14 @@
     }];
     
     [self.tableView beginUpdates];
-    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationBottom];
+    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
     [self.tableView endUpdates];
-    
+    [self.tableView scrollToRowAtIndexPath:addIndexPathes.lastObject atScrollPosition:UITableViewScrollPositionTop animated:NO];
+
     [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
+        
         [self resetLayout];
     } completion:nil];
-    
-    [self.tableView nim_scrollToBottom:YES];
 }
 
 - (void)remove:(NSArray<NSIndexPath *> *)indexPaths

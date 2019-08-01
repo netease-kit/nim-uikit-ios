@@ -183,10 +183,8 @@
     NSInteger index = 0;
     if ([self.dataProvider respondsToSelector:@selector(pullDown:handler:)])
     {
-        __weak typeof(self) wself = self;
         [self.dataProvider pullDown:currentOldestMsg.message handler:^(NSError *error, NSArray *messages) {
             NIMKit_Dispatch_Async_Main(^{
-                NSInteger index = [wself insertMessages:messages];
                 if (handler) {
                     handler(index,messages,error);
                 }

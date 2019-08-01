@@ -77,10 +77,12 @@
         NIMMessageModel *model = (NIMMessageModel *)modelInArray;
         
         CGSize size = [model contentSize:tableView.nim_width];
+        CGFloat avatarMarginY = [model avatarMargin].y;
         
         UIEdgeInsets contentViewInsets = model.contentViewInsets;
         UIEdgeInsets bubbleViewInsets  = model.bubbleViewInsets;
         cellHeight = size.height + contentViewInsets.top + contentViewInsets.bottom + bubbleViewInsets.top + bubbleViewInsets.bottom;
+        cellHeight = cellHeight > (model.avatarSize.height + avatarMarginY) ? cellHeight : model.avatarSize.height + avatarMarginY;
     }
     else if ([modelInArray isKindOfClass:[NIMTimestampModel class]])
     {

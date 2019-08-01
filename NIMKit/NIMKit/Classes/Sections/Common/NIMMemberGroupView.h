@@ -20,6 +20,16 @@
 
 @end
 
+@interface NIMMemebrGroupData : NSObject
+
+@property (nonatomic,strong) NSString *userId;
+
+@property (nonatomic,assign) NIMKitCardHeaderOpeator opera;
+
+@property (nonatomic,assign) BOOL isMyUserId;
+
+@end
+
 @interface NIMMemberGroupView : UIView
 
 @property (nonatomic,strong) UICollectionView *collectionView;
@@ -32,7 +42,7 @@
 
 @property (nonatomic,weak) id<NIMMemberGroupViewDelegate> delegate;
 
-- (void)refreshUids:(NSArray *)uids operators:(NIMKitCardHeaderOpeator)operators;
+- (void)refreshDatas:(NSArray <NIMMemebrGroupData *> *)datas operators:(NIMKitCardHeaderOpeator)operators;
 
 - (void)setTitle:(NSString *)title forOperator:(NIMKitCardHeaderOpeator)opera;
 

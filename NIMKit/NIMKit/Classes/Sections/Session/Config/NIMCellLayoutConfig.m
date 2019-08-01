@@ -47,7 +47,8 @@
     }
     CGFloat cellTopToBubbleTop           = 3;
     CGFloat otherNickNameHeight          = 20;
-    CGFloat otherBubbleOriginX           = [self shouldShowAvatar:model]? 55 : 0;
+    CGFloat bubbleLeftToCellLeft         = 13;
+    CGFloat otherBubbleOriginX           = [self shouldShowAvatar:model] ? [self avatarSize:model].width + bubbleLeftToCellLeft : 0;
     CGFloat cellBubbleButtomToCellButtom = 13;
     if ([self shouldShowNickName:model])
     {
@@ -72,14 +73,17 @@
     if (message.messageType == NIMMessageTypeNotification)
     {
         NIMNotificationType type = [(NIMNotificationObject *)message.messageObject notificationType];
-        if (type == NIMNotificationTypeTeam) {
+        if (type == NIMNotificationTypeTeam || type == NIMNotificationTypeSuperTeam) {
             return NO;
         }
     }
     if (message.messageType == NIMMessageTypeTip) {
         return NO;
     }
-    return (!message.isOutgoingMsg && message.session.sessionType == NIMSessionTypeTeam);
+
+    BOOL isTeamMessage = (message.session.sessionType == NIMSessionTypeTeam
+                          || message.session.sessionType == NIMSessionTypeSuperTeam);
+    return (!message.isOutgoingMsg && isTeamMessage);
 }
 
 
@@ -100,7 +104,7 @@
 
 - (CGPoint)nickNameMargin:(NIMMessageModel *)model
 {
-    return [self shouldShowAvatar:model] ? CGPointMake(57.f, -3.f) : CGPointMake(10.f, -3.f);
+    return [self shouldShowAvatar:model] ? CGPointMake([self avatarSize:model].width + 15.f, -3.f) : CGPointMake(10.f, -3.f);
 }
 
 

@@ -21,16 +21,10 @@
 
 + (NIMMessage *)msgWithImagePath:(NSString *)path;
 
++ (NIMMessage *)msgWithImageData:(NSData *)data extension:(NSString *)extension;
+
 + (NIMMessage *)msgWithVideo:(NSString *)filePath;
 
 + (NIMMessage *)msgWithLocation:(NIMKitLocationPoint *)locationPoint;
-
-+ (NIMMessage *)msgWithRobotQuery:(NSString *)text
-                          toRobot:(NSString *)robotId;
-
-+ (NIMMessage *)msgWithRobotSelect:(NSString *)text
-                            target:(NSString *)target
-                            params:(NSString *)params
-                           toRobot:(NSString *)robotId;
 
 @end

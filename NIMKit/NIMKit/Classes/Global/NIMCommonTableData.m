@@ -66,6 +66,7 @@
         _sepLeftEdge    = [dict[SepLeftEdge] floatValue];
         _showAccessory  = [dict[ShowAccessory] boolValue];
         _forbidSelect   = [dict[ForbidSelect] boolValue];
+        _userInteractionDisable = [dict[DisableUserInteraction] boolValue];
     }
     return self;
 }

@@ -31,6 +31,7 @@
 #define Disable       @"disable"      //cell不可见
 #define ShowAccessory @"accessory"    //cell显示>箭头
 #define ForbidSelect  @"forbidSelect" //cell不响应select事件
+#define DisableUserInteraction @"disableUserInteraction" //cell是否响应任何事件
 
 @interface NIMCommonTableSection : NSObject
 
@@ -70,6 +71,8 @@
 @property (nonatomic,assign) BOOL     showAccessory;
 
 @property (nonatomic,assign) BOOL     forbidSelect;
+
+@property (nonatomic,assign) BOOL     userInteractionDisable;
 
 @property (nonatomic,strong) id extraInfo;
 

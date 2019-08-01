@@ -112,6 +112,9 @@
     {
         return _shouldShowReadLabel && self.message.isRemoteRead;
     }
+    else if (self.message.session.sessionType == NIMSessionTypeSuperTeam) { //超大群这个功能还没做
+        return NO;
+    }
     else
     {
         return _shouldShowReadLabel;

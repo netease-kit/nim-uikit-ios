@@ -68,6 +68,7 @@ static NSString *DefaultTableCell = @"UITableViewCell";
         [(id<NIMCommonTableViewCell>)cell refreshData:tableRow tableView:tableView];
     }
     cell.accessoryType = tableRow.showAccessory ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+    cell.userInteractionEnabled = !tableRow.userInteractionDisable;
     return cell;
 }
 

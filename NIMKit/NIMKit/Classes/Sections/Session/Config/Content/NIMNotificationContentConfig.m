@@ -22,6 +22,7 @@
     
     switch (object.notificationType) {
         case NIMNotificationTypeTeam:
+        case NIMNotificationTypeSuperTeam:
         case NIMNotificationTypeChatroom:
         {
             CGFloat TeamNotificationMessageWidth  = cellWidth;
@@ -49,8 +50,6 @@
             contentSize = [label sizeThatFits:CGSizeMake(msgContentMaxWidth, CGFLOAT_MAX)];
             break;
         }
-        case NIMNotificationTypeSuperTeam:
-            break;
         default:
         {
             NIMUnsupportContentConfig *config = [[NIMUnsupportContentConfig alloc] init];

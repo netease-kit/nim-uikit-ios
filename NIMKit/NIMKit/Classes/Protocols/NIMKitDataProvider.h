@@ -39,4 +39,15 @@
 - (NIMKitInfo *)infoByTeam:(NSString *)teamId
                     option:(NIMKitInfoFetchOption *)option;
 
+/**
+ *  上层提供超大群组信息的接口
+ *
+ *  @param teamId 群组ID
+ *  @param option 获取选项
+ *
+ *  @return 群组信息
+ */
+- (NIMKitInfo *)infoBySuperTeam:(NSString *)teamId
+                         option:(NIMKitInfoFetchOption *)option;
+
 @end

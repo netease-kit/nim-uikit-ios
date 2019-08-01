@@ -36,10 +36,11 @@
     return self;
 }
 
-- (void)refreshItem:(id<NIMGroupMemberProtocol>)member withMemberInfo:(NIMKitInfo *)info {
+- (void)refreshItem:(id<NIMGroupMemberProtocol>)member {
     [self refreshTitle:member.showName];
-    self.memberId = [member memberId];
-    [self refreshAvatar:info];
+    self.memberId = member.memberId;
+    NSURL *url = member.avatarUrlString ? [NSURL URLWithString:member.avatarUrlString] : nil;
+    [_avatarImageView nim_setImageWithURL:url placeholderImage:member.avatarImage options:SDWebImageRetryFailed];
 }
 
 - (void)refreshUser:(id<NIMGroupMemberProtocol>)member{
@@ -64,7 +65,6 @@
     NSURL *url = info.avatarUrlString ? [NSURL URLWithString:info.avatarUrlString] : nil;
     [_avatarImageView nim_setImageWithURL:url placeholderImage:info.avatarImage options:SDWebImageRetryFailed];
 }
-
 
 - (void)onPressAvatar:(id)sender{
     if ([self.delegate respondsToSelector:@selector(onPressAvatar:)]) {

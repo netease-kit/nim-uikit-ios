@@ -50,20 +50,17 @@
     return self;
 }
 
-- (void)refreshData:(NSDictionary *)data team:(NIMTeam *)team{
+- (void)refreshData:(NSDictionary *)data nick:(NSString *)nick{
     NSString *title = [data objectForKey:@"title"];
     _titleLabel.text = title;
     NSString *content = [data objectForKey:@"content"];
     _contentLabel.text = content;
-    NSString *creatorId = [data objectForKey:@"creator"];
     NSNumber *time = [data objectForKey:@"time"];
-    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"MM-dd HH:mm"];
     NSDate * date = [NSDate dateWithTimeIntervalSince1970:time.integerValue];
-    NIMSession *session = [NIMSession session:team.teamId type:NIMSessionTypeTeam];
-    NSString *nick = [NIMKitUtil showNick:creatorId inSession:session];
-    _infoLabel.text = [NSString stringWithFormat:@"%@ %@", nick, [dateFormatter stringFromDate:date]];
+    NSString *dataString = [dateFormatter stringFromDate:date];
+    _infoLabel.text = [NSString stringWithFormat:@"%@ %@", nick ?: @"", dataString];
 }
 
 @end

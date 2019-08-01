@@ -11,6 +11,6 @@
 
 @interface NIMTeamAnnouncementListCell : UITableViewCell
 
-- (void)refreshData:(NSDictionary *)data team:(NIMTeam *)team;
+- (void)refreshData:(NSDictionary *)data nick:(NSString *)nick;
 
 @end

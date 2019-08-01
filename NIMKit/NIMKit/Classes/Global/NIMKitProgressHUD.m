@@ -91,13 +91,25 @@
         
         CALayer *maskLayer = [CALayer layer];
         
-        NSBundle *bundle = [NSBundle bundleForClass:[NIMKitProgressHUD class]];
-        NSURL *url = [bundle URLForResource:[NIMKit sharedKit].resourceBundleName withExtension:nil];
-        NSBundle *imageBundle = [NSBundle bundleWithURL:url];
+        NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
+        NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKitProgressHUD class]] URLForResource:bundleName withExtension:nil];
         
-        NSString *path = [imageBundle pathForResource:@"bk_angle_mask" ofType:@"png"];
+        if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
+        {
+            bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
+        }
         
-        maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
+        if (bundleURL)
+        {
+            NSBundle *imageBundle = [NSBundle bundleWithURL:bundleURL];
+            
+            if (imageBundle)
+            {
+                NSString *path = [imageBundle pathForResource:@"bk_angle_mask" ofType:@"png"];
+                maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
+            }
+        }
+        
         maskLayer.frame = _indefiniteAnimatedLayer.bounds;
         _indefiniteAnimatedLayer.mask = maskLayer;
         

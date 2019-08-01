@@ -1,12 +1,12 @@
 //
-//  NIMAdvancedTeamMemberCell.m
+//  NIMTeamMemberListCell.m
 //  NIM
 //
 //  Created by chris on 15/3/26.
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMAdvancedTeamMemberCell.h"
+#import "NIMTeamMemberListCell.h"
 #import "UIView+NIM.h"
 #import "NIMUsrInfoData.h"
 #import "NIMAvatarImageView.h"
@@ -14,7 +14,7 @@
 #import "NIMKit.h"
 #import "UIImage+NIMKit.h"
 
-@interface NIMAdvancedTeamMemberView : UIView{
+@interface NIMTeamMemberView : UIView{
 
 }
 
@@ -28,7 +28,7 @@
 
 #define RegularTeamMemberViewHeight 53
 #define RegularTeamMemberViewWidth  38
-@implementation NIMAdvancedTeamMemberView
+@implementation NIMTeamMemberView
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
@@ -49,6 +49,7 @@
         avatarURL = [NSURL URLWithString:member.avatarUrlString];
     }
     [_imageView nim_setImageWithURL:avatarURL placeholderImage:member.avatarImage];
+    _titleLabel.text = (member.showName ?: @"");
 }
 
 
@@ -68,20 +69,18 @@
 }
 @end
 
+const CGFloat kNIMTeamMemberListCellItemWidth = 49.f;
+const CGFloat kNIMTeamMemberListCellItemPadding = 44.f;
 
-@interface NIMAdvancedTeamMemberCell()
+@interface NIMTeamMemberListCell()
 
 @property(nonatomic,strong) NSMutableArray *icons;
 
-@property(nonatomic,strong) NIMTeam *team;
-
-@property(nonatomic,copy)   NSArray *teamMembers;
-
-@property(nonatomic,strong) UIButton *addBtn;
+@property(nonatomic, strong) UIButton *addBtn;
 
 @end
 
-@implementation NIMAdvancedTeamMemberCell
+@implementation NIMTeamMemberListCell
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
@@ -94,46 +93,36 @@
     return self;
 }
 
-- (void)rereshWithTeam:(NIMTeam*)team
-               members:(NSArray*)members
-                 width:(CGFloat)width{
-    _team = team;
-    _teamMembers = members;
-    NIMTeamMember *myTeamInfo;
-    for (NIMTeamMember *member in members) {
-        if ([member.userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount]) {
-            myTeamInfo = member;
-            break;
-        }
-    }
+- (NSInteger)maxShowMemberCount {
+    NSInteger maxShowCount = (self.nim_width - kNIMTeamMemberListCellItemPadding) / kNIMTeamMemberListCellItemWidth;
+    return maxShowCount;
+}
+
+- (void)setInfos:(NSMutableArray<NIMKitInfo *> *)infos {
     NSInteger count = 0;
-    if ([NIMKitUtil canInviteMember:myTeamInfo]) {
-        NIMAdvancedTeamMemberView *view = [self fetchMemeberView:0];
+    
+    //invite button
+    if (!_disableInvite) {
+        NIMTeamMemberView *view = [self fetchMemeberView:0];
         UIImage *addImage = [UIImage nim_imageInKit:@"icon_add_normal"];
         [view.imageView nim_setImageWithURL:nil placeholderImage:addImage];
         view.titleLabel.text = @"邀请";
         count = 1;
-        self.addBtn.userInteractionEnabled = YES;
-    }else{
-        self.addBtn.userInteractionEnabled = NO;
     }
+    self.addBtn.userInteractionEnabled = (count != 0);
     
-    CGFloat padding = 44.f;
-    CGFloat itemWidth = 49.f;
-    NSInteger maxIconCount = (width - padding) / itemWidth;
-    NSInteger iconCount = members.count > maxIconCount-count ? maxIconCount : members.count + count;
-    NIMSession *session = [NIMSession session:team.teamId type:NIMSessionTypeTeam];
+    //icons
     for (UIView *view in _icons) {
         [view removeFromSuperview];
     }
+    
+    NSInteger maxShowCount = self.maxShowMemberCount;
+    NSInteger iconCount = infos.count > maxShowCount-count ? maxShowCount : infos.count+count;
     for (NSInteger i = 0; i < iconCount; i++) {
-        NIMAdvancedTeamMemberView *view = [self fetchMemeberView:i];
+        NIMTeamMemberView *view = [self fetchMemeberView:i];
         if (!count || i != 0) {
-            NSInteger memberIndex       = i - count;
-            NIMTeamMember *member       = members[memberIndex];
-            NIMKitInfo *info            = [[NIMKit sharedKit] infoByUser:member.userId option:nil];
-            view.member                 = info;
-            view.titleLabel.text        = [NIMKitUtil showNick:member.userId inSession:session];
+            NSInteger memberIndex = i - count;
+            view.member = infos[memberIndex];
         }
         [self addSubview:view];
         [view setNeedsLayout];
@@ -165,7 +154,7 @@
     
     CGFloat spacing = 12.f;
     CGFloat bottom  = 10.f;
-    for (NIMAdvancedTeamMemberView *view in _icons) {
+    for (NIMTeamMemberView *view in _icons) {
         view.nim_left = left;
         left += view.nim_width;
         left += spacing;
@@ -176,10 +165,10 @@
 
 #pragma mark - Private
 
-- (NIMAdvancedTeamMemberView *)fetchMemeberView:(NSInteger)index{
+- (NIMTeamMemberView *)fetchMemeberView:(NSInteger)index{
     if (_icons.count <= index) {
         for (int i = 0; i < index - _icons.count + 1 ; i++) {
-            NIMAdvancedTeamMemberView *view = [[NIMAdvancedTeamMemberView alloc]initWithFrame:CGRectZero];
+            NIMTeamMemberView *view = [[NIMTeamMemberView alloc]initWithFrame:CGRectZero];
             view.userInteractionEnabled = NO;
             [view sizeToFit];
             [_icons addObject:view];

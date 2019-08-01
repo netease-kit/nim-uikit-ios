@@ -48,17 +48,18 @@
     if ([data respondsToSelector:@selector(imageUrl)] && data.imageUrl.length) {
         url = [NSURL URLWithString:data.imageUrl];
     }
+
     [self.imageView nim_setImageWithURL:url placeholderImage:data.imageNormal];
     [self.imageView addTarget:self action:@selector(onSelected:) forControlEvents:UIControlEventTouchUpInside];
     self.titleLabel.text = data.title;
     if([data isKindOfClass:[NIMTeamCardMemberItem class]]) {
         NIMTeamCardMemberItem *member = data;
-        self.titleLabel.text = member.title.length ? member.title : member.memberId;
-        switch (member.type) {
-            case NIMTeamMemberTypeOwner:
+        self.titleLabel.text = member.title.length ? member.title : member.userId;
+        switch (member.userType) {
+            case NIMKitTeamMemberTypeOwner:
                 self.roleImageView.image = [UIImage nim_imageInKit:@"icon_team_creator"];
                 break;
-            case NIMTeamMemberTypeManager:
+            case NIMKitTeamMemberTypeManager:
                 self.roleImageView.image = [UIImage nim_imageInKit:@"icon_team_manager"];
                 break;
             default:

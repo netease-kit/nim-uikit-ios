@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <NIMSDK/NIMSDK.h>
+#import "NIMTeamMemberListDataSource.h"
 
 @interface NIMTeamMemberListViewController : UIViewController
 
-- (instancetype)initTeam:(NIMTeam*)team
-                 members:(NSArray*)members;
+- (instancetype)initWithDataSource:(id<NIMTeamMemberListDataSource>)dataSource;
 
 @end

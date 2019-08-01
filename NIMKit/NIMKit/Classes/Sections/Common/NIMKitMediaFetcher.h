@@ -19,7 +19,7 @@ typedef void(^NIMKitCameraFetchResult)(NSString *path, UIImage *image);
 
 @property (nonatomic,assign) NSInteger limit;
 
-@property (nonatomic,strong) NSArray *mediaTypes; //kUTTypeMovie,kUTTypeImage
+@property (nonatomic,strong) NSArray *mediaTypes; //kUTTypeMovie,kUTTypeImage,kUTTypeGIF
 
 - (void)fetchPhotoFromLibrary:(NIMKitLibraryFetchResult)result;
 

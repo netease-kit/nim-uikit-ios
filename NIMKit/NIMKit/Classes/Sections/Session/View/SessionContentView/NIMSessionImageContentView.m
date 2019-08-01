@@ -10,10 +10,11 @@
 #import "NIMMessageModel.h"
 #import "UIView+NIM.h"
 #import "NIMLoadProgressView.h"
+#import "NIMKitDependency.h"
 
 @interface NIMSessionImageContentView()
 
-@property (nonatomic,strong,readwrite) UIImageView * imageView;
+@property (nonatomic,strong,readwrite) FLAnimatedImageView * imageView;
 
 @property (nonatomic,strong) NIMLoadProgressView * progressView;
 
@@ -25,8 +26,8 @@
     self = [super initSessionMessageContentView];
     if (self) {
         self.opaque = YES;
-        _imageView  = [[UIImageView alloc] initWithFrame:CGRectZero];
-        _imageView.backgroundColor = [UIColor blackColor];
+        _imageView  = [[FLAnimatedImageView alloc] initWithFrame:CGRectZero];
+        _imageView.backgroundColor = [UIColor whiteColor];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         [self addSubview:_imageView];
         _progressView = [[NIMLoadProgressView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
@@ -39,9 +40,22 @@
 - (void)refresh:(NIMMessageModel *)data
 {
     [super refresh:data];
+    _imageView.image = nil;
+    _imageView.animatedImage = nil;
     NIMImageObject * imageObject = (NIMImageObject*)self.model.message.messageObject;
-    UIImage * image              = [UIImage imageWithContentsOfFile:imageObject.thumbPath];
-    self.imageView.image         = image;
+    NSData *imageData = [[NSData alloc] initWithContentsOfFile:imageObject.thumbPath];
+    BOOL isGif = ([NSData sd_imageFormatForImageData:imageData] == SDImageFormatGIF);
+    if (!isGif) {
+        UIImage *image = [UIImage imageWithData:imageData];
+        _imageView.image = image;
+    } else {
+        FLAnimatedImage *image = [[FLAnimatedImage alloc] initWithAnimatedGIFData:imageData];
+        _imageView.animatedImage = image;
+        if (!_imageView.isAnimating) {
+            [_imageView startAnimating];
+        }
+    }
+    
     self.progressView.hidden     = self.model.message.isOutgoingMsg ? (self.model.message.deliveryState != NIMMessageDeliveryStateDelivering) : (self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateDownloading);
     if (!self.progressView.hidden) {
         [self.progressView setProgress:[[[NIMSDK sharedSDK] chatManager] messageTransportProgress:self.model.message]];

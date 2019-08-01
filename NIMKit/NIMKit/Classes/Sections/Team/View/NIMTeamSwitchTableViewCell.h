@@ -14,6 +14,7 @@
 @end
 
 @interface NIMTeamSwitchTableViewCell : UITableViewCell
+@property (nonatomic, assign) NSInteger identify;
 @property (strong, nonatomic) UISwitch *switcher;
 @property (weak, nonatomic) id<NIMTeamSwitchProtocol> switchDelegate;
 

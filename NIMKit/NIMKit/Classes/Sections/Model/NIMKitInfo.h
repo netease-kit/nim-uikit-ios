@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSInteger, NIMKitTeamType){
+    NIMKitTeamTypeNomal  = 0,
+    NIMKitTeamTypeSuper  = 1,
+};
+
 @interface NIMKitInfo : NSObject
 /**
  *   id,如果是用户信息，为用户id；如果是群信息，为群id

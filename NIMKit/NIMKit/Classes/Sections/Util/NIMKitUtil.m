@@ -29,13 +29,6 @@
     }
     NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
     option.message = message;
-    if (message.messageType == NIMMessageTypeRobot)
-    {
-        NIMRobotObject *object = (NIMRobotObject *)message.messageObject;
-        if (object.isFromRobot) {
-            return [[NIMKit sharedKit] infoByUser:object.robotId option:option].showName;
-        }
-    }
     return [[NIMKit sharedKit] infoByUser:uid option:option].showName;
 }
 
@@ -159,6 +152,9 @@
     switch (object.notificationType) {
         case NIMNotificationTypeTeam:{
             return [NIMKitUtil teamNotificationFormatedMessage:message];
+        }
+        case NIMNotificationTypeSuperTeam:{
+            return [NIMKitUtil superTeamNotificationFormatedMessage:message];
         }
         case NIMNotificationTypeNetCall:{
             return [NIMKitUtil netcallNotificationFormatedMessage:message];
@@ -302,6 +298,112 @@
     return formatedMessage;
 }
 
++ (NSString*)superTeamNotificationFormatedMessage:(NIMMessage *)message{
+    NSString *formatedMessage = @"";
+    NIMNotificationObject *object = message.messageObject;
+    if (object.notificationType == NIMNotificationTypeSuperTeam)
+    {
+        NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
+        NSString *source = [NIMKitUtil superTeamNotificationSourceName:message];
+        NSArray *targets = [NIMKitUtil superTeamNotificationTargetNames:message];
+        NSString *teamName = [NIMKitUtil superTeamNotificationTeamShowName:message];
+        
+        switch (content.operationType) {
+            case NIMSuperTeamOperationTypeInvite:{
+                NSString *str = [NSString stringWithFormat:@"%@邀请%@",source,targets.firstObject];
+                if (targets.count>1) {
+                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                }
+                str = [str stringByAppendingFormat:@"进入了%@",teamName];
+                formatedMessage = str;
+            }
+                break;
+            case NIMSuperTeamOperationTypeDismiss:
+                formatedMessage = [NSString stringWithFormat:@"%@解散了%@",source,teamName];
+                break;
+            case NIMSuperTeamOperationTypeKick:{
+                NSString *str = [NSString stringWithFormat:@"%@将%@",source,targets.firstObject];
+                if (targets.count>1) {
+                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                }
+                str = [str stringByAppendingFormat:@"移出了%@",teamName];
+                formatedMessage = str;
+            }
+                break;
+            case NIMSuperTeamOperationTypeUpdate:
+            {
+                id attachment = [content attachment];
+                if ([attachment isKindOfClass:[NIMUpdateSuperTeamInfoAttachment class]]) {
+                    NIMUpdateSuperTeamInfoAttachment *teamAttachment = (NIMUpdateSuperTeamInfoAttachment *)attachment;
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                    //如果只是单个项目项被修改则显示具体的修改项
+                    if ([teamAttachment.values count] == 1) {
+                        NIMSuperTeamUpdateTag tag = [[[teamAttachment.values allKeys] firstObject] integerValue];
+                        switch (tag) {
+                            case NIMSuperTeamUpdateTagName:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagIntro:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagAnouncement:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagAvatar:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagClientCustom:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了自定义扩展字段",source];
+                                break;
+                            case NIMSuperTeamUpdateTagMuteMode: {
+                                NSString *muteState = teamAttachment.values.allValues.firstObject;
+                                BOOL muted = [muteState isEqualToString:@"0"] ? NO : YES;
+                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言",source]: [NSString stringWithFormat:@"%@取消了全体禁言",source];
+                                break;
+                            }
+                            default:
+                                break;
+                                
+                        }
+                    }
+                }
+                if (formatedMessage.length == 0){
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                }
+            }
+                break;
+            case NIMSuperTeamOperationTypeLeave:
+                formatedMessage = [NSString stringWithFormat:@"%@离开了%@",source,teamName];
+                break;
+            case NIMSuperTeamOperationTypeTransferOwner:
+                formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@",source,targets.firstObject];
+                break;
+            case NIMSuperTeamOperationTypeAddManager:
+                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员",targets.firstObject];
+                break;
+            case NIMSuperTeamOperationTypeRemoveManager:
+                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份",targets.firstObject];
+                break;
+            case NIMSuperTeamOperationTypeMute:{
+                id attachment = [content attachment];
+                if ([attachment isKindOfClass:[NIMMuteSuperTeamMemberAttachment class]])
+                {
+                    BOOL mute = [(NIMMuteSuperTeamMemberAttachment *)attachment flag];
+                    NSString *muteStr = mute? @"禁言" : @"解除禁言";
+                    NSString *str = [targets componentsJoinedByString:@","];
+                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@",str,source,muteStr];
+                }
+            }
+            default:
+                break;
+        }
+        
+    }
+    if (!formatedMessage.length) {
+        formatedMessage = [NSString stringWithFormat:@"未知系统消息"];
+    }
+    return formatedMessage;
+}
 
 + (NSString *)netcallNotificationFormatedMessage:(NIMMessage *)message{
     NIMNotificationObject *object = message.messageObject;
@@ -483,6 +585,49 @@
     return teamName;
 }
 
++ (NSString *)superTeamNotificationSourceName:(NIMMessage *)message{
+    NSString *source;
+    NIMNotificationObject *object = message.messageObject;
+    NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
+    NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
+    if ([content.sourceID isEqualToString:currentAccount]) {
+        source = @"你";
+    }else{
+        source = [NIMKitUtil showNick:content.sourceID inSession:message.session];
+    }
+    return source;
+}
+
++ (NSArray *)superTeamNotificationTargetNames:(NIMMessage *)message{
+    NSMutableArray *targets = [[NSMutableArray alloc] init];
+    NIMNotificationObject *object = message.messageObject;
+    NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
+    NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
+    for (NSString *item in content.targetIDs) {
+        if ([item isEqualToString:currentAccount]) {
+            [targets addObject:@"你"];
+        }else{
+            NSString *targetShowName = [NIMKitUtil showNick:item inSession:message.session];
+            [targets addObject:targetShowName];
+        }
+    }
+    return targets;
+}
+
+
++ (NSString *)superTeamNotificationTeamShowName:(NIMMessage *)message{
+    NSString *teamName = @"超大群";
+    return teamName;
+}
+
++ (BOOL)canEditSuperTeamInfo:(NIMTeamMember *)member {
+    return (member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager);
+}
+
++ (BOOL)canInviteMemberToSuperTeam:(NIMTeamMember *)member {
+    return (member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager);
+}
+
 + (BOOL)canEditTeamInfo:(NIMTeamMember *)member
 {
     NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:member.teamId];
@@ -496,7 +641,7 @@
     }
 }
 
-+ (BOOL)canInviteMember:(NIMTeamMember *)member
++ (BOOL)canInviteMemberToTeam:(NIMTeamMember *)member
 {
     NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:member.teamId];
     if (team.inviteMode == NIMTeamInviteModeManager)

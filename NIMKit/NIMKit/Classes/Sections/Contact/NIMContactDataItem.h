@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "NIMContactDefines.h"
 
-@class NIMUsrInfo;
-
 @interface NIMContactDataItem : NSObject<NIMContactItemCollection>
 
 @property (nonatomic,copy)   NSString *title;

@@ -114,12 +114,6 @@
  */
 - (id<NIMKitMessageProvider>)messageDataProvider;
 
-
-/**
- *  是否开启机器人
- */
-- (BOOL)enableRobot;
-
 /**
  *  会话聊天背景更换接口
  */

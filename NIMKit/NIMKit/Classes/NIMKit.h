@@ -26,7 +26,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 #import "NIMMediaItem.h"            //多媒体面板对象
 #import "NIMMessageModel.h"         //message Wrapper
 
-
 /**
  *  协议
  */
@@ -59,11 +58,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *  会话列表页
  */
 #import "NIMSessionListViewController.h"
-
-/*
- *  机器人消息模板解析器
- */
-#import "NIMKitRobotDefaultTemplateParser.h"
 
 /*
  *  独立聊天室模式下需注入的信息
@@ -114,14 +108,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 
 /**
- *  机器人消息模板解析器
- */
-@property (nonatomic,strong)    NIMKitRobotDefaultTemplateParser *robotTemplateParser;
-
-
-
-
-/**
  *  用户信息变更通知接口
  *
  *  @param userIds 用户 id 集合
@@ -144,6 +130,21 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 - (void)notifyTeamMemebersChanged:(NSArray *)teamIds;
 
 /**
+ *  超大群信息变更通知接口
+ *
+ *  @param teamIds 群 id 集合
+ */
+- (void)notifySuperTeamInfoChanged:(NSArray *)teamIds;
+
+
+/**
+ *  超大群群成员变更通知接口
+ *
+ *  @param teamIds 群id
+ */
+- (void)notifySuperTeamMemebersChanged:(NSArray *)teamIds;
+
+/**
  *  返回用户信息
  */
 - (NIMKitInfo *)infoByUser:(NSString *)userId
@@ -154,6 +155,12 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 - (NIMKitInfo *)infoByTeam:(NSString *)teamId
                     option:(NIMKitInfoFetchOption *)option;
+
+/**
+ *  返回群信息
+ */
+- (NIMKitInfo *)infoBySuperTeam:(NSString *)teamId
+                         option:(NIMKitInfoFetchOption *)option;
 
 @end
 

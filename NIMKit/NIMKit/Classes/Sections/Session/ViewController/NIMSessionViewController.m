@@ -50,7 +50,6 @@
 - (void)dealloc
 {
     [self removeListener];
-    [[NIMKit sharedKit].robotTemplateParser clean];
     
     _tableView.delegate = nil;
     _tableView.dataSource = nil;
@@ -215,6 +214,10 @@
             title = [NIMKitUtil showNick:self.session.sessionId inSession:self.session];
         }
             break;
+        case NIMSessionTypeSuperTeam: {
+            NIMTeam *team = [[[NIMSDK sharedSDK] superTeamManager] teamById:self.session.sessionId];
+            title = [NSString stringWithFormat:@"%@(%zd)",[team teamName],[team memberNumber]];
+        }
         default:
             break;
     }
@@ -252,7 +255,8 @@
     if ([message.session isEqual:_session])
     {
         [self.interactor updateMessage:message];
-        if (message.session.sessionType == NIMSessionTypeTeam)
+        if (message.session.sessionType == NIMSessionTypeTeam ||
+            message.session.sessionType == NIMSessionTypeSuperTeam)
         {
             //如果是群的话需要检查一下回执显示情况
             NIMMessageReceipt *receipt = [[NIMMessageReceipt alloc] initWithMessage:message];
@@ -424,18 +428,8 @@
     {
         [users addObject:self.session.sessionId];
     }
-    NSString *robotsToSend = [self robotsToSend:users];
-    
-    NIMMessage *message = nil;
-    if (robotsToSend.length)
-    {
-        message = [NIMMessageMaker msgWithRobotQuery:text toRobot:robotsToSend];
-    }
-    else
-    {
-        message = [NIMMessageMaker msgWithText:text];
-    }
-    
+
+    NIMMessage *message = [NIMMessageMaker msgWithText:text];
     if (atUsers.count)
     {
         NIMMessageApnsMemberOption *apnsOption = [[NIMMessageApnsMemberOption alloc] init];
@@ -450,18 +444,6 @@
         message.apnsMemberOption = apnsOption;
     }
     [self sendMessage:message];
-}
-
-- (NSString *)robotsToSend:(NSArray *)atUsers
-{
-    for (NSString *userId in atUsers)
-    {
-        if ([[NIMSDK sharedSDK].robotManager isValidRobot:userId])
-        {
-            return userId;
-        }
-    }
-    return nil;
 }
 
 
@@ -500,27 +482,6 @@
         [self.interactor mediaAudioPressed:event.messageModel];
         handle = YES;
     }
-    if ([eventName isEqualToString:NIMKitEventNameTapRobotBlock]) {
-        NSDictionary *param = event.data;
-        NIMMessage *message = [NIMMessageMaker msgWithRobotSelect:param[@"text"] target:param[@"target"] params:param[@"param"] toRobot:param[@"robotId"]];
-        [self sendMessage:message];
-        handle = YES;
-    }
-    if ([eventName isEqualToString:NIMKitEventNameTapRobotContinueSession]) {
-        NIMRobotObject *robotObject = (NIMRobotObject *)event.messageModel.message.messageObject;
-        NIMRobot *robot = [[NIMSDK sharedSDK].robotManager robotInfo:robotObject.robotId];
-        NSString *text = [NSString stringWithFormat:@"%@%@%@",NIMInputAtStartChar,robot.nickname,NIMInputAtEndChar];
-        
-        NIMInputAtItem *item = [[NIMInputAtItem alloc] init];
-        item.uid  = robot.userId;
-        item.name = robot.nickname;
-        [self.sessionInputView.atCache addAtItem:item];
-        
-        [self.sessionInputView.toolBar insertText:text];
-
-        handle = YES;
-    }
-    
     return handle;
 }
 
@@ -621,11 +582,6 @@
     if (message.messageType == NIMMessageTypeText)
     {
         copyText = YES;
-    }
-    if (message.messageType == NIMMessageTypeRobot)
-    {
-        NIMRobotObject *robotObject = (NIMRobotObject *)message.messageObject;
-        copyText = !robotObject.isFromRobot;
     }
     if (copyText) {
         [items addObject:[[UIMenuItem alloc] initWithTitle:@"复制"
@@ -784,6 +740,7 @@
             break;
         case NIMSessionTypeP2P:
         case NIMSessionTypeTeam:
+        case NIMSessionTypeSuperTeam:
         default:
             return [NIMSDK sharedSDK].conversationManager;
     }

@@ -230,10 +230,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     __weak typeof(self) wself = self;
     [self.dataSource loadHistoryMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
         if (messages.count) {
-            [wself.layout layoutAfterRefresh];
-            NSInteger firstRow = [self findMessageIndex:messages[0]] - 1;
-            [wself.layout adjustOffset:firstRow];
-            
             if (![self.sessionConfig respondsToSelector:@selector(autoFetchAttachment)]
                 || self.sessionConfig.autoFetchAttachment) {
                 [wself.dataSource checkAttachmentState:messages];
@@ -338,7 +334,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     NSDictionary *userInfo = notification.userInfo;
     extern NSString *NIMKitInfoKey;
     NSArray *teamIds = userInfo[NIMKitInfoKey];
-    if (self.session.sessionType == NIMSessionTypeTeam
+    if ((self.session.sessionType == NIMSessionTypeTeam || self.session.sessionType == NIMSessionTypeSuperTeam)
         && ([teamIds containsObject:self.session.sessionId] || [teamIds containsObject:[NSNull null]])) {
         [self.delegate didRefreshMessageData];
     }
@@ -349,7 +345,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     extern NSString *NIMKitInfoKey;
     NSArray *teamIds = userInfo[NIMKitInfoKey];
     
-    if (self.session.sessionType == NIMSessionTypeTeam
+    if ((self.session.sessionType == NIMSessionTypeTeam || self.session.sessionType == NIMSessionTypeSuperTeam)
         && ([teamIds containsObject:self.session.sessionId] || [teamIds containsObject:[NSNull null]])) {
         [self.delegate didRefreshMessageData];
     }
@@ -472,8 +468,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     [self loadMessages:^(NSArray *messages, NSError *error) {
         [wself.layout layoutAfterRefresh];
         if (messages.count) {
-            NSInteger row = [self findMessageIndex:messages[0]] - 1;
-            [wself.layout adjustOffset:row];
+            [wself insertMessages:messages];
         }
         if (messages.count)
         {

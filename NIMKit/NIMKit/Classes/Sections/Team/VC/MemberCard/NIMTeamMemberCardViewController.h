@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "NIMCardMemberItem.h"
+#import "NIMTeamMemberListDataSource.h"
 
 @protocol NIMTeamMemberCardActionDelegate <NSObject>
 @optional
@@ -20,9 +21,8 @@
 @interface NIMTeamMemberCardViewController : UIViewController
 
 @property (nonatomic, strong) id<NIMTeamMemberCardActionDelegate> delegate;
-@property (nonatomic, strong) NIMTeamCardMemberItem *member;
-@property (nonatomic, strong) NIMTeamCardMemberItem *viewer;
 
-- (instancetype)initWithUserId:(NSString *)userId team:(NSString *)teamId;
+- (instancetype)initWithMember:(NIMTeamCardMemberItem *)member
+                    dataSource:(id <NIMTeamMemberListDataSource>) dataSource;
 
 @end

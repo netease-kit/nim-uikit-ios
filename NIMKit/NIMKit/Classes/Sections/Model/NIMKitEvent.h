@@ -26,6 +26,3 @@
 extern NSString *const NIMKitEventNameTapContent;
 extern NSString *const NIMKitEventNameTapLabelLink;
 extern NSString *const NIMKitEventNameTapAudio;
-extern NSString *const NIMKitEventNameTapRobotLink;
-extern NSString *const NIMKitEventNameTapRobotBlock;
-extern NSString *const NIMKitEventNameTapRobotContinueSession;

@@ -7,9 +7,11 @@
 //
 
 #import "NIMContactDefines.h"
-
+#import "NIMKit.h"
 
 @interface NIMGroupUser:NSObject<NIMGroupMemberProtocol>
+
+@property (nonatomic,readonly) NIMKitInfo *info;
 
 - (instancetype)initWithUserId:(NSString *)userId;
 
@@ -17,14 +19,20 @@
 
 @interface NIMGroupTeamMember:NSObject<NIMGroupMemberProtocol>
 
-- (instancetype)initWithUserId:(NSString *)userId teamId:(NSString *)teamId;
+@property (nonatomic,readonly) NIMKitInfo *info;
+
+- (instancetype)initWithUserId:(NSString *)userId
+                       session:(NIMSession *)session;
 
 @end
 
 
 @interface NIMGroupTeam:NSObject<NIMGroupMemberProtocol>
 
-- (instancetype)initWithTeam:(NSString *)teamId;
+@property (nonatomic,readonly) NIMKitInfo *info;
+
+- (instancetype)initWithTeamId:(NSString *)teamId
+                      teamType:(NIMKitTeamType)teamType;
 
 @end
 

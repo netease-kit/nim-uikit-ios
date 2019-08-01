@@ -9,28 +9,48 @@
 #import <Foundation/Foundation.h>
 #import "NIMCardDataSourceProtocol.h"
 
-@class NIMUsrInfo;
 
-/**
- *  普通用户member,只显示默认昵称
- */
-@interface NIMUserCardMemberItem : NSObject<NIMKitCardHeaderData>
+@interface NIMCardMemberItem : NSObject<NIMKitCardHeaderData>
 
-- (instancetype)initWithUserId:(NSString*)userId;
+@property (nonatomic, copy) NSString *userId;
+
+@property (nonatomic, assign) NIMKitTeamMemberType userType;
+
++ (NIMKitTeamMemberType)showTypeWithTeamMemberType:(NIMTeamMemberType)type;
 
 @end
 
 
+@interface NIMUserCardMemberItem : NIMCardMemberItem
+
+@property (nonatomic, assign) BOOL isMyUserId;
+
+- (instancetype)initWithTeamMember:(NIMTeamMember *)member;
+
+- (instancetype)initWithSuperTeamMember:(NIMTeamMember *)member;
+
+@end
+
+#pragma mark - Team Card Member Item
 /**
  *  team member，优先显示 team 昵称，并且存储一些群成员的权限级别
  */
-@interface NIMTeamCardMemberItem : NSObject<NIMKitCardHeaderData>
+@interface NIMTeamCardMemberItem : NIMCardMemberItem
 
-@property (nonatomic, assign) NIMTeamMemberType type;
-@property (nonatomic, readonly, copy) NSString *title;
-@property (nonatomic, readonly, strong) NIMTeam *team;
-@property (nonatomic, readonly, strong) NIMTeamMember *member;
+@property (nonatomic, copy) NSString *teamId;
 
-- (instancetype)initWithMember:(NIMTeamMember*)member;
+@property (nonatomic, copy) NSString *inviterAccid;
+
+@property (nonatomic, assign) NIMKitTeamCardType teamType;
+
+@property (nonatomic, assign) BOOL isMute;
+
+- (instancetype)initWithTeamId:(NSString *)teamId
+                        member:(NIMTeamMember *)member;
+
+- (instancetype)initWithSuperTeamId:(NSString *)teamId
+                             member:(NIMTeamMember *)member;
 
 @end
+
+

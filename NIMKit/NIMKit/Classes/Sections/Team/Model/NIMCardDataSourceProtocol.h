@@ -10,6 +10,10 @@
 #import <UIKit/UIKit.h>
 #import <NIMSDK/NIMSDK.h>
 
+@protocol NIMKitSelectCardData;
+
+typedef void(^NIMTeamCardRowSelectedBlock)(id <NIMKitSelectCardData> item);
+
 typedef NS_ENUM(NSInteger, NIMKitCardHeaderOpeator){
     CardHeaderOpeatorNone   = 0,
     CardHeaderOpeatorAdd    = (1UL << 0),
@@ -22,9 +26,26 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
     TeamCardRowItemTypeRedButton,
     TeamCardRowItemTypeBlueButton,
     TeamCardRowItemTypeSwitch,
-    TeamCardRowItemTypeCheckMark,
+    TeamCardRowItemTypeSelected,
 };
 
+typedef NS_ENUM(NSInteger, NIMKitTeamCardType){
+    NIMKitTeamCardTypeNormal  = 0,
+    NIMKitTeamCardTypeSuper   = 1,
+};
+
+typedef NS_ENUM (NSInteger, NIMKitTeamMemberType) {
+    NIMKitTeamMemberTypeNormal = 0,
+    NIMKitTeamMemberTypeOwner,
+    NIMKitTeamMemberTypeManager,
+    NIMKitTeamMemberTypeApply
+};
+
+typedef NS_ENUM (NSInteger, NIMKitTeamNotifyState) {
+    NIMKitTeamNotifyStateAll = 0,
+    NIMKitTeamNotifyStateNone,
+    NIMKitTeamNotifyStateOnlyManager,
+};
 
 @protocol NIMKitCardHeaderData <NSObject>
 
@@ -32,24 +53,53 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
 
 - (NSString*)title;
 
-@optional
 - (NSString*)imageUrl;
 
-- (NSString*)memberId;
+- (NSString*)teamId;
+
+- (NSString*)userId;
+
+- (NSString*)inviterAccid;
+
+- (BOOL)isMuted;
 
 - (NIMKitCardHeaderOpeator)opera;
 
+- (NIMKitTeamMemberType)userType;
+
+- (void)setUserType:(NIMKitTeamMemberType)userType;
+
+- (NIMKitTeamCardType)teamType;
+
+- (BOOL)isMyUserId;
+
 @end
 
+@protocol NIMKitSelectCardData <NSObject>
 
+- (id)value;
+
+- (NSString*)title;
+
+- (BOOL)selected;
+
+- (void)setSelected:(BOOL)selected;
+
+@end
 
 @protocol NTESCardBodyData <NSObject>
 
 - (NSString*)title;
 
+- (id)value;
+
 - (NIMKitTeamCardRowItemType)type;
 
 - (CGFloat)rowHeight;
+
+- (NIMTeamCardRowSelectedBlock)selectedBlock;
+
+- (NSMutableArray <id <NIMKitSelectCardData>> *)optionItems;
 
 @optional
 - (NSString*)subTitle;
@@ -60,6 +110,8 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
 
 - (BOOL)switchOn;
 
-- (id)value;
+- (NSInteger)identify;
+
+- (BOOL)disableUserInteraction;
 
 @end

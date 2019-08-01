@@ -156,11 +156,6 @@ typedef NS_ENUM(NSInteger,NIMKitAvatarType) {
 @property (nonatomic, strong) NIMKitSetting *tipSetting;
 
 /**
- *  机器人类型消息设置
- */
-@property (nonatomic, strong) NIMKitSetting *robotSetting;
-
-/**
  *  无法识别类型消息设置
  */
 @property (nonatomic, strong) NIMKitSetting *unsupportSetting;
@@ -169,6 +164,11 @@ typedef NS_ENUM(NSInteger,NIMKitAvatarType) {
  *  群组通知类型通知消息设置
  */
 @property (nonatomic, strong) NIMKitSetting *teamNotificationSetting;
+
+/**
+ *  群组通知类型通知消息设置
+ */
+@property (nonatomic, strong) NIMKitSetting *superTeamNotificationSetting;
 
 /**
  *  聊天室类型类型通知消息设置

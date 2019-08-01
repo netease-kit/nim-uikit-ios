@@ -10,7 +10,6 @@
 #import <NIMSDK/NIMSDK.h>
 #import "NIMUsrInfoData.h"
 
-
 @interface NIMTeamInfoData : NSObject<NIMGroupMemberProtocol>
 
 @property (nonatomic, copy) NSString *teamId;

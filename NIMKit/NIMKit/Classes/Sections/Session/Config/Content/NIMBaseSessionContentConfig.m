@@ -16,7 +16,6 @@
 #import "NIMLocationContentConfig.h"
 #import "NIMUnsupportContentConfig.h"
 #import "NIMTipContentConfig.h"
-#import "NIMRobotContentConfig.h"
 
 @interface NIMSessionContentConfigFactory ()
 @property (nonatomic,strong)    NSDictionary                *dict;
@@ -46,8 +45,7 @@
                   @(NIMMessageTypeFile)         :       [NIMFileContentConfig new],
                   @(NIMMessageTypeLocation)     :       [NIMLocationContentConfig new],
                   @(NIMMessageTypeNotification) :       [NIMNotificationContentConfig new],
-                  @(NIMMessageTypeTip)          :       [NIMTipContentConfig new],
-                  @(NIMMessageTypeRobot)        :       [NIMRobotContentConfig new]};
+                  @(NIMMessageTypeTip)          :       [NIMTipContentConfig new]};
         _unsupportConfig = [[NIMUnsupportContentConfig alloc] init];
     }
     return self;

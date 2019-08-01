@@ -15,6 +15,10 @@
 
 - (NSString *)showName;
 
+- (NSString *)avatarUrlString;
+
+- (UIImage *)avatarImage;
+
 - (id)sortKey;
 
 @end

@@ -24,7 +24,9 @@
         [_doneButton setBackgroundImage:doneButtonNormal forState:UIControlStateNormal];
         [_doneButton setBackgroundImage:doneButtonHighlighted forState:UIControlStateHighlighted];
         [_doneButton setTitle:@"确定" forState:UIControlStateNormal];
-        _doneButton.nim_size = doneButtonNormal.size;
+        [_doneButton sizeToFit];
+        _doneButton.nim_size = CGSizeMake(MAX(doneButtonNormal.size.width, _doneButton.nim_width + 12.0),
+                                          doneButtonNormal.size.height);
         [self addSubview:_doneButton];
         self.backgroundColor = [UIColor colorWithPatternImage:[UIImage nim_imageInKit:@"contact_bg.png"]];
     }

@@ -36,7 +36,6 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         _provider = [[NIMKitDataProviderImpl alloc] init];   //默认使用 NIMKit 的实现
         
         _layoutConfig = [[NIMCellLayoutConfig alloc] init];
-        _robotTemplateParser = [[NIMKitRobotDefaultTemplateParser alloc] init];
         
         [self preloadNIMKitBundleResource];
     }
@@ -99,12 +98,12 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     {
         for (NSString *teamId in teamIds)
         {
-            [self notifyTeam:teamId];
+            [self notifyTeam:teamId type:NIMKitTeamTypeNomal];
         }
     }
     else
     {
-        [self notifyTeam:nil];
+        [self notifyTeam:nil type:NIMKitTeamTypeNomal];
     }
 }
 
@@ -114,32 +113,69 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     {
         for (NSString *teamId in teamIds)
         {
-            [self notifyTeamMemebers:teamId];
+            [self notifyTeamMemebers:teamId type:NIMKitTeamTypeNomal];
         }
     }
     else
     {
-        [self notifyTeamMemebers:nil];
+        [self notifyTeamMemebers:nil  type:NIMKitTeamTypeNomal];
     }
 }
 
+- (void)notifySuperTeamInfoChanged:(NSArray *)teamIds {
+    if (teamIds.count)
+    {
+        for (NSString *teamId in teamIds)
+        {
+            [self notifyTeam:teamId type:NIMKitTeamTypeSuper];
+        }
+    }
+    else
+    {
+        [self notifyTeam:nil type:NIMKitTeamTypeSuper];
+    }
+}
 
-- (void)notifyTeam:(NSString *)teamId
+- (void)notifySuperTeamMemebersChanged:(NSArray *)teamIds {
+    if (teamIds.count)
+    {
+        for (NSString *teamId in teamIds)
+        {
+            [self notifyTeamMemebers:teamId type:NIMKitTeamTypeSuper];
+        }
+    }
+    else
+    {
+        [self notifyTeamMemebers:nil  type:NIMKitTeamTypeSuper];
+    }
+}
+
+- (void)notifyTeam:(NSString *)teamId type:(NIMKitTeamType)type
 {
     NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
     if (teamId.length) {
-        NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        NIMSession *session = nil;
+        if (type == NIMKitTeamTypeNomal) {
+            session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        } else if (type == NIMKitTeamTypeSuper) {
+            session = [NIMSession session:teamId type:NIMSessionTypeSuperTeam];
+        }
         info.session = session;
     }
     info.notificationName = NIMKitTeamInfoHasUpdatedNotification;
     [self.firer addFireInfo:info];
 }
 
-- (void)notifyTeamMemebers:(NSString *)teamId
+- (void)notifyTeamMemebers:(NSString *)teamId type:(NIMKitTeamType)type
 {
     NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
     if (teamId.length) {
-        NIMSession *session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        NIMSession *session = nil;
+        if (type == NIMKitTeamTypeNomal) {
+            session = [NIMSession session:teamId type:NIMSessionTypeTeam];
+        } else if (type == NIMKitTeamTypeSuper) {
+            session = [NIMSession session:teamId type:NIMSessionTypeSuperTeam];
+        }
         info.session = session;
     }
     extern NSString *NIMKitTeamMembersHasUpdatedNotification;
@@ -164,6 +200,16 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     }
     return info;
 
+}
+
+- (NIMKitInfo *)infoBySuperTeam:(NSString *)teamId option:(NIMKitInfoFetchOption *)option
+{
+    NIMKitInfo *info = nil;
+    if (self.provider && [self.provider respondsToSelector:@selector(infoBySuperTeam:option:)]) {
+        info = [self.provider infoBySuperTeam:teamId option:option];
+    }
+    return info;
+    
 }
 
 - (void)preloadNIMKitBundleResource {
