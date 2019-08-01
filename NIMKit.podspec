@@ -104,8 +104,6 @@ Pod::Spec.new do |s|
 		end
 	end
 
-   End 
-
   s.default_subspec = 'Lite'  
 
 end 
