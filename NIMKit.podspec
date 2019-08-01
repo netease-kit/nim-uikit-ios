@@ -82,9 +82,7 @@ Pod::Spec.new do |s|
 			 	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}'
 			end
 		
-			cs.subspec 'Sections' do |ps| 
-			 	ps.source_files  	= 'NIMKit/NIMKit/Classes/Sections/*.{h,m}'
-				
+			cs.subspec 'Sections' do |ps|				
 				ps.subspec 'Common' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Common/**/*.{h,m}'
 				end
