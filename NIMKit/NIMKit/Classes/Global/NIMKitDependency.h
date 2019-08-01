@@ -26,10 +26,8 @@
 
 #if __has_include(<FLAnimatedImage/FLAnimatedImage.h>)
 #import <FLAnimatedImage/FLAnimatedImage.h>
-#import <FLAnimatedImage/FLAnimatedImageView.h>
 #elif __has_include("FLAnimatedImage.h")
 #import "FLAnimatedImage.h"
-#import "FLAnimatedImageView.h"
 #else
 @import FLAnimatedImage;
 #endif
