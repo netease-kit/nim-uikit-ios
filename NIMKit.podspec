@@ -75,7 +75,7 @@ Pod::Spec.new do |s|
 			end
 		
 			cs.subspec 'Protocols' do |ps| 
-			 	ps.source_files  = 'NIMKit/NIMKit/Classes/Protocols/**/*.{h,m}}'
+			 	ps.source_files  = 'NIMKit/NIMKit/Classes/Protocols/**/*.{h,m}'
 			end
 			
 			cs.subspec 'Category' do |es| 
