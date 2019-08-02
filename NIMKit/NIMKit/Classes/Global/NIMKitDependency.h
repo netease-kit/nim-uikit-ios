@@ -24,16 +24,16 @@
 @import SDWebImage;
 #endif
 
-#if __has_include(<FLAnimatedImage.h>)
-#import <FLAnimatedImage.h>
+#if __has_include(<FLAnimatedImage/FLAnimatedImage.h>)
+#import <FLAnimatedImage/FLAnimatedImage.h>
 #elif __has_include("FLAnimatedImage.h")
 #import "FLAnimatedImage.h"
 #else
 @import FLAnimatedImage;
 #endif
 
-#if __has_include(<FLAnimatedImageView.h>)
-#import <FLAnimatedImageView.h>
+#if __has_include(<FLAnimatedImage/FLAnimatedImageView.h>)
+#import <FLAnimatedImage/FLAnimatedImageView.h>
 #elif __has_include("FLAnimatedImageView.h")
 #import "FLAnimatedImageView.h"
 #else

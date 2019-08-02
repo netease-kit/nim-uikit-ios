@@ -22,6 +22,15 @@ Pod::Spec.new do |s|
     cs.dependency 'NIMKit/Core'
     cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
   end
+  
+  s.subspec 'Core' do |os|     
+    os.resources = 'NIMKit/Resources/*.*'   
+    os.dependency 'SDWebImage', '~> 5.0.6'
+    os.dependency 'FLAnimatedImage', '~> 1.0.12'
+    os.dependency 'Toast', '~> 3.0'         
+    os.dependency 'M80AttributedLabel', '~> 1.6.3'       
+    os.dependency 'TZImagePickerController', '~> 3.0.7'  
+  end
 
 
   s.subspec 'Full_Free' do |cs|
@@ -36,21 +45,6 @@ Pod::Spec.new do |s|
     cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
   end
 
-
-
-
-
-
-
-  s.subspec 'Core' do |os|     
-    os.resources = 'NIMKit/Resources/*.*'   
-    os.dependency 'SDWebImage', '~> 5.0.6'
-    os.dependency 'FLAnimatedImage', '~> 1.0.12'
-    os.dependency 'Toast', '~> 3.0'         
-    os.dependency 'M80AttributedLabel', '~> 1.6.3'       
-    os.dependency 'TZImagePickerController', '~> 3.0.7'  
-  end  
-
   s.subspec 'Core_Free' do |os|
     os.resources = 'NIMKit/Resources/*.*'
     os.dependency 'SDWebImage'
@@ -60,8 +54,6 @@ Pod::Spec.new do |s|
     os.dependency 'TZImagePickerController'
   end
 
-  
-  
   
 
   s.default_subspec = 'Lite'  
