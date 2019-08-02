@@ -11,11 +11,11 @@ Pod::Spec.new do |s|
   s.libraries  = 'sqlite3.0', 'z', 'c++' 
 
 
-  s.subspec 'Full' do |cs|
-    cs.dependency 'NIMKit/Sources'	
-    cs.dependency 'NIMKit/Core' 
-    cs.dependency 'NIMSDK', '~> 6.7.0' 
-  end 
+  # s.subspec 'Full' do |cs|
+ #    cs.dependency 'NIMKit/Sources'
+ #    cs.dependency 'NIMKit/Core'
+ #    cs.dependency 'NIMSDK', '~> 6.7.0'
+ #  end
 
   s.subspec 'Lite' do |cs|
     cs.dependency 'NIMKit/Sources'
@@ -80,6 +80,7 @@ Pod::Spec.new do |s|
 			
 			cs.subspec 'Category' do |es| 
 			 	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}'
+				cs.dependency 'NIMKit/Sources/Sections/Input/NIMInputEmoticonDefine.h'
 			end
 		
 			cs.subspec 'Sections' do |ps|
