@@ -8,7 +8,7 @@
 
 #import "NIMAvatarImageView.h"
 #import "UIView+NIM.h"
-#import "objc/runtime.h"
+#import <objc/runtime.h>
 #import "NIMKitDependency.h"
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
