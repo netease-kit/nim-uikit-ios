@@ -11,34 +11,30 @@ Pod::Spec.new do |s|
   s.libraries  = 'sqlite3.0', 'z', 'c++' 
 
 
-  # s.subspec 'Full' do |cs|
- #    cs.dependency 'NIMKit/Sources'
- #    cs.dependency 'NIMKit/Core'
- #    cs.dependency 'NIMSDK', '~> 6.7.0'
- #  end
+  s.subspec 'Full' do |cs|
+    cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
+    cs.dependency 'NIMKit/Core'
+    cs.dependency 'NIMSDK', '~> 6.7.0'
+  end
 
   s.subspec 'Lite' do |cs|
-    cs.dependency 'NIMKit/Sources'
+    cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
     cs.dependency 'NIMKit/Core'
     cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
   end
 
 
+  s.subspec 'Full_Free' do |cs|
+    cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
+    cs.dependency 'NIMKit/Core_Free'
+    cs.dependency 'NIMSDK', '~> 6.7.0'
+  end
 
-
-
-
-  # s.subspec 'FullFree' do |cs|
-  #   cs.dependency 'NIMKit/Sources'
-  #   cs.dependency 'NIMKit/CoreFree'
-  #   cs.dependency 'NIMSDK', '~> 6.7.0'
-  # end
-  #
-  # s.subspec 'LiteFree' do |cs|
-  #   cs.dependency 'NIMKit/Sources'
-  #   cs.dependency 'NIMKit/CoreFree'
-  #   cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-  # end
+  s.subspec 'Lite_Free' do |cs|
+    cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
+    cs.dependency 'NIMKit/Core_Free'
+    cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
+  end
 
 
 
@@ -55,96 +51,18 @@ Pod::Spec.new do |s|
     os.dependency 'TZImagePickerController', '~> 3.0.7'  
   end  
 
-  # s.subspec 'CoreFree' do |os|
-  #   os.resources = 'NIMKit/Resources/*.*'
-  #   os.dependency 'SDWebImage'
-  #   os.dependency 'FLAnimatedImage'
-  #   os.dependency 'Toast'
-  #   os.dependency 'M80AttributedLabel'
-  #   os.dependency 'TZImagePickerController'
-  # end
-  
-  
-  
-  
+  s.subspec 'Core_Free' do |os|
+    os.resources = 'NIMKit/Resources/*.*'
+    os.dependency 'SDWebImage'
+    os.dependency 'FLAnimatedImage'
+    os.dependency 'Toast'
+    os.dependency 'M80AttributedLabel'
+    os.dependency 'TZImagePickerController'
+  end
 
-  s.subspec 'Sources' do |cs|	
-	cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-  	
-			cs.subspec 'Common' do |gs| 
-			 	gs.source_files  = 'NIMKit/NIMKit/Classes/*.{h,m}', 'NIMKit/NIMKit/Classes/Global/**/*.{h,m}','NIMKit/NIMKit/Classes/Protocols/**/*.{h,m}','NIMKit/NIMKit/Classes/Category/**/*.{h,m}','NIMKit/NIMKit/Classes/Sections/Input/NIMInputEmoticonDefine.h'
-				gs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-			end
-		
-			# cs.subspec 'Protocols' do |ps|
-			#  	ps.source_files  = 'NIMKit/NIMKit/Classes/Protocols/**/*.{h,m}'
-			# end
-			#
-			# cs.subspec 'Category' do |es|
-			#  	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}'
-			# 	es.dependency 'NIMKit/NIMKit/Classes/Sections/Input/NIMInputEmoticonDefine.h'
-			# 	es.dependency 'NIMKit/NIMKit/Classes/NIMKit.h'
-			# end
-		
-			cs.subspec 'Sections' do |ps|
-				ps.subspec 'Common' do |cs| 
-				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Common/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'Contact' do |cs| 
-				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Contact/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'Input' do |cs| 
-				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Input/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'Model' do |cs| 
-				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Model/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'Session' do |cs| 
-				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Session/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'SessionList' do |cs| 
-				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/SessionList/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-				
-				ps.subspec 'Team' do |cs| 
-				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/Team/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-					cs.dependency 'NIMKit/Sources/Sections/Util'
-				end
-				
-				ps.subspec 'Util' do |cs| 
-				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/Util/**/*.{h,m}'
-					cs.dependency 'NIMKit/Sources/Common'
-					cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-					
-				end
-			end
-	end
+  
+  
+  
 
   s.default_subspec = 'Lite'  
 
