@@ -17,11 +17,11 @@ Pod::Spec.new do |s|
     cs.dependency 'NIMSDK', '~> 6.7.0' 
   end 
 
-  s.subspec 'Lite' do |cs|  
-    cs.dependency 'NIMKit/Sources'
-    cs.dependency 'NIMKit/Core'  
-    cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
-  end
+  # s.subspec 'Lite' do |cs|
+#     cs.dependency 'NIMKit/Sources'
+#     cs.dependency 'NIMKit/Core'
+#     cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
+#   end
 
 
 
@@ -82,37 +82,62 @@ Pod::Spec.new do |s|
 			 	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}'
 			end
 		
-			cs.subspec 'Sections' do |ps|				
+			cs.subspec 'Sections' do |ps|
 				ps.subspec 'Common' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Common/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'Contact' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Contact/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'Input' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Input/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'Model' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Model/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'Session' do |cs| 
 				 	cs.source_files  	= 'NIMKit/NIMKit/Classes/Sections/Session/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'SessionList' do |cs| 
 				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/SessionList/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 				
 				ps.subspec 'Team' do |cs| 
 				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/Team/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
+					cs.dependency 'NIMKit/Sources/Sections/Util'
 				end
 				
 				ps.subspec 'Util' do |cs| 
 				 	cs.source_files        = 'NIMKit/NIMKit/Classes/Sections/Util/**/*.{h,m}'
+					cs.dependency 'NIMKit/Sources/Global'
+					cs.dependency 'NIMKit/Sources/Protocols'
+					cs.dependency 'NIMKit/Sources/Category'
 				end
 			end
 	end
