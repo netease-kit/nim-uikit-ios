@@ -68,10 +68,11 @@ Pod::Spec.new do |s|
   
   
 
-  s.subspec 'Sources' do |cs|		
+  s.subspec 'Sources' do |cs|	
+	cs.dependency 'NIMSDK_LITE', '~> 6.7.0'
+  	
 			cs.subspec 'Common' do |gs| 
 			 	gs.source_files  = 'NIMKit/NIMKit/Classes/*.{h,m}', 'NIMKit/NIMKit/Classes/Global/**/*.{h,m}','NIMKit/NIMKit/Classes/Protocols/**/*.{h,m}','NIMKit/NIMKit/Classes/Category/**/*.{h,m}','NIMKit/NIMKit/Classes/Sections/Input/NIMInputEmoticonDefine.h'
-				gs.dependency 'NIMSDK_LITE', '~> 6.7.0'
 			end
 		
 			# cs.subspec 'Protocols' do |ps|
