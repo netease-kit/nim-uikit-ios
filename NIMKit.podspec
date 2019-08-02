@@ -79,7 +79,7 @@ Pod::Spec.new do |s|
 			end
 			
 			cs.subspec 'Category' do |es| 
-			 	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}','/NIMKit/NIMKit/Classes/Sections/Input/NIMInputEmoticonDefine.h'
+			 	es.source_files  	= 'NIMKit/NIMKit/Classes/Category/**/*.{h,m}', 'NIMKit/NIMKit/Classes/Sections/Input/NIMInputEmoticonDefine.h'
 			end
 		
 			cs.subspec 'Sections' do |ps|
