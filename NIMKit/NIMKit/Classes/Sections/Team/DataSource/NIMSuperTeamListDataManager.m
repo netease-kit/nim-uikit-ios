@@ -29,7 +29,7 @@
 - (instancetype)initWithTeam:(NIMTeam *)team session:(NIMSession *)session{
     if (self = [super init]) {
         _team = team;
-        _session = _session;
+        _session = session;
     }
     return self;
 }
