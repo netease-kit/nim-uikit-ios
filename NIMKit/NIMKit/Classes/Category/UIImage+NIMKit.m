@@ -32,7 +32,8 @@
     //先拿2倍图
     NSString *doubleImage  = [imageName stringByAppendingString:@"@2x"];
     NSString *tribleImage  = [imageName stringByAppendingString:@"@3x"];
-    NSString *bundlePath   = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:subDirectory];
+    NSString *bundlePath   = [[NSBundle bundleForClass:NIMKit.class].bundlePath stringByAppendingPathComponent:subDirectory];
+    
     NSString *path = nil;
     
     NSArray *array = [NSBundle pathsForResourcesOfType:nil inDirectory:bundlePath];
@@ -114,13 +115,15 @@
     UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
     //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
         NSString *name = [bundleName stringByAppendingPathComponent:imageName];
-    return image? image : [UIImage imageNamed:name];
+    return image? image : [UIImage imageNamed:imageName inBundle: resourceBundle compatibleWithTraitCollection: nil ];
 }
 
 + (UIImage *)nim_emoticonInKit:(NSString *)imageName
 {
-    NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageNamed:name];
+    NSURL *url = [[NSBundle bundleForClass: NIMKit.class] URLForResource:[[NIMKit sharedKit] emoticonBundleName]
+                                                           withExtension:nil];
+    NSBundle *emotionBundle = [NSBundle bundleWithURL:url];
+    UIImage *image = [UIImage imageNamed:imageName inBundle:emotionBundle compatibleWithTraitCollection:nil];
     return image;
 }
 
