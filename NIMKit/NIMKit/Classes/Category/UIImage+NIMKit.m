@@ -94,11 +94,26 @@
 
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
-    NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
-    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:[[NIMKit sharedKit] resourceBundleName] withExtension:nil];
+//    NSString *name = [[[NIMKit sharedKit] resourceBundleName] stringByAppendingPathComponent:imageName];
+//    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:[[NIMKit sharedKit] resourceBundleName] withExtension:nil];
+    
+    NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
+    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:bundleName withExtension:nil];
+    
+    if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
+    {
+        bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
+    }
+    
+    if (!bundleURL)
+    {
+        return nil;
+    }
+
     NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
     UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
     //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
+        NSString *name = [bundleName stringByAppendingPathComponent:imageName];
     return image? image : [UIImage imageNamed:name];
 }
 
