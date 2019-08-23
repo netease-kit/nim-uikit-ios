@@ -94,32 +94,12 @@
 
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
-    NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
-    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:bundleName withExtension:nil];
-    
-    if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
-    {
-        bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
-    }
-    
-    if (!bundleURL)
-    {
-        return nil;
-    }
-
-    NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
-    UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
-    
-    NSString *name = [bundleName stringByAppendingPathComponent:imageName];
-    //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
-    return image? image : [UIImage imageNamed:name];
+    return [UIImage imageNamed:imageName inBundle:[NIMKit sharedKit].resourceBundle compatibleWithTraitCollection:nil];
 }
 
 + (UIImage *)nim_emoticonInKit:(NSString *)imageName
 {
-    NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageNamed:name];
-    return image;
+    return [UIImage imageNamed:imageName inBundle:[NIMKit sharedKit].emoticonBundle compatibleWithTraitCollection:nil];
 }
 
 - (UIImage *)nim_imageForAvatarUpload

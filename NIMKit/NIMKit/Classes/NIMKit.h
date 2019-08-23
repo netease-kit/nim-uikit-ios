@@ -97,14 +97,14 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 
 
 /**
- *  NIMKit图片资源所在的 bundle 名称。
+ *  NIMKit图片资源所在的 bundle 。
  */
-@property (nonatomic,copy)      NSString *resourceBundleName;
+@property (nonatomic,copy)      NSBundle *resourceBundle;
 
 /**
- *  NIMKit表情资源所在的 bundle 名称。
+ *  NIMKit表情资源所在的 bundle 。
  */
-@property (nonatomic,copy)      NSString *emoticonBundleName;
+@property (nonatomic,copy)      NSBundle *emoticonBundle;
 
 
 /**

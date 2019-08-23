@@ -29,8 +29,8 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 - (instancetype)init
 {
     if (self = [super init]) {
-        _resourceBundleName  = @"NIMKitResource.bundle";
-        _emoticonBundleName  = @"NIMKitEmoticon.bundle";
+        _resourceBundle  = [self bundleForName:@"NIMKitResource"];
+        _emoticonBundle  = [self bundleForName:@"NIMKitEmoticon"];
         
         _firer = [[NIMKitNotificationFirer alloc] init];
         _provider = [[NIMKitDataProviderImpl alloc] init];   //默认使用 NIMKit 的实现
@@ -40,6 +40,13 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         [self preloadNIMKitBundleResource];
     }
     return self;
+}
+
+- (NSBundle *)bundleForName:(NSString *)name
+{
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSURL *url = [bundle URLForResource:name withExtension:@"bundle"];
+    return url ? [NSBundle bundleWithURL:url] : nil;
 }
 
 + (instancetype)sharedKit
