@@ -44,7 +44,7 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 
 - (NSBundle *)bundleForName:(NSString *)name
 {
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:[NIMKit class]];
     NSURL *url = [bundle URLForResource:name withExtension:@"bundle"];
     return url ? [NSBundle bundleWithURL:url] : nil;
 }
