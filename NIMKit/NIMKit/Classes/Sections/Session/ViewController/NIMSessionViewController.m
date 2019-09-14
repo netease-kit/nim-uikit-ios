@@ -140,6 +140,9 @@
 {
     [super viewWillDisappear:animated];
     [self.sessionInputView endEditing:YES];
+
+    [[NIMSDK sharedSDK].mediaManager cancelRecord];
+    [[NIMSDK sharedSDK].mediaManager stopPlay];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
