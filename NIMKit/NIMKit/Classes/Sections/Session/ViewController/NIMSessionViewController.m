@@ -499,6 +499,8 @@
 - (BOOL)onLongPressCell:(NIMMessage *)message
                  inView:(UIView *)view
 {
+    [[NIMSDK sharedSDK].mediaManager stopPlay];
+    
     BOOL handle = NO;
     NSArray *items = [self menusItems:message];
     if ([items count] && [self becomeFirstResponder]) {
