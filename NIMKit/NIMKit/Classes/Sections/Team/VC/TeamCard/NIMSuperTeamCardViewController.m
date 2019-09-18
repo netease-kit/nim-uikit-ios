@@ -18,6 +18,7 @@
 #import "NIMTeamAnnouncementListViewController.h"
 #import "NIMSuperTeamListDataManager.h"
 #import "NIMTeamMemberListViewController.h"
+#import "NIMKitInfoFetchOption.h"
 
 #define NIMSuperTeamCardShowMaxMemberCount (10)  //这个页面显示10个已经够了
 
@@ -68,7 +69,9 @@
     NSMutableArray <NIMKitInfo *>*memberInfos = [NSMutableArray array];
     for (int i = 0; i < MIN(cell.maxShowMemberCount, _dataSource.members.count); i++) {
         NIMTeamMember *obj = _dataSource.members[i];
-        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:obj.userId option:nil];
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = _dataSource.session;
+        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:obj.userId option:option];
         [memberInfos addObject:info];
     }
     cell.infos = memberInfos;
@@ -193,8 +196,7 @@
     NIMMembersFetchOption *option = [[NIMMembersFetchOption alloc] init];
     option.isRefresh = YES;
     option.offset = 0;
-    NSInteger currentCount = _dataSource.members.count;
-    option.count = currentCount == 0 ? NIMSuperTeamCardShowMaxMemberCount : currentCount;
+    option.count = NIMSuperTeamCardShowMaxMemberCount;
     [_dataSource fetchTeamMembersWithOption:option
                                  completion:^(NSError * _Nullable error, NSString * _Nullable msg) {
         if (!error) {
@@ -394,8 +396,10 @@
 }
 
 #pragma mark - NIMTeamManagerDelegate
-- (void)onSuperTeamMemberChanged:(NIMTeam *)team {
-    [self didLoadTeamMember];
+- (void)onTeamMemberChanged:(NIMTeam *)team {
+    if (team.type == NIMTeamTypeSuper) {
+        [self didLoadTeamMember];
+    }
 }
 
 #pragma mark - NIMTeamSwitchProtocol

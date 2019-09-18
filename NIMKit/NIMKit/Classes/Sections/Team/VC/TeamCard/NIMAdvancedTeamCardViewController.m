@@ -20,6 +20,7 @@
 #import "NIMKitProgressHUD.h"
 #import "NIMTeamCardHeaderView.h"
 #import "NIMTeamListDataManager.h"
+#import "NIMKitInfoFetchOption.h"
 
 @interface NIMAdvancedTeamCardViewController ()<NIMTeamMemberListCellActionDelegate,
                                                 NIMContactSelectDelegate,
@@ -78,7 +79,9 @@
     NSMutableArray <NIMKitInfo *>*memberInfos = [NSMutableArray array];
     for (int i = 0; i < MIN(cell.maxShowMemberCount, _dataSource.members.count); i++) {
         NIMTeamMember *obj = _dataSource.members[i];
-        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:obj.userId option:nil];
+        NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+        option.session = _dataSource.session;
+        NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:obj.userId option:option];
         [memberInfos addObject:info];
     }
     cell.infos = memberInfos;
@@ -605,6 +608,7 @@
         [NIMKitProgressHUD show];
         __weak typeof(self) weakSelf = self;
         [_dataSource updateTeamAvatar:filePath completion:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
+            [NIMKitProgressHUD dismiss];
             if (!error) {
                 NSString *urlString = weakSelf.dataSource.team.avatarUrl;
                 SDWebImageManager *sdManager = [SDWebImageManager sharedManager];

@@ -32,14 +32,6 @@
 @import FLAnimatedImage;
 #endif
 
-#if __has_include(<FLAnimatedImage/FLAnimatedImageView.h>)
-#import <FLAnimatedImage/FLAnimatedImageView.h>
-#elif __has_include("FLAnimatedImageView.h")
-#import "FLAnimatedImageView.h"
-#else
-@import FLAnimatedImage;
-#endif
-
 #if __has_include(<SDWebImage/SDWebImage.h>)
 #import <SDWebImage/SDWebImage.h>
 #elif __has_include("UIView+WebCacheOperation.h")

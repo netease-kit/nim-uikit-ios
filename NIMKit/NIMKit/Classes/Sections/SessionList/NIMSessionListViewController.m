@@ -43,7 +43,7 @@
     self.tableView.dataSource       = self;
     self.tableView.tableFooterView  = [[UIView alloc] init];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    _recentSessions = [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
+    _recentSessions = [self getRecentSessions];
     if (!self.recentSessions.count)
     {
         _recentSessions = [NSMutableArray array];
@@ -64,6 +64,10 @@
     
     extern NSString *const NIMKitUserInfoHasUpdatedNotification;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoHasUpdatedNotification:) name:NIMKitUserInfoHasUpdatedNotification object:nil];
+}
+
+- (NSMutableArray *)getRecentSessions {
+    return [[NIMSDK sharedSDK].conversationManager.allRecentSessions mutableCopy];
 }
 
 - (void)refresh{

@@ -118,6 +118,7 @@
 
 - (void)show{
     UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+    vc.modalPresentationStyle = UIModalPresentationFullScreen;
     [vc presentViewController:[[UINavigationController alloc] initWithRootViewController:self] animated:YES completion:nil];
 }
 

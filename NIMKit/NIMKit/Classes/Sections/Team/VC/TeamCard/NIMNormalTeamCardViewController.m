@@ -208,7 +208,7 @@
 
 - (void)didUpdateNotifiyState:(NIMTeamNotifyState)state {
     __weak typeof(self) weakSelf = self;
-    [_dataSource updateTeamNotifyState:state completion:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
+    [_dataSource updateTeamNotifyState:(NIMKitTeamNotifyState)state completion:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
         if (!error) {
             [weakSelf refreshTableBody];
         }

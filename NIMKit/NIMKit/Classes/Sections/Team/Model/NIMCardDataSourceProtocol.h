@@ -49,6 +49,7 @@ typedef NS_ENUM (NSInteger, NIMKitTeamNotifyState) {
 
 @protocol NIMKitCardHeaderData <NSObject>
 
+@optional
 - (UIImage*)imageNormal;
 
 - (NSString*)title;

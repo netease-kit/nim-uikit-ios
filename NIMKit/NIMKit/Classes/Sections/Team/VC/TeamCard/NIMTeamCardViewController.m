@@ -43,6 +43,7 @@
     picker.delegate      = self;
     picker.sourceType    = type;
     picker.allowsEditing = YES;
+    self.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:picker animated:YES completion:nil];
 }
 
@@ -68,6 +69,7 @@
 }
 
 - (void)showAlert:(UIAlertController *)alert {
+    self.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:alert animated:YES completion:nil];
 }
 

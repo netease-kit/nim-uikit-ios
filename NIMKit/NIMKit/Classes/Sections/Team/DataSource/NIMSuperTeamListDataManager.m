@@ -275,7 +275,25 @@
 - (void)updateUserNick:(NSString *)userId
                   nick:(NSString *)nick
             completion:(NIMTeamListDataBlock)completion {
-    [self doExecuteUnsupportBlock:completion];
+    NSString *teamId = _team.teamId;
+    __block NSString *msg = nil;
+    __weak typeof(self) weakSelf = self;
+    [[NIMSDK sharedSDK].superTeamManager updateMyNick:nick inTeam:teamId completion:^(NSError * _Nullable error) {
+        if (!error) {
+            [weakSelf.members enumerateObjectsUsingBlock:^(NIMTeamMember * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([obj.userId isEqualToString:userId]) {
+                    obj.nickname = nick;
+                    *stop = YES;
+                }
+            }];
+            msg = @"修改成功";
+        }else{
+            msg = @"修改失败";
+        }
+        if (completion) {
+            completion(error, msg);
+        }
+    }];
 }
 
 //修改用户禁言状态
