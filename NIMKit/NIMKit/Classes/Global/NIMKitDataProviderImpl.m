@@ -305,14 +305,21 @@
 {
     NIMKitInfo *info = [[NIMKitInfo alloc] init];
     info.infoId = userId;
-    
-    if ([userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount])
+    NIMMessageChatroomExtension *ext = [option.message.messageExt isKindOfClass:[NIMMessageChatroomExtension class]] ?
+    (NIMMessageChatroomExtension *)option.message.messageExt : nil;
+    if (ext)
     {
+        info.showName = ext.roomNickname;
+        info.avatarUrlString = ext.roomAvatar;
+    }
+    else if ([userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount])
+    {
+        NIMSDKAuthMode mode = [[NIMSDK sharedSDK].chatroomManager chatroomAuthMode:roomId];
         
-        switch ([NIMSDK sharedSDK].loginManager.currentAuthMode) {
+        switch (mode) {
             case NIMSDKAuthModeChatroom:
             {
-                NSAssert([NIMKit sharedKit].independentModeExtraInfo, @"in mode NIMSDKAuthModeChatroom , must has independentModeExtraInfo");
+//                NSAssert([NIMKit sharedKit].independentModeExtraInfo, @"in mode NIMSDKAuthModeChatroom , must has independentModeExtraInfo");
                 info.showName        = [NIMKit sharedKit].independentModeExtraInfo.myChatroomNickname;
                 info.avatarUrlString = [NIMKit sharedKit].independentModeExtraInfo.myChatroomAvatar;
             }
@@ -330,16 +337,8 @@
             }
                 break;
         }
-        
     }
-    else
-    {
-        NSAssert(option.message, @"message must has value in chatroom");
-        NIMMessageChatroomExtension *ext = [option.message.messageExt isKindOfClass:[NIMMessageChatroomExtension class]] ?
-        (NIMMessageChatroomExtension *)option.message.messageExt : nil;
-        info.showName = ext.roomNickname;
-        info.avatarUrlString = ext.roomAvatar;
-    }
+    
     info.avatarImage = self.defaultUserAvatar;
     return info;
 }

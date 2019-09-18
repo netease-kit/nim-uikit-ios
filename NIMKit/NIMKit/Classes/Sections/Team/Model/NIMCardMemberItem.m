@@ -115,6 +115,16 @@
     return self;
 }
 
+- (NSString *)title {
+    if (_teamType == NIMKitTeamCardTypeNormal) {
+        NIMSession *session = [NIMSession session:self.teamId type:NIMSessionTypeTeam];
+        return [NIMKitUtil showNick:self.userId inSession:session];
+    } else {
+        NIMSession *session = [NIMSession session:self.teamId type:NIMSessionTypeSuperTeam];
+        return [NIMKitUtil showNick:self.userId inSession:session];
+    }
+}
+
 @end
 
 #pragma mark - NIMUserCardMemberItem

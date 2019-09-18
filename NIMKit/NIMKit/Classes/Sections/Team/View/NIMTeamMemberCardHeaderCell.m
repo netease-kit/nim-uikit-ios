@@ -41,7 +41,7 @@
         avatarURL = [NSURL URLWithString:userInfo.avatarUrlString];
     }
     [self.avatarView nim_setImageWithURL:avatarURL placeholderImage:userInfo.avatarImage];
-    self.nickLabel.text = userInfo.showName;
+    self.nickLabel.text = userInfo.infoId;
     [self.nickLabel sizeToFit];
     self.userInteractionEnabled = NO;
 }

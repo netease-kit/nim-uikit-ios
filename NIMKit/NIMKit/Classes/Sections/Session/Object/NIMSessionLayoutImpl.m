@@ -272,4 +272,8 @@
     return !self.tableView.isDecelerating && !self.tableView.isDragging;
 }
 
+- (void)adjustOffset:(NSInteger)row {
+    
+}
+
 @end

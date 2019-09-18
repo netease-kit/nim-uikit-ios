@@ -515,7 +515,20 @@
                 });
             }
                 break;
-            case NIMSessionTypeSuperTeam: //超大群不支持at
+            case NIMSessionTypeSuperTeam:
+            {
+                NIMContactTeamMemberSelectConfig *config = [[NIMContactTeamMemberSelectConfig alloc] init];
+                config.teamType = NIMKitTeamTypeSuper;
+                config.needMutiSelected = NO;
+                config.teamId = self.session.sessionId;
+                config.session = self.session;
+                config.filterIds = @[[NIMSDK sharedSDK].loginManager.currentAccount];
+                NIMContactSelectViewController *vc = [[NIMContactSelectViewController alloc] initWithConfig:config];
+                vc.delegate = self;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [vc show];
+                });
+            }
                 break;
             case NIMSessionTypeP2P:
                 break;

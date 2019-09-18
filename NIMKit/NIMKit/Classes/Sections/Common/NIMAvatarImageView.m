@@ -154,7 +154,7 @@
 }
 
 - (void)setImageWithUrlString:(NSString *)urlString placeholderImage:(UIImage *)placeholderImage options:(SDWebImageOptions)options {
-    if (placeholderImage) {
+    if (placeholderImage && self.image != placeholderImage) {
         self.image = placeholderImage;
     }
     if (urlString.length == 0) {

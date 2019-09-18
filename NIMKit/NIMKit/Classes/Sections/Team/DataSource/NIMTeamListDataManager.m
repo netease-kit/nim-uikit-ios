@@ -232,10 +232,7 @@
     __weak typeof(self) wself = self;
     [[NIMSDK sharedSDK].resourceManager upload:filePath scene:NIMNOSSceneTypeAvatar progress:nil completion:^(NSString *urlString, NSError *error) {
         if (!error && urlString && wself) {
-            NSDictionary *dic =@{
-                                    @(NIMUserInfoUpdateTagAvatar) : urlString
-                                 };
-            [[NIMSDK sharedSDK].userManager updateMyUserInfo:dic completion:^(NSError *error) {
+            [[NIMSDK sharedSDK].teamManager updateTeamAvatar:urlString teamId:wself.team.teamId completion:^(NSError * _Nullable error) {
                 if (error) {
                     msg = @"设置头像失败，请重试";
                 } else {

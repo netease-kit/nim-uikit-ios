@@ -17,6 +17,7 @@
 #import "UIView+NIM.h"
 #import "NIMKitColorButtonCell.h"
 #import "NIMKitSwitcherCell.h"
+#import "NIMKitInfoFetchOption.h"
 
 @interface NIMTeamMemberCardViewController () <UIActionSheetDelegate>{
     UIAlertView *_kickAlertView;
@@ -64,7 +65,9 @@
 }
 
 - (NSArray *)buildData{
-    NIMKitInfo *usrInfo = [[NIMKit sharedKit] infoByUser:_member.userId option:nil];
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.session = _dataSource.session;
+    NIMKitInfo *usrInfo = [[NIMKit sharedKit] infoByUser:_member.userId option:option];
     NSDictionary *headerItem = @{
                                  CellClass     : @"NIMTeamMemberCardHeaderCell",
                                  RowHeight     : @(222),

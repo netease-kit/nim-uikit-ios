@@ -435,7 +435,9 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     NIMLocationViewController *vc = [[NIMLocationViewController alloc] initWithNibName:nil bundle:nil];
     vc.delegate = self;
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-    [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:nav animated:YES completion:nil];
+    UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+    rootVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    [rootVC presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)onSendLocation:(NIMKitLocationPoint *)locationPoint{ 
@@ -528,7 +530,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 {
     //声音的监听放在 viewWillApear 回调里，不在这里添加
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vcBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    if (self.session.sessionType == NIMSessionTypeTeam) {
+    if (self.session.sessionType == NIMSessionTypeTeam || self.session.sessionType == NIMSessionTypeSuperTeam) {
         extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         extern NSString *const NIMKitTeamMembersHasUpdatedNotification;
         

@@ -94,7 +94,8 @@ const CGFloat kNIMTeamMemberListCellItemPadding = 44.f;
 }
 
 - (NSInteger)maxShowMemberCount {
-    NSInteger maxShowCount = (self.nim_width - kNIMTeamMemberListCellItemPadding) / kNIMTeamMemberListCellItemWidth;
+    CGFloat width = (self.nim_width != NIMKit_UIScreenWidth) ? NIMKit_UIScreenWidth : self.nim_width;
+    NSInteger maxShowCount = (width - kNIMTeamMemberListCellItemPadding) / kNIMTeamMemberListCellItemWidth;
     return maxShowCount;
 }
 
