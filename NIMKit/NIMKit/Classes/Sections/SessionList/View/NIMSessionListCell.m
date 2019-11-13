@@ -21,18 +21,15 @@
         [self addSubview:_avatarImageView];
         
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _nameLabel.backgroundColor = [UIColor whiteColor];
         _nameLabel.font            = [UIFont systemFontOfSize:15.f];
         [self addSubview:_nameLabel];
         
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _messageLabel.backgroundColor = [UIColor whiteColor];
         _messageLabel.font            = [UIFont systemFontOfSize:14.f];
         _messageLabel.textColor       = [UIColor lightGrayColor];
         [self addSubview:_messageLabel];
         
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _timeLabel.backgroundColor = [UIColor whiteColor];
         _timeLabel.font            = [UIFont systemFontOfSize:14.f];
         _timeLabel.textColor       = [UIColor lightGrayColor];
         [self addSubview:_timeLabel];
