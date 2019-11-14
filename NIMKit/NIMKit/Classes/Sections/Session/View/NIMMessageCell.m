@@ -55,9 +55,13 @@
 - (void)makeComponents
 {
     static UIImage *NIMRetryButtonImage;
+    static UIImage *NIMSelectButtonNormalImage;
+    static UIImage *NIMSelectButtonHighImage;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NIMRetryButtonImage = [UIImage nim_imageInKit:@"icon_message_cell_error"];
+        NIMSelectButtonNormalImage = [UIImage nim_imageInKit:@"icon_accessory_normal"];
+        NIMSelectButtonHighImage = [UIImage nim_imageInKit:@"icon_accessory_selected"];
     });
     //retyrBtn
     _retryButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -100,6 +104,22 @@
     [_readButton setHidden:YES];
     [_readButton addTarget:self action:@selector(onPressReadButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:_readButton];
+    
+    //selectButton
+    _selectButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_selectButton setImage:NIMSelectButtonNormalImage forState:UIControlStateNormal];
+    [_selectButton setImage:NIMSelectButtonHighImage forState:UIControlStateSelected];
+    [_selectButton sizeToFit];
+    [self.contentView addSubview:_selectButton];
+    _selectButton.hidden = YES;
+    
+    //selectButtonMask
+    _selectButtonMask = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_selectButtonMask setBackgroundColor:[UIColor clearColor]];
+    [_selectButtonMask addTarget:self action:@selector(onTapSelectedButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:_selectButtonMask];
+    _selectButtonMask.hidden = YES;
+    
 }
 
 - (void)makeGesture{
@@ -112,6 +132,7 @@
     self.model = data;
     if ([self checkData])
     {
+        [self.model updateLayoutConfig];
         [self refresh];
     }
 }
@@ -120,13 +141,17 @@
     return [self.model isKindOfClass:[NIMMessageModel class]];
 }
 
-
 - (void)refresh
 {
     [self addContentViewIfNotExist];
     [self addUserCustomViews];
     
     self.backgroundColor = [NIMKit sharedKit].config.cellBackgroundColor;
+    
+    if ([self needShowSelectButton]) {
+        _selectButton.selected = self.model.selected;
+        _selectButtonMask.hidden = NO;
+    }
     
     if ([self needShowAvatar])
     {
@@ -161,7 +186,6 @@
     
     [self setNeedsLayout];
 }
-
 
 - (void)refreshReadButton
 {
@@ -198,7 +222,7 @@
         if (messageType == NIMMessageTypeAudio) {
             ((NIMSessionAudioContentView *)_bubbleView).audioUIDelegate = self;
         }
-        [self.contentView addSubview:_bubbleView];
+        [self.contentView insertSubview:_bubbleView belowSubview:_selectButtonMask];
     }
 }
 
@@ -218,6 +242,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    [self layoutSelectButton];
     [self layoutAvatar];
     [self layoutNameLabel];
     [self layoutBubbleView];
@@ -227,7 +252,19 @@
     [self layoutReadButton];
 }
 
-
+- (void)layoutSelectButton {
+    BOOL needShow = [self needShowSelectButton];
+    if (needShow) {
+        _selectButton.hidden = self.model.disableSelected;
+        _selectButtonMask.hidden = NO;
+        _selectButtonMask.userInteractionEnabled = !self.model.disableSelected;
+        _selectButton.frame = [self selectButtonRect];
+        _selectButtonMask.frame = self.contentView.bounds;
+    } else {
+        _selectButton.hidden = YES;
+        _selectButtonMask.hidden = YES;
+    }
+}
 
 - (void)layoutAvatar
 {
@@ -241,7 +278,7 @@
 - (void)layoutNameLabel
 {
     if ([self needShowNickName]) {
-        CGFloat otherBubbleOriginX  = self.cellPaddingToNick.x;
+        CGFloat otherBubbleOriginX  = ![self needShowSelectButton] ? self.cellPaddingToNick.x : _selectButton.nim_right + self.cellPaddingToNick.x;
         CGFloat otherBubbleOriginy  = self.cellPaddingToNick.y;
         CGFloat otherNickNameWidth  = 200.f;
         CGFloat otherNickNameHeight = 20.f;
@@ -262,13 +299,21 @@
     _bubbleView.nim_size = size;
     
     UIEdgeInsets contentInsets = self.model.bubbleViewInsets;
+    CGFloat left = contentInsets.left;
+    CGFloat protraitRightToBubble = 5.f;
     if (!self.model.shouldShowLeft)
     {
-        CGFloat protraitRightToBubble = 5.f;
         CGFloat right = self.model.shouldShowAvatar? CGRectGetMinX(self.headImageView.frame)  - protraitRightToBubble : self.nim_width;
-        contentInsets.left = right - CGRectGetWidth(self.bubbleView.bounds);
+        left = right - CGRectGetWidth(self.bubbleView.bounds);
+    } else {
+        if (![self needShowSelectButton]) {
+            left = contentInsets.left;
+        } else {
+            left = contentInsets.left + _selectButton.nim_right + protraitRightToBubble;
+        }
     }
-    _bubbleView.nim_left = contentInsets.left;
+    
+    _bubbleView.nim_left = left;
     _bubbleView.nim_top  = contentInsets.top;
 }
 
@@ -372,16 +417,36 @@
     [self onRetryMessage:nil];
 }
 
-
-
 #pragma mark - Private
+- (CGRect)selectButtonRect {
+    CGSize size = _selectButton.nim_size;
+    CGRect avatarRect = [self avatarViewRect];
+    CGFloat y = (avatarRect.size.height - size.height)/2 + avatarRect.origin.y;
+    CGFloat x = [self selectButtonPadding];
+    return CGRectMake(x, y, size.width, size.height);
+}
+
 - (CGRect)avatarViewRect
 {
     CGFloat cellWidth = self.bounds.size.width;
     CGFloat protraitImageWidth = [self avatarSize].width;
     CGFloat protraitImageHeight = [self avatarSize].height;
-    CGFloat selfProtraitOriginX   = (cellWidth - self.cellPaddingToAvatar.x - protraitImageWidth);
-    return self.model.shouldShowLeft ? CGRectMake(self.cellPaddingToAvatar.x,self.cellPaddingToAvatar.y,protraitImageWidth, protraitImageHeight) :  CGRectMake(selfProtraitOriginX, self.cellPaddingToAvatar.y,protraitImageWidth,protraitImageHeight);
+    CGFloat selfProtraitOriginX = self.cellPaddingToAvatar.x;
+    
+    if (self.model.shouldShowLeft) {
+        if (![self needShowSelectButton]) {
+            selfProtraitOriginX = self.cellPaddingToAvatar.x;
+        } else {
+            selfProtraitOriginX = self.cellPaddingToAvatar.x + _selectButton.nim_right;
+        }
+    } else {
+        selfProtraitOriginX = cellWidth - self.cellPaddingToAvatar.x - protraitImageWidth;
+    }
+    return CGRectMake(selfProtraitOriginX, self.cellPaddingToAvatar.y,protraitImageWidth,protraitImageHeight);
+}
+
+- (BOOL)needShowSelectButton {
+    return self.model.shouldShowSelect;
 }
 
 - (BOOL)needShowAvatar
@@ -463,6 +528,10 @@
     return 2.0;
 }
 
+- (CGFloat)selectButtonPadding{
+    return 8.0;
+}
+
 - (CGPoint)cellPaddingToAvatar
 {
     return self.model.avatarMargin;
@@ -501,6 +570,15 @@
     if ([self.delegate respondsToSelector:@selector(onPressReadLabel:)])
     {
         [self.delegate onPressReadLabel:self.model.message];
+    }
+}
+
+- (void)onTapSelectedButton:(id)sender
+{
+    _selectButton.selected = !_selectButton.selected;
+    self.model.selected = _selectButton.selected;
+    if ([self.delegate respondsToSelector:@selector(onSelectedMessage:message:)]) {
+        [self.delegate onSelectedMessage:self.model.selected message:self.model.message];
     }
 }
 

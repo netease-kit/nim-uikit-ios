@@ -12,6 +12,11 @@
 #import <NIMSDK/NIMSDK.h>
 #import "NIMMessageModel.h"
 
+typedef NS_ENUM(NSUInteger, NIMKitSessionState) {
+    NIMKitSessionStateNormal = 0,
+    NIMKitSessionStateSelect,
+};
+
 @protocol NIMSessionInteractorDelegate <NSObject>
 
 - (void)didFetchMessageData;
@@ -42,7 +47,6 @@
 
 - (NIMMessageModel *)deleteMessage:(NIMMessage *)message;
 
-
 //数据接口
 - (NSArray *)items;
 
@@ -62,6 +66,7 @@
 
 - (NSInteger)findMessageIndex:(NIMMessage *)message;
 
+- (BOOL)messageCanBeSelected:(NIMMessage *)message;
 
 //排版接口
 
@@ -72,7 +77,6 @@
 - (void)cleanCache;
 
 - (void)pullUp;
-
 
 //按钮响应接口
 - (void)mediaAudioPressed:(NIMMessageModel *)messageModel;
@@ -88,6 +92,11 @@
 - (void)onViewWillAppear;
 
 - (void)onViewDidDisappear;
+
+//页面状态切换接口(正常/选择)
+- (NIMKitSessionState)sessionState;
+
+- (void)setSessionState:(NIMKitSessionState)sessionState;
 
 @end
 

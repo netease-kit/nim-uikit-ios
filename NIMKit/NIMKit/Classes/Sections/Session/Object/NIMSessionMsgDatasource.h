@@ -49,4 +49,8 @@
 
 //清理缓存数据
 - (void)cleanCache;
+
+//是否显示选择
+- (void)refreshMessageModelShowSelect:(BOOL)isShow;
+
 @end

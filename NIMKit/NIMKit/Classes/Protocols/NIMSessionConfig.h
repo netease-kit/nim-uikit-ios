@@ -88,6 +88,15 @@
 - (BOOL)shouldHandleReceiptForMessage:(NIMMessage *)message;
 
 /**
+*  该条消息是否不允许选中
+*
+*  @param message 消息
+*
+*  @return 是否允许选中
+*/
+- (BOOL)disableSelectedForMessage:(NIMMessage *)message;
+
+/**
  *  是否禁用进入会话自动标记会话已读，如果禁用，请自行调用 SDK markAllMessagesReadInSession 接口维护未读数。
  *
  */

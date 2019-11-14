@@ -19,6 +19,8 @@
 
 @property (nonatomic,strong) NSMutableDictionary *msgIdDict;
 
+@property (nonatomic,assign) BOOL messageModelShowSelect;
+
 @end
 
 @implementation NIMSessionMsgDatasource
@@ -290,9 +292,30 @@
     }
 }
 
+- (void)refreshMessageModelShowSelect:(BOOL)isShow {
+    _messageModelShowSelect = isShow;
+
+    for (id item in self.items)
+    {
+        if ([item isKindOfClass:[NIMMessageModel class]])
+        {
+            NIMMessageModel *model = (NIMMessageModel *)item;
+            model.shouldShowSelect = isShow;
+            model.selected = NO;
+            if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
+                model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
+            }
+        }
+    }
+}
+
 #pragma mark - private methods
 - (void)insertMessage:(NIMMessage *)message{
     NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
+    model.shouldShowSelect = _messageModelShowSelect;
+    if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
+        model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
+    }
     if ([self modelIsExist:model]) {
         return;
     }
@@ -353,6 +376,10 @@
     NSMutableArray *array = [[NSMutableArray alloc] init];
     for (NIMMessage *message in messages) {
         NIMMessageModel *model = [[NIMMessageModel alloc] initWithMessage:message];
+        model.shouldShowSelect = _messageModelShowSelect;
+        if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
+            model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
+        }
         [array addObject:model];
     }
     return array;

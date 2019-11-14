@@ -94,6 +94,7 @@
 
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
+    
     NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
     NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:bundleName withExtension:nil];
     
@@ -117,7 +118,24 @@
 
 + (UIImage *)nim_emoticonInKit:(NSString *)imageName
 {
+    NSParameterAssert(imageName.length != 0);
+    if (imageName.length == 0) {
+        return nil;
+    }
+  
     NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
+    NSParameterAssert(name.length != 0);
+    if (name.length == 0) {
+        return nil;
+    }
+    NSFileManager *fm =[NSFileManager defaultManager];
+    BOOL isDir = NO;
+    BOOL isExist = (![fm fileExistsAtPath:name isDirectory:&isDir] || isDir);
+    NSParameterAssert(isExist);
+    if (!isExist) {
+        return nil;
+    }
+    
     UIImage *image = [UIImage imageNamed:name];
     return image;
 }
@@ -128,6 +146,7 @@
     UIImage * image = [self nim_imageForUpload:pixels];
     return [image nim_fixOrientation];
 }
+
 
 #pragma mark - Private
 
@@ -286,6 +305,45 @@
     CGImageRelease(cgimg);
     return img;
 }
+
+- (UIImage *)nim_cropedImageWithSize:(CGSize)targetSize
+{
+    // 裁剪两边
+    CGSize sourceSize = self.size;
+    CGFloat cropedWidth = sourceSize.width;
+    CGFloat cropedHeight = sourceSize.height;
+
+    if (CGSizeEqualToSize(targetSize, CGSizeZero) ||
+        CGSizeEqualToSize(sourceSize, CGSizeZero) ||
+        targetSize.width == 0 ||
+        targetSize.height == 0)
+    {
+        return  self;
+    }
+    
+    if (targetSize.width / targetSize.height > sourceSize.width / sourceSize.height)
+    {
+        cropedHeight = cropedWidth * (targetSize.height / targetSize.width);
+    }
+    else
+    {
+        cropedWidth = cropedHeight * (targetSize.width / targetSize.height);
+    }
+    
+    CGRect cropRect = CGRectMake((sourceSize.width - cropedWidth) * .5f, (sourceSize.height - cropedHeight) * .5f, cropedWidth, cropedHeight);
+    CGImageRef imageRef = CGImageCreateWithImageInRect(self.CGImage, cropRect);
+    UIImage *image = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    
+    // 缩放
+    UIGraphicsBeginImageContextWithOptions(targetSize, YES, 0);
+    [image drawInRect:CGRectMake(0, 0, targetSize.width, targetSize.height)];
+    image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
+}
+
 
 
 @end
