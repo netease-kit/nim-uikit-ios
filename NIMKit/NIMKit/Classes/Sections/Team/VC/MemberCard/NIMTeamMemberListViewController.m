@@ -7,8 +7,8 @@
 //
 
 #import "NIMTeamMemberListViewController.h"
-#import "NIMTeamCardHeaderCell.h"
-#import "NIMCardMemberItem.h"
+#import "NIMCardHeaderCell.h"
+#import "NIMTeamCardMemberItem.h"
 #import "NIMTeamMemberCardViewController.h"
 #import "NIMKitDependency.h"
 #import "NIMKitProgressHUD.h"
@@ -25,26 +25,29 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
 
 @interface NIMTeamMemberListViewController ()<UICollectionViewDelegate,
                                               UICollectionViewDataSource,
-                                              NIMTeamCardHeaderCellDelegate,
-                                              NIMTeamMemberCardActionDelegate>
+                                              NIMCardHeaderCellDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, weak) id <NIMTeamMemberListDataSource> dataSource;
 @property (nonatomic, assign) NSInteger pageIndex;
 @property (nonatomic, assign) NSInteger totalPageCount;
-@property (nonatomic, assign) NSInteger currentOffset;
 @property (nonatomic, strong) UIButton *nextBtn;
 @property (nonatomic, strong) UIButton *lastBtn;
 @end
 
 @implementation NIMTeamMemberListViewController
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (instancetype)initWithDataSource:(id<NIMTeamMemberListDataSource>)dataSource {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _dataSource = dataSource;
         _pageIndex = 0;
-        _currentOffset = 0;
+        extern NSString *kNIMTeamListDataTeamMembersChanged;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(teamMemberUpdate:) name:kNIMTeamListDataTeamMembersChanged object:nil];
     }
     return self;
 }
@@ -55,13 +58,27 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
     [self loadNextData];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self refreshPage];
+    [_collectionView reloadData];
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
 }
 
 - (void)refreshPage {
-    NSInteger totalPage = _dataSource.memberNumber % self.itemCountPerPage == 0 ? _dataSource.memberNumber / self.itemCountPerPage : _dataSource.memberNumber / self.itemCountPerPage + 1;
-    self.navigationItem.title = [NSString stringWithFormat:@"群成员(%ld/%ld页)", _pageIndex+1, totalPage];
+    NSInteger itemCountPerPage = self.itemCountPerPage;
+    NSInteger memberNumber = _dataSource.memberNumber;
+    _totalPageCount = memberNumber / itemCountPerPage;
+    
+    if (memberNumber%itemCountPerPage != 0) {
+        _totalPageCount++;
+    }
+    self.navigationItem.title = [NSString stringWithFormat:@"群成员(%d/%d页)", (int)_pageIndex+1, (int)_totalPageCount];
+    _nextBtn.hidden = (_totalPageCount == 1 || _pageIndex == _totalPageCount - 1);
+    _lastBtn.hidden = (_totalPageCount == 1 || _pageIndex == 0);
 }
 
 - (void)setupUI {
@@ -69,9 +86,12 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
     _nextBtn.titleLabel.font = [UIFont systemFontOfSize:13.0];
     [_nextBtn setTitle:@"下一页" forState:UIControlStateNormal];
     [_nextBtn addTarget:self action:@selector(nextPageAction:) forControlEvents:UIControlEventTouchUpInside];
+    _nextBtn.frame = CGRectMake(0, 0, 40, 40);
+    _nextBtn.hidden = YES;
     _lastBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     _lastBtn.titleLabel.font = [UIFont systemFontOfSize:13.0];
     [_lastBtn setTitle:@"上一页" forState:UIControlStateNormal];
+    _lastBtn.frame = CGRectMake(0, 0, 40, 40);
     _lastBtn.hidden = YES;
     [_lastBtn addTarget:self action:@selector(lastPageAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *nextBtnItem =[[UIBarButtonItem alloc] initWithCustomView:_nextBtn];
@@ -83,7 +103,7 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
 - (void)loadNextData {
     NSInteger itemCountPerPage = [self itemCountPerPage];
     NIMMembersFetchOption *option = [[NIMMembersFetchOption alloc] init];
-    option.offset = _currentOffset;
+    option.offset = _pageIndex*itemCountPerPage;
     option.count = itemCountPerPage;
     option.isRefresh = NO;
     __weak typeof(self) weakSelf = self;
@@ -93,18 +113,6 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
         if (error) {
             [weakSelf.view makeToast:msg duration:2 position:CSToastPositionCenter];
         } else {
-            NSInteger totalCount = weakSelf.dataSource.datas.count;
-            if (totalCount == 0) {
-                weakSelf.pageIndex = 0;
-                weakSelf.totalPageCount = 0;
-                weakSelf.currentOffset = 0;
-            } else {
-                weakSelf.totalPageCount = (totalCount%itemCountPerPage == 0) ? totalCount/itemCountPerPage: totalCount/itemCountPerPage + 1;
-                if (weakSelf.pageIndex > weakSelf.totalPageCount - 1) {
-                    weakSelf.pageIndex = weakSelf.totalPageCount - 1;
-                }
-                weakSelf.currentOffset = weakSelf.dataSource.datas.count;
-            }
             [weakSelf refreshPage];
             [weakSelf.collectionView reloadData];
         }
@@ -116,13 +124,12 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
     NSInteger targetPage = _pageIndex+1;
     NSInteger itemCountPerPage = [self itemCountPerPage];
     _pageIndex++;
-    if (targetPage*itemCountPerPage + itemCountPerPage > _dataSource.datas.count) { //需要加载新数据
+    if (targetPage*itemCountPerPage + itemCountPerPage > _dataSource.members.count) { //需要加载新数据
         [self loadNextData];
     } else {
         [self refreshPage];
         [_collectionView reloadData];
     }
-    _lastBtn.hidden = (_pageIndex == 0);
 }
 
 - (void)lastPageAction:(id)sender {
@@ -132,14 +139,18 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
     _pageIndex--;
     [self refreshPage];
     [_collectionView reloadData];
-    _lastBtn.hidden = (_pageIndex == 0);
+}
+
+- (void)teamMemberUpdate:(NSNotification *)note {
+    [self refreshPage];
+    [_collectionView reloadData];
 }
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     NSInteger count = 0;
     if (_pageIndex == _totalPageCount - 1) {
-        count = _dataSource.datas.count - _pageIndex * self.itemCountPerPage;
+        count = _dataSource.members.count - _pageIndex * self.itemCountPerPage;
     } else if (_pageIndex < _totalPageCount - 1) {
         count = self.itemCountPerPage;
     }
@@ -147,10 +158,10 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
-    NIMTeamCardHeaderCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
+    NIMCardHeaderCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
     cell.delegate = self;
     NSInteger index = _pageIndex * self.itemCountPerPage + indexPath.row;
-    id<NIMKitCardHeaderData> data = _dataSource.datas[index];
+    id<NIMKitCardHeaderData> data = _dataSource.members[index];
     [cell refreshData:data];
     return cell;
 }
@@ -167,25 +178,14 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
     return UIEdgeInsetsMake(CollectionEdgeInsetTop, 0, 0, 0);
 }
 
-#pragma mark - NIMTeamCardHeaderCellDelegate
-- (void)cellDidSelected:(NIMTeamCardHeaderCell*)cell{
+#pragma mark - NIMCardHeaderCellDelegate
+- (void)cellDidSelected:(NIMCardHeaderCell*)cell{
     NSIndexPath *indexpath = [self.collectionView indexPathForCell:cell];
     NSInteger index = _pageIndex * self.itemCountPerPage + indexpath.row;
-    NIMTeamCardMemberItem *member = _dataSource.datas[index];
-    NIMTeamMemberCardViewController *vc = [[NIMTeamMemberCardViewController alloc] initWithMember:member
+    NIMTeamCardMemberItem *member = _dataSource.members[index];
+    NIMTeamMemberCardViewController *vc = [[NIMTeamMemberCardViewController alloc] initWithMember:member.userId
                                                                                        dataSource:_dataSource];
-    vc.delegate = self;
     [self.navigationController pushViewController:vc animated:YES];
-}
-
-#pragma mark - TeamMemberCardActionDelegate
-- (void)onTeamMemberKicked:(NIMTeamCardMemberItem *)member {
-    [_dataSource.datas removeObject:member];
-    [_collectionView reloadData];
-}
-
-- (void)onTeamMemberInfoChaneged:(NIMTeamCardMemberItem *)member {
-    [_collectionView reloadData];
 }
 
 #pragma mark - 旋转处理 (iOS8 or above)
@@ -213,7 +213,7 @@ typedef void(^NIMTeamMemberListFetchDataBlock)(BOOL isCompletion);
         _collectionView.backgroundColor = [UIColor colorWithRed:236.0/255.0 green:241.0/255.0 blue:245.0/255.0 alpha:1];
         _collectionView.delegate   = self;
         _collectionView.dataSource = self;
-        [_collectionView registerClass:[NIMTeamCardHeaderCell class] forCellWithReuseIdentifier:CollectionCellReuseId];
+        [_collectionView registerClass:[NIMCardHeaderCell class] forCellWithReuseIdentifier:CollectionCellReuseId];
         _collectionView.contentInset = UIEdgeInsetsMake(self.collectionView.contentInset.top,
                                                         CollectionEdgeInsetLeftRight,
                                                         _collectionView.contentInset.bottom,

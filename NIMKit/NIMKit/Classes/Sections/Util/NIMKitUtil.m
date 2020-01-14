@@ -290,7 +290,6 @@
             default:
                 break;
         }
-        
     }
     if (!formatedMessage.length) {
         formatedMessage = [NSString stringWithFormat:@"未知系统消息"];
@@ -306,6 +305,7 @@
         NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
         NSString *source = [NIMKitUtil superTeamNotificationSourceName:message];
         NSArray *targets = [NIMKitUtil superTeamNotificationTargetNames:message];
+        NSString *targetText = [targets count] > 1 ? [targets componentsJoinedByString:@","] : [targets firstObject];
         NSString *teamName = [NIMKitUtil superTeamNotificationTeamShowName:message];
         
         switch (content.operationType) {
@@ -352,6 +352,12 @@
                             case NIMSuperTeamUpdateTagAvatar:
                                 formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像",source,teamName];
                                 break;
+                            case NIMSuperTeamUpdateTagJoinMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagBeInviteMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了被邀请人身份验证权限",source];
+                                break;
                             case NIMSuperTeamUpdateTagClientCustom:
                                 formatedMessage = [NSString stringWithFormat:@"%@更新了自定义扩展字段",source];
                                 break;
@@ -375,6 +381,15 @@
             case NIMSuperTeamOperationTypeLeave:
                 formatedMessage = [NSString stringWithFormat:@"%@离开了%@",source,teamName];
                 break;
+            case NIMSuperTeamOperationTypeApplyPass:{
+                if ([source isEqualToString:targetText]) {
+                    //说明是以不需要验证的方式进入
+                    formatedMessage = [NSString stringWithFormat:@"%@进入了%@",source,teamName];
+                }else{
+                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的申请",source,targetText];
+                }
+            }
+                break;
             case NIMSuperTeamOperationTypeTransferOwner:
                 formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@",source,targets.firstObject];
                 break;
@@ -383,6 +398,9 @@
                 break;
             case NIMSuperTeamOperationTypeRemoveManager:
                 formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份",targets.firstObject];
+                break;
+            case NIMSuperTeamOperationTypeAcceptInvitation:
+                formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群",source,targetText];
                 break;
             case NIMSuperTeamOperationTypeMute:{
                 id attachment = [content attachment];

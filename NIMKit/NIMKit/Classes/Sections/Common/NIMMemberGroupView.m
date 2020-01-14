@@ -7,10 +7,10 @@
 //
 
 #import "NIMMemberGroupView.h"
-#import "NIMTeamCardHeaderCell.h"
+#import "NIMCardHeaderCell.h"
 #import "UIView+NIM.h"
-#import "NIMTeamCardOperationItem.h"
-#import "NIMCardMemberItem.h"
+#import "NIMCardOperationItem.h"
+#import "NIMTeamCardMemberItem.h"
 
 #define CollectionItemWidth  58
 #define CollectionItemHeight 80
@@ -30,11 +30,15 @@
     return self;
 }
 
+- (BOOL)isMyUserId {
+    return [_userId isEqualToString:[NIMSDK sharedSDK].loginManager.currentAccount];
+}
+
 @end
 
 #pragma mark - NIMMemberGroupView
 
-@interface NIMMemberGroupView()<UICollectionViewDataSource,UICollectionViewDelegate,NIMTeamCardHeaderCellDelegate>
+@interface NIMMemberGroupView()<UICollectionViewDataSource,UICollectionViewDelegate,NIMCardHeaderCellDelegate>
 
 @property (nonatomic,strong)    NSMutableArray *data;
 
@@ -110,7 +114,7 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
-    NIMTeamCardHeaderCell *cell;
+    NIMCardHeaderCell *cell;
     NIMMemebrGroupData *data = [self dataAtIndexPath:indexPath];
     if (data.opera == CardHeaderOpeatorAdd || data.opera == CardHeaderOpeatorRemove) {
         cell = [self buildOperatorCell:data.opera indexPath:indexPath];
@@ -127,8 +131,8 @@
     return self.data[index];
 }
 
-#pragma mark - NIMTeamCardHeaderCellDelegate
-- (void)cellDidSelected:(NIMTeamCardHeaderCell *)cell{
+#pragma mark - NIMCardHeaderCellDelegate
+- (void)cellDidSelected:(NIMCardHeaderCell *)cell{
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     NIMMemebrGroupData *groupData = [self dataAtIndexPath:indexPath];
     if (groupData.opera == CardHeaderOpeatorNone && [self.delegate respondsToSelector:@selector(didSelectMemberId:)]) {
@@ -138,7 +142,7 @@
     }
 }
 
-- (void)cellShouldBeRemoved:(NIMTeamCardHeaderCell*)cell{
+- (void)cellShouldBeRemoved:(NIMCardHeaderCell*)cell{
     NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
     NIMMemebrGroupData *groupData = [self dataAtIndexPath:indexPath];
     if (groupData.opera == CardHeaderOpeatorNone && [self.delegate respondsToSelector:@selector(didSelectRemoveButtonWithMemberId:)]) {
@@ -168,7 +172,7 @@
         _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _collectionView.delegate   = self;
         _collectionView.dataSource = self;
-        [_collectionView registerClass:[NIMTeamCardHeaderCell class] forCellWithReuseIdentifier:CollectionCellReuseId];
+        [_collectionView registerClass:[NIMCardHeaderCell class] forCellWithReuseIdentifier:CollectionCellReuseId];
     }
     return _collectionView;
 }
@@ -178,20 +182,19 @@
 }
 
 #pragma mark - Private
-- (NIMTeamCardHeaderCell *)buildUserCell:(NIMMemebrGroupData *)data indexPath:(NSIndexPath *)indexPath{
-    NIMTeamCardHeaderCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
-    NIMUserCardMemberItem *item = [[NIMUserCardMemberItem alloc] init];
+- (NIMCardHeaderCell *)buildUserCell:(NIMMemebrGroupData *)data indexPath:(NSIndexPath *)indexPath{
+    NIMCardHeaderCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
+    NIMCardMemberItem *item = [[NIMCardMemberItem alloc] init];
     item.userId = data.userId;
-    item.isMyUserId = data.isMyUserId;
-    
+
     [cell refreshData:item];
     cell.removeBtn.hidden = (self.enableRemove ? item.isMyUserId : YES);
     return cell;
 }
 
-- (NIMTeamCardHeaderCell *)buildOperatorCell:(NIMKitCardHeaderOpeator)operator indexPath:(NSIndexPath *)indexPath{
-    NIMTeamCardHeaderCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
-    NIMTeamCardOperationItem *item = [[NIMTeamCardOperationItem alloc] initWithOperation:operator];
+- (NIMCardHeaderCell *)buildOperatorCell:(NIMKitCardHeaderOpeator)operator indexPath:(NSIndexPath *)indexPath{
+    NIMCardHeaderCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:CollectionCellReuseId forIndexPath:indexPath];
+    NIMCardOperationItem *item = [[NIMCardOperationItem alloc] initWithOperation:operator];
     if (self.operatorTitle[@(operator)]) {
         item.title = self.operatorTitle[@(operator)];
     }

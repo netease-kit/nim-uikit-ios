@@ -20,4 +20,8 @@
 
 - (UIColor *)nim_hexToColor;
 
+- (BOOL)nim_fileIsExist;
+
+- (BOOL)nim_containsEmoji;
+
 @end

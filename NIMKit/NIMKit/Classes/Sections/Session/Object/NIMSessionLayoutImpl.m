@@ -232,19 +232,35 @@
         [addIndexPathes addObject:indexPath];
     }];
     
-    [self.tableView beginUpdates];
-    [self.tableView insertRowsAtIndexPaths:addIndexPathes withRowAnimation:UITableViewRowAnimationNone];
-    [self.tableView endUpdates];
-    [self.tableView scrollToRowAtIndexPath:addIndexPathes.lastObject atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    if ([self shouldReloadWhenInsert:addIndexPathes])
+    {
+        [self.tableView reloadData];
+    }
+    else
+    {
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:addIndexPathes
+                              withRowAnimation:UITableViewRowAnimationNone];
+        [self.tableView endUpdates];
+        [self.tableView scrollToRowAtIndexPath:addIndexPathes.lastObject
+                              atScrollPosition:UITableViewScrollPositionTop
+                                      animated:NO];
+    }
+   
 
     [UIView animateWithDuration:0.25 delay:0 options:7 animations:^{
-        
         [self resetLayout];
     } completion:nil];
 }
 
 - (void)remove:(NSArray<NSIndexPath *> *)indexPaths
 {
+    if ([self shouldReloadWhenRemoveOrUpdate:indexPaths])
+    {
+        [self.tableView reloadData];
+        return;
+    }
+    
     [self.tableView beginUpdates];
     [self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
     [self.tableView endUpdates];
@@ -275,5 +291,75 @@
 - (void)adjustOffset:(NSInteger)row {
     
 }
+
+#pragma mark - 
+
+- (BOOL)shouldReloadWhenInsert:(NSArray<NSIndexPath *> *)indexPaths
+{
+    // 如果插入数据后，中间有空档，则不能直接插入，需要全量重新加载
+    NSMutableDictionary * sectionCurrentCount = [NSMutableDictionary dictionary];
+    NSMutableDictionary * sectionMaxCount = [NSMutableDictionary dictionary];
+    NSMutableDictionary * sectionInsertingCount = [NSMutableDictionary dictionary];
+    
+    for(NSIndexPath * indexPath in indexPaths)
+    {
+        NSInteger section = indexPath.section;
+        NSInteger count = [self.tableView numberOfRowsInSection:section];
+        sectionCurrentCount[@(section)] = @(count);
+    }
+    
+    for(NSIndexPath * indexPath in indexPaths)
+    {
+        NSInteger section = indexPath.section;
+        NSInteger row = indexPath.row;
+        NSInteger count = [sectionCurrentCount[@(section)] integerValue];
+        NSInteger sectionMaxNum = [sectionMaxCount[@(section)] integerValue];
+        NSInteger max = 0;
+        if (row <= count)
+        {
+            sectionCurrentCount[@(section)] = @(count+1);
+            max = count + 1;
+        }
+        else
+        {
+            max = row + 1;
+        }
+        max = MAX(max, sectionMaxNum);
+        sectionMaxCount[@(section)] = @(max);
+        
+        NSInteger sectionCurrentCount = [sectionInsertingCount[@(section)] integerValue];
+        sectionInsertingCount[@(section)] = @(++ sectionCurrentCount);
+    }
+    
+    for(NSNumber * sectionKey in sectionMaxCount.allKeys)
+    {
+        NSInteger maxCount = [sectionMaxCount[sectionKey] integerValue];
+        NSInteger currentCount = [sectionInsertingCount[sectionKey] integerValue];
+        NSInteger section = [sectionKey integerValue];
+        NSInteger count = [self.tableView numberOfRowsInSection:section];
+        if (maxCount > count + currentCount)
+        {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+- (BOOL)shouldReloadWhenRemoveOrUpdate:(NSArray<NSIndexPath *> *)indexPaths
+{
+    for(NSIndexPath * indexPath in indexPaths)
+    {
+        NSInteger section = indexPath.section;
+        NSInteger number = [self.tableView numberOfRowsInSection:section];
+        if (number <= indexPath.row)
+        {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
 
 @end

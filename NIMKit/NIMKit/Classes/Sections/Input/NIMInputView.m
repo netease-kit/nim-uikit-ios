@@ -21,6 +21,7 @@
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
 #import "NIMKitKeyboardInfo.h"
+#import "NSString+NIMKit.h"
 
 @interface NIMInputView()<NIMInputToolBarDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate>
 {
@@ -592,8 +593,6 @@
                 [self.actionDelegate onSelectChartlet:emoticonID catalog:emotCatalogID];
             }
         }
-        
-        
     }
 }
 
@@ -631,14 +630,26 @@
 - (NSRange)delRangeForEmoticon
 {
     NSString *text = self.toolBar.contentText;
-    NSRange range = [self rangeForPrefix:@"[" suffix:@"]"];
     NSRange selectedRange = [self.toolBar selectedRange];
-    if (range.length > 1)
-    {
-        NSString *name = [text substringWithRange:range];
-        NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
-        range = icon? range : NSMakeRange(selectedRange.location - 1, 1);
+    BOOL isEmoji = NO;
+    if (selectedRange.location >= 2) {
+        NSString *subStr = [text substringWithRange:NSMakeRange(selectedRange.location - 2, 2)];
+        isEmoji = [subStr nim_containsEmoji];
     }
+    
+    NSRange range = NSMakeRange(selectedRange.location - 1, 1);
+    if (isEmoji) {
+        range = NSMakeRange(selectedRange.location-2, 2);
+    } else {
+        NSRange subRange = [self rangeForPrefix:@"[" suffix:@"]"];
+        if (subRange.length > 1)
+        {
+            NSString *name = [text substringWithRange:subRange];
+            NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
+            range = icon? subRange : NSMakeRange(selectedRange.location - 1, 1);
+        }
+    }
+
     return range;
 }
 

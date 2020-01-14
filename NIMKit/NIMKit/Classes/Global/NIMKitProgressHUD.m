@@ -8,6 +8,7 @@
 
 #import "NIMKitProgressHUD.h"
 #import "UIView+NIM.h"
+#import "NSBundle+NIMKit.h"
 #import "NIMKit.h"
 
 @interface NIMKitProgressHUD()
@@ -91,24 +92,27 @@
         
         CALayer *maskLayer = [CALayer layer];
         
-        NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
-        NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKitProgressHUD class]] URLForResource:bundleName withExtension:nil];
+//        NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
+//        NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKitProgressHUD class]] URLForResource:bundleName withExtension:nil];
+//        
+//        if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
+//        {
+//            bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
+//        }
+//        
+//        if (bundleURL)
+//        {
+//            NSBundle *imageBundle = [NSBundle bundleWithURL:bundleURL];
+//            
+//            if (imageBundle)
+//            {
+//                NSString *path = [imageBundle pathForResource:@"bk_angle_mask" ofType:@"png"];
+//                maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
+//            }
+//        }
         
-        if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
-        {
-            bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
-        }
-        
-        if (bundleURL)
-        {
-            NSBundle *imageBundle = [NSBundle bundleWithURL:bundleURL];
-            
-            if (imageBundle)
-            {
-                NSString *path = [imageBundle pathForResource:@"bk_angle_mask" ofType:@"png"];
-                maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
-            }
-        }
+        NSString *path = [NSBundle nim_ResourceImage:@"bk_angle_mask"];
+        maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
         
         maskLayer.frame = _indefiniteAnimatedLayer.bounds;
         _indefiniteAnimatedLayer.mask = maskLayer;

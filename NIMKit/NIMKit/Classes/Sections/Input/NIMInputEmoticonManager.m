@@ -11,8 +11,18 @@
 #import "NSString+NIMKit.h"
 #import "NIMKit.h"
 #import "UIImage+NIMKit.h"
+#import "NSBundle+NIMKit.h"
 
 @implementation NIMInputEmoticon
+
+- (NIMEmoticonType)type {
+    if (_unicode.length) {
+        return NIMEmoticonTypeUnicode;
+    } else {
+        return NIMEmoticonTypeFile;
+    }
+}
+
 @end
 
 @implementation NIMInputEmoticonCatalog
@@ -57,10 +67,10 @@
 
 @interface NIMInputEmoticonManager ()
 @property (nonatomic,strong)    NSArray *catalogs;
-@property (nonatomic, copy)     NSDictionary *bundleEmoticonInfos;
 @end
 
 @implementation NIMInputEmoticonManager
+
 + (instancetype)sharedManager
 {
     static NIMInputEmoticonManager *instance = nil;
@@ -76,9 +86,12 @@
     if (self = [super init])
     {
         [self parsePlist];
+        [self preloadEmoticonResource];
     }
     return self;
 }
+
+- (void)start {};
 
 - (NIMInputEmoticonCatalog *)emoticonCatalog:(NSString *)catalogID
 {
@@ -149,12 +162,7 @@
 - (void)parsePlist
 {
     NSMutableArray *catalogs = [NSMutableArray array];
-    
-    NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:[[NIMKit sharedKit] emoticonBundleName]
-                                         withExtension:nil];
-    NSBundle *bundle = [NSBundle bundleWithURL:url];
-    
-    NSString *filepath = [bundle pathForResource:@"emoji_ios" ofType:@"plist" inDirectory:NIMKit_EmojiPath];
+    NSString *filepath = [NSBundle nim_EmojiPlistFile];
     if (filepath) {
         NSArray *array = [NSArray arrayWithContentsOfFile:filepath];
         for (NSDictionary *dict in array)
@@ -174,15 +182,10 @@
                              emoticons:(NSArray *)emoticonsArray
 {
     NIMInputEmoticonCatalog *catalog = [[NIMInputEmoticonCatalog alloc]init];
-    catalog.catalogID   = info[@"id"];
-    catalog.title       = info[@"title"];
-    NSString *iconNamePrefix = NIMKit_EmojiPath;
-    NSString *icon      = info[@"normal"];
-    catalog.icon = [iconNamePrefix stringByAppendingPathComponent:icon];
-    NSString *iconPressed = info[@"pressed"];
-    catalog.iconPressed = [iconNamePrefix stringByAppendingPathComponent:iconPressed];
-
-    
+    catalog.catalogID = info[@"id"];
+    catalog.title     = info[@"title"];
+    catalog.icon      = info[@"normal"];
+    catalog.iconPressed = info[@"pressed"];
     NSMutableDictionary *tag2Emoticons = [NSMutableDictionary dictionary];
     NSMutableDictionary *id2Emoticons = [NSMutableDictionary dictionary];
     NSMutableArray *emoticons = [NSMutableArray array];
@@ -192,9 +195,7 @@
         emoticon.emoticonID     = emoticonDict[@"id"];
         emoticon.tag            = emoticonDict[@"tag"];
         emoticon.unicode        = emoticonDict[@"unicode"];
-        NSString *fileName      = emoticonDict[@"file"];
-        NSString *imageNamePrefix = NIMKit_EmojiPath;
-        emoticon.filename = [imageNamePrefix stringByAppendingPathComponent:fileName];
+        emoticon.filename       = emoticonDict[@"file"];
         
         if (emoticon.emoticonID) {
             [emoticons addObject:emoticon];
@@ -211,21 +212,15 @@
     return catalog;
 }
 
-// HOT FIX for iOS 12 load bundle resource much slower than earlier versions
 - (void)preloadEmoticonResource {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        __block NSMutableDictionary *emoticonInfos = [NSMutableDictionary dictionary];
-        for (NIMInputEmoticonCatalog *catalog in self.catalogs) {
-            NSArray *emoticons = catalog.emoticons;
-            for (NIMInputEmoticon *data in emoticons) {
-                UIImage *image = [UIImage nim_emoticonInKit:data.filename];
-                emoticonInfos[data.filename] = image;
-            }
+        for (NIMInputEmoticonCatalog *catalog in _catalogs) {
+            [catalog.emoticons enumerateObjectsUsingBlock:^(NIMInputEmoticon  *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if (obj.filename) {
+                   __unused UIImage *image = [UIImage nim_emoticonInKit:obj.filename];
+                }
+            }];
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.bundleEmoticonInfos = emoticonInfos;
-        });
     });
 }
 

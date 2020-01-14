@@ -4,7 +4,7 @@
 //
 //  Created by Netease on 2019/6/11.
 //  Copyright © 2019 NetEase. All rights reserved.
-//
+//  
 
 #import "NIMTeamCardViewController.h"
 #import "NIMKitUtil.h"
@@ -79,19 +79,6 @@
                     duration:2.0
                     position:CSToastPositionCenter];
     }
-}
-
-- (NSMutableArray *)itemsWithListDic:(NSArray <NSDictionary *> *)listDic
-                         selectValue:(NSInteger)selectValue {
-    NSMutableArray *items = [[NSMutableArray alloc] init];
-    for (NSDictionary *dic in listDic) {
-        NIMTeamCardRowItem *item = [[NIMTeamCardRowItem alloc] init];
-        item.value = dic[@"value"];
-        item.title = dic[@"title"];
-        item.selected = (selectValue == [dic[@"value"] integerValue]);
-        [items addObject:item];
-    }
-    return items;
 }
 
 #pragma mark - Private
@@ -342,8 +329,10 @@
 
 - (void)didBuildTeamSwitchCell:(NIMTeamSwitchTableViewCell *)cell {}
 
-@end
+- (void)reloadTableViewData {};
 
-@implementation NIMTeamCardViewControllerOption
+- (void)reloadTableHeaderData {};
+
+- (void)reloadOtherData {};
 
 @end

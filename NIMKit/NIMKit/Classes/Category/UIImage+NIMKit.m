@@ -10,19 +10,9 @@
 #import "NIMInputEmoticonDefine.h"
 #import "NIMKit.h"
 #import "NIMKitDevice.h"
+#import "NSBundle+NIMKit.h"
 
 @implementation UIImage (NIMKit)
-
-
-
-+ (UIImage *)nim_fetchEmoticon:(NSString *)imageNameOrPath{
-    UIImage *image = [UIImage nim_emoticonInKit:imageNameOrPath];
-    if (!image) {
-        image = [UIImage imageWithContentsOfFile:imageNameOrPath];
-    }
-    return image;
-}
-
 
 + (UIImage *)nim_fetchChartlet:(NSString *)imageName chartletId:(NSString *)chartletId{
     if ([chartletId isEqualToString:NIMKit_EmojiCatalog]) {
@@ -94,49 +84,23 @@
 
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
-    
-    NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
-    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:bundleName withExtension:nil];
-    
-    if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
-    {
-        bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
+    NSBundle *bundle = [NIMKit sharedKit].resourceBundle;
+    UIImage *image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
+    if (!image) {
+        image = [UIImage imageNamed:imageName];
     }
-    
-    if (!bundleURL)
-    {
-        return nil;
-    }
-
-    NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
-    UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
-    
-    NSString *name = [bundleName stringByAppendingPathComponent:imageName];
-    //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
-    return image? image : [UIImage imageNamed:name];
+    //NSAssert(image != nil, @"nim_imageInKit return nil!");
+    return image;
 }
 
-+ (UIImage *)nim_emoticonInKit:(NSString *)imageName
-{
-    NSParameterAssert(imageName.length != 0);
-    if (imageName.length == 0) {
-        return nil;
++ (UIImage *)nim_emoticonInKit:(NSString *)imageName {
+    NSBundle *bundle = [NIMKit sharedKit].emoticonBundle;
+    NSString *name = [NIMKit_EmojiPath stringByAppendingPathComponent:imageName];
+    UIImage *image = [UIImage imageNamed:name inBundle:bundle compatibleWithTraitCollection:nil];
+    if (!image) {
+        image = [UIImage imageNamed:imageName];
     }
-  
-    NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
-    NSParameterAssert(name.length != 0);
-    if (name.length == 0) {
-        return nil;
-    }
-    NSFileManager *fm =[NSFileManager defaultManager];
-    BOOL isDir = NO;
-    BOOL isExist = (![fm fileExistsAtPath:name isDirectory:&isDir] || isDir);
-    NSParameterAssert(isExist);
-    if (!isExist) {
-        return nil;
-    }
-    
-    UIImage *image = [UIImage imageNamed:name];
+    NSAssert(image != nil, @"nim_emoticonInKit return nil!");
     return image;
 }
 

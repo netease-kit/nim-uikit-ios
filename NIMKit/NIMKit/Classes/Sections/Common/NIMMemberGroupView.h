@@ -26,7 +26,7 @@
 
 @property (nonatomic,assign) NIMKitCardHeaderOpeator opera;
 
-@property (nonatomic,assign) BOOL isMyUserId;
+@property (nonatomic,readonly) BOOL isMyUserId;
 
 @end
 

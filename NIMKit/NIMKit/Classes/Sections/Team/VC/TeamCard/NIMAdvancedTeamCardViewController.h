@@ -6,13 +6,8 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMTeamCardViewController.h"
-#import <NIMSDK/NIMSDK.h>
+#import "NIMTeamCardOperationViewController.h"
 
-@interface NIMAdvancedTeamCardViewController : NIMTeamCardViewController
-
-- (instancetype)initWithTeam:(NIMTeam *)team
-                     session:(NIMSession *)session
-                      option:(NIMTeamCardViewControllerOption *)option;
+@interface NIMAdvancedTeamCardViewController : NIMTeamCardOperationViewController
 
 @end

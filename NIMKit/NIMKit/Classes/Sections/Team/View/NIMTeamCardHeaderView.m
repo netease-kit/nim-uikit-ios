@@ -64,30 +64,26 @@
 }
 
 #pragma mark - Public
-- (void)setDataModel:(NIMTeamCardHeaderViewModel *)dataModel {
-    _dataModel = dataModel;
+- (void)setTeam:(NIMTeam *)team {
+    _team = team;
     
     //avatar
-    NSURL *avatarUrl = dataModel.avatarUrl.length? [NSURL URLWithString:_dataModel.avatarUrl] : nil;
+    NSURL *avatarUrl = team.avatarUrl.length? [NSURL URLWithString:team.avatarUrl] : nil;
     [_avatar nim_setImageWithURL:avatarUrl placeholderImage:[UIImage nim_imageInKit:@"avatar_team"]];
     
     //title
-    _titleLabel.text  = dataModel.teamName;
+    _titleLabel.text  = team.teamName;
     [_titleLabel sizeToFit];
     
     //teamId
-    _numberLabel.text = dataModel.teamId;
+    _numberLabel.text = team.teamId;
     [_numberLabel sizeToFit];
     
     //create time
-    _createTimeLabel.text  = [self formatTime:dataModel.createTime];
+    _createTimeLabel.text  = [self formatTime:team.createTime];
     [_createTimeLabel sizeToFit];
     
     [self layoutIfNeeded];
-}
-
-- (void)reloadData {
-    self.dataModel = _dataModel;
 }
 
 #pragma mark - Private
@@ -149,30 +145,6 @@
         _createTimeLabel.textColor       = NIMKit_UIColorFromRGB(0x999999);
     }
     return _createTimeLabel;
-}
-
-@end
-
-@implementation NIMTeamCardHeaderViewModel
-
-- (instancetype)initWithTeam:(NIMTeam *)team {
-    if (self = [super init]) {
-        _avatarUrl = team.thumbAvatarUrl;
-        _teamName = team.teamName;
-        _teamId = team.teamId;
-        _createTime = team.createTime;
-    }
-    return self;
-}
-
-- (instancetype)initWithSuperTeam:(NIMTeam *)team {
-    if (self = [super init]) {
-        _avatarUrl = team.thumbAvatarUrl;
-        _teamName = team.teamName;
-        _teamId = team.teamId;
-        _createTime = team.createTime;
-    }
-    return self;
 }
 
 @end

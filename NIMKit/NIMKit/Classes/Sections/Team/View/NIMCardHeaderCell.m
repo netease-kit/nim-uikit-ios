@@ -6,19 +6,19 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMTeamCardHeaderCell.h"
+#import "NIMCardHeaderCell.h"
 #import "NIMAvatarImageView.h"
 #import "UIView+NIM.h"
-#import "NIMCardMemberItem.h"
 #import "UIImage+NIMKit.h"
+#import "NIMTeamHelper.h"
 
-@interface NIMTeamCardHeaderCell()
+@interface NIMCardHeaderCell()
 
 @property (nonatomic,strong) id<NIMKitCardHeaderData> data;
 
 @end
 
-@implementation NIMTeamCardHeaderCell
+@implementation NIMCardHeaderCell
 
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
@@ -44,31 +44,16 @@
 
 - (void)refreshData:(id<NIMKitCardHeaderData>)data{
     self.data = data;
-    NSURL *url;
-    if ([data respondsToSelector:@selector(imageUrl)] && data.imageUrl.length) {
-        url = [NSURL URLWithString:data.imageUrl];
-    }
-
+    NSURL *url = [NSURL URLWithString:data.imageUrl];
     [self.imageView nim_setImageWithURL:url placeholderImage:data.imageNormal];
     [self.imageView addTarget:self action:@selector(onSelected:) forControlEvents:UIControlEventTouchUpInside];
-    self.titleLabel.text = data.title;
-    if([data isKindOfClass:[NIMTeamCardMemberItem class]]) {
-        NIMTeamCardMemberItem *member = data;
-        self.titleLabel.text = member.title.length ? member.title : member.userId;
-        switch (member.userType) {
-            case NIMKitTeamMemberTypeOwner:
-                self.roleImageView.image = [UIImage nim_imageInKit:@"icon_team_creator"];
-                break;
-            case NIMKitTeamMemberTypeManager:
-                self.roleImageView.image = [UIImage nim_imageInKit:@"icon_team_manager"];
-                break;
-            default:
-                self.roleImageView.image = nil;
-                break;
-        }
-    }else{
-        self.roleImageView.image = nil;
+
+    NSString *showName = data.title;
+    if ([data isMyUserId]) {
+        showName = @"我";
     }
+    self.titleLabel.text = showName;
+    self.roleImageView.image = [NIMTeamHelper imageWithMemberType:data.userType];
     [self.titleLabel sizeToFit];
 }
 
@@ -83,7 +68,6 @@
         [self.delegate cellShouldBeRemoved:self];
     }
 }
-
 
 - (void)layoutSubviews{
     [super layoutSubviews];

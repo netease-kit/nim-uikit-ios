@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "NIMCardDataSourceProtocol.h"
 
-@interface NIMTeamCardRowItem : NSObject<NTESCardBodyData>
+typedef void(^NIMTeamCardRowSelectedBlock)(id <NIMKitSelectCardData> item);
+
+@interface NIMTeamCardRowItem : NSObject
 
 @property(nonatomic,copy) NSString *title;
 

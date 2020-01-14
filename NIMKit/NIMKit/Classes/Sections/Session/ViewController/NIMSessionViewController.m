@@ -65,8 +65,6 @@
     [self setupInputView];
     //会话相关逻辑配置器安装
     [self setupConfigurator];
-    //添加监听
-    [self addListener];
     //进入会话时，标记所有消息已读，并发送已读回执
     [self markRead];
     //更新已读位置
@@ -133,8 +131,8 @@
 {
     [super viewWillAppear:animated];
     [self.interactor onViewWillAppear];
+    [self addListener];
 }
-
 
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -146,6 +144,7 @@
 {
     [super viewDidDisappear:animated];
     [self.interactor onViewDidDisappear];
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
 }
 
 
@@ -452,6 +451,7 @@
         apnsOption.apnsContent = [NSString stringWithFormat:@"%@在群里@了你",me];
         message.apnsMemberOption = apnsOption;
     }
+    
     [self sendMessage:message];
 }
 
@@ -479,7 +479,7 @@
     [[NIMSDK sharedSDK].mediaManager addDelegate:self];
     
     [[NIMSDK sharedSDK].mediaManager record:type
-                                     duration:duration];
+                                   duration:duration];
 }
 
 #pragma mark - NIMMessageCellDelegate
@@ -731,6 +731,7 @@
 {
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
 }
 
 - (void)changeLeftBarBadge:(NSInteger)unreadCount

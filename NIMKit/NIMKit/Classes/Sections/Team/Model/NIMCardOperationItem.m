@@ -6,16 +6,16 @@
 //  Copyright (c) 2015年 Netease. All rights reserved.
 //
 
-#import "NIMTeamCardOperationItem.h"
+#import "NIMCardOperationItem.h"
 #import "UIImage+NIMKit.h"
 
-@interface NIMTeamCardOperationItem()
+@interface NIMCardOperationItem()
 
 @property(nonatomic,assign) NIMKitCardHeaderOpeator opera;
 
 @end
 
-@implementation NIMTeamCardOperationItem
+@implementation NIMCardOperationItem
 
 - (instancetype)initWithOperation:(NIMKitCardHeaderOpeator)opera{
     self = [self init];
@@ -41,6 +41,41 @@
         default:
             break;
     }
+}
+
+- (NSString*)teamId {
+    return @"";
+}
+
+- (NSString*)userId {
+    return @"";
+}
+
+- (NIMTeamMemberType)userType {
+    return NIMTeamMemberTypeNormal;
+}
+
+- (void)setUserType:(NIMTeamMemberType)userType {}
+
+- (NIMTeamType)teamType {
+    return NIMTeamTypeNormal;
+}
+
+
+- (NSString*)imageUrl {
+    return nil;
+}
+
+- (NSString*)inviterAccid {
+    return nil;
+}
+
+- (BOOL)isMuted {
+    return NO;
+}
+
+- (BOOL)isMyUserId {
+    return NO;
 }
 
 @end

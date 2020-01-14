@@ -10,12 +10,17 @@
 #import "NIMInputEmoticonParser.h"
 #import "NIMInputEmoticonManager.h"
 #import "UIImage+NIMKit.h"
+#import "NSString+NIMKit.h"
+#import <objc/runtime.h>
+
+static char * kOriLineBreakMode = "kOriLineBreakMode";
 
 @implementation M80AttributedLabel (NIMKit)
 - (void)nim_setText:(NSString *)text
 {
     [self setText:@""];
     NSArray *tokens = [[NIMInputEmoticonParser currentParser] tokens:text];
+    BOOL containEmojiUnicode = NO;
     for (NIMInputTextToken *token in tokens)
     {
         if (token.type == NIMInputTokenTypeEmoticon)
@@ -34,6 +39,7 @@
                 }
             } else if (emoticon.unicode && emoticon.unicode.length>0){
                 [self appendText:emoticon.unicode];
+                containEmojiUnicode = YES;
             }
             else {
                 [self appendText:@"[?]"];
@@ -43,7 +49,26 @@
         {
             NSString *text = token.text;
             [self appendText:text];
+            containEmojiUnicode = [text nim_containsEmoji];
         }
     }
+
+    if (containEmojiUnicode) {
+        //emoji unicode word折行计算有点问题，先强制使用char折行
+        [self setOriLineBreakMode:self.lineBreakMode];
+        self.lineBreakMode = kCTLineBreakByCharWrapping;
+    } else {
+        self.lineBreakMode = [self oriLineBreakMode];
+    }
 }
+
+- (void)setOriLineBreakMode:(CTLineBreakMode)lineBreakModel{
+    objc_setAssociatedObject(self, kOriLineBreakMode, @(lineBreakModel), OBJC_ASSOCIATION_ASSIGN);
+}
+
+- (CTLineBreakMode)oriLineBreakMode{
+    return (CTLineBreakMode)[objc_getAssociatedObject(self, kOriLineBreakMode)integerValue];
+}
+
+
 @end

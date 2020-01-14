@@ -18,9 +18,6 @@
 {
     NIMMessage *textMessage = [[NIMMessage alloc] init];
     textMessage.text        = text;
-    NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
-    setting.teamReceiptEnabled = YES;
-    textMessage.setting = setting;
     return textMessage;
 }
 

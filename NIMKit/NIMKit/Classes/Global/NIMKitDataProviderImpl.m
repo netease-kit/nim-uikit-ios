@@ -278,7 +278,7 @@
     NIMUser *user = [[NIMSDK sharedSDK].userManager userInfo:userId];
     NIMUserInfo *userInfo = user.userInfo;
     NIMTeamMember *member =  [[NIMSDK sharedSDK].superTeamManager teamMember:userId
-                                                                           inTeam:teamId];
+                                                                      inTeam:teamId];
     
     NIMKitInfo *info;
     
@@ -452,10 +452,10 @@
         switch (team.type) {
             case NIMTeamTypeNormal:
             case NIMTeamTypeAdvanced:
-                [[NIMKit sharedKit] notifyTeamInfoChanged:@[team.teamId]];
+                [[NIMKit sharedKit] notifyTeamInfoChanged:team.teamId type:NIMKitTeamTypeNomal];
                 break;
             case NIMTeamTypeSuper:
-                [[NIMKit sharedKit] notifySuperTeamInfoChanged:@[team.teamId]];
+                [[NIMKit sharedKit] notifyTeamInfoChanged:team.teamId type:NIMKitTeamTypeSuper];
                 break;
             default:
                 break;
@@ -474,10 +474,10 @@
         switch (team.type) {
             case NIMTeamTypeNormal:
             case NIMTeamTypeAdvanced:
-                [[NIMKit sharedKit] notifyTeamMemebersChanged:@[team.teamId]];
+                [[NIMKit sharedKit] notifyTeamInfoChanged:team.teamId type:NIMKitTeamTypeNomal];
                 break;
             case NIMTeamTypeSuper:
-                [[NIMKit sharedKit] notifySuperTeamMemebersChanged:@[team.teamId]];
+                [[NIMKit sharedKit] notifyTeamInfoChanged:team.teamId type:NIMKitTeamTypeSuper];
                 break;
             default:
                 break;
@@ -489,8 +489,8 @@
 - (void)onLogin:(NIMLoginStep)step
 {
     if (step == NIMLoginStepSyncOK) {
-        [[NIMKit sharedKit] notifyTeamInfoChanged:nil];
-        [[NIMKit sharedKit] notifyTeamMemebersChanged:nil];
+        [[NIMKit sharedKit] notifyTeamInfoChanged:nil type:NIMKitTeamTypeNomal];
+        [[NIMKit sharedKit] notifyTeamMemebersChanged:nil type:NIMKitTeamTypeNomal];
     }
 }
 

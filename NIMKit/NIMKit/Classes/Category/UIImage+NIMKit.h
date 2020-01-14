@@ -10,8 +10,6 @@
 
 @interface UIImage (NIMKit)
 
-+ (UIImage *)nim_fetchEmoticon:(NSString *)imageNameOrPath;
-
 + (UIImage *)nim_fetchChartlet:(NSString *)imageName chartletId:(NSString *)chartletId;
 
 + (CGSize)nim_sizeWithImageOriginSize:(CGSize)originSize

@@ -8,11 +8,15 @@
 
 #import "NIMTeamMemberListCell.h"
 #import "UIView+NIM.h"
-#import "NIMUsrInfoData.h"
 #import "NIMAvatarImageView.h"
 #import "NIMKitUtil.h"
 #import "NIMKit.h"
 #import "UIImage+NIMKit.h"
+#import "NIMTeamHelper.h"
+#import "NIMCardDataSourceProtocol.h"
+
+NSString *const kTeamMember = @"kTeamMember";
+NSString *const kTeamMemberInfo = @"kTeamMemberInfo";
 
 @interface NIMTeamMemberView : UIView{
 
@@ -20,9 +24,11 @@
 
 @property(nonatomic,strong) NIMAvatarImageView *imageView;
 
+@property (nonatomic,strong) UIImageView *roleImageView;
+
 @property(nonatomic,strong) UILabel *titleLabel;
 
-@property(nonatomic,strong) NIMKitInfo *member;
+@property(nonatomic,strong) NSDictionary *member;
 
 @end
 
@@ -38,18 +44,28 @@
         [self addSubview:_titleLabel];
         _imageView   = [[NIMAvatarImageView alloc] initWithFrame:CGRectMake(0, 0, 37, 37)];
         [self addSubview:_imageView];
+        _roleImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        [self addSubview:_roleImageView];
     }
     return self;
 }
 
-- (void)setMember:(NIMKitInfo *)member{
+- (void)setMember:(NSDictionary *)member{
     _member = member;
+    NIMKitInfo *info = member[kTeamMemberInfo];
+    id<NIMKitCardHeaderData>user = member[kTeamMember];
     NSURL *avatarURL;
-    if (member.avatarUrlString.length) {
-        avatarURL = [NSURL URLWithString:member.avatarUrlString];
+    if (info.avatarUrlString.length) {
+        avatarURL = [NSURL URLWithString:info.avatarUrlString];
     }
-    [_imageView nim_setImageWithURL:avatarURL placeholderImage:member.avatarImage];
-    _titleLabel.text = (member.showName ?: @"");
+    [_imageView nim_setImageWithURL:avatarURL placeholderImage:info.avatarImage];
+    
+    NSString *showName = (info.showName ?: @"");
+    if ([user isMyUserId]) {
+        showName = @"我";
+    }
+    _titleLabel.text = showName;
+    _roleImageView.image = [NIMTeamHelper imageWithMemberType:user.userType];
 }
 
 
@@ -66,6 +82,9 @@
     self.imageView.nim_centerX = self.nim_width * .5f;
     self.titleLabel.nim_centerX = self.nim_width * .5f;
     self.titleLabel.nim_bottom = self.nim_height;
+    self.roleImageView.nim_size = CGSizeMake(16, 16);
+    self.roleImageView.nim_bottom = self.imageView.nim_bottom;
+    self.roleImageView.nim_right  = self.imageView.nim_right;
 }
 @end
 
@@ -99,14 +118,15 @@ const CGFloat kNIMTeamMemberListCellItemPadding = 44.f;
     return maxShowCount;
 }
 
-- (void)setInfos:(NSMutableArray<NIMKitInfo *> *)infos {
+- (void)setInfos:(NSMutableArray<NSDictionary *> *)infos {
     NSInteger count = 0;
     
     //invite button
     if (!_disableInvite) {
         NIMTeamMemberView *view = [self fetchMemeberView:0];
         UIImage *addImage = [UIImage nim_imageInKit:@"icon_add_normal"];
-        [view.imageView nim_setImageWithURL:nil placeholderImage:addImage];
+        [view.imageView setImage:addImage];
+        view.roleImageView.image = nil;
         view.titleLabel.text = @"邀请";
         count = 1;
     }

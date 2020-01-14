@@ -61,9 +61,9 @@ const CGFloat NIMInputLineBoarder = .5f;
     [_seps removeAllObjects];
     for (NIMInputEmoticonCatalog * catelog in emoticonCatalogs) {
         UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-        [button setImage:[UIImage nim_fetchEmoticon:catelog.icon] forState:UIControlStateNormal];
-        [button setImage:[UIImage nim_fetchEmoticon:catelog.iconPressed] forState:UIControlStateHighlighted];
-        [button setImage:[UIImage nim_fetchEmoticon:catelog.iconPressed] forState:UIControlStateSelected];
+        [button setImage:[UIImage nim_emoticonInKit:catelog.icon] forState:UIControlStateNormal];
+        [button setImage:[UIImage nim_emoticonInKit:catelog.iconPressed] forState:UIControlStateHighlighted];
+        [button setImage:[UIImage nim_emoticonInKit:catelog.iconPressed] forState:UIControlStateSelected];
         [button addTarget:self action:@selector(onTouchTab:) forControlEvents:UIControlEventTouchUpInside];
         [button sizeToFit];
         [self addSubview:button];
