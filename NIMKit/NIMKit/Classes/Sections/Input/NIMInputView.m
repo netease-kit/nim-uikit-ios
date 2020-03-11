@@ -21,6 +21,7 @@
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
 #import "NIMKitKeyboardInfo.h"
+#import "NSString+NIMKit.h"
 
 @interface NIMInputView()<NIMInputToolBarDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate>
 {
@@ -186,7 +187,7 @@
     [_toolBar.recordButton addTarget:self action:@selector(onTouchRecordBtnUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
     _toolBar.nim_size = [_toolBar sizeThatFits:CGSizeMake(self.nim_width, CGFLOAT_MAX)];
     _toolBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [_toolBar.recordButton setTitle:@"按住说话" forState:UIControlStateNormal];
+    [_toolBar.recordButton setTitle:@"按住说话".nim_localized forState:UIControlStateNormal];
     [_toolBar.recordButton setHidden:YES];
     
     //设置最大输入字数
@@ -341,9 +342,9 @@
                 else {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [[[UIAlertView alloc] initWithTitle:nil
-                                                    message:@"没有麦克风权限"
+                                                    message:@"没有麦克风权限".nim_localized
                                                    delegate:nil
-                                          cancelButtonTitle:@"确定"
+                                          cancelButtonTitle:@"确定".nim_localized
                                           otherButtonTitles:nil] show];
                     });
                 }
@@ -592,8 +593,6 @@
                 [self.actionDelegate onSelectChartlet:emoticonID catalog:emotCatalogID];
             }
         }
-        
-        
     }
 }
 
@@ -631,14 +630,26 @@
 - (NSRange)delRangeForEmoticon
 {
     NSString *text = self.toolBar.contentText;
-    NSRange range = [self rangeForPrefix:@"[" suffix:@"]"];
     NSRange selectedRange = [self.toolBar selectedRange];
-    if (range.length > 1)
-    {
-        NSString *name = [text substringWithRange:range];
-        NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
-        range = icon? range : NSMakeRange(selectedRange.location - 1, 1);
+    BOOL isEmoji = NO;
+    if (selectedRange.location >= 2) {
+        NSString *subStr = [text substringWithRange:NSMakeRange(selectedRange.location - 2, 2)];
+        isEmoji = [subStr nim_containsEmoji];
     }
+    
+    NSRange range = NSMakeRange(selectedRange.location - 1, 1);
+    if (isEmoji) {
+        range = NSMakeRange(selectedRange.location-2, 2);
+    } else {
+        NSRange subRange = [self rangeForPrefix:@"[" suffix:@"]"];
+        if (subRange.length > 1)
+        {
+            NSString *name = [text substringWithRange:subRange];
+            NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
+            range = icon? subRange : NSMakeRange(selectedRange.location - 1, 1);
+        }
+    }
+
     return range;
 }
 

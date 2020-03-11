@@ -12,6 +12,7 @@
 #import "NIMKitDataProviderImpl.h"
 #import "NIMCellLayoutConfig.h"
 #import "NIMKitInfoFetchOption.h"
+#import "NSBundle+NIMKit.h"
 
 extern NSString *const NIMKitUserInfoHasUpdatedNotification;
 extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
@@ -29,14 +30,9 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 - (instancetype)init
 {
     if (self = [super init]) {
-        _resourceBundleName  = @"NIMKitResource.bundle";
-        _emoticonBundleName  = @"NIMKitEmoticon.bundle";
-        
         _firer = [[NIMKitNotificationFirer alloc] init];
         _provider = [[NIMKitDataProviderImpl alloc] init];   //默认使用 NIMKit 的实现
-        
         _layoutConfig = [[NIMCellLayoutConfig alloc] init];
-        
         [self preloadNIMKitBundleResource];
     }
     return self;
@@ -64,6 +60,26 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     }
 }
 
+- (NSBundle *)resourceBundle {
+    if (!_resourceBundle) {
+        _resourceBundle = [NSBundle nim_defaultResourceBundle];
+    }
+    return _resourceBundle;
+}
+
+- (NSBundle *)emoticonBundle {
+    if (!_emoticonBundle) {
+        _emoticonBundle = [NSBundle nim_defaultEmojiBundle];
+    }
+    return _emoticonBundle;
+}
+
+- (NSBundle *)languageBundle {
+    if (!_languageBundle) {
+        _languageBundle = [NSBundle nim_defaultLanguageBundle];
+    }
+    return _languageBundle;
+}
 
 - (id<NIMCellLayoutConfig>)layoutConfig
 {
@@ -93,64 +109,7 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     }
 }
 
-- (void)notifyTeamInfoChanged:(NSArray *)teamIds{
-    if (teamIds.count)
-    {
-        for (NSString *teamId in teamIds)
-        {
-            [self notifyTeam:teamId type:NIMKitTeamTypeNomal];
-        }
-    }
-    else
-    {
-        [self notifyTeam:nil type:NIMKitTeamTypeNomal];
-    }
-}
-
-- (void)notifyTeamMemebersChanged:(NSArray *)teamIds
-{
-    if (teamIds.count)
-    {
-        for (NSString *teamId in teamIds)
-        {
-            [self notifyTeamMemebers:teamId type:NIMKitTeamTypeNomal];
-        }
-    }
-    else
-    {
-        [self notifyTeamMemebers:nil  type:NIMKitTeamTypeNomal];
-    }
-}
-
-- (void)notifySuperTeamInfoChanged:(NSArray *)teamIds {
-    if (teamIds.count)
-    {
-        for (NSString *teamId in teamIds)
-        {
-            [self notifyTeam:teamId type:NIMKitTeamTypeSuper];
-        }
-    }
-    else
-    {
-        [self notifyTeam:nil type:NIMKitTeamTypeSuper];
-    }
-}
-
-- (void)notifySuperTeamMemebersChanged:(NSArray *)teamIds {
-    if (teamIds.count)
-    {
-        for (NSString *teamId in teamIds)
-        {
-            [self notifyTeamMemebers:teamId type:NIMKitTeamTypeSuper];
-        }
-    }
-    else
-    {
-        [self notifyTeamMemebers:nil  type:NIMKitTeamTypeSuper];
-    }
-}
-
-- (void)notifyTeam:(NSString *)teamId type:(NIMKitTeamType)type
+- (void)notifyTeamInfoChanged:(NSString *)teamId type:(NIMKitTeamType)type
 {
     NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
     if (teamId.length) {
@@ -166,7 +125,7 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     [self.firer addFireInfo:info];
 }
 
-- (void)notifyTeamMemebers:(NSString *)teamId type:(NIMKitTeamType)type
+- (void)notifyTeamMemebersChanged:(NSString *)teamId type:(NIMKitTeamType)type
 {
     NIMKitFirerInfo *info = [[NIMKitFirerInfo alloc] init];
     if (teamId.length) {
@@ -214,7 +173,7 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
 
 - (void)preloadNIMKitBundleResource {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NIMInputEmoticonManager sharedManager] preloadEmoticonResource];
+        [[NIMInputEmoticonManager sharedManager] start];
     });
 }
 

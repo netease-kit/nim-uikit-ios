@@ -9,11 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "NIMCardDataSourceProtocol.h"
 @class NIMAvatarImageView;
-@protocol NIMTeamCardHeaderCellDelegate;
+@protocol NIMCardHeaderCellDelegate;
 
 
 
-@interface NIMTeamCardHeaderCell : UICollectionViewCell
+@interface NIMCardHeaderCell : UICollectionViewCell
 
 @property (nonatomic,strong) NIMAvatarImageView *imageView;
 
@@ -23,7 +23,7 @@
 
 @property (nonatomic,strong) UIButton *removeBtn;
 
-@property (nonatomic,weak) id<NIMTeamCardHeaderCellDelegate>delegate;
+@property (nonatomic,weak) id<NIMCardHeaderCellDelegate>delegate;
 
 @property (nonatomic,readonly) id<NIMKitCardHeaderData> data;
 
@@ -32,12 +32,12 @@
 @end
 
 
-@protocol NIMTeamCardHeaderCellDelegate <NSObject>
+@protocol NIMCardHeaderCellDelegate <NSObject>
 
-- (void)cellDidSelected:(NIMTeamCardHeaderCell*)cell;
+- (void)cellDidSelected:(NIMCardHeaderCell*)cell;
 
 
 @optional
-- (void)cellShouldBeRemoved:(NIMTeamCardHeaderCell*)cell;
+- (void)cellShouldBeRemoved:(NIMCardHeaderCell*)cell;
 
 @end

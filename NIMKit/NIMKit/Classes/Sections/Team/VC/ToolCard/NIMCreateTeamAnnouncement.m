@@ -23,7 +23,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"新建群公告";
+    self.navigationItem.title = @"新建群公告".nim_localized;
     self.view.backgroundColor = NIMKit_UIColorFromRGB(0xe4e7ec);
     self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -37,7 +37,7 @@
     CGFloat padding = 20.f;
     CGFloat contentWidth = self.view.nim_width - padding;
     self.titleTextField = [[UITextField alloc] initWithFrame:CGRectMake(15, 11, contentWidth, 30)];
-    self.titleTextField.placeholder = @"标题";
+    self.titleTextField.placeholder = @"标题".nim_localized;
     self.titleTextField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.titleTextField.font = [UIFont systemFontOfSize:17.f];
     self.titleTextField.textColor = [UIColor grayColor];
@@ -61,7 +61,7 @@
     [contentView addSubview:self.contentTextView];
     
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStylePlain target:self action:@selector(onSave:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"保存".nim_localized style:UIBarButtonItemStylePlain target:self action:@selector(onSave:)];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:NIMKitKeyboardWillChangeFrameNotification object:nil];
 }

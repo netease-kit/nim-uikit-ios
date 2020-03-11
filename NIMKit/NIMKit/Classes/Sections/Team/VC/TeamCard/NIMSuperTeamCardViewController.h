@@ -6,16 +6,11 @@
 //  Copyright © 2019 NetEase. All rights reserved.
 //
 
-#import "NIMTeamCardViewController.h"
-#import <NIMSDK/NIMSDK.h>
+#import "NIMTeamCardOperationViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NIMSuperTeamCardViewController : NIMTeamCardViewController
-
-- (instancetype)initWithTeam:(NIMTeam *)team
-                     session:(NIMSession *)session
-                      option:(NIMTeamCardViewControllerOption *)option;
+@interface NIMSuperTeamCardViewController : NIMTeamCardOperationViewController
 
 @end
 

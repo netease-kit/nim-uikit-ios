@@ -12,6 +12,7 @@
 #import "NIMTeamAnnouncementListCell.h"
 #import "NIMKitDependency.h"
 #import "NIMKitProgressHUD.h"
+#import "NIMGlobalMacro.h"
 
 @interface NIMTeamAnnouncementListViewController () <UITableViewDelegate,
                                                      UITableViewDataSource,
@@ -39,9 +40,9 @@
 
 - (void)setupUI {
     [self.view addSubview:self.tableView];
-    self.navigationItem.title = @"群公告";
+    self.navigationItem.title = @"群公告".nim_localized;
     if(_option.canCreateAnnouncement) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"新建" style:UIBarButtonItemStylePlain target:self action:@selector(onCreateAnnouncement:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"新建".nim_localized style:UIBarButtonItemStylePlain target:self action:@selector(onCreateAnnouncement:)];
     }
 }
 
@@ -96,11 +97,11 @@
         [_delegate didUpdateAnnouncement:ret completion:^(NSError *error) {
             [NIMKitProgressHUD dismiss];
             if(!error) {
-                [wself.view makeToast:@"创建成功"];
+                [wself.view makeToast:@"创建成功".nim_localized];
                 [wself updateAnnouncementsWithContent:ret];
                 [wself.tableView reloadData];
             } else {
-                [wself.view makeToast:@"创建失败"];
+                [wself.view makeToast:@"创建失败".nim_localized];
             }
         }];
     }

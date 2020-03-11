@@ -10,6 +10,7 @@
 #import "NIMContactPickedView.h"
 #import "UIView+NIM.h"
 #import "UIImage+NIMKit.h"
+#import "NIMGlobalMacro.h"
 
 @implementation NIMContactSelectTabView
 
@@ -23,7 +24,7 @@
         UIImage *doneButtonHighlighted = [UIImage nim_imageInKit:@"icon_cell_blue_normal"];
         [_doneButton setBackgroundImage:doneButtonNormal forState:UIControlStateNormal];
         [_doneButton setBackgroundImage:doneButtonHighlighted forState:UIControlStateHighlighted];
-        [_doneButton setTitle:@"确定" forState:UIControlStateNormal];
+        [_doneButton setTitle:@"确定".nim_localized forState:UIControlStateNormal];
         [_doneButton sizeToFit];
         _doneButton.nim_size = CGSizeMake(MAX(doneButtonNormal.size.width, _doneButton.nim_width + 12.0),
                                           doneButtonNormal.size.height);

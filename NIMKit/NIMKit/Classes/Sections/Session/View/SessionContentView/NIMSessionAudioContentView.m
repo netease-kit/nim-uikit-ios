@@ -84,13 +84,29 @@
 - (void)layoutSubviews{
     [super layoutSubviews];
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
-    if (self.model.message.isOutgoingMsg) {
-        self.voiceImageView.nim_right = self.nim_width - contentInsets.right;
-        _durationLabel.nim_left = contentInsets.left;
-    } else
-    {
-       self.voiceImageView.nim_left = contentInsets.left;
-        _durationLabel.nim_right = self.nim_width - contentInsets.right;
+    switch (self.layoutStyle) {
+        case NIMSessionMessageContentViewLayoutLeft: {
+            self.voiceImageView.nim_left = contentInsets.left;
+             _durationLabel.nim_right = self.nim_width - contentInsets.right;
+            break;
+        }
+        case NIMSessionMessageContentViewLayoutRight: {
+            self.voiceImageView.nim_right = self.nim_width - contentInsets.right;
+            _durationLabel.nim_left = contentInsets.left;
+            break;
+        }
+        case NIMSessionMessageContentViewLayoutAuto:
+        default:
+        {
+            if (self.model.message.isOutgoingMsg) {
+                self.voiceImageView.nim_right = self.nim_width - contentInsets.right;
+                _durationLabel.nim_left = contentInsets.left;
+            } else {
+               self.voiceImageView.nim_left = contentInsets.left;
+                _durationLabel.nim_right = self.nim_width - contentInsets.right;
+            }
+            break;
+        }
     }
     _voiceImageView.nim_centerY = self.nim_height * .5f;
     _durationLabel.nim_centerY = _voiceImageView.nim_centerY;

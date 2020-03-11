@@ -65,8 +65,6 @@
     [self setupInputView];
     //会话相关逻辑配置器安装
     [self setupConfigurator];
-    //添加监听
-    [self addListener];
     //进入会话时，标记所有消息已读，并发送已读回执
     [self markRead];
     //更新已读位置
@@ -133,8 +131,8 @@
 {
     [super viewWillAppear:animated];
     [self.interactor onViewWillAppear];
+    [self addListener];
 }
-
 
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -146,6 +144,7 @@
 {
     [super viewDidDisappear:animated];
     [self.interactor onViewDidDisappear];
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
 }
 
 
@@ -225,6 +224,15 @@
 }
 
 - (NSString *)sessionSubTitle{return @"";};
+
+#pragma mark - 状态操作
+- (NIMKitSessionState)sessionState {
+    return [self.interactor sessionState];
+}
+
+- (void)setSessionState:(NIMKitSessionState)state {
+    [self.interactor setSessionState:state];
+}
 
 #pragma mark - NIMChatManagerDelegate
 //开始发送
@@ -440,9 +448,10 @@
         option.session = self.session;
         
         NSString *me = [[NIMKit sharedKit].provider infoByUser:[NIMSDK sharedSDK].loginManager.currentAccount option:option].showName;
-        apnsOption.apnsContent = [NSString stringWithFormat:@"%@在群里@了你",me];
+        apnsOption.apnsContent = [NSString stringWithFormat:@"%@在群里@了你".nim_localized, me];
         message.apnsMemberOption = apnsOption;
     }
+    
     [self sendMessage:message];
 }
 
@@ -470,7 +479,7 @@
     [[NIMSDK sharedSDK].mediaManager addDelegate:self];
     
     [[NIMSDK sharedSDK].mediaManager record:type
-                                     duration:duration];
+                                   duration:duration];
 }
 
 #pragma mark - NIMMessageCellDelegate
@@ -584,10 +593,10 @@
         copyText = YES;
     }
     if (copyText) {
-        [items addObject:[[UIMenuItem alloc] initWithTitle:@"复制"
+        [items addObject:[[UIMenuItem alloc] initWithTitle:@"复制".nim_localized
                                                     action:@selector(copyText:)]];
     }
-    [items addObject:[[UIMenuItem alloc] initWithTitle:@"删除"
+    [items addObject:[[UIMenuItem alloc] initWithTitle:@"删除".nim_localized
                                                 action:@selector(deleteMsg:)]];
     
     
@@ -637,7 +646,6 @@
 {
     [UIMenuController sharedMenuController].menuItems = nil;
 }
-
 
 #pragma mark - 操作接口
 - (void)uiAddMessages:(NSArray *)messages
@@ -723,6 +731,7 @@
 {
     [[NIMSDK sharedSDK].chatManager removeDelegate:self];
     [[NIMSDK sharedSDK].conversationManager removeDelegate:self];
+    [[NIMSDK sharedSDK].mediaManager removeDelegate:self];
 }
 
 - (void)changeLeftBarBadge:(NSInteger)unreadCount

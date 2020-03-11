@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "NIMKitEvent.h"
+
+typedef NS_ENUM (NSInteger, NIMSessionMessageContentViewLayout){
+    NIMSessionMessageContentViewLayoutAuto = 0, //根据消息自动布局
+    NIMSessionMessageContentViewLayoutLeft,  //左边布局
+    NIMSessionMessageContentViewLayoutRight, //右边布局
+};
+
 @class NIMKitBubbleStyleObject;
 
 @protocol NIMMessageContentViewDelegate <NSObject>
@@ -23,6 +30,8 @@
 @property (nonatomic,strong,readonly)  NIMMessageModel   *model;
 
 @property (nonatomic,strong) UIImageView * bubbleImageView;
+
+@property (nonatomic,assign) NIMSessionMessageContentViewLayout layoutStyle;
 
 @property (nonatomic,weak) id<NIMMessageContentViewDelegate> delegate;
 

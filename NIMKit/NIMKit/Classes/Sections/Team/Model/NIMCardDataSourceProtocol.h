@@ -29,48 +29,27 @@ typedef NS_ENUM(NSInteger, NIMKitTeamCardRowItemType) {
     TeamCardRowItemTypeSelected,
 };
 
-typedef NS_ENUM(NSInteger, NIMKitTeamCardType){
-    NIMKitTeamCardTypeNormal  = 0,
-    NIMKitTeamCardTypeSuper   = 1,
-};
-
-typedef NS_ENUM (NSInteger, NIMKitTeamMemberType) {
-    NIMKitTeamMemberTypeNormal = 0,
-    NIMKitTeamMemberTypeOwner,
-    NIMKitTeamMemberTypeManager,
-    NIMKitTeamMemberTypeApply
-};
-
-typedef NS_ENUM (NSInteger, NIMKitTeamNotifyState) {
-    NIMKitTeamNotifyStateAll = 0,
-    NIMKitTeamNotifyStateNone,
-    NIMKitTeamNotifyStateOnlyManager,
-};
-
 @protocol NIMKitCardHeaderData <NSObject>
 
-@optional
+- (NSString*)teamId;
+
+- (NSString*)userId;
+
+- (NIMTeamMemberType)userType;
+
+- (void)setUserType:(NIMTeamMemberType)userType;
+
+- (NIMTeamType)teamType;
+
 - (UIImage*)imageNormal;
 
 - (NSString*)title;
 
 - (NSString*)imageUrl;
 
-- (NSString*)teamId;
-
-- (NSString*)userId;
-
 - (NSString*)inviterAccid;
 
 - (BOOL)isMuted;
-
-- (NIMKitCardHeaderOpeator)opera;
-
-- (NIMKitTeamMemberType)userType;
-
-- (void)setUserType:(NIMKitTeamMemberType)userType;
-
-- (NIMKitTeamCardType)teamType;
 
 - (BOOL)isMyUserId;
 

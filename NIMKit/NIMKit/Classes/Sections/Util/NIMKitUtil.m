@@ -69,11 +69,11 @@
     }
     else if(isSameMonth && (nowDateComponents.day == (msgDateComponents.day+1)))//昨天
     {
-        result = showDetail?  [[NSString alloc] initWithFormat:@"昨天%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : @"昨天";
+        result = showDetail?  [[NSString alloc] initWithFormat:@"昨天%@ %zd:%02d".nim_localized,result,hour,(int)msgDateComponents.minute] : @"昨天".nim_localized;
     }
     else if(isSameMonth && (nowDateComponents.day == (msgDateComponents.day+2))) //前天
     {
-        result = showDetail? [[NSString alloc] initWithFormat:@"前天%@ %zd:%02d",result,hour,(int)msgDateComponents.minute] : @"前天";
+        result = showDetail? [[NSString alloc] initWithFormat:@"前天%@ %zd:%02d".nim_localized,result,hour,(int)msgDateComponents.minute] : @"前天".nim_localized;
     }
     else if([nowDate timeIntervalSinceDate:msgDate] < 7 * OnedayTimeIntervalValue)//一周内
     {
@@ -96,19 +96,19 @@
     NSString *showPeriodOfTime = @"";
     if (totalMin > 0 && totalMin <= 5 * 60)
     {
-        showPeriodOfTime = @"凌晨";
+        showPeriodOfTime = @"凌晨".nim_localized;
     }
     else if (totalMin > 5 * 60 && totalMin < 12 * 60)
     {
-        showPeriodOfTime = @"上午";
+        showPeriodOfTime = @"上午".nim_localized;
     }
     else if (totalMin >= 12 * 60 && totalMin <= 18 * 60)
     {
-        showPeriodOfTime = @"下午";
+        showPeriodOfTime = @"下午".nim_localized;
     }
     else if ((totalMin > 18 * 60 && totalMin <= (23 * 60 + 59)) || totalMin == 0)
     {
-        showPeriodOfTime = @"晚上";
+        showPeriodOfTime = @"晚上".nim_localized;
     }
     return showPeriodOfTime;
 }
@@ -116,13 +116,13 @@
 +(NSString*)weekdayStr:(NSInteger)dayOfWeek
 {
     static NSDictionary *daysOfWeekDict = nil;
-    daysOfWeekDict = @{@(1):@"星期日",
-                       @(2):@"星期一",
-                       @(3):@"星期二",
-                       @(4):@"星期三",
-                       @(5):@"星期四",
-                       @(6):@"星期五",
-                       @(7):@"星期六",};
+    daysOfWeekDict = @{@(1):@"星期日".nim_localized,
+                       @(2):@"星期一".nim_localized,
+                       @(3):@"星期二".nim_localized,
+                       @(4):@"星期三".nim_localized,
+                       @(5):@"星期四".nim_localized,
+                       @(6):@"星期五".nim_localized,
+                       @(7):@"星期六".nim_localized,};
     return [daysOfWeekDict objectForKey:@(dayOfWeek)];
 }
 
@@ -181,23 +181,23 @@
         
         switch (content.operationType) {
             case NIMTeamOperationTypeInvite:{
-                NSString *str = [NSString stringWithFormat:@"%@邀请%@",source,targets.firstObject];
+                NSString *str = [NSString stringWithFormat:@"%@邀请%@".nim_localized,source,targets.firstObject];
                 if (targets.count>1) {
-                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                    str = [str stringByAppendingFormat:@"%zd人".nim_localized,targets.count];
                 }
-                str = [str stringByAppendingFormat:@"进入了%@",teamName];
+                str = [str stringByAppendingFormat:@"进入了%@".nim_localized,teamName];
                 formatedMessage = str;
             }
                 break;
             case NIMTeamOperationTypeDismiss:
-                formatedMessage = [NSString stringWithFormat:@"%@解散了%@",source,teamName];
+                formatedMessage = [NSString stringWithFormat:@"%@解散了%@".nim_localized,source,teamName];
                 break;
             case NIMTeamOperationTypeKick:{
-                NSString *str = [NSString stringWithFormat:@"%@将%@",source,targets.firstObject];
+                NSString *str = [NSString stringWithFormat:@"%@将%@".nim_localized,source,targets.firstObject];
                 if (targets.count>1) {
-                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                    str = [str stringByAppendingFormat:@"%zd人".nim_localized,targets.count];
                 }
-                str = [str stringByAppendingFormat:@"移出了%@",teamName];
+                str = [str stringByAppendingFormat:@"移出了%@".nim_localized,teamName];
                 formatedMessage = str;
             }
                 break;
@@ -206,39 +206,39 @@
                 id attachment = [content attachment];
                 if ([attachment isKindOfClass:[NIMUpdateTeamInfoAttachment class]]) {
                     NIMUpdateTeamInfoAttachment *teamAttachment = (NIMUpdateTeamInfoAttachment *)attachment;
-                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息".nim_localized,source,teamName];
                     //如果只是单个项目项被修改则显示具体的修改项
                     if ([teamAttachment.values count] == 1) {
                         NIMTeamUpdateTag tag = [[[teamAttachment.values allKeys] firstObject] integerValue];
                         switch (tag) {
                             case NIMTeamUpdateTagName:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称".nim_localized,source,teamName];
                                 break;
                             case NIMTeamUpdateTagIntro:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍".nim_localized,source,teamName];
                                 break;
                             case NIMTeamUpdateTagAnouncement:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告".nim_localized,source,teamName];
                                 break;
                             case NIMTeamUpdateTagJoinMode:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式".nim_localized,source,teamName];
                                 break;
                             case NIMTeamUpdateTagAvatar:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像".nim_localized,source,teamName];
                                 break;
                             case NIMTeamUpdateTagInviteMode:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了邀请他人权限",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了邀请他人权限".nim_localized,source];
                                 break;
                             case NIMTeamUpdateTagBeInviteMode:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了被邀请人身份验证权限",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了被邀请人身份验证权限".nim_localized,source];
                                 break;
                             case NIMTeamUpdateTagUpdateInfoMode:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了群资料修改权限",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了群资料修改权限".nim_localized,source];
                                 break;
                             case NIMTeamUpdateTagMuteMode:{
                                 NSString *muteState = teamAttachment.values.allValues.firstObject;
                                 BOOL muted = [muteState isEqualToString:@"0"] ? NO : YES;
-                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言",source]: [NSString stringWithFormat:@"%@取消了全体禁言",source];
+                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言".nim_localized,source]: [NSString stringWithFormat:@"%@取消了全体禁言".nim_localized,source];
                                 break;
                             }
                             default:
@@ -248,52 +248,51 @@
                     }
                 }
                 if (formatedMessage == nil){
-                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息".nim_localized,source,teamName];
                 }
             }
                 break;
             case NIMTeamOperationTypeLeave:
-                formatedMessage = [NSString stringWithFormat:@"%@离开了%@",source,teamName];
+                formatedMessage = [NSString stringWithFormat:@"%@离开了%@".nim_localized,source,teamName];
                 break;
             case NIMTeamOperationTypeApplyPass:{
                 if ([source isEqualToString:targetText]) {
                     //说明是以不需要验证的方式进入
-                    formatedMessage = [NSString stringWithFormat:@"%@进入了%@",source,teamName];
+                    formatedMessage = [NSString stringWithFormat:@"%@进入了%@".nim_localized,source,teamName];
                 }else{
-                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的申请",source,targetText];
+                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的申请".nim_localized,source,targetText];
                 }
             }
                 break;
             case NIMTeamOperationTypeTransferOwner:
-                formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@",source,targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@".nim_localized,source,targetText];
                 break;
             case NIMTeamOperationTypeAddManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员",targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员".nim_localized,targetText];
                 break;
             case NIMTeamOperationTypeRemoveManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份",targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份".nim_localized,targetText];
                 break;
             case NIMTeamOperationTypeAcceptInvitation:
-                formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群",source,targetText];
+                formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群".nim_localized,source,targetText];
                 break;
             case NIMTeamOperationTypeMute:{
                 id attachment = [content attachment];
                 if ([attachment isKindOfClass:[NIMMuteTeamMemberAttachment class]])
                 {
                     BOOL mute = [(NIMMuteTeamMemberAttachment *)attachment flag];
-                    NSString *muteStr = mute? @"禁言" : @"解除禁言";
+                    NSString *muteStr = mute? @"禁言".nim_localized : @"解除禁言".nim_localized;
                     NSString *str = [targets componentsJoinedByString:@","];
-                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@",str,source,muteStr];
+                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@".nim_localized,str,source,muteStr];
                 }
             }
                 break;
             default:
                 break;
         }
-        
     }
     if (!formatedMessage.length) {
-        formatedMessage = [NSString stringWithFormat:@"未知系统消息"];
+        formatedMessage = @"未知系统消息".nim_localized;
     }
     return formatedMessage;
 }
@@ -306,27 +305,28 @@
         NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
         NSString *source = [NIMKitUtil superTeamNotificationSourceName:message];
         NSArray *targets = [NIMKitUtil superTeamNotificationTargetNames:message];
+        NSString *targetText = [targets count] > 1 ? [targets componentsJoinedByString:@","] : [targets firstObject];
         NSString *teamName = [NIMKitUtil superTeamNotificationTeamShowName:message];
         
         switch (content.operationType) {
             case NIMSuperTeamOperationTypeInvite:{
-                NSString *str = [NSString stringWithFormat:@"%@邀请%@",source,targets.firstObject];
+                NSString *str = [NSString stringWithFormat:@"%@邀请%@".nim_localized,source,targets.firstObject];
                 if (targets.count>1) {
-                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                    str = [str stringByAppendingFormat:@"%zd人".nim_localized,targets.count];
                 }
-                str = [str stringByAppendingFormat:@"进入了%@",teamName];
+                str = [str stringByAppendingFormat:@"进入了%@".nim_localized,teamName];
                 formatedMessage = str;
             }
                 break;
             case NIMSuperTeamOperationTypeDismiss:
-                formatedMessage = [NSString stringWithFormat:@"%@解散了%@",source,teamName];
+                formatedMessage = [NSString stringWithFormat:@"%@解散了%@".nim_localized,source,teamName];
                 break;
             case NIMSuperTeamOperationTypeKick:{
-                NSString *str = [NSString stringWithFormat:@"%@将%@",source,targets.firstObject];
+                NSString *str = [NSString stringWithFormat:@"%@将%@".nim_localized,source,targets.firstObject];
                 if (targets.count>1) {
-                    str = [str stringByAppendingFormat:@"等%zd人",targets.count];
+                    str = [str stringByAppendingFormat:@"%zd人".nim_localized,targets.count];
                 }
-                str = [str stringByAppendingFormat:@"移出了%@",teamName];
+                str = [str stringByAppendingFormat:@"移出了%@".nim_localized,teamName];
                 formatedMessage = str;
             }
                 break;
@@ -335,30 +335,36 @@
                 id attachment = [content attachment];
                 if ([attachment isKindOfClass:[NIMUpdateSuperTeamInfoAttachment class]]) {
                     NIMUpdateSuperTeamInfoAttachment *teamAttachment = (NIMUpdateSuperTeamInfoAttachment *)attachment;
-                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息".nim_localized,source,teamName];
                     //如果只是单个项目项被修改则显示具体的修改项
                     if ([teamAttachment.values count] == 1) {
                         NIMSuperTeamUpdateTag tag = [[[teamAttachment.values allKeys] firstObject] integerValue];
                         switch (tag) {
                             case NIMSuperTeamUpdateTagName:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@名称".nim_localized,source,teamName];
                                 break;
                             case NIMSuperTeamUpdateTagIntro:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@介绍".nim_localized,source,teamName];
                                 break;
                             case NIMSuperTeamUpdateTagAnouncement:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@公告".nim_localized,source,teamName];
                                 break;
                             case NIMSuperTeamUpdateTagAvatar:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像",source,teamName];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@头像".nim_localized,source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagJoinMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了%@验证方式",source,teamName];
+                                break;
+                            case NIMSuperTeamUpdateTagBeInviteMode:
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了被邀请人身份验证权限",source];
                                 break;
                             case NIMSuperTeamUpdateTagClientCustom:
-                                formatedMessage = [NSString stringWithFormat:@"%@更新了自定义扩展字段",source];
+                                formatedMessage = [NSString stringWithFormat:@"%@更新了自定义扩展字段".nim_localized,source];
                                 break;
                             case NIMSuperTeamUpdateTagMuteMode: {
                                 NSString *muteState = teamAttachment.values.allValues.firstObject;
                                 BOOL muted = [muteState isEqualToString:@"0"] ? NO : YES;
-                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言",source]: [NSString stringWithFormat:@"%@取消了全体禁言",source];
+                                formatedMessage = muted? [NSString stringWithFormat:@"%@设置了群全体禁言".nim_localized,source]: [NSString stringWithFormat:@"%@取消了全体禁言".nim_localized,source];
                                 break;
                             }
                             default:
@@ -368,30 +374,42 @@
                     }
                 }
                 if (formatedMessage.length == 0){
-                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息",source,teamName];
+                    formatedMessage = [NSString stringWithFormat:@"%@更新了%@信息".nim_localized,source,teamName];
                 }
             }
                 break;
             case NIMSuperTeamOperationTypeLeave:
-                formatedMessage = [NSString stringWithFormat:@"%@离开了%@",source,teamName];
+                formatedMessage = [NSString stringWithFormat:@"%@离开了%@".nim_localized,source,teamName];
+                break;
+            case NIMSuperTeamOperationTypeApplyPass:{
+                if ([source isEqualToString:targetText]) {
+                    //说明是以不需要验证的方式进入
+                    formatedMessage = [NSString stringWithFormat:@"%@进入了%@",source,teamName];
+                }else{
+                    formatedMessage = [NSString stringWithFormat:@"%@通过了%@的申请",source,targetText];
+                }
+            }
                 break;
             case NIMSuperTeamOperationTypeTransferOwner:
-                formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@",source,targets.firstObject];
+                formatedMessage = [NSString stringWithFormat:@"%@转移了群主身份给%@".nim_localized,source,targets.firstObject];
                 break;
             case NIMSuperTeamOperationTypeAddManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员",targets.firstObject];
+                formatedMessage = [NSString stringWithFormat:@"%@被添加为群管理员".nim_localized,targets.firstObject];
                 break;
             case NIMSuperTeamOperationTypeRemoveManager:
-                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份",targets.firstObject];
+                formatedMessage = [NSString stringWithFormat:@"%@被撤销了群管理员身份".nim_localized,targets.firstObject];
+                break;
+            case NIMSuperTeamOperationTypeAcceptInvitation:
+                formatedMessage = [NSString stringWithFormat:@"%@接受%@的邀请进群",source,targetText];
                 break;
             case NIMSuperTeamOperationTypeMute:{
                 id attachment = [content attachment];
                 if ([attachment isKindOfClass:[NIMMuteSuperTeamMemberAttachment class]])
                 {
                     BOOL mute = [(NIMMuteSuperTeamMemberAttachment *)attachment flag];
-                    NSString *muteStr = mute? @"禁言" : @"解除禁言";
+                    NSString *muteStr = mute? @"禁言".nim_localized : @"解除禁言".nim_localized;
                     NSString *str = [targets componentsJoinedByString:@","];
-                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@",str,source,muteStr];
+                    formatedMessage = [NSString stringWithFormat:@"%@被%@%@".nim_localized,str,source,muteStr];
                 }
             }
             default:
@@ -400,7 +418,7 @@
         
     }
     if (!formatedMessage.length) {
-        formatedMessage = [NSString stringWithFormat:@"未知系统消息"];
+        formatedMessage = @"未知系统消息".nim_localized;
     }
     return formatedMessage;
 }
@@ -412,22 +430,22 @@
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     switch (content.eventType) {
         case NIMNetCallEventTypeMiss:{
-            text = @"未接听";
+            text = @"未接听".nim_localized;
             break;
         }
         case NIMNetCallEventTypeBill:{
-            text =  ([object.message.from isEqualToString:currentAccount])? @"通话拨打时长 " : @"通话接听时长 ";
+            text =  ([object.message.from isEqualToString:currentAccount])? @"通话拨打时长 ".nim_localized : @"通话接听时长 ".nim_localized;
             NSTimeInterval duration = content.duration;
             NSString *durationDesc = [NSString stringWithFormat:@"%02d:%02d",(int)duration/60,(int)duration%60];
             text = [text stringByAppendingString:durationDesc];
             break;
         }
         case NIMNetCallEventTypeReject:{
-            text = ([object.message.from isEqualToString:currentAccount])? @"对方正忙" : @"已拒绝";
+            text = ([object.message.from isEqualToString:currentAccount])? @"对方正忙".nim_localized : @"已拒绝".nim_localized;
             break;
         }
         case NIMNetCallEventTypeNoResponse:{
-            text = @"未接通，已取消";
+            text = @"未接通，已取消".nim_localized;
             break;
         }
         default:
@@ -443,7 +461,7 @@
     NSMutableArray *targetNicks = [[NSMutableArray alloc] init];
     for (NIMChatroomNotificationMember *memebr in content.targets) {
         if ([memebr.userId isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]]) {
-           [targetNicks addObject:@"你"];
+           [targetNicks addObject:@"你".nim_localized];
         }else{
            [targetNicks addObject:memebr.nick];
         }
@@ -454,93 +472,93 @@
     switch (content.eventType) {
         case NIMChatroomEventTypeEnter:
         {
-            return [NSString stringWithFormat:@"欢迎%@进入直播间",targetText];
+            return [NSString stringWithFormat:@"欢迎%@进入直播间".nim_localized,targetText];
         }
         case NIMChatroomEventTypeAddBlack:
         {
-            return [NSString stringWithFormat:@"%@被管理员拉入黑名单",targetText];
+            return [NSString stringWithFormat:@"%@被管理员拉入黑名单".nim_localized, targetText];
         }
         case NIMChatroomEventTypeRemoveBlack:
         {
-            return [NSString stringWithFormat:@"%@被管理员解除拉黑",targetText];
+            return [NSString stringWithFormat:@"%@被管理员解除拉黑".nim_localized,targetText];
         }
         case NIMChatroomEventTypeAddMute:
         {
             if (content.targets.count == 1 && [[content.targets.firstObject userId] isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]])
             {
-                return @"你已被禁言";
+                return @"你已被禁言".nim_localized;
             }
             else
             {
-                return [NSString stringWithFormat:@"%@被管理员禁言",targetText];
+                return [NSString stringWithFormat:@"%@被管理员禁言".nim_localized,targetText];
             }
         }
         case NIMChatroomEventTypeRemoveMute:
         {
-            return [NSString stringWithFormat:@"%@被管理员解除禁言",targetText];
+            return [NSString stringWithFormat:@"%@被管理员解除禁言".nim_localized,targetText];
         }
         case NIMChatroomEventTypeAddManager:
         {
-            return [NSString stringWithFormat:@"%@被任命管理员身份",targetText];
+            return [NSString stringWithFormat:@"%@被任命管理员身份".nim_localized,targetText];
         }
         case NIMChatroomEventTypeRemoveManager:
         {
-            return [NSString stringWithFormat:@"%@被解除管理员身份",targetText];
+            return [NSString stringWithFormat:@"%@被解除管理员身份".nim_localized,targetText];
         }
         case NIMChatroomEventTypeRemoveCommon:
         {
-            return [NSString stringWithFormat:@"%@被解除直播室成员身份",targetText];
+            return [NSString stringWithFormat:@"%@被解除直播室成员身份".nim_localized,targetText];
         }
         case NIMChatroomEventTypeAddCommon:
         {
-            return [NSString stringWithFormat:@"%@被添加为直播室成员身份",targetText];
+            return [NSString stringWithFormat:@"%@被添加为直播室成员身份".nim_localized,targetText];
         }
         case NIMChatroomEventTypeInfoUpdated:
         {
-            return [NSString stringWithFormat:@"直播间公告已更新"];
+            return @"直播间公告已更新".nim_localized;
         }
         case NIMChatroomEventTypeKicked:
         {
-            return [NSString stringWithFormat:@"%@被管理员移出直播间",targetText];
+            return [NSString stringWithFormat:@"%@被管理员移出直播间".nim_localized,targetText];
         }
         case NIMChatroomEventTypeExit:
         {
-            return [NSString stringWithFormat:@"%@离开了直播间",targetText];
+            return [NSString stringWithFormat:@"%@离开了直播间".nim_localized,targetText];
         }
         case NIMChatroomEventTypeClosed:
         {
-            return [NSString stringWithFormat:@"直播间已关闭"];
+            return @"直播间已关闭".nim_localized;
         }
         case NIMChatroomEventTypeAddMuteTemporarily:
         {
             if (content.targets.count == 1 && [[content.targets.firstObject userId] isEqualToString:[[NIMSDK sharedSDK].loginManager currentAccount]])
             {
-                return @"你已被临时禁言";
+                return @"你已被临时禁言".nim_localized;
             }
             else
             {
-                return [NSString stringWithFormat:@"%@被管理员禁言",targetText];
+                return [NSString stringWithFormat:@"%@被管理员禁言".nim_localized,targetText];
             }
         }
         case NIMChatroomEventTypeRemoveMuteTemporarily:
         {
-            return [NSString stringWithFormat:@"%@被管理员解除临时禁言",targetText];
+            return [NSString stringWithFormat:@"%@被管理员解除临时禁言".nim_localized,targetText];
         }
         case NIMChatroomEventTypeMemberUpdateInfo:
         {
-            return [NSString stringWithFormat:@"%@更新了自己的个人信息",targetText];
+            return [NSString stringWithFormat:@"%@更新了自己的个人信息".nim_localized,targetText];
         }
         case NIMChatroomEventTypeRoomMuted:
         {
-            return @"全体禁言，管理员可发言";
+            return @"全体禁言，管理员可发言".nim_localized;
         }
         case NIMChatroomEventTypeRoomUnMuted:
         {
-            return @"解除全体禁言";
+            return @"解除全体禁言".nim_localized;
         }
         case NIMChatroomEventTypeQueueChange:
         case NIMChatroomEventTypeQueueBatchChange:
-            return [NSString stringWithFormat:@"%@改变了聊天室队列",opeText];
+            return [NSString stringWithFormat:@"%@改变了聊天室队列".nim_localized,opeText];
         default:
             break;
     }
@@ -555,7 +573,7 @@
     NIMTeamNotificationContent *content = (NIMTeamNotificationContent*)object.content;
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     if ([content.sourceID isEqualToString:currentAccount]) {
-        source = @"你";
+        source = @"你".nim_localized;
     }else{
         source = [NIMKitUtil showNick:content.sourceID inSession:message.session];
     }
@@ -569,7 +587,7 @@
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     for (NSString *item in content.targetIDs) {
         if ([item isEqualToString:currentAccount]) {
-            [targets addObject:@"你"];
+            [targets addObject:@"你".nim_localized];
         }else{
             NSString *targetShowName = [NIMKitUtil showNick:item inSession:message.session];
             [targets addObject:targetShowName];
@@ -581,7 +599,7 @@
 
 + (NSString *)teamNotificationTeamShowName:(NIMMessage *)message{
     NIMTeam *team = [[NIMSDK sharedSDK].teamManager teamById:message.session.sessionId];
-    NSString *teamName = team.type == NIMTeamTypeNormal ? @"讨论组" : @"群";
+    NSString *teamName = team.type == NIMTeamTypeNormal ? @"讨论组".nim_localized : @"群".nim_localized;
     return teamName;
 }
 
@@ -591,7 +609,7 @@
     NIMSuperTeamNotificationContent *content = (NIMSuperTeamNotificationContent*)object.content;
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     if ([content.sourceID isEqualToString:currentAccount]) {
-        source = @"你";
+        source = @"你".nim_localized;
     }else{
         source = [NIMKitUtil showNick:content.sourceID inSession:message.session];
     }
@@ -605,7 +623,7 @@
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     for (NSString *item in content.targetIDs) {
         if ([item isEqualToString:currentAccount]) {
-            [targets addObject:@"你"];
+            [targets addObject:@"你".nim_localized];
         }else{
             NSString *targetShowName = [NIMKitUtil showNick:item inSession:message.session];
             [targets addObject:targetShowName];
@@ -616,7 +634,7 @@
 
 
 + (NSString *)superTeamNotificationTeamShowName:(NIMMessage *)message{
-    NSString *teamName = @"超大群";
+    NSString *teamName = @"超大群".nim_localized;
     return teamName;
 }
 

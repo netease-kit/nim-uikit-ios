@@ -39,18 +39,18 @@
 {
     return @[[NIMMediaItem item:@"onTapMediaItemPicture:"
                     normalImage:[UIImage nim_imageInKit:@"bk_media_picture_normal"]
-                  selectedImage:[UIImage nim_imageInKit:@"bk_media_picture_nomal_pressed"]
-                          title:@"相册"],
+                  selectedImage:[UIImage nim_imageInKit:@"bk_media_picture_pressed"]
+                          title:@"相册".nim_localized],
              
              [NIMMediaItem item:@"onTapMediaItemShoot:"
                     normalImage:[UIImage nim_imageInKit:@"bk_media_shoot_normal"]
                   selectedImage:[UIImage nim_imageInKit:@"bk_media_shoot_pressed"]
-                          title:@"拍摄"],
+                          title:@"拍摄".nim_localized],
              
              [NIMMediaItem item:@"onTapMediaItemLocation:"
                     normalImage:[UIImage nim_imageInKit:@"bk_media_position_normal"]
                   selectedImage:[UIImage nim_imageInKit:@"bk_media_position_pressed"]
-                          title:@"位置"],
+                          title:@"位置".nim_localized],
              ];
 }
 
@@ -65,7 +65,7 @@
     _messageInterval = 300;
     _messageLimit    = 20;
     _recordMaxDuration = 60.f;
-    _placeholder = @"请输入消息";
+    _placeholder = @"请输入消息".nim_localized;
     _inputMaxLength = 1000;
     _nickFont  = [UIFont systemFontOfSize:13.0];
     _nickColor = [UIColor darkGrayColor];

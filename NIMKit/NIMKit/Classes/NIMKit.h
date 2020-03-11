@@ -95,17 +95,30 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 @property (nonatomic,strong)  NIMKitIndependentModeExtraInfo *independentModeExtraInfo;
 
-
 /**
- *  NIMKit图片资源所在的 bundle 名称。
- */
-@property (nonatomic,copy)      NSString *resourceBundleName;
+*  NIMKit图片资源所在的 bundle 名称。
+*/
+@property (nonatomic, copy) NSBundle *resourceBundle;
 
 /**
  *  NIMKit表情资源所在的 bundle 名称。
  */
-@property (nonatomic,copy)      NSString *emoticonBundleName;
+@property (nonatomic, copy) NSBundle *emoticonBundle;
 
+/**
+ *  NIMKit语言所在Bundle, 启动的时候根据系统语言会选择对应的语言包，后面用户可替换
+ */
+@property (nonatomic, strong) NSBundle * languageBundle;
+
+/**
+ *  NIMKit语言所在Table，默认 language
+ */
+@property (nonatomic, copy) NSString * languageTable;
+
+/**
+ *  NIMKit语言所在Table，默认 获取系统语言
+ */
+@property (nonatomic, copy) NSString * defaultLanguage;
 
 /**
  *  用户信息变更通知接口
@@ -119,7 +132,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *
  *  @param teamIds 群 id 集合
  */
-- (void)notifyTeamInfoChanged:(NSArray *)teamIds;
+- (void)notifyTeamInfoChanged:(NSString *)teamId type:(NIMKitTeamType)type;
 
 
 /**
@@ -127,7 +140,7 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *
  *  @param teamIds 群id
  */
-- (void)notifyTeamMemebersChanged:(NSArray *)teamIds;
+- (void)notifyTeamMemebersChanged:(NSString *)teamId type:(NIMKitTeamType)type;
 
 /**
  *  超大群信息变更通知接口

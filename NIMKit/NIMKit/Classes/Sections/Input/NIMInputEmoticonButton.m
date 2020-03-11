@@ -23,14 +23,23 @@
     icon.exclusiveTouch         = YES;
     icon.contentMode            = UIViewContentModeScaleToFill;
     icon.delegate               = delegate;
-    if(data.unicode && data.unicode.length>0) {
-        [icon setTitle:data.unicode forState:UIControlStateNormal];
-        [icon setTitle:data.unicode forState:UIControlStateHighlighted];
-        icon.titleLabel.font = [UIFont systemFontOfSize:32];
-    }else if(data.filename && data.filename.length>0){
-        UIImage *image = [UIImage nim_fetchEmoticon:data.filename];
-        [icon setImage:image forState:UIControlStateNormal];
-        [icon setImage:image forState:UIControlStateHighlighted];
+    
+    switch (data.type) {
+        case NIMEmoticonTypeUnicode:
+        {
+            [icon setTitle:data.unicode forState:UIControlStateNormal];
+            [icon setTitle:data.unicode forState:UIControlStateHighlighted];
+            icon.titleLabel.font = [UIFont systemFontOfSize:32];
+            break;
+        }
+        case NIMEmoticonTypeFile:
+        default:
+        {
+            UIImage *image = [UIImage nim_emoticonInKit:data.filename];
+            [icon setImage:image forState:UIControlStateNormal];
+            [icon setImage:image forState:UIControlStateHighlighted];
+            break;
+        }
     }
     return icon;
 }

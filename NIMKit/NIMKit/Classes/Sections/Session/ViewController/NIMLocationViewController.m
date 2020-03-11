@@ -10,6 +10,7 @@
 #import "NIMKitLocationPoint.h"
 #import <AddressBookUI/AddressBookUI.h>
 #import <CoreLocation/CoreLocation.h>
+#import "NSString+NIMKit.h"
 
 @interface NIMLocationViewController () <CLLocationManagerDelegate>
 {
@@ -47,7 +48,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"位置";
+    self.navigationItem.title = @"位置".nim_localized;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismiss:)];
     self.mapView = [[MKMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.delegate = self;
@@ -70,14 +71,14 @@
             [_locationManager requestWhenInUseAuthorization];
             CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
             if (status == kCLAuthorizationStatusRestricted || status == kCLAuthorizationStatusDenied) {
-                [self.view makeToast:@"请在设置-隐私里允许程序使用地理位置服务"
+                [self.view makeToast:@"请在设置-隐私里允许程序使用地理位置服务".nim_localized
                             duration:2
                             position:CSToastPositionCenter];
             }else{
                 self.mapView.showsUserLocation = YES;
             }
         }else{
-            [self.view makeToast:@"请打开地理位置服务"
+            [self.view makeToast:@"请打开地理位置服务".nim_localized
                         duration:2
                         position:CSToastPositionCenter];
         }
@@ -104,7 +105,9 @@
     if ([self.delegate respondsToSelector:@selector(onSendLocation:)]) {
         [self.delegate onSendLocation:self.locationPoint];
     }
-    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+    if (!_disableAutoExit) {
+        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

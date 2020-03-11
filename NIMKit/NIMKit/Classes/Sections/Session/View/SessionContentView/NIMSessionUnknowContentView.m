@@ -11,6 +11,9 @@
 #import "UIView+NIM.h"
 #import "NIMMessageModel.h"
 #import "NIMKit.h"
+#import "NSString+NIMKit.h"
+#import "NIMGlobalMacro.h"
+
 
 @interface NIMSessionUnknowContentView()
 
@@ -33,7 +36,7 @@
 
 - (void)refresh:(NIMMessageModel *)data{
     [super refresh:data];
-    NSString *text = @"未知类型消息";
+    NSString *text = @"未知类型消息".nim_localized;
     
     NIMKitSetting *setting = [[NIMKit sharedKit].config setting:data.message];
 

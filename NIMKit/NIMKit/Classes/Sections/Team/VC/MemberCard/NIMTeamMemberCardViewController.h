@@ -7,14 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NIMCardMemberItem.h"
+#import "NIMTeamCardMemberItem.h"
 #import "NIMTeamMemberListDataSource.h"
 
 @protocol NIMTeamMemberCardActionDelegate <NSObject>
 @optional
 
+- (void)onTeamMemberMuted:(NIMTeamCardMemberItem *)member mute:(BOOL)mute;
 - (void)onTeamMemberKicked:(NIMTeamCardMemberItem *)member;
-- (void)onTeamMemberInfoChaneged:(NIMTeamCardMemberItem *)member;
 
 @end
 
@@ -22,7 +22,7 @@
 
 @property (nonatomic, strong) id<NIMTeamMemberCardActionDelegate> delegate;
 
-- (instancetype)initWithMember:(NIMTeamCardMemberItem *)member
+- (instancetype)initWithMember:(NSString *)userId
                     dataSource:(id <NIMTeamMemberListDataSource>) dataSource;
 
 @end

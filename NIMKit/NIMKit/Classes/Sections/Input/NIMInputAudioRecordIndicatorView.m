@@ -8,6 +8,7 @@
 
 #import "NIMInputAudioRecordIndicatorView.h"
 #import "UIImage+NIMKit.h"
+#import "NIMGlobalMacro.h"
 
 #define NIMKit_ViewWidth 160
 #define NIMKit_ViewHeight 110
@@ -50,7 +51,7 @@
         _tipLabel.font = [UIFont systemFontOfSize:NIMKit_TipFontSize];
         _tipLabel.textColor = [UIColor whiteColor];
         _tipLabel.textAlignment = NSTextAlignmentCenter;
-        _tipLabel.text = @"手指上滑，取消发送";
+        _tipLabel.text = @"手指上滑，取消发送".nim_localized;
         [self addSubview:_tipLabel];
         
         self.phase = AudioRecordPhaseEnd;
@@ -68,10 +69,10 @@
     if(phase == AudioRecordPhaseStart) {
         [self setRecordTime:0];
     } else if(phase == AudioRecordPhaseCancelling) {
-        _tipLabel.text = @"松开手指，取消发送";
+        _tipLabel.text = @"松开手指，取消发送".nim_localized;
         _tipBackgroundView.hidden = NO;
     } else {
-        _tipLabel.text = @"手指上滑，取消发送";
+        _tipLabel.text = @"手指上滑，取消发送".nim_localized;
         _tipBackgroundView.hidden = YES;
     }
 }

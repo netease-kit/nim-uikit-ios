@@ -9,13 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "NIMCardDataSourceProtocol.h"
 
-@interface NIMTeamCardOperationItem : NSObject<NIMKitCardHeaderData>
+@interface NIMCardOperationItem : NSObject<NIMKitCardHeaderData>
 
 @property(nonatomic,copy)   NSString *title;
 
 @property(nonatomic,strong) UIImage  *imageNormal;
 
 @property(nonatomic,strong) UIImage  *imageHighLight;
+
+@property(nonatomic,readonly) NIMKitCardHeaderOpeator opera;
 
 - (instancetype)initWithOperation:(NIMKitCardHeaderOpeator)opera;
 

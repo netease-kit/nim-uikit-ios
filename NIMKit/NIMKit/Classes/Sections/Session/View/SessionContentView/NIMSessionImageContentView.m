@@ -11,10 +11,11 @@
 #import "UIView+NIM.h"
 #import "NIMLoadProgressView.h"
 #import "NIMKitDependency.h"
+#import <YYImage/YYImage.h>
 
 @interface NIMSessionImageContentView()
 
-@property (nonatomic,strong,readwrite) FLAnimatedImageView * imageView;
+@property (nonatomic,strong,readwrite) YYAnimatedImageView * imageView;
 
 @property (nonatomic,strong) NIMLoadProgressView * progressView;
 
@@ -26,7 +27,7 @@
     self = [super initSessionMessageContentView];
     if (self) {
         self.opaque = YES;
-        _imageView  = [[FLAnimatedImageView alloc] initWithFrame:CGRectZero];
+        _imageView  = [[YYAnimatedImageView alloc] initWithFrame:CGRectZero];
         _imageView.backgroundColor = [UIColor whiteColor];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
         [self addSubview:_imageView];
@@ -41,20 +42,11 @@
 {
     [super refresh:data];
     _imageView.image = nil;
-    _imageView.animatedImage = nil;
     NIMImageObject * imageObject = (NIMImageObject*)self.model.message.messageObject;
+    
     NSData *imageData = [[NSData alloc] initWithContentsOfFile:imageObject.thumbPath];
-    BOOL isGif = ([NSData sd_imageFormatForImageData:imageData] == SDImageFormatGIF);
-    if (!isGif) {
-        UIImage *image = [UIImage imageWithData:imageData];
-        _imageView.image = image;
-    } else {
-        FLAnimatedImage *image = [[FLAnimatedImage alloc] initWithAnimatedGIFData:imageData];
-        _imageView.animatedImage = image;
-        if (!_imageView.isAnimating) {
-            [_imageView startAnimating];
-        }
-    }
+    YYImage *image = [YYImage imageWithData:imageData scale:[UIScreen mainScreen].scale];
+    _imageView.image = image;
     
     self.progressView.hidden     = self.model.message.isOutgoingMsg ? (self.model.message.deliveryState != NIMMessageDeliveryStateDelivering) : (self.model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateDownloading);
     if (!self.progressView.hidden) {

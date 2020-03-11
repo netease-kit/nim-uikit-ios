@@ -76,7 +76,7 @@
 
 @property (nonatomic,strong) id extraInfo;
 
-- (instancetype) initWithDict:(NSDictionary *)dict;
+- (instancetype)initWithDict:(NSDictionary *)dict;
 
 + (NSArray *)rowsWithData:(NSArray *)data;
 

@@ -72,7 +72,7 @@
 
 - (void)setUpNav
 {
-    self.navigationItem.title = [self.config respondsToSelector:@selector(title)] ? [self.config title] : @"选择联系人";
+    self.navigationItem.title = [self.config respondsToSelector:@selector(title)] ? [self.config title] : @"选择联系人".nim_localized;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBtnClick:)];
     if ([self.config respondsToSelector:@selector(showSelectDetail)] && self.config.showSelectDetail) {
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -98,7 +98,7 @@
     }
     else
     {
-        detail = [NSString stringWithFormat:@"已选%zd人",_selectecContacts.count];
+        detail = [NSString stringWithFormat:@"已选%zd人".nim_localized,_selectecContacts.count];
     }
     return detail;
 }
@@ -205,7 +205,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if ([self.sectionTitles[0] isEqualToString:@"$"] && section == 0) {
-        return @"机器人";
+        return @"机器人".nim_localized;
     }else {
         return self.sectionTitles[section];
     }

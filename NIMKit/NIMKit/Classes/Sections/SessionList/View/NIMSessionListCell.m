@@ -21,24 +21,25 @@
         [self addSubview:_avatarImageView];
         
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _nameLabel.backgroundColor = [UIColor whiteColor];
+        _nameLabel.backgroundColor = [UIColor clearColor];
         _nameLabel.font            = [UIFont systemFontOfSize:15.f];
         [self addSubview:_nameLabel];
         
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _messageLabel.backgroundColor = [UIColor whiteColor];
+        _messageLabel.backgroundColor = [UIColor clearColor];
         _messageLabel.font            = [UIFont systemFontOfSize:14.f];
         _messageLabel.textColor       = [UIColor lightGrayColor];
         [self addSubview:_messageLabel];
         
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        _timeLabel.backgroundColor = [UIColor whiteColor];
+        _timeLabel.backgroundColor = [UIColor clearColor];
         _timeLabel.font            = [UIFont systemFontOfSize:14.f];
         _timeLabel.textColor       = [UIColor lightGrayColor];
         [self addSubview:_timeLabel];
         
         _badgeView = [NIMBadgeView viewWithBadgeTip:@""];
         [self addSubview:_badgeView];
+        
     }
     return self;
 }
@@ -81,8 +82,8 @@
     _timeLabel.nim_top           = sessionListTimeTop;
     _badgeView.nim_right         = self.nim_width - sessionBadgeTimeRight;
     _badgeView.nim_bottom        = self.nim_height - sessionBadgeTimeBottom;
+    
+    
 }
-
-
 
 @end

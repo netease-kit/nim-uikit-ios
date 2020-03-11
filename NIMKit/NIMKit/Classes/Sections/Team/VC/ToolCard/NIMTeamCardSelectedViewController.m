@@ -51,7 +51,7 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.title = _titleString ?: @"";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(onDone:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成".nim_localized style:UIBarButtonItemStyleDone target:self action:@selector(onDone:)];
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor blackColor];
     [self.view addSubview:self.tableView];
 }

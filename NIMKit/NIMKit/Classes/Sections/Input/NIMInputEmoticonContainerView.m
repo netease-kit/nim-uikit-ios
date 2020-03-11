@@ -167,11 +167,8 @@ NSInteger NIMCustomPageViewHeight    = 159;
     deleteIcon.userInteractionEnabled = YES;
     deleteIcon.exclusiveTouch = YES;
     deleteIcon.contentMode = UIViewContentModeCenter;
-    NSString *prefix = NIMKit_EmojiPath;
-    NSString *imageNormalName = [prefix stringByAppendingPathComponent:@"emoji_del_normal"];
-    NSString *imagePressName = [prefix stringByAppendingPathComponent:@"emoji_del_pressed"];
-    UIImage *imageNormal  = [UIImage nim_emoticonInKit:imageNormalName];
-    UIImage *imagePressed = [UIImage nim_emoticonInKit:imagePressName];
+    UIImage *imageNormal  = [UIImage nim_emoticonInKit:@"emoji_del_normal"];
+    UIImage *imagePressed = [UIImage nim_emoticonInKit:@"emoji_del_pressed"];
     
     [deleteIcon setImage:imageNormal forState:UIControlStateNormal];
     [deleteIcon setImage:imagePressed forState:UIControlStateHighlighted];
@@ -292,7 +289,11 @@ NSInteger NIMCustomPageViewHeight    = 159;
 #pragma mark - EmoticonButtonTouchDelegate
 - (void)selectedEmoticon:(NIMInputEmoticon*)emoticon catalogID:(NSString*)catalogID{
     if ([self.delegate respondsToSelector:@selector(selectedEmoticon:catalog:description:)]) {
-        [self.delegate selectedEmoticon:emoticon.emoticonID catalog:catalogID description:emoticon.tag];
+        if (emoticon.type == NIMEmoticonTypeUnicode) {
+            [self.delegate selectedEmoticon:emoticon.emoticonID catalog:catalogID description:emoticon.unicode];
+        } else {
+            [self.delegate selectedEmoticon:emoticon.emoticonID catalog:catalogID description:emoticon.tag];
+        }
     }
 }
 

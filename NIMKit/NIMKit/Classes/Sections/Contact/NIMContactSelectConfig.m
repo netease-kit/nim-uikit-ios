@@ -21,7 +21,7 @@
 }
 
 - (NSString *)title{
-    return @"选择联系人";
+    return @"选择联系人".nim_localized;
 }
 
 - (NSInteger)maxSelectedNum{
@@ -33,7 +33,7 @@
 }
 
 - (NSString *)selectedOverFlowTip{
-    return @"选择超限";
+    return @"选择超限".nim_localized;
 }
 
 - (void)getContactData:(NIMContactDataProviderHandler)handler {
@@ -89,11 +89,11 @@
 }
 
 - (NSString *)title{
-    return @"选择联系人";
+    return @"选择联系人".nim_localized;
 }
 
 - (NSString *)selectedOverFlowTip{
-    return @"选择超限";
+    return @"选择超限".nim_localized;
 }
 
 - (void)getTeamContactDataWithTeamId:(NSString *)teamID
@@ -186,7 +186,7 @@
 @implementation NIMContactTeamSelectConfig : NSObject
 
 - (NSString *)title{
-    return @"选择群组";
+    return @"选择群组".nim_localized;
 }
 
 - (NSInteger)maxSelectedNum{
@@ -198,7 +198,7 @@
 }
 
 - (NSString *)selectedOverFlowTip{
-    return @"选择超限";
+    return @"选择超限".nim_localized;
 }
 
 - (NSArray *)getTeamIdsWithTeamType:(NIMKitTeamType)teamType {

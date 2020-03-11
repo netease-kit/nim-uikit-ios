@@ -20,4 +20,13 @@
 
 - (UIColor *)nim_hexToColor;
 
+- (BOOL)nim_fileIsExist;
+
+
+- (NSString *)nim_localized;
+
+- (NSString *)nim_localizedWithTable:(NSString *)table;
+
+- (BOOL)nim_containsEmoji;
+
 @end

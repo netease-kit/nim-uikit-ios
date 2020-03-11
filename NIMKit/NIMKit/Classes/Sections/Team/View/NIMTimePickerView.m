@@ -102,11 +102,11 @@
         case 0:         //小时
             return [NSString stringWithFormat:@"%02zd",row];
         case 1:         //小时说明文字
-            return @"时";
+            return @"时".nim_localized;
         case 2:
             return [NSString stringWithFormat:@"%02zd",row];
         case 3:
-            return @"分";
+            return @"分".nim_localized;
         default:
             return @"";
     }

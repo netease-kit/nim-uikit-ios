@@ -12,8 +12,6 @@
 				<string>emoticon_emoji_01</string>
 				<key>tag</key>
 				<string>[可爱]</string>
-				<key>unicode</key>
-				<string>😊</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -22,8 +20,6 @@
 				<string>emoticon_emoji_0</string>
 				<key>tag</key>
 				<string>[大笑]</string>
-				<key>unicode</key>
-				<string>😀</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -32,8 +28,6 @@
 				<string>emoticon_emoji_02</string>
 				<key>tag</key>
 				<string>[色]</string>
-				<key>unicode</key>
-				<string>😍</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -50,8 +44,6 @@
 				<string>emoticon_emoji_04</string>
 				<key>tag</key>
 				<string>[亲]</string>
-				<key>unicode</key>
-				<string>😚</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -60,8 +52,6 @@
 				<string>emoticon_emoji_05</string>
 				<key>tag</key>
 				<string>[呆]</string>
-				<key>unicode</key>
-				<string>😳</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -78,8 +68,6 @@
 				<string>emoticon_emoji_145</string>
 				<key>tag</key>
 				<string>[汗]</string>
-				<key>unicode</key>
-				<string>😓</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -88,8 +76,6 @@
 				<string>emoticon_emoji_07</string>
 				<key>tag</key>
 				<string>[呲牙]</string>
-				<key>unicode</key>
-				<string>😬</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -98,8 +84,6 @@
 				<string>emoticon_emoji_08</string>
 				<key>tag</key>
 				<string>[鬼脸]</string>
-				<key>unicode</key>
-				<string>😜</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -108,8 +92,6 @@
 				<string>emoticon_emoji_09</string>
 				<key>tag</key>
 				<string>[害羞]</string>
-				<key>unicode</key>
-				<string>☺️</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -126,8 +108,6 @@
 				<string>emoticon_emoji_11</string>
 				<key>tag</key>
 				<string>[调皮]</string>
-				<key>unicode</key>
-				<string>😉</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -152,8 +132,6 @@
 				<string>emoticon_emoji_14</string>
 				<key>tag</key>
 				<string>[惊讶]</string>
-				<key>unicode</key>
-				<string>😲</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -162,8 +140,6 @@
 				<string>emoticon_emoji_15</string>
 				<key>tag</key>
 				<string>[流感]</string>
-				<key>unicode</key>
-				<string>😢</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -180,8 +156,6 @@
 				<string>emoticon_emoji_17</string>
 				<key>tag</key>
 				<string>[流泪]</string>
-				<key>unicode</key>
-				<string>😭</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -190,8 +164,6 @@
 				<string>emoticon_emoji_18</string>
 				<key>tag</key>
 				<string>[嚎哭]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -200,8 +172,6 @@
 				<string>emoticon_emoji_19</string>
 				<key>tag</key>
 				<string>[惊恐]</string>
-				<key>unicode</key>
-				<string>😱</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -210,8 +180,6 @@
 				<string>emoticon_emoji_20</string>
 				<key>tag</key>
 				<string>[怒]</string>
-				<key>unicode</key>
-				<string>😡</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -220,8 +188,6 @@
 				<string>emoticon_emoji_21</string>
 				<key>tag</key>
 				<string>[酷]</string>
-				<key>unicode</key>
-				<string>😎</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -230,8 +196,6 @@
 				<string>emoticon_emoji_22</string>
 				<key>tag</key>
 				<string>[不说]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -240,8 +204,6 @@
 				<string>emoticon_emoji_23</string>
 				<key>tag</key>
 				<string>[鄙视]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -250,8 +212,6 @@
 				<string>emoticon_emoji_24</string>
 				<key>tag</key>
 				<string>[阿弥陀佛]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -260,8 +220,6 @@
 				<string>emoticon_emoji_25</string>
 				<key>tag</key>
 				<string>[奸笑]</string>
-				<key>unicode</key>
-				<string>😏</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -270,8 +228,6 @@
 				<string>emoticon_emoji_26</string>
 				<key>tag</key>
 				<string>[睡着]</string>
-				<key>unicode</key>
-				<string>😴</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -280,8 +236,6 @@
 				<string>emoticon_emoji_27</string>
 				<key>tag</key>
 				<string>[口罩]</string>
-				<key>unicode</key>
-				<string>😷</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -290,8 +244,6 @@
 				<string>emoticon_emoji_28</string>
 				<key>tag</key>
 				<string>[努力]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -300,8 +252,6 @@
 				<string>emoticon_emoji_29</string>
 				<key>tag</key>
 				<string>[抠鼻孔]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -310,8 +260,6 @@
 				<string>emoticon_emoji_30</string>
 				<key>tag</key>
 				<string>[疑问]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -320,8 +268,6 @@
 				<string>emoticon_emoji_31</string>
 				<key>tag</key>
 				<string>[怒骂]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -330,8 +276,6 @@
 				<string>emoticon_emoji_32</string>
 				<key>tag</key>
 				<string>[晕]</string>
-				<key>unicode</key>
-				<string>😵</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -340,8 +284,6 @@
 				<string>emoticon_emoji_33</string>
 				<key>tag</key>
 				<string>[呕吐]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -350,8 +292,6 @@
 				<string>emoticon_emoji_160</string>
 				<key>tag</key>
 				<string>[拜一拜]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -360,8 +300,6 @@
 				<string>emoticon_emoji_161</string>
 				<key>tag</key>
 				<string>[惊喜]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -370,8 +308,6 @@
 				<string>emoticon_emoji_162</string>
 				<key>tag</key>
 				<string>[流汗]</string>
-				<key>unicode</key>
-				<string>😅</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -380,8 +316,6 @@
 				<string>emoticon_emoji_163</string>
 				<key>tag</key>
 				<string>[卖萌]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -390,8 +324,6 @@
 				<string>emoticon_emoji_164</string>
 				<key>tag</key>
 				<string>[默契眨眼]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -400,8 +332,6 @@
 				<string>emoticon_emoji_165</string>
 				<key>tag</key>
 				<string>[烧香拜佛]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -410,68 +340,6 @@
 				<string>emoticon_emoji_166</string>
 				<key>tag</key>
 				<string>[晚安]</string>
-				<key>unicode</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_34.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_34</string>
-				<key>tag</key>
-				<string>[强]</string>
-				<key>unicode</key>
-				<string>👍</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_35.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_35</string>
-				<key>tag</key>
-				<string>[弱]</string>
-				<key>unicode</key>
-				<string>👎</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_36.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_36</string>
-				<key>tag</key>
-				<string>[OK]</string>
-				<key>unicode</key>
-				<string>👌</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_37.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_37</string>
-				<key>tag</key>
-				<string>[拳头]</string>
-				<key>unicode</key>
-				<string>✊</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_38.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_38</string>
-				<key>tag</key>
-				<string>[胜利]</string>
-				<key>unicode</key>
-				<string>✌️</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_39.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_39</string>
-				<key>tag</key>
-				<string>[鼓掌]</string>
-				<key>unicode</key>
-				<string>👏</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -480,12 +348,56 @@
 				<string>emoticon_emoji_200</string>
 				<key>tag</key>
 				<string>[握手]</string>
-				<key>unicode</key>
-				<string></string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_40.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_34</string>
+				<key>tag</key>
+				<string>[强]</string>
+				<key>unicode</key>
+				<string>👍</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_35</string>
+				<key>tag</key>
+				<string>[弱]</string>
+				<key>unicode</key>
+				<string>👎</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_36</string>
+				<key>tag</key>
+				<string>[OK]</string>
+				<key>unicode</key>
+				<string>👌</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_37</string>
+				<key>tag</key>
+				<string>[拳头]</string>
+				<key>unicode</key>
+				<string>✊</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_38</string>
+				<key>tag</key>
+				<string>[胜利]</string>
+				<key>unicode</key>
+				<string>✌️</string>
+			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_39</string>
+				<key>tag</key>
+				<string>[鼓掌]</string>
+				<key>unicode</key>
+				<string>👏</string>
+			</dict>
+			<dict>
 				<key>id</key>
 				<string>emoticon_emoji_40</string>
 				<key>tag</key>
@@ -494,8 +406,6 @@
 				<string>😈</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_41.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_41</string>
 				<key>tag</key>
@@ -504,8 +414,6 @@
 				<string>💀</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_42.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_42</string>
 				<key>tag</key>
@@ -514,8 +422,6 @@
 				<string>💩</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_43.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_43</string>
 				<key>tag</key>
@@ -524,8 +430,6 @@
 				<string>🔥</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_44.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_44</string>
 				<key>tag</key>
@@ -534,8 +438,6 @@
 				<string>💨</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_45.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_45</string>
 				<key>tag</key>
@@ -544,8 +446,6 @@
 				<string>❤️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_46.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_46</string>
 				<key>tag</key>
@@ -554,8 +454,6 @@
 				<string>💔</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_47.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_47</string>
 				<key>tag</key>
@@ -564,8 +462,6 @@
 				<string>💘</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_48.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_48</string>
 				<key>tag</key>
@@ -574,8 +470,6 @@
 				<string>💋</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_49.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_49</string>
 				<key>tag</key>
@@ -584,8 +478,6 @@
 				<string>💍</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_50.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_50</string>
 				<key>tag</key>
@@ -594,8 +486,6 @@
 				<string>💠</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_51.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_51</string>
 				<key>tag</key>
@@ -604,8 +494,6 @@
 				<string>☀️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_52.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_52</string>
 				<key>tag</key>
@@ -614,8 +502,6 @@
 				<string>⛅</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_53.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_53</string>
 				<key>tag</key>
@@ -624,8 +510,6 @@
 				<string>☁️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_54.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_54</string>
 				<key>tag</key>
@@ -634,16 +518,14 @@
 				<string>⚡</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_55.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_55</string>
 				<key>tag</key>
 				<string>[雨]</string>
+				<key>unicode</key>
+				<string>☔️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_56.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_56</string>
 				<key>tag</key>
@@ -652,8 +534,6 @@
 				<string>❄️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_57.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_57</string>
 				<key>tag</key>
@@ -662,8 +542,6 @@
 				<string>💑</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_58.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_58</string>
 				<key>tag</key>
@@ -672,8 +550,6 @@
 				<string>🎩</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_59.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_59</string>
 				<key>tag</key>
@@ -682,8 +558,6 @@
 				<string>👑</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_60.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_60</string>
 				<key>tag</key>
@@ -692,8 +566,6 @@
 				<string>🏀</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_61.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_61</string>
 				<key>tag</key>
@@ -702,8 +574,6 @@
 				<string>⚽</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_62.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_62</string>
 				<key>tag</key>
@@ -712,8 +582,6 @@
 				<string>⚾</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_63.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_63</string>
 				<key>tag</key>
@@ -722,8 +590,6 @@
 				<string>🎾</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_64.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_64</string>
 				<key>tag</key>
@@ -732,8 +598,6 @@
 				<string>🎱</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_65.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_65</string>
 				<key>tag</key>
@@ -742,8 +606,6 @@
 				<string>☕</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_66.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_66</string>
 				<key>tag</key>
@@ -752,8 +614,6 @@
 				<string>🍺</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_67.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_67</string>
 				<key>tag</key>
@@ -762,8 +622,6 @@
 				<string>🍻</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_68.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_68</string>
 				<key>tag</key>
@@ -772,8 +630,6 @@
 				<string>🍹</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_69.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_69</string>
 				<key>tag</key>
@@ -782,8 +638,6 @@
 				<string>🍴</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_70.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_70</string>
 				<key>tag</key>
@@ -792,8 +646,6 @@
 				<string>🍔</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_71.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_71</string>
 				<key>tag</key>
@@ -802,8 +654,6 @@
 				<string>🍗</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_72.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_72</string>
 				<key>tag</key>
@@ -812,8 +662,6 @@
 				<string>🍜</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_73.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_73</string>
 				<key>tag</key>
@@ -822,8 +670,6 @@
 				<string>🍦</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_74.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_74</string>
 				<key>tag</key>
@@ -832,8 +678,6 @@
 				<string>🍨</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_75.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_75</string>
 				<key>tag</key>
@@ -842,8 +686,6 @@
 				<string>🎂</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_76.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_76</string>
 				<key>tag</key>
@@ -852,8 +694,6 @@
 				<string>🍰</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_77.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_77</string>
 				<key>tag</key>
@@ -862,8 +702,6 @@
 				<string>🍭</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_78.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_78</string>
 				<key>tag</key>
@@ -872,8 +710,6 @@
 				<string>🍇</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_79.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_79</string>
 				<key>tag</key>
@@ -882,8 +718,6 @@
 				<string>🍉</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_80.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_80</string>
 				<key>tag</key>
@@ -892,8 +726,6 @@
 				<string>📀</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_81.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_81</string>
 				<key>tag</key>
@@ -902,8 +734,6 @@
 				<string>📱</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_82.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_82</string>
 				<key>tag</key>
@@ -912,8 +742,6 @@
 				<string>📞</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_83.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_83</string>
 				<key>tag</key>
@@ -922,8 +750,6 @@
 				<string>📺</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_84.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_84</string>
 				<key>tag</key>
@@ -932,8 +758,6 @@
 				<string>🔊</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_85.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_85</string>
 				<key>tag</key>
@@ -942,8 +766,6 @@
 				<string>🔇</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_86.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_86</string>
 				<key>tag</key>
@@ -952,8 +774,6 @@
 				<string>🔔</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_87.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_87</string>
 				<key>tag</key>
@@ -962,8 +782,6 @@
 				<string>🔒</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_88.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_88</string>
 				<key>tag</key>
@@ -972,8 +790,6 @@
 				<string>🔎</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_89.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_89</string>
 				<key>tag</key>
@@ -982,8 +798,6 @@
 				<string>💡</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_90.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_90</string>
 				<key>tag</key>
@@ -992,8 +806,6 @@
 				<string>🔨</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_91.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_91</string>
 				<key>tag</key>
@@ -1002,8 +814,6 @@
 				<string>🚬</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_92.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_92</string>
 				<key>tag</key>
@@ -1012,8 +822,6 @@
 				<string>💣</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_93.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_93</string>
 				<key>tag</key>
@@ -1022,8 +830,6 @@
 				<string>🔫</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_94.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_94</string>
 				<key>tag</key>
@@ -1032,8 +838,6 @@
 				<string>🔪</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_95.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_95</string>
 				<key>tag</key>
@@ -1042,8 +846,6 @@
 				<string>💊</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_96.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_96</string>
 				<key>tag</key>
@@ -1052,8 +854,6 @@
 				<string>💉</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_97.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_97</string>
 				<key>tag</key>
@@ -1062,8 +862,6 @@
 				<string>💰</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_98.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_98</string>
 				<key>tag</key>
@@ -1072,8 +870,6 @@
 				<string>💵</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_99.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_99</string>
 				<key>tag</key>
@@ -1082,16 +878,6 @@
 				<string>💳</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_100.png</string>
-				<key>id</key>
-				<string>emoticon_emoji_100</string>
-				<key>tag</key>
-				<string>[手柄]</string>
-			</dict>
-			<dict>
-				<key>file</key>
-				<string>emoji_101.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_101</string>
 				<key>tag</key>
@@ -1100,8 +886,6 @@
 				<string>🀄</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_102.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_102</string>
 				<key>tag</key>
@@ -1110,8 +894,6 @@
 				<string>🎨</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_103.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_103</string>
 				<key>tag</key>
@@ -1120,8 +902,6 @@
 				<string>🎬</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_104.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_104</string>
 				<key>tag</key>
@@ -1130,8 +910,6 @@
 				<string>🎤</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_105.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_105</string>
 				<key>tag</key>
@@ -1140,8 +918,6 @@
 				<string>🎧</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_106.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_106</string>
 				<key>tag</key>
@@ -1150,8 +926,6 @@
 				<string>🎵</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_107.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_107</string>
 				<key>tag</key>
@@ -1160,8 +934,6 @@
 				<string>🎸</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_108.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_108</string>
 				<key>tag</key>
@@ -1170,8 +942,6 @@
 				<string>🚀</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_109.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_109</string>
 				<key>tag</key>
@@ -1180,8 +950,6 @@
 				<string>✈️</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_110.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_110</string>
 				<key>tag</key>
@@ -1190,8 +958,6 @@
 				<string>🚆</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_111.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_111</string>
 				<key>tag</key>
@@ -1200,8 +966,6 @@
 				<string>🚌</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_112.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_112</string>
 				<key>tag</key>
@@ -1210,8 +974,6 @@
 				<string>🚗</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_113.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_113</string>
 				<key>tag</key>
@@ -1220,8 +982,6 @@
 				<string>🚕</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_114.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_114</string>
 				<key>tag</key>
@@ -1230,8 +990,6 @@
 				<string>🚓</string>
 			</dict>
 			<dict>
-				<key>file</key>
-				<string>emoji_115.png</string>
 				<key>id</key>
 				<string>emoticon_emoji_115</string>
 				<key>tag</key>

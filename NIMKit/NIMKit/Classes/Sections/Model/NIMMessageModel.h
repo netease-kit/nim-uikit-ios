@@ -35,7 +35,7 @@
 
 @property (nonatomic, readonly) CGPoint nickNameMargin;
 
-@property(nonatomic, readonly) CGSize avatarSize;
+@property (nonatomic, readonly) CGSize avatarSize;
 
 @property (nonatomic, readonly) BOOL shouldShowAvatar;
 
@@ -43,8 +43,19 @@
 
 @property (nonatomic, readonly) BOOL shouldShowLeft;
 
-@property (nonatomic) BOOL shouldShowReadLabel;
+@property (nonatomic) BOOL focreShowAvatar; //强制显示头像
 
+@property (nonatomic) BOOL focreShowNickName; //强制显示昵称
+
+@property (nonatomic) BOOL focreShowLeft; //强制左边显示
+
+@property (nonatomic) BOOL shouldShowReadLabel; //显示已读
+
+@property (nonatomic) BOOL shouldShowSelect; //显示选择按钮
+
+@property (nonatomic) BOOL disableSelected; //不允许用户选择
+
+@property (nonatomic) BOOL selected; //选择状态
 
 /**
  *  NIMMessage封装成NIMMessageModel的方法
@@ -65,5 +76,10 @@
  *  计算内容大小
  */
 - (CGSize)contentSize:(CGFloat)width;
+
+/**
+*  更新布局配置
+*/
+- (void)updateLayoutConfig;
 
 @end

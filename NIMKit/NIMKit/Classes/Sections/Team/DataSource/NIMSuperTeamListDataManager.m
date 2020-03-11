@@ -7,6 +7,7 @@
 //
 
 #import "NIMSuperTeamListDataManager.h"
+#import "NIMGlobalMacro.h"
 
 @interface NIMSuperTeamListDataManager ()
 
@@ -77,13 +78,13 @@
 - (NSString *)memberTypeString:(NIMKitTeamMemberType)type {
     switch (type) {
         case NIMKitTeamMemberTypeNormal:
-            return @"普通成员";
+            return @"普通成员".nim_localized;
         case NIMKitTeamMemberTypeOwner:
-            return @"群主";
+            return @"群主".nim_localized;
         case NIMKitTeamMemberTypeManager:
-            return @"管理员";
+            return @"管理员".nim_localized;
         default:
-            return @"未知";
+            return @"未知".nim_localized;
     }
 }
 
@@ -99,7 +100,7 @@
                                        completion:^(NSError * _Nullable error, NSArray<NIMTeamMember *> * _Nullable members) {
         NSString *msg = nil;
         if (error) {
-            msg = [NSString stringWithFormat:@"邀请失败。error_code:%zd", error.code];
+            msg = [NSString stringWithFormat:@"邀请失败。error_code:%zd".nim_localized, error.code];
         }
         if (completion) {
             completion(error, msg);
@@ -118,14 +119,14 @@
                 if (!error) {
                     wself.team.avatarUrl = urlString;
                 }else{
-                    msg = [NSString stringWithFormat:@"设置头像失败，请重试.code:%zd", error.code];
+                    msg = [NSString stringWithFormat:@"设置头像失败，请重试.code:%zd".nim_localized, error.code];
                 }
                 if (completion) {
                     completion(error, msg);
                 }
             }];
         }else{
-            msg = [NSString stringWithFormat:@"图片上传失败，请重试.code:%zd", error.code];
+            msg = [NSString stringWithFormat:@"图片上传失败，请重试.code:%zd".nim_localized, error.code];
             if (completion) {
                 completion(error, msg);
             }
@@ -142,9 +143,9 @@
     [[NIMSDK sharedSDK].superTeamManager updateTeamInfos:update teamId:teamId completion:^(NSError * _Nullable error) {
         if (!error) {
             weakSelf.team.teamName = name;
-            msg = @"修改成功";
+            msg = @"修改成功".nim_localized;
         } else {
-            msg = [NSString stringWithFormat:@"修改失败 code:%zd",error.code];
+            msg = [NSString stringWithFormat:@"修改失败 code:%zd".nim_localized,error.code];
         }
         if (completion) {
             completion(error, msg);
@@ -161,9 +162,9 @@
     [[NIMSDK sharedSDK].superTeamManager updateMyNick:nickName inTeam:teamId completion:^(NSError * _Nullable error) {
         if (!error) {
             weakSelf.myTeamInfo.nickname = nickName;
-            msg = @"修改成功";
+            msg = @"修改成功".nim_localized;
         } else {
-            msg = [NSString stringWithFormat:@"修改失败 code:%zd",error.code];
+            msg = [NSString stringWithFormat:@"修改失败 code:%zd".nim_localized,error.code];
         }
         
         if (completion) {
@@ -181,9 +182,9 @@
     [[NIMSDK sharedSDK].superTeamManager updateTeamInfos:update teamId:teamId completion:^(NSError * _Nullable error) {
         if (!error) {
             weakSelf.team.intro = intro;
-            msg = @"修改成功";
+            msg = @"修改成功".nim_localized;
         } else {
-            msg = [NSString stringWithFormat:@"修改失败 code:%zd",error.code];
+            msg = [NSString stringWithFormat:@"修改失败 code:%zd".nim_localized,error.code];
         }
         
         if (completion) {
@@ -214,7 +215,7 @@
     __block NSString *msg = nil;
     [[NIMSDK sharedSDK].superTeamManager quitTeam:teamId completion:^(NSError * _Nullable error) {
         if (error) {
-            msg = [NSString stringWithFormat:@"退出失败 code:%zd",error.code];
+            msg = [NSString stringWithFormat:@"退出失败 code:%zd".nim_localized,error.code];
         }
         if (completion) {
             completion(error, msg);
@@ -245,9 +246,9 @@
             //update members
             [weakSelf updateMembersWithOption:option members:members];
         } else if (error.code == NIMRemoteErrorCodeTeamNotMember) {
-            msg = @"你已经不在群里";
+            msg = @"你已经不在群里".nim_localized;
         } else {
-            msg = [NSString stringWithFormat:@"拉好友失败 error: %zd",error.code];
+            msg = [NSString stringWithFormat:@"拉好友失败 error: %zd".nim_localized,error.code];
         }
         if (completion) {
             completion(error, msg);
@@ -263,7 +264,7 @@
                                         completion:^(NSError * _Nullable error) {
         NSString *msg = nil;
         if (error) {
-            msg = [NSString stringWithFormat:@"踢人失败。error_code:%zd", error.code];
+            msg = [NSString stringWithFormat:@"踢人失败。error_code:%zd".nim_localized, error.code];
         }
         if (completion) {
             completion(error, msg);
@@ -286,9 +287,9 @@
                     *stop = YES;
                 }
             }];
-            msg = @"修改成功";
+            msg = @"修改成功".nim_localized;
         }else{
-            msg = @"修改失败";
+            msg = @"修改失败".nim_localized;
         }
         if (completion) {
             completion(error, msg);
@@ -325,7 +326,7 @@
                                                       inTeam:teamId
                                                   completion:^(NSError *error) {
           if (error) {
-              msg = [NSString stringWithFormat:@"修改失败 code:%zd",error.code];
+              msg = [NSString stringWithFormat:@"修改失败 code:%zd".nim_localized,error.code];
           }
           if (completion) {
               completion(error, msg);
@@ -342,7 +343,7 @@
 
 #pragma mark - Private
 - (void)doExecuteUnsupportBlock:(NIMTeamListDataBlock)block {
-    NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"超大群不支持该功能"};
+    NSDictionary *userInfo = @{NSLocalizedDescriptionKey : @"超大群不支持该功能".nim_localized};
     NSError *error = [NSError errorWithDomain:@"nimkit.teamlist.data" code:0x1000 userInfo:userInfo];
     if (block) {
         block(error, nil);
@@ -415,13 +416,13 @@
 + (NSString *)notifyStateText:(NIMKitTeamNotifyState)state {
     switch (state) {
         case NIMKitTeamNotifyStateAll:
-            return @"提醒所有消息";
+            return @"提醒所有消息".nim_localized;
         case NIMKitTeamNotifyStateNone:
-            return @"不提醒任何消息";
+            return @"不提醒任何消息".nim_localized;
         case NIMKitTeamNotifyStateOnlyManager:
-            return @"只提醒管理员消息";
+            return @"只提醒管理员消息".nim_localized;
         default:
-            return @"未知模式";
+            return @"未知模式".nim_localized;
     }
 }
 

@@ -10,19 +10,9 @@
 #import "NIMInputEmoticonDefine.h"
 #import "NIMKit.h"
 #import "NIMKitDevice.h"
+#import "NSBundle+NIMKit.h"
 
 @implementation UIImage (NIMKit)
-
-
-
-+ (UIImage *)nim_fetchEmoticon:(NSString *)imageNameOrPath{
-    UIImage *image = [UIImage nim_emoticonInKit:imageNameOrPath];
-    if (!image) {
-        image = [UIImage imageWithContentsOfFile:imageNameOrPath];
-    }
-    return image;
-}
-
 
 + (UIImage *)nim_fetchChartlet:(NSString *)imageName chartletId:(NSString *)chartletId{
     if ([chartletId isEqualToString:NIMKit_EmojiCatalog]) {
@@ -94,31 +84,23 @@
 
 
 + (UIImage *)nim_imageInKit:(NSString *)imageName{
-    NSString *bundleName = [[NIMKit sharedKit] resourceBundleName];
-    NSURL *bundleURL = [[NSBundle bundleForClass:[NIMKit class]] URLForResource:bundleName withExtension:nil];
-    
-    if (!bundleURL) // 兼容Pod use_frameworks!下，用户自定义资源文件
-    {
-        bundleURL = [[NSBundle mainBundle] URLForResource:bundleName withExtension:nil];
+    NSBundle *bundle = [NIMKit sharedKit].resourceBundle;
+    UIImage *image = [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
+    if (!image) {
+        image = [UIImage imageNamed:imageName];
     }
-    
-    if (!bundleURL)
-    {
-        return nil;
-    }
-
-    NSBundle *resourceBundle = [NSBundle bundleWithURL:bundleURL];
-    UIImage *image = [UIImage imageNamed:imageName inBundle:resourceBundle compatibleWithTraitCollection:nil];
-    
-    NSString *name = [bundleName stringByAppendingPathComponent:imageName];
-    //优先取上层bundle 里的图片，如果没有，则用自带资源的图片
-    return image? image : [UIImage imageNamed:name];
+    //NSAssert(image != nil, @"nim_imageInKit return nil!");
+    return image;
 }
 
-+ (UIImage *)nim_emoticonInKit:(NSString *)imageName
-{
-    NSString *name = [[[NIMKit sharedKit] emoticonBundleName] stringByAppendingPathComponent:imageName];
-    UIImage *image = [UIImage imageNamed:name];
++ (UIImage *)nim_emoticonInKit:(NSString *)imageName {
+    NSBundle *bundle = [NIMKit sharedKit].emoticonBundle;
+    NSString *name = [NIMKit_EmojiPath stringByAppendingPathComponent:imageName];
+    UIImage *image = [UIImage imageNamed:name inBundle:bundle compatibleWithTraitCollection:nil];
+    if (!image) {
+        image = [UIImage imageNamed:imageName];
+    }
+    NSAssert(image != nil, @"nim_emoticonInKit return nil!");
     return image;
 }
 
@@ -128,6 +110,7 @@
     UIImage * image = [self nim_imageForUpload:pixels];
     return [image nim_fixOrientation];
 }
+
 
 #pragma mark - Private
 
@@ -286,6 +269,45 @@
     CGImageRelease(cgimg);
     return img;
 }
+
+- (UIImage *)nim_cropedImageWithSize:(CGSize)targetSize
+{
+    // 裁剪两边
+    CGSize sourceSize = self.size;
+    CGFloat cropedWidth = sourceSize.width;
+    CGFloat cropedHeight = sourceSize.height;
+
+    if (CGSizeEqualToSize(targetSize, CGSizeZero) ||
+        CGSizeEqualToSize(sourceSize, CGSizeZero) ||
+        targetSize.width == 0 ||
+        targetSize.height == 0)
+    {
+        return  self;
+    }
+    
+    if (targetSize.width / targetSize.height > sourceSize.width / sourceSize.height)
+    {
+        cropedHeight = cropedWidth * (targetSize.height / targetSize.width);
+    }
+    else
+    {
+        cropedWidth = cropedHeight * (targetSize.width / targetSize.height);
+    }
+    
+    CGRect cropRect = CGRectMake((sourceSize.width - cropedWidth) * .5f, (sourceSize.height - cropedHeight) * .5f, cropedWidth, cropedHeight);
+    CGImageRef imageRef = CGImageCreateWithImageInRect(self.CGImage, cropRect);
+    UIImage *image = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    
+    // 缩放
+    UIGraphicsBeginImageContextWithOptions(targetSize, YES, 0);
+    [image drawInRect:CGRectMake(0, 0, targetSize.width, targetSize.height)];
+    image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
+}
+
 
 
 @end
