@@ -1,11 +1,11 @@
 Pod::Spec.new do |s| 
   s.name = 'NIMKit' 
-  s.version = '2.12.16' 
+  s.version = '2.12.15' 
   s.summary = 'Netease IM UI Kit' 
   s.homepage = 'http://netease.im' 
   s.license = { :'type' => 'Copyright', :'text' => ' Copyright 2019 Netease '} 
   s.authors = 'Netease IM Team'  
-  s.source  = { :git => 'https://github.com/netease-im/NIM_iOS_UIKit.git', :tag => '2.12.16'}  
+  s.source  = { :git => 'https://github.com/netease-im/NIM_iOS_UIKit.git', :tag => '2.12.15'}  
   s.platform = :ios, '9.0' 
   s.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
   s.libraries  = 'sqlite3.0', 'z', 'c++' 
