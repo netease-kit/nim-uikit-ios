@@ -54,6 +54,8 @@ Pod::Spec.new do |s|
     os.dependency 'Toast'
     os.dependency 'M80AttributedLabel'
     os.dependency 'TZImagePickerController'
+    os.dependency  'YYImage'
+    os.dependency 'YYImage/WebP'
   end
 
   
