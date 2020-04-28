@@ -98,12 +98,12 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
 *  NIMKit图片资源所在的 bundle 名称。
 */
-@property (nonatomic, copy) NSBundle *resourceBundle;
+@property (nonatomic, strong) NSBundle *resourceBundle;
 
 /**
  *  NIMKit表情资源所在的 bundle 名称。
  */
-@property (nonatomic, copy) NSBundle *emoticonBundle;
+@property (nonatomic, strong) NSBundle *emoticonBundle;
 
 /**
  *  NIMKit语言所在Bundle, 启动的时候根据系统语言会选择对应的语言包，后面用户可替换
