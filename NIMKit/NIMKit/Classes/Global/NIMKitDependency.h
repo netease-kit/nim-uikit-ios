@@ -44,7 +44,7 @@
 #if __has_include(<Toast/UIView+Toast.h>)
 #import <Toast/UIView+Toast.h>
 #elif __has_include("UIView+Toast.h")
-#import "Toast/UIView+Toast.h"
+#import "UIView+Toast.h"
 #else
 @import Toast;
 #endif
