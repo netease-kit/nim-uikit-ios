@@ -484,7 +484,7 @@
             [self.interactor addQuickComment:newComment
                                   completion:^(NSError *error)
             {
-//                [self.view hideToasts];
+                [self.view hideToasts];
                 if (error)
                 {
                     [self.view makeToast:@"操作失败".nim_localized duration:2 position:CSToastPositionCenter];
@@ -500,7 +500,7 @@
                                targetMessage:self.messageForMenu
                                   completion:^(NSError *error)
             {
-//                [self.view hideToasts];
+                [self.view hideToasts];
                 if (error)
                 {
                     [self.view makeToast:@"操作失败".nim_localized duration:2 position:CSToastPositionCenter];
@@ -642,7 +642,7 @@
                            targetMessage:message
                               completion:^(NSError *error)
          {
-//            [self.view hideToasts];
+            [self.view hideToasts];
             if (!error)
             {
                 return;
@@ -657,7 +657,7 @@
                                toMessage:message
                               completion:^(NSError *error)
          {
-//            [self.view hideToasts];
+            [self.view hideToasts];
             if (!error)
             {
                 return;
