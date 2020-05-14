@@ -23,6 +23,7 @@
 - (void)onSelectChartlet:(NSString *)chartletId
                  catalog:(NSString *)catalogId;
 
+- (void)onSelectEmoticon:(id)emoticon;
 
 - (void)onCancelRecording;
 
@@ -35,6 +36,9 @@
 - (void)onTapEmoticonBtn:(id)sender;
 
 - (void)onTapVoiceBtn:(id)sender;
+
+- (void)didReplyCancelled;
+
 
 @end
 

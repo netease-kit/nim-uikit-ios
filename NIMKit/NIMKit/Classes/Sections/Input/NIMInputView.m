@@ -22,8 +22,11 @@
 #import "NIMKitInfoFetchOption.h"
 #import "NIMKitKeyboardInfo.h"
 #import "NSString+NIMKit.h"
+#import "NIMReplyContentView.h"
+#import "M80AttributedLabel+NIMKit.h"
 
-@interface NIMInputView()<NIMInputToolBarDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate>
+
+@interface NIMInputView()<NIMInputToolBarDelegate,NIMInputEmoticonProtocol,NIMContactSelectDelegate,NIMReplyContentViewDelegate>
 {
     UIView  *_emoticonView;
 }
@@ -67,16 +70,21 @@
 - (CGSize)sizeThatFits:(CGSize)size
 {
     //这里不做.语法 get 操作，会提前初始化组件导致卡顿
+    CGFloat replyedContentHeight = _replyedContent.hidden ? 0 : _replyedContent.nim_height;
     CGFloat toolBarHeight = _toolBar.nim_height;
     CGFloat containerHeight = 0;
     switch (self.status)
     {
         case NIMInputStatusEmoticon:
+        {
             containerHeight = _emoticonContainer.nim_height;
             break;
+        }
         case NIMInputStatusMore:
+        {
             containerHeight = _moreContainer.nim_height;
             break;
+        }
         default:
         {
             UIEdgeInsets safeArea = UIEdgeInsetsZero;
@@ -92,7 +100,7 @@
         }
            break;
     }
-    CGFloat height = toolBarHeight + containerHeight;
+    CGFloat height = replyedContentHeight + toolBarHeight + containerHeight;
     CGFloat width = self.superview? self.superview.nim_width : self.nim_width;
     return CGSizeMake(width, height);
 }
@@ -124,8 +132,6 @@
         self.emoticonContainer.hidden = status != NIMInputStatusEmoticon;
     });
 }
-
-
 
 - (NIMInputAudioRecordIndicatorView *)audioRecordIndicator {
     if(!_audioRecordIndicator) {
@@ -280,6 +286,22 @@
     
 }
 
+- (void)refreshReplyedContent:(NIMMessage *)message
+{
+    NSString *text = [NSString stringWithFormat:@"%@", [[NIMKit sharedKit] replyedContentWithMessage:message]];
+    [self.replyedContent.label nim_setText:text];
+
+    self.replyedContent.hidden = NO;
+    [self.replyedContent setNeedsLayout];
+}
+
+- (void)dismissReplyedContent
+{
+    self.replyedContent.label.text = nil;
+    self.replyedContent.hidden = YES;
+    [self setNeedsLayout];
+}
+
 #pragma mark - private methods
 
 - (void)setFrame:(CGRect)frame
@@ -314,8 +336,45 @@
 {
     [super layoutSubviews];
     //这里不做.语法 get 操作，会提前初始化组件导致卡顿
+    if (!_replyedContent.hidden)
+    {
+        self.toolBar.nim_top = _replyedContent.nim_bottom;
+    }
+    else
+    {
+        self.toolBar.nim_top = 0.f;
+    }
     _moreContainer.nim_top     = self.toolBar.nim_bottom;
     _emoticonContainer.nim_top = self.toolBar.nim_bottom;
+}
+
+- (NIMReplyContentView *)replyedContent
+{
+    if (!_replyedContent)
+    {
+        _replyedContent = [[NIMReplyContentView alloc] initWithFrame:CGRectMake(0, 0, self.nim_width, 35)];
+        _replyedContent.hidden = YES;
+        _replyedContent.delegate = self;
+        [self addSubview:_replyedContent];
+    }
+    return _replyedContent;
+}
+
+- (void)setStatus:(NIMInputStatus)status
+{
+    if (_status != status)
+    {
+        _status = status;
+        switch (_status) {
+            case NIMInputStatusEmoticon:
+                [self checkEmoticonContainer];
+                break;
+            case NIMInputStatusMore:
+                [self checkMoreContainer];
+            default:
+                break;
+        }
+    }
 }
 
 
@@ -556,12 +615,21 @@
     [self sizeToFit];
 }
 
-
+- (void)addAtItems:(NSArray *)selectedContacts
+{
+    NSMutableString *str = [[NSMutableString alloc] initWithString:@"@"];
+    [self addContacts:selectedContacts prefix:str];
+}
 
 #pragma mark - NIMContactSelectDelegate
 - (void)didFinishedSelect:(NSArray *)selectedContacts
 {
     NSMutableString *str = [[NSMutableString alloc] initWithString:@""];
+    [self addContacts:selectedContacts prefix:str];
+}
+
+- (void)addContacts:(NSArray *)selectedContacts prefix:(NSMutableString *)str
+{
     NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
     option.session = self.session;
     option.forbidaAlias = YES;
@@ -583,7 +651,7 @@
 #pragma mark - InputEmoticonProtocol
 - (void)selectedEmoticon:(NSString*)emoticonID catalog:(NSString*)emotCatalogID description:(NSString *)description{
     if (!emotCatalogID) { //删除键
-        [self onTextDelete];
+        [self doButtonDeleteText];
     }else{
         if ([emotCatalogID isEqualToString:NIMKit_EmojiCatalog]) {
             [self.toolBar insertText:description];
@@ -627,6 +695,23 @@
     return NO;
 }
 
+- (BOOL)doButtonDeleteText
+{
+    NSRange range = [self delRangeForLastComponent];
+    if (range.length == 1)
+    {
+        //删的不是表情，可能是@
+        NIMInputAtItem *item = [self delRangeForAt];
+        if (item) {
+            range = item.range;
+        }
+    }
+    
+    [self.toolBar deleteText:range];
+    return NO;
+}
+
+
 - (NSRange)delRangeForEmoticon
 {
     NSString *text = self.toolBar.contentText;
@@ -648,6 +733,34 @@
             NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
             range = icon? subRange : NSMakeRange(selectedRange.location - 1, 1);
         }
+    }
+
+    return range;
+}
+
+- (NSRange)delRangeForLastComponent
+{
+    NSString *text = self.toolBar.contentText;
+    NSRange selectedRange = [self.toolBar selectedRange];
+    if (selectedRange.location == 0)
+    {
+        return NSMakeRange(0, 0) ;
+    }
+    
+    NSRange range = NSMakeRange(0, 0);
+    NSRange subRange = [self rangeForPrefix:@"[" suffix:@"]"];
+    
+    if (text.length > 0 &&
+        [[text substringFromIndex:text.length - 1] isEqualToString:@"]"] &&
+        subRange.length > 1)
+    {
+        NSString *name = [text substringWithRange:subRange];
+        NIMInputEmoticon *icon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:name];
+        range = icon? subRange : NSMakeRange(selectedRange.location - 1, 1);
+    }
+    else
+    {
+        range = [text nim_rangeOfLastUnicode];
     }
 
     return range;
@@ -699,6 +812,18 @@
         }
     }
     return index == -1? NSMakeRange(endLocation - 1, 1) : NSMakeRange(index, endLocation - index);
+}
+
+#pragma mark - NIMReplyContentViewDelegate
+
+- (void)onClearReplyContent:(id)sender
+{
+    [self setNeedsLayout];
+    self.toolBar.inputTextView.text = nil;
+    if ([self.actionDelegate respondsToSelector:@selector(didReplyCancelled)])
+    {
+        [self.actionDelegate didReplyCancelled];
+    }
 }
 
 @end

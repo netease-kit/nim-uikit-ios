@@ -19,9 +19,15 @@
 
 - (UIEdgeInsets)contentViewInsets:(NIMMessage *)message;
 
+
+@optional
+- (BOOL)enableBackgroundBubbleView:(NIMMessage *)message;
+
 @end
 
 @interface NIMSessionContentConfigFactory : NSObject
 + (instancetype)sharedFacotry;
 - (id<NIMSessionContentConfig>)configBy:(NIMMessage *)message;
+- (id<NIMSessionContentConfig>)replyConfigBy:(NIMMessage *)message;
+
 @end

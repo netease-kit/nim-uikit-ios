@@ -100,7 +100,7 @@
         if ([item isKindOfClass:[NIMMessageModel class]] && [item.message.messageId isEqual:message.messageId]) {
             model = item;
             //防止那种进了会话又退出去再进来这种行为，防止SDK里回调上来的message和会话持有的message不是一个，导致刷界面刷跪了的情况
-            model.message = message;
+//            model.message = message;
         }
     }
     return model;
@@ -119,12 +119,37 @@
     [self.dataSource resetMessages:handler];
 }
 
+- (void)enhancedResetMessages:(void(^)(NSError *error, NSArray *))handler
+{
+    [self.dataSource enhancedResetMessages:handler];
+}
+
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler{
     [self.dataSource loadHistoryMessagesWithComplete:handler];
 }
 
 - (void)loadNewMessagesWithComplete:(void (^)(NSInteger, NSArray *, NSError *))handler {
     [self.dataSource loadPullUpMessagesWithComplete:handler];
+}
+
+- (void)loadMessagePins:(void (^)(NSError *))handler
+{
+    [self.dataSource loadMessagePins:handler];
+}
+
+- (void)willDisplayMessageModel:(NIMMessageModel *)model
+{
+    [self.dataSource willDisplayMessageModel:model];
+}
+
+- (void)addPinForMessage:(NIMMessage *)message callback:(void (^)(NSError *))handler
+{
+    [self.dataSource addPinForMessage:message callback:handler];
+}
+
+- (void)removePinForMessage:(NIMMessage *)message callback:(void (^)(NSError *))handler
+{
+    [self.dataSource removePinForMessage:message callback:handler];
 }
 
 - (void)checkAttachmentState:(NSArray *)messages{

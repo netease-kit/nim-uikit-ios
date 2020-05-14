@@ -28,6 +28,7 @@
         [self addTarget:self action:@selector(onTouchUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
         _bubbleImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,defaultBubbleSize.width,defaultBubbleSize.height)];
         _bubbleImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        _bubbleImageView.hidden = YES;
         [self addSubview:_bubbleImageView];
     }
     return self;
@@ -36,9 +37,10 @@
 - (void)refresh:(NIMMessageModel*)data
 {
     _model = data;
-    [_bubbleImageView setImage:[self chatBubbleImageForState:UIControlStateNormal outgoing:data.message.isOutgoingMsg]];
-    [_bubbleImageView setHighlightedImage:[self chatBubbleImageForState:UIControlStateHighlighted outgoing:data.message.isOutgoingMsg]];
-    [self setNeedsLayout];
+    [_bubbleImageView setImage:[self chatBubbleImageForState:UIControlStateNormal
+                                                    outgoing:data.message.isOutgoingMsg]];
+    [_bubbleImageView setHighlightedImage:[self chatBubbleImageForState:UIControlStateHighlighted
+                                                               outgoing:data.message.isOutgoingMsg]];
 }
 
 

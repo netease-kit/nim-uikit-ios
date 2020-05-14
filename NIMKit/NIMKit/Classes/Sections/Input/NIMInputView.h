@@ -14,6 +14,7 @@
 
 @class NIMInputMoreContainerView;
 @class NIMInputEmoticonContainerView;
+@class NIMReplyContentView;
 
 
 
@@ -46,6 +47,8 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 @property (strong, nonatomic)  UIView *moreContainer;
 @property (strong, nonatomic)  UIView *emoticonContainer;
 
+@property (nonatomic, strong)   NIMReplyContentView *replyedContent;
+
 @property (nonatomic, assign) NIMInputStatus status;
 @property (nonatomic, strong) NIMInputAtCache *atCache;
 
@@ -64,5 +67,9 @@ typedef NS_ENUM(NSInteger, NIMAudioRecordPhase) {
 - (void)setInputTextPlaceHolder:(NSString*)placeHolder;
 - (void)updateAudioRecordTime:(NSTimeInterval)time;
 - (void)updateVoicePower:(float)power;
+- (void)addAtItems:(NSArray *)contacts;
+
+- (void)refreshReplyedContent:(NIMMessage *)message;
+- (void)dismissReplyedContent;
 
 @end

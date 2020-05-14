@@ -11,6 +11,7 @@
 @class NIMSession;
 @class NIMKitInfo;
 @class NIMKitInfoFetchOption;
+@class NIMMessage;
 
 @protocol NIMKitDataProvider <NSObject>
 
@@ -49,5 +50,14 @@
  */
 - (NIMKitInfo *)infoBySuperTeam:(NSString *)teamId
                          option:(NIMKitInfoFetchOption *)option;
+
+/**
+*  上层提供被回复消息内容给统一格式的接口
+*
+*  @param message 被回复的消息
+*
+*  @return 回复展示内容
+*/
+- (NSString *)replyedContentWithMessage:(NIMMessage *)message;
 
 @end

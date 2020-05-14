@@ -82,6 +82,11 @@
     }
 }
 
+- (void)stopPlayAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
+{
+    self.currentPlayingMessage = nil;
+}
+
 
 - (void)playAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
 {

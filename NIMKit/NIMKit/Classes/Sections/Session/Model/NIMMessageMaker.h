@@ -28,3 +28,12 @@
 + (NIMMessage *)msgWithLocation:(NIMKitLocationPoint *)locationPoint;
 
 @end
+
+
+@interface NIMCommentMaker : NSObject
+
++ (NIMQuickComment *)commentWithType:(int64_t)type
+                             content:(NSString *)content
+                                 ext:(NSString *)ext;
+
+@end

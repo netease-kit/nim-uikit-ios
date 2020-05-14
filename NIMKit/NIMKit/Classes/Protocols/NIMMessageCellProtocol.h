@@ -12,6 +12,7 @@
 
 @class NIMMessageModel;
 @class NIMMessage;
+@class NIMQuickComment;
 @class NIMKitEvent;
 @protocol NIMMessageCellDelegate <NSObject>
 
@@ -38,5 +39,11 @@
 - (void)onRetryMessage:(NIMMessage *)message;
 
 - (void)onSelectedMessage:(BOOL)selected message:(NIMMessage *)message;
+
+- (void)onClickReplyButton:(NIMMessage *)message;
+
+- (void)onClickEmoticon:(NIMMessage *)message
+                comment:(NIMQuickComment *)comment
+               selected:(BOOL)isSelected;
 
 @end

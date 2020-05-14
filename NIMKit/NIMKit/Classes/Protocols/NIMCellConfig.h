@@ -20,7 +20,6 @@
  */
 - (CGSize)contentSize:(NIMMessageModel *)model cellWidth:(CGFloat)width;
 
-
 /**
  *  需要构造的cellContent类名
  */
@@ -35,6 +34,26 @@
  *  左对齐的气泡，cell内容距离气泡的内间距，
  */
 - (UIEdgeInsets)contentViewInsets:(NIMMessageModel *)model;
+
+/**
+ * @return 返回message的所回复消息内容大小
+ */
+- (CGSize)replyContentSize:(NIMMessageModel *)model cellWidth:(CGFloat)width;
+
+/**
+ *  需要构造的ReplyContent类名
+ */
+- (NSString *)replyContent:(NIMMessageModel *)model;
+
+/**
+ *  左对齐的气泡，cell reply气泡距离整个cell的内间距
+ */
+- (UIEdgeInsets)replyCellInsets:(NIMMessageModel *)model;
+
+/**
+ *  左对齐的气泡，cell reply内容距离气泡的内间距，
+ */
+- (UIEdgeInsets)replyContentViewInsets:(NIMMessageModel *)model;
 
 /**
  *  是否显示头像
@@ -79,6 +98,11 @@
  *  是否开启重试叹号开关
  */
 - (BOOL)disableRetryButton:(NIMMessageModel *)model;
+
+/**
+ * 是否显示气泡背景图
+ */
+- (BOOL)shouldDisplayBubbleBackground:(NIMMessageModel *)model;
 
 
 @end

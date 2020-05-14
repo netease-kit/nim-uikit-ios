@@ -26,7 +26,7 @@ static char * kOriLineBreakMode = "kOriLineBreakMode";
         if (token.type == NIMInputTokenTypeEmoticon)
         {
             NIMInputEmoticon *emoticon = [[NIMInputEmoticonManager sharedManager] emoticonByTag:token.text];
-            UIImage *image = nil; ;
+            UIImage *image = nil;
 
             if(emoticon.filename &&
                emoticon.filename.length>0 &&

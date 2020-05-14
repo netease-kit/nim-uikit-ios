@@ -443,7 +443,7 @@
 				<key>tag</key>
 				<string>[爱心]</string>
 				<key>unicode</key>
-				<string>❤️</string>
+				<string>❤</string>
 			</dict>
 			<dict>
 				<key>id</key>
@@ -491,7 +491,7 @@
 				<key>tag</key>
 				<string>[太阳]</string>
 				<key>unicode</key>
-				<string>☀️</string>
+				<string>☀</string>
 			</dict>
 			<dict>
 				<key>id</key>
@@ -507,7 +507,7 @@
 				<key>tag</key>
 				<string>[多云]</string>
 				<key>unicode</key>
-				<string>☁️</string>
+				<string>☁</string>
 			</dict>
 			<dict>
 				<key>id</key>
@@ -523,7 +523,7 @@
 				<key>tag</key>
 				<string>[雨]</string>
 				<key>unicode</key>
-				<string>☔️</string>
+				<string>☔</string>
 			</dict>
 			<dict>
 				<key>id</key>
@@ -531,7 +531,7 @@
 				<key>tag</key>
 				<string>[雪花]</string>
 				<key>unicode</key>
-				<string>❄️</string>
+				<string>❄</string>
 			</dict>
 			<dict>
 				<key>id</key>

@@ -20,6 +20,8 @@
 
 @property (nonatomic, weak) id<NIMPlayAudioUIDelegate> audioUIDelegate;
 
+@property (nonatomic, strong) UIView *audioBackgroundView;
+
 - (void)setPlaying:(BOOL)isPlaying;
 
 @end

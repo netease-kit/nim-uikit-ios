@@ -42,6 +42,8 @@
 
 - (void)resetMessages:(void(^)(NSError *error))handler;
 
+- (void)enhancedResetMessages:(void(^)(NSError *error, NSArray *))handler;
+
 - (void)loadHistoryMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler;
 
 - (void)loadNewMessagesWithComplete:(void(^)(NSInteger index, NSArray *messages , NSError *error))handler;
@@ -55,6 +57,15 @@
 - (void)cleanCache;
 
 - (void)refreshMessageModelShowSelect:(BOOL)isShow;
+
+- (void)loadMessagePins:(void (^)(NSError *))handler;
+
+// 展示message之前做额外配置
+- (void)willDisplayMessageModel:(NIMMessageModel *)model;
+
+- (void)addPinForMessage:(NIMMessage *)message callback:(void (^)(NSError *))handler;
+
+- (void)removePinForMessage:(NIMMessage *)message callback:(void (^)(NSError *))handler;
 
 @end
 
@@ -88,6 +99,10 @@
 - (void)layoutAfterRefresh;
 
 - (void)adjustOffset:(NSInteger)row;
+
+- (void)dismissReplyContent;
+
+- (NSInteger)numberOfRows;
 
 @end
 

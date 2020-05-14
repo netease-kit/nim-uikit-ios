@@ -62,6 +62,45 @@
 
 }
 
+- (UIEdgeInsets)replyContentViewInsets:(NIMMessageModel *)model{
+    id<NIMSessionContentConfig>config = [[NIMSessionContentConfigFactory sharedFacotry] replyConfigBy:model.repliedMessage];
+    return [config contentViewInsets:model.repliedMessage];
+}
+
+
+- (UIEdgeInsets)replyCellInsets:(NIMMessageModel *)model
+{
+    if ([[self cellContent:model] isEqualToString:@"NIMSessionNotificationContentView"]) {
+        return UIEdgeInsetsZero;
+    }
+    CGFloat cellTopToBubbleTop           = 3;
+    CGFloat otherNickNameHeight          = 20;
+    CGFloat bubbleLeftToCellLeft         = 13;
+    CGFloat otherBubbleOriginX           = [self shouldShowAvatar:model] ? [self avatarSize:model].width + bubbleLeftToCellLeft : 0;
+    CGFloat cellBubbleButtomToCellButtom = 1;
+    if ([self shouldShowNickName:model])
+    {
+        //要显示名字
+        return UIEdgeInsetsMake(cellTopToBubbleTop + otherNickNameHeight ,otherBubbleOriginX,cellBubbleButtomToCellButtom, 0);
+    }
+    else
+    {
+        return UIEdgeInsetsMake(cellTopToBubbleTop,otherBubbleOriginX,cellBubbleButtomToCellButtom, 0);
+    }
+
+}
+
+- (CGSize)replyContentSize:(NIMMessageModel *)model cellWidth:(CGFloat)cellWidth {
+    id<NIMSessionContentConfig>config = [[NIMSessionContentConfigFactory sharedFacotry] replyConfigBy:model.repliedMessage];
+    return [config contentSize:cellWidth message:model.repliedMessage];
+}
+
+- (NSString *)replyContent:(NIMMessageModel *)model {
+    id<NIMSessionContentConfig>config = [[NIMSessionContentConfigFactory sharedFacotry] replyConfigBy:model.repliedMessage];
+    NSString *cellContent = [config cellContent:model.repliedMessage];
+    return cellContent.length ? cellContent : @"NIMSessionUnknowContentView";
+}
+
 - (BOOL)shouldShowAvatar:(NIMMessageModel *)model
 {
     return [[NIMKit sharedKit].config setting:model.message].showAvatar;
@@ -123,6 +162,16 @@
     {
         return model.message.attachmentDownloadState != NIMMessageAttachmentDownloadStateFailed;
     }
+}
+
+- (BOOL)shouldDisplayBubbleBackground:(NIMMessageModel *)model
+{
+    id<NIMSessionContentConfig> config = [[NIMSessionContentConfigFactory sharedFacotry] configBy:model.message];
+    if ([config respondsToSelector:@selector(enableBackgroundBubbleView:)])
+    {
+        return [config enableBackgroundBubbleView:model.message];
+    }
+    return YES;
 }
 
 @end

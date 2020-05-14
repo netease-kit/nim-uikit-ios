@@ -40,7 +40,7 @@
     NSString *identity = [layoutConfig cellContent:model];
     NIMMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:identity];
     if (!cell) {
-        NSString *clz = @"NIMMessageCell";
+        NSString *clz = @"NIMAdvancedMessageCell";
         [tableView registerClass:NSClassFromString(clz) forCellReuseIdentifier:identity];
         cell = [tableView dequeueReusableCellWithIdentifier:identity];
     }    

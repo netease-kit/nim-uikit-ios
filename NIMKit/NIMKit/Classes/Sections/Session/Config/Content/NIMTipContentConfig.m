@@ -36,4 +36,9 @@
     return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
+- (BOOL)enableBackgroundBubbleView:(NIMMessage *)message
+{
+    return NO;
+}
+
 @end

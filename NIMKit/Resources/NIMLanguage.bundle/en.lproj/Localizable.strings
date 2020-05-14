@@ -172,6 +172,7 @@
 "完成" = "Finish";
 "昨天" = "Yesterday";
 "前天" = "The day before yesterday";
+"前天%@ %zd:%02d" = "%@ %zd:%02d the day before yesterday";
 "凌晨" = "Early morning";
 "上午" = "Morning";
 "下午" = "Afternoon";
@@ -222,7 +223,7 @@
 "通话接听时长 " = "Call answering duration ";
 "对方正忙" = "Callee busy";
 "已拒绝" = "Rejected";
-"未接通，已取消" = "Not connected, canceled";
+"未接通，已取消" = "Not connected, cancelled";
 "你" = "You";
 "欢迎" = "Welcome";
 
@@ -246,6 +247,27 @@
 "改变了聊天室队列" = "Changed chat room queue";
 "讨论组" = "group chat";
 "群" = "Group";
+
+"标记消息" = "Pinned Messages";
+"取消标记" = "Un-pin";
+"选择会话类型" = "Select session type";
+"个人" = "Individual";
+"群组" = "Team";
+"超大群组" = "Super team";
+"确认转发给" = "Confirm Forward to";
+"确认转发" = "Confirm Forward";
+"转发失败" = "Forward Failed";
+"转发" = "Forward";
+"收藏" = "Collect";
+"取消收藏" = "Remove Collect";
+"已添加" = "Added";
+"收藏消息" = "Collected Messages";
+"暂无收藏消息" = "No Collected Message";
+"暂PIN消息" = "No Pinned Message";
+"跳转至指定位置" = "View in Chat";
+"已复制" = "Copied";
+"收藏失败" = "Collect Failed";
+"取消标记失败" = "Unpin Failed";
 
 "[语音]" = "[Audio]";
 "[图片]" = "[Image]";
@@ -325,3 +347,29 @@
 "%@接受%@的邀请进群" = "%@ accepts %@'s invitation to join the group";
 "%@被%@%@" = "%@ was %@%@";
 "%@解散了%@" = "%@ dismissed the %@";
+
+"未知消息" = "unknown";
+"操作失败" = "failed";
+
+"取消成功" = "Success";
+
+"\"未知消息\"" = "\"unknown message\"";
+"%@: [图片]" = "%@: [image]";
+"%@: [视频]" = "%@: [video]";
+"%@: [文件]" = "%@: [file]";
+"%@: [位置]" = "%@: [location]";
+"%@: [通知]" = "%@: [notification]";
+"%@: [提示]" = "%@: [tip]";
+"%@: [语音]" = "%@: [audio]";
+"%@: [自定义消息]" = "%@: [custom]";
+"\"回复 %@\"" = "\"Reply to %@\"";
+
+"%zd条回复" = "%zd replies";
+"1条回复" = "1 reply";
+
+"%@标记了这条消息" = "Pinned by %@";
+
+
+"取消成功" = "Cancelled";
+"操作失败" = "Failed";
+"评论成功" = "Added";

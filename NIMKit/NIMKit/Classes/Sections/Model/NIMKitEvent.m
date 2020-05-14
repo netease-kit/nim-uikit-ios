@@ -12,6 +12,9 @@ NSString *const NIMKitEventNameTapContent = @"NIMKitEventNameTapContent";
 NSString *const NIMKitEventNameTapLabelLink = @"NIMKitEventNameTapLabelLink";
 NSString *const NIMKitEventNameTapAudio   = @"NIMKitEventNameTapAudio";
 
+NSString *const NIMKitEventNameTapRepliedContent = @"NIMKitEventNameTapRepliedContent";
+
+
 @implementation NIMKitEvent
 
 @end

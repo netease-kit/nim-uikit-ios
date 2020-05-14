@@ -64,6 +64,27 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 #import "NIMKitIndependentModeExtraInfo.h"
 
+/**
+ *  标记消息页
+ */
+#import "NIMMessagePinListViewController.h"
+
+/**
+ * 收藏页
+ */
+#import "NIMCollectMessageListViewController.h"
+
+/**
+ * 聊天常用UI方法
+ */
+#import "NIMChatUIManagerProtocol.h"
+
+/**
+ * 快捷评论
+ */
+#import "NIMCollectionViewLeftAlignedLayout.h"
+#import "NIMKitQuickCommentUtil.h"
+
 @interface NIMKit : NSObject
 
 + (instancetype)sharedKit;
@@ -94,6 +115,11 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  *  此字段需要配合默认的 NIMKitDataProvider ( NIMKitDataProviderImpl ) 使用，如果上层自己定义了 provider ， 则忽略此字段。
  */
 @property (nonatomic,strong)  NIMKitIndependentModeExtraInfo *independentModeExtraInfo;
+
+/**
+ * 聊天模块常用UI方法
+ */
+@property (nonatomic, readonly) id<NIMChatUIManager> chatUIManager;
 
 /**
 *  NIMKit图片资源所在的 bundle 名称。
@@ -174,6 +200,13 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
  */
 - (NIMKitInfo *)infoBySuperTeam:(NSString *)teamId
                          option:(NIMKitInfoFetchOption *)option;
+
+/**
+ *  @param message 被回复的消息
+ *
+ *  @return 格式化的内容
+ */
+- (NSString *)replyedContentWithMessage:(NIMMessage *)message;
 
 @end
 

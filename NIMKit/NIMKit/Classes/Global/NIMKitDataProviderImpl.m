@@ -11,6 +11,7 @@
 #import "NIMKitDataProviderImpl.h"
 #import "NIMKitInfoFetchOption.h"
 #import "UIImage+NIMKit.h"
+#import "NSString+NIMKit.h"
 
 #pragma mark - kit data request
 @interface NIMKitDataRequest : NSObject
@@ -163,6 +164,53 @@
     info.avatarImage = self.defaultTeamAvatar;
     info.avatarUrlString = team.thumbAvatarUrl;
     return info;
+}
+
+- (NSString *)replyedContentWithMessage:(NIMMessage *)replyedMessage
+{
+    NIMMessageType messageType = replyedMessage.messageType;
+    NSString *content = @"未知消息".nim_localized;
+    NIMKitInfoFetchOption *option = [[NIMKitInfoFetchOption alloc] init];
+    option.message = replyedMessage;
+    NIMKitInfo *info = [[NIMKit sharedKit] infoByUser:replyedMessage.from option:option];
+    NSString *from = info.showName;
+    switch (messageType) {
+        case NIMMessageTypeText:
+            content = [NSString stringWithFormat:@"%@: %@".nim_localized, from, replyedMessage.text];
+            break;
+        case NIMMessageTypeImage:
+            content = [NSString stringWithFormat:@"%@: [图片]".nim_localized, from];
+            break;
+        case NIMMessageTypeVideo:
+            content = [NSString stringWithFormat:@"%@: [视频]".nim_localized, from];
+            break;
+        case NIMMessageTypeFile:
+            content = [NSString stringWithFormat:@"%@: [文件]".nim_localized, from];
+            break;
+        case NIMMessageTypeLocation:
+            content = [NSString stringWithFormat:@"%@: [位置]".nim_localized, from];
+            break;
+        case NIMMessageTypeNotification:
+            content = [NSString stringWithFormat:@"%@: [通知]".nim_localized, from];
+            break;
+        case NIMMessageTypeTip:
+            content = [NSString stringWithFormat:@"%@: [提示]".nim_localized, from];
+            break;
+        case NIMMessageTypeAudio:
+            content = [NSString stringWithFormat:@"%@: [语音]".nim_localized, from];
+            break;
+        case NIMMessageTypeCustom:
+            content = [NSString stringWithFormat:@"%@: [自定义消息]".nim_localized, from];
+            break;
+        default:
+            break;
+    }
+                       
+    if (content.length > 0)
+    {
+        content = [NSString stringWithFormat:@"“%@”".nim_localized, content];
+    }
+    return content;
 }
 
 #pragma mark - 用户信息拼装

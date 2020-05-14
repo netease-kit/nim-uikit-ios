@@ -14,8 +14,13 @@
 #import "NIMMessageMaker.h"
 #import "NIMLocationViewController.h"
 #import "NIMKitAudioCenter.h"
+#import "NIMMessageModel.h"
+#import "NIMKitQuickCommentUtil.h"
 
 static const void * const NTESDispatchMessageDataPrepareSpecificKey = &NTESDispatchMessageDataPrepareSpecificKey;
+
+typedef void(^NIMSessionInteractorHandler) (BOOL success, id result);
+
 dispatch_queue_t NTESMessageDataPrepareQueue()
 {
     static dispatch_queue_t queue;
@@ -41,6 +46,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 @property (nonatomic,strong) NSMutableArray *pendingAudioMessages;
 
 @property (nonatomic,assign) NIMKitSessionState sessionState;
+
+@property (nonatomic,strong) NIMMessage *referenceMessage;
 
 @end
 
@@ -102,9 +109,19 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
             model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
         }
+        
+        if ([_sessionConfig respondsToSelector:@selector(needShowReplyContent)]) {
+            model.enableRepliedContent = [_sessionConfig needShowReplyContent];
+        }
+        
+        if ([_sessionConfig respondsToSelector:@selector(needShowQuickComments)]) {
+            model.enableQuickComments = [_sessionConfig needShowQuickComments];
+        }
         [models addObject:model];
     }
+    
     NIMSessionMessageOperateResult *result = [self.dataSource insertMessageModels:models];
+    [self refreshAllChatExtendDatasByModels:models completion:nil];
     [self.layout insert:result.indexpaths animated:YES];
 }
 
@@ -121,6 +138,20 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
             model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
         }
+        
+        if ([_sessionConfig respondsToSelector:@selector(needShowReplyContent)]) {
+            model.enableRepliedContent = [_sessionConfig needShowReplyContent];
+        }
+        
+        if ([_sessionConfig respondsToSelector:@selector(needShowQuickComments)]) {
+            model.enableQuickComments = [_sessionConfig needShowQuickComments];
+        }
+        
+        
+        // 聊天扩展相关
+        [self refreshAllChatExtendDatasByMessage:[self threadMessageOfMessage:message]]; // 刷新父消息
+        [self refreshAllChatExtendDatasByModel:model completion:nil]; // 刷新本条消息
+        
         [models addObject:model];
     }
     NIMSessionMessageOperateResult *result = [self.dataSource addMessageModels:models];
@@ -146,6 +177,14 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
             if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
                 model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
             }
+            if ([_sessionConfig respondsToSelector:@selector(needShowReplyContent)]) {
+                model.enableRepliedContent = [_sessionConfig needShowReplyContent];
+            }
+            
+            if ([_sessionConfig respondsToSelector:@selector(needShowQuickComments)]) {
+                model.enableQuickComments = [_sessionConfig needShowQuickComments];
+            }
+            
             [weakSelf.layout calculateContent:model];
             [models addObject:model];
         }
@@ -162,21 +201,53 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     if (model) {
         NIMSessionMessageOperateResult *result = [self.dataSource deleteMessageModel:model];
         [self.layout remove:result.indexpaths];
+        
+        // 聊天扩展相关
+        [self refreshAllChatExtendDatasBySubModel:model completion:nil];
     }
     return model;
 }
 
 - (NIMMessageModel *)updateMessage:(NIMMessage *)message
 {
+    if (!message)
+    {
+        return nil;
+    }
+    
     NIMMessageModel *model = [self findMessageModel:message];
     if (model)
     {
+        // 聊天扩展相关
+        [self refreshAllChatExtendDatasByMessage:[self threadMessageOfMessage:message]];
+        [self refreshAllChatExtendDatasByModel:model
+                                  completion:nil];
         NIMSessionMessageOperateResult *result = [self.dataSource updateMessageModel:model];
         NSInteger index = [result.indexpaths.firstObject row];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-        [self.layout update:indexPath];
+        [self safelyReloadRowAtIndexPath:indexPath];
     }
     return model;
+}
+
+- (void)addPinForMessage:(NIMMessage *)message
+{
+    __weak typeof(self) wself = self;
+    [self.dataSource addPinForMessage:message callback:^(NSError *error) {
+        __strong typeof(self) sself = wself;
+        if (!sself) return;
+        [sself updateMessage:message];
+    }];
+}
+
+- (void)removePinForMessage:(NIMMessage *)message
+{
+    __weak typeof(self) wself = self;
+    [self.dataSource removePinForMessage:message callback:^(NSError *error) {
+        __strong typeof(self) sself = wself;
+        if (!sself) return;
+        [self updateMessage:message];
+    }];
 }
 
 - (void)setSessionState:(NIMKitSessionState)sessionState {
@@ -202,6 +273,13 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         if ([_sessionConfig respondsToSelector:@selector(disableSelectedForMessage:)]) {
             model.disableSelected = [_sessionConfig disableSelectedForMessage:model.message];;
         }
+        if ([_sessionConfig respondsToSelector:@selector(needShowReplyContent)]) {
+            model.enableRepliedContent = [_sessionConfig needShowReplyContent];
+        }
+        if ([_sessionConfig respondsToSelector:@selector(needShowQuickComments)]) {
+            model.enableQuickComments = [_sessionConfig needShowQuickComments];
+        }
+        
         return [self.dataSource indexAtModelArray:model];
     }
     return -1;
@@ -214,7 +292,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         NSDictionary *models = [self.dataSource checkReceipts:receipts];
         for (NSNumber *index in models.allKeys) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index.integerValue inSection:0];
-            [self.layout update:indexPath];
+            [self safelyReloadRowAtIndexPath:indexPath];
         }
     }
 }
@@ -233,6 +311,57 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (void)sendMessageReceipt:(NSArray *)messages
 {
     [self.dataSource sendMessageReceipt:messages];
+}
+
+- (void)addQuickComment:(NIMQuickComment *)comment
+             completion:(void(^)(NSError *error))completion
+{
+    NIMMessage *message = self.referenceMessage;
+    if (message)
+    {
+        [self addQuickComment:comment
+                    toMessage:message
+                   completion:^(NSError *error)
+        {
+            if (completion)
+            {
+                completion(error);
+            }
+        }];
+        self.referenceMessage = nil;
+    }
+}
+
+- (void)addQuickComment:(NIMQuickComment *)comment
+              toMessage:(NIMMessage *)message
+             completion:(void(^)(NSError *error))completion
+{
+    [[NIMSDK sharedSDK].chatExtendManager addQuickComment:comment
+                                                toMessage:message
+                                               completion:^(NSError * _Nullable error)
+    {
+        [self refreshQuickComments:message completion:nil];
+        if (completion)
+        {
+            completion(error);
+        }
+    }];
+}
+
+- (void)delQuickComment:(NIMQuickComment *)comment
+          targetMessage:(NIMMessage *)message
+             completion:(void(^)(NSError *error))completion
+{
+    [[NIMSDK sharedSDK].chatExtendManager deleteQuickComment:comment
+                                                  completion:^(NSError * _Nullable error)
+    {
+        self.referenceMessage = nil;
+        [self refreshQuickComments:message completion:nil];
+        if (completion)
+        {
+            completion(error);
+        }
+    }];
 }
 
 - (void)resetLayout
@@ -256,6 +385,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     __weak typeof(self) wself = self;
     [self.dataSource loadHistoryMessagesWithComplete:^(NSInteger index, NSArray *messages, NSError *error) {
         if (messages.count) {
+            [self refreshAllAfterFetchCommentsByMessages:messages];
+
             if (![self.sessionConfig respondsToSelector:@selector(autoFetchAttachment)]
                 || self.sessionConfig.autoFetchAttachment) {
                 [wself.dataSource checkAttachmentState:messages];
@@ -283,6 +414,9 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
                 [wself.dataSource checkAttachmentState:messages];
             }
         }
+        
+        [self refreshAllAfterFetchCommentsByMessages:messages];
+        
         if (handler) {
             handler(messages, error);
         }
@@ -292,15 +426,35 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (void)resetMessages:(void (^)(NSError *error))handler
 {
     __weak typeof(self) weakSelf = self;
-    [self.dataSource resetMessages:^(NSError *error) {
+    __block NSError *e = nil;
+    dispatch_group_t group = dispatch_group_create();
+    
+    dispatch_group_enter(group);
+    [self.dataSource enhancedResetMessages:^(NSError *error, NSArray *models) {
+        [self refreshAllAfterFetchCommentsByModels:models];
+
+        e = error;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self loadMessagePins:^(NSError *error) {
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        
         if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
         {
             [weakSelf.delegate didFetchMessageData];
             if (handler) {
-                handler(error);
+                handler(e);
             }
         }
-    }];
+    });
+    
+    
+    
 }
 
 - (void)autoFetchMessages
@@ -308,7 +462,20 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     if (![self.sessionConfig respondsToSelector:@selector(autoFetchWhenOpenSession)]
         || self.sessionConfig.autoFetchWhenOpenSession) {
         __weak typeof(self) weakSelf = self;
-        [self.dataSource resetMessages:^(NSError *error) {
+        dispatch_group_t group = dispatch_group_create();
+        
+        dispatch_group_enter(group);
+        [self.dataSource enhancedResetMessages:^(NSError *error, NSArray *models) {
+            [self refreshAllAfterFetchCommentsByModels:models];
+            dispatch_group_leave(group);
+        }];
+        
+        dispatch_group_enter(group);
+        [self loadMessagePins:^(NSError *error) {
+            dispatch_group_leave(group);
+        }];
+        
+        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
             if([weakSelf.delegate respondsToSelector:@selector(didFetchMessageData)])
             {
                 [weakSelf.delegate didFetchMessageData];
@@ -318,7 +485,8 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
                     [weakSelf.dataSource checkAttachmentState:weakSelf.items];
                 }
             }
-        }];
+        });
+        
     }
 }
 
@@ -333,6 +501,38 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 - (void)sendMessage:(NIMMessage *)message
 {    
     [[[NIMSDK sharedSDK] chatManager] sendMessage:message toSession:_session error:nil];
+    [self.layout dismissReplyContent];
+}
+
+- (void)sendMessage:(NIMMessage *)message toMessage:(NIMMessage *)toMessage
+{
+    if (toMessage)
+    {
+        [[[NIMSDK sharedSDK] chatExtendManager] reply:message
+                                                   to:toMessage
+                                                error:nil];
+    }
+    else if ([self.sessionConfig respondsToSelector:@selector(threadMessage)] && [self.sessionConfig threadMessage])
+    {
+        NIMMessage *threadMessage = [self.sessionConfig threadMessage];
+        [[[NIMSDK sharedSDK] chatExtendManager] reply:message
+                                                   to:threadMessage
+                                                error:nil];
+        
+        if ([self.sessionConfig respondsToSelector:@selector(clearThreadMessageAfterSent)])
+        {
+            if ([self.sessionConfig clearThreadMessageAfterSent])
+            {
+                [self.sessionConfig cleanThreadMessage];
+            }
+        }
+    }
+    else if (!toMessage)
+    {
+        [self sendMessage:message];
+    }
+    
+    [self.layout dismissReplyContent];
 }
 
 - (void)sendMessage:(NIMMessage *)message completion:(void(^)(NSError *))completion
@@ -341,9 +541,56 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         if(completion) {
             completion(err);
         }
+        [self.layout dismissReplyContent];
     }];
 }
 
+- (void)sendMessage:(NIMMessage *)message
+          toMessage:(NIMMessage *)toMessage
+         completion:(void(^)(NSError * error))completion
+{
+   if (toMessage)
+    {
+        [[NIMSDK sharedSDK].chatExtendManager reply:message
+                                                to:toMessage
+                                        completion:^(NSError * _Nullable error)
+         {
+            if (completion)
+            {
+                completion(error);
+            }
+            [self refreshAllChatExtendDatasByMessage:[self threadMessageOfMessage:toMessage]];
+
+        }];
+    }
+    else if ([self.sessionConfig respondsToSelector:@selector(threadMessage)] && [self.sessionConfig threadMessage])
+    {
+        NIMMessage *threadMessage = [self.sessionConfig threadMessage];
+        [[[NIMSDK sharedSDK] chatExtendManager] reply:message
+                                                   to:threadMessage
+                                           completion:^(NSError * _Nullable error) {
+            if ([self.sessionConfig respondsToSelector:@selector(clearThreadMessageAfterSent)])
+            {
+                if ([self.sessionConfig clearThreadMessageAfterSent])
+                {
+                    [self.sessionConfig cleanThreadMessage];
+                }
+            }
+            
+            if (completion)
+            {
+                completion(error);
+            }
+            [self refreshAllChatExtendDatasByMessage:[self threadMessageOfMessage:toMessage]];
+        }];
+    }
+    else if (!toMessage)
+    {
+        [self sendMessage:message completion:completion];
+    }
+    
+    [self.layout dismissReplyContent];
+}
 
 #pragma mark - Notifitcation
 - (void)vcBecomeActive:(NSNotification *)notification
@@ -403,14 +650,13 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 - (void)mediaPicturePressed
 {
-    __weak typeof(self) weakSelf = self;
     [self.mediaFetcher fetchPhotoFromLibrary:^(NSArray *images, NSString *path, PHAssetMediaType type) {
         switch (type) {
             case PHAssetMediaTypeImage:
             {
                 for (UIImage *image in images) {
                     NIMMessage *message = [NIMMessageMaker msgWithImage:image];
-                    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+                    [self sendMessage:message toMessage:nil];
                 }
                 if (path) {
                     NIMMessage *message;
@@ -425,14 +671,14 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
                         message = [NIMMessageMaker msgWithImagePath:path];
                     }
                     
-                    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+                    [self sendMessage:message toMessage:nil];
                 }
             }
                 break;
             case PHAssetMediaTypeVideo:
             {
                 NIMMessage *message = [NIMMessageMaker msgWithVideo:path];
-                [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+                [self sendMessage:message toMessage:nil];
             }
                 break;
             default:
@@ -444,7 +690,6 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 - (void)mediaShootPressed
 {
-    __weak typeof(self) weakSelf = self;
     [self.mediaFetcher fetchMediaFromCamera:^(NSString *path, UIImage *image) {
         NIMMessage *message;
         if (image) {
@@ -452,7 +697,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
         }else{
             message = [NIMMessageMaker msgWithVideo:path];
         }
-        [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:weakSelf.session error:nil];
+        [self sendMessage:message toMessage:nil];
     }];
 }
 
@@ -468,7 +713,7 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
 
 - (void)onSendLocation:(NIMKitLocationPoint *)locationPoint{ 
     NIMMessage *message = [NIMMessageMaker msgWithLocation:locationPoint];
-    [[NIMSDK sharedSDK].chatManager sendMessage:message toSession:self.session error:nil];
+    [self sendMessage:message toMessage:nil];
 }
 
 
@@ -492,6 +737,16 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     return YES;
 }
 
+- (void)loadMessagePins:(void (^)(NSError *))handler
+{
+    [self.dataSource loadMessagePins:handler];
+}
+
+- (void)willDisplayMessageModel:(NIMMessageModel *)model
+{
+    [self.dataSource willDisplayMessageModel:model];
+}
+
 #pragma mark - NIMSessionLayoutDelegate
 - (void)onRefresh
 {
@@ -506,12 +761,26 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
             [wself checkReceipts:nil];
             [wself markRead];
         }
+        
+        [self refreshAllChatExtendDatasByMessages:messages];
     }];
 }
 
 #pragma mark - NIMMediaManagerDelegate
 
 - (void)playAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
+{
+    if (!error)
+    {
+        BOOL disable = [self.sessionConfig respondsToSelector:@selector(disableAutoPlayAudio)] && [self.sessionConfig disableAutoPlayAudio];
+        if (!disable)
+        {
+            [self playNextAudio];
+        }
+    }
+}
+
+- (void)stopPlayAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
 {
     if (!error)
     {
@@ -650,7 +919,381 @@ dispatch_queue_t NTESMessageDataPrepareQueue()
     }
 }
 
+#pragma mark - 聊天扩展相关
 
+- (void)refreshAllChatExtendDatasByMessage:(NIMMessage *)message
+{
+    NIMMessageModel *model = [self findMessageModel:message];
+    if (model)
+    {
+        [self refreshAllChatExtendDatasByModel:model completion:nil];
+    }
+}
+
+- (void)refreshAllChatExtendDatasByMessages:(NSArray<NIMMessage *> *)messages
+{
+    for (NIMMessage *message in messages)
+    {
+        [self refreshAllChatExtendDatasByMessage:message];
+    }
+}
+
+- (void)refreshAllAfterFetchCommentsByMessages:(NSArray<NIMMessage *> *)messages
+{
+    [[NIMSDK sharedSDK].chatExtendManager fetchQuickComments:messages
+                                                  completion:^(NSError * error, NSMapTable<NIMMessage *,NSArray<NIMQuickComment *> *> * result,NSArray *failedMessages)
+    {
+        [self refreshAllChatExtendDatasByMessages:messages];
+    }];
+}
+
+- (void)refreshAllAfterFetchCommentsByModels:(NSArray<NIMMessageModel *> *)models
+{
+    NSMutableArray *messages = [NSMutableArray array];
+    for(NIMMessageModel *model in models)
+    {
+        [messages addObject:model.message];
+    }
+    
+    [self refreshAllAfterFetchCommentsByMessages:messages];
+}
+
+- (void)refreshAllChatExtendDatasBySubModel:(NIMMessageModel *)model
+                                 completion:(NIMSessionInteractorHandler)completion
+{
+    NIMMessage *message = model.message;
+    NIMMessage *threadMessage = [self threadMessageOfMessage:message];
+    NIMMessageModel *threadMessageModel = [self findMessageModel:threadMessage];
+    if (threadMessage)
+    {
+        [self refreshAllChatExtendDatasByModel:threadMessageModel completion:completion];
+    }
+    else
+    {
+       if (completion)
+        {
+            completion(NO, nil);
+        }
+    }
+}
+
+- (void)refreshAllChatExtendDatasByModel:(NIMMessageModel *)model
+                              completion:(NIMSessionInteractorHandler)completion
+
+{
+    
+    // Thread & 被回复消息
+    [self loadThreadAndRepliedMessages:model completion:^(BOOL success, id result)
+    {
+        if (success)
+        {
+            [self uiReloadMessageCell:model.message];
+        }
+        
+        if (completion)
+        {
+            completion(success, result);
+        }
+    }];
+    
+    // 该消息的子消息
+    [self loadChildMessages:model completion:^(BOOL success, id result)
+    {
+        if (success)
+        {
+            [self uiReloadMessageCell:model.message];
+        }
+        
+        if (completion)
+        {
+            completion(success, result);
+        }
+    }];
+    
+    // 该消息的快捷回复
+    [self loadQuickComments:model completion:^(BOOL success, id result)
+    {
+        if (success)
+        {
+            [self uiReloadMessageCell:model.message];
+        }
+        
+        if (completion)
+        {
+            completion(success, result);
+        }
+    }];
+}
+
+
+- (void)refreshAllChatExtendDatasByModels:(NSArray<NIMMessageModel *> *)models
+                               completion:(NIMSessionInteractorHandler)completion
+{
+    for (NIMMessageModel *model in models)
+    {
+        [self refreshAllChatExtendDatasByModel:model completion:nil];
+    }
+}
+
+- (void)refreshQuickComments:(NIMMessage *)message
+                  completion:(NIMSessionInteractorHandler)completion
+{
+   NIMMessageModel *model = [self findMessageModel:message];
+    if (model)
+    {
+        [self loadQuickComments:model completion:^(BOOL success, id result) {
+            [self uiReloadMessageCell:message];
+            if (completion)
+            {
+                completion(success, result);
+            }
+        }];
+    }
+    else
+    {
+        if (completion)
+        {
+            completion(NO, nil);
+        }
+    }
+}
+
+- (void)loadThreadAndRepliedMessages:(NIMMessageModel *)model
+                          completion:(NIMSessionInteractorHandler)completion
+{
+    NIMMessage *message = model.message;
+    if (!model.enableRepliedContent || !message)
+    {
+        if (completion)
+        {
+            completion(NO, nil);
+        }
+        return;
+    }
+    
+    // 父消息
+    NIMMessage *threadMessage = nil;
+    if (message.threadMessageId.length > 0)
+    {
+       threadMessage = [[[NIMSDK sharedSDK].conversationManager messagesInSession:message.session messageIds:@[message.threadMessageId]] firstObject];
+       model.parentMessage = threadMessage;
+        if (!threadMessage)
+        {
+            NIMChatExtendBasicInfo *key = [[NIMChatExtendBasicInfo alloc] init];
+            key.messageID = message.threadMessageId;
+            key.fromAccount = message.threadMessageFrom;
+            key.toAccount = message.threadMessageTo;
+            key.serverID = message.threadMessageServerId;
+            key.timestamp = message.threadMessageTime;
+            key.type = message.session.sessionType;
+            
+            if (key.messageID.length == 0)
+            {
+                if (completion)
+                {
+                    completion(NO, nil);
+                }
+                return;
+            }
+            
+            [self fetchMessageInfo:key completion:^(BOOL success, NIMMessage *result) {
+                model.parentMessage = result;
+                
+                if (completion)
+                {
+                    completion(success, nil);
+                }
+            }];
+        }
+        else
+        {
+            if (completion)
+            {
+                completion(YES, nil);
+            }
+        }
+    }
+    
+    // 被回复消息
+    NIMMessage *repliedMessage = nil;
+    if (message.repliedMessageId.length > 0)
+    {
+       repliedMessage = [[[NIMSDK sharedSDK].conversationManager messagesInSession:message.session
+                                                                        messageIds:@[message.repliedMessageId]] firstObject];
+        if (!repliedMessage)
+        {
+            NIMChatExtendBasicInfo *key = [[NIMChatExtendBasicInfo alloc] init];
+            key.messageID = message.repliedMessageId;
+            key.fromAccount = message.repliedMessageFrom;
+            key.toAccount = message.repliedMessageTo;
+            key.serverID = message.repliedMessageServerId;
+            key.timestamp = message.repliedMessageTime;
+            key.type = message.session.sessionType;
+            
+            if (!key)
+            {
+                if (completion)
+                {
+                    completion(NO, nil);
+                }
+                return;
+            }
+            
+            [self fetchMessageInfo:key completion:^(BOOL success, NIMMessage *result) {
+                model.repliedMessage = result;
+                
+                if (completion)
+                {
+                    completion(success, nil);
+                }
+            }];
+        }
+        else
+        {
+            model.repliedMessage = repliedMessage;
+            if (completion)
+            {
+                completion(YES, nil);
+            }
+        }
+    }
+}
+
+- (void)fetchMessageInfo:(NIMChatExtendBasicInfo *)info
+              completion:(NIMSessionInteractorHandler)completion
+{
+    if (!info)
+    {
+        if (completion)
+        {
+            completion(NO, nil);
+        }
+        return;
+    }
+    
+    [[NIMSDK sharedSDK].chatExtendManager fetchHistoryMessages:@[info]
+                                                      syncToDB:YES
+                                                    completion:^(NSError * error, NSMapTable<NIMChatExtendBasicInfo *,NIMMessage *> * result)
+    {
+        if (error)
+        {
+            if (completion)
+            {
+                completion(NO, nil);
+            }
+            return;
+        }
+        
+        completion(YES, [result objectForKey:info]);
+    }];
+}
+
+- (void)loadChildMessages:(NIMMessageModel *)model
+               completion:(NIMSessionInteractorHandler)completion
+{
+    NIMMessage *message = model.message;
+    if (!model.enableSubMessages || !message)
+    {
+        if (completion)
+        {
+            completion(NO, nil);
+        }
+        return;
+    }
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        NSArray *subMessages = [[NIMSDK sharedSDK].chatExtendManager subMessages:message];
+        model.childMessages = subMessages;
+        model.childMessagesCount = [[NIMSDK sharedSDK].chatExtendManager subMessagesCount:message];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion)
+            {
+                completion(YES, subMessages);
+            }
+        });
+        
+    });
+}
+
+- (void)loadQuickComments:(NIMMessageModel *)model
+               completion:(NIMSessionInteractorHandler)completion
+{
+    NIMMessage *message = model.message;
+    if (!model.enableQuickComments || !message)
+    {
+        if (completion)
+        {
+            completion(NO, nil);
+        }
+        return;
+    }
+    
+    [[NIMSDK sharedSDK].chatExtendManager quickCommentsByMessage:message
+                                                      completion:^(NSError * _Nullable error, NSMapTable<NSNumber *,NIMQuickComment *> * _Nullable result)
+    {
+        if (completion)
+        {
+            model.quickComments = result;
+            if (result.count > 0)
+            {
+                model.emoticonsContainerSize = [NIMKitQuickCommentUtil containerSizeWithComments:result];
+            }
+            else
+            {
+                model.emoticonsContainerSize = CGSizeZero;
+            }
+            completion(YES, result);
+        }
+    }];
+}
+
+- (void)uiReloadThreadMessageBySubMessage:(NIMMessageModel *)model
+{
+    NIMMessage *message = model.message;
+    NIMMessage *threadMessage = [self threadMessageOfMessage:message];
+    if (threadMessage)
+    {
+        [self uiReloadMessageCell:threadMessage];
+    }
+}
+
+- (void)uiReloadMessageCell:(NIMMessage *)message
+{
+    if (!message)
+    {
+        return;
+    }
+    NIMMessageModel *model = [self findMessageModel:message];
+    if (model)
+    {
+        NIMSessionMessageOperateResult *result = [self.dataSource updateMessageModel:model];
+        NSInteger index = [result.indexpaths.firstObject row];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        [self safelyReloadRowAtIndexPath:indexPath];
+    }
+    return;
+}
+
+
+- (NIMMessage *)threadMessageOfMessage:(NIMMessage *)message
+{
+    NIMSession *session = message.session;
+    NSString *messageID = message.threadMessageId;
+    if (messageID.length == 0)
+    {
+        return nil;
+    }
+    return [[[NIMSDK sharedSDK].conversationManager messagesInSession:session messageIds:@[messageID]] firstObject];
+}
+
+- (void)safelyReloadRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.dataSource.items.count != [self.layout numberOfRows]) {
+        NSLog(@"Error: trying to reload message while cell count: %ld is not equal to item count %ld.", [self.layout numberOfRows], self.dataSource.items.count);
+        return;
+    }
+    [self.layout update:indexPath];
+}
 
 
 @end

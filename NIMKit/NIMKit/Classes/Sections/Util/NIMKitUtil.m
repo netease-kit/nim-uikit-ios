@@ -9,6 +9,7 @@
 #import "NIMKitUtil.h"
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
+#import "NIMInputEmoticonManager.h"
 
 @implementation NIMKitUtil
 
@@ -671,6 +672,23 @@
         return member.type == NIMTeamMemberTypeOwner || member.type == NIMTeamMemberTypeManager || member.type == NIMTeamMemberTypeNormal;
     }
 
+}
+
++ (NSString *)quickCommentContent:(NIMQuickComment *)comment
+{
+    NSString *ID = [NSString stringWithFormat:NIMKitQuickCommentFormat, comment.replyType];
+    NIMInputEmoticon *emoticon = [[NIMInputEmoticonManager sharedManager] emoticonByID:ID];
+    NSString *content = nil;
+    if (emoticon)
+    {
+        if (emoticon.type == NIMEmoticonTypeUnicode) {
+            content = emoticon.unicode;
+        } else {
+            content = emoticon.tag;
+        }
+    }
+    content = [NSString stringWithFormat:@"%@|%@", content, comment.from];
+    return content;
 }
 
 @end

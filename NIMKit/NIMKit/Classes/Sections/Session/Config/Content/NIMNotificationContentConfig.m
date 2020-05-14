@@ -85,4 +85,24 @@
     return [[NIMKit sharedKit].config setting:message].contentInsets;
 }
 
+- (BOOL)enableBackgroundBubbleView:(NIMMessage *)message
+{
+    NIMNotificationObject *object = message.messageObject;
+    NSAssert([object isKindOfClass:[NIMNotificationObject class]], @"message should be notification");
+    
+    switch (object.notificationType) {
+        case NIMNotificationTypeTeam:
+        case NIMNotificationTypeSuperTeam:
+        case NIMNotificationTypeChatroom:
+            return NO;
+        case NIMNotificationTypeNetCall:
+            return YES;
+        case NIMNotificationTypeUnsupport:
+            return NO;
+        default:
+            break;
+    }
+    return YES;
+}
+
 @end

@@ -121,4 +121,11 @@
     return returnValue;
 }
 
+- (NSRange)nim_rangeOfLastUnicode
+{
+    NSUInteger lastCharIndex = [self length] - 1;
+    NSRange rangeOfLastChar = [self rangeOfComposedCharacterSequenceAtIndex:lastCharIndex];
+    return rangeOfLastChar;
+}
+
 @end

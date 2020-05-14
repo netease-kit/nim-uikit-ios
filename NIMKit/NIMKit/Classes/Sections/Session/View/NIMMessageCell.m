@@ -113,12 +113,18 @@
     [self.contentView addSubview:_selectButton];
     _selectButton.hidden = YES;
     
+    //bubblesBackgroundView
+    _bubblesBackgroundView = [[UIImageView alloc] init];
+    
+    [self.contentView addSubview:_bubblesBackgroundView];
+    
     //selectButtonMask
     _selectButtonMask = [UIButton buttonWithType:UIButtonTypeCustom];
     [_selectButtonMask setBackgroundColor:[UIColor clearColor]];
     [_selectButtonMask addTarget:self action:@selector(onTapSelectedButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.contentView addSubview:_selectButtonMask];
     _selectButtonMask.hidden = YES;
+    
     
 }
 
@@ -143,6 +149,8 @@
 
 - (void)refresh
 {
+    [self refreshBubblesBackgroundView];
+    [self addReplyedContentViewIfNotExist];
     [self addContentViewIfNotExist];
     [self addUserCustomViews];
     
@@ -166,9 +174,6 @@
     [_nameLabel setHidden:![self needShowNickName]];
     
     
-    [_bubbleView refresh:self.model];
-    [_bubbleView setNeedsLayout];
-    
     BOOL isActivityIndicatorHidden = [self activityIndicatorHidden];
     if (isActivityIndicatorHidden)
     {
@@ -185,6 +190,13 @@
     [self refreshReadButton];
     
     [self setNeedsLayout];
+}
+
+- (void)refreshBubblesBackgroundView
+{
+    _bubblesBackgroundView.hidden = ![[NIMKit sharedKit].layoutConfig shouldDisplayBubbleBackground:self.model];;
+    [_bubblesBackgroundView setImage:[self chatBubbleImageForState:UIControlStateNormal]];
+    [_bubblesBackgroundView setHighlightedImage:[self chatBubbleImageForState:UIControlStateHighlighted]];
 }
 
 - (void)refreshReadButton
@@ -206,6 +218,32 @@
     }
 }
 
+- (void)addReplyedContentViewIfNotExist
+{
+    if ([self.model needShowRepliedContent])
+    {
+        if (!_replyedBubbleView)
+        {
+            id<NIMCellLayoutConfig> layoutConfig = [[NIMKit sharedKit] layoutConfig];
+            NSString *contentStr = [layoutConfig replyContent:self.model];
+            NSAssert([contentStr length] > 0, @"should offer cell content class name");
+            Class clazz = NSClassFromString(contentStr);
+            NIMSessionMessageContentView *contentView =  [[clazz alloc] initSessionMessageContentView];
+            NSAssert(contentView, @"can not init content view");
+            _replyedBubbleView = contentView;
+            _replyedBubbleView.delegate = self;
+            [self.contentView insertSubview:_replyedBubbleView belowSubview:_selectButtonMask];
+        }
+        [_replyedBubbleView refresh:self.model];
+        [_replyedBubbleView setNeedsLayout];
+    }
+    else if (_replyedBubbleView)
+    {
+        [_replyedBubbleView removeFromSuperview];
+        _replyedBubbleView = nil;
+    }
+}
+
 - (void)addContentViewIfNotExist
 {
     if (_bubbleView == nil)
@@ -224,6 +262,9 @@
         }
         [self.contentView insertSubview:_bubbleView belowSubview:_selectButtonMask];
     }
+    
+    [_bubbleView refresh:self.model];
+    [_bubbleView setNeedsLayout];
 }
 
 - (void)addUserCustomViews
@@ -245,7 +286,10 @@
     [self layoutSelectButton];
     [self layoutAvatar];
     [self layoutNameLabel];
+    [self layoutReplyBubbleView];
     [self layoutBubbleView];
+    [self fixReplyBubbleAndBubbleLeft];
+    [self layoutBubblesBackgroundView];
     [self layoutRetryButton];
     [self layoutAudioPlayedIcon];
     [self layoutActivityIndicator];
@@ -290,6 +334,38 @@
     }
 }
 
+- (void)layoutReplyBubbleView
+{
+    if (!_replyedBubbleView)
+    {
+        return;
+    }
+    
+    CGSize size  = [self.model replyContentSize:self.nim_width];
+    UIEdgeInsets insets = self.model.replyContentViewInsets;
+    size.width  = size.width + insets.left * 2 + insets.right;
+    size.height = size.height + insets.top + insets.bottom;
+    _replyedBubbleView.nim_size = size;
+    
+    UIEdgeInsets contentInsets = self.model.replyBubbleViewInsets;
+    CGFloat left = contentInsets.left;
+    CGFloat protraitRightToBubble = 5.f;
+    if (!self.model.shouldShowLeft)
+    {
+        CGFloat right = self.model.shouldShowAvatar? CGRectGetMinX(self.headImageView.frame)  - protraitRightToBubble : self.nim_width;
+        left = right - CGRectGetWidth(self.replyedBubbleView.bounds);
+    } else {
+        if (![self needShowSelectButton]) {
+            left = contentInsets.left;
+        } else {
+            left = contentInsets.left + _selectButton.nim_right + protraitRightToBubble;
+        }
+    }
+    
+    _replyedBubbleView.nim_left = left;
+    _replyedBubbleView.nim_top  = contentInsets.top;
+}
+
 - (void)layoutBubbleView
 {
     CGSize size  = [self.model contentSize:self.nim_width];
@@ -314,8 +390,56 @@
     }
     
     _bubbleView.nim_left = left;
-    _bubbleView.nim_top  = contentInsets.top;
+    if (_replyedBubbleView)
+    {
+        _bubbleView.nim_top  = self.replyedBubbleView.nim_bottom;
+    }
+    else
+    {
+        _bubbleView.nim_top  = contentInsets.top;
+    }
+
 }
+
+- (void)fixReplyBubbleAndBubbleLeft
+{
+    if (!self.replyedBubbleView)
+    {
+        return;
+    }
+    
+    CGFloat left = 0;
+    if (!self.model.shouldShowLeft)
+    {
+        
+        left = self.replyedBubbleView.nim_left < self.bubbleView.nim_left ? self.replyedBubbleView.nim_left : self.bubbleView.nim_left;
+    }
+    else
+    {
+        left = self.replyedBubbleView.nim_left > self.bubbleView.nim_left ? self.replyedBubbleView.nim_left : self.bubbleView.nim_left;
+    }
+    
+    self.replyedBubbleView.nim_left = left;
+    self.bubbleView.nim_left = left;
+}
+
+- (void)layoutBubblesBackgroundView
+{
+    CGFloat height = self.replyedBubbleView.nim_height + self.bubbleView.nim_height;
+    CGFloat width = self.replyedBubbleView.nim_width > self.bubbleView.nim_width ? self.replyedBubbleView.nim_width : self.bubbleView.nim_width;
+    self.bubblesBackgroundView.nim_size = CGSizeMake(width, height);
+    self.bubblesBackgroundView.nim_left = self.bubbleView.nim_left;
+    
+    if (self.replyedBubbleView)
+    {
+        self.bubblesBackgroundView.nim_top = self.replyedBubbleView.nim_top;
+    }
+    else
+    {
+        self.bubblesBackgroundView.nim_top = self.bubbleView.nim_top;
+    }
+}
+
 
 - (void)layoutActivityIndicator
 {
@@ -323,14 +447,14 @@
         CGFloat centerX = 0;
         if (!self.model.shouldShowLeft)
         {
-            centerX = CGRectGetMinX(_bubbleView.frame) - [self retryButtonBubblePadding] - CGRectGetWidth(_traningActivityIndicator.bounds)/2;;
+            centerX = CGRectGetMinX(_bubblesBackgroundView.frame) - [self retryButtonBubblePadding] - CGRectGetWidth(_traningActivityIndicator.bounds)/2;;
         }
         else
         {
-            centerX = CGRectGetMaxX(_bubbleView.frame) + [self retryButtonBubblePadding] +  CGRectGetWidth(_traningActivityIndicator.bounds)/2;
+            centerX = CGRectGetMaxX(_bubblesBackgroundView.frame) + [self retryButtonBubblePadding] +  CGRectGetWidth(_traningActivityIndicator.bounds)/2;
         }
         self.traningActivityIndicator.center = CGPointMake(centerX,
-                                                           _bubbleView.center.y);
+                                                           _bubblesBackgroundView.center.y);
     }
 }
 
@@ -340,14 +464,14 @@
         CGFloat centerX = 0;
         if (self.model.shouldShowLeft)
         {
-            centerX = CGRectGetMaxX(_bubbleView.frame) + [self retryButtonBubblePadding] +CGRectGetWidth(_retryButton.bounds)/2;
+            centerX = CGRectGetMaxX(_bubblesBackgroundView.frame) + [self retryButtonBubblePadding] +CGRectGetWidth(_retryButton.bounds)/2;
         }
         else
         {
-            centerX = CGRectGetMinX(_bubbleView.frame) - [self retryButtonBubblePadding] - CGRectGetWidth(_retryButton.bounds)/2;
+            centerX = CGRectGetMinX(_bubblesBackgroundView.frame) - [self retryButtonBubblePadding] - CGRectGetWidth(_retryButton.bounds)/2;
         }
         
-        _retryButton.center = CGPointMake(centerX, _bubbleView.center.y);
+        _retryButton.center = CGPointMake(centerX, _bubblesBackgroundView.center.y);
     }
 }
 
@@ -356,13 +480,13 @@
         CGFloat padding = [self audioPlayedIconBubblePadding];
         if (self.model.shouldShowLeft)
         {
-            _audioPlayedIcon.nim_left = _bubbleView.nim_right + padding;
+            _audioPlayedIcon.nim_left = _bubblesBackgroundView.nim_right + padding;
         }
         else
         {
-            _audioPlayedIcon.nim_right = _bubbleView.nim_left - padding;
+            _audioPlayedIcon.nim_right = _bubblesBackgroundView.nim_left - padding;
         }
-        _audioPlayedIcon.nim_top = _bubbleView.nim_top;
+        _audioPlayedIcon.nim_top = _bubblesBackgroundView.nim_top;
     }
 }
 
@@ -370,8 +494,8 @@
     
     if (!_readButton.isHidden) {
         
-        CGFloat left = _bubbleView.nim_left;
-        CGFloat bottom = _bubbleView.nim_bottom;
+        CGFloat left = _bubblesBackgroundView.nim_left;
+        CGFloat bottom = _bubblesBackgroundView.nim_bottom;
         
         _readButton.nim_left = left - CGRectGetWidth(_readButton.bounds) - [self readButtonBubblePadding];
         _readButton.nim_bottom = bottom;
@@ -418,6 +542,21 @@
 }
 
 #pragma mark - Private
+
+- (UIImage *)chatBubbleImageForState:(UIControlState)state
+{
+    
+    NIMKitSetting *setting = [[NIMKit sharedKit].config setting:self.model.message];
+    if (state == UIControlStateNormal)
+    {
+        return setting.normalBackgroundImage;
+    }
+    else
+    {
+        return setting.highLightBackgroundImage;
+    }
+}
+
 - (CGRect)selectButtonRect {
     CGSize size = _selectButton.nim_size;
     CGRect avatarRect = [self avatarViewRect];

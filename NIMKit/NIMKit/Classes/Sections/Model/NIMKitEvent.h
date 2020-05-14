@@ -26,3 +26,6 @@
 extern NSString *const NIMKitEventNameTapContent;
 extern NSString *const NIMKitEventNameTapLabelLink;
 extern NSString *const NIMKitEventNameTapAudio;
+
+extern NSString *const NIMKitEventNameTapRepliedContent;
+

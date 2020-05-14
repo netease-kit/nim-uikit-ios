@@ -33,6 +33,7 @@
     
     self.label.textColor = setting.textColor;
     self.label.font = setting.font;
+    self.bubbleImageView.hidden = NO;
 }
 
 - (void)layoutSubviews
@@ -44,6 +45,5 @@
     self.label.nim_centerY = self.nim_height * .5f;
     self.bubbleImageView.frame = CGRectInset(self.label.frame, -8, -4);
 }
-
 
 @end

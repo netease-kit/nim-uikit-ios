@@ -81,6 +81,7 @@
         self.tableView.hidden = YES;
     }else{
         self.tableView.hidden = NO;
+        [self customSortRecents:self.recentSessions];
     }
     [self.tableView reloadData];
 }
@@ -162,7 +163,7 @@
               totalUnreadCount:(NSInteger)totalUnreadCount
 {
     //清理本地数据
-    NSInteger index = [self.recentSessions indexOfObject:recentSession];
+    NSUInteger index = [self.recentSessions indexOfObject:recentSession];
     [self.recentSessions removeObjectAtIndex:index];
     
     //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作

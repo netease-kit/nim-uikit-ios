@@ -13,6 +13,8 @@
 #import "NIMCellLayoutConfig.h"
 #import "NIMKitInfoFetchOption.h"
 #import "NSBundle+NIMKit.h"
+#import "NSString+NIMKit.h"
+#import "NIMChatUIManager.h"
 
 extern NSString *const NIMKitUserInfoHasUpdatedNotification;
 extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
@@ -79,6 +81,11 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
         _languageBundle = [NSBundle nim_defaultLanguageBundle];
     }
     return _languageBundle;
+}
+
+- (id<NIMChatManager>)chatUIManager
+{
+    return NIMChatUIManager.sharedManager;
 }
 
 - (id<NIMCellLayoutConfig>)layoutConfig
@@ -175,6 +182,21 @@ extern NSString *const NIMKitTeamInfoHasUpdatedNotification;
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NIMInputEmoticonManager sharedManager] start];
     });
+}
+
+- (NSString *)replyedContentWithMessage:(NIMMessage *)message
+{
+    NSString *info = nil;
+
+    if (!message)
+    {
+        return @"\"未知消息\"".nim_localized;
+    }
+    
+    if (self.provider && [self.provider respondsToSelector:@selector(replyedContentWithMessage:)]) {
+        info = [self.provider replyedContentWithMessage:message];
+    }
+    return info;
 }
 
 @end

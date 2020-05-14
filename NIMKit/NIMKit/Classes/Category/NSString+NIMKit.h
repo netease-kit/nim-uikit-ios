@@ -29,4 +29,5 @@
 
 - (BOOL)nim_containsEmoji;
 
+- (NSRange)nim_rangeOfLastUnicode;
 @end

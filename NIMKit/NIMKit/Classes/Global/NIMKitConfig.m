@@ -34,26 +34,44 @@
     return self;
 }
 
-
 - (NSArray *)defaultMediaItems
 {
     return @[[NIMMediaItem item:@"onTapMediaItemPicture:"
-                    normalImage:[UIImage nim_imageInKit:@"bk_media_picture_normal"]
-                  selectedImage:[UIImage nim_imageInKit:@"bk_media_picture_pressed"]
-                          title:@"相册".nim_localized],
-             
-             [NIMMediaItem item:@"onTapMediaItemShoot:"
-                    normalImage:[UIImage nim_imageInKit:@"bk_media_shoot_normal"]
-                  selectedImage:[UIImage nim_imageInKit:@"bk_media_shoot_pressed"]
-                          title:@"拍摄".nim_localized],
-             
-             [NIMMediaItem item:@"onTapMediaItemLocation:"
-                    normalImage:[UIImage nim_imageInKit:@"bk_media_position_normal"]
-                  selectedImage:[UIImage nim_imageInKit:@"bk_media_position_pressed"]
-                          title:@"位置".nim_localized],
-             ];
+           normalImage:[UIImage nim_imageInKit:@"bk_media_picture_normal"]
+         selectedImage:[UIImage nim_imageInKit:@"bk_media_picture_pressed"]
+                 title:@"相册".nim_localized],
+    
+    [NIMMediaItem item:@"onTapMediaItemShoot:"
+           normalImage:[UIImage nim_imageInKit:@"bk_media_shoot_normal"]
+         selectedImage:[UIImage nim_imageInKit:@"bk_media_shoot_pressed"]
+                 title:@"拍摄".nim_localized],
+    
+    [NIMMediaItem item:@"onTapMediaItemLocation:"
+           normalImage:[UIImage nim_imageInKit:@"bk_media_position_normal"]
+         selectedImage:[UIImage nim_imageInKit:@"bk_media_position_pressed"]
+                 title:@"位置".nim_localized],
+    ];
 }
 
+- (NSArray *)defaultMenuItemsWithMessage:(NIMMessage *)message
+{
+    NSMutableArray *menuItems = [NSMutableArray array];
+    if (message.messageType == NIMMessageTypeText)
+    {
+        [menuItems addObject:[NIMMediaItem item:@"onTapMenuItemCopy:"
+                                    normalImage:[UIImage nim_imageInKit:@"bk_media_picture_normal"]
+                                  selectedImage:[UIImage nim_imageInKit:@"bk_media_picture_pressed"]
+                                          title:@"复制".nim_localized]];
+    }
+    
+    NIMMediaItem *delItem = [NIMMediaItem item:@"onTapMenuItemDelete:"
+                                normalImage:[UIImage nim_imageInKit:@"bk_media_shoot_normal"]
+                              selectedImage:[UIImage nim_imageInKit:@"bk_media_shoot_pressed"]
+                                      title:@"删除".nim_localized];
+        
+    [menuItems addObject:delItem];
+    return menuItems;
+}
 
 - (CGFloat)maxNotificationTipPadding{
     return 20.f;
@@ -119,6 +137,12 @@
     return settings.unsupportSetting;
 }
 
+- (NIMKitSetting *)repliedSetting:(NIMMessage *)message
+{
+    NIMKitSettings *settings = message.isOutgoingMsg? self.rightBubbleSettings : self.leftBubbleSettings;
+    return settings.repliedSetting;
+}
+
 @end
 
 
@@ -149,14 +173,24 @@
     [self applyDefaultSuperTeamNotificationSettings];
     [self applyDefaultChatroomNotificationSettings];
     [self applyDefaultNetcallNotificationSettings];
+    [self applyDefaultRepliedSettings];
+}
+
+- (void)applyDefaultRepliedSettings
+{
+    _repliedSetting = [[NIMKitSetting alloc] init];
+    _repliedSetting.contentInsets = _isRight? UIEdgeInsetsFromString(@"{9,11,0,15}") : UIEdgeInsetsFromString(@"{9,15,0,9}");
+    _repliedSetting.replyedTextColor = _isRight? NIMKit_UIColorFromRGB(0xE0EAFF) : NIMKit_UIColorFromRGB(0x111111);;
+    _repliedSetting.replyedFont      = [UIFont systemFontOfSize:14];
+    _repliedSetting.showAvatar = YES;
 }
 
 - (void)applyDefaultTextSettings
 {
     _textSetting = [[NIMKitSetting alloc] init:_isRight];
-    _textSetting.contentInsets = _isRight? UIEdgeInsetsFromString(@"{11,11,9,15}") : UIEdgeInsetsFromString(@"{11,15,9,9}");
+    _textSetting.contentInsets = _isRight? UIEdgeInsetsFromString(@"{9,11,9,15}") : UIEdgeInsetsFromString(@"{9,15,9,9}");
     _textSetting.textColor = _isRight? NIMKit_UIColorFromRGB(0xFFFFFF) : NIMKit_UIColorFromRGB(0x000000);
-    _textSetting.font      = [UIFont systemFontOfSize:14];
+    _textSetting.font      = [UIFont systemFontOfSize:16];
     _textSetting.showAvatar = YES;
 }
 

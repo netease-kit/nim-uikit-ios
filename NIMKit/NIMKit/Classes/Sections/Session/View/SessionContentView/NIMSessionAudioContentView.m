@@ -12,6 +12,7 @@
 #import "UIImage+NIMKit.h"
 #import "NIMKitAudioCenter.h"
 #import "NIMKit.h"
+#import "UIColor+NIMKit.h"
 
 @interface NIMSessionAudioContentView()<NIMMediaManagerDelegate>
 
@@ -48,6 +49,11 @@
 }
 
 - (void)addVoiceView{
+    _audioBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
+    _audioBackgroundView.layer.cornerRadius = 16.f;
+    _audioBackgroundView.userInteractionEnabled = NO;
+    [self addSubview:_audioBackgroundView];
+    
     UIImage * image = [UIImage nim_imageInKit:@"icon_receiver_voice_playing.png"];
     _voiceImageView = [[UIImageView alloc] initWithImage:image];
     NSArray * animateNames = @[@"icon_receiver_voice_playing_001.png",@"icon_receiver_voice_playing_002.png",@"icon_receiver_voice_playing_003.png"];
@@ -63,9 +69,11 @@
     _durationLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _durationLabel.backgroundColor = [UIColor clearColor];
     [self addSubview:_durationLabel];
+    
+    
 }
 
-- (void)refresh:(NIMMessageModel *)data{
+- (void)refresh:(NIMMessageModel *)data {
     [super refresh:data];
     NIMAudioObject *object = self.model.message.messageObject;
     self.durationLabel.text = [NSString stringWithFormat:@"%zd\"",(object.duration+500)/1000];//四舍五入
@@ -78,6 +86,23 @@
     [self.durationLabel sizeToFit];
     
     [self setPlaying:self.isPlaying];
+    
+    [self refreshBackground:data];
+}
+
+- (void)refreshBackground:(NIMMessageModel *)data
+{
+    UIColor *color = nil;
+    if (data.shouldShowLeft)
+    {
+        color = [UIColor colorWithHex:0xF3F3F3 alpha:1];
+    }
+    else
+    {
+        color = [UIColor colorWithHex:0x1A73E0 alpha:1];
+    }
+    
+    _audioBackgroundView.backgroundColor = color;
 }
 
 
@@ -86,12 +111,12 @@
     UIEdgeInsets contentInsets = self.model.contentViewInsets;
     switch (self.layoutStyle) {
         case NIMSessionMessageContentViewLayoutLeft: {
-            self.voiceImageView.nim_left = contentInsets.left;
-             _durationLabel.nim_right = self.nim_width - contentInsets.right;
+            self.voiceImageView.nim_left = contentInsets.left * 2;
+             _durationLabel.nim_right = self.nim_width - contentInsets.right * 2;
             break;
         }
         case NIMSessionMessageContentViewLayoutRight: {
-            self.voiceImageView.nim_right = self.nim_width - contentInsets.right;
+            self.voiceImageView.nim_right = self.nim_width - contentInsets.right * 2;
             _durationLabel.nim_left = contentInsets.left;
             break;
         }
@@ -99,17 +124,49 @@
         default:
         {
             if (self.model.message.isOutgoingMsg) {
-                self.voiceImageView.nim_right = self.nim_width - contentInsets.right;
-                _durationLabel.nim_left = contentInsets.left;
+                self.voiceImageView.nim_right = self.nim_width - contentInsets.right * 2;
+                _durationLabel.nim_left = contentInsets.left * 2;
             } else {
                self.voiceImageView.nim_left = contentInsets.left;
-                _durationLabel.nim_right = self.nim_width - contentInsets.right;
+                _durationLabel.nim_right = self.nim_width - contentInsets.right * 2;
             }
             break;
         }
     }
     _voiceImageView.nim_centerY = self.nim_height * .5f;
     _durationLabel.nim_centerY = _voiceImageView.nim_centerY;
+    
+    CGFloat backgroundWidth = 0;
+    CGFloat backgroundLeft = 0;
+    switch (self.layoutStyle) {
+        case NIMSessionMessageContentViewLayoutLeft:
+            {
+                backgroundWidth = self.nim_width - contentInsets.left * .5f - 2;
+                backgroundLeft = contentInsets.left * .5f;
+            }
+            break;
+        case NIMSessionMessageContentViewLayoutRight:
+            {
+                backgroundWidth = self.nim_width - 2 - contentInsets.right * .5f;
+                backgroundLeft = 2;
+            }
+            break;
+        default:
+        {
+            if (self.model.message.isOutgoingMsg) {
+                backgroundWidth = self.nim_width - 2 - contentInsets.right * .5f;
+                backgroundLeft = 2;
+            } else {
+                backgroundWidth = self.nim_width - contentInsets.left * .5f - 2;
+                backgroundLeft = contentInsets.left * .5f;
+            }
+            break;
+        }
+    }
+    _audioBackgroundView.nim_size = CGSizeMake(backgroundWidth,
+                                               self.nim_height - 4);
+    _audioBackgroundView.nim_left = backgroundLeft;
+    _audioBackgroundView.nim_top = 2;
 }
 
 -(void)onTouchUpInside:(id)sender
@@ -145,6 +202,11 @@
 }
 
 - (void)playAudio:(NSString *)filePath didCompletedWithError:(NSError *)error
+{
+    [self stopPlayingUI];
+}
+
+- (void)stopPlayAudio:(NSString *)filePath didCompletedWithError:(nullable NSError *)error
 {
     [self stopPlayingUI];
 }

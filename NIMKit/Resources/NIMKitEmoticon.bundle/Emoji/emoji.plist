@@ -997,6 +997,12 @@
 				<key>tag</key>
 				<string>[自行车]</string>
 			</dict>
+			<dict>
+				<key>id</key>
+				<string>emoticon_emoji_1001</string>
+				<key>tag</key>
+				<string>[快捷表情1]</string>
+			</dict>
 		</array>
 		<key>info</key>
 		<dict>

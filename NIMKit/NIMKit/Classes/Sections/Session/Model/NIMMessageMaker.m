@@ -105,3 +105,27 @@
 
 
 @end
+
+
+@implementation NIMCommentMaker
+
++ (NIMQuickComment *)commentWithType:(int64_t)type
+                             content:(NSString *)content
+                                 ext:(NSString *)ext
+{
+    NIMQuickComment *comment = [[NIMQuickComment alloc] init];
+    comment.ext = ext;
+    NIMQuickCommentSetting *setting = [[NIMQuickCommentSetting alloc] init];
+    setting.needPush = YES;
+    setting.needBadge = YES;
+    setting.pushTitle = @"你收到了一条快捷评论";
+    setting.pushContent = content;
+    setting.pushPayload = @{
+        @"key" : @"value"
+    };
+    comment.setting = setting;
+    comment.replyType = type;
+    return comment;
+}
+
+@end

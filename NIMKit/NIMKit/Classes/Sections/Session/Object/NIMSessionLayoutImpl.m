@@ -13,6 +13,7 @@
 #import "NIMSessionTableAdapter.h"
 #import "UIView+NIM.h"
 #import "NIMKitKeyboardInfo.h"
+#import "NIMReplyContentView.h"
 
 @interface NIMSessionLayoutImpl()
 {
@@ -106,23 +107,6 @@
 
 - (void)adjustTableView
 {
-    //输入框是否弹起
-    BOOL inputViewUp = NO;
-    switch (self.inputView.status)
-    {
-        case NIMInputStatusText:
-            inputViewUp = [NIMKitKeyboardInfo instance].isVisiable;
-            break;
-        case NIMInputStatusAudio:
-            inputViewUp = NO;
-            break;
-        case NIMInputStatusMore:
-        case NIMInputStatusEmoticon:
-            inputViewUp = YES;
-        default:
-            break;
-    }
-    self.tableView.userInteractionEnabled = !inputViewUp;
     CGRect rect = self.tableView.frame;
     
     //tableview 的位置
@@ -277,9 +261,14 @@
 {
     NIMMessageCell *cell = (NIMMessageCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     if (cell) {
-        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        CGFloat scrollOffsetY = self.tableView.contentOffset.y;
-        [self.tableView setContentOffset:CGPointMake(self.tableView.contentOffset.x, scrollOffsetY) animated:NO];
+        @try {
+            [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        } @catch (NSException *exception) {
+            // 暂时无法保证数据源的一致性
+        } @finally {
+            CGFloat scrollOffsetY = self.tableView.contentOffset.y;
+            [self.tableView setContentOffset:CGPointMake(self.tableView.contentOffset.x, scrollOffsetY) animated:NO];
+        }
     }
 }
 
@@ -290,6 +279,13 @@
 
 - (void)adjustOffset:(NSInteger)row {
     
+}
+
+- (void)dismissReplyContent {
+    if (!self.inputView.replyedContent.hidden)
+    {
+        [self.inputView.replyedContent dismiss];
+    }
 }
 
 #pragma mark - 
@@ -361,5 +357,9 @@
     return NO;
 }
 
+- (NSInteger)numberOfRows
+{
+    return [self.tableView numberOfRowsInSection:0];
+}
 
 @end
