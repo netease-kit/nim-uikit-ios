@@ -985,7 +985,12 @@
 {
     if (!_advanceMenu)
     {
-        _advanceMenu = [[NIMAdvanceMenu alloc] initWithFrame:CGRectMake(0, 0, 320, 190) emotions:self.sessionConfig.emotionItems];
+        NSArray *emotionItems = nil;
+        if ([self.sessionConfig respondsToSelector:@selector(emotionItems)])
+        {
+            emotionItems = self.sessionConfig.emotionItems;
+        }
+        _advanceMenu = [[NIMAdvanceMenu alloc] initWithFrame:CGRectMake(0, 0, 320, 190) emotions:emotionItems];
         [_advanceMenu setConfig:self.sessionConfig];
         [self.view addSubview:_advanceMenu];
         _advanceMenu.actionDelegate = self;
