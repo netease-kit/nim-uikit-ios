@@ -105,13 +105,13 @@ static const NSInteger kNIMEmoticonsCountInPage = 7;
     NSMutableArray *mediaButtons = [NSMutableArray array];
     NSMutableArray *mediaItems = [NSMutableArray array];
     NSArray *items;
-    if (!self.config)
-    {
-        items = [[NIMKit sharedKit].config defaultMenuItemsWithMessage:message];
-    }
-    else if([self.config respondsToSelector:@selector(menuItemsWithMessage:)])
+    if([self.config respondsToSelector:@selector(menuItemsWithMessage:)])
     {
         items = [self.config menuItemsWithMessage:message];
+    }
+    else
+    {
+        items = [[NIMKit sharedKit].config defaultMenuItemsWithMessage:message];
     }
     [items enumerateObjectsUsingBlock:^(NIMMediaItem *item, NSUInteger idx, BOOL *stop) {
         [mediaItems addObject:item];
