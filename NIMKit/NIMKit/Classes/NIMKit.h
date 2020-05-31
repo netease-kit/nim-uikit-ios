@@ -82,7 +82,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 /**
  * 快捷评论
  */
-#import "NIMCollectionViewLeftAlignedLayout.h"
 #import "NIMKitQuickCommentUtil.h"
 
 @interface NIMKit : NSObject

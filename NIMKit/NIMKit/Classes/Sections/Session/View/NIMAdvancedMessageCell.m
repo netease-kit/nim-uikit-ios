@@ -19,7 +19,7 @@
 #import "NIMKitQuickCommentUtil.h"
 #import "UIColor+NIMKit.h"
 #import "UIImage+NIMKit.h"
-#import "NIMCollectionViewLeftAlignedLayout.h"
+#import <UICollectionViewLeftAlignedLayout/UICollectionViewLeftAlignedLayout.h>
 
 
 static NSString * const kNIMListCellReuseID = @"NIMQuickCommentCell";
@@ -119,7 +119,7 @@ static const CGFloat kNIMAdvancedBackgroundPadding = 5;
         UICollectionView *collectionView = self.emoticonsContainerView;
         if (!collectionView)
         {
-            UICollectionViewFlowLayout *flowLayout = [[NIMCollectionViewLeftAlignedLayout alloc] init];
+            UICollectionViewFlowLayout *flowLayout = [[UICollectionViewLeftAlignedLayout alloc] init];
             flowLayout.minimumLineSpacing = NIMKitCommentUtilCellPadding;
             flowLayout.minimumInteritemSpacing = NIMKitCommentUtilCellPadding;
             collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero

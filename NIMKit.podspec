@@ -31,8 +31,8 @@ Pod::Spec.new do |s|
     os.dependency 'TZImagePickerController', '~> 3.2.1'  
     os.dependency 'M80AttributedLabel', '~> 1.9.9' 
     os.dependency 'YYImage', '~> 1.0.4'
-	os.dependency 'YYImage/WebP', '~> 1.0.4'       
-	      
+    os.dependency 'YYImage/WebP', '~> 1.0.4'
+    os.dependency 'UICollectionViewLeftAlignedLayout', '~> 1.0'
   end
 
 
@@ -56,7 +56,8 @@ Pod::Spec.new do |s|
     os.dependency 'M80AttributedLabel'
     os.dependency 'TZImagePickerController'
     os.dependency 'YYImage'
-	os.dependency 'YYImage/WebP'
+    os.dependency 'YYImage/WebP'
+    os.dependency 'UICollectionViewLeftAlignedLayout'
   end
 
   
