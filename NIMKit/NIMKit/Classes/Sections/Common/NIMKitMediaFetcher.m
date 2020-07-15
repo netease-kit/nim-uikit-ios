@@ -223,33 +223,22 @@
 {
     if (asset.mediaType == PHAssetMediaTypeVideo) {
         
-        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-        options.version = PHVideoRequestOptionsVersionCurrent;
-        options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
-        
-
-        [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession * _Nullable exportSession, NSDictionary * _Nullable info) {
-
-            NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
-            NSString *outputPath = [NIMKitFileLocationHelper filepathForVideo:outputFileName];
-
-            exportSession.outputURL = [NSURL fileURLWithPath:outputPath];
-            exportSession.outputFileType = AVFileTypeMPEG4;
-            exportSession.shouldOptimizeForNetworkUse = YES;
-            [exportSession exportAsynchronouslyWithCompletionHandler:^(void)
-             {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     if (exportSession.status == AVAssetExportSessionStatusCompleted)
-                     {
-                         handler(outputPath, PHAssetMediaTypeVideo);
-                     }
-                     else
-                     {
-                         handler(nil,PHAssetMediaTypeVideo);
-                     }
-                 });
-             }];
-        }];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+            options.version = PHVideoRequestOptionsVersionCurrent;
+            options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+            
+            [PHImageManager.defaultManager requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                AVURLAsset *URLAsset = (AVURLAsset *)asset;
+                NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
+                NSString *outputPath = [NIMKitFileLocationHelper filepathForVideo:outputFileName];
+                NSError *error;
+                [NSFileManager.defaultManager copyItemAtURL:URLAsset.URL toURL:[NSURL fileURLWithPath:outputPath] error:&error];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    handler(!error ? outputPath : nil, PHAssetMediaTypeVideo);
+                });
+            }];
+        });
     }
     
     if (asset.mediaType == PHAssetMediaTypeImage)
