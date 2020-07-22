@@ -26,9 +26,9 @@
 
 @property (nonatomic,copy)   NIMKitCameraFetchResult  cameraResultHandler;
 
-@property (nonatomic,strong) UIImagePickerController  *imagePicker;
+@property (nonatomic,weak) UIImagePickerController  *imagePicker;
 
-@property (nonatomic,strong) NIMKitMediaPickerController  *assetsPicker;
+@property (nonatomic,weak) NIMKitMediaPickerController  *assetsPicker;
 
 @end
 
@@ -106,14 +106,14 @@
                 if(handler) handler(nil);
             }
             if (status == PHAuthorizationStatusAuthorized) {
-                NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:self.limit delegate:weakSelf];
+                NIMKitMediaPickerController *vc = [[NIMKitMediaPickerController alloc] initWithMaxImagesCount:weakSelf.limit delegate:weakSelf];
                 vc.naviBgColor = [UIColor blackColor];
                 vc.naviTitleColor = [UIColor whiteColor];
                 vc.barItemTextColor = [UIColor whiteColor];
                 vc.navigationBar.barStyle = UIBarStyleDefault;
-                vc.allowPickingVideo = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
-                vc.allowPickingImage = [_mediaTypes containsObject:(NSString *)kUTTypeImage];
-                vc.allowPickingGif = [_mediaTypes containsObject:(NSString *)kUTTypeGIF];
+                vc.allowPickingVideo = [weakSelf.mediaTypes containsObject:(NSString *)kUTTypeMovie];
+                vc.allowPickingImage = [weakSelf.mediaTypes containsObject:(NSString *)kUTTypeImage];
+                vc.allowPickingGif = [weakSelf.mediaTypes containsObject:(NSString *)kUTTypeGIF];
                 if(handler) handler(vc);
             }
         });
@@ -125,6 +125,7 @@
     NSString *mediaType = info[UIImagePickerControllerMediaType];
     if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
         
+        __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSURL *inputURL  = [info objectForKey:UIImagePickerControllerMediaURL];
             NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
@@ -139,20 +140,20 @@
             [session exportAsynchronouslyWithCompletionHandler:^(void)
              {
                  dispatch_async(dispatch_get_main_queue(), ^{
-                     if (!self.cameraResultHandler)
+                     if (!weakSelf.cameraResultHandler)
                      {
                          return;
                      }
                      
                      if (session.status == AVAssetExportSessionStatusCompleted)
                      {
-                         self.cameraResultHandler(outputPath,nil);
+                         weakSelf.cameraResultHandler(outputPath,nil);
                      }
                      else
                      {
-                         self.cameraResultHandler(nil,nil);
+                         weakSelf.cameraResultHandler(nil,nil);
                      }
-                     self.cameraResultHandler = nil;
+                     weakSelf.cameraResultHandler = nil;
                  });
              }];
             
@@ -351,10 +352,11 @@
     PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
     option.networkAccessAllowed = YES;
     option.synchronous = YES;
+    __weak typeof(self) weakSelf = self;
     [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
         if (downloadFinined && result) {
-            result = [self fixOrientation:result];
+            result = [weakSelf fixOrientation:result];
             BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
             if (completion) completion(result,info,isDegraded);
         }

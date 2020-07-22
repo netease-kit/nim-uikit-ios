@@ -348,7 +348,7 @@
     _replyedBubbleView.nim_size = size;
     
     UIEdgeInsets contentInsets = self.model.replyBubbleViewInsets;
-    CGFloat left = contentInsets.left;
+    CGFloat left = 0;
     CGFloat protraitRightToBubble = 5.f;
     if (!self.model.shouldShowLeft)
     {
@@ -375,7 +375,7 @@
     _bubbleView.nim_size = size;
     
     UIEdgeInsets contentInsets = self.model.bubbleViewInsets;
-    CGFloat left = contentInsets.left;
+    CGFloat left = 0;
     CGFloat protraitRightToBubble = 5.f;
     if (!self.model.shouldShowLeft)
     {
@@ -570,7 +570,7 @@
     CGFloat cellWidth = self.bounds.size.width;
     CGFloat protraitImageWidth = [self avatarSize].width;
     CGFloat protraitImageHeight = [self avatarSize].height;
-    CGFloat selfProtraitOriginX = self.cellPaddingToAvatar.x;
+    CGFloat selfProtraitOriginX = 0;
     
     if (self.model.shouldShowLeft) {
         if (![self needShowSelectButton]) {

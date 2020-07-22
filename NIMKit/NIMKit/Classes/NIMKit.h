@@ -169,21 +169,6 @@ FOUNDATION_EXPORT const unsigned char NIMKitVersionString[];
 - (void)notifyTeamMemebersChanged:(NSString *)teamId type:(NIMKitTeamType)type;
 
 /**
- *  超大群信息变更通知接口
- *
- *  @param teamIds 群 id 集合
- */
-- (void)notifySuperTeamInfoChanged:(NSArray *)teamIds;
-
-
-/**
- *  超大群群成员变更通知接口
- *
- *  @param teamIds 群id
- */
-- (void)notifySuperTeamMemebersChanged:(NSArray *)teamIds;
-
-/**
  *  返回用户信息
  */
 - (NIMKitInfo *)infoByUser:(NSString *)userId

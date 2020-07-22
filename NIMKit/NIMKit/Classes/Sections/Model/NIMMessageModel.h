@@ -122,13 +122,6 @@
 - (void)updateLayoutConfig;
 
 /**
- * thread talk 子消息
- *
- * @return 子消息列表
- */
-- (NSArray *)threadTalkMessages;
-
-/**
  * thread talk 显示被回复内容
  *
  * @return 是否显示回复内容

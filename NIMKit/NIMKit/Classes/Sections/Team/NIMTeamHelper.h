@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 //成员类型
 + (NSString *)memberTypeText:(NIMTeamMemberType)type;
 
-+ (UIImage *)imageWithMemberType:(NIMTeamMemberType)type;
++ (nullable UIImage *)imageWithMemberType:(NIMTeamMemberType)type;
 
 //群禁言
 + (NSString *)teamMuteText:(BOOL)isMute;

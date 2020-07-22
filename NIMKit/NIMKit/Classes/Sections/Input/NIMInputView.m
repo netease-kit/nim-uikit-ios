@@ -395,7 +395,7 @@
                         {
                             weakSelf.toolBar.showsKeyboard = NO;
                         }
-                        [self sizeToFit];
+                        [weakSelf sizeToFit];
                     });
                 }
                 else {
@@ -498,11 +498,13 @@
     BOOL endEditing = [super endEditing:force];
     if (!self.toolBar.showsKeyboard) {
         UIViewAnimationCurve curve = UIViewAnimationCurveEaseInOut;
+        
+        __weak typeof(self) weakSelf = self;
         void(^animations)(void) = ^{
-            [self refreshStatus:NIMInputStatusText];
-            [self sizeToFit];
-            if (self.inputDelegate && [self.inputDelegate respondsToSelector:@selector(didChangeInputHeight:)]) {
-                [self.inputDelegate didChangeInputHeight:self.nim_height];
+            [weakSelf refreshStatus:NIMInputStatusText];
+            [weakSelf sizeToFit];
+            if (weakSelf.inputDelegate && [weakSelf.inputDelegate respondsToSelector:@selector(didChangeInputHeight:)]) {
+                [weakSelf.inputDelegate didChangeInputHeight:weakSelf.nim_height];
             }
         };
         NSTimeInterval duration = 0.25;
@@ -747,7 +749,7 @@
         return NSMakeRange(0, 0) ;
     }
     
-    NSRange range = NSMakeRange(0, 0);
+    NSRange range;
     NSRange subRange = [self rangeForPrefix:@"[" suffix:@"]"];
     
     if (text.length > 0 &&

@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 //初始化
 - (instancetype)initWithTeam:(NIMTeam *)team
                      session:(NIMSession *)session
-                      option:(NIMTeamCardViewControllerOption *)option;
+                      option:(NIMTeamCardViewControllerOption * _Nullable)option;
 //查询全部群成员
 - (void)didFetchTeamMember:(nullable NIMMembersFetchOption *)option;
 

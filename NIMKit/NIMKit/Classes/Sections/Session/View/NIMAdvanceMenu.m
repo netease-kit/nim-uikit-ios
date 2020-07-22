@@ -275,11 +275,6 @@ static const NSInteger kNIMEmoticonsCountInPage = 7;
         [subView addSubview:button];
         indexInPage ++;
     }
-    if (coloumnIndex == layout.columes -1)
-    {
-        rowIndex = rowIndex +1;
-        coloumnIndex = -1; //设置成-1是因为显示在第0位，有加1
-    }
     return subView;
 }
 

@@ -214,7 +214,6 @@
         NSArray *messages = [[[NIMSDK sharedSDK] conversationManager] messagesInSession:_currentSession
                                                                                 message:currentOldestMsg.message
                                                                                   limit:self.messageLimit];
-        index = [self insertMessages:messages];
         if (handler) {
             NIMKit_Dispatch_Async_Main(^{
                 handler(index,messages,nil);

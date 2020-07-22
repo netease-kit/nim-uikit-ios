@@ -51,7 +51,7 @@ NSString  * const NIMKitQuickCommentFormat = @"emoticon_emoji_%02ld";
 
 + (NSString *)commentContent:(NIMQuickComment *)comment
 {
-    NSString *ID = [NSString stringWithFormat:NIMKitQuickCommentFormat, comment.replyType];
+    NSString *ID = [NSString stringWithFormat:NIMKitQuickCommentFormat, (long)comment.replyType];
     NIMInputEmoticon *emoticon = [[NIMInputEmoticonManager sharedManager] emoticonByID:ID];
     NSString *content = nil;
     if (emoticon)
@@ -70,12 +70,10 @@ NSString  * const NIMKitQuickCommentFormat = @"emoticon_emoji_%02ld";
 {
     NSString *currentAccount = [[NIMSDK sharedSDK].loginManager currentAccount];
     NIMQuickComment *firstComment = comments.firstObject;
-    NSString *first = firstComment.from;
     for (NIMQuickComment *comment in comments)
     {
         if ([currentAccount isEqualToString:comment.from])
         {
-            first = comment.from;
             firstComment = comment;
             break;
         }
