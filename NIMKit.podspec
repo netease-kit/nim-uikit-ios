@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.platform = :ios, '9.0' 
   s.frameworks = 'CoreText', 'SystemConfiguration', 'AVFoundation', 'CoreTelephony', 'AudioToolbox', 'CoreMedia' , 'VideoToolbox' 
   s.libraries  = 'sqlite3.0', 'z', 'c++' 
-  
+
 
   s.subspec 'Full' do |cs|
     cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
