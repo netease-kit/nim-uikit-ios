@@ -26,10 +26,6 @@
 
 @property (nonatomic,copy)   NIMKitCameraFetchResult  cameraResultHandler;
 
-@property (nonatomic,weak) UIImagePickerController  *imagePicker;
-
-@property (nonatomic,weak) NIMKitMediaPickerController  *assetsPicker;
-
 @end
 
 @implementation NIMKitMediaFetcher
@@ -49,7 +45,6 @@
     __weak typeof(self) weakSelf = self;
     [self setUpPhotoLibrary:^(NIMKitMediaPickerController * _Nullable picker) {
         if (picker && weakSelf) {
-            weakSelf.assetsPicker = picker;
             weakSelf.libraryResultHandler = result;
             UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
             picker.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -66,29 +61,33 @@
 
 - (void)fetchMediaFromCamera:(NIMKitCameraFetchResult)result
 {
-    if ([self initCamera]) {
+    [self initCamera:^(UIImagePickerController * _Nullable imagePicker) {
+        if (!imagePicker) {
+            return;
+        }
+
         self.cameraResultHandler = result;
 #if TARGET_IPHONE_SIMULATOR
         NSAssert(0, @"not supported");
 #elif TARGET_OS_IPHONE
         
-        BOOL allowMovie = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
-        BOOL allowPhoto = [_mediaTypes containsObject:(NSString *)kUTTypeImage];
+        BOOL allowMovie = [self.mediaTypes containsObject:(NSString *)kUTTypeMovie];
+        BOOL allowPhoto = [self.mediaTypes containsObject:(NSString *)kUTTypeImage];
         if (allowMovie && !allowPhoto) {
-            self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
+            imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
         } else {
-            self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
+            imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
         }
-        self.imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
+        imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
         UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
         rootVC.modalPresentationStyle = UIModalPresentationFullScreen;
         if (rootVC.presentedViewController) {
-            [rootVC.presentedViewController presentViewController:self.imagePicker animated:YES completion:nil];
+            [rootVC.presentedViewController presentViewController:imagePicker animated:YES completion:nil];
         } else {
-            [rootVC presentViewController:self.imagePicker animated:YES completion:nil];
+            [rootVC presentViewController:imagePicker animated:YES completion:nil];
         }
 #endif
-    }
+    }];
 }
 
 
@@ -254,14 +253,6 @@
 
 #pragma mark - Private
 
-- (void)setMediaTypes:(NSArray *)mediaTypes
-{
-    _mediaTypes = mediaTypes;
-    _imagePicker.mediaTypes = mediaTypes;
-    _assetsPicker.allowPickingVideo = [mediaTypes containsObject:(NSString *)kUTTypeMovie];
-    _assetsPicker.allowPickingImage = [mediaTypes containsObject:(NSString *)kUTTypeImage];
-}
-
 - (AVMutableVideoComposition *)getVideoComposition:(AVAsset *)asset
 {
     AVAssetTrack *videoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
@@ -321,15 +312,17 @@
     return isPortrait;
 }
 
-- (BOOL)initCamera{
+- (void)initCamera:(void (^)(UIImagePickerController * _Nullable imagePicker))handler {
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         [[[UIAlertView alloc] initWithTitle:nil
                                     message:@"检测不到相机设备".nim_localized
                                    delegate:nil
                           cancelButtonTitle:@"确定".nim_localized
                           otherButtonTitles:nil] show];
-        return NO;
+        handler(nil);
+        return;
     }
+
     NSString *mediaType = AVMediaTypeVideo;
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:mediaType];
     if(authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied){
@@ -338,14 +331,15 @@
                                    delegate:nil
                           cancelButtonTitle:@"确定".nim_localized
                           otherButtonTitles:nil] show];
-        return NO;
-        
+        handler(nil);
+        return;
     }
-    self.imagePicker = [[UIImagePickerController alloc] init];
-    self.imagePicker.delegate = self;
-    self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    self.imagePicker.mediaTypes = self.mediaTypes;
-    return YES;
+    
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+    imagePicker.delegate = self;
+    imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    imagePicker.mediaTypes = self.mediaTypes;
+    handler(imagePicker);
 }
 
 - (void)originalPhotoWithAsset:(id)asset completion:(void (^)(UIImage *photo,NSDictionary *info,BOOL isDegraded))completion {
