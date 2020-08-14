@@ -72,23 +72,35 @@
         NSAssert(0, @"not supported");
 #elif TARGET_OS_IPHONE
         
-        BOOL allowMovie = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
-        BOOL allowPhoto = [_mediaTypes containsObject:(NSString *)kUTTypeImage];
-        if (allowMovie && !allowPhoto) {
-            self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
-        } else {
-            self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
-        }
-        self.imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
+        UIImagePickerController *imagePicker = [self setupImagePicker];
         UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
         rootVC.modalPresentationStyle = UIModalPresentationFullScreen;
         if (rootVC.presentedViewController) {
-            [rootVC.presentedViewController presentViewController:self.imagePicker animated:YES completion:nil];
+            [rootVC.presentedViewController presentViewController:imagePicker animated:YES completion:nil];
         } else {
-            [rootVC presentViewController:self.imagePicker animated:YES completion:nil];
+            [rootVC presentViewController:imagePicker animated:YES completion:nil];
         }
+        
+        _imagePicker = imagePicker;
 #endif
     }
+}
+
+- (UIImagePickerController *)setupImagePicker {
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+    imagePicker.delegate = self;
+    imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    imagePicker.mediaTypes = self.mediaTypes;
+    
+    BOOL allowMovie = [_mediaTypes containsObject:(NSString *)kUTTypeMovie];
+    BOOL allowPhoto = [_mediaTypes containsObject:(NSString *)kUTTypeImage];
+    if (allowMovie && !allowPhoto) {
+        imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
+    } else {
+        imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
+    }
+    imagePicker.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    return imagePicker;
 }
 
 
@@ -216,7 +228,6 @@
             [assets removeObjectAtIndex:0];
             [weakSelf requestAssets:assets];
         })
-        
     }];
 }
 
@@ -341,10 +352,6 @@
         return NO;
         
     }
-    self.imagePicker = [[UIImagePickerController alloc] init];
-    self.imagePicker.delegate = self;
-    self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    self.imagePicker.mediaTypes = self.mediaTypes;
     return YES;
 }
 
