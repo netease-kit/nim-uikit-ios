@@ -240,12 +240,35 @@
             options.version = PHVideoRequestOptionsVersionCurrent;
             options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
             
-            [PHImageManager.defaultManager requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
-                AVURLAsset *URLAsset = (AVURLAsset *)asset;
-                NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
-                NSString *outputPath = [NIMKitFileLocationHelper filepathForVideo:outputFileName];
-                NSError *error;
-                [NSFileManager.defaultManager copyItemAtURL:URLAsset.URL toURL:[NSURL fileURLWithPath:outputPath] error:&error];
+            [PHImageManager.defaultManager requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable assetR, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                NSError *error = nil;
+                NSString *outputPath = nil;
+                if ([[info objectForKey:PHImageResultIsInCloudKey] boolValue]) {
+                    outputPath = nil;
+                    error = [NSError errorWithDomain:@"nimdemo.netease.fetcher" code:0x1000 userInfo:@{NSLocalizedDescriptionKey:@"图片在iCloud上"}];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[UIApplication sharedApplication].keyWindow makeToast:@"文件在iCloud上，无法发送"
+                                                                      duration:2
+                                                                      position:CSToastPositionCenter];
+                    });
+                } else {
+                    AVURLAsset *URLAsset = (AVURLAsset *)assetR;
+                    NSString *outputFileName = [NIMKitFileLocationHelper genFilenameWithExt:@"mp4"];
+                    outputPath = [NIMKitFileLocationHelper filepathForVideo:outputFileName];
+                    BOOL fileExist = [[NSFileManager defaultManager] fileExistsAtPath:URLAsset.URL.path];
+                    if (!fileExist) {
+                        error = [NSError errorWithDomain:@"nimdemo.netease.fetcher" code:0x1001 userInfo:@{NSLocalizedDescriptionKey:@"图片在本地不存在"}];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication].keyWindow makeToast:@"图片在本地不存在，无法发送"
+                                                                          duration:2
+                                                                          position:CSToastPositionCenter];
+                        });
+                    } else {
+                        [NSFileManager.defaultManager copyItemAtURL:URLAsset.URL toURL:[NSURL fileURLWithPath:outputPath] error:&error];
+                    }
+                }
+
                 dispatch_async(dispatch_get_main_queue(), ^{
                     handler(!error ? outputPath : nil, PHAssetMediaTypeVideo);
                 });
