@@ -18,27 +18,27 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         _avatarImageView = [[NIMAvatarImageView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
-        [self addSubview:_avatarImageView];
+        [self.contentView addSubview:_avatarImageView];
         
         _nameLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _nameLabel.backgroundColor = [UIColor clearColor];
         _nameLabel.font            = [UIFont systemFontOfSize:15.f];
-        [self addSubview:_nameLabel];
+        [self.contentView addSubview:_nameLabel];
         
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _messageLabel.backgroundColor = [UIColor clearColor];
         _messageLabel.font            = [UIFont systemFontOfSize:14.f];
         _messageLabel.textColor       = [UIColor lightGrayColor];
-        [self addSubview:_messageLabel];
+        [self.contentView addSubview:_messageLabel];
         
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _timeLabel.backgroundColor = [UIColor clearColor];
         _timeLabel.font            = [UIFont systemFontOfSize:14.f];
         _timeLabel.textColor       = [UIColor lightGrayColor];
-        [self addSubview:_timeLabel];
+        [self.contentView addSubview:_timeLabel];
         
         _badgeView = [NIMBadgeView viewWithBadgeTip:@""];
-        [self addSubview:_badgeView];
+        [self.contentView addSubview:_badgeView];
         
     }
     return self;

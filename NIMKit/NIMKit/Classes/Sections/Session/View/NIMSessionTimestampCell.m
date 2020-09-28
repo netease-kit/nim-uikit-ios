@@ -28,11 +28,11 @@
         self.backgroundColor = [NIMKit sharedKit].config.cellBackgroundColor;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         _timeBGView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        [self addSubview:_timeBGView];
+        [self.contentView addSubview:_timeBGView];
         _timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         _timeLabel.font = [UIFont boldSystemFontOfSize:10.f];
         _timeLabel.textColor = [UIColor whiteColor];
-        [self addSubview:_timeLabel];
+        [self.contentView addSubview:_timeLabel];
         [_timeBGView setImage:[[UIImage nim_imageInKit:@"icon_session_time_bg"] resizableImageWithCapInsets:UIEdgeInsetsMake(8,20,8,20) resizingMode:UIImageResizingModeStretch]];
 
     }

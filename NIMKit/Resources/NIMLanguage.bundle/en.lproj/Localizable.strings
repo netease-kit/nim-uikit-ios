@@ -282,6 +282,13 @@
 "[超大群信息更新]" = "[Super Group Information Update]";
 "[未知消息]" = "[Unknown message]";
 
+"[系统通知][%@]" = "[System Notication][%@]";
+"点对点消息撤回" = "Revoke P2P";
+"群消息撤回" = "Revoke team";
+"超大群消息撤回" = "Revoke superteam";
+"点对点消息单向撤回" = "Revoke P2P one-sided";
+"群消息单向撤回" = "Revoke team one-sided";
+
 "相册权限受限" = "Album permission restricted ";
 "检测不到相机设备" = " Cannot detect camera device";
 "相机权限受限" = "Camera permission restricted ";

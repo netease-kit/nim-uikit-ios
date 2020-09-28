@@ -16,7 +16,7 @@
     if (self) {
         _switcher = [[UISwitch alloc] initWithFrame:CGRectZero];
         [_switcher addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
-        [self addSubview:_switcher];
+        [self.contentView addSubview:_switcher];
     }
     return self;
 }

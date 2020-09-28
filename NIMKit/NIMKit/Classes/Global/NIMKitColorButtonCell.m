@@ -26,7 +26,7 @@
         _button = [[NIMKitColorButton alloc] initWithFrame:CGRectZero];
         _button.nim_size = [_button sizeThatFits:CGSizeMake(self.nim_width, CGFLOAT_MAX)];
         _button.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [self addSubview:_button];
+        [self.contentView addSubview:_button];
     }
     return self;
 }

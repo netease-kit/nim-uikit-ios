@@ -354,6 +354,18 @@
     [self.tableView reloadData];
 }
 
+// 远端消息清空回调
+- (void)onRecvAllRemoteMessagesInSessionDeleted:(NIMSessionDeleteAllRemoteMessagesInfo *)info
+{
+    [self refreshMessages];
+}
+
+// 远端消息批量删除删除回调
+- (void)onRecvMessagesDeleted:(NSArray<NIMMessage *> *)messages exts:(NSDictionary<NSString *,NSString *> *)exts
+{
+    [self refreshMessages];
+}
+
 - (void)didAddRecentSession:(NIMRecentSession *)recentSession
            totalUnreadCount:(NSInteger)totalUnreadCount{
     [self changeUnreadCount:recentSession totalUnreadCount:totalUnreadCount];

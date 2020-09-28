@@ -21,6 +21,8 @@ typedef NS_ENUM (NSInteger, NIMSessionMessageContentViewLayout){
 
 - (void)onCatchEvent:(NIMKitEvent *)event;
 
+- (void)disableLongPress:(BOOL)disable;
+
 @end
 
 @class NIMMessageModel;

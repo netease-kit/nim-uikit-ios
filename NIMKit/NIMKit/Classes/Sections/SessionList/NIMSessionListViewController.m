@@ -240,7 +240,12 @@
 }
 
 - (NSString *)timestampDescriptionForRecentSession:(NIMRecentSession *)recent{
-    return [NIMKitUtil showTime:recent.lastMessage.timestamp showDetail:NO];
+    if (recent.lastMessage) {
+        return [NIMKitUtil showTime:recent.lastMessage.timestamp showDetail:NO];
+    }
+    // 服务端时间戳以毫秒为单位,需要转化
+    NSTimeInterval timeSecond = recent.updateTime / 1000.0;
+    return [NIMKitUtil showTime:timeSecond showDetail:NO];
 }
 
 #pragma mark - Misc

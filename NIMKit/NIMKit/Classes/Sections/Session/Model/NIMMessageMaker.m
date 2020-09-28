@@ -101,6 +101,7 @@
     NIMMessageSetting *setting = [[NIMMessageSetting alloc] init];
     setting.scene = NIMNOSSceneTypeMessage;
     message.setting = setting;
+    message.env = [[NSUserDefaults standardUserDefaults] objectForKey:@"nim_test_msg_env"];
 }
 
 

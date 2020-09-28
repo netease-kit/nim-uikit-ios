@@ -27,24 +27,24 @@
         _titleLabel.font = [UIFont systemFontOfSize:16.f];
         _titleLabel.textColor = [UIColor blackColor];
         _titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [self addSubview:_titleLabel];
+        [self.contentView addSubview:_titleLabel];
 
         _infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(11, 39, 298, 13)];
         _infoLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         _infoLabel.font = [UIFont systemFontOfSize:13.f];
         _infoLabel.textColor = [UIColor grayColor];
-        [self addSubview:_infoLabel];
+        [self.contentView addSubview:_infoLabel];
 
         _line = [[UIView alloc] initWithFrame:CGRectMake(11, 64, 298, .5)];
         _line.backgroundColor = [UIColor lightGrayColor];
         _line.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [self addSubview:_line];
+        [self.contentView addSubview:_line];
 
         _contentLabel = [[UILabel alloc] initWithFrame:CGRectMake(11, 73, 298, 178)];
         _contentLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         _contentLabel.textColor = [UIColor blackColor];
         _contentLabel.font = [UIFont systemFontOfSize:14.f];
-        [self addSubview:_contentLabel];
+        [self.contentView addSubview:_contentLabel];
 
     }
     return self;
