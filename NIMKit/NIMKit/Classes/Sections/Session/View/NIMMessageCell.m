@@ -510,6 +510,10 @@
     }
 }
 
+- (void)disableLongPress:(BOOL)disable {
+    _longPressGesture.enabled = !disable;
+}
+
 #pragma mark - Action
 - (void)onRetryMessage:(id)sender
 {

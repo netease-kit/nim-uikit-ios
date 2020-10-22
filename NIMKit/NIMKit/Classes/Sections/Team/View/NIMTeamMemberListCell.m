@@ -107,7 +107,7 @@ const CGFloat kNIMTeamMemberListCellItemPadding = 44.f;
         _addBtn = [[UIButton alloc]initWithFrame:CGRectZero];
         [_addBtn addTarget:self action:@selector(onPress:) forControlEvents:UIControlEventTouchUpInside];
         _addBtn.userInteractionEnabled = NO;
-        [self addSubview:_addBtn];
+        [self.contentView addSubview:_addBtn];
     }
     return self;
 }
@@ -145,7 +145,7 @@ const CGFloat kNIMTeamMemberListCellItemPadding = 44.f;
             NSInteger memberIndex = i - count;
             view.member = infos[memberIndex];
         }
-        [self addSubview:view];
+        [self.contentView addSubview:view];
         [view setNeedsLayout];
     }
     [self bringSubviewToFront:self.addBtn];
