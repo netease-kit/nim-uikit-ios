@@ -163,6 +163,11 @@ typedef NS_ENUM(NSInteger,NIMKitAvatarType) {
 @property (nonatomic, strong) NIMKitSetting *tipSetting;
 
 /**
+ *  Rtc话单类型消息设置
+ */
+@property (nonatomic, strong) NIMKitSetting *rtcCallRecordSetting;
+
+/**
  *  无法识别类型消息设置
  */
 @property (nonatomic, strong) NIMKitSetting *unsupportSetting;

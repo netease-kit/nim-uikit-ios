@@ -113,6 +113,8 @@
             return settings.fileSetting;
         case NIMMessageTypeTip:
             return settings.tipSetting;
+        case NIMMessageTypeRtcCallRecord:
+            return settings.rtcCallRecordSetting;
         case NIMMessageTypeNotification:
         {
             NIMNotificationObject *object = (NIMNotificationObject *)message.messageObject;
@@ -174,6 +176,7 @@
     [self applyDefaultChatroomNotificationSettings];
     [self applyDefaultNetcallNotificationSettings];
     [self applyDefaultRepliedSettings];
+    [self applyDefaultRtcCallRecordSettings];
 }
 
 - (void)applyDefaultRepliedSettings
@@ -246,6 +249,16 @@
     _tipSetting.normalBackgroundImage    = backgroundImage;
     _tipSetting.highLightBackgroundImage = backgroundImage;
 }
+
+- (void)applyDefaultRtcCallRecordSettings
+{
+    _rtcCallRecordSetting = [[NIMKitSetting alloc] init:_isRight];
+    _rtcCallRecordSetting.contentInsets = _isRight? UIEdgeInsetsFromString(@"{9,11,9,15}") : UIEdgeInsetsFromString(@"{9,15,9,9}");
+    _rtcCallRecordSetting.textColor = _isRight? NIMKit_UIColorFromRGB(0xFFFFFF) : NIMKit_UIColorFromRGB(0x000000);
+    _rtcCallRecordSetting.font      = [UIFont systemFontOfSize:16];
+    _rtcCallRecordSetting.showAvatar = YES;
+}
+
 
 - (void)applyDefaultUnsupportSettings
 {

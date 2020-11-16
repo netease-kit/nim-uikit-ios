@@ -10,6 +10,9 @@
 #import "NIMKit.h"
 #import "NIMKitInfoFetchOption.h"
 #import "NIMInputEmoticonManager.h"
+#import "NSDictionary+NIMKit.h"
+
+static NSDateComponentsFormatter *_dateComponentsFormatter;
 
 @implementation NIMKitUtil
 
@@ -135,11 +138,13 @@
     if (text == nil) {
         switch (message.messageType) {
             case NIMMessageTypeNotification:
-                text =  [NIMKitUtil notificationMessage:message];
+                text = [NIMKitUtil notificationMessage:message];
                 break;
             case NIMMessageTypeTip:
                 text = message.text;
                 break;
+            case NIMMessageTypeRtcCallRecord:
+                text = [self rtcCallRecordFormatedMessage:message];
             default:
                 break;
         }
@@ -147,6 +152,25 @@
     return text;
 }
 
++ (NSString *)durationTextWithSeconds:(NSTimeInterval)seconds
+{
+    NSString *text = [[self dateComponentsFormatter] stringFromTimeInterval:seconds];
+    return text;
+}
+
++ (NSDateComponentsFormatter *)dateComponentsFormatter {
+    if (!_dateComponentsFormatter) {
+        @synchronized (self) {
+            if (!_dateComponentsFormatter) {
+                _dateComponentsFormatter = [[NSDateComponentsFormatter alloc] init];
+                _dateComponentsFormatter.unitsStyle = NSDateComponentsFormatterUnitsStylePositional;
+                _dateComponentsFormatter.allowedUnits = NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitSecond;
+                _dateComponentsFormatter.zeroFormattingBehavior = NSDateComponentsFormatterZeroFormattingBehaviorPad;
+            }
+        }
+    }
+    return _dateComponentsFormatter;
+}
 
 + (NSString *)notificationMessage:(NIMMessage *)message{
     NIMNotificationObject *object = message.messageObject;
@@ -422,6 +446,29 @@
         formatedMessage = @"未知系统消息".nim_localized;
     }
     return formatedMessage;
+}
+
++ (NSString *)rtcCallRecordFormatedMessage:(NIMMessage *)message {
+    NIMRtcCallRecordObject *record = message.messageObject;
+    switch (record.callStatus) {
+        case NIMRtcCallStatusCanceled:
+            return @"已取消".nim_localized;
+        case NIMRtcCallStatusTimeout:
+            return @"未接听".nim_localized;
+        case NIMRtcCallStatusRejected:
+            return @"已拒绝".nim_localized;
+        case NIMRtcCallStatusBusy:
+            if ([message.from isEqualToString:NIMSDK.sharedSDK.loginManager.currentAccount]) {
+                return @"已拒绝".nim_localized;
+            }
+            return @"对方正忙".nim_localized;
+        case NIMRtcCallStatusComplete: {
+            NSTimeInterval duration = [record.durations nimkit_jsonInteger:NIMSDK.sharedSDK.loginManager.currentAccount?:@""];
+            return [NSString stringWithFormat:@"通话时长 %@",[NIMKitUtil durationTextWithSeconds:duration]];
+        }
+        default:
+            return @"未知".nim_localized;
+    }
 }
 
 + (NSString *)netcallNotificationFormatedMessage:(NIMMessage *)message{
