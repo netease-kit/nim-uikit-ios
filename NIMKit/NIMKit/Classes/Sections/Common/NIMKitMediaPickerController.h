@@ -6,7 +6,7 @@
 //  Copyright © 2020 NetEase. All rights reserved.
 //
 
-#import "TZImagePickerController.h"
+#import <TZImagePickerController/TZImagePickerController.h>
 #import "NIMKitMediaPickerDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
