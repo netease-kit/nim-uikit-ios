@@ -25,16 +25,8 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "UICollectionViewLeftAlignedLayout.h"
 
 @interface NIMCollectionViewLeftAlignedLayout : UICollectionViewFlowLayout
-
-@end
-
-/**
- *  Just a convenience protocol to keep things consistent.
- *  Someone could find it confusing for a delegate object to conform to UICollectionViewDelegateFlowLayout
- *  while using NIMCollectionViewLeftAlignedLayout.
- */
-@protocol UICollectionViewDelegateLeftAlignedLayout <UICollectionViewDelegateFlowLayout>
 
 @end
