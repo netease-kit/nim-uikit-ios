@@ -12,7 +12,7 @@
 #import "NIMMessageMaker.h"
 #import "NIMGlobalMacro.h"
 #import "NIMKitDependency.h"
-#import "TZImageManager.h"
+#import <TZImagePickerController/TZImageManager.h>
 #import "NIMKitProgressHUD.h"
 #import "UIImage+NIMKit.h"
 #import "NIMKitMediaPickerController.h"
