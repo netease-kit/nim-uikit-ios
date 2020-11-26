@@ -6,7 +6,7 @@
 //  Copyright © 2020 NetEase. All rights reserved.
 //  修复YYAnimatedImageView在ios14上不显示图片的问题
 
-#import "YYAnimatedImageView.h"
+#import <YYImage/YYAnimatedImageView.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
