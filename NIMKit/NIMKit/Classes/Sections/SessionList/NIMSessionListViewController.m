@@ -163,8 +163,7 @@
               totalUnreadCount:(NSInteger)totalUnreadCount
 {
     //清理本地数据
-    NSUInteger index = [self.recentSessions indexOfObject:recentSession];
-    [self.recentSessions removeObjectAtIndex:index];
+    [self.recentSessions removeObject:recentSession];
     
     //如果删除本地会话后就不允许漫游当前会话，则需要进行一次删除服务器会话的操作
     if (self.autoRemoveRemoteSession)

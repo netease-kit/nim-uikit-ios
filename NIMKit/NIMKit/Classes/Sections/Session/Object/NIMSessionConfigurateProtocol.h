@@ -72,7 +72,7 @@ typedef NS_ENUM(NSUInteger, NIMKitSessionState) {
 //数据接口
 - (NSArray *)items;
 
-- (void)markRead;
+- (void)markRead:(BOOL)needMarkDataModel;
 
 - (NIMMessageModel *)findMessageModel:(NIMMessage *)message;
 
