@@ -1073,7 +1073,7 @@ NSString *const kNIMTeamListDataTeamMembersChanged = @"kNIMTeamListDataTeamMembe
     [[NSNotificationCenter defaultCenter] postNotificationName:kNIMTeamListDataTeamInfoUpdate object:nil];
 }
 
-- (void)onTeamMemberChanged:(NIMTeam *)team {
+- (void)handleTeamMemberChanged:(NIMTeam *)team {
     if (![team.teamId isEqualToString:_team.teamId]) {
         return;
     }
@@ -1088,6 +1088,22 @@ NSString *const kNIMTeamListDataTeamMembersChanged = @"kNIMTeamListDataTeamMembe
             [[NSNotificationCenter defaultCenter] postNotificationName:kNIMTeamListDataTeamMembersChanged object:nil];
         }
     }];
+}
+
+- (void)onTeamMemberChanged:(NIMTeam *)team
+{
+    // 忽略，使用onTeamMemberUpdated+onTeamMemberRemoved
+//    [self handleTeamMemberChanged:team];
+}
+
+- (void)onTeamMemberUpdated:(NIMTeam *)team withMembers:(NSArray<NSString *> *)memberIDs
+{
+    [self handleTeamMemberChanged:team];
+}
+
+- (void)onTeamMemberRemoved:(NIMTeam *)team withMembers:(NSArray<NSString *> *)memberIDs
+{
+    [self handleTeamMemberChanged:team];
 }
 
 @end
