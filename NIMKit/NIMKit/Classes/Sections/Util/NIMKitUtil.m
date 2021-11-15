@@ -607,6 +607,8 @@ static NSDateComponentsFormatter *_dateComponentsFormatter;
         case NIMChatroomEventTypeQueueChange:
         case NIMChatroomEventTypeQueueBatchChange:
             return [NSString stringWithFormat:@"%@改变了聊天室队列".nim_localized,opeText];
+        case NIMChatroomEventTypeRecall:
+            return [NSString stringWithFormat:@"撤回消息%@", [content revokedMessageId]];
         default:
             break;
     }
