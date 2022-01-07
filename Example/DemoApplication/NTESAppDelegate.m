@@ -10,7 +10,7 @@
 #import <NIMSDK/NIMSDK.h>
 #import "NTESCellLayoutConfig.h"
 #import "NTESAttachmentDecoder.h"
-#define NIMSDKAppKey @"8fc95f505b6cbaedf613677c8e08fc0b"
+#define NIMSDKAppKey @"<#请输入网易云信控制台获取的App Key#>"
 
 @interface NTESAppDelegate ()
 
