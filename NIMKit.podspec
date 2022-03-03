@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.subspec 'Lite' do |cs|
     cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
     cs.dependency 'NIMKit/Core'
-    cs.dependency 'NIMSDK_LITE', '~> 8.7.0'
+    cs.dependency 'NIMSDK_LITE', '~> 9.0.0'
   end
   
   s.subspec 'Core' do |os|     
@@ -45,7 +45,7 @@ Pod::Spec.new do |s|
   s.subspec 'Lite_Free' do |cs|
     cs.source_files  = 'NIMKit/NIMKit/Classes/**/*.{h,m}'
     cs.dependency 'NIMKit/Core_Free'
-    cs.dependency 'NIMSDK_LITE', '~> 8.7.0'
+    cs.dependency 'NIMSDK_LITE', '~> 9.0.0'
   end
 
   s.subspec 'Core_Free' do |os|
