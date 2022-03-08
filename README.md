@@ -1,4 +1,4 @@
-**推荐客户得比特币/京东卡，现在推荐使用网易云信，最低得0.02BTC或3000元京东卡/单，点击参与https://yunxin.163.com/promotion/recommend**
+**#推荐好友使用云信，即享1500元京东卡奖励# 点击参与https://yunxin.163.com/promotion/recommend?channel=github**
 
 # 网易云信 UI 组件 	· iOS
 [![Build Status](https://img.shields.io/travis/netease-im/NIM_iOS_UIKit/master.svg?style=flat)](https://travis-ci.org/netease-im/NIM_iOS_UIKit)
