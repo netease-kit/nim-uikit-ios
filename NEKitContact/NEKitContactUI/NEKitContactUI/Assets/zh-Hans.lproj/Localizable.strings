@@ -1,0 +1,15 @@
+/* 
+  YXLogin.strings
+  Pods
+
+  Created by yu chen on 2021/12/24.
+  
+*/
+
+"验证消息"="验证消息";
+
+"alert_tip"="提示";
+"alert_sure"="确定";
+"alert_cancel"="取消";
+"备注名"="备注名";
+"remove_black" = "解除";

@@ -1,0 +1,12 @@
+/* 
+  YXLogin.strings
+  Pods
+
+  Created by yu chen on 2021/12/24.
+  
+*/
+
+//MAKR：common
+"add_friend"="添加好友";
+"create_discussion_group"="创建讨论组";
+"create_senior_group"="创建高级群";
