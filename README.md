@@ -5,16 +5,11 @@ IM UIKit 简化了基于 NIM SDK 的应用开发过程。它不仅能助您快�
 
 ## 功能优势
 
-<div style="width:100px" align="left">优势</div> | <div style="width:120px" align="left">说明</div>
+优势 | 说明
 ---- | --------------
 UI 组件解耦 | IM UIKit 不同组件可相互独立运行使用。您可按需选择组件，将其快速集成到您的应用，实现相应的 UI 功能，减少无用依赖。
 UI 能力简洁易用 |IM UIKit 的业务逻辑层与 UI 层相互独立。在 UI 层，您仅需关注视图展示和事件处理。IM UIKit 清晰的数据流转处理，让 UI 层代码更简洁易懂。
 完善的业务逻辑处理 | IM UIKit 业务逻辑层提供完善的业务逻辑处理能力。您无需关心 SDK 层不同接口间的复杂处理逻辑，业务逻辑层一个接口帮您搞定所有。
-  
-
-
-
-
 
 
 ## 技术原理
@@ -52,38 +47,7 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ![iOS二维码.png](https://yx-web-nosdn.netease.im/common/9179ca9460368d1bf73775da9a32bb0c/iOS二维码.png)
 
 
-## 示例项目效果展示
-
-
-如下动图展示了 UIKit 示例项目的主要功能。
-
-<div style="display:flex;width:100%;justify-content:space-between;background-color:#F0F0F0;">
-    <div style="width:30%; text-align:center;">
-        <p><b>圈组相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/455613865e80a9b342588228bb1c0bc8/创建服务器.gif" alt="image" />
-    </div>
-    <div style="width:30%;text-align:center;">
-        <p><b>通讯录相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/c0a3237dcc4319d81bc2cab7d62b460a/通讯录.gif" alt="image" />
-    </div>
-    <div style="width:30%;text-align:center;">
-        <p><b>消息相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/88eb27b848c619150131f989303c3eb3/消息相关.gif" alt="image" />
-    </div>
-</div>
-
-
-## 示例项目功能清单
-
-IM UIKit 示例项目包含四大功能模块，即**消息**、**圈组**、**通讯录**和**我的**。您可参考[示例项目](https://github.com/netease-kit/nim-uikit-ios)快速集成含 UI 界面的即时通讯应用。
-
-
-<div style="width:40px" align="left">界面模块</div> | <div style="width:160px" align="left">功能项 </div>
----- | -------------- 
-消息| <div> <ul> <li>消息（文本、语音、表情、图片、视频）收发</li><li>复制消息</li><li>显示对方正在输入</li><li>对消息进行回复</li><li>转发消息</li><li>标记消息</li><li>多选消息</li><li>收藏消息</li><li>删除消息</li><li>撤回消息</li><li>消息提醒</li><li>根据关键字搜索单聊和群聊</li><li>Pin 消息</li><li>清理聊天记录</li><li>历史消息</li><li>会话管理</li><li>创建讨论组</li><li>创建高级群</li><li>设置群昵称</li><li>展示群组列表</li><li>开启消息提醒</li><li>聊天置顶</li></ul></div>
-圈组 | <div> <ul><li>创建服务器</li><li>加入别人的服务器</li><li>服务器信息设置</li><li>身份组管理</li><li>成员特殊权限管理</li><li>创建频道</li><li>频道消息收发</li><li>频道信息设置</li><li>频道权限设置</li><li>频道黑名单设置</li><li>频道白名单设置</li><li>频道内选择成员单聊</li></ul></div>
-通讯录 | <div> <ul> <li>添加好友</li><li>好友验证</li><li>好友备注</li><li>删除好友</li><li>好友排序</li><li>我的群聊列表</li><li>黑名单管理</li></ul></div>
-我的 | <div> <ul> <li>个人信息设置</li><li>查看收藏</li><li>消息提醒设置</li><li>清理缓存</li><li>开启/关闭听筒模式</li><li>删除好友是否同步删除备注</li><li>消息已读未读功能</li></ul></div>
+详见[IM UIKit介绍](https://doc.yunxin.163.com/docs/TM5MzM5Njk/jA5OTcwNDE?platformId=60278)。
 
 
 ## IM UIKit 集成
