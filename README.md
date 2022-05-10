@@ -47,25 +47,7 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ![iOS二维码.png](https://yx-web-nosdn.netease.im/common/9179ca9460368d1bf73775da9a32bb0c/iOS二维码.png)
 
 
-## 示例项目效果展示
-
-
-如下动图展示了 UIKit 示例项目的主要功能。
-
-<div style="display:flex;width:100%;justify-content:space-between;background-color:#F0F0F0;">
-    <div style="width:30%; text-align:center;">
-        <p><b>圈组相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/455613865e80a9b342588228bb1c0bc8/创建服务器.gif" alt="image" />
-    </div>
-    <div style="width:30%;text-align:center;">
-        <p><b>通讯录相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/c0a3237dcc4319d81bc2cab7d62b460a/通讯录.gif" alt="image" />
-    </div>
-    <div style="width:30%;text-align:center;">
-        <p><b>消息相关</b></p>
-        <img style="width:100%" src="https://yx-web-nosdn.netease.im/common/88eb27b848c619150131f989303c3eb3/消息相关.gif" alt="image" />
-    </div>
-</div>
+详见[IM UIKit介绍](https://doc.yunxin.163.com/docs/TM5MzM5Njk/jA5OTcwNDE?platformId=60278)。
 
 
 ## IM UIKit 集成
