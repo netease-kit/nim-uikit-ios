@@ -1,0 +1,128 @@
+
+// Copyright (c) 2022 NetEase, Inc.  All rights reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+
+import UIKit
+
+protocol ChatRecordViewDelegate: AnyObject {
+    func startRecord()
+    func moveOutView()
+    func moveInView()
+    func endRecord(insideView: Bool)
+}
+
+class ChatRecordView: UIView, UIGestureRecognizerDelegate {
+    var recordImageView = UIImageView()
+    var topTipLabel = UILabel()
+    var tipLabel = UILabel()
+    public weak var delegate: ChatRecordViewDelegate?
+    private var outView = false
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func commonUI() {
+        topTipLabel.translatesAutoresizingMaskIntoConstraints = false
+        topTipLabel.text = localizable("send_after_let_go")
+        topTipLabel.font = UIFont.systemFont(ofSize: 12)
+        topTipLabel.textColor = .ne_lightText
+        topTipLabel.textAlignment = .center
+        self.addSubview(topTipLabel)
+        NSLayoutConstraint.activate([
+            topTipLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 0),
+            topTipLabel.heightAnchor.constraint(equalToConstant: 23),
+            topTipLabel.leftAnchor.constraint(equalTo: self.leftAnchor),
+            topTipLabel.rightAnchor.constraint(equalTo: self.rightAnchor)
+        ])
+        
+        recordImageView.translatesAutoresizingMaskIntoConstraints = false
+        recordImageView.image = UIImage.ne_imageNamed(name: "chat_record")
+        recordImageView.contentMode = .center
+        self.addSubview(recordImageView)
+        NSLayoutConstraint.activate([
+            recordImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            recordImageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 40),
+            recordImageView.heightAnchor.constraint(equalToConstant: 103),
+            recordImageView.widthAnchor.constraint(equalToConstant: 103)
+        ])
+        
+        if let image1 = UIImage.ne_imageNamed(name: "record_3"), let image2 = UIImage.ne_imageNamed(name: "record_2"), let image3 = UIImage.ne_imageNamed(name: "record_1") {
+            recordImageView.animationImages = [image1,image2,image3]
+        }
+        recordImageView.animationDuration = 0.8
+        let guesture = UILongPressGestureRecognizer(target: self, action: #selector(clickLabel))
+        recordImageView.isUserInteractionEnabled = true
+        recordImageView.addGestureRecognizer(guesture)
+        
+        tipLabel.translatesAutoresizingMaskIntoConstraints = false
+        tipLabel.text = localizable("按住说话")
+        tipLabel.font = UIFont.systemFont(ofSize: 12)
+        tipLabel.textColor = .ne_lightText
+        tipLabel.textAlignment = .center
+        self.addSubview(tipLabel)
+        NSLayoutConstraint.activate([
+            tipLabel.topAnchor.constraint(equalTo: recordImageView.bottomAnchor, constant: 12),
+            tipLabel.heightAnchor.constraint(equalToConstant: 23),
+            tipLabel.leftAnchor.constraint(equalTo: self.leftAnchor),
+            tipLabel.rightAnchor.constraint(equalTo: self.rightAnchor)
+        ])
+    }
+    
+    @objc func clickLabel(recognizer: UILongPressGestureRecognizer) {
+        print("location:\(recognizer.location(in: recognizer.view))")
+        switch recognizer.state {
+        case .began:
+            print("state:begin")
+            startRecord()
+        case .changed:
+            print("state:changed")
+        case .ended:
+            self.endRecord(recognizer: recognizer)
+        case .cancelled:
+            print("state:cancelled")
+        case .failed:
+            print("state:failed")
+        default:
+            print("state:default")
+        }
+    }
+    
+    public func stopRecordAnimation() {
+        topTipLabel.isHidden = true
+        self.recordImageView.stopAnimating()
+    }
+    
+    private func startRecord() {
+        topTipLabel.isHidden = false
+        self.recordImageView.startAnimating()
+        self.delegate?.startRecord()
+    }
+    
+    private func moveOutView() {
+        self.delegate?.moveOutView()
+    }
+    
+    private func moveInView() {
+        self.delegate?.moveInView()
+    }
+    
+    private func endRecord(recognizer: UILongPressGestureRecognizer) {
+        self.stopRecordAnimation()
+        let inView = isInRecordView(recognizer: recognizer)
+        self.delegate?.endRecord(insideView: inView)
+    }
+    
+    
+    private func isInRecordView(recognizer: UILongPressGestureRecognizer) -> Bool {
+        let point = recognizer.location(in: recognizer.view)
+        if point.x < 0 || point.x > recognizer.view?.bounds.size.width ?? 0 || point.y < 0 || point.y > recognizer.view?.bounds.size.height ?? 0 {
+            return false
+        }
+        return true
+    }
+}

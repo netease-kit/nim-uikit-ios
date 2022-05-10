@@ -1,0 +1,102 @@
+/* 
+  YXLogin.strings
+  Pods
+
+  Created by yu chen on 2021/12/24.
+  
+*/
+
+//MAKR：common
+"ok"="确认";
+"send_to"="发送给 ";
+//MAKR：message
+"发来了一张图片"="发来了一张图";
+"发来了一段语音"="发来了一段语音";
+"发来了一段视频"="发来了一段视频";
+"按住说话"="按住说话";
+"send_after_let_go"="松开发送，按住滑到空白区域取消";
+"录音时间太短"="录音时间太短";
+"没有麦克风权限"="没有麦克风权限";
+
+//MARK: tips
+//MARK: team
+"invite"="邀请 ";
+"humans"="人";
+"enter"="进入了";
+"unknown_system_message"="未知消息类型";
+"You"="你 ";
+"discussion_group"="讨论组";
+"group"="群";
+"dissolve"="解散了";
+"kick"="将 ";
+"out"="移除了 ";
+"has_updated" = "更新了";
+
+"team_name" = "名字";
+"team_intro" = "介绍";
+"team_anouncement" = "公告";
+"team_avatar" = "头像";
+"team_join_mode" = "加入方式";
+"team_be_invited_mode" = "邀请方式";
+"team_be_invited_permission" = "邀请权限";
+"team_update_info_permission" = "更新群信息权限";
+"team_update_client_custom"="更新客户端自定义字段的权限";
+
+"team_custom_info" = "自定义扩展字段";
+"not_mute" = "解除禁言";
+"mute" = "禁言";
+"team_has_been_removed" = "当前群聊已解散";
+"join"="进入了";
+"pass"="通过了";
+"leave"="离开了";
+"transfer"="转移了群主身份给";
+"added_manager"="被添加为群管理员";
+"removed_manager"="被撤销了群管理员身份";
+"accept"="接受入群邀请来自";
+"team_mute"="当前群主设置为禁言";
+"team_all_mute"="群全体禁言";
+"team_all_no_mute"="取消群全体禁言";
+
+"pin_text"="标记了这条信息，对话内容双方均可见";
+
+"session_set_top"="聊天置顶";
+"message_remind"="开启消息提醒";
+
+"open_soon"="暂未开放";
+
+//MARK: operation
+"operation_copy"="复制";
+"operation_replay"="回复";
+"operation_forward"="转发";
+"operation_pin"="标记";
+"operation_cancel_pin"="取消标记";
+"operation_select"="多选";
+"operation_collection"="收藏";
+"operation_delete"="删除";
+"operation_recall"="撤回";
+"message_has_be_withdrawn" = "此消息已撤回";
+"message_reedit" = "重新编辑";
+"message_revoke_confim" = "确认要撤回该消息吗？";
+"message_delete_comfirm"="确认要删除该消息吗？";
+
+
+//MARK: toast
+"copy_success"="复制成功";
+"collection_success"="已收藏";
+"no_permession"="暂无权限";
+"msg_reply"="回复";
+"msg_image"="图片";
+"msg_audio"="语音";
+"msg_video"="视频";
+"msg_file"="文件";
+"msg_custom"="自定义";
+"msg_unknown"="未知消息类型";
+"message_read"="消息阅读状态";
+"message_all_unread"="全部成员未读";
+"user_select"="选择提醒";
+"user_select_all"="所有人";
+
+"contact_user"="好友";
+"team"="群聊";
+"cancel"="取消";
+"send_to"="发送给";

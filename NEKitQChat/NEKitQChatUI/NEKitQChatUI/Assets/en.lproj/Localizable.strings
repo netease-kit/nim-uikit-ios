@@ -1,0 +1,197 @@
+/* 
+  YXLogin.strings
+  Pods
+
+  Created by yu chen on 2021/12/24.
+  
+*/
+//MAKR：common
+"ok"="ok";
+"exceed"="超出";
+"person"="人";
+"limit"="限制";
+
+//MARK: Server
+"qchat_setting"="服务器设置";
+"close"="关闭";
+"qchat_delete_server"="删除服务器";
+"qchat_leave_server"="退出服务器";
+"qchat_permisssion"="权限";
+"qchat_server_theme"="服务器主题";
+"qchat_server_name"="服务器名称";
+"qchat_id_group"="身份组";
+"qchat_group_default_permission"="所有服务器成员默认权限";
+"qchat_sort"="排序";
+"qchat_create"="创建";
+"qchat_create_new_id_group"="创建新身份组";
+"qchat_add_member"="添加成员";
+"qchat_group_name"="身份组名称";
+"qchat_manager_member"="成员管理";
+"qchat_edit"="编辑";
+"qchat_save"="保存";
+"qchat_nickname"="昵称";
+"qcaht_edit_nickname"="编辑昵称";
+"qchat_kick_out"="踢除";
+"qchat_prohibit"="封禁";
+"qchat_manager_server"="管理服务器";
+"qchat_manager_channel"="管理所有频道属性";
+"qchat_manager_role"="管理角色";
+"qchat_send_message"="发送消息";
+"qchat_delete_message"="所有频道中删除他人消息";
+"qchat_recall_message"="所有频道撤回他人消息";
+"qchat_at_any"="@任意人的权限";
+"qchat_at_all"="@所有人的权限";
+"qchat_modify_own_server"="修改自己服务器成员信息";
+"qchat_modify_other_server"="修改他人服务器成员信息";
+"qchat_invite_member"="邀请他人进入server权限";
+"qchat_kickout_member"="踢人";
+"qchat_manager_channel_list"="管理频道名单";
+"qchat_common_permission"="通用权限";
+"qchat_message_permission"="消息权限";
+"qchat_member_permission"="成员权限";
+"qchat_member"="成员";
+"qchat_id_group_sort"="身份组排序";
+"qchat_sure"="确定";
+"qchat_cancel"="取消";
+"qchat_tip"="提示";
+"qchat_select"="选择";
+"qchat_please_input_topic"="请输入主题";
+"qchat_not_empty_servername"="服务器名不能为空";
+"qchat_not_empty_header_url"="请先上传头像";
+"qchat_not_empty_select_memeber"="请选择用户";
+"qchat_please_input_role_name"="请输入身份组名称";
+"qchat_sure_delete_user"="确定删除当前用户?";
+"qchat_delete_success"="删除成功";
+"qchat_add_success"="添加成功";
+"qchat_add_Server"="创建服务器";
+"qchat_mine_add"="自己创建";
+"qchat_join_otherServer"="加入别人服务器";
+
+
+////MARK: Channel
+//"create_channel"="Create Channel";
+//"delete_channel"="Delete Channel";
+//"confirm_delete_channel"="Would you like to delete ";
+//
+//"create"="Create";
+//"cancel"="Cancel";
+//"channel_name"="Channel Name";
+//"channel_topic"="Channel Topic";
+//"channel_type"="Channel Type";
+//"input_channel_name"="Please enter name of channel";
+//"input_channel_topic"="Please enter topic of channel";
+//"public"="Public";
+//"private"="Private";
+//"online"="Online";
+//"offline"="Offline";
+//"first_channel"="频道1";
+//"second_channel"="频道2";
+//
+//"more"="more";
+//
+//
+////MARK:toast
+//"update_channel_suscess"="Update Channel Suscess";
+//"delete_channel_suscess"="Delete Channel Suscess";
+//
+//
+////MARK: channel_setting
+//"channel_setting"="Setting";
+//"save_setting"="Save";
+//"close"="Close";
+//"authority"="Authority";
+//"authority_setting"="Authority setting";
+//"list"="List";
+//"white_list"="White List";
+//"black_list"="Black List";
+//"channel_member"="Members";
+//"delete_channel"="Delete Channel";
+//"authority_setting"="Authority Setting";
+//
+//"add_group"="Add Authority Group";
+//"add_member"="Add Member";
+//"member_permission_setting"="Member Permission Setting";
+//"group_permission_setting"="Permission Setting";
+//"finish"="Finished";
+//"removeMember"="Remove Member";
+//MARK: Channel
+"create_channel"="创建新频道";
+"delete_channel"="删除频道";
+"confirm_delete_channel"="确认要移除";
+
+"create"="创建";
+"cancel"="取消";
+"channel_name"="频道名称";
+"channel_topic"="频道主题";
+"channel_type"="频道类型";
+"input_channel_name"="请输入名称";
+"input_channel_topic"="请输入主题";
+"public"="公开";
+"private"="私密";
+"online"="在线";
+"offline"="离线";
+"first_channel"="频道1";
+"second_channel"="频道2";
+"more"="更多";
+"has_no_role"="无身份组可添加";
+"send_to"="发送给";
+"image_is_nil"= "图片为空";
+"text_is_nil"="内容为空";
+//MARK:toast
+"update_channel_suscess"="保存成功";
+"delete_channel_suscess"="删除成功";
+"open_soon"="暂未开放";
+
+
+//MARK: channel_setting
+"channel_setting"="频道设置";
+"save"="保存";
+"close"="关闭";
+"authority"="权限";
+"authority_setting"="权限设置";
+"list"="名单";
+"white_list"="白名单";
+"black_list"="黑名单";
+"channel_member"="频道成员";
+"delete_channel"="删除频道";
+"authority_setting"="权限设置";
+
+"add_group"="添加身份组";
+"add_member"="添加成员";
+"member_permission_setting"="成员权限设置";
+"group_permission_setting"="权限设置";
+"finish"="完成";
+"removeMember"="移除成员";
+"removeRole"="移除身份组";
+//MARK:身份组权限设置
+"auth1"="ManageServer";
+"auth2"="管理频道属性";
+"auth3"="管理频道权限";
+"auth4"="发送消息";
+"auth5"="ModifySelfInfo";
+"auth6"="InviteToServer";
+"auth7"="KickOthersInServer";
+"auth8"="ModifyOthersInfoInServer";
+"auth9"="频道中撤回他人消息";
+"auth10"="频道中删除他人消息";
+"auth11"="RemindOther";
+"auth12"="RemindAll";
+"auth13"="管理频道名单";
+
+//MARK：error toast
+"param_error"="Parameter error";
+"no_Permession"="暂无权限在该频道发言";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
