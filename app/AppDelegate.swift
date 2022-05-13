@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         IQKeyboardManager.shared.shouldResignOnTouchOutside = true
        
         //login action
-        loginWithUI(account: <#imaccid#>, token: <#imToken#>)
+        startLogin(account: <#imaccid#>, token: <#imToken#>)
     }
     
     @objc func refreshRoot(){
@@ -78,7 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         QChatLog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
-    func loginWithUI(account:String,token:String){
+    func startLogin(account:String,token:String){
         weak var weakSelf = self
         CoreKitEngine.instance.login(account, token) { error in
             if let err = error {
