@@ -88,23 +88,21 @@ class MineSettingViewController: NEBaseViewController {
         return footer
     }
     
+    //logout action
     @objc func loginOutAction(){
-        AuthorManager.shareInstance()?.logout(withConfirm: "确认要退出登录吗？", withCompletion: {[weak self] user, error in
-            if error != nil {
-                self?.view.makeToast(error?.localizedDescription)
-            }else {
-                NIMSDK.shared().loginManager.logout { error in
-                    NIMSDK.shared().qchatManager.logout { chatError in
-                        if error != nil {
-                            self?.view.makeToast(error?.localizedDescription)
-                        }else {
-                            print("logout success")
-                            NotificationCenter.default.post(name: Notification.Name("logout"), object: nil)
-                        }
-                    }
+        
+        NIMSDK.shared().loginManager.logout { error in
+            NIMSDK.shared().qchatManager.logout { chatError in
+                if error != nil {
+                    self?.view.makeToast(error?.localizedDescription)
+                }else {
+                    print("logout success")
+                    NotificationCenter.default.post(name: Notification.Name("logout"), object: nil)
                 }
             }
-        })
+        }
+
+
     }
 }
 

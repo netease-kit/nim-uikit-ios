@@ -33,42 +33,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCername = AppKey.pushCerName
         CoreKitEngine.instance.setupCoreKit(option)
         
-        // login to business server
-        let config = YXConfig()
-        config.appKey = AppKey.appKey
-        config.parentScope = NSNumber(integerLiteral: 2)
-        config.scope = NSNumber(integerLiteral: 7)
-        config.supportInternationalize = false
-        config.type = .phone
-        #if DEBUG
-        config.isOnline = false
-        print("debug")
-        #else
-        config.isOnline = true
-        print("release")
-        #endif
-        AuthorManager.shareInstance()?.initAuthor(with: config)
+
         IQKeyboardManager.shared.enable = true
         IQKeyboardManager.shared.shouldResignOnTouchOutside = true
-        weak var weakSelf = self
-        if let canAutoLogin = AuthorManager.shareInstance()?.canAutologin(), canAutoLogin == true {
-            AuthorManager.shareInstance()?.autoLogin(completion: { user, error in
-                if let err = error{
-                    print("auto login error : ", err)
-                    weakSelf?.loginWithUI()
-                }else {
-                    print("login accid : ", user?.imAccid as Any)
-                    weakSelf?.setupSuccessLogic(user)
-                }
-            })
-        }else {
-            loginWithUI()
-        }
+       
+        //login action
+        startLogin(account: <#imaccid#>, token: <#imToken#>)
     }
     
     @objc func refreshRoot(){
         print("refresh root")
-        loginWithUI()
+        
     }
     
     func registerAPNS(){
@@ -103,41 +78,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         QChatLog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
-    func loginWithUI(){
+    func startLogin(account:String,token:String){
         weak var weakSelf = self
-        AuthorManager.shareInstance()?.startLogin(completion: { user, error in
-            if let err = error{
-                print("login error : ", err)
+        CoreKitEngine.instance.login(account, token) { error in
+            if let err = error {
+                print("NEKitCore login error : ", err)
             }else {
-                weakSelf?.setupSuccessLogic(user)
-            }
-        })
-    }
-    
-    func setupSuccessLogic(_ user: YXUserInfo?){
-        setupXKit(user)
-    }
-    
-    func setupXKit(_ user: YXUserInfo?){
-        if let token = user?.imToken, let account = user?.imAccid {
-            weak var weakSelf = self
-            CoreKitEngine.instance.login(account, token) { error in
-                if let err = error {
-                    print("NEKitCore login error : ", err)
-                }else {
-                    ChatRouter.setupInit()
-                    let param = QChatLoginParam(account,token)
-                    CoreKitIMEngine.instance.loginQchat(param) { error, response in
-                        if let err = error {
-                            print("qchatLogin failed, error : ", err)
-                        }else {
-                            weakSelf?.setupTabbar()
-                        }
+                ChatRouter.setupInit()
+                let param = QChatLoginParam(account,token)
+                CoreKitIMEngine.instance.loginQchat(param) { error, response in
+                    if let err = error {
+                        print("qchatLogin failed, error : ", err)
+                    }else {
+                        weakSelf?.setupTabbar()
                     }
                 }
             }
         }
     }
+    
     
     func setupTabbar() {
         self.window?.rootViewController = NETabBarController()
