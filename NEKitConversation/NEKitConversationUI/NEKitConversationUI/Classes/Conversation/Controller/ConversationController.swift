@@ -36,7 +36,7 @@ public class ConversationController: UIViewController {
             navView.topAnchor.constraint(equalTo: self.view.topAnchor),
             navView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
             navView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-            navView.heightAnchor.constraint(equalToConstant:NEConstant.navigationHeight + NEConstant.statusBarHeight)
+            navView.heightAnchor.constraint(equalToConstant:NEConstant.navigationHeight + NEConstant.statusBarHeight + 16)
         ])
         
         NSLayoutConstraint.activate([

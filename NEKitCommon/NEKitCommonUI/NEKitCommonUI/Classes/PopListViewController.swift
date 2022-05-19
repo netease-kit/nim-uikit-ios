@@ -49,7 +49,7 @@ public class PopListViewController: UIViewController  {
         shadowView.clipsToBounds = false
         shadowView.layer.shadowOffset = CGSize(width: 0, height: 4)
         shadowView.layer.shadowColor = NEConstant.hexRGB(0x85888C).cgColor
-        shadowView.layer.shadowOpacity = 1.0
+        shadowView.layer.shadowOpacity = 0.25
         shadowView.layer.shadowRadius = 7
         NSLayoutConstraint.activate([
             shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: 2),

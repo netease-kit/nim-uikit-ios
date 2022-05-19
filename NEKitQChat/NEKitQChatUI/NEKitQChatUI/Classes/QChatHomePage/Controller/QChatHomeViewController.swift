@@ -302,10 +302,16 @@ extension QChatHomeViewController:NIMQChatMessageManagerDelegate {
                 break
             case .serverMemberApplyDone,.serverCreate,.serverRemove,.serverMemberLeave:
                 
-                if systemNotification.fromAccount == CoreKitIMEngine.instance.imAccid {
+                if systemNotification.type == .serverRemove {
                     selectIndex = 0
                     self.requestData(timeTag: 0)
+                }else {
+                    if systemNotification.fromAccount == CoreKitIMEngine.instance.imAccid {
+                        selectIndex = 0
+                        self.requestData(timeTag: 0)
+                    }
                 }
+               
                 break
                 
             case .serverUpdate:

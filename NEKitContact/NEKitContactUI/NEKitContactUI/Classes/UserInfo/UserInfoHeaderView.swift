@@ -7,6 +7,7 @@ import UIKit
 import NEKitCoreIM
 import SDWebImage
 
+
 class UserInfoHeaderView: UIView {
     public var avatarImage = UIImageView()
     public var nameLabel = UILabel()
@@ -18,7 +19,7 @@ class UserInfoHeaderView: UIView {
         self.avatarImage.layer.cornerRadius = 30
         self.avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
         self.avatarImage.translatesAutoresizingMaskIntoConstraints = false
-//        self.avatarImage.contentMode = .center
+        self.avatarImage.contentMode = .scaleAspectFill
         self.avatarImage.clipsToBounds = true
         self.addSubview(self.avatarImage)
         NSLayoutConstraint.activate([

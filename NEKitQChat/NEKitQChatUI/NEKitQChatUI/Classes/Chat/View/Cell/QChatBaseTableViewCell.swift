@@ -65,16 +65,18 @@ class QChatBaseTableViewCell: UITableViewCell {
             
             //TODO: 头像赋值
             if let icon = messageFrame?.avatar {
-                self.btnHeadImage.setTitle("")
-                self.btnHeadImage.sd_setImage(with: URL.init(string: icon), completed: nil)
+                btnHeadImage.setTitle("")
+                btnHeadImage.sd_setImage(with: URL.init(string: icon), completed: nil)
             }else {
                 if let sendName = messageFrame?.message?.senderName {
-                    self.btnHeadImage.setTitle(sendName)
+                    btnHeadImage.setTitle(sendName)
                 }else {
-                    self.btnHeadImage.setTitle(messageFrame?.message?.from ?? "")
+                    btnHeadImage.setTitle(messageFrame?.message?.from ?? "")
                 }
-                self.btnHeadImage.backgroundColor = UIColor.colorWithNumber(number: 0)
+                btnHeadImage.sd_setImage(with:nil, completed: nil)
+                btnHeadImage.backgroundColor = UIColor.colorWithNumber(number: 0)
             }
+ 
             
             guard let msg = messageFrame?.message else {
                 return

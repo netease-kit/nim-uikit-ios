@@ -11,6 +11,7 @@ public enum SettingCellType: Int {
     case SettingHeaderCell
     case SettingTeamUserCell
     case SettingSubtitleCell
+    case SettingSubtitleCustomCell
 }
 
 public class SettingCellModel {
@@ -28,5 +29,10 @@ public class SettingCellModel {
     public var switchOpen = false
     //头像扩展字段
     public var defaultHeadData:String?
+    //自定义视图的icon
+    public var rightCustomViewIcon:String?
+    //自定义视图的点击事件
+    public var customViewClick: CellClick?
+
     public init(){}
 }
