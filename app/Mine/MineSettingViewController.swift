@@ -94,7 +94,7 @@ class MineSettingViewController: NEBaseViewController {
         NIMSDK.shared().loginManager.logout { error in
             NIMSDK.shared().qchatManager.logout { chatError in
                 if error != nil {
-                    self?.view.makeToast(error?.localizedDescription)
+                    self.view.makeToast(error?.localizedDescription)
                 }else {
                     print("logout success")
                     NotificationCenter.default.post(name: Notification.Name("logout"), object: nil)

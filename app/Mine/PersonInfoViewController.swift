@@ -10,7 +10,8 @@ import NIMSDK
 
 class PersonInfoViewController: NEBaseViewController {
     
-    public var cellClassDic = [SettingCellType.SettingSubtitleCell.rawValue: TeamSettingSubtitleCell.self, SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self]
+    public var cellClassDic = [SettingCellType.SettingSubtitleCell.rawValue: TeamSettingSubtitleCell.self, SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self,
+        SettingCellType.SettingSubtitleCustomCell.rawValue: TeamSettingRightCustomCell.self]
     private var viewModel = PersonInfoViewModel()
     private var className = "PersonInfoViewController"
 
@@ -48,20 +49,24 @@ class PersonInfoViewController: NEBaseViewController {
     }
     
     func showAlert(firstContent:String,secondContent:String,selectValue:@escaping ((_ value:NSInteger)->Void)) {
-        let alert = UIAlertController(title: "请选择", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.modalPresentationStyle = .popover
         
         let first = UIAlertAction.init(title: firstContent, style: .default) { action in
             selectValue(0)
         }
-        
+        first.setValue(UIColor.init(hexString: "0x333333"), forKey: "_titleTextColor")
+
         let second = UIAlertAction.init(title: secondContent, style: .default) { action in
             selectValue(1)
         }
-        
+        second.setValue(UIColor.init(hexString: "0x333333"), forKey: "_titleTextColor")
+
         let cancel = UIAlertAction(title: "取消", style: .cancel) { action in
             
         }
+        cancel.setValue(UIColor.init(hexString: "0x333333"), forKey: "_titleTextColor")
+
         alert.addAction(first)
         alert.addAction(second)
         alert.addAction(cancel)
@@ -168,7 +173,8 @@ extension PersonInfoViewController:UINavigationControllerDelegate {
 }
 
 extension PersonInfoViewController:PersonInfoViewModelDelegate {
-    
+
+
     func didClickHeadImage() {
         showBottomAlert(self)
     }
@@ -250,7 +256,10 @@ extension PersonInfoViewController:PersonInfoViewModelDelegate {
         navigationController?.pushViewController(ctrl, animated: true)
     }
 
-    
+    func didCopyAccount(account: String) {
+        showToast("复制成功")
+        UIPasteboard.general.string = account
+    }
 }
 
 
