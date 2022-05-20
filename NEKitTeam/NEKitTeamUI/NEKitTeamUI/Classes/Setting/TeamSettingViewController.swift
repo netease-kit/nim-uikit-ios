@@ -583,11 +583,12 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
         
         weak var weakSelf = self
         
-        let actionSheetController = UIAlertController(title: "提示", message: nil, preferredStyle: .actionSheet)
+        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let cancelActionButton = UIAlertAction(title: "取消", style: .cancel) { _ in
             print("Cancel")
         }
+        cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
         actionSheetController.addAction(cancelActionButton)
         
         let manager = UIAlertAction(title: "群主", style: .default){ _ in
@@ -603,6 +604,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
                 }
             }
         }
+        manager.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
         actionSheetController.addAction(manager)
         
         let deleteActionButton = UIAlertAction(title: "所有人", style: .default){ _ in
@@ -618,6 +620,8 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
                 }
             }
         }
+        
+        deleteActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
         actionSheetController.addAction(deleteActionButton)
         
         navigationController?.present(actionSheetController, animated: true, completion: nil)

@@ -18,6 +18,7 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
     public var messages: [QChatMessageFrame] = [QChatMessageFrame]()
     public weak var delegate: QChatViewModelDelegate?
     private var lastMsg: NIMQChatMessage?
+    private let Tag = "QChatViewModel"
     
     init(channel:ChatChannel?) {
         super.init()
@@ -144,8 +145,12 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
         if let cid = self.channel?.channelId, let sid = self.channel?.serverId {
             var param = MarkMessageReadParam(serverId: sid, channelId: cid)
             param.ackTimestamp = time
+            weak var weakSelf = self
             QChatSystemMessageProvider.shared.markMessageRead(param: param) { error in
-                print("mark read error : ", error as Any)
+                if error != nil {
+                    QChatLog.errorLog(weakSelf?.Tag ?? "QChatViewModel", desc: "❌markMessageRead failed,error = \(error!)")
+                }
+               
             }
         }
     }

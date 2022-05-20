@@ -27,6 +27,7 @@ public class NEUserHeaderView: UIImageView {
     }
     
     func setupUI(){
+        contentMode = .scaleAspectFill
         isUserInteractionEnabled = true
         clipsToBounds = false
         addSubview(titleLabel)

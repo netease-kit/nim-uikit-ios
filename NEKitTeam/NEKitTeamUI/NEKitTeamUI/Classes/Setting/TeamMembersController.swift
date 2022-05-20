@@ -24,6 +24,7 @@ class TeamMembersController: NEBaseViewController {
         field.placeholder = "搜索好友"
         field.textColor = .ne_greyText
         field.font = UIFont.systemFont(ofSize: 14.0)
+        field.backgroundColor = UIColor.ne_backcolor
         return field
     }()
     
@@ -74,7 +75,7 @@ class TeamMembersController: NEBaseViewController {
                 back.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4.0),
                 back.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
                 back.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-                back.heightAnchor.constraint(equalToConstant: 36)
+                back.heightAnchor.constraint(equalToConstant: 32)
             ])
         } else {
             // Fallback on earlier versions
@@ -82,7 +83,7 @@ class TeamMembersController: NEBaseViewController {
                 back.topAnchor.constraint(equalTo: view.topAnchor, constant: 4.0),
                 back.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
                 back.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-                back.heightAnchor.constraint(equalToConstant: 36)
+                back.heightAnchor.constraint(equalToConstant: 32)
             ])
         }
         

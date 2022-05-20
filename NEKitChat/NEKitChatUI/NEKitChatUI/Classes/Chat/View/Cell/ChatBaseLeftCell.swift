@@ -39,6 +39,7 @@ class ChatBaseLeftCell: ChatBaseCell {
         self.avatarImage.translatesAutoresizingMaskIntoConstraints = false
         self.avatarImage.clipsToBounds = true
         self.avatarImage.isUserInteractionEnabled = true
+        self.avatarImage.contentMode = .scaleAspectFill
         self.contentView.addSubview(self.avatarImage)
         NSLayoutConstraint.activate([
             self.avatarImage.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 16),

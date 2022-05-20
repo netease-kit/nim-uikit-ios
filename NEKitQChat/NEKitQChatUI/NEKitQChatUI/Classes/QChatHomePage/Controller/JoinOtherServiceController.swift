@@ -6,7 +6,7 @@ import UIKit
 import NEKitCore
 import NEKitCoreIM
 import NEKitCommon
-
+import IQKeyboardManagerSwift
 
 public class JoinOtherServiceController: NEBaseViewController {
 
@@ -23,7 +23,7 @@ public class JoinOtherServiceController: NEBaseViewController {
     
     func initializeConfig(){
         self.title = localizable("qchat_join_otherServer")
-        self.searchTextField.becomeFirstResponder()
+        IQKeyboardManager.shared.enableAutoToolbar = true
     }
     
     func setupSubviews(){

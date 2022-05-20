@@ -52,7 +52,13 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
         tableView.mj_header = MJRefreshNormalHeader(refreshingTarget: self, refreshingAction: #selector(loadMoreData))
         return tableView
     }()
+    
+    deinit {
+        QChatLog.infoLog(className(), desc: "✅ QChatViewController release")
+    }
 }
+
+
 
 //MARK: ===============   QChatBaseCellDelegate   ================
 extension QChatViewController:QChatBaseCellDelegate {
@@ -161,6 +167,8 @@ extension QChatViewController {
         
 //        IQKeyboardManager.shared.enable = false
         IQKeyboardManager.shared.keyboardDistanceFromTextField = 60
+        IQKeyboardManager.shared.enable = true
+        IQKeyboardManager.shared.enableAutoToolbar = false
         let inputView = QChatInputView()
         var tip = localizable("send_to")
         if let cName = viewmodel?.channel?.name {

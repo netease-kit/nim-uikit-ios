@@ -96,7 +96,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     
     public func sendVideoMessage(url: URL, _ completion: @escaping (Error?) -> Void){
         weak var weakSelf = self
-        VideoFormatConvert.convertToMP4(with: url) { path, image in
+        VideoFormatConvert.convertToMP4(with: url,avQuality: AVAssetExportPresetHighestQuality) { path, image in
             if let p = path, let s = weakSelf?.session {
                 weakSelf?.repo.sendMessage(message: MessageUtils.videoMessage(filePath: p), session: s, completion)
             }else {

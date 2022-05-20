@@ -28,31 +28,40 @@ class ConversationNavView: UIView {
         self.addSubview(brandBtn)
         self.addSubview(searchBtn)
         self.addSubview(addBtn)
+        self.addSubview(bottomLine)
 
         NSLayoutConstraint.activate([
-            brandBtn.bottomAnchor.constraint(equalTo: self.bottomAnchor,constant: -13),
+            brandBtn.bottomAnchor.constraint(equalTo: self.bottomAnchor,constant: -8),
             brandBtn.leftAnchor.constraint(equalTo: self.leftAnchor,constant: NEConstant.screenInterval),
         ])
         
         NSLayoutConstraint.activate([
-            addBtn.bottomAnchor.constraint(equalTo: self.bottomAnchor,constant: -15),
+            addBtn.centerYAnchor.constraint(equalTo: brandBtn.centerYAnchor),
             addBtn.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -NEConstant.screenInterval),
             addBtn.widthAnchor.constraint(equalToConstant: 20),
             addBtn.heightAnchor.constraint(equalToConstant: 20)
         ])
         
         NSLayoutConstraint.activate([
-            searchBtn.bottomAnchor.constraint(equalTo: self.bottomAnchor,constant: -15),
+            searchBtn.centerYAnchor.constraint(equalTo: brandBtn.centerYAnchor),
             searchBtn.rightAnchor.constraint(equalTo: addBtn.leftAnchor,constant: -NEConstant.screenInterval),
             searchBtn.widthAnchor.constraint(equalToConstant: 20),
             searchBtn.heightAnchor.constraint(equalToConstant: 20)
+        ])
+        
+        
+        NSLayoutConstraint.activate([
+            bottomLine.leftAnchor.constraint(equalTo: self.leftAnchor),
+            bottomLine.rightAnchor.constraint(equalTo: self.rightAnchor),
+            bottomLine.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            bottomLine.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
     
     //MARK: lazy method
     private lazy var brandBtn:UIButton = {
         let button = UIButton()
-        button.setTitle(localizable("云信Demo"), for: .normal)
+        button.setTitle(localizable("云信IM"), for: .normal)
         button.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
         button.layoutButtonImage(style: .left, space: 12)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -77,6 +86,14 @@ class ConversationNavView: UIView {
         button.addTarget(self, action: #selector(addBtnClick), for: .touchUpInside)
         return button
     }()
+    
+    private lazy var bottomLine:UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.init(hexString: "0xDBE0E8")
+        return view
+    }()
+    
 }
 
 extension ConversationNavView {

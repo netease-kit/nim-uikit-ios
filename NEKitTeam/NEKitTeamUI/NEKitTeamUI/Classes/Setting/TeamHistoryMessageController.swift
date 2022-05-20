@@ -87,7 +87,7 @@ public class TeamHistoryMessageController: NEBaseViewController {
         textField.textColor = UIColor.ne_greyText
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.layer.cornerRadius = 8
-        textField.backgroundColor = UIColor.init(hexString: "0xEFF1F4")
+        textField.backgroundColor = UIColor.init(hexString: "0xF2F4F5")
         textField.clearButtonMode = .whileEditing
         textField.returnKeyType = .search
         textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)

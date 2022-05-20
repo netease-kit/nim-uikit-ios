@@ -14,6 +14,7 @@ protocol PersonInfoViewModelDelegate: AnyObject {
     func didClickMobile(mobile:String)
     func didClickEmail(email:String)
     func didClickSign(sign:String)
+    func didCopyAccount(account:String)
 }
 
 public class  PersonInfoViewModel{
@@ -59,6 +60,17 @@ public class  PersonInfoViewModel{
         nickNameItem.rowHeight = 46.0
         nickNameItem.cellClick = {
             weakSelf?.delegate?.didClickNickName(name: nickNameItem.subTitle ?? "")
+        }
+        
+        //账号
+        let accountItem = SettingCellModel()
+        accountItem.type = SettingCellType.SettingSubtitleCustomCell.rawValue
+        accountItem.cellName = "账号"
+        accountItem.subTitle = mineInfo.userId
+        accountItem.rowHeight = 46.0
+        accountItem.rightCustomViewIcon = "copy_icon"
+        accountItem.customViewClick = {
+            weakSelf?.delegate?.didCopyAccount(account: mineInfo.userId ?? "")
         }
         
         //性别
@@ -111,7 +123,7 @@ public class  PersonInfoViewModel{
         emailItem.cellClick = {
             weakSelf?.delegate?.didClickEmail(email: emailItem.subTitle ?? "")
         }
-        model.cellModels.append(contentsOf: [headImageItem, nickNameItem,sexItem,birthdayItem,telephoneItem,emailItem])
+        model.cellModels.append(contentsOf: [headImageItem, nickNameItem,accountItem,sexItem,birthdayItem,telephoneItem,emailItem])
         return model
         
     }

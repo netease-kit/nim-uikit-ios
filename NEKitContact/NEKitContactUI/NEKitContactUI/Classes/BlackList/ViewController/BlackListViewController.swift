@@ -5,6 +5,7 @@
 
 import UIKit
 import NEKitCoreIM
+import NEKitCommon
 class BlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,TeamTableViewCellDelegate {
     var tableView = UITableView(frame: .zero, style: .plain)
     var viewModel = BlackListViewModel()
@@ -36,7 +37,13 @@ class BlackListViewController: UIViewController, UITableViewDelegate, UITableVie
         ])
         self.tableView.register(BlackListCell.self, forCellReuseIdentifier: "\(NSStringFromClass(TeamTableViewCell.self))")
         self.tableView.rowHeight = 62
-        self.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+        let headView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: Int(NEConstant.screenWidth), height: 40))
+        let contentLabel = UILabel.init(frame: CGRect.init(x: 20, y: 0, width: Int(NEConstant.screenWidth)-20, height: 40))
+        contentLabel.text = "   你不会收到列表中任何联系人的消息"
+        contentLabel.textColor = UIColor.ne_emptyTitleColor
+        contentLabel.font = UIFont.systemFont(ofSize: 14)
+        headView.addSubview(contentLabel)
+        self.tableView.tableHeaderView = headView
     }
     
     func loadData() {

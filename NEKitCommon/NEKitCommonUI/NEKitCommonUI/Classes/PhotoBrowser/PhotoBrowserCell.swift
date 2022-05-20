@@ -23,7 +23,7 @@ class PhotoBrowserCell: UICollectionViewCell {
     
     lazy var imgView : UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     

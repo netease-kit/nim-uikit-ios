@@ -15,11 +15,6 @@ class QChatImageTableViewCell: QChatBaseTableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        contentBtn.addCorner(conrners: .allCorners, radius: 8)
-    }
-    
     private lazy var contentImageView:UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill

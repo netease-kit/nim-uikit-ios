@@ -45,6 +45,14 @@ class BlackListCell: TeamTableViewCell {
             self.button.heightAnchor.constraint(equalToConstant: 32),
             self.button.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor, constant: 0)
         ])
+        
+        contentView.addSubview(bottomLine)
+        NSLayoutConstraint.activate([
+            bottomLine.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+            bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+            bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            bottomLine.heightAnchor.constraint(equalToConstant: 1)
+        ])
     }
     
     @objc func buttonEvent(sender: UIButton) {
@@ -70,9 +78,18 @@ class BlackListCell: TeamTableViewCell {
         }
         // avatar
         if let imageUrl = user.userInfo?.thumbAvatarUrl {
+            self.nameLabel.text = ""
             self.avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
         }
         
     }
+    
+    
+    private lazy var bottomLine:UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.ne_greyLine
+        return view
+    }()
 
 }

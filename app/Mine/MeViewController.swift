@@ -33,7 +33,7 @@ class MeViewController: UIViewController {
     
     lazy var idLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .ne_greyText
+        label.textColor = .ne_darkText
         label.font = UIFont.systemFont(ofSize: 16.0)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

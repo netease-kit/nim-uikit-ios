@@ -12,6 +12,7 @@ open class ContactBaseViewCell: UITableViewCell {
         avatar.translatesAutoresizingMaskIntoConstraints = false
         avatar.addSubview(nameLabel)
         avatar.clipsToBounds = true
+        avatar.contentMode = .scaleAspectFill
         avatar.backgroundColor = UIColor.colorWithNumber(number: 0)
         NSLayoutConstraint.activate([
             nameLabel.leftAnchor.constraint(equalTo: avatar.leftAnchor, constant: 1),
