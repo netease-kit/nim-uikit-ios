@@ -8,7 +8,7 @@ import NEKitCoreIM
 
 typealias MemberCountChange = (Int) -> Void
 
-class QChatMemberManagerController: NEBaseTableViewController {
+public class QChatMemberManagerController: NEBaseTableViewController {
     
     let viewmodel = MemberManagerViewModel()
     
@@ -20,7 +20,7 @@ class QChatMemberManagerController: NEBaseTableViewController {
     
     var countChangeBlock: MemberCountChange?
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -66,7 +66,7 @@ class QChatMemberManagerController: NEBaseTableViewController {
 
 extension QChatMemberManagerController: UITableViewDelegate, UITableViewDataSource, ViewModelDelegate, QChatMemberSelectControllerDelegate {
     
-    func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
+    public func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
         var param = GetExistingServerRoleMembersByAccidsParam()
         param.serverId = serverId
         param.accids = accid
@@ -89,27 +89,27 @@ extension QChatMemberManagerController: UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         view.hideToastActivity()
         tableView.mj_footer?.endRefreshing()
         tableView.reloadData()
     }
     
-    func dataNoMore() {
+    public func dataNoMore() {
         view.hideToastActivity()
         tableView.mj_footer?.endRefreshingWithNoMoreData()
         tableView.mj_footer?.isHidden = true
     }
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         showToast(error.localizedDescription)
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         }
@@ -119,7 +119,7 @@ extension QChatMemberManagerController: UITableViewDelegate, UITableViewDataSour
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
             let cell: QChatPlainTextArrowCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatPlainTextArrowCell.self)", for: indexPath) as! QChatPlainTextArrowCell
@@ -138,27 +138,27 @@ extension QChatMemberManagerController: UITableViewDelegate, UITableViewDataSour
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0 
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return nil
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return nil
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         weak var weakSelf = self
         if indexPath.section == 0 {
             let memberSelect = QChatMemberSelectController()

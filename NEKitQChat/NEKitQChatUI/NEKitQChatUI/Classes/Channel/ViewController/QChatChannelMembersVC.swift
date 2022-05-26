@@ -6,14 +6,14 @@ import UIKit
 import NEKitCoreIM
 import MJRefresh
 
-class QChatChannelMembersVC: QChatTableViewController, QChatMemberInfoViewDelegate {
+public class QChatChannelMembersVC: QChatTableViewController, QChatMemberInfoViewDelegate {
     
     public var channel: ChatChannel?
     private var channelMembers:[ServerMemeber]?
     var memberInfoView: QChatMemberInfoView?
     var  lastMember: ServerMemeber?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
         loadData()
@@ -65,11 +65,11 @@ class QChatChannelMembersVC: QChatTableViewController, QChatMemberInfoViewDelega
         }
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.channelMembers?.count ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatImageTextOnlineCell.self)", for: indexPath) as! QChatImageTextOnlineCell
         let member = self.channelMembers![indexPath.row] as ServerMemeber
         cell.setup(accid: member.accid, nickName: member.nick)

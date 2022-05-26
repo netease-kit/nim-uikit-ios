@@ -6,13 +6,13 @@ import UIKit
 import NEKitCoreIM
 import NEKitCore
 
-class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectControllerDelegate {
+public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectControllerDelegate {
     public var type: RoleType = .white
     public var channel: ChatChannel?
     private var memberArray: [ServerMemeber]?
     private var isEdited: Bool = false
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.isEdited = false
         self.title = self.type == .white ? localizable("white_list") : localizable("black_list")
@@ -38,7 +38,7 @@ class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectControll
         return 2
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         }else {
@@ -46,7 +46,7 @@ class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectControll
         }
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextCell.self)", for: indexPath) as! QChatTextCell
             cell.backgroundColor = .white
@@ -178,7 +178,7 @@ class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectControll
         self.tableView.reloadData()
     }
     
-    func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
+    public func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
         let type: ChannelMemberRoleType = self.type == .white ? .white : .black
         let param = GetExistingChannelBlackWhiteMembersParam(serverId: self.channel?.serverId, channelId: self.channel?.channelId, type: type, accIds: accid)
         QChatChannelProvider.shared.getExistingChannelBlackWhiteMembers(param: param) { error, result in

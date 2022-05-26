@@ -10,7 +10,7 @@ import NIMSDK
 
 typealias SaveSuccessBlock = (_ server: QChatServer?) -> Void
 
-class QChatServerSettingViewController: NEBaseTableViewController {
+public class QChatServerSettingViewController: NEBaseTableViewController {
     
     let viewModel = SettingViewModel()
     var server: QChatServer?
@@ -37,13 +37,13 @@ class QChatServerSettingViewController: NEBaseTableViewController {
         return label
     }()
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = false
     }
     
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
@@ -332,7 +332,7 @@ extension QChatServerSettingViewController {
 
 extension QChatServerSettingViewController: UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let l = textField.tag
         let text = "\(textField.text ?? "")\(string)"
         print("count : ", text.count)
@@ -342,11 +342,11 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
         return true
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         print("count section : ", section)
         if section == 0 {
             return viewModel.permissions.count
@@ -356,7 +356,7 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
             let textCell: QChatTextArrowCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextArrowCell.self)", for: indexPath) as! QChatTextArrowCell
@@ -376,7 +376,7 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             
             if indexPath.row == 1 {
@@ -409,7 +409,7 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             return 48
         }else if indexPath.section == 1 {
@@ -418,21 +418,21 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
         return 0
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 1 {
             return UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 24))
         }
         return nil
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 1 {
             return 24
         }
         return 0
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
     }
     

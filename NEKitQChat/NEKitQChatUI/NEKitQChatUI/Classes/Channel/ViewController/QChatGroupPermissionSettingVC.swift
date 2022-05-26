@@ -7,7 +7,7 @@ import NEKitCoreIM
 
 typealias channelUpdateSettingBlock = (_ channelRole: ChannelRole?) -> ()
 
-class QChatGroupPermissionSettingVC: QChatTableViewController, QChatPermissionSettingCellDelegate {
+public class QChatGroupPermissionSettingVC: QChatTableViewController, QChatPermissionSettingCellDelegate {
 //    public var didUpdateBlock: channelUpdateSettingBlock?
     public var cRole: ChannelRole?
     private var commonAuths = [RoleStatusInfoExt]()
@@ -24,7 +24,7 @@ class QChatGroupPermissionSettingVC: QChatTableViewController, QChatPermissionSe
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         if let name = self.cRole?.name {
             self.title = name + localizable("authority_setting")
@@ -78,11 +78,11 @@ class QChatGroupPermissionSettingVC: QChatTableViewController, QChatPermissionSe
         return self.auths.count
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.auths[section].count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatPermissionSettingCell.self)", for: indexPath) as! QChatPermissionSettingCell
         let auths = self.auths[indexPath.section]
         let authExt = auths[indexPath.row]

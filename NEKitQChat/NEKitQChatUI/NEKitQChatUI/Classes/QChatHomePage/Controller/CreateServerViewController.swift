@@ -4,7 +4,7 @@
 
 import UIKit
 
- class CreateServerViewController: NEBaseViewController {
+ public class CreateServerViewController: NEBaseViewController {
     
     public var serverViewModel = CreateServerViewModel()
     
@@ -56,18 +56,18 @@ extension CreateServerViewController {
 extension CreateServerViewController:UITableViewDelegate,UITableViewDataSource {
 
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return serverViewModel.dataArray.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(NSStringFromClass(NECreateServerCell.self))", for: indexPath) as! NECreateServerCell
         let model = serverViewModel.dataArray[indexPath.row]
         cell.model = model
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.row == 0 {
             let mineCreateCtrl = MineCreateServerController()
@@ -78,7 +78,7 @@ extension CreateServerViewController:UITableViewDelegate,UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76
     }
     

@@ -8,7 +8,7 @@ import CoreAudio
 import MJRefresh
 
 typealias AddMemberRoleBlock = (_ memberRole: MemberRole?) -> Void
-class QChatAddMemberVC: QChatSearchVC {
+public class QChatAddMemberVC: QChatSearchVC {
     public var channel: ChatChannel?
     private var serverMembers:[ServerMemeber]?
     private var channelMembers:[ServerMemeber]?
@@ -24,7 +24,7 @@ class QChatAddMemberVC: QChatSearchVC {
         super.init(coder: coder)
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.title = localizable("add_member")
         self.tableView.register(QChatImageTextCell.self, forCellReuseIdentifier: "\(QChatImageTextCell.self)")
@@ -149,11 +149,11 @@ class QChatAddMemberVC: QChatSearchVC {
         }
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.serverMembers?.count ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatImageTextCell.self)", for: indexPath) as! QChatImageTextCell
         cell.backgroundColor = .white
         cell.rightStyle = .indicate

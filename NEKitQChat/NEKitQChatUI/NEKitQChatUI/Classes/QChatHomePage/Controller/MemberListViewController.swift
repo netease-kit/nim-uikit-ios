@@ -5,7 +5,7 @@
 import UIKit
 import NEKitCoreIM
 import NEKitCore
-class MemberListViewController: NEBaseViewController {
+public class MemberListViewController: NEBaseViewController {
 
     public var serverViewModel = CreateServerViewModel()
     public var memberViewModel = MemberListViewModel()
@@ -13,7 +13,7 @@ class MemberListViewController: NEBaseViewController {
     var dataArray:Array<ServerMemeber>?
     var serverId: UInt64?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         initializeConfig()
         requestData()
@@ -109,19 +109,19 @@ extension MemberListViewController:UITableViewDelegate,UITableViewDataSource {
 //        }
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataArray?.count ?? 0
 
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(NSStringFromClass(NEGroupIdentityMemberCell.self))", for: indexPath) as! NEGroupIdentityMemberCell
         cell.memberModel = dataArray?[indexPath.row]
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
 //        let user = viewModel.limitUsers[indexPath.row]
         if let member = dataArray?[indexPath.row] {

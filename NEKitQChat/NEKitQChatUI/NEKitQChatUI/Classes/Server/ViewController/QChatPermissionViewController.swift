@@ -6,7 +6,7 @@ import UIKit
 import NEKitCoreIM
 
 typealias RoleUpdateCompletion = (_ role: ServerRole) -> Void
-class QChatPermissionViewController: NEBaseTableViewController {
+public class QChatPermissionViewController: NEBaseTableViewController {
     
     var idGroup: IdGroupModel?
     
@@ -16,7 +16,7 @@ class QChatPermissionViewController: NEBaseTableViewController {
     
     var completion: RoleUpdateCompletion?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
@@ -74,11 +74,11 @@ extension QChatPermissionViewController: UITableViewDelegate, UITableViewDataSou
         }
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.reloadData()
     }
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         showToast(error.localizedDescription)
     }
     
@@ -89,11 +89,11 @@ extension QChatPermissionViewController: UITableViewDelegate, UITableViewDataSou
         }
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 5
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         }
@@ -115,7 +115,7 @@ extension QChatPermissionViewController: UITableViewDelegate, UITableViewDataSou
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
             let cell: QChatTextEditCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextEditCell.self)", for: indexPath) as! QChatTextEditCell
@@ -157,11 +157,11 @@ extension QChatPermissionViewController: UITableViewDelegate, UITableViewDataSou
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = QChatHeaderView()
         switch section  {
         case 0:
@@ -188,14 +188,14 @@ extension QChatPermissionViewController: UITableViewDelegate, UITableViewDataSou
         return header
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if let type = idGroup?.role?.type, type == .everyone, section == 1 {
             return 0
         }
         return 40
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.section == 1 {
             let memberManager = QChatMemberManagerController()
