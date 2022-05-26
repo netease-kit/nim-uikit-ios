@@ -7,11 +7,11 @@ target 'app' do
   
   pod 'YXLogin', '1.0.0'
   
-  pod 'NEContactUIKit', '9.0.1'
-  pod 'NEQChatUIKit', '9.0.1'
-  pod 'NEConversationUIKit', '9.0.1'
-  pod 'NEChatUIKit', '9.0.1'
-  pod 'NETeamUIKit', '9.0.1'
+  pod 'NEContactUIKit', '9.0.2-beta2'
+  pod 'NEQChatUIKit', '9.0.2-beta2'
+  pod 'NEConversationUIKit', '9.0.2-beta2'
+  pod 'NEChatUIKit', '9.0.2-beta2'
+  pod 'NETeamUIKit', '9.0.2-beta2'
   
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
 #  pod 'NEChatKit', '9.0.1'
