@@ -7,7 +7,7 @@ import UIKit
 import NEKitCoreIM
 import NEKitCore
 
-class ContactRemakNameViewController: ContactBaseViewController, UITextFieldDelegate {
+public class ContactRemakNameViewController: ContactBaseViewController, UITextFieldDelegate {
     
     typealias ModifyBlock = (_ user: User) -> Void
     
@@ -29,7 +29,7 @@ class ContactRemakNameViewController: ContactBaseViewController, UITextFieldDele
 //        return btn
 //    }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -106,7 +106,7 @@ class ContactRemakNameViewController: ContactBaseViewController, UITextFieldDele
     }
     */
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let text = "\(textField.text ?? "")\(string)"
         print("text count : ", text.count)
         if text.count > 30 {

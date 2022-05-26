@@ -7,7 +7,7 @@ import NEKitCommonUI
 import NIMSDK
 import NEKitTeam
 
-class TeamAvatarViewController: NEBaseViewController {
+public class TeamAvatarViewController: NEBaseViewController {
     
     typealias SaveCompletion = () -> Void
     
@@ -43,7 +43,7 @@ class TeamAvatarViewController: NEBaseViewController {
         return collection
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
@@ -204,11 +204,11 @@ extension TeamAvatarViewController {
 
 extension TeamAvatarViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 5
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(TeamDefaultIconCell.self)", for: indexPath) as? TeamDefaultIconCell {
             cell.iconImage.image = coreLoader.loadImage("icon_\(indexPath.row)")
            
@@ -217,14 +217,14 @@ extension TeamAvatarViewController: UICollectionViewDelegate, UICollectionViewDa
         return UICollectionViewCell()
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         let space = (self.view.width - 297.0)/4.0
         print("mini inter : ", space)
         return space
     }
     
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if TeamRouter.iconUrls.count > indexPath.row {
             headerUrl = TeamRouter.iconUrls[indexPath.row]
             //headerView.image = coreLoader.loadImage("icon_\(indexPath.row)")

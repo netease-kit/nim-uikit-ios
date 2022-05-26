@@ -8,7 +8,7 @@ import NEKitCore
 //
 
 
-class TeamMembersController: NEBaseViewController {
+public class TeamMembersController: NEBaseViewController {
     
     var datas: [TeamMemberInfoModel]?
     
@@ -47,7 +47,7 @@ class TeamMembersController: NEBaseViewController {
         return table
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -174,14 +174,14 @@ extension TeamMembersController: UITableViewDelegate, UITableViewDataSource {
         return datas?[index]
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let text = searchTextField.text, text.count > 0 {
             return searchDatas.count
         }
         return datas?.count ?? 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "\(TeamMemberCell.self)", for: indexPath) as? TeamMemberCell {
             if let model = getRealModel(indexPath.row){
                 cell.configure(model)
@@ -192,11 +192,11 @@ extension TeamMembersController: UITableViewDelegate, UITableViewDataSource {
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 62.0
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let model = getRealModel(indexPath.row), let user = model.nimUser {
             if CoreKitIMEngine.instance.isMySelf(user.userId) {
                 Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)

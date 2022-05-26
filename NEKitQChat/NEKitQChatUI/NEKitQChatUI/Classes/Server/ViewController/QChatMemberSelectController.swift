@@ -17,7 +17,7 @@ public protocol QChatMemberSelectControllerDelegate: AnyObject {
 //    case ChannelMember
 //}
 
-class QChatMemberSelectController: NEBaseTableViewController,MemberSelectViewModelDelegate {
+public class QChatMemberSelectController: NEBaseTableViewController,MemberSelectViewModelDelegate {
     
     let viewmodel = MemberSelectViewModel()
     var filterBlock: FilterMembersBlock?
@@ -45,7 +45,7 @@ class QChatMemberSelectController: NEBaseTableViewController,MemberSelectViewMod
     
     var selectArray = [UserInfo]()
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         viewmodel.delegate = self
         loadData()
@@ -140,51 +140,51 @@ class QChatMemberSelectController: NEBaseTableViewController,MemberSelectViewMod
 
 extension QChatMemberSelectController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource, ViewModelDelegate {
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         view.makeToast(error.localizedDescription)
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.reloadData()
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return selectArray.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let user = selectArray[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(NSStringFromClass(QChatUserUnCheckCell.self))", for: indexPath) as? QChatUserUnCheckCell
         cell?.configure(user)
         return cell ?? UICollectionViewCell()
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let user = selectArray[indexPath.row]
         didUnselectContact(user)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 46, height: 52)
     }
 
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewmodel.datas.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: QChatSelectedCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatSelectedCell.self)", for: indexPath) as! QChatSelectedCell
         let user  = viewmodel.datas[indexPath.row]
         cell.user = user
         return  cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 62
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let user = viewmodel.datas[indexPath.row]
         let cell = tableView.cellForRow(at: indexPath) as? QChatSelectedCell
@@ -241,7 +241,7 @@ extension QChatMemberSelectController: UICollectionViewDelegate, UICollectionVie
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0
     }
     

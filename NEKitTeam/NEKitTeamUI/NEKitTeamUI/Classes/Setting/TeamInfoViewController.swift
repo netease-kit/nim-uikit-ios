@@ -5,7 +5,7 @@
 import UIKit
 import NIMSDK
 
-class TeamInfoViewController: NEBaseViewController {
+public class TeamInfoViewController: NEBaseViewController {
 
     let viewmodel = TeamInfoViewModel()
     
@@ -26,7 +26,7 @@ class TeamInfoViewController: NEBaseViewController {
         return table
     }()
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -68,11 +68,11 @@ class TeamInfoViewController: NEBaseViewController {
 
 extension TeamInfoViewController: UITableViewDelegate, UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewmodel.cellDatas.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = viewmodel.cellDatas[indexPath.row]
         if let cell = tableView.dequeueReusableCell(withIdentifier: "\(model.type)", for: indexPath) as? BaseTeamSettingCell {
             cell.configure(model)
@@ -81,7 +81,7 @@ extension TeamInfoViewController: UITableViewDelegate, UITableViewDataSource {
         return UITableViewCell()
     }
 
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
             let avatar = TeamAvatarViewController()
             avatar.team = team
@@ -105,12 +105,12 @@ extension TeamInfoViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let model = viewmodel.cellDatas[indexPath.row]
         return model.rowHeight
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 12.0
     }
     

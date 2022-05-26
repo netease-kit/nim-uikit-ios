@@ -7,7 +7,7 @@ import NEKitCoreIM
 
 typealias CreateCompletion = () -> Void
 
-class QChatCreateGroupViewController: NEBaseTableViewController, QChatMemberSelectControllerDelegate {
+public class QChatCreateGroupViewController: NEBaseTableViewController, QChatMemberSelectControllerDelegate {
 
     let viewModel = CreateGroupViewModel()
     
@@ -17,7 +17,7 @@ class QChatCreateGroupViewController: NEBaseTableViewController, QChatMemberSele
     
     var completion: CreateCompletion?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -116,7 +116,7 @@ extension QChatCreateGroupViewController: UITextFieldDelegate {
 
 extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDelegate, ViewModelDelegate, QChatTextEditCellDelegate {
     
-    func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
+    public func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> ()) {
         
         var dic = [String : String]()
         viewModel.allUsers.forEach { user in
@@ -148,16 +148,16 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
     }
     
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         UIApplication.shared.keyWindow?.endEditing(true)
         view.makeToast(error.localizedDescription)
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.reloadData()
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         let count = 3
 //        if viewModel.limitUsers.count < viewModel.allUsers.count {
 //            count = count + 1
@@ -165,7 +165,7 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
         return count
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 || section == 1 {
             return 1
         }else if section == 2 {
@@ -176,7 +176,7 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
             let cell: QChatTextEditCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextEditCell.self)", for: indexPath) as! QChatTextEditCell
@@ -205,7 +205,7 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             
             let memberSelect = QChatMemberSelectController()
@@ -235,11 +235,11 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 || section == 1 {
             return 40.0
         }else if section == 2 {
@@ -248,7 +248,7 @@ extension QChatCreateGroupViewController: UITableViewDataSource, UITableViewDele
         return 0
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
         let header = QChatHeaderView()
         if section == 0 {

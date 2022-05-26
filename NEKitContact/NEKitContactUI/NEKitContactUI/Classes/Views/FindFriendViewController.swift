@@ -5,7 +5,7 @@
 
 import UIKit
 
-class FindFriendViewController: ContactBaseViewController, UITextFieldDelegate {
+public class FindFriendViewController: ContactBaseViewController, UITextFieldDelegate {
     
     let viewModel = FindFriendViewModel()
     let noResultView = UIView()
@@ -30,13 +30,13 @@ class FindFriendViewController: ContactBaseViewController, UITextFieldDelegate {
         return label
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "添加好友"
         setupUI()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = false
     }
@@ -99,7 +99,7 @@ class FindFriendViewController: ContactBaseViewController, UITextFieldDelegate {
         userLabel.isHidden = true
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         guard let text = textField.text else {
             return false

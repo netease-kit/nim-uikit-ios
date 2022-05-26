@@ -6,7 +6,7 @@ import UIKit
 import NIMSDK
 import NEKitCoreIM
 
-class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
+public class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
     
 //    override init(session: NIMSession) {
 //        super.init(session: session)
@@ -27,12 +27,12 @@ class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
     }
     
-    override func getSessionInfo(session: NIMSession) {
+    public override func getSessionInfo(session: NIMSession) {
         if let vm = self.viewmodel as? TeamChatViewModel {
             if let t = vm.getTeam(teamId: session.sessionId)  {
                 self.updateTeamInfo(team: t)
@@ -53,13 +53,13 @@ class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
     }
     
 //    MARK: TeamChatViewModelDelegate
-    func onTeamRemoved(team: NIMTeam) {
+    public func onTeamRemoved(team: NIMTeam) {
         showSingleAlert(message: localizable("team_has_been_removed")) {
             self.navigationController?.popViewController(animated: true)
         }
     }
     
-    func onTeamUpdate(team: NIMTeam) {
+    public func onTeamUpdate(team: NIMTeam) {
         self.updateTeamInfo(team: team)
     }
 }

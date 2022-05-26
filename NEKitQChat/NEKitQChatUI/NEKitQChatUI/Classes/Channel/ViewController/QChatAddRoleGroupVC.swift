@@ -7,7 +7,7 @@ import NEKitCoreIM
 import MJRefresh
 
 typealias AddChannelRoleBlock = (_ role: ChannelRole?) -> Void
-class QChatAddRoleGroupVC: QChatSearchVC {
+public class QChatAddRoleGroupVC: QChatSearchVC {
     public var channel: ChatChannel?
     private var serverRoles:[ServerRole]?
     private var channelRoles:[ChannelRole]?
@@ -15,7 +15,7 @@ class QChatAddRoleGroupVC: QChatSearchVC {
     private var priority: Int?
     private lazy var placeholderView: EmptyDataView = EmptyDataView(imageName: "rolePlaceholder", content: localizable("has_no_role"), frame: CGRect(x: 0, y: 60, width: self.view.bounds.size.width, height: self.view.bounds.size.height))
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.title = localizable("add_group")
         self.tableView.register(QChatTextArrowCell.self, forCellReuseIdentifier: "\(QChatTextArrowCell.self)")
@@ -158,11 +158,11 @@ class QChatAddRoleGroupVC: QChatSearchVC {
         }
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.serverRoles?.count ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextArrowCell.self)", for: indexPath) as! QChatTextArrowCell
         cell.backgroundColor = .white
         cell.titleLabel.text = self.serverRoles?[indexPath.row].name

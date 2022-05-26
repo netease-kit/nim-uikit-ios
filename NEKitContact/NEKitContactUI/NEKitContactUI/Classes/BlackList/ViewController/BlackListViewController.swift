@@ -6,12 +6,12 @@
 import UIKit
 import NEKitCoreIM
 import NEKitCommon
-class BlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,TeamTableViewCellDelegate {
+public class BlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,TeamTableViewCellDelegate {
     var tableView = UITableView(frame: .zero, style: .plain)
     var viewModel = BlackListViewModel()
     public var blackList: [User]?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
         loadData()

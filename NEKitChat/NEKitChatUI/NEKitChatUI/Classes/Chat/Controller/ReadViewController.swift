@@ -7,7 +7,7 @@ import NIMSDK
 import NEKitCoreIM
 import NEKitCommonUI
 
-class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource {
+public class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource {
     
     public var read: Bool = true
     public var line: UIView = UIView()
@@ -27,7 +27,7 @@ class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableVie
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
         loadData(message: self.message)
@@ -201,7 +201,7 @@ class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableVie
         }
     }
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if self.read {
             return self.readUsers.count
         }else {
@@ -209,7 +209,7 @@ class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableVie
         }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(UserTableViewCell.self)", for: indexPath) as! UserTableViewCell
         if self.read {
             let model = self.readUsers[indexPath.row]

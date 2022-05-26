@@ -12,7 +12,7 @@ typealias EditMemberChange = () -> Void
 
 typealias EditMemberDelete = () -> Void
 
-class QChatEditMemberViewController: NEBaseTableViewController {
+public class QChatEditMemberViewController: NEBaseTableViewController {
     
     var user: UserInfo?
     var editAble = false
@@ -26,7 +26,7 @@ class QChatEditMemberViewController: NEBaseTableViewController {
     
     var didChange = false
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -89,19 +89,19 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
         }
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.reloadData()
     }
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         showToast(error.localizedDescription)
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return  5
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 || section == 1 {
             return 1
         }else if section == 2 {
@@ -116,7 +116,7 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
             let cell: QChatHeaderCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatHeaderCell.self)", for: indexPath) as! QChatHeaderCell
@@ -177,14 +177,14 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             return 92
         }
         return 50
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = QChatHeaderView()
         if section == 1 {
             header.titleLabel.text = localizable("qchat_nickname")
@@ -198,7 +198,7 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
         return nil
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         if section == 0 {
             return 22
@@ -218,7 +218,7 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
         return 0
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.section == 1 {
             //showToast("请点击编辑后修改昵称")

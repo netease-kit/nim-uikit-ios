@@ -9,7 +9,7 @@ import NEKitCoreIM
 
 typealias SortChange = () -> Void
 
-class QChatIdGroupSortController: NEBaseTableViewController {
+public class QChatIdGroupSortController: NEBaseTableViewController {
     
     var serverId: UInt64?
     
@@ -23,7 +23,7 @@ class QChatIdGroupSortController: NEBaseTableViewController {
     
     var completion: SortChange?
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -83,20 +83,20 @@ class QChatIdGroupSortController: NEBaseTableViewController {
 
 extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource, ViewModelDelegate {
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.reloadData()
     }
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         view.hideToastActivity()
         showToast(error.localizedDescription)
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 //        if section == 0 {
 //            return viewmodel.lockData.count
 //        }else if section == 1 {
@@ -105,7 +105,7 @@ extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource
         return viewmodel.datas.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell: QChatSortCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatSortCell.self)", for: indexPath) as! QChatSortCell
 //        if indexPath.section == 0 {
@@ -126,7 +126,7 @@ extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource
         return cell
     }
     
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         print("source :" , sourceIndexPath.row , " destionation :" ,destinationIndexPath.row)
         
         if sourceIndexPath.row > destinationIndexPath.row {
@@ -147,15 +147,15 @@ extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource
         }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
     
-    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+    public func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return false
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
             weak var weakSelf = self
             if model.hasPermission == true {
@@ -170,7 +170,7 @@ extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource
         }
     }
     
-    func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
+    public func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
         if isOwer == true {
             return proposedDestinationIndexPath
         }else {
@@ -183,21 +183,21 @@ extension QChatIdGroupSortController: UITableViewDelegate, UITableViewDataSource
         return sourceIndexPath
     }
     
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
             return model.hasPermission
         }
         return true
     }
     
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
             return model.hasPermission
         }
         return true
     }
 
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+    public func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return UITableViewCell.EditingStyle.none
     }
     

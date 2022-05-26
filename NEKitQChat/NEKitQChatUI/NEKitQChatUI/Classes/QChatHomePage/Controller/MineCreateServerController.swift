@@ -8,13 +8,13 @@ import NEKitCoreIM
 import NIMSDK
 import NEKitCommon
 
- class MineCreateServerController: NEBaseViewController, UINavigationControllerDelegate {
+public class MineCreateServerController: NEBaseViewController, UINavigationControllerDelegate {
      
     private let tag = "MineCreateServerController"
     public var serverViewModel = CreateServerViewModel()
     var headImageUrl:String?
      
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         initializeConfig()
         setupSubviews()
@@ -176,7 +176,7 @@ extension MineCreateServerController:UITextFieldDelegate{
     }
     
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         let text = "\(textField.text ?? "")\(string)"
         if text.count > 50 {

@@ -7,7 +7,7 @@ import NEKitCoreIM
 
 typealias updateChannelSuccess = (_ channel: ChatChannel?) -> Void
 
-class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellDelegate {
+public class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellDelegate {
     var viewModel: QChatUpdateChannelViewModel?
     var didUpdateChannel: updateChannelSuccess?
     var didDeleteChannel: updateChannelSuccess?
@@ -15,7 +15,7 @@ class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellDelegate
     var sections: [String]?
     var cells = [String]()
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         loadData()
         commonUI()
@@ -46,11 +46,11 @@ class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellDelegate
         return sections?.count ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextEditCell.self)", for: indexPath) as! QChatTextEditCell

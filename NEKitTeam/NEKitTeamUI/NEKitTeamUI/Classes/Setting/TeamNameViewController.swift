@@ -11,7 +11,7 @@ enum ChangeType {
     case TeamName
     case NickName
 }
-class TeamNameViewController: NEBaseViewController {
+public class TeamNameViewController: NEBaseViewController {
     
     var team: NIMTeam?
 //    var user: NIMUser?
@@ -38,7 +38,7 @@ class TeamNameViewController: NEBaseViewController {
         return text
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
@@ -158,7 +158,7 @@ class TeamNameViewController: NEBaseViewController {
 
 extension TeamNameViewController: UITextFieldDelegate {
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string), text.count > 30 {
             return false

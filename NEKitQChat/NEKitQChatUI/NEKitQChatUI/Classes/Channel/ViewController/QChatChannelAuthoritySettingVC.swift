@@ -5,7 +5,7 @@
 import UIKit
 import NEKitCoreIM
 
-class QChatChannelAuthoritySettingVC: QChatTableViewController {
+public class QChatChannelAuthoritySettingVC: QChatTableViewController {
     var channel: ChatChannel?
     var viewModel: QChatAuthoritySettingViewModel?
     var sectionTitle: [String] = ["",localizable("qchat_id_group"),localizable("qchat_member")]
@@ -23,14 +23,14 @@ class QChatChannelAuthoritySettingVC: QChatTableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
          print("viewWillAppear")
         loadData()
     }
     
 
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
     }
@@ -78,7 +78,7 @@ class QChatChannelAuthoritySettingVC: QChatTableViewController {
         return sectionTitle.count
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
             return staticData.count
@@ -91,7 +91,7 @@ class QChatChannelAuthoritySettingVC: QChatTableViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch indexPath.section {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatTextArrowCell.self)", for: indexPath) as! QChatTextArrowCell

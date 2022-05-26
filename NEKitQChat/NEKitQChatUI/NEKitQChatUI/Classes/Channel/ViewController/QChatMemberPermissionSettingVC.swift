@@ -6,7 +6,7 @@ import UIKit
 import NEKitCoreIM
 
 typealias updateSettingBlock = (_ memberRole: MemberRole?) -> ()
-class QChatMemberPermissionSettingVC: QChatTableViewController, QChatPermissionSettingCellDelegate {
+public class QChatMemberPermissionSettingVC: QChatTableViewController, QChatPermissionSettingCellDelegate {
     public var channel: ChatChannel?
     public var memberRole: MemberRole?
 //    public var didUpdateBlock: updateSettingBlock?
@@ -26,7 +26,7 @@ class QChatMemberPermissionSettingVC: QChatTableViewController, QChatPermissionS
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.title = localizable("member_permission_setting")
         self.tableView.register(QChatPermissionSettingCell.self, forCellReuseIdentifier: "\(QChatPermissionSettingCell.self)")
@@ -82,11 +82,11 @@ class QChatMemberPermissionSettingVC: QChatTableViewController, QChatPermissionS
         return self.auths.count
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.auths[section].count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             //用户
             let cell = tableView.dequeueReusableCell(withIdentifier: "\(QChatImageTextCell.self)", for: indexPath) as! QChatImageTextCell

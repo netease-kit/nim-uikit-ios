@@ -4,11 +4,11 @@
 
 import UIKit
 
-class QChatSearchVC: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
+public class QChatSearchVC: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
     var textField = UITextField()
     var tableView = UITableView(frame: .zero, style: .plain)
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
     }
@@ -65,11 +65,11 @@ class QChatSearchVC: NEBaseViewController, UITableViewDelegate, UITableViewDataS
     }
     
 //    MARK:UITableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 0;
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(UITableViewCell.self)", for: indexPath)
         return cell
     }

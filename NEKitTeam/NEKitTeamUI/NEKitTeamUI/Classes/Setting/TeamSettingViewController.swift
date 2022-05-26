@@ -7,7 +7,7 @@ import NEKitCommonUI
 import NEKitCoreIM
 import NIMSDK
 
-class TeamSettingViewController: NEBaseViewController {
+public class TeamSettingViewController: NEBaseViewController {
     
     let viewmodel = TeamSettingViewModel()
     
@@ -79,7 +79,7 @@ class TeamSettingViewController: NEBaseViewController {
         return button
     }()
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let model = viewmodel.teamInfoModel {
             if let url = model.team?.avatarUrl {
@@ -91,7 +91,7 @@ class TeamSettingViewController: NEBaseViewController {
         }
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         title = localizable("setting")
         weak var weakSelf = self
@@ -473,12 +473,12 @@ extension TeamSettingViewController {
 
 extension TeamSettingViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         print("numberOfItemsInSection ",viewmodel.teamInfoModel?.users.count as Any)
         return viewmodel.teamInfoModel?.users.count ?? 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(TeamUserCell.self)", for: indexPath) as? TeamUserCell {
             if let user = viewmodel.teamInfoModel?.users[indexPath.row] {
                 cell.user = user
@@ -488,11 +488,11 @@ extension TeamSettingViewController: UICollectionViewDelegate, UICollectionViewD
         return UICollectionViewCell()
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 47.0, height: 32)
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let member = viewmodel.teamInfoModel?.users[indexPath.row], let nimUser = member.nimUser{
             let user = User(user:nimUser)
             if CoreKitIMEngine.instance.isMySelf(user.userId) {
@@ -508,7 +508,7 @@ extension TeamSettingViewController: UICollectionViewDelegate, UICollectionViewD
 
 extension TeamSettingViewController: UITableViewDataSource, UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if viewmodel.sectionData.count > section {
             let model = viewmodel.sectionData[section]
             return model.cellModels.count
@@ -516,11 +516,11 @@ extension TeamSettingViewController: UITableViewDataSource, UITableViewDelegate 
         return 0
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return viewmodel.sectionData.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
         if let cell = tableView.dequeueReusableCell(withIdentifier: "\(model.type)", for: indexPath) as? BaseTeamSettingCell {
             cell.configure(model)
@@ -529,7 +529,7 @@ extension TeamSettingViewController: UITableViewDataSource, UITableViewDelegate 
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
         if let block = model.cellClick {
@@ -538,12 +538,12 @@ extension TeamSettingViewController: UITableViewDataSource, UITableViewDelegate 
         
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
         return model.rowHeight
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         if viewmodel.sectionData.count > section {
             let model = viewmodel.sectionData[section]
@@ -554,13 +554,13 @@ extension TeamSettingViewController: UITableViewDataSource, UITableViewDelegate 
         return 0
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = UIView()
         header.backgroundColor = NEConstant.hexRGB(0xF1F1F6)
         return header
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         if section == viewmodel.sectionData.count - 1 {
             return 12.0
         }

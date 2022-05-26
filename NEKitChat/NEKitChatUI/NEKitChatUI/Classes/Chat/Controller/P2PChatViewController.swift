@@ -4,15 +4,15 @@
 
 import UIKit
 import NIMSDK
-class P2PChatViewController: ChatViewController {
+public class P2PChatViewController: ChatViewController {
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
     
-    override func getSessionInfo(session: NIMSession) {
+    public override func getSessionInfo(session: NIMSession) {
         viewmodel.getUserInfo(userId: session.sessionId)
         let user = viewmodel.getUserInfo(userId: session.sessionId)
         let title = user?.showName() ?? ""

@@ -7,7 +7,7 @@ import NEKitCommon
 import NIMSDK
 import NEKitTeam
 
-class TeamIntroduceViewController: NEBaseViewController {
+public class TeamIntroduceViewController: NEBaseViewController {
     
 //    typealias SaveCompletion = () -> Void
 //    
@@ -36,7 +36,7 @@ class TeamIntroduceViewController: NEBaseViewController {
         return label
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -139,14 +139,14 @@ class TeamIntroduceViewController: NEBaseViewController {
 
 extension TeamIntroduceViewController: UITextViewDelegate {
     
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         let currentText = textView.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
         return updatedText.count <= 100
     }
     
-    func textViewDidChange(_ textView: UITextView) {
+    public func textViewDidChange(_ textView: UITextView) {
         if var text = textView.text {
             if let lang = textView.textInputMode?.primaryLanguage, lang == "zh-Hans", let selectRange = textView.markedTextRange {
                 let position = textView.position(from: selectRange.start, offset: 0)

@@ -5,13 +5,13 @@
 import UIKit
 import MJRefresh
 
-class QChatIdGroupViewController: NEBaseTableViewController {
+public class QChatIdGroupViewController: NEBaseTableViewController {
     
     let viewModel = IdGroupViewModel()
     var isOwner = false
     var serverid: UInt64?
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
@@ -70,27 +70,27 @@ class QChatIdGroupViewController: NEBaseTableViewController {
 
 extension QChatIdGroupViewController: UITableViewDelegate, UITableViewDataSource, ViewModelDelegate {
     
-    func dataDidError(_ error: Error) {
+    public func dataDidError(_ error: Error) {
         print("get roles error : ", error)
         QChatLog.errorLog(className(), desc: "error : \(error)")
         view.makeToast(error.localizedDescription)
     }
     
-    func dataDidChange() {
+    public func dataDidChange() {
         tableView.mj_footer?.endRefreshing()
         tableView.reloadData()
     }
     
-    func dataNoMore() {
+    public func dataNoMore() {
         tableView.mj_footer?.endRefreshingWithNoMoreData()
         tableView.mj_footer?.isHidden = true
     }
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    public func numberOfSections(in tableView: UITableView) -> Int {
         return 3
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return viewModel.topDatas.count
         }else if section == 1 {
@@ -103,7 +103,7 @@ extension QChatIdGroupViewController: UITableViewDelegate, UITableViewDataSource
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let model = viewModel.topDatas[indexPath.row]
             let cell: QChatIdGroupTopCell = tableView.dequeueReusableCell(withIdentifier: "\(QChatIdGroupTopCell.self)", for: indexPath) as! QChatIdGroupTopCell
@@ -124,7 +124,7 @@ extension QChatIdGroupViewController: UITableViewDelegate, UITableViewDataSource
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             return 68
         }else if indexPath.section == 1 {
@@ -135,14 +135,14 @@ extension QChatIdGroupViewController: UITableViewDelegate, UITableViewDataSource
         return 0
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 1 {
             return 6
         }
         return 0
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 1 {
             let view = UIView(frame: CGRect.zero)
             view.backgroundColor = UIColor(hexString: "EFF1F4")
@@ -151,15 +151,15 @@ extension QChatIdGroupViewController: UITableViewDelegate, UITableViewDataSource
         return nil
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return nil
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.section == 1 {
             return
