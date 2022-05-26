@@ -69,7 +69,6 @@ open class ContactBaseViewCell: UITableViewCell {
         contentView.addSubview(avatarImage)
         leftConstraint = avatarImage.leftAnchor.constraint(equalTo: self.contentView.leftAnchor, constant: 20)
         leftConstraint?.isActive = true
-
         NSLayoutConstraint.activate([
             avatarImage.widthAnchor.constraint(equalToConstant: 36),
             avatarImage.heightAnchor.constraint(equalToConstant: 36),

@@ -7,12 +7,12 @@ import UIKit
 import NIMSDK
 import NEKitCore
 
-class TeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+public class TeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var tableView = UITableView(frame: .zero, style: .plain)
     var viewModel = TeamListViewModel()
     var isClickCallBack = false
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
         loadData()
@@ -54,7 +54,7 @@ class TeamListViewController: UIViewController, UITableViewDelegate, UITableView
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let model = viewModel.teamList[indexPath.row]
         if isClickCallBack == true {
             Router.shared.use(ContactTeamDataRouter, parameters: ["team": model.nimTeam as Any], closure: nil)

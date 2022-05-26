@@ -11,14 +11,14 @@ public class ValiationMessageConfig {
     
 }
 
-class ValidationMessageViewController: ContactBaseViewController {
+public class ValidationMessageViewController: ContactBaseViewController {
 
     let viewModel = ValidationMessageViewModel()
     
     let tableView = UITableView()
     private let tag = "ValidationMessageViewController"
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
@@ -68,11 +68,11 @@ class ValidationMessageViewController: ContactBaseViewController {
 
 extension ValidationMessageViewController: UITableViewDelegate, UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.datas.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         let noti = viewModel.datas[indexPath.row]
         let reuseIdentifier = "\(SystemNotificationCell.self)"
@@ -82,7 +82,7 @@ extension ValidationMessageViewController: UITableViewDelegate, UITableViewDataS
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
 
