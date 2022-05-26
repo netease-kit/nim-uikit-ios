@@ -25,7 +25,7 @@ public class NEMessageUtil {
             text = "[图片]"
             break
         case .video:
-            text = "[视屏]"
+            text = "[视频]"
             break
         case .location:
             text = "[位置]"

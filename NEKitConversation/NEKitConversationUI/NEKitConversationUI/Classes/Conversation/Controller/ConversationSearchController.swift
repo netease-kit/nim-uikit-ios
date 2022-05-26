@@ -6,7 +6,7 @@
 import UIKit
 import NIMSDK
 
- class SearchSessionHeaderView:UITableViewHeaderFooterView {
+class SearchSessionHeaderView:UITableViewHeaderFooterView {
     
      override init(reuseIdentifier: String?) {
          super.init(reuseIdentifier: reuseIdentifier)
