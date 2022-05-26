@@ -6,7 +6,7 @@ import UIKit
 import NEKitCommon
 import NIMSDK
 
-class UserSettingViewController: NEBaseViewController, UserSettingViewModelDelegate {
+public class UserSettingViewController: NEBaseViewController, UserSettingViewModelDelegate {
     
     var userId: String?
     
@@ -53,7 +53,7 @@ class UserSettingViewController: NEBaseViewController, UserSettingViewModelDeleg
         return table
     }()
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         viewmodel.delegate = self
         setupUI()
@@ -205,11 +205,11 @@ class UserSettingViewController: NEBaseViewController, UserSettingViewModelDeleg
 
 extension UserSettingViewController: UITableViewDataSource, UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewmodel.cellDatas.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = viewmodel.cellDatas[indexPath.row]
         if let cell = tableView.dequeueReusableCell(withIdentifier: "\(UserSettingSwitchCell.self)", for: indexPath) as? UserSettingBaseCell {
             cell.configure(model)
@@ -218,7 +218,7 @@ extension UserSettingViewController: UITableViewDataSource, UITableViewDelegate 
         return UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        let model = viewmodel.cellDatas[indexPath.row]
         
     }

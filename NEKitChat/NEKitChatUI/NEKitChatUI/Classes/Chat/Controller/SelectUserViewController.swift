@@ -5,9 +5,9 @@
 import UIKit
 import NEKitChat
 
-typealias didSelectedAtRow = ( _ index: Int, _ model: ChatTeamMemberInfoModel?) -> ()
+public typealias didSelectedAtRow = ( _ index: Int, _ model: ChatTeamMemberInfoModel?) -> ()
 
-class SelectUserViewController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
+public class SelectUserViewController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
 
     public var tableView = UITableView.init(frame: .zero, style: .plain)
     public var sessionId: String
@@ -24,7 +24,7 @@ class SelectUserViewController: NEBaseViewController, UITableViewDelegate, UITab
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         commonUI()
         loadData()
@@ -109,14 +109,14 @@ class SelectUserViewController: NEBaseViewController, UITableViewDelegate, UITab
         }
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let count = self.teamInfo?.users.count {
             return count + 1
         }
         return 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(ChatTeamMemberCell.self)", for: indexPath) as! ChatTeamMemberCell
         if indexPath.row == 0 {
             cell.headerView.image = UIImage.ne_imageNamed(name: "chat_team")
@@ -129,7 +129,7 @@ class SelectUserViewController: NEBaseViewController, UITableViewDelegate, UITab
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.row == 0 {
             if let block = self.selectedBlock {
