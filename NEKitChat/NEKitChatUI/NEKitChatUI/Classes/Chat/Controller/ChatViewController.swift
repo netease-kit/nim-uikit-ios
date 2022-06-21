@@ -533,7 +533,9 @@ extension ChatViewController {
             print("dropDownRemoteRefresh messages count ", messages?.count as Any)
             
             weakSelf?.tableView.reloadData()
-            weakSelf?.tableView.scrollToRow(at: IndexPath(row:count, section: 0), at: .top, animated: false)
+            if count>0 {
+                weakSelf?.tableView.scrollToRow(at: IndexPath(row:count, section: 0), at: .top, animated: false)
+            }
             weakSelf?.tableView.mj_header?.endRefreshing()
         }
 
