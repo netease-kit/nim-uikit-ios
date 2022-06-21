@@ -224,6 +224,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     //查询更多本地历史消息
     public func getMoreMessageHistory(_ completion: @escaping (Error?,NSInteger, [MessageModel]?) -> Void) {
         
+        if messages.count > 0 {
+            self.oldMsg = messages.last?.message
+        }
         weak var weakSelf = self
         ChatProvider.shared.getMessageHistory(session: self.session, message: self.oldMsg, limit: messagPageNum) { [weak self] error, messages in
             if let messageArray = messages, messageArray.count > 0 {
