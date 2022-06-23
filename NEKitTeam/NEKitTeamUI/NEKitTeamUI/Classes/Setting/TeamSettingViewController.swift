@@ -332,14 +332,14 @@ extension TeamSettingViewController {
     func didAddUserAndRefreshUI(_ accids: [String], _ tid: String){
         weak var weakSelf = self
         view.makeToastActivity(.center)
-        viewmodel.repo.addTeamUsers(accids, tid, nil, nil) { error, members in
+        viewmodel.repo.inviteUser(accids, tid, nil, nil) { error, members in
             if let err = error {
                 weakSelf?.view.hideToastActivity()
                 weakSelf?.showToast(err.localizedDescription)
             }else {
                 print("add users success : ", members as Any)
                 if let ms = members, let model = weakSelf?.viewmodel.teamInfoModel {
-                    weakSelf?.viewmodel.repo.chunckMembersAndFetch(ms, model) { error, team in
+                    weakSelf?.viewmodel.repo.splitGroupMember(ms, model) { error, team in
                         weakSelf?.view.hideToastActivity()
                         if let e = error {
                             weakSelf?.showToast(e.localizedDescription)
@@ -358,7 +358,7 @@ extension TeamSettingViewController {
     func didAddUser(_ accids: [String], _ tid: String){
         weak var weakSelf = self
         view.makeToastActivity(.center)
-        viewmodel.repo.addTeamUsers(accids, tid, nil, nil) { error, members in
+        viewmodel.repo.inviteUser(accids, tid, nil, nil) { error, members in
             weakSelf?.view.hideToastActivity()
             if let err = error {
                 weakSelf?.showToast(err.localizedDescription)
@@ -371,7 +371,7 @@ extension TeamSettingViewController {
     @objc func addUser(){
         
         weak var weakSelf = self
-        Router.shared.register("didSelectedAccids") { param in
+        Router.shared.register(ContactSelectedUsersRouter) { param in
             print("addUser weak self ", weakSelf as Any)
             if let accids = param["accids"] as? [String], let tid = self.viewmodel.teamInfoModel?.team?.teamId, let beInviteMode = self.viewmodel.teamInfoModel?.team?.beInviteMode, let type = self.viewmodel.teamInfoModel?.team?.type {
                 if beInviteMode == .noAuth || type == .normal {
@@ -495,7 +495,7 @@ extension TeamSettingViewController: UICollectionViewDelegate, UICollectionViewD
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let member = viewmodel.teamInfoModel?.users[indexPath.row], let nimUser = member.nimUser{
             let user = User(user:nimUser)
-            if CoreKitIMEngine.instance.isMySelf(user.userId) {
+            if IMKitLoginManager.instance.isMySelf(user.userId) {
                 Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
             }else {
                 Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "user" : user], closure: nil)
@@ -637,7 +637,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
         
         let manager = UIAlertAction(title: "群主", style: .default){ _ in
             weakSelf?.view.makeToastActivity(.center)
-            weakSelf?.viewmodel.repo.updateInfoMode(.manager, weakSelf?.teamId ?? "") { error in
+            weakSelf?.viewmodel.repo.updateTeamInfoPrivilege(.manager, weakSelf?.teamId ?? "") { error in
                 weakSelf?.view.hideToastActivity()
                 if let err = error {
                     weakSelf?.showToast(err.localizedDescription)
@@ -652,7 +652,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
         
         let all = UIAlertAction(title: "所有人", style: .default){ _ in
             weakSelf?.view.makeToastActivity(.center)
-            weakSelf?.viewmodel.repo.updateInfoMode(.all, weakSelf?.teamId ?? "") { error in
+            weakSelf?.viewmodel.repo.updateTeamInfoPrivilege(.all, weakSelf?.teamId ?? "") { error in
                 weakSelf?.view.hideToastActivity()
                 if let err = error {
                     weakSelf?.showToast(err.localizedDescription)

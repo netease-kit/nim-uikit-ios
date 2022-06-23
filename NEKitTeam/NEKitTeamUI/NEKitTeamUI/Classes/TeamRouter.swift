@@ -5,13 +5,7 @@
 import Foundation
 import NEKitTeam
 import NEKitCore
-public let TeamCreateDisuss = "xkit://team.create.discuss"
-public let TeamCreateSenior = "xkit://team.create.senior"
-
-public let TeamCreateDiscussResult = "xkit://team.create.discuss.result"
-public let TeamCreateSeniorResult = "xkit://team.create.senior.result"
-
-public let TeamSettingView = "xkit://team.setting.view"
+import NEKitCoreIM
 
 public class TeamRouter {
     
@@ -25,7 +19,7 @@ public class TeamRouter {
     
     public static func register(){
         
-        Router.shared.register(TeamSettingView){ param in
+        Router.shared.register(TeamSettingViewRouter){ param in
             let nav = param["nav"] as? UINavigationController
             let teamId = param["teamid"] as? String
             let teamSetting = TeamSettingViewController()
@@ -63,7 +57,7 @@ public class TeamRouter {
                     name = String(name.prefix(30))
                 }
                 let iconUrl = (param["url"] as? String) ??  iconUrls[Int(arc4random()) % iconUrls.count]
-                repo.createSeniorTeam(accids, iconUrl, name) { error, teamid, failedIds in
+                repo.createAdvanceTeam(accids, iconUrl, name) { error, teamid, failedIds in
                     var result = [String : Any]()
                     if let err = error {
                         result["code"] = err.code
@@ -73,7 +67,7 @@ public class TeamRouter {
                         result["msg"] = "ok"
                         result["teamId"] = teamid
                         
-                        repo.sendCreateSeniorNoti(teamid ?? "", localizable("create_senior_team_noti")) { error  in
+                        repo.sendCreateAdavanceNoti(teamid ?? "", localizable("create_senior_team_noti")) { error  in
                             print("send noti message  : ", error as Any)
                         }
                     }

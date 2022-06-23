@@ -198,7 +198,7 @@ extension TeamMembersController: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let model = getRealModel(indexPath.row), let user = model.nimUser {
-            if CoreKitIMEngine.instance.isMySelf(user.userId) {
+            if IMKitLoginManager.instance.isMySelf(user.userId) {
                 Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
             }else {
                 Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "nim_user": user], closure: nil)

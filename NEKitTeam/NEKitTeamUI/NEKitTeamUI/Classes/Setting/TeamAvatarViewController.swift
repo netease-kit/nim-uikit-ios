@@ -153,7 +153,7 @@ public class TeamAvatarViewController: NEBaseViewController {
         if let type = team?.type, type == .normal {
             return true
         }
-        if let ownerId = team?.owner,  CoreKitIMEngine.instance.isMySelf(ownerId) {
+        if let ownerId = team?.owner,  IMKitLoginManager.instance.isMySelf(ownerId) {
             return true
         }
         if let mode = team?.updateInfoMode, mode == .all {
@@ -186,7 +186,7 @@ extension TeamAvatarViewController {
         if let tid = team?.teamId {
             view.makeToastActivity(.center)
             weak var weakSelf = self
-            repo.updateTeamAvatar(headerUrl, tid) { error in
+            repo.updateTeamIcon(headerUrl, tid) { error in
                 weakSelf?.view.hideToastActivity()
                 if let err = error {
                     weakSelf?.showToast(err.localizedDescription)
@@ -247,7 +247,7 @@ extension TeamAvatarViewController: UINavigationControllerDelegate {
         
         view.makeToastActivity(.center)
         if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-            let filePath = NSHomeDirectory().appending("/Documents/").appending(CoreKitIMEngine.instance.imAccid)
+            let filePath = NSHomeDirectory().appending("/Documents/").appending(IMKitLoginManager.instance.imAccid)
             let succcess =  imageData.write(toFile: filePath, atomically: true)
             weak var weakSelf = self
             if succcess {

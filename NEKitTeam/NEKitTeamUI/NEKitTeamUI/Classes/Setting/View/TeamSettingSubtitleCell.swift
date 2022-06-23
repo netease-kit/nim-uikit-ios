@@ -47,7 +47,7 @@ public class TeamSettingSubtitleCell: BaseTeamSettingCell {
         NSLayoutConstraint.activate([
             subTitleLabel.rightAnchor.constraint(equalTo: arrow.leftAnchor,constant: -10),
             subTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-//            subTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor,constant: 20)
+            subTitleLabel.widthAnchor.constraint(equalToConstant: 200)
         ])
         
         titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true

@@ -126,7 +126,7 @@ public class TeamIntroduceViewController: NEBaseViewController {
     */
     
     func changePermission() -> Bool {
-        if let ownerId = team?.owner,  CoreKitIMEngine.instance.isMySelf(ownerId) {
+        if let ownerId = team?.owner,  IMKitLoginManager.instance.isMySelf(ownerId) {
             return true
         }
         if let mode = team?.updateInfoMode, mode == .all {
@@ -170,7 +170,7 @@ extension TeamIntroduceViewController: UITextViewDelegate {
             let text = textView.text ?? ""
             weak var weakSelf = self
             view.makeToastActivity(.center)
-            repo.updateTeamIntr(text, teamid) { error in
+            repo.updateTeamIntroduce(text, teamid) { error in
                 weakSelf?.view.hideToastActivity()
                 if let err = error {
                     weakSelf?.showToast(err.localizedDescription)

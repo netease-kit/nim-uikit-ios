@@ -81,7 +81,7 @@ public class TeamSettingViewModel {
             if let tid = weakSelf?.teamInfoModel?.team?.teamId {
                 if isOpen == true {
                     //weakSelf?.repo.updateNoti(.all, tid)
-                    weakSelf?.repo.updateNoti(.all, tid, { error in
+                    weakSelf?.repo.updateTeamNotify(.all, tid, { error in
                         if let err = error {
                             weakSelf?.delegate?.didNeedRefreshUI()
                             weakSelf?.delegate?.didError(err)
@@ -91,7 +91,7 @@ public class TeamSettingViewModel {
                     })
                 }else {
 //                    weakSelf?.repo.updateNoti(.none, tid)
-                    weakSelf?.repo.updateNoti(.none, tid, { error in
+                    weakSelf?.repo.updateTeamNotify(.none, tid, { error in
                         if let err = error {
                             weakSelf?.delegate?.didNeedRefreshUI()
                             weakSelf?.delegate?.didError(err)
@@ -110,7 +110,7 @@ public class TeamSettingViewModel {
         
         if let tid = teamInfoModel?.team?.teamId {
             let session = NIMSession(tid, type: .team)
-            setTop.switchOpen = repo.sessionIsTop(session)
+            setTop.switchOpen = repo.isStickTop(session)
         }
         
         setTop.swichChange = { isOpen in
@@ -118,7 +118,7 @@ public class TeamSettingViewModel {
                 let session = NIMSession(tid, type: .team)
                 if isOpen {
                     let params = NIMAddStickTopSessionParams.init(session: session)
-                    weakSelf?.repo.addStickTopSession(params: params) { error, info in
+                    weakSelf?.repo.addStickTop(params: params) { error, info in
                         print("add stick : ",error as Any)
                         if let err = error {
                             weakSelf?.delegate?.didNeedRefreshUI()
@@ -129,7 +129,7 @@ public class TeamSettingViewModel {
                     }
                 }else {
                     if  let info = weakSelf?.repo.getTopSessionInfo(session) {
-                        weakSelf?.repo.removeStickTopSession(params: info) { error, info in
+                        weakSelf?.repo.removeStickTop(params: info) { error, info in
                             print("remote stick : ",error as Any)
                             if let err = error {
                                 weakSelf?.delegate?.didNeedRefreshUI()
@@ -168,7 +168,7 @@ public class TeamSettingViewModel {
         }
         forbiddenWords.swichChange = { isOpen in
             if let tid = weakSelf?.teamInfoModel?.team?.teamId {
-                weakSelf?.repo.updateMuteState(isOpen, tid, { error in
+                weakSelf?.repo.muteAllMembers(isOpen, tid, { error in
                     print("update mute error : ", error as Any)
                     if let err = error {
                         forbiddenWords.switchOpen = !isOpen
@@ -284,7 +284,7 @@ public class TeamSettingViewModel {
             
             if error == nil {
                 weakSelf?.getData()
-                weakSelf?.getCurrentMember(CoreKitIMEngine.instance.imAccid, teamId)
+                weakSelf?.getCurrentMember(IMKitLoginManager.instance.imAccid, teamId)
             }
             completion(error)
         }
@@ -308,7 +308,7 @@ public class TeamSettingViewModel {
     
     func isOwner() -> Bool {
         if let accid = teamInfoModel?.team?.owner {
-            if CoreKitIMEngine.instance.isMySelf(accid) {
+            if IMKitLoginManager.instance.isMySelf(accid) {
                 return true
             }
         }
@@ -316,7 +316,7 @@ public class TeamSettingViewModel {
     }
     
     public func updateInfoMode(_ mode: NIMTeamUpdateInfoMode, _ teamId: String, _ completion: @escaping (Error?) -> Void){
-        repo.updateInfoMode(mode, teamId, completion)
+        repo.updateTeamInfoPrivilege(mode, teamId, completion)
     }
     
     public func updateInviteMode(_ mode: NIMTeamInviteMode, _ teamId: String, _ completion: @escaping (Error?) -> Void){
@@ -332,26 +332,14 @@ public class TeamSettingViewModel {
     }
     
     public func searchMessages(_ session:NIMSession,option:NIMMessageSearchOption,_ completion:@escaping (NSError?,[HistoryMessageModel]?)->()) {
-        
         weak var weakSelf = self
-        var resultArr = [HistoryMessageModel]()
-        
         repo.searchMessages(session, option: option) { error, messages in
             if error == nil {
-                messages?.forEach({ message in
-                    let messageModel = HistoryMessageModel()
-                    messageModel.imMessage = message
-                    let userInfo = weakSelf?.repo.getUserInfo(userId: message.from ?? "")
-                    messageModel.avatar = userInfo?.userInfo?.avatarUrl
-                    messageModel.content = message.text
-                    messageModel.name = userInfo?.showName()
-                    messageModel.time = String.stringFromDate(date: Date(timeIntervalSince1970: message.timestamp))
-                    resultArr.append(messageModel)
-                })
-                resultArr.reverse()
-                weakSelf?.searchResultInfos = resultArr
+                weakSelf?.searchResultInfos = messages
+                completion(nil,weakSelf?.searchResultInfos)
+            }else {
+                completion(error,nil)
             }
-            completion(error,weakSelf?.searchResultInfos)
         }
     }
 }

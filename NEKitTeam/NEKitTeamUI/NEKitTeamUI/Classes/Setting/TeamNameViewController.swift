@@ -135,7 +135,7 @@ public class TeamNameViewController: NEBaseViewController {
             return true
         }
         
-        if let ownerId = team?.owner,  CoreKitIMEngine.instance.isMySelf(ownerId) {
+        if let ownerId = team?.owner,  IMKitLoginManager.instance.isMySelf(ownerId) {
             return true
         }
         if let mode = team?.updateInfoMode, mode == .all {
@@ -213,7 +213,7 @@ extension TeamNameViewController: UITextFieldDelegate {
         }else if type == .NickName, let tid = team?.teamId, let uid = teamMember?.userId{
             let n = textField.text ?? ""
             view.makeToastActivity(.center)
-            repo.updateTeamNick(uid, n, tid) { error in
+            repo.updateMemberNick(uid, n, tid) { error in
                 
                 weakSelf?.view.hideToastActivity()
                 if let err = error {
