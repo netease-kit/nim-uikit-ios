@@ -24,7 +24,7 @@ public class ConversationViewModel:NSObject,ConversationRepoDelegate,NIMConversa
     public override init() {
         super.init()
         repo.delegate = self
-        repo.addConversationDelegate(delegate: self)
+        repo.addSessionDelegate(delegate: self)
         repo.addTeamDelegate(delegate: self)
         stickTopInfos = repo.getStickTopInfos()
         NIMSDK.shared().userManager.add(self)
@@ -33,44 +33,35 @@ public class ConversationViewModel:NSObject,ConversationRepoDelegate,NIMConversa
     public func fetchServerSessions(option:NIMFetchServerSessionOption,_ completion:@escaping (NSError?,[ConversationListModel]?)->()) {
         
         weak var weakSelf = self
-        repo.getServerSessions(option: option) { error, conversaitonList in
-            weakSelf?.conversationListArray = conversaitonList?.filter({ listModel in
-                if listModel.recentSession?.session?.sessionType == .team && listModel.teamInfo == nil {
-                    if let recentSession = listModel.recentSession {
-                        weakSelf?.deleteRecentSession(recentSession: recentSession)
-                    }
-                    return false
-                }else {
-                    return true
-                }
-            })
+        repo.getSessionList(option: option) { error, conversaitonList in
+            weakSelf?.conversationListArray = conversaitonList
             completion(error,weakSelf?.conversationListArray)
         }
     }
     
     public func deleteRecentSession(recentSession:NIMRecentSession){
-        repo.deleteRecentSession(recentSession: recentSession)
+        repo.deleteLocalSession(recentSession: recentSession)
     }
     
     public func stickTopInfoForSession(session:NIMSession) -> NIMStickTopSessionInfo?{
-        return repo.stickTopInfoForSession(session: session)
+        return repo.getStickTopSessionInfo(session: session)
     }
     
     public func addStickTopSession(session:NIMSession,_ completion:@escaping (NSError?,NIMStickTopSessionInfo?)->()){
         let params = NIMAddStickTopSessionParams.init(session: session)
-        repo.addStickTopSession(params: params) { error, stickTopSessionInfo in
+        repo.addStickTop(params: params) { error, stickTopSessionInfo in
             completion(error as NSError?,stickTopSessionInfo)
         }
     }
     
     public func removeStickTopSession(params:NIMStickTopSessionInfo,_ completion:@escaping (NSError?,NIMStickTopSessionInfo?)->()) {
-        repo.removeStickTopSession(params: params) { error, stickTopSessionInfo in
+        repo.removeStickTop(params: params) { error, stickTopSessionInfo in
             completion(error as NSError?,stickTopSessionInfo)
         }
     }
     
     public func loadStickTopSessionInfos(_ completion:@escaping (NSError?,[NIMSession:NIMStickTopSessionInfo]?)->()){
-        repo.loadStickTopSessionInfos(completion)
+        repo.getStickTopSessions(completion)
     }
     
     public func notifyForNewMsg(userId:String?) -> Bool{
@@ -79,12 +70,12 @@ public class ConversationViewModel:NSObject,ConversationRepoDelegate,NIMConversa
     
     
     public func notifyStateForNewMsg(teamId:String?) -> NIMTeamNotifyState{
-        return repo.notifyStateForNewMsg(teamId: teamId)
+        return repo.getNotifyStateForNewMsg(teamId: teamId)
     }
     
     deinit {
         NIMSDK.shared().userManager.remove(self)
-        repo.removeConversationDelegate(delegate: self)
+        repo.removeSessionDelegate(delegate: self)
         repo.removeTeamDelegate(delegate: self)
     }
     
@@ -102,7 +93,7 @@ public class ConversationViewModel:NSObject,ConversationRepoDelegate,NIMConversa
             }
         })
         
-        let resultArr = repo.sortRecentSessions(recentSessions: tempArr, stickTopInfo: stickTopInfos)
+        let resultArr = repo.sortSessionList(recentSessions: tempArr, stickTopInfo: stickTopInfos)
         var sortResultArr = [ConversationListModel]()
         resultArr.forEach { recentSession in
             let listModel = ConversationListModel()
@@ -181,7 +172,7 @@ public class ConversationViewModel:NSObject,ConversationRepoDelegate,NIMConversa
             conversationListArray?.append(listModel)
             delegate?.didAddRecentSession()
         }else if recentSession.session?.sessionType == .team {
-             repo.fetchTeamInfo(teamId: targetId, { error, teamInfo in
+             repo.getTeamInfo(teamId: targetId, { error, teamInfo in
                  listModel.teamInfo = teamInfo
                  weakSelf?.conversationListArray?.append(listModel)
                  weakSelf?.delegate?.didAddRecentSession()

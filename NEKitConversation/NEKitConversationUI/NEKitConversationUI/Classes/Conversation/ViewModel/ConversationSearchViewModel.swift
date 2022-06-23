@@ -23,7 +23,7 @@ class ConversationSearchViewModel: NSObject {
     ///   - completion: 回调结果
     public func doSearch(searchStr:String,_ completion:@escaping (NSError?,(friend:[ConversationSearchListModel], contactGroup:[ConversationSearchListModel],seniorGroup:[ConversationSearchListModel])?)->()) {
         weak var weakSelf = self
-        repo.doSearch(searchStr: searchStr) { error, searchResult in
+        repo.searchContact(searchStr: searchStr) { error, searchResult in
             weakSelf?.searchResult = searchResult
             completion(error,searchResult)
         }

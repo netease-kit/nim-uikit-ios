@@ -7,17 +7,17 @@ import UIKit
 import NIMSDK
 
 
-class ConversationListCell: UITableViewCell {
+open class ConversationListCell: UITableViewCell {
     
     private var viewModel = ConversationViewModel()
     public var topStickInfos = [NIMSession:NIMStickTopSessionInfo]()
 
-    override func awakeFromNib() {
+    open override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
+    open override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
@@ -26,12 +26,14 @@ class ConversationListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubviews()
+        initSubviewsLayout()
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    @objc
     func setupSubviews(){
         self.selectionStyle = .none
         self.contentView.addSubview(headImge)
@@ -78,8 +80,17 @@ class ConversationListCell: UITableViewCell {
             notifyMsg.heightAnchor.constraint(equalToConstant: 13)
         ])
     }
-
-    func configData(sessionModel:ConversationListModel?){
+    
+    func initSubviewsLayout (){
+        if NEKitConversationConfig.shared.ui.avatarType == .rectangle {
+            headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.avatarCornerRadius
+        }else if NEKitConversationConfig.shared.ui.avatarType == .cycle {
+            headImge.layer.cornerRadius = 21.0
+        }
+    }
+    
+    
+     func configData(sessionModel:ConversationListModel?){
         
         guard let conversationModel = sessionModel else { return  }
         
@@ -218,8 +229,8 @@ class ConversationListCell: UITableViewCell {
     private lazy var title:UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = UIColor.ne_darkText
-        label.font = NEConstant.defaultTextFont(16)
+        label.textColor = NEKitConversationConfig.shared.ui.titleColor
+        label.font = NEKitConversationConfig.shared.ui.titleFont
         label.text = "Oliver"
         return label
     }()
@@ -227,16 +238,16 @@ class ConversationListCell: UITableViewCell {
     private lazy var subTitle:UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = UIColor.ne_lightText
-        label.font = NEConstant.defaultTextFont(13)
+        label.textColor = NEKitConversationConfig.shared.ui.subTitleColor
+        label.font = NEKitConversationConfig.shared.ui.subTitleFont
         return label
     }()
     
     private lazy var timeLabel:UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = NEConstant.hexRGB(0xcccccc)
-        label.font = NEConstant.defaultTextFont(12)
+        label.textColor = NEKitConversationConfig.shared.ui.timeColor
+        label.font = NEKitConversationConfig.shared.ui.timeFont
         label.textAlignment = .right
         return label
     }()

@@ -5,12 +5,11 @@
 
 import UIKit
 import NEKitCommonUI
-//
 import NEKitCore
 
 
-
-public class ConversationController: UIViewController {
+@objcMembers
+open class ConversationController: UIViewController {
     
     let viewmodel = ConversationViewModel()
     private var listCtrl = ConversationListViewController()
@@ -26,6 +25,8 @@ public class ConversationController: UIViewController {
     }
     
     func setupSubviews(){
+        
+//        NEKitConversationConfig.shared.ui.avatarType = .rectangle
         
         listCtrl.view.translatesAutoresizingMaskIntoConstraints = false
         self.addChild(listCtrl)
@@ -53,6 +54,8 @@ public class ConversationController: UIViewController {
         nav.translatesAutoresizingMaskIntoConstraints = false
         nav.backgroundColor = .white
         nav.delegate = self
+        
+        nav.isHidden = NEKitConversationConfig.shared.ui.hiddenNav
         return nav
     }()
     
@@ -93,8 +96,7 @@ extension ConversationController: ConversationNavViewDelegate {
         addFriend.showName = localizable("add_friend")
         addFriend.image = UIImage.ne_imageNamed(name: "add_friend")
         addFriend.completion = {
-            Router.shared.use("xkit://contact.searchuser.view", parameters: ["nav": self.navigationController as Any]) { obj, routerState, str in
-                
+            Router.shared.use(ContactSearchUserRouter, parameters: ["nav": self.navigationController as Any]) { obj, routerState, str in
             }
         }
         items.append(addFriend)
@@ -119,17 +121,17 @@ extension ConversationController: ConversationNavViewDelegate {
     }
     
     func createDiscussGroup(){
-        Router.shared.register("didSelectedAccids") { param in
+        Router.shared.register(ContactSelectedUsersRouter) { param in
             print("user setting accids : ", param)
-            Router.shared.use("xkit://team.create.discuss", parameters: param, closure: nil)
+            Router.shared.use(TeamCreateDisuss, parameters: param, closure: nil)
         }
         Router.shared.use(ContactUserSelectRouter, parameters: ["nav": navigationController as Any, "limit": 200], closure: nil)
         weak var weakSelf = self
-        Router.shared.register("xkit://team.create.discuss.result") { param in
+        Router.shared.register(TeamCreateDiscussResult) { param in
             print("create discuss ", param)
             if let code = param["code"] as? Int, let teamid = param["teamId"] as? String, code == 0 {
-                let session = weakSelf?.viewmodel.repo.createRecentTeamSession(teamid)
-                Router.shared.use("pushGroupChatVC", parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
+                let session = weakSelf?.viewmodel.repo.createTeamSession(teamid)
+                Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
             }else if let msg = param["msg"] as? String {
                 weakSelf?.showToast(msg)
             }
@@ -137,16 +139,16 @@ extension ConversationController: ConversationNavViewDelegate {
     }
     
     func createSeniorGroup(){
-        Router.shared.register("didSelectedAccids") { param in
-            Router.shared.use("xkit://team.create.senior", parameters: param, closure: nil)
+        Router.shared.register(ContactSelectedUsersRouter) { param in
+            Router.shared.use(TeamCreateSenior, parameters: param, closure: nil)
         }
         Router.shared.use(ContactUserSelectRouter, parameters: ["nav": navigationController as Any, "limit": 200], closure: nil)
         weak var weakSelf = self
-        Router.shared.register("xkit://team.create.senior.result") { param in
+        Router.shared.register(TeamCreateSeniorResult) { param in
             print("create senior : ", param)
             if let code = param["code"] as? Int, let teamid = param["teamId"] as? String, code == 0 {
-                let session = weakSelf?.viewmodel.repo.createRecentTeamSession(teamid)
-                Router.shared.use("pushGroupChatVC", parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
+                let session = weakSelf?.viewmodel.repo.createTeamSession(teamid)
+                Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
             }else if let msg = param["msg"] as? String {
                 weakSelf?.showToast(msg)
             }

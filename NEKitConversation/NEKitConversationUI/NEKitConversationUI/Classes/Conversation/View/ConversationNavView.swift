@@ -18,6 +18,8 @@ class ConversationNavView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
+        initSubviewsLayout()
+        
     }
     
     required init?(coder: NSCoder) {
@@ -58,6 +60,16 @@ class ConversationNavView: UIView {
         ])
     }
     
+    func initSubviewsLayout(){
+        if NEKitConversationConfig.shared.ui.hiddenRightBtns {
+            searchBtn.isHidden = true
+            addBtn.isHidden = true
+        }else {
+            if NEKitConversationConfig.shared.ui.hiddenSearchBtn {
+                searchBtn.isHidden = true
+            }
+        }
+    }
     //MARK: lazy method
     private lazy var brandBtn:UIButton = {
         let button = UIButton()

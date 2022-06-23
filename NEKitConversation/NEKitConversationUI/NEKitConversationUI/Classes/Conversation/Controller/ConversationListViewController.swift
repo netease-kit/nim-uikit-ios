@@ -6,9 +6,9 @@
 import UIKit
 import NIMSDK
 
-public class ConversationListViewController: UIViewController {
+@objcMembers
+open class ConversationListViewController: UIViewController {
 
-    
     private var viewModel = ConversationViewModel()
     private let className = "ConversationListViewController"
     private var tableViewTopConstraint:NSLayoutConstraint?
@@ -166,7 +166,7 @@ extension ConversationListViewController:UITableViewDelegate,UITableViewDataSour
         }else if conversationModel?.recentSession?.session?.sessionType == .team {
            
             let session = NIMSession(commonId, type: .team)
-            Router.shared.use("pushGroupChatVC", parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+            Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
         }
     }
     

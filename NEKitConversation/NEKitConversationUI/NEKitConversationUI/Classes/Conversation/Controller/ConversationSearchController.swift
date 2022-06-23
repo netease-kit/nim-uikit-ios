@@ -6,7 +6,8 @@
 import UIKit
 import NIMSDK
 
-class SearchSessionHeaderView:UITableViewHeaderFooterView {
+@objcMembers
+open class SearchSessionHeaderView:UITableViewHeaderFooterView {
     
      override init(reuseIdentifier: String?) {
          super.init(reuseIdentifier: reuseIdentifier)
@@ -29,7 +30,7 @@ class SearchSessionHeaderView:UITableViewHeaderFooterView {
      }
 
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -235,13 +236,13 @@ extension ConversationSearchController:UITableViewDelegate,UITableViewDataSource
             let searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
             if let teamId = searchModel?.teamInfo?.teamId {
                 let session = NIMSession(teamId, type: .team)
-                Router.shared.use("pushGroupChatVC", parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
             }
         }else {
             let searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
             if let teamId = searchModel?.teamInfo?.teamId {
                 let session = NIMSession(teamId, type: .team)
-                Router.shared.use("pushGroupChatVC", parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
             }
         }
 
