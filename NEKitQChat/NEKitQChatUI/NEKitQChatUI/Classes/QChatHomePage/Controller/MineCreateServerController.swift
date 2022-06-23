@@ -213,7 +213,7 @@ extension MineCreateServerController:UITextFieldDelegate{
 
         self.view.makeToastActivity(.center)
         if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-             let filePath = NSHomeDirectory().appending("/Documents/").appending(CoreKitIMEngine.instance.imAccid)
+             let filePath = NSHomeDirectory().appending("/Documents/").appending(IMKitLoginManager.instance.imAccid)
              let succcess =  imageData.write(toFile: filePath, atomically: true)
             
             if succcess {

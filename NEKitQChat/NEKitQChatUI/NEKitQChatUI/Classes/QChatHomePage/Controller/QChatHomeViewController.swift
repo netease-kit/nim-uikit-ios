@@ -291,12 +291,12 @@ extension QChatHomeViewController:NIMQChatMessageManagerDelegate {
             
             switch systemNotification.type {
 
-            case .channelCreate,.channelRemove,.channelUpdateWhiteBlackIdentifyUser,.channelUpdate:
+            case .channelCreate,.channelRemove,.updateChannelCategoryBlackWhiteRole,.channelUpdate:
                 self.channelChange(notificationInfo: systemNotification)
                 break
             case .serverMemberKick,.serverMemberInviteDone:
                 
-                if systemNotification.fromAccount != CoreKitIMEngine.instance.imAccid,((systemNotification.toAccids?.contains(CoreKitIMEngine.instance.imAccid)) != nil){
+                if systemNotification.fromAccount != IMKitLoginManager.instance.imAccid,((systemNotification.toAccids?.contains(IMKitLoginManager.instance.imAccid)) != nil){
                     self.requestData(timeTag: 0)
                 }
                 break
@@ -306,7 +306,7 @@ extension QChatHomeViewController:NIMQChatMessageManagerDelegate {
                     selectIndex = 0
                     self.requestData(timeTag: 0)
                 }else {
-                    if systemNotification.fromAccount == CoreKitIMEngine.instance.imAccid {
+                    if systemNotification.fromAccount == IMKitLoginManager.instance.imAccid {
                         selectIndex = 0
                         self.requestData(timeTag: 0)
                     }

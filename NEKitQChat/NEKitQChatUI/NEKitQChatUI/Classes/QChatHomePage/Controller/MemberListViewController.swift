@@ -72,7 +72,7 @@ extension MemberListViewController:UITableViewDelegate,UITableViewDataSource {
     
     @objc func addMemberClick(sender:UIButton) {
         
-        Router.shared.register("didSelectedAccids") {[weak self] param in
+        Router.shared.register(ContactSelectedUsersRouter) {[weak self] param in
             print("param\(param)")
             if let userIds = param["accids"] as? [String] {
                 print("userIds:\(userIds)")

@@ -33,7 +33,7 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
         if let cid = self.channel?.channelId, let sid = self.channel?.serverId {
             let message = NIMQChatMessage()
             message.text = text
-            message.from = CoreKitIMEngine.instance.imAccid
+            message.from = IMKitLoginManager.instance.imAccid
             QChatSystemMessageProvider.shared.sendMessage(message: message, session: NIMSession(forQChat: Int64(cid), qchatServerId: Int64(sid))) { error in
                 print("sendText error:\(error) ")
                 completion(error)
@@ -45,7 +45,7 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
         if let cid = self.channel?.channelId, let sid = self.channel?.serverId {
             let message = NIMQChatMessage()
             message.messageObject = NIMImageObject(image: image)
-            message.from = CoreKitIMEngine.instance.imAccid
+            message.from = IMKitLoginManager.instance.imAccid
             QChatSystemMessageProvider.shared.sendMessage(message: message, session: NIMSession(forQChat: Int64(cid), qchatServerId: Int64(sid))) { error in
                 print("sendImage error:\(error) ")
                 completion(error)

@@ -383,7 +383,7 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
                 
                 let idGroupController = QChatIdGroupViewController()
                 idGroupController.serverid = server?.serverId
-                if let owner = server?.owner, owner == CoreKitIMEngine.instance.imAccid {
+                if let owner = server?.owner, owner == IMKitLoginManager.instance.imAccid {
                     idGroupController.isOwner = true
                 }
                 navigationController?.pushViewController(idGroupController, animated: true)
@@ -438,7 +438,7 @@ extension QChatServerSettingViewController: UITableViewDelegate, UITableViewData
     
     func isMyServer() -> Bool{
         if let owner = server?.owner {
-            let accid = CoreKitIMEngine.instance.imAccid
+            let accid = IMKitLoginManager.instance.imAccid
             if owner == accid {
                 return true
             }
@@ -459,7 +459,7 @@ extension QChatServerSettingViewController: UINavigationControllerDelegate {
         
         view.makeToastActivity(.center)
         if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-            let filePath = NSHomeDirectory().appending("/Documents/").appending(CoreKitIMEngine.instance.imAccid)
+            let filePath = NSHomeDirectory().appending("/Documents/").appending(IMKitLoginManager.instance.imAccid)
             let succcess =  imageData.write(toFile: filePath, atomically: true)
             weak var weakSelf = self
             if succcess {

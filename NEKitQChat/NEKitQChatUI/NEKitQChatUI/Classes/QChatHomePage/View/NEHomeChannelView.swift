@@ -114,8 +114,8 @@ class NEHomeChannelView: UIView {
                 requestData(timeTag: 0)
             }
             break
-        case .channelUpdateWhiteBlackIdentifyUser:
-            if noticeInfo.serverId == self.qchatServerModel?.serverId,((noticeInfo.toAccids?.contains(CoreKitIMEngine.instance.imAccid)) != nil){
+        case .updateChannelCategoryBlackWhiteRole:
+            if noticeInfo.serverId == self.qchatServerModel?.serverId,((noticeInfo.toAccids?.contains(IMKitLoginManager.instance.imAccid)) != nil){
                 requestData(timeTag: 0)
             }
             break

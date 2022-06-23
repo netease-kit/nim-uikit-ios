@@ -33,7 +33,7 @@ class NESearchServerCell: UITableViewCell {
             }
             self.subContent.text = "\(serverId)"
             
-            let item = QChatGetServerMemberItem(serverId: serverId, accid: CoreKitIMEngine.instance.imAccid)
+            let item = QChatGetServerMemberItem(serverId: serverId, accid: IMKitLoginManager.instance.imAccid)
             let param = QChatGetServerMembersParam(serverAccIds: [item])
             
             serverViewModel.getServerMemberList(parameter: param) { error, membersResult in

@@ -71,7 +71,7 @@ extension QChatViewController:QChatBaseCellDelegate {
     }
     
     func didClickHeader(_ message: NIMQChatMessage) {
-        if CoreKitIMEngine.instance.isMySelf(message.from) == true {
+        if IMKitLoginManager.instance.isMySelf(message.from) == true {
             Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
         }else {
             Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "uid": message.from as Any], closure: nil)

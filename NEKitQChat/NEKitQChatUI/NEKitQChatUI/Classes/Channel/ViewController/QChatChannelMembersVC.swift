@@ -136,7 +136,7 @@ public class QChatChannelMembersVC: QChatTableViewController, QChatMemberInfoVie
     
     func didClickUserHeader(_ accid: String?) {
         if let uid = accid {
-            if CoreKitIMEngine.instance.isMySelf(uid){
+            if IMKitLoginManager.instance.isMySelf(uid){
                 Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
             }else {
                 Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "uid": uid as Any], closure: nil)

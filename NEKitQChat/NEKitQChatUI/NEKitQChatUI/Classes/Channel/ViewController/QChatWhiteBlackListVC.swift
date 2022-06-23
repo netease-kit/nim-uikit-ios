@@ -59,7 +59,10 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
             let member = self.memberArray?[indexPath.row]
             cell.setup(accid: member?.accid, nickName: member?.nick)
             cell.rightStyle = self.isEdited ? .delete : .none
-            if CoreKitEngine.instance.imAccid == member?.accid, self.type == .white {
+//            if CoreKitEngine.instance.imAccid == member?.accid, self.type == .white {
+//                cell.rightStyle = .none
+//            }
+            if IMKitLoginManager.instance.imAccid == member?.accid,self.type == .white {
                 cell.rightStyle = .none
             }
             return cell
@@ -102,9 +105,14 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
                     return
                 }
                 
-                if CoreKitEngine.instance.imAccid == member.accid, self.type == .white {
+//                if CoreKitEngine.instance.imAccid == member.accid, self.type == .white {
+//                    return
+//                }
+                
+                if IMKitLoginManager.instance.imAccid == member.accid,self.type == .white {
                     return
                 }
+                
                 let name = (member.nick != nil ? member.nick : member.accid) ?? ""
                 let message = localizable("confirm_delete_channel") + name + localizable("qchat_member") + "?"
                 let alertVC = UIAlertController.reconfimAlertView(title: localizable("removeMember"), message: message) {

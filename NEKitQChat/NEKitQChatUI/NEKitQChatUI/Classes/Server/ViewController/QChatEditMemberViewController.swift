@@ -271,10 +271,13 @@ extension QChatEditMemberViewController: UITableViewDataSource, UITableViewDeleg
     
     func getKickDisable() -> Bool {
         if let accid = user?.serverMember?.accid {
-            if CoreKitEngine.instance.imAccid == accid {
+//            if CoreKitEngine.instance.imAccid == accid {
+//                return true
+//            }
+            
+            if IMKitLoginManager.instance.imAccid == accid {
                 return true
             }
-            
             if let type = user?.serverMember?.type, type == .owner {
                 return true
             }
@@ -313,24 +316,19 @@ extension QChatEditMemberViewController  {
     @objc func rightBtnClick(_ btn: ExpandButton){
         if btn.isSelected == true {
             print("to save")
-//            if nickName.count <= 0 {
-//                showToast("昵称不能为空")
-//                return
-//            }
-            weak var weakSelf = self
-            
+            if nickName.count <= 0 {
+                showToast("昵称不能为空")
+                return
+            }
+
             guard let accid = user?.accid else {
                 showToast("accid 不能为空")
                 return
             }
             
-            if nickName.count == 0 {
-                if let aid = user?.accid {
-                    nickName = aid
-                }
-            }
-            
-            if CoreKitIMEngine.instance.isMySelf(accid) == true {
+            weak var weakSelf = self
+
+            if IMKitLoginManager.instance.isMySelf(accid) == true {
                 viewModel.updateMyMember(user?.serverMember?.serverId, nickName ) { error, member in
                     if let err = error {
                         weakSelf?.showToast(err.localizedDescription)
