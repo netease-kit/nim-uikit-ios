@@ -127,7 +127,7 @@ class MeViewController: UIViewController {
     }
     
     func updateUserInfo(){
-        let user = userProvider.getUserInfo(userId: CoreKitIMEngine.instance.imAccid)
+        let user = userProvider.getUserInfo(userId: IMKitLoginManager.instance.imAccid)
         idLabel.text = "账号:\(user?.userId ?? "")"
         nameLabel.text = user?.userInfo?.nickName
         header.configHeadData(headUrl: user?.userInfo?.avatarUrl, name: user?.showName() ?? "")
