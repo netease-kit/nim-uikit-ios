@@ -22,7 +22,7 @@ public struct ChatRouter {
         }
         
         // group
-        Router.shared.register("pushGroupChatVC") { param in
+        Router.shared.register(ChatPushGroupVC) { param in
             print("param:\(param)")
             let nav = param["nav"] as? UINavigationController
             guard let session = param["session"] as? NIMSession else {

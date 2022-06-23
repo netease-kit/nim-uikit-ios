@@ -35,11 +35,11 @@ public class TeamChatViewModel:ChatViewModel, NIMTeamManagerDelegate {
     }
     
     public func getTeam(teamId: String) -> NIMTeam? {
-        return repo.getTeam(teamId: teamId)
+        return repo.getTeamInfo(teamId: teamId)
     }
     
     public func fetchTeamInfo(teamId: String, _ completion: @escaping (NSError?, NIMTeam?)->()) {
-        repo.fetchTeamInfo(teamId: teamId) {[weak self] error, team in
+        repo.getTeamInfo(teamId: teamId) {[weak self] error, team in
             if error == nil {
                 self?.team = team
             }

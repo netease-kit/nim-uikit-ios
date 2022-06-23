@@ -6,7 +6,9 @@ import UIKit
 import NIMSDK
 import NEKitCoreIM
 
-public class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
+
+@objcMembers
+open class GroupChatViewController: ChatViewController, TeamChatViewModelDelegate {
     
 //    override init(session: NIMSession) {
 //        super.init(session: session)
@@ -23,7 +25,7 @@ public class GroupChatViewController: ChatViewController, TeamChatViewModelDeleg
         
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     

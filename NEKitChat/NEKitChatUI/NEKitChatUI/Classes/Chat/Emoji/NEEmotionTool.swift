@@ -5,7 +5,7 @@
 import UIKit
 
 public class NEEmotionTool: NSObject {
-    class func getAttWithStr(str:String,font:UIFont, _ offset: CGPoint = CGPoint(x: 0, y: -3) )->NSAttributedString {
+    class func getAttWithStr(str:String,font:UIFont, _ offset: CGPoint = CGPoint(x: 0, y: -3) )->NSMutableAttributedString {
         let regular = "\\[[^\\[|^\\]]+\\]"
         
         var reExpression: NSRegularExpression? = nil
@@ -19,7 +19,7 @@ public class NEEmotionTool: NSObject {
         let emoticons = NIMInputEmoticonManager.shared.emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
         let attStr = NSMutableAttributedString(string: str, attributes: [
             NSAttributedString.Key.font: font,
-            .foregroundColor:UIColor.ne_darkText
+            .foregroundColor:NEKitChatConfig.shared.ui.messageColor
         ])
         
         if let regArr = regularArr,regArr.count > 0,let targetEmotions = emoticons {

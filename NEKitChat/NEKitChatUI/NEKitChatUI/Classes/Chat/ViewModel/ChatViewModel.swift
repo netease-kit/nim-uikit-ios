@@ -41,11 +41,12 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     //下拉时间戳
     private var oldMsg: NIMMessage?
 
+    
     public var repo: ChatRepo = ChatRepo()
     public var operationModel: MessageContentModel?
     private var userInfo = [String : User]()
     public var isReplying =  false
-    public let messagPageNum: UInt = 20
+    public let messagPageNum: UInt = 100
     private let className = "ChatViewModel"
     //可信时间戳
     public var credibleTimestamp:TimeInterval = 0
@@ -59,9 +60,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         self.anchor = nil
         super.init()
         repo.addChatDelegate(delegate: self)
-        repo.addConversationDelegate(delegate: self)
-        repo.addSystemNotiDelegate(delegate: self)
-        repo.addChatExtDelegate(delegate: self)
+        repo.addSessionDelegate(delegate: self)
+        repo.addSystemNotificationDelegate(delegate: self)
+        repo.addChatExtendDelegate(delegate: self)
     }
     
     
@@ -73,9 +74,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             isHistoryChat = true
         }
         repo.addChatDelegate(delegate: self)
-        repo.addConversationDelegate(delegate: self)
-        repo.addSystemNotiDelegate(delegate: self)
-        repo.addChatExtDelegate(delegate: self)
+        repo.addSessionDelegate(delegate: self)
+        repo.addSystemNotificationDelegate(delegate: self)
+        repo.addChatExtendDelegate(delegate: self)
     }
     
     public func sendTextMessage(text: String, _ completion: @escaping (Error?) -> Void) {
@@ -109,13 +110,13 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     public func queryRoamMsgHasMoreTime(_ completion: @escaping (Error?,NSInteger,[MessageModel]?) -> Void){
 //        NIMIncompleteSessionInfo
         weak var weakSelf = self
-        repo.incompleteSessionInfo(session: session) { error, sessionInfos in
+        repo.getIncompleteSessionInfo(session: session) { error, sessionInfos in
             if error == nil {
                 let sessionInfo = sessionInfos?.first
                 //记录可信时间戳
                 weakSelf?.credibleTimestamp = sessionInfo?.timestamp ?? 0
                 if weakSelf?.anchor == nil {
-                    weakSelf?.getMessageHistory(completion)
+                    weakSelf?.getMessageHistory(self.oldMsg, completion)
 
                 }else {
                     //有锚点消息，从两个方向拉去消息
@@ -131,13 +132,13 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     
     public func queryRoamMsgHasMoreTime_v2(_ completion: @escaping (Error?,NSInteger,NSInteger,[MessageModel]?, Int) -> Void){
         weak var weakSelf = self
-        repo.incompleteSessionInfo(session: session) { error, sessionInfos in
+        repo.getIncompleteSessionInfo(session: session) { error, sessionInfos in
             if error == nil {
                 let sessionInfo = sessionInfos?.first
                 //记录可信时间戳
                 weakSelf?.credibleTimestamp = sessionInfo?.timestamp ?? 0
                 if weakSelf?.anchor == nil {
-                    weakSelf?.getMessageHistory({ error, value, models in
+                    weakSelf?.getMessageHistory(self.newMsg, { error, value, models in
                         completion(error, value, 0, models, 0)
                     })
                 }else {
@@ -199,8 +200,8 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     //查询本地历史消息
-    public func getMessageHistory(_ completion: @escaping (Error?, NSInteger,[MessageModel]?) -> Void) {
-        ChatProvider.shared.getMessageHistory(session: self.session, message: self.oldMsg, limit: messagPageNum) { [weak self] error, messages in
+    public func getMessageHistory(_ message:NIMMessage?, _ completion: @escaping (Error?, NSInteger,[MessageModel]?) -> Void) {
+        ChatProvider.shared.getMessageHistory(session: self.session, message: message, limit: messagPageNum) { [weak self] error, messages in
             if let messageArray = messages, messageArray.count > 0 {
                 self?.oldMsg = messageArray.first
                 for msg in messageArray {
@@ -216,6 +217,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
                 })
                 
             }else {
+                
                 completion(error,0,self?.messages)
             }
         }
@@ -223,12 +225,12 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     
     //查询更多本地历史消息
     public func getMoreMessageHistory(_ completion: @escaping (Error?,NSInteger, [MessageModel]?) -> Void) {
-        
-        if messages.count > 0 {
-            self.oldMsg = messages.last?.message
-        }
+
         weak var weakSelf = self
-        ChatProvider.shared.getMessageHistory(session: self.session, message: self.oldMsg, limit: messagPageNum) { [weak self] error, messages in
+        
+        let messageParam = self.oldMsg ?? self.newMsg
+        
+        ChatProvider.shared.getMessageHistory(session: self.session, message: messageParam, limit: messagPageNum) { [weak self] error, messages in
             if let messageArray = messages, messageArray.count > 0 {
                 weakSelf?.oldMsg = messageArray.first
                 
@@ -247,6 +249,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
                     option.startTime = 0
                     option.endTime = self?.oldMsg?.timestamp ?? 0
                     option.limit = self?.messagPageNum ?? 100
+                    option.sync = true
                     weakSelf?.getRemoteHistoryMessage(direction:.old,updateCredible:true,option: option, completion)
                 }
 
@@ -268,12 +271,13 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
             }
         }
+        
     }
     
     //查询远端历史消息
     public func getRemoteHistoryMessage(direction:LoadMessageDirection,updateCredible:Bool, option:NIMHistoryMessageSearchOption, _ completion: @escaping (Error?,NSInteger, [MessageModel]?) -> Void){
         weak var weakSelf = self
-        repo.fetchMessageHistory(session: self.session, option: option) { error, messages in
+        repo.getHistoryMessage(session: self.session, option: option) { error, messages in
             if error == nil {
                 if let messageArray = messages, messageArray.count > 0 {
                     if direction == .old {
@@ -282,7 +286,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
                         weakSelf?.newMsg = messageArray.first
                     }
                     for msg in messageArray {
-                        weakSelf?.addTimeMessage(msg)
+                        weakSelf?.addTimeForHistoryMessage(msg)
                         if let model = weakSelf?.modelFromMessage(message: msg)  {
                             weakSelf?.messages.insert(model, at: 0)
                         }
@@ -318,7 +322,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         option.startTime = 0
         option.endTime = oldMsg?.timestamp ?? 0
         option.limit = messagPageNum
-        
+        option.sync = true
         let isCredible = isMessageCredible(message: oldMsg ?? NIMMessage())
         if isCredible {//继续拉去本地消息
             getMoreMessageHistory(completion)
@@ -408,8 +412,11 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             self.markReadInTeam(messages: messages, completion)
         }
 //        mark session read
+        weak var weakself = self
         repo.markReadInSession(session) { error in
-            
+            if error != nil {
+                QChatLog.errorLog(weakself?.className() ?? "ChatViewModel", desc: "❌markReadInSession failed,error = \(error!)")
+            }
         }
     }
 
@@ -417,7 +424,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         for message in messages.reversed() {
             if message.isReceivedMsg {
                 let param = NIMMessageReceipt(message: message)
-                repo.markRead(param: param, completion)
+                repo.markP2pMessageRead(param: param, completion)
                 break
             }
         }
@@ -433,7 +440,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
                 receipts.append(receipt)
             }
         }
-        repo.markReadInTeam(param: receipts) { error, failedReceipts in
+        repo.markTeamMessageRead(param: receipts) { error, failedReceipts in
             print("!! chatViewModel markReadInTeam error:\(error)")
             completion(error)
         }
@@ -445,7 +452,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     public func replyMessage(_ message: NIMMessage, _ target: NIMMessage, _ completion: @escaping (Error?)->()) {
-        repo.reply(message, target) { error in
+        repo.replyMessage(message, target) { error in
             completion(error)
         }
     }
@@ -468,7 +475,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     public func getTeamMember(userId: String, teamId: String) -> NIMTeamMember? {
-        return repo.getTeamMember(userId: userId, teamId: teamId)
+        return repo.getTeamMemberList(userId: userId, teamId: teamId)
     }
     
     public func onReceive(_ notification: NIMCustomSystemNotification) {
@@ -491,6 +498,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     //    MARK: NIMChatManagerDelegate
     public func onRecvMessages(_ messages: [NIMMessage]) {
         print("\(#function) 1messages:\(messages.count)")
+
         for msg in messages {
             if msg.session?.sessionId == self.session.sessionId {
                 self.newMsg = msg
@@ -500,9 +508,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         }
         self.delegate?.onRecvMessages(messages)
         
-        self.markRead(messages: messages, { error in
-            print("mark read \(error?.localizedDescription)")
-        })
+//        self.markRead(messages: messages, { error in
+//            print("mark read \(error?.localizedDescription)")
+//        })
     }
     
 
@@ -529,6 +537,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             self.addTimeMessage(message)
             self.messages.append(self.modelFromMessage(message: message))
         }
+        
         self.delegate?.willSend(message)
     }
         
@@ -624,7 +633,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             param.data = string ?? ""
         }
         param.uniqueId = message.serverID
-        repo.addCollection(param, completion)
+        repo.collectMessage(param, completion)
     }
     
 //    MARK: revoke
@@ -793,7 +802,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             model.shortName = fullName.count > 2 ? String(fullName[fullName.index(fullName.endIndex, offsetBy: -2)...]) : fullName
         }
         model.replyedModel = getReplyMessage(message: message)
-        if let pin = repo.pinItem(message) {
+        if let pin = repo.searchMessagePinHistory(message) {
             model.isPined = true
             model.pinAccount = pin.accountID
             let pinID = pin.accountID ?? NIMSDK.shared().loginManager.currentAccount()
@@ -897,6 +906,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         if index >= 0 {
 //            let model = MessageRevokeModel(message: message)
             self.messages[index].isRevoked = true
+            self.messages[index].replyedModel = nil
             indexs.append(IndexPath(row: index, section: 0))
         }
         self.delegate?.onRevokeMessage(message, atIndexs: indexs)
@@ -923,11 +933,11 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     public func fetchMessageAttachment(_ message: NIMMessage, _ completion: @escaping (Error?) -> Void) {
-        repo.fetchMessageAttachment(message, completion)
+        repo.downloadMessageAttachment(message, completion)
     }
     
     public func downLoad(_ urlString: String, _ filePath: String, _ progress: NIMHttpProgressBlock?, _ completion: NIMDownloadCompleteBlock?){
-        repo.downLoad(urlString, filePath, progress, completion)
+        repo.downLoadSource(urlString, filePath, progress, completion)
     }
     
     public func getUrls() -> [String] {
@@ -966,7 +976,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     
     public func pinMessage(_ message: NIMMessage, _ completion: @escaping (Error?, NIMMessagePinItem?, Int)->()) {
         let item = NIMMessagePinItem(message: message)
-        repo.pin(item) {[weak self] error, pinItem in
+        repo.addMessagePin(item) {[weak self] error, pinItem in
             var index = -1
             if var messages = self?.messages {
                 for (i, model) in messages.enumerated() {
@@ -1017,15 +1027,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     func setTypingCustom(_ typing: Int){
-//        let message = NIMMessage()
-//        let attachment = TypingAttachment()
-//        attachment.typing = typing
-//        let custom = NIMCustomObject()
-//        custom.attachment = attachment
-//        message.messageObject = custom
-//        repo.sendMessage(message: message, session: session) { error in
-//
-//        }
+
         let message = NIMMessage()
         if message.setting == nil {
             message.setting = NIMMessageSetting()
@@ -1034,7 +1036,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         message.setting?.shouldBeCounted = false
         let noti = NIMCustomSystemNotification(content: getJSONStringFromDictionary(["typing":typing]))
         
-        repo.sendNotificationMessage(noti, session) { error in
+        repo.sendCustomNotification(noti, session) { error in
             if let err = error {
                 print("send noti success :", err)
             }
@@ -1043,7 +1045,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     public func getHandSetEnable() -> Bool{
-        return repo.getHandSetEnable()
+        return repo.getEarState()
     }
     
     public func getMessageRead() -> Bool {

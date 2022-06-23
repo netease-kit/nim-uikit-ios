@@ -29,7 +29,7 @@ class ChatTimeTableViewCell: UITableViewCell {
     private lazy var timeLable:UILabel = {
         let label = UILabel()
         label.font = DefaultTextFont(12)
-        label.textColor = UIColor.ne_emptyTitleColor
+        label.textColor = NEKitChatConfig.shared.ui.timeColor
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

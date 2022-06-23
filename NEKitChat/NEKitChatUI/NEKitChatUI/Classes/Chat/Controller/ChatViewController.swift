@@ -12,7 +12,10 @@ import NEKitCommon
 import NEKitCore
 import NEKitCommonUI
 import WebKit
-public class ChatViewController: NEBaseViewController, UINavigationControllerDelegate, ChatInputViewDelegate, ChatViewModelDelegate, NIMMediaManagerDelegate,MessageOperationViewDelegate, UIGestureRecognizerDelegate {
+
+@objcMembers
+
+open class ChatViewController: NEBaseViewController, UINavigationControllerDelegate, ChatInputViewDelegate, ChatViewModelDelegate, NIMMediaManagerDelegate,MessageOperationViewDelegate, UIGestureRecognizerDelegate {
     
     private let tag = "ChatViewController"
     public var viewmodel:ChatViewModel
@@ -37,7 +40,7 @@ public class ChatViewController: NEBaseViewController, UINavigationControllerDel
         NIMSDK.shared().mediaManager.setNeedProximityMonitor(viewmodel.getHandSetEnable())
     }
         
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -72,7 +75,6 @@ public class ChatViewController: NEBaseViewController, UINavigationControllerDel
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
-        tableView.backgroundColor = .red
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = .white
@@ -150,7 +152,7 @@ extension ChatViewController: ChatBaseCellDelegate {
         if let uid = model?.message?.from {
             FriendProvider.shared.fetchUserInfo(accountList: [uid]) {[weak self] users, error in
                 if let u = users.first {
-                    Router.shared.use("xkit://contact/userinfo/page", parameters: ["nav": self?.navigationController as Any, "user" : u], closure: nil)
+                    Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": self?.navigationController as Any, "user" : u], closure: nil)
                 }
             }
         }
@@ -1229,7 +1231,7 @@ extension ChatViewController {
             weak var weakSelf = self
             let userAction = UIAlertAction(title: localizable("contact_user"), style: .default) { action in
                 
-                Router.shared.register("didSelectedAccids") { param in
+                Router.shared.register(ContactSelectedUsersRouter) { param in
                     print("user setting accids : ", param)
                     var items = [ForwardItem]()
                     
@@ -1337,7 +1339,7 @@ extension ChatViewController {
 extension ChatViewController {
     @objc func toSetting() {
         if viewmodel.session.sessionType == .team {
-            Router.shared.use("xkit://team.setting.view", parameters: ["nav": navigationController as Any, "teamid": viewmodel.session.sessionId], closure: nil)
+            Router.shared.use(TeamSettingViewRouter, parameters: ["nav": navigationController as Any, "teamid": viewmodel.session.sessionId], closure: nil)
         }else if viewmodel.session.sessionType == .P2P {
             let userSetting = UserSettingViewController()
             userSetting.userId = viewmodel.session.sessionId

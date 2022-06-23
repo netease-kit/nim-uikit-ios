@@ -10,6 +10,6 @@ public class TeamMemberSelectVM {
     public var chatRepo: ChatRepo = ChatRepo()
     
     func fetchTeamMembers(sessionId: String, _ completion: @escaping (Error?, ChatTeamInfoModel?) -> Void ) {
-        chatRepo.fetchTeamInfo(sessionId, completion)
+        chatRepo.getTeamInfo(sessionId, completion)
     }
 }

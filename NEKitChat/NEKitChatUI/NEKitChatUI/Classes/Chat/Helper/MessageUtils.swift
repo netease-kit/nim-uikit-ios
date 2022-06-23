@@ -4,7 +4,8 @@
 
 import Foundation
 import NIMSDK
-import NEKitCore
+import NEKitCoreIM
+
 public class MessageUtils {
     
     public class func textMessage(text: String) -> NIMMessage {

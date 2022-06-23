@@ -55,7 +55,7 @@ public class UserSettingViewModel {
 
         if let uid = user.userId {
             let session = NIMSession(uid, type: .P2P)
-            setTop.switchOpen = repo.sessionIsTop(session)
+            setTop.switchOpen = repo.isStickTop(session)
         }
         
         setTop.swichChange = { isOpen in

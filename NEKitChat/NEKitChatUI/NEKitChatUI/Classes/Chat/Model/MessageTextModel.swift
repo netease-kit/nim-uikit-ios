@@ -13,7 +13,7 @@ class MessageTextModel: MessageContentModel {
         super.init(message: message)
         type = .text
 //        text = message?.text
-        attributeStr = NEEmotionTool.getAttWithStr(str: message?.text ?? "", font: UIFont.systemFont(ofSize: 16))
+        attributeStr = NEEmotionTool.getAttWithStr(str: message?.text ?? "", font: NEKitChatConfig.shared.ui.messageFont)
  
         let textSize = NEChatUITool.getSizeWithAtt(att: attributeStr ?? NSAttributedString.init(string: ""), font: DefaultTextFont(16), maxSize: CGSize.init(width: qChat_content_maxW, height: CGFloat.greatestFiniteMagnitude))
         

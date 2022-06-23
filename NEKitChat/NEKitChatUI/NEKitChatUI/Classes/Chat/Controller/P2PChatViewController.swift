@@ -4,7 +4,9 @@
 
 import UIKit
 import NIMSDK
-public class P2PChatViewController: ChatViewController {
+
+@objcMembers
+open class P2PChatViewController: ChatViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()

@@ -65,7 +65,7 @@ public class MessageContentModel: MessageModel {
     required public init(message: NIMMessage?) {
         self.message = message
         contentSize = CGSize(width: 32.0, height: qChat_min_h)
-        if message?.session?.sessionType == .team && !CoreKitIMEngine.instance.isMySelf(message?.from) {
+        if message?.session?.sessionType == .team && !IMKitLoginManager.instance.isMySelf(message?.from) {
             self.fullNameHeight = 20
         }
         print("self.fullNameHeight\(self.fullNameHeight)")

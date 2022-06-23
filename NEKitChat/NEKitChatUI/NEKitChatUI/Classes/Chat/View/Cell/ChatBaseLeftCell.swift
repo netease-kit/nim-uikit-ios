@@ -24,6 +24,7 @@ class ChatBaseLeftCell: ChatBaseCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         baseCommonUI()
         addGesture()
+        initSubviewsLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -75,7 +76,7 @@ class ChatBaseLeftCell: ChatBaseCell {
         ])
         
 //        bubbleImage
-        if let image = UIImage.ne_imageNamed(name: "chat_message_receive") {
+        if let image = NEKitChatConfig.shared.ui.leftBubbleBg {
             self.bubbleImage.image = image.resizableImage(withCapInsets: UIEdgeInsets.init(top: 35, left: 25, bottom: 10, right: 25))
         }
         self.bubbleImage.translatesAutoresizingMaskIntoConstraints = false
@@ -149,6 +150,15 @@ class ChatBaseLeftCell: ChatBaseCell {
         let messageLongPress  = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
         self.bubbleImage.addGestureRecognizer(messageLongPress)
     }
+    
+    func initSubviewsLayout(){
+        if NEKitChatConfig.shared.ui.avatarType == .rectangle {
+            avatarImage.layer.cornerRadius = NEKitChatConfig.shared.ui.avatarCornerRadius
+        }else if NEKitChatConfig.shared.ui.avatarType == .cycle {
+            avatarImage.layer.cornerRadius = 16.0
+        }
+    }
+    
     
 //    MARK: event
     @objc func tapAvatar(tap: UITapGestureRecognizer) {
@@ -224,7 +234,7 @@ class ChatBaseLeftCell: ChatBaseCell {
     private func updatePinStatus(_ model: MessageContentModel) {
         self.pinLabel.isHidden = !model.isPined
         self.pinImage.isHidden = !model.isPined
-        self.contentView.backgroundColor = model.isPined ? UIColor.ne_yellowBackgroundColor : .white
+        self.contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui.chatPinColor : .white
         if model.isPined {
             if let text = model.pinShowName {
                 self.pinLabel.text = text + localizable("pin_text")

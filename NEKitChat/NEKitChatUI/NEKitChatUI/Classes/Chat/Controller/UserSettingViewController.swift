@@ -133,7 +133,7 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
     
     @objc func createDiscuss(){
         weak var weakSelf = self
-        Router.shared.register("didSelectedAccids") { param in
+        Router.shared.register(ContactSelectedUsersRouter) { param in
             print("user setting create disscuss  : ", param)
             var convertParam = [String: Any]()
             param.forEach { (key: String, value: Any) in
@@ -144,7 +144,7 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
                 }
             }
             weakSelf?.view.makeToastActivity(.center)
-            Router.shared.use("xkit://team.create.discuss", parameters: convertParam, closure: nil)
+            Router.shared.use(TeamCreateDisuss, parameters: convertParam, closure: nil)
         }
         var filters = Set<String>()
         if let uid = userId {
@@ -153,13 +153,11 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
         
         Router.shared.use(ContactUserSelectRouter, parameters: ["nav": navigationController as Any, "filters":filters, "limit": 199], closure: nil)
         
-        Router.shared.register("xkit://team.create.discuss.result") { param in
+        Router.shared.register(TeamCreateDiscussResult) { param in
             print("create discuss ", param)
             weakSelf?.view.hideToastActivity()
             if let code = param["code"] as? Int, let teamid = param["teamId"] as? String, code == 0 {
                 let session = NIMSession(teamid, type: .team)
-                
-                Router.shared.use("pushGroupChatVC", parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
                 
                 DispatchQueue.main.async {
                     if let allControllers =  weakSelf?.navigationController?.viewControllers.filter({
@@ -169,6 +167,7 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
                         return true
                     }){
                         weakSelf?.navigationController?.viewControllers = allControllers
+                        Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
                     }
                 }
             }else if let error = param["msg"] as? String {
@@ -179,7 +178,7 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
     
     @objc func showUserInfo(){
         if let user = viewmodel.userInfo {
-            Router.shared.use("xkit://contact/userinfo/page", parameters: ["nav": navigationController as Any, "user" : user], closure: nil)
+            Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "user" : user], closure: nil)
         }
     }
     
