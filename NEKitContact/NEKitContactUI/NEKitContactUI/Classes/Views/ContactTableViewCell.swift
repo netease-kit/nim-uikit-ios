@@ -37,6 +37,7 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.commonUI()
+        initSubviewsLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -71,9 +72,19 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
         ])
     }
     
+    func initSubviewsLayout(){
+        if NEKitContactConfig.shared.ui.avatarType == .rectangle {
+            avatarImage.layer.cornerRadius = NEKitContactConfig.shared.ui.avatarCornerRadius
+        }else if NEKitContactConfig.shared.ui.avatarType == .cycle {
+            avatarImage.layer.cornerRadius = 18.0
+        }
+    }
+    
+    
+    
     func setConfig(_ config: ContactsConfig){
-        self.titleLabel.font = config.cellTitleFont
-        self.titleLabel.textColor = config.cellTitleColor
+        self.titleLabel.font = NEKitContactConfig.shared.ui.titleFont
+        self.titleLabel.textColor = NEKitContactConfig.shared.ui.titleColor
         self.nameLabel.font = config.cellNameFont
         self.nameLabel.textColor = config.cellNameColor
     }

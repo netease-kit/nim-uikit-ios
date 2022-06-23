@@ -15,8 +15,6 @@ public class ContactsConfig {
     public var sectionHeaderTitleFont = UIFont.systemFont(ofSize: 14.0)
     
     // ContactTableViewCell
-    public var cellTitleFont = UIFont.systemFont(ofSize: 14.0)
-    public var cellTitleColor = UIColor(hexString: "333333")
     public var cellNameFont = UIFont.systemFont(ofSize: 14.0)
     public var cellNameColor = UIColor.white
     

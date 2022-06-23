@@ -89,7 +89,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
     func loadData() {
         
         let isFriend = viewModel.contactRepo.isFriend(account: self.user?.userId ?? "")
-        self.isBlack = viewModel.contactRepo.isBlack(account: self.user?.userId ?? "")
+        self.isBlack = viewModel.contactRepo.isBlackList(account: self.user?.userId ?? "")
         
         if isFriend {
             data = [[UserItem(title: localizable("备注名"), detailTitle: user?.alias, value: false, textColor: UIColor.darkText, cellClass: TextWithRightArrowCell.self)],
@@ -209,7 +209,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
             
         }else {
             // remove
-            viewModel.contactRepo.removeFromBlackList(account: userId) {[weak self] error in
+            viewModel.contactRepo.removeBlackList(account: userId) {[weak self] error in
                 if error != nil {
                     self?.view.makeToast(error?.localizedDescription)
                 }else {
@@ -248,16 +248,17 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
     }
     
     @objc func addFriend(){
+        
+        
+        weak var weakSelf = self
         if let account = user?.userId {
             viewModel.addFriend(account) { error in
                 if let err = error {
-                    print("add friend failed :", err)
+                    QChatLog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
                 }else {
-                    print("add friend success")
-                    self.navigationController?.popToRootViewController(animated: true)
+                    weakSelf?.showToast("好友申请已发送")
                 }
             }
         }
-        print("add friend")
     }
 }

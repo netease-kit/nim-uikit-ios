@@ -6,6 +6,7 @@
 import Foundation
 import NEKitCoreIM
 import UIKit
+import NEKitCore
 
 public class ContactInfo {
     func getRowHeight() -> CGFloat? {

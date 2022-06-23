@@ -63,7 +63,7 @@ public class TeamListViewController: UIViewController, UITableViewDelegate, UITa
         }
         if let teamid = model.teamId {
             let session = NIMSession(teamid, type: .team)
-            Router.shared.use("pushGroupChatVC", parameters: ["nav": navigationController as Any, "session" : session as Any], closure: nil)
+            Router.shared.use(ChatPushGroupVC, parameters: ["nav": navigationController as Any, "session" : session as Any], closure: nil)
         }
         
     }

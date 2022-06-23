@@ -22,7 +22,7 @@ public class ContactViewModel: ContactRepoSystemNotiDelegate {
     var refresh: RefreshBlock?
     init(contactHeaders: [ContactHeadItem]?) {
         contactRepo.notiDelegate = self
-        unreadCount = contactRepo.getUnreadCount()
+        unreadCount = contactRepo.getNotificationUnreadCount()
         self.contactHeaders = contactHeaders
     }
     
@@ -50,7 +50,7 @@ public class ContactViewModel: ContactRepoSystemNotiDelegate {
     
     func getContactList(_ filters: Set<String>? = nil) -> [ContactSection] {
         var contactList: [ContactSection] = []
-        var users = contactRepo.getFriends()
+        var users = contactRepo.getFriendList()
         
         if let filterUsers = filters {
             users = users.filter({ user in
@@ -73,7 +73,7 @@ public class ContactViewModel: ContactRepoSystemNotiDelegate {
             let inital = name?.initalLetter()
             let contactInfo = ContactInfo()
             contactInfo.user = contact
-            contactInfo.headerBackColor = UIColor.colorWithString(string: contact.userId)
+            contactInfo.headerBackColor = UIColor.colorWithString(string: contact.showName() ?? "")
 
             var contactsTemp = initalDict[inital!]
             if contactsTemp == nil {

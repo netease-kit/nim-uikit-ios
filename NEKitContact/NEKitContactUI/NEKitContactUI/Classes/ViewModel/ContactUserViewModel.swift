@@ -12,7 +12,6 @@ class ContactUserViewModel {
     let contactRepo = ContactRepo()
 
     func addFriend(_ account: String, _ completion: @escaping (NSError?)->()){
-        print("account : ", account)
         let request = AddFriendRequest()
         request.account = account
         request.operationType = .addRequest
@@ -28,7 +27,7 @@ class ContactUserViewModel {
     }
     
     public func isBlack(account: String) -> Bool {
-        return contactRepo.isBlack(account: account)
+        return contactRepo.isBlackList(account: account)
     }
     
     public func update(_ user: User, _ completion: @escaping (Error?) -> Void){
@@ -36,7 +35,7 @@ class ContactUserViewModel {
     }
     
     public func getUserInfo(_ uid: String, _ completion: @escaping (Error?, User?) -> Void){
-        contactRepo.getUserInfoAdvanced(uid) { error, users in
+        contactRepo.getUserInfo(uid) { error, users in
             completion(error, users.first)
         }
     }

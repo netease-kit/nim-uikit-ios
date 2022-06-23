@@ -17,7 +17,7 @@ public class BlackListViewModel: FriendProviderDelegate {
     }
     
     func removeFromBlackList(account: String, _ completion: @escaping (NSError?)->()) {
-        contactRepo.removeFromBlackList(account: account, completion)
+        contactRepo.removeBlackList(account: account, completion)
     }
     
     func addBlackList(account: String, _ completion: @escaping (NSError?)->()) {

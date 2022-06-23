@@ -12,7 +12,7 @@ class FindFriendViewModel {
     let contactRepo = ContactRepo()
     
     func searchFriend(_ text: String, _ completion: @escaping ([User]?, NSError?)->()){
-        contactRepo.fetchUserInfo(accountList: [text], completion)
+        contactRepo.getUserInfo(accountList: [text], completion)
     }
     
 }

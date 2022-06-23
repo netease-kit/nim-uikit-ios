@@ -10,7 +10,7 @@ import Toast_Swift
 import NEKitCore
 import NIMSDK
 
-public class ContactsSelectedViewController: ContactBaseViewController {
+open class ContactsSelectedViewController: ContactBaseViewController {
     
     public var callBack: ContactsSelectCompletion?
     
@@ -137,7 +137,7 @@ extension ContactsSelectedViewController {
         var accids = [String]()
         var names = [String]()
         
-        names.append(viewModel.contactRepo.currentUserShowName())
+        names.append(viewModel.contactRepo.getUserName())
 
         var users = [NIMUser]()
         for c in selectArray {
@@ -155,8 +155,7 @@ extension ContactsSelectedViewController {
         
         let nameString = names.joined(separator: "、")
         print("name string : ", nameString)
-        Router.shared.use("didSelectedAccids", parameters: ["accids":accids, "names":nameString, "im_user": users], closure: nil)
-        
+        Router.shared.use(ContactSelectedUsersRouter, parameters: ["accids":accids, "names":nameString, "im_user": users], closure: nil)
         self.navigationController?.popViewController(animated: true)
     }
 }

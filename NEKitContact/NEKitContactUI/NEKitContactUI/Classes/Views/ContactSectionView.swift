@@ -21,7 +21,8 @@ public class ContactSectionView: UITableViewHeaderFooterView {
     func commonUI() {
         self.contentView.backgroundColor = .white
         self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.titleLabel.textColor = UIColor(red: 179/255.0, green: 183/255.0, blue: 188/255.0, alpha: 1.0)
+        
+        self.titleLabel.textColor = NEKitContactConfig.shared.ui.indexTitleColor
         self.titleLabel.font = UIFont.systemFont(ofSize: 14.0)
         self.addSubview(self.titleLabel)
         NSLayoutConstraint.activate([
@@ -32,7 +33,7 @@ public class ContactSectionView: UITableViewHeaderFooterView {
         ])
         
         self.line.translatesAutoresizingMaskIntoConstraints = false
-        self.line.backgroundColor = UIColor(red: 219/255.0, green: 224/255.0, blue: 232/255.0, alpha: 1.0)
+        self.line.backgroundColor = NEKitContactConfig.shared.ui.divideLineColor
         self.addSubview(self.line)
         NSLayoutConstraint.activate([
             self.line.leftAnchor.constraint(equalTo: self.titleLabel.leftAnchor),

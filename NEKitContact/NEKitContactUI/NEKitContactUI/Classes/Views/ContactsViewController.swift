@@ -25,8 +25,10 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
     public init(withConfig custom: ContactsConfig){
         super.init(nibName: nil, bundle: nil)
         uiConfig = custom
-        viewModel.contactRepo.addNotifyDelegate(delegate: self)
+        viewModel.contactRepo.addNotificationDelegate(delegate: self)
         viewModel.contactRepo.addContactDelegate(delegate: self)
+        
+//        NEKitContactConfig.shared.ui.avatarType = .rectangle
     }
     
     required init?(coder: NSCoder) {
@@ -127,7 +129,7 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
         if info.contactCellType == ContactCellType.ContactOthers.rawValue {
             switch info.router {
             case ValidationMessageRouter:
-                viewModel.contactRepo.clearUnreadCount()
+                viewModel.contactRepo.clearNotificationUnreadCount()
                 let validationController = ValidationMessageViewController()
                 validationController.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(validationController, animated: true)
@@ -203,13 +205,25 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
 
 extension ContactsViewController {
     private func addNavbarAction(){
+        
         edgesForExtendedLayout = []
         let addItem = UIBarButtonItem(image: UIImage.ne_imageNamed(name: "add"), style: .plain, target: self, action: #selector(goToFindFriend))
         addItem.tintColor = UIColor(hexString: "333333")
         let searchItem = UIBarButtonItem(image: UIImage.ne_imageNamed(name: "contact_search"), style: .plain, target: self, action: #selector(searchContact))
         searchItem.imageInsets = UIEdgeInsets.init(top: 0, left: 35, bottom: 0, right: 0)
         searchItem.tintColor = UIColor(hexString: "333333")
-        self.navigationItem.rightBarButtonItems = [addItem,searchItem]
+        if NEKitContactConfig.shared.ui.hiddenRightBtns {
+            return
+        }else {
+            if NEKitContactConfig.shared.ui.hiddenSearchBtn {
+                self.navigationItem.rightBarButtonItems = [addItem]
+            }else {
+                self.navigationItem.rightBarButtonItems = [addItem,searchItem]
+            }
+        }
+        
+        
+        
     }
     
     @objc private func goToFindFriend(){

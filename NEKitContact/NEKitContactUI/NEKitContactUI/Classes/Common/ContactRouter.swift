@@ -7,13 +7,6 @@ import Foundation
 import NEKitCore
 import NEKitCoreIM
 import NIMSDK
-public let ValidationMessageRouter = "xkit://contact.validation.view"
-public let ContactPersonRouter = "xkit://contact.person.view"
-public let ContactBlackListRouter = "xkit://contact.blacklist.view"
-public let ContactGroupRouter = "xkit://contact.group.view"
-public let ContactComputerRouter = "xkit://contact.computer.view"
-public let ContactSearchUserRouter = "xkit://contact.searchuser.view"
-
 
 public struct ContactRouter {
     public static func register() {

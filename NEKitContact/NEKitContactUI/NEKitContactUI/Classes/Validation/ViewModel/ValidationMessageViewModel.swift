@@ -6,13 +6,14 @@
 import Foundation
 import NEKitContact
 import NEKitCoreIM
+import NEKitCore
 
 public class ValidationMessageViewModel: ContactRepoSystemNotiDelegate {
     
     typealias DataRefresh = () -> Void
     
     var dataRefresh: DataRefresh?
-    
+    private let className = "ValidationMessageViewModel"
     let contactRepo = ContactRepo()
     var datas = [XNotification]()
     
@@ -29,7 +30,7 @@ public class ValidationMessageViewModel: ContactRepoSystemNotiDelegate {
 //            datas.insert(notification, at: 0)
 //        }
         datas.insert(notification, at: 0)
-        contactRepo.clearUnreadCount()
+        contactRepo.clearNotificationUnreadCount()
         if let block = dataRefresh {
             block()
         }
@@ -37,28 +38,26 @@ public class ValidationMessageViewModel: ContactRepoSystemNotiDelegate {
     
     func getValidationMessage(_ completin: () -> Void ){
         let data = contactRepo.getNotificationList(limit: 500)
-        print("get validation message : ", data)
-        data.forEach { noti in
-            datas.append(noti)
-            print("get noti : ", noti.type as Any)
-        }
+        datas = data
         if datas.count > 0 {
             completin()
+        }else {
+            QChatLog.warn(className, desc: "⚠️NotificationList is empty")
         }
     }
     
     func clearAllNoti(_ completion: () -> Void){
-        contactRepo.deleteNoti()
+        contactRepo.clearNotification()
         datas.removeAll()
         completion()
     }
     
     public func acceptInviteWithTeam(_ teamId:String,_ invitorId:String,_ completion: @escaping (Error?) -> Void){
-        contactRepo.acceptInviteWithTeam(teamId, invitorId, completion)
+        contactRepo.acceptTeamInvite(teamId, invitorId, completion)
     }
 
     public func rejectInviteWithTeam(_ teamId:String,_ invitorId:String,_ completion: @escaping (Error?) -> Void){
-        contactRepo.rejectInviteWithTeam(teamId, invitorId, completion)
+        contactRepo.rejectTeamInvite(teamId, invitorId, completion)
     }
     
     func agreeRequest(_ account: String, _ completion: @escaping (NSError?)->()){
