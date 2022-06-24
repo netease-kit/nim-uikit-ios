@@ -38,7 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         IQKeyboardManager.shared.shouldResignOnTouchOutside = true
        
         //login action
-        startLogin(account:"279476370047232", token:"22b4fb5a-9696-4ce6-95b5-39be56bf5980")
+        startLogin(account: <#imaccid#>, token: <#imToken#>)
+
     }
     
     @objc func refreshRoot(){
