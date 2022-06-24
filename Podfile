@@ -7,22 +7,24 @@ target 'app' do
   
   pod 'YXLogin', '1.0.0'
   
-  pod 'NEContactUIKit', '9.0.2-beta2'
-  pod 'NEQChatUIKit', '9.0.2-beta2'
-  pod 'NEConversationUIKit', '9.0.2-beta2'
-  pod 'NEChatUIKit', '9.0.2-beta2'
-  pod 'NETeamUIKit', '9.0.2-beta2'
+#  pod 'NEContactUIKit', '9.2.2'
+#  pod 'NEQChatUIKit', '9.2.2'
+#  pod 'NEConversationUIKit', '9.2.2'
+#  pod 'NEChatUIKit', '9.2.2'
+#  pod 'NETeamUIKit', '9.2.2'
   
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-#  pod 'NEChatKit', '9.0.1'
-#  pod 'NEConversationKit', '9.0.1'
-#  pod 'NEContactKit', '9.0.1'
-#  pod 'NETeamKit', '9.0.1'
-#  pod 'NEKitQChatUI', :path => 'NEKitQChat/NEKitQChatUI/NEKitQChatUI.podspec'
-#  pod 'NEKitContactUI', :path => 'NEKitContact/NEKitContactUI/NEKitContactUI.podspec'
-#  pod 'NEKitConversationUI', :path => 'NEKitConversation/NEKitConversationUI/NEKitConversationUI.podspec'
-#  pod 'NEKitCommonUI', :path => 'NEKitCommon/NEKitCommonUI/NEKitCommonUI.podspec'
-#  pod 'NEKitTeamUI', :path => 'NEKitTeam/NEKitTeamUI/NEKitTeamUI.podspec'
-#  pod 'NEKitChatUI', :path => 'NEKitChat/NEKitChatUI/NEKitChatUI.podspec'
+  pod 'NEChatKit', '9.2.2'
+  pod 'NEConversationKit', '9.2.2'
+  pod 'NEContactKit', '9.2.2'
+  pod 'NETeamKit', '9.2.2'
+
+
+  pod 'NEKitQChatUI', :path => 'NEKitQChatUI/NEKitQChatUI.podspec'
+  pod 'NEKitContactUI', :path => 'NEKitContactUI/NEKitContactUI.podspec'
+  pod 'NEKitConversationUI', :path => 'NEKitConversationUI/NEKitConversationUI.podspec'
+  pod 'NEKitCommonUI', :path => 'NEKitCommonUI/NEKitCommonUI.podspec'
+  pod 'NEKitTeamUI', :path => 'NEKitTeamUI/NEKitTeamUI.podspec'
+  pod 'NEKitChatUI', :path => 'NEKitChatUI/NEKitChatUI.podspec'
     
 end

@@ -61,7 +61,7 @@ class NETabBarController: UITabBarController {
     }
     
     func setUpSessionBadgeValue(){
-        sessionUnreadCount = ConversationRepo().allUnreadCount(notify: true)
+        sessionUnreadCount = ConversationRepo().getMsgUnreadCount(notify: true)
         if sessionUnreadCount > 0  {
             self.tabBar.showBadgOn(index: 0)
         }else {

@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let option = NIMSDKOption()
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
-        CoreKitEngine.instance.setupCoreKit(option)
+        IMKitEngine.instance.setupCoreKitIM(option)
         
 
         IQKeyboardManager.shared.enable = true
@@ -39,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
        
         //login action
         startLogin(account: <#imaccid#>, token: <#imToken#>)
+
     }
     
     @objc func refreshRoot(){
@@ -80,13 +81,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func startLogin(account:String,token:String){
         weak var weakSelf = self
-        CoreKitEngine.instance.login(account, token) { error in
+        IMKitLoginManager.instance.loginIM(account, token) { error in
             if let err = error {
                 print("NEKitCore login error : ", err)
             }else {
                 ChatRouter.setupInit()
                 let param = QChatLoginParam(account,token)
-                CoreKitIMEngine.instance.loginQchat(param) { error, response in
+                IMKitLoginManager.instance.loginQchat(param) { error, response in
                     if let err = error {
                         print("qchatLogin failed, error : ", err)
                     }else {

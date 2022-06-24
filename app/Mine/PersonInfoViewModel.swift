@@ -26,7 +26,7 @@ public class  PersonInfoViewModel{
     
     func getData(){
         sectionData.removeAll()
-        userInfo = friendProvider.getUserInfo(userId: CoreKitIMEngine.instance.imAccid)
+        userInfo = friendProvider.getUserInfo(userId: IMKitLoginManager.instance.imAccid)
         sectionData.append(getFirstSection())
         sectionData.append(getSecondSection())
     }

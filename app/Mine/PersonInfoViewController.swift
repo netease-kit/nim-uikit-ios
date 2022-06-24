@@ -128,7 +128,7 @@ class PersonInfoViewController: NEBaseViewController {
 extension PersonInfoViewController:NIMUserManagerDelegate {
     
     func onUserInfoChanged(_ user: NIMUser) {
-        if user.userId == CoreKitIMEngine.instance.imAccid {
+        if user.userId == IMKitLoginManager.instance.imAccid {
             viewModel.getData()
             tableView.reloadData()
         }
@@ -150,7 +150,7 @@ extension PersonInfoViewController:UINavigationControllerDelegate {
         self.view.makeToastActivity(.center)
         weak var weakSelf = self
         if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-             let filePath = NSHomeDirectory().appending("/Documents/").appending(CoreKitIMEngine.instance.imAccid)
+             let filePath = NSHomeDirectory().appending("/Documents/").appending(IMKitLoginManager.instance.imAccid)
              let succcess =  imageData.write(toFile: filePath, atomically: true)
             if succcess {
                 NIMSDK.shared().resourceManager.upload(filePath, scene: NIMNOSSceneTypeAvatar, progress: nil) { urlString, error in
