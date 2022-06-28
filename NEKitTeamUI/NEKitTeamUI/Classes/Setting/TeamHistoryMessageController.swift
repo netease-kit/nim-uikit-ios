@@ -173,7 +173,7 @@ extension TeamHistoryMessageController:UITableViewDelegate,UITableViewDataSource
             
             if let sid = cellModel?.imMessage?.session?.sessionId, let message = cellModel?.imMessage {
                 let session = NIMSession(sid, type: .team)
-                Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any, "anchor": message], closure: nil)
+                Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any, "anchor": message], closure: nil)
             }
       
         }

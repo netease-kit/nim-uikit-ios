@@ -496,7 +496,7 @@ extension TeamSettingViewController: UICollectionViewDelegate, UICollectionViewD
         if let member = viewmodel.teamInfoModel?.users[indexPath.row], let nimUser = member.nimUser{
             let user = User(user:nimUser)
             if IMKitLoginManager.instance.isMySelf(user.userId) {
-                Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
+                Router.shared.use(MeSettingRouter, parameters: ["nav": navigationController as Any], closure: nil)
             }else {
                 Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "user" : user], closure: nil)
             }
@@ -678,12 +678,10 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
     }
     
     func didClickHistoryMessage() {
-        
+
         guard let tid = teamId else {
             return
         }
-        let session = NIMSession(tid, type: .team)
-        let ctrl = TeamHistoryMessageController(session: session)
-        navigationController?.pushViewController(ctrl, animated: true)
+        Router.shared.use(SearchMessageRouter, parameters: ["nav": navigationController as Any, "teamId": tid], closure: nil)
     }
 }
