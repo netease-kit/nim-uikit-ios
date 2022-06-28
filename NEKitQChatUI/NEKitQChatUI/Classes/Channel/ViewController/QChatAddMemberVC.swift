@@ -172,7 +172,7 @@ public class QChatAddMemberVC: QChatSearchVC {
         let param = AddMemberRoleParam(serverId: self.channel?.serverId, channelId: self.channel?.channelId, accid: member?.accid)
         QChatRoleProvider.shared.addMemberRole(param) { error, memberRole in
             if error != nil {
-                self.view.makeToast(error?.localizedDescription)
+                self.showToast(error?.localizedDescription ?? "")
             }else {
                 self.serverMembers?.remove(at: index)
                 self.tableView.reloadData()
