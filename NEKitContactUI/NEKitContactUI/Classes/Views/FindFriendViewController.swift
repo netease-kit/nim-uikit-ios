@@ -135,7 +135,7 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
                     weakSelf?.userLabel.isHidden = false
                 }
             }else {
-                self.view.makeToast(error?.localizedDescription)
+                self.showToast(error?.localizedDescription ?? "")
             }
         }
     }
