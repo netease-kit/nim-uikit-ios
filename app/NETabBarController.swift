@@ -42,9 +42,7 @@ class NETabBarController: UITabBarController {
         
         
         // Contacts
-        let uiConfig = ContactsConfig()
-        // example uiConfig.cellNameFont = ...
-        let contactVC = ContactsViewController(withConfig: uiConfig)
+        let contactVC = ContactsViewController()
         contactVC.tabBarItem = UITabBarItem(title: "通讯录", image: UIImage(named: "contact"), selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal))
         contactVC.title = "通讯录"
         let contactsNav = NENavigationController(rootViewController: contactVC)
