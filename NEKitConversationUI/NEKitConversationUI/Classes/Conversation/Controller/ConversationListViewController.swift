@@ -162,11 +162,11 @@ extension ConversationListViewController:UITableViewDelegate,UITableViewDataSour
 
         if conversationModel?.recentSession?.session?.sessionType == .P2P {
             let session = NIMSession(commonId, type: .P2P)
-            Router.shared.use("pushChatVC", parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+            Router.shared.use(PushP2pChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
         }else if conversationModel?.recentSession?.session?.sessionType == .team {
            
             let session = NIMSession(commonId, type: .team)
-            Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+            Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
         }
     }
     

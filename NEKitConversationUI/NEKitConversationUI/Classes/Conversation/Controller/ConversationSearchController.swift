@@ -229,20 +229,20 @@ extension ConversationSearchController:UITableViewDelegate,UITableViewDataSource
             let searchModel = viewModel.searchResult?.friend[indexPath.row]
             if let userId = searchModel?.userInfo?.userId {
                 let session = NIMSession(userId, type: .P2P)
-                Router.shared.use("pushChatVC", parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(PushP2pChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
             }
            
         }else if indexPath.section == 1 {
             let searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
             if let teamId = searchModel?.teamInfo?.teamId {
                 let session = NIMSession(teamId, type: .team)
-                Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
             }
         }else {
             let searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
             if let teamId = searchModel?.teamInfo?.teamId {
                 let session = NIMSession(teamId, type: .team)
-                Router.shared.use(ChatPushGroupVC, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": self.navigationController as Any, "session" : session as Any], closure: nil)
             }
         }
 
