@@ -227,7 +227,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
             return
         }
         let session = NIMSession(accid, type: .P2P)
-        Router.shared.use("pushChatVC", parameters: ["nav": self.navigationController,"session": session]) { obj, routerState, str in
+        Router.shared.use(PushP2pChatVCRouter, parameters: ["nav": self.navigationController,"session": session]) { obj, routerState, str in
             print("obj:\(obj) routerState:\(routerState) str:\(str)")
         }
     }
@@ -238,7 +238,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
         if let userId = user?.userId {
             viewModel.deleteFriend(account: userId) { error in
                 if error != nil {
-                    self.view.makeToast(error?.localizedDescription)
+                    self.showToast(error?.localizedDescription ?? "")
                 }else {
                     self.navigationController?.popViewController(animated: true)
                 }

@@ -8,12 +8,16 @@ import Foundation
 public struct ConversationRouter {
 
     public static func register() {
-        Router.shared.register(SearchContactRouter) { param in
+        Router.shared.register(SearchContactPageRouter) { param in
             let nav = param["nav"] as? UINavigationController
             let searchCtrl = ConversationSearchController()
             nav?.pushViewController(searchCtrl, animated: true)
         }
-        
 
+        Router.shared.register(ConversationPageRouter) { param in
+            let nav = param["nav"] as? UINavigationController
+            let conversation = ConversationController()
+            nav?.pushViewController(conversation, animated: true)
+        }
     }
 }

@@ -496,21 +496,26 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     
     //    MARK: NIMChatManagerDelegate
+    //收到消息
     public func onRecvMessages(_ messages: [NIMMessage]) {
         print("\(#function) 1messages:\(messages.count)")
 
         for msg in messages {
             if msg.session?.sessionId == self.session.sessionId {
-                self.newMsg = msg
-                self.addTimeMessage(msg)
-                self.messages.append(self.modelFromMessage(message: msg))
+                
+                //自定义消息处理
+                if msg.messageType == .custom {
+                    
+                }else {
+                    self.newMsg = msg
+                    self.addTimeMessage(msg)
+                    self.messages.append(self.modelFromMessage(message: msg))
+                }
+                
             }
         }
         self.delegate?.onRecvMessages(messages)
-        
-//        self.markRead(messages: messages, { error in
-//            print("mark read \(error?.localizedDescription)")
-//        })
+
     }
     
 
@@ -520,25 +525,30 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         if message.session?.sessionId != self.session.sessionId {
             return
         }
-        if self.newMsg == nil {
-            self.newMsg = message
-        }
-        
-        var isResend = false
-        for (i, msg) in self.messages.enumerated() {
-            if message.messageId == msg.message?.messageId {
-                self.messages[i].message = message
-                isResend = true
-                break
+        //自定义消息发送之前的处理
+        if message.messageType == .custom {
+            
+        }else {
+            if self.newMsg == nil {
+                self.newMsg = message
             }
+            
+            var isResend = false
+            for (i, msg) in self.messages.enumerated() {
+                if message.messageId == msg.message?.messageId {
+                    self.messages[i].message = message
+                    isResend = true
+                    break
+                }
+            }
+            
+            if !isResend {
+                self.addTimeMessage(message)
+                self.messages.append(self.modelFromMessage(message: message))
+            }
+            
+            self.delegate?.willSend(message)
         }
-        
-        if !isResend {
-            self.addTimeMessage(message)
-            self.messages.append(self.modelFromMessage(message: message))
-        }
-        
-        self.delegate?.willSend(message)
     }
         
     public func send(_ message: NIMMessage, progress: Float) {

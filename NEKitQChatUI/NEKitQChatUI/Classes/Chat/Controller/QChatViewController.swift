@@ -72,7 +72,7 @@ extension QChatViewController:QChatBaseCellDelegate {
     
     func didClickHeader(_ message: NIMQChatMessage) {
         if IMKitLoginManager.instance.isMySelf(message.from) == true {
-            Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
+            Router.shared.use(MeSettingRouter, parameters: ["nav": navigationController as Any], closure: nil)
         }else {
             Router.shared.use(ContactUserInfoPageRouter, parameters: ["nav": navigationController as Any, "uid": message.from as Any], closure: nil)
         }
@@ -296,7 +296,8 @@ extension QChatViewController {
     func sendText(text: String?) {
         print("sendText:\(text)")
         guard let content = text, content.count > 0 else {
-            self.view.makeToast(localizable("text_is_nil"))
+            self.showToast(localizable("text_is_nil"))
+            
             return
         }
         viewmodel?.sendTextMessage(text: content, {[weak self] error in
@@ -312,7 +313,7 @@ extension QChatViewController {
         if index == 2 {
             self.showMenue(sourceView: button)
         }else {
-            self.view.makeToast(localizable("open_soon"))
+            self.showToast(localizable("open_soon"))
         }
     }
     
@@ -358,7 +359,7 @@ extension QChatViewController {
 //        send message
         picker.dismiss(animated: true, completion: nil)
         guard let image = info[.originalImage] as? UIImage else {
-            self.view.makeToast(localizable("image_is_nil"))
+            self.showToast(localizable("image_is_nil"))
             return
         }
         viewmodel?.sendImageMessage(image: image, {[weak self] error in

@@ -146,7 +146,7 @@ extension ChatViewController: ChatBaseCellDelegate {
 
     func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
         if let isOut = model?.message?.isOutgoingMsg, isOut {
-            Router.shared.use(MeSetting, parameters: ["nav": navigationController as Any], closure: nil)
+            Router.shared.use(MeSettingRouter, parameters: ["nav": navigationController as Any], closure: nil)
             return
         }
         if let uid = model?.message?.from {
@@ -638,7 +638,7 @@ extension ChatViewController {
 //    MARK:ChatInputViewDelegate
     public func sendText(text: String?) {
         guard let content = text, content.count > 0 else {
-            self.view.makeToast(localizable("text_is_nil"))
+            self.showToast(localizable("text_is_nil"))
             return
         }
         if viewmodel.isReplying, let msg = self.viewmodel.operationModel?.message {
@@ -726,7 +726,7 @@ extension ChatViewController {
         }else if index == 3 {
             showBottomVideoAction(self, false)
         }else {
-            self.view.makeToast(localizable("open_soon"))
+            self.showToast(localizable("open_soon"))
         }
     }
     
@@ -796,7 +796,7 @@ extension ChatViewController {
         }
         
         guard let image = info[.originalImage] as? UIImage else {
-            self.view.makeToast(localizable("image_is_nil"))
+            self.showToast(localizable("image_is_nil"))
             return
         }
         viewmodel.sendImageMessage(image: image, {[weak self] error in
@@ -908,7 +908,9 @@ extension ChatViewController {
             NEAuthManager.requestAudioAuthorization { granted in
                 if granted {
                 }else {
-                    self.showToast(localizable("没有麦克风权限"))
+                    DispatchQueue.main.async {
+                        self.showToast(localizable("没有麦克风权限"))
+                    }
                 }
             }
         }
@@ -975,7 +977,7 @@ extension ChatViewController {
     public func playAudio(_ filePath: String, didBeganWithError error: Error?) {
         print(#function + "\(error)")
         if let e = error {
-            self.view.makeToast(e.localizedDescription)
+            self.showToast(e.localizedDescription)
             // stop
             self.playingCell?.stopAnimation()
         }
@@ -984,7 +986,7 @@ extension ChatViewController {
     public func playAudio(_ filePath: String, didCompletedWithError error: Error?) {
         print(#function + "\(error)")
         if let e = error {
-            self.view.makeToast(e.localizedDescription)
+            self.showToast(e.localizedDescription)
         }
         // stop
         self.playingCell?.stopAnimation()
@@ -993,7 +995,7 @@ extension ChatViewController {
     public func stopPlayAudio(_ filePath: String, didCompletedWithError error: Error?) {
         print(#function + "\(error)")
         if let e = error {
-            self.view.makeToast(e.localizedDescription)
+            self.showToast(e.localizedDescription)
         }
         self.playingCell?.stopAnimation()
     }
@@ -1021,7 +1023,7 @@ extension ChatViewController {
         print("[record] sdk Completed error:\(error)")
         self.menuView.stopRecordAnimation()
         guard let fp = filePath else {
-            self.view.makeToast(error?.localizedDescription)
+            self.showToast(error?.localizedDescription ?? "")
             return
         }
         let dur = recordDuration(filePath: fp)
@@ -1030,13 +1032,13 @@ extension ChatViewController {
         if dur > 1 {
             self.viewmodel.sendAudioMessage(filePath: fp, { error in
                 if let e = error {
-                    self.view.makeToast(e.localizedDescription)
+                    self.showToast(e.localizedDescription)
                 }else {
                     
                 }
             })
         }else {
-            self.view.makeToast(localizable("录音时间太短"))
+            self.showToast(localizable("录音时间太短"))
         }
     }
     

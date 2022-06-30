@@ -6,7 +6,7 @@ import Foundation
 import NEKitTeam
 import NEKitCore
 import NEKitCoreIM
-
+import NIMSDK
 public class TeamRouter {
     
     public static var iconUrls = ["https://s.netease.im/safe/ABg8YjWQWvcqO6sAAAAAAAAAAAA?_im_url=1",
@@ -76,5 +76,17 @@ public class TeamRouter {
                 }
             }
         }
+        
+        Router.shared.register(SearchMessageRouter){ param in
+
+            let nav = param["nav"] as? UINavigationController
+            if let tid = param["teamId"] as? String {
+                let session = NIMSession(tid, type: .team)
+                let searchMsgCtrl = TeamHistoryMessageController(session: session)
+                nav?.pushViewController(searchMsgCtrl, animated: true)
+            }
+
+        }
+        
     }
 }

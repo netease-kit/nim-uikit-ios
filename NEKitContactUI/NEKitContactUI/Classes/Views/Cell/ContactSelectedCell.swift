@@ -35,8 +35,8 @@ class ContactSelectedCell: ContactTableViewCell {
         ])
     }
     
-    override func setModel(_ model: ContactInfo, _ config: ContactsConfig) {
-        super.setModel(model, config)
+    override func setModel(_ model: ContactInfo) {
+        super.setModel(model)
         if model.isSelected == false {
             sImage.isHighlighted = false
         }else {

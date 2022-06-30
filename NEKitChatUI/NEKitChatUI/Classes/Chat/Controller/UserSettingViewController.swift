@@ -167,7 +167,7 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
                         return true
                     }){
                         weakSelf?.navigationController?.viewControllers = allControllers
-                        Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
+                        Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
                     }
                 }
             }else if let error = param["msg"] as? String {

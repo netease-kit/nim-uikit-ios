@@ -11,7 +11,7 @@ public struct ChatRouter {
         
        
         // p2p
-        Router.shared.register("pushChatVC") { param in
+        Router.shared.register(PushP2pChatVCRouter) { param in
             print("param:\(param)")
             let nav = param["nav"] as? UINavigationController
             guard let session = param["session"] as? NIMSession else {
@@ -22,7 +22,7 @@ public struct ChatRouter {
         }
         
         // group
-        Router.shared.register(ChatPushGroupVC) { param in
+        Router.shared.register(PushTeamChatVCRouter) { param in
             print("param:\(param)")
             let nav = param["nav"] as? UINavigationController
             guard let session = param["session"] as? NIMSession else {

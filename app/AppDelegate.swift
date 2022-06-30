@@ -112,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         TeamRouter.register()
         ConversationRouter.register()
         
-        Router.shared.register(MeSetting) { param in
+        Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
                 let me = PersonInfoViewController()
                 nav.pushViewController(me, animated: true)

@@ -11,7 +11,7 @@ import NEKitCore
 
 public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     
-    weak var uiConfig: ContactsConfig?
+    
     
     public lazy var arrow: UIImageView = {
         let imageView = UIImageView(image:UIImage.ne_imageNamed(name: "arrowRight"))
@@ -82,21 +82,18 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     
     
     
-    func setConfig(_ config: ContactsConfig){
+    func setConfig(){
         self.titleLabel.font = NEKitContactConfig.shared.ui.titleFont
         self.titleLabel.textColor = NEKitContactConfig.shared.ui.titleColor
-        self.nameLabel.font = config.cellNameFont
-        self.nameLabel.textColor = config.cellNameColor
+        self.nameLabel.font =  UIFont.systemFont(ofSize: 14.0)
+        self.nameLabel.textColor = UIColor.white
     }
     
-    public func setModel(_ model: ContactInfo, _ config: ContactsConfig) {
+    public func setModel(_ model: ContactInfo) {
         guard let user = model.user else {
             return
         }
-        if uiConfig == nil {
-            uiConfig = config
-            setConfig(config)
-        }
+        setConfig()
         
         if model.contactCellType == 2 {
             // person

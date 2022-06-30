@@ -7,9 +7,10 @@ import UIKit
 import NEKitCoreIM
 import NEKitCore
 
-public class ContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SystemMessageProviderDelegate,FriendProviderDelegate {
+
+open class ContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SystemMessageProviderDelegate,FriendProviderDelegate {
     
-    lazy var uiConfig = ContactsConfig()
+    
     
     public var customCells:[Int : ContactTableViewCell.Type] = [ContactCellType.ContactPerson.rawValue : ContactTableViewCell.self, ContactCellType.ContactOthers.rawValue : ContactTableViewCell.self] // custom ui cell
     
@@ -22,19 +23,18 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
         ContactHeadItem(name: "我的群聊", imageName: "group", router: ContactGroupRouter, color: UIColor(hexString: "#BE65D9"))]
     )
     
-    public init(withConfig custom: ContactsConfig){
+    @objc
+    public init(){
         super.init(nibName: nil, bundle: nil)
-        uiConfig = custom
         viewModel.contactRepo.addNotificationDelegate(delegate: self)
         viewModel.contactRepo.addContactDelegate(delegate: self)
-        
-//        NEKitContactConfig.shared.ui.avatarType = .rectangle
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
+    @objc
     public override func viewDidLoad() {
         super.viewDidLoad()
         weak var weakSelf = self
@@ -49,6 +49,7 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
          loadData()
     }
     
+    @objc
     func commonUI() {
         self.tableView.separatorStyle = .none
         self.tableView.delegate = self
@@ -63,9 +64,9 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
         ])
         self.tableView.register(ContactTableViewCell.self, forCellReuseIdentifier: "\(ContactTableViewCell.self)")
         self.tableView.register(ContactSectionView.self, forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))")
-        self.tableView.rowHeight = uiConfig.rowHeight
-        self.tableView.sectionHeaderHeight = uiConfig.sectionHeaderHeight
-        self.tableView.sectionFooterHeight = uiConfig.sectionFooterHeight
+        self.tableView.rowHeight = 52
+        self.tableView.sectionHeaderHeight = 40
+        self.tableView.sectionFooterHeight = 0
         self.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     }
     
@@ -86,7 +87,7 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "\(ContactTableViewCell.self)", for: indexPath) as! ContactTableViewCell
-        cell.setModel(info, uiConfig)
+        cell.setModel(info)
         if indexPath.section == 0 && indexPath.row == 0 && viewModel.unreadCount > 0  {
             cell.redAngleView.isHidden = false
             cell.redAngleView.text = "\(viewModel.unreadCount)"
@@ -104,7 +105,7 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if viewModel.contacts[section].initial.count > 0 {
-            return uiConfig.sectionHeaderHeight
+            return 40
         }
         return 0
     }
@@ -117,7 +118,7 @@ public class ContactsViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return uiConfig.rowHeight
+        return 52
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -233,10 +234,8 @@ extension ContactsViewController {
     }
     
     @objc private func searchContact(){
-        Router.shared.use(SearchContactRouter, parameters: ["nav": self.navigationController as Any], closure: nil)
-        
+        Router.shared.use(SearchContactPageRouter, parameters: ["nav": self.navigationController as Any], closure: nil)
     }
-
     
 }
         

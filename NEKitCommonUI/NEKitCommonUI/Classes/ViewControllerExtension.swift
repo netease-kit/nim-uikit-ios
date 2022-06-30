@@ -244,7 +244,7 @@ extension UIViewController: UIImagePickerControllerDelegate {
                 //在需要的地方present出来
                 self.present(photoPicker, animated: true, completion: nil)
             }else {
-                self.view.makeToast("未打开相册权限")
+                self.showToast("未打开相册权限")
             }
         }
     }
@@ -259,7 +259,9 @@ extension UIViewController: UIImagePickerControllerDelegate {
                 //在需要的地方present出来
                 self.present(photoPicker, animated: true, completion: nil)
             }else {
-                self.view.makeToast("未打开相册权限")
+//                self.view.makeToast("未打开相册权限")
+                self.showToast("未打开相册权限")
+
             }
         }
     }

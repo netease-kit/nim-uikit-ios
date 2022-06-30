@@ -172,7 +172,7 @@ public class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UIT
         NIMSDK.shared().chatManager.queryMessageReceiptDetail(message) { anError, receiptInfo in
             print("anError:\(anError) receiptInfo:\(receiptInfo)")
             if let error = anError {
-                self.view.makeToast(error.localizedDescription)
+                self.showToast(error.localizedDescription)
                 return
             }
             

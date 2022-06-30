@@ -7,5 +7,5 @@ import Foundation
 import UIKit
 
 public protocol ContactCellDataProtrol {
-    func setModel(_ model: ContactInfo, _ config: ContactsConfig)
+    func setModel(_ model: ContactInfo)
 }

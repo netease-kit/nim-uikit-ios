@@ -17,7 +17,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
     public var filterUsers: Set<String>?
 
     public var limit = 10   //max select count
-    lazy var uiConfig = ContactsConfig()
+   
     var selectArray = [ContactInfo]()
     let selectDic = [String : ContactInfo]()
     lazy var collection : UICollectionView = {
@@ -92,9 +92,9 @@ open class ContactsSelectedViewController: ContactBaseViewController {
             }
         }
         tableView.register(ContactSectionView.self, forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))")
-        tableView.rowHeight = uiConfig.rowHeight
-        tableView.sectionHeaderHeight = uiConfig.sectionHeaderHeight
-        tableView.sectionFooterHeight = uiConfig.sectionFooterHeight
+        tableView.rowHeight = 52
+        tableView.sectionHeaderHeight = 40
+        tableView.sectionFooterHeight = 0
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
         tableView.separatorStyle = .none
         
@@ -176,7 +176,7 @@ extension ContactsSelectedViewController: UICollectionViewDelegate, UICollection
         let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
         if let cellClass = customCells[info.contactCellType]{
             let anyCell = tableView.dequeueReusableCell(withIdentifier: "\(NSStringFromClass(cellClass))", for: indexPath) as? ContactTableViewCell
-            anyCell?.setModel(info, uiConfig)
+            anyCell?.setModel(info)
             if let cell = anyCell {
                 return cell
             }
@@ -192,7 +192,7 @@ extension ContactsSelectedViewController: UICollectionViewDelegate, UICollection
     
     public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if viewModel.contacts[section].initial.count > 0 {
-            return uiConfig.sectionHeaderHeight
+            return 40
         }
         return 0
     }

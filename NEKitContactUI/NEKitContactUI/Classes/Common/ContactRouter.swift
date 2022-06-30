@@ -23,7 +23,7 @@ public struct ContactRouter {
             nav?.pushViewController(contactSelectVC, animated: true)
         }
         
-        Router.shared.register(ContactSearchUserRouter) { param in
+        Router.shared.register(ContactAddFriendRouter) { param in
             let nav = param["nav"] as? UINavigationController
             let findFrined = FindFriendViewController()
             nav?.pushViewController(findFrined, animated: true)

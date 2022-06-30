@@ -69,8 +69,7 @@ open class ConversationController: UIViewController {
 extension ConversationController: ConversationNavViewDelegate {
     
     func searchAction(){
-        let ctrl = ConversationSearchController()
-        self.navigationController?.pushViewController(ctrl, animated: true)
+        Router.shared.use(SearchContactPageRouter, parameters: ["nav": self.navigationController as Any], closure: nil)
     }
     
     func didClickAddBtn() {
@@ -96,7 +95,7 @@ extension ConversationController: ConversationNavViewDelegate {
         addFriend.showName = localizable("add_friend")
         addFriend.image = UIImage.ne_imageNamed(name: "add_friend")
         addFriend.completion = {
-            Router.shared.use(ContactSearchUserRouter, parameters: ["nav": self.navigationController as Any]) { obj, routerState, str in
+            Router.shared.use(ContactAddFriendRouter, parameters: ["nav": self.navigationController as Any]) { obj, routerState, str in
             }
         }
         items.append(addFriend)
@@ -131,7 +130,7 @@ extension ConversationController: ConversationNavViewDelegate {
             print("create discuss ", param)
             if let code = param["code"] as? Int, let teamid = param["teamId"] as? String, code == 0 {
                 let session = weakSelf?.viewmodel.repo.createTeamSession(teamid)
-                Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
             }else if let msg = param["msg"] as? String {
                 weakSelf?.showToast(msg)
             }
@@ -148,7 +147,7 @@ extension ConversationController: ConversationNavViewDelegate {
             print("create senior : ", param)
             if let code = param["code"] as? Int, let teamid = param["teamId"] as? String, code == 0 {
                 let session = weakSelf?.viewmodel.repo.createTeamSession(teamid)
-                Router.shared.use(ChatPushGroupVC, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
+                Router.shared.use(PushTeamChatVCRouter, parameters: ["nav": weakSelf?.navigationController as Any, "session" : session as Any], closure: nil)
             }else if let msg = param["msg"] as? String {
                 weakSelf?.showToast(msg)
             }
