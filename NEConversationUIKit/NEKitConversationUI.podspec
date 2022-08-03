@@ -34,7 +34,7 @@ TODO: Add long description of the pod here.
   s.resource = 'NEKitConversationUI/Assets/**/*'
   # s.public_header_files = 'Pod/Classes/**/*.h'
   
-  s.dependency 'NEKitCommonUI'
+  s.dependency 'NECommonUIKit'
   s.dependency 'NEConversationKit'
   
 end

@@ -33,8 +33,8 @@ TODO: Add long description of the pod here.
   }
   
   s.resource = 'NEKitQChatUI/Assets/**/*'
-  s.dependency 'NEKitCommonUI'
-  s.dependency 'NEKitQChat'
+  s.dependency 'NECommonUIKit'
+  s.dependency 'NEQChatKit'
 
 
 end

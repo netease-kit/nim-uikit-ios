@@ -29,6 +29,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'NEKitContactUI/Classes/**/*'
   s.resource = 'NEKitContactUI/Assets/**/*'
-  s.dependency 'NEKitContact'
-  s.dependency 'NEKitCommonUI'
+  s.dependency 'NEContactKit'
+  s.dependency 'NECommonUIKit'
 end
