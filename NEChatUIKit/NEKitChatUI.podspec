@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "NEKitChatUI"
-  spec.version      = "9.2.6"
+  spec.version      = "9.2.6-rc01"
   spec.summary      = "Chat Module of IM."
 
   # This description is used to generate tags and improve search results.
@@ -40,6 +40,6 @@ TODO: Add long description of the pod here.
   }
   
   spec.resource = 'NEKitChatUI/Assets/**/*'
-  spec.dependency 'NEKitChat'
-  spec.dependency 'NEKitCommonUI'
+  spec.dependency 'NEChatKit'
+  spec.dependency 'NECommonUIKit'
 end

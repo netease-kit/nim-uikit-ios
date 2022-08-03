@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEKitCommonUI'
-  s.version          = '9.2.6'
+  s.version          = '9.2.6-rc01'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -40,7 +40,7 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   
-  s.dependency 'NEKitCommon'
+  s.dependency 'NECommonKit'
   s.dependency 'Toast-Swift'
   s.dependency 'MJRefresh'
   s.dependency 'Toast'

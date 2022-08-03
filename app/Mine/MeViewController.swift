@@ -14,7 +14,7 @@ class MeViewController: UIViewController {
 
 //    private let mineData = [["收藏":"mine_collection"],["关于云信":"about_yunxin"],["设置":"mine_setting"]]
     private let mineData = [["关于云信":"about_yunxin"],["设置":"mine_setting"]]
-    private let userProvider = FriendProvider.shared
+    private let userProvider = UserInfoProvider.shared
     
     lazy var header: NEUserHeaderView = {
         let view = NEUserHeaderView(frame: .zero)

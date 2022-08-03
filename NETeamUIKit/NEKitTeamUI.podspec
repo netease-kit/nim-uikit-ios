@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEKitTeamUI'
-  s.version          = '9.2.6'
+  s.version          = '9.2.6-rc01'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -39,5 +39,5 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
   s.dependency 'NEKitCommonUI'
-  s.dependency 'NEKitTeam'
+  s.dependency 'NETeamKit'
 end

@@ -21,12 +21,14 @@ public class  PersonInfoViewModel{
     
     var sectionData = [SettingSectionModel]()
     public let friendProvider = FriendProvider.shared
+    public let userProvider = UserInfoProvider.shared
+
     private var userInfo:User?
     weak var delegate:PersonInfoViewModelDelegate?
     
     func getData(){
         sectionData.removeAll()
-        userInfo = friendProvider.getUserInfo(userId: IMKitLoginManager.instance.imAccid)
+        userInfo = userProvider.getUserInfo(userId: IMKitLoginManager.instance.imAccid)
         sectionData.append(getFirstSection())
         sectionData.append(getSecondSection())
     }
@@ -153,7 +155,7 @@ public class  PersonInfoViewModel{
     
     func updateAvatar(avatar:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.avatar.rawValue):avatar]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -164,7 +166,7 @@ public class  PersonInfoViewModel{
     
     func updateSex(sex:NIMUserGender,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.gender.rawValue):NSNumber.init(value: sex.rawValue)]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -176,7 +178,7 @@ public class  PersonInfoViewModel{
     
     func updateBirthday(birthDay:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.birth.rawValue):birthDay]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -188,7 +190,7 @@ public class  PersonInfoViewModel{
     
     func updateNickName(name:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.nick.rawValue):name]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -199,7 +201,7 @@ public class  PersonInfoViewModel{
     
     func updateMobile(mobile:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.mobile.rawValue):mobile]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -210,7 +212,7 @@ public class  PersonInfoViewModel{
     
     func updateEmail(email:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.email.rawValue):email]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
@@ -221,7 +223,7 @@ public class  PersonInfoViewModel{
     
     func updateSign(sign:String,_ completion:@escaping (NSError?)->Void) {
         let changeValue = [NSNumber.init(value: NIMUserInfoUpdateTag.sign.rawValue):sign]
-        friendProvider.updateMyUserInfo(values: changeValue) { error in
+        userProvider.updateMyUserInfo(values: changeValue) { error in
             if error == nil {
                 completion(nil)
             }else {
