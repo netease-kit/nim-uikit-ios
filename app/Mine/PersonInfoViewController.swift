@@ -162,7 +162,7 @@ extension PersonInfoViewController:UINavigationControllerDelegate {
                         })
                        
                     }else {
-                        QChatLog.errorLog(weakSelf?.className ?? "", desc: "❌upload image failed,error = \(error!)")
+                        NELog.errorLog(weakSelf?.className ?? "", desc: "❌upload image failed,error = \(error!)")
                     }
                     self.view.hideToastActivity()
                 }
