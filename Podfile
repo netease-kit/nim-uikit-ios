@@ -13,18 +13,20 @@ target 'app' do
   pod 'NEChatUIKit', '9.2.6-rc01'
   pod 'NETeamUIKit', '9.2.6-rc01'
   
+
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
 #  pod 'NEChatKit', '9.2.6-rc01'
 #  pod 'NEConversationKit', '9.2.6-rc01'
 #  pod 'NEContactKit', '9.2.6-rc01'
 #  pod 'NETeamKit', '9.2.6-rc01'
+#  pod 'NEQChatKit','9.2.6-rc01'
 #
 #
-#  pod 'NEKitQChatUI', :path => 'NEKitQChatUI/NEKitQChatUI.podspec'
-#  pod 'NEKitContactUI', :path => 'NEKitContactUI/NEKitContactUI.podspec'
-#  pod 'NEKitConversationUI', :path => 'NEKitConversationUI/NEKitConversationUI.podspec'
-#  pod 'NEKitCommonUI', :path => 'NEKitCommonUI/NEKitCommonUI.podspec'
-#  pod 'NEKitTeamUI', :path => 'NEKitTeamUI/NEKitTeamUI.podspec'
-#  pod 'NEKitChatUI', :path => 'NEKitChatUI/NEKitChatUI.podspec'
-    
+#  pod 'NEKitQChatUI', :path => 'NEQChatUIKit/NEKitQChatUI.podspec'
+#  pod 'NEKitContactUI', :path => 'NEContactUIKit/NEKitContactUI.podspec'
+#  pod 'NEKitConversationUI', :path => 'NEConversationUIKit/NEKitConversationUI.podspec'
+#  pod 'NEKitCommonUI', :path => 'NECommonUIKit/NEKitCommonUI.podspec'
+#  pod 'NEKitTeamUI', :path => 'NETeamUIKit/NEKitTeamUI.podspec'
+#  pod 'NEKitChatUI', :path => 'NEChatUIKit/NEKitChatUI.podspec'
+#
 end
