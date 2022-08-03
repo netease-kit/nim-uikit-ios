@@ -7,17 +7,17 @@ target 'app' do
   
   pod 'YXLogin', '1.0.0'
   
-  pod 'NEContactUIKit', '9.2.4'
-  pod 'NEQChatUIKit', '9.2.4'
-  pod 'NEConversationUIKit', '9.2.4'
-  pod 'NEChatUIKit', '9.2.4'
-  pod 'NETeamUIKit', '9.2.4'
+  pod 'NEContactUIKit', '9.2.6-rc01'
+  pod 'NEQChatUIKit', '9.2.6-rc01'
+  pod 'NEConversationUIKit', '9.2.6-rc01'
+  pod 'NEChatUIKit', '9.2.6-rc01'
+  pod 'NETeamUIKit', '9.2.6-rc01'
   
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-#  pod 'NEChatKit', '9.2.4'
-#  pod 'NEConversationKit', '9.2.4'
-#  pod 'NEContactKit', '9.2.4'
-#  pod 'NETeamKit', '9.2.4'
+#  pod 'NEChatKit', '9.2.6-rc01'
+#  pod 'NEConversationKit', '9.2.6-rc01'
+#  pod 'NEContactKit', '9.2.6-rc01'
+#  pod 'NETeamKit', '9.2.6-rc01'
 #
 #
 #  pod 'NEKitQChatUI', :path => 'NEKitQChatUI/NEKitQChatUI.podspec'
