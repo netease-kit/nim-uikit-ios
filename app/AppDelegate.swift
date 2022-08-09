@@ -39,7 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
        
         //login action
         startLogin(account: <#imaccid#>, token: <#imToken#>)
-
     }
     
     @objc func refreshRoot(){
@@ -76,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        QChatLog.infoLog("app delegate : ", desc: error.localizedDescription)
+        NELog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
     func startLogin(account:String,token:String){
