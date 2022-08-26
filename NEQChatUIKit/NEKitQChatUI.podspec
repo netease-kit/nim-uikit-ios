@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEKitQChatUI'
-  s.version          = '9.2.6-rc01'
+  s.version          = '9.2.7'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -24,7 +24,11 @@ TODO: Add long description of the pod here.
   s.license          = { :'type' => 'Copyright', :'text' => ' Copyright 2022 Netease '}
   s.author           = 'yunxin engineering department'
   s.source           = { :git => 'ssh://git@g.hz.netease.com:22222/yunxin-app/xkit-ios.git', :tag => s.version.to_s }
-
+  s.pod_target_xcconfig = {
+      'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
+    }
+  s.user_target_xcconfig = { 'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES' }
+  
   s.ios.deployment_target = '9.0'
   s.source_files = 'NEKitQChatUI/Classes/**/*'
   
