@@ -1,10 +1,8 @@
-/* 
-  YXLogin.strings
-  Pods
 
-  Created by yu chen on 2021/12/24.
-  
-*/
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
 //MAKR：common
 "ok"="ok";
 "exceed"="超出";
@@ -163,7 +161,20 @@
 "finish"="完成";
 "removeMember"="移除成员";
 "removeRole"="移除身份组";
-
+//MARK:身份组权限设置
+"auth1"="ManageServer";
+"auth2"="管理频道属性";
+"auth3"="管理频道权限";
+"auth4"="发送消息";
+"auth5"="ModifySelfInfo";
+"auth6"="InviteToServer";
+"auth7"="KickOthersInServer";
+"auth8"="ModifyOthersInfoInServer";
+"auth9"="频道中撤回他人消息";
+"auth10"="频道中删除他人消息";
+"auth11"="RemindOther";
+"auth12"="RemindAll";
+"auth13"="管理频道名单";
 
 //MARK：error toast
 "param_error"="Parameter error";

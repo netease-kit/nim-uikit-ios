@@ -1,247 +1,278 @@
 
-// Copyright (c) 2022 NetEase, Inc.  All rights reserved.
-// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
 
 import UIKit
 import NEKitCoreIM
 import NEKitCore
 
 protocol ChatBaseCellDelegate: AnyObject {
-    func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?)
-    func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
-    func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
-    func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?)
 //     reedit button event on revokecell
-    func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?)
-    func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?)
-
+  func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 class ChatBaseRightCell: ChatBaseCell {
-    public var pinImage = UIImageView()
-    public var avatarImage = UIImageView()
-    public var nameLabel = UILabel()
-    public var bubbleImage = UIImageView()
-    public var activityView = ChatActivityIndicatorView()
-    public var readView = CirleProgressView(frame: CGRect(x: 0, y: 0, width: 16, height: 16))
-    public var seletedBtn = UIButton(type: .custom)
-    public var pinLabel = UILabel()
-    public var bubbleW: NSLayoutConstraint?
-    public weak var delegate: ChatBaseCellDelegate?
-    public var model: MessageContentModel?
-    private let bubbleWidth = 32.0
-    private var pinLabelW: NSLayoutConstraint?
-    private var pinLabelH: NSLayoutConstraint?
+  public var pinImage = UIImageView()
+  public var avatarImage = UIImageView()
+  public var nameLabel = UILabel()
+  public var bubbleImage = UIImageView()
+  public var activityView = ChatActivityIndicatorView()
+  public var readView = CirleProgressView(frame: CGRect(x: 0, y: 0, width: 16, height: 16))
+  public var seletedBtn = UIButton(type: .custom)
+  public var pinLabel = UILabel()
+  public var bubbleW: NSLayoutConstraint?
+  public weak var delegate: ChatBaseCellDelegate?
+  public var model: MessageContentModel?
+  private let bubbleWidth = 32.0
+  private var pinLabelW: NSLayoutConstraint?
+  private var pinLabelH: NSLayoutConstraint?
 
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    baseCommonUI()
+    addGesture()
+    initSubviewsLayout()
+  }
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        baseCommonUI()
-        addGesture()
-        initSubviewsLayout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func baseCommonUI() {
-        // avatar
-        self.selectionStyle = .none
-        self.backgroundColor = .white
-        self.avatarImage.layer.cornerRadius = 16
-        self.avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
-        self.avatarImage.translatesAutoresizingMaskIntoConstraints = false
-        self.avatarImage.clipsToBounds = true
-        self.avatarImage.isUserInteractionEnabled = true
-        self.avatarImage.contentMode = .scaleAspectFill
-        self.contentView.addSubview(self.avatarImage)
-        NSLayoutConstraint.activate([
-            self.avatarImage.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -16),
-            self.avatarImage.widthAnchor.constraint(equalToConstant: 32),
-            self.avatarImage.heightAnchor.constraint(equalToConstant: 32),
-            self.avatarImage.topAnchor.constraint(equalTo: self.topAnchor, constant: 4)
-        ])
-        
-        // name
-        self.nameLabel.textAlignment = .center
-        self.nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.nameLabel.font = UIFont.systemFont(ofSize: 12)
-        self.nameLabel.textColor = .white
-        self.contentView.addSubview(self.nameLabel)
-        NSLayoutConstraint.activate([
-            self.nameLabel.leftAnchor.constraint(equalTo: self.avatarImage.leftAnchor),
-            self.nameLabel.rightAnchor.constraint(equalTo: self.avatarImage.rightAnchor),
-            self.nameLabel.topAnchor.constraint(equalTo: self.avatarImage.topAnchor),
-            self.nameLabel.bottomAnchor.constraint(equalTo: self.avatarImage.bottomAnchor),
-        ])
-        
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  func baseCommonUI() {
+    // avatar
+    selectionStyle = .none
+    backgroundColor = .white
+    avatarImage.layer.cornerRadius = 16
+    avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
+    avatarImage.translatesAutoresizingMaskIntoConstraints = false
+    avatarImage.clipsToBounds = true
+    avatarImage.isUserInteractionEnabled = true
+    avatarImage.contentMode = .scaleAspectFill
+    contentView.addSubview(avatarImage)
+    NSLayoutConstraint.activate([
+      avatarImage.rightAnchor.constraint(equalTo: rightAnchor, constant: -16),
+      avatarImage.widthAnchor.constraint(equalToConstant: 32),
+      avatarImage.heightAnchor.constraint(equalToConstant: 32),
+      avatarImage.topAnchor.constraint(equalTo: topAnchor, constant: 4),
+    ])
+
+    // name
+    nameLabel.textAlignment = .center
+    nameLabel.translatesAutoresizingMaskIntoConstraints = false
+    nameLabel.font = UIFont.systemFont(ofSize: 12)
+    nameLabel.textColor = .white
+    contentView.addSubview(nameLabel)
+    NSLayoutConstraint.activate([
+      nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
+      nameLabel.rightAnchor.constraint(equalTo: avatarImage.rightAnchor),
+      nameLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor),
+      nameLabel.bottomAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+    ])
+
 //        bubbleImage
-        self.bubbleImage.translatesAutoresizingMaskIntoConstraints = false
-        if let image = NEKitChatConfig.shared.ui.rightBubbleBg {
-            self.bubbleImage.image = image.resizableImage(withCapInsets: UIEdgeInsets.init(top: 35, left: 25, bottom: 10, right: 25))
-        }
-        self.bubbleImage.isUserInteractionEnabled = true
-        self.contentView.addSubview(self.bubbleImage)
-        let top = NSLayoutConstraint.init(item: self.bubbleImage, attribute: .top, relatedBy: .equal, toItem: self.contentView, attribute: .top, multiplier: 1.0, constant: 4)
-        let right = NSLayoutConstraint.init(item: self.bubbleImage, attribute: .right, relatedBy: .equal, toItem: self.avatarImage, attribute: .left, multiplier: 1.0, constant: -8)
-        bubbleW = NSLayoutConstraint.init(item: self.bubbleImage, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: bubbleWidth)
-        self.contentView.addConstraints([top, right])
-        self.bubbleImage.addConstraint(bubbleW!)
+    bubbleImage.translatesAutoresizingMaskIntoConstraints = false
+    if let image = NEKitChatConfig.shared.ui.rightBubbleBg {
+      bubbleImage.image = image
+        .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
+    }
+    bubbleImage.isUserInteractionEnabled = true
+    contentView.addSubview(bubbleImage)
+    let top = NSLayoutConstraint(
+      item: bubbleImage,
+      attribute: .top,
+      relatedBy: .equal,
+      toItem: contentView,
+      attribute: .top,
+      multiplier: 1.0,
+      constant: 4
+    )
+    let right = NSLayoutConstraint(
+      item: bubbleImage,
+      attribute: .right,
+      relatedBy: .equal,
+      toItem: avatarImage,
+      attribute: .left,
+      multiplier: 1.0,
+      constant: -8
+    )
+    bubbleW = NSLayoutConstraint(
+      item: bubbleImage,
+      attribute: .width,
+      relatedBy: .equal,
+      toItem: nil,
+      attribute: .notAnAttribute,
+      multiplier: 1.0,
+      constant: bubbleWidth
+    )
+    contentView.addConstraints([top, right])
+    bubbleImage.addConstraint(bubbleW!)
 
 //        activityView
-        self.contentView.addSubview(activityView)
-        self.activityView.translatesAutoresizingMaskIntoConstraints = false
-        self.activityView.failBtn.addTarget(self, action: #selector(resend), for: .touchUpInside)
-        NSLayoutConstraint.activate([
-            self.activityView.rightAnchor.constraint(equalTo: self.bubbleImage.leftAnchor, constant: -8),
-            self.activityView.centerYAnchor.constraint(equalTo: self.bubbleImage.centerYAnchor, constant: 0),
-            self.activityView.widthAnchor.constraint(equalToConstant: 25),
-            self.activityView.heightAnchor.constraint(equalToConstant: 25),
-        ])
-        
+    contentView.addSubview(activityView)
+    activityView.translatesAutoresizingMaskIntoConstraints = false
+    activityView.failBtn.addTarget(self, action: #selector(resend), for: .touchUpInside)
+    NSLayoutConstraint.activate([
+      activityView.rightAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: -8),
+      activityView.centerYAnchor.constraint(equalTo: bubbleImage.centerYAnchor, constant: 0),
+      activityView.widthAnchor.constraint(equalToConstant: 25),
+      activityView.heightAnchor.constraint(equalToConstant: 25),
+    ])
+
 //        readView
-        self.contentView.addSubview(readView)
-        self.readView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.readView.rightAnchor.constraint(equalTo: self.bubbleImage.leftAnchor, constant: -8),
-            self.readView.bottomAnchor.constraint(equalTo: self.bubbleImage.bottomAnchor, constant: 0),
-            self.readView.widthAnchor.constraint(equalToConstant: 16),
-            self.readView.heightAnchor.constraint(equalToConstant: 16),
-        ])
-        
+    contentView.addSubview(readView)
+    readView.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      readView.rightAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: -8),
+      readView.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
+      readView.widthAnchor.constraint(equalToConstant: 16),
+      readView.heightAnchor.constraint(equalToConstant: 16),
+    ])
+
 //        seletedBtn
-        self.contentView.addSubview(seletedBtn)
-        self.seletedBtn.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.seletedBtn.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 16),
-            self.seletedBtn.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 0),
-            self.seletedBtn.widthAnchor.constraint(equalToConstant: 18),
-            self.seletedBtn.heightAnchor.constraint(equalToConstant: 18),
-        ])
-        
-        self.contentView.addSubview(pinLabel)
-        self.pinLabel.translatesAutoresizingMaskIntoConstraints = false
-        pinLabel.textColor = UIColor.ne_greenText
-        pinLabel.font = UIFont.systemFont(ofSize: 12)
-        pinLabel.textAlignment = .right
-        pinLabelW = self.pinLabel.widthAnchor.constraint(equalToConstant: 210)
-        pinLabelH = self.pinLabel.heightAnchor.constraint(equalToConstant: 0)
-        NSLayoutConstraint.activate([
-            self.pinLabel.topAnchor.constraint(equalTo: self.bubbleImage.bottomAnchor, constant: 4),
-            self.pinLabel.rightAnchor.constraint(equalTo: self.bubbleImage.rightAnchor, constant: 0),
-            pinLabelW!,
-            pinLabelH!,
-            self.pinLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -4),
-        ])
-        
-        pinImage.translatesAutoresizingMaskIntoConstraints = false
-        pinImage.contentMode = .scaleAspectFit
-        self.contentView.addSubview(pinImage)
-        NSLayoutConstraint.activate([
-            pinImage.topAnchor.constraint(equalTo: self.bubbleImage.bottomAnchor, constant: 4),
-            pinImage.widthAnchor.constraint(equalToConstant: 10),
-            pinImage.rightAnchor.constraint(equalTo: self.pinLabel.leftAnchor, constant: -2),
-            pinImage.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -4),
-        ])
-    }
-    
-    func addGesture() {
+    contentView.addSubview(seletedBtn)
+    seletedBtn.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      seletedBtn.leftAnchor.constraint(equalTo: leftAnchor, constant: 16),
+      seletedBtn.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0),
+      seletedBtn.widthAnchor.constraint(equalToConstant: 18),
+      seletedBtn.heightAnchor.constraint(equalToConstant: 18),
+    ])
+
+    contentView.addSubview(pinLabel)
+    pinLabel.translatesAutoresizingMaskIntoConstraints = false
+    pinLabel.textColor = UIColor.ne_greenText
+    pinLabel.font = UIFont.systemFont(ofSize: 12)
+    pinLabel.textAlignment = .right
+    pinLabelW = pinLabel.widthAnchor.constraint(equalToConstant: 210)
+    pinLabelH = pinLabel.heightAnchor.constraint(equalToConstant: 0)
+    NSLayoutConstraint.activate([
+      pinLabel.topAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 4),
+      pinLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
+      pinLabelW!,
+      pinLabelH!,
+      pinLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4),
+    ])
+
+    pinImage.translatesAutoresizingMaskIntoConstraints = false
+    pinImage.contentMode = .scaleAspectFit
+    contentView.addSubview(pinImage)
+    NSLayoutConstraint.activate([
+      pinImage.topAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 4),
+      pinImage.widthAnchor.constraint(equalToConstant: 10),
+      pinImage.rightAnchor.constraint(equalTo: pinLabel.leftAnchor, constant: -2),
+      pinImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4),
+    ])
+  }
+
+  func addGesture() {
 //        avatar
-        let tap  = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
-        self.avatarImage.addGestureRecognizer(tap)
-        
-        let messageTap  = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
-        self.bubbleImage.addGestureRecognizer(messageTap)
-        
-        let messageLongPress  = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+    let tap = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
+    avatarImage.addGestureRecognizer(tap)
+
+    let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
+    bubbleImage.addGestureRecognizer(messageTap)
+
+    let messageLongPress = UILongPressGestureRecognizer(
+      target: self,
+      action: #selector(longPress)
+    )
 //        messageLongPress.minimumPressDuration
-        self.bubbleImage.addGestureRecognizer(messageLongPress)
-        
-        let tapReadView = UITapGestureRecognizer(target: self, action: #selector(tapReadView))
-        self.readView.addGestureRecognizer(tapReadView)
-        
+    bubbleImage.addGestureRecognizer(messageLongPress)
+
+    let tapReadView = UITapGestureRecognizer(target: self, action: #selector(tapReadView))
+    readView.addGestureRecognizer(tapReadView)
+  }
+
+  func initSubviewsLayout() {
+    if NEKitChatConfig.shared.ui.avatarType == .rectangle {
+      avatarImage.layer.cornerRadius = NEKitChatConfig.shared.ui.avatarCornerRadius
+    } else if NEKitChatConfig.shared.ui.avatarType == .cycle {
+      avatarImage.layer.cornerRadius = 16.0
     }
-    
-    func initSubviewsLayout(){
-        if NEKitChatConfig.shared.ui.avatarType == .rectangle {
-            avatarImage.layer.cornerRadius = NEKitChatConfig.shared.ui.avatarCornerRadius
-        }else if NEKitChatConfig.shared.ui.avatarType == .cycle {
-            avatarImage.layer.cornerRadius = 16.0
-        }
-    }
-    
+  }
+
 //    MARK: event
-    @objc func tapAvatar(tap: UITapGestureRecognizer) {
-        print(#function)
-        self.delegate?.didTapAvatarView(self, self.model)
+
+  @objc func tapAvatar(tap: UITapGestureRecognizer) {
+    print(#function)
+    delegate?.didTapAvatarView(self, model)
+  }
+
+  @objc func tapMessage(tap: UITapGestureRecognizer) {
+    print(#function)
+    delegate?.didTapMessageView(self, model)
+  }
+
+  @objc func longPress(longPress: UILongPressGestureRecognizer) {
+    print(#function)
+    switch longPress.state {
+    case .began:
+      print("state:begin")
+      delegate?.didLongPressMessageView(self, model)
+    case .changed:
+      print("state:changed")
+    case .ended:
+      print("state:ended")
+    case .cancelled:
+      print("state:cancelled")
+    case .failed:
+      print("state:failed")
+    default:
+      print("state:default")
     }
-    
-    @objc func tapMessage(tap: UITapGestureRecognizer) {
-        print(#function)
-        self.delegate?.didTapMessageView(self, self.model)
-    }
-    
-    @objc func longPress(longPress: UILongPressGestureRecognizer) {
-        print(#function)
-        switch longPress.state {
-        case .began:
-            print("state:begin")
-            self.delegate?.didLongPressMessageView(self, self.model)
-        case .changed:
-            print("state:changed")
-        case .ended:
-            print("state:ended")
-        case .cancelled:
-            print("state:cancelled")
-        case .failed:
-            print("state:failed")
-        default:
-            print("state:default")
-        }
-    }
-    
-    @objc func resend(button: UIButton) {
-        print("state:default")
-        self.delegate?.didTapResendView(self, self.model)
-    }
-    
-    @objc func tapReadView(tap: UITapGestureRecognizer) {
-        print(#function)
-        self.delegate?.didTapReadView(self, self.model)
-    }
+  }
+
+  @objc func resend(button: UIButton) {
+    print("state:default")
+    delegate?.didTapResendView(self, model)
+  }
+
+  @objc func tapReadView(tap: UITapGestureRecognizer) {
+    print(#function)
+    delegate?.didTapReadView(self, model)
+  }
+
 //    MARK: set data
-    func setModel(_ model: MessageContentModel) {
-        self.model = model
-        self.updatePinStatus(model)
-        
-        bubbleW?.constant = model.contentSize.width
+
+  func setModel(_ model: MessageContentModel) {
+    self.model = model
+    updatePinStatus(model)
+
+    bubbleW?.constant = model.contentSize.width
 //        print("set model width : ", model.contentSize.width)
-        //avatar
-        self.nameLabel.text = model.shortName
-        self.avatarImage.backgroundColor = UIColor.colorWithNumber(number: UInt64(model.message?.from ?? "0"))
-        if let avatarURL = model.avatar {
-            self.avatarImage.sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
-                if error == nil {
-                    self?.nameLabel.isHidden = true
-                }else {
-                    self?.nameLabel.isHidden = false
-                }
-            }
-        }else {
-            self.avatarImage.image = nil
-            self.nameLabel.isHidden = false
+    // avatar
+    nameLabel.text = model.shortName
+    avatarImage.backgroundColor = UIColor
+      .colorWithNumber(number: UInt64(model.message?.from ?? "0"))
+    if let avatarURL = model.avatar {
+      avatarImage
+        .sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
+          if error == nil {
+            self?.nameLabel.isHidden = true
+          } else {
+            self?.nameLabel.isHidden = false
+          }
         }
-        switch model.message?.deliveryState {
-        case .delivering:
-            self.activityView.messageStatus = .sending
-        case .deliveried:
-            self.activityView.messageStatus = .successed
-        case .failed:
-            self.activityView.messageStatus = .failed
-        default: break
-        }
-        
+    } else {
+      avatarImage.image = nil
+      nameLabel.isHidden = false
+    }
+    switch model.message?.deliveryState {
+    case .delivering:
+      activityView.messageStatus = .sending
+    case .deliveried:
+      activityView.messageStatus = .successed
+    case .failed:
+      activityView.messageStatus = .failed
+    default: break
+    }
+
 //        read status
 //        if SettingProvider.shared.getMessageRead() && model.message?.deliveryState == .deliveried {
 //            self.readView.isHidden = false
@@ -264,59 +295,62 @@ class ChatBaseRightCell: ChatBaseCell {
 //        }else {
 //            readView.isHidden = true
 //        }
-        
-        if model.message?.deliveryState == .deliveried {
-            if model.message?.session?.sessionType == .P2P {
-                let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
-                if receiptEnable {
-                    self.readView.isHidden = false
-                    if let read = model.message?.isRemoteRead, read {
-                        readView.progress = 1
-                    }else {
-                        readView.progress = 0
-                    }
-                }else {
-                    self.readView.isHidden = true
-                }
-                
-            }else if model.message?.session?.sessionType == .team {
-                let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
-                if receiptEnable {
-                    self.readView.isHidden = false
-                    let  readCount = model.message?.teamReceiptInfo?.readCount ?? 0
-                    let  unreadCount = model.message?.teamReceiptInfo?.unreadCount ?? 0
-                    let total = Float(readCount + unreadCount)
-                    if total > 0 {
-                        readView.progress = Float(readCount)/total
-                    }else {
-                        readView.progress = 0
-                    }
-                }else {
-                    readView.isHidden = true
-                }
-            }
-        }else {
-            readView.isHidden = true
-        }
-        
-    }
-    
-    private func updatePinStatus(_ model: MessageContentModel) {
-        self.pinLabel.isHidden = !model.isPined
-        self.pinImage.isHidden = !model.isPined
-        self.contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui.chatPinColor : .white
-        if model.isPined {
-            if let text = model.pinShowName {
-                self.pinLabel.text = text + localizable("pin_text")
-            }
-            self.pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")
-            let size = String.getTextRectSize(self.pinLabel.text ?? localizable("pin_text"), font: UIFont.systemFont(ofSize: 11.0), size: CGSize(width: kScreenWidth - 56 - 22, height: CGFloat.greatestFiniteMagnitude))
-            self.pinLabelW?.constant = size.width
-            pinLabelH?.constant = chat_pin_height
-        }else {
-            self.pinImage.image = nil
-            pinLabelH?.constant = 0
-        }
-    }
 
+    if model.message?.deliveryState == .deliveried {
+      if model.message?.session?.sessionType == .P2P {
+        let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
+        if receiptEnable {
+          readView.isHidden = false
+          if let read = model.message?.isRemoteRead, read {
+            readView.progress = 1
+          } else {
+            readView.progress = 0
+          }
+        } else {
+          readView.isHidden = true
+        }
+
+      } else if model.message?.session?.sessionType == .team {
+        let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
+        if receiptEnable {
+          readView.isHidden = false
+          let readCount = model.message?.teamReceiptInfo?.readCount ?? 0
+          let unreadCount = model.message?.teamReceiptInfo?.unreadCount ?? 0
+          let total = Float(readCount + unreadCount)
+          if total > 0 {
+            readView.progress = Float(readCount) / total
+          } else {
+            readView.progress = 0
+          }
+        } else {
+          readView.isHidden = true
+        }
+      }
+    } else {
+      readView.isHidden = true
+    }
+  }
+
+  private func updatePinStatus(_ model: MessageContentModel) {
+    pinLabel.isHidden = !model.isPined
+    pinImage.isHidden = !model.isPined
+    contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
+      .chatPinColor : .white
+    if model.isPined {
+      if let text = model.pinShowName {
+        pinLabel.text = text + localizable("pin_text")
+      }
+      pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")
+      let size = String.getTextRectSize(
+        pinLabel.text ?? localizable("pin_text"),
+        font: UIFont.systemFont(ofSize: 11.0),
+        size: CGSize(width: kScreenWidth - 56 - 22, height: CGFloat.greatestFiniteMagnitude)
+      )
+      pinLabelW?.constant = size.width
+      pinLabelH?.constant = chat_pin_height
+    } else {
+      pinImage.image = nil
+      pinLabelH?.constant = 0
+    }
+  }
 }

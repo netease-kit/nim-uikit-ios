@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEKitConversationUI'
-  s.version          = '9.2.6-rc01'
+  s.version          = '9.2.7'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -34,6 +34,10 @@ TODO: Add long description of the pod here.
   s.resource = 'NEKitConversationUI/Assets/**/*'
   # s.public_header_files = 'Pod/Classes/**/*.h'
   
+  s.pod_target_xcconfig = {
+    'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
+  }
+  s.user_target_xcconfig = { 'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES' }
   s.dependency 'NECommonUIKit'
   s.dependency 'NEConversationKit'
   

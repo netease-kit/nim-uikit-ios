@@ -1,16 +1,17 @@
 
-// Copyright (c) 2022 NetEase, Inc.  All rights reserved.
-// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
 
 import Foundation
 import CoreGraphics
 import UIKit
-extension UIImage {
-    public class func ne_imageNamed(name: String?) -> UIImage? {
-        guard let imageName = name else {
-            return nil
-        }
-        return coreLoader.loadImage(imageName)
+public extension UIImage {
+  class func ne_imageNamed(name: String?) -> UIImage? {
+    guard let imageName = name else {
+      return nil
+    }
+    return coreLoader.loadImage(imageName)
 //        guard let path = Bundle(for: QChatBaseCell.self).resourcePath?.appending("/NEKitQChatUI.bundle") else {
 //            print("Image:\(imageName) path: nil")
 //            return nil
@@ -19,7 +20,5 @@ extension UIImage {
 //        print("Bundle:\(Bundle(path: path))")
 //        print("imageName:\(imageName) image:\(image)")
 //        return image
-    }
-    
-
+  }
 }

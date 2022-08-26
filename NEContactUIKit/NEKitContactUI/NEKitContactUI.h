@@ -1,9 +1,7 @@
-//
-//  contactkit_ui.h
-//  contactkit-ui
-//
-//  Created by yu chen on 2021/12/28.
-//
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
 
 #import <Foundation/Foundation.h>
 
@@ -13,6 +11,5 @@ FOUNDATION_EXPORT double contactkit_uiVersionNumber;
 //! Project version string for contactkit_ui.
 FOUNDATION_EXPORT const unsigned char contactkit_uiVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <contactkit_ui/PublicHeader.h>
-
-
+// In this header, you should import all the public headers of your framework
+// using statements like #import <contactkit_ui/PublicHeader.h>

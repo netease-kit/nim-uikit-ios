@@ -9,35 +9,28 @@ target 'app' do
   pod 'YXLogin', '1.0.0'
   
   #可选UI库
-  pod 'NEContactUIKit', '9.2.6-rc01'
-  pod 'NEQChatUIKit', '9.2.6-rc01'
-  pod 'NEConversationUIKit', '9.2.6-rc01'
-  pod 'NEChatUIKit', '9.2.6-rc01'
-  pod 'NETeamUIKit', '9.2.6-rc01'
+  pod 'NEContactUIKit', '9.2.7'
+  pod 'NEQChatUIKit', '9.2.7'
+  pod 'NEConversationUIKit', '9.2.7'
+  pod 'NEChatUIKit', '9.2.7'
+  pod 'NETeamUIKit', '9.2.7'
   
   
   #可选Kit库（和UIKit对应）
-  pod 'NEContactKit', '9.2.6-rc01'
-  pod 'NEQChatKit', '9.2.6-rc01'
-  pod 'NEConversationKit', '9.2.6-rc01'
-  pod 'NEChatKit', '9.2.6-rc01'
-  pod 'NETeamKit', '9.2.6-rc01'
+  pod 'NEContactKit', '9.2.7'
+  pod 'NEQChatKit', '9.2.7'
+  pod 'NEConversationKit', '9.2.7'
+  pod 'NEChatKit', '9.2.7'
+  pod 'NETeamKit', '9.2.7'
   
   #基础kit库
-  pod 'NECommonUIKit', '9.2.6-rc01'
-  pod 'NECommonKit', '9.2.6-rc01'
-  pod 'NECoreIMKit', '9.2.6-rc01'
-  pod 'NECoreKit', '9.2.6-rc01'
+  pod 'NECommonUIKit', '9.2.7'
+  pod 'NECommonKit', '9.2.7'
+  pod 'NECoreIMKit', '9.2.7'
+  pod 'NECoreKit', '9.2.7'
 
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-#  pod 'NEChatKit', '9.2.6-rc01'
-#  pod 'NEConversationKit', '9.2.6-rc01'
-#  pod 'NEContactKit', '9.2.6-rc01'
-#  pod 'NETeamKit', '9.2.6-rc01'
-#  pod 'NEQChatKit','9.2.6-rc01'
-#
-#
 #  pod 'NEKitQChatUI', :path => 'NEQChatUIKit/NEKitQChatUI.podspec'
 #  pod 'NEKitContactUI', :path => 'NEContactUIKit/NEKitContactUI.podspec'
 #  pod 'NEKitConversationUI', :path => 'NEConversationUIKit/NEKitConversationUI.podspec'
@@ -45,3 +38,12 @@ target 'app' do
 #  pod 'NEKitChatUI', :path => 'NEChatUIKit/NEKitChatUI.podspec'
 #
 end
+
+#⚠️如果pod依赖报错，可打开以下注释
+#post_install do |installer|
+#  installer.pods_project.targets.each do |target|
+#    target.build_configurations.each do |config|
+#      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+#    end
+#  end
+#end
