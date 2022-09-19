@@ -8,7 +8,8 @@ import NEKitCore
 import NEKitTeamUI
 import NEKitChatUI
 
-class IntroduceBrandViewController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
+class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
+  UITableViewDataSource {
   private var viewModel = IntroduceViewModel()
 
   override func viewDidLoad() {
@@ -24,6 +25,8 @@ class IntroduceBrandViewController: NEBaseViewController,UITableViewDelegate, UI
 
   func setupSubviews() {
     view.addSubview(headImage)
+    view.addSubview(headLable)
+
     view.addSubview(tableView)
 
     NSLayoutConstraint.activate([
@@ -32,9 +35,14 @@ class IntroduceBrandViewController: NEBaseViewController,UITableViewDelegate, UI
         equalTo: view.topAnchor,
         constant: kNavigationHeight + KStatusBarHeight + 20
       ),
-      headImage.widthAnchor.constraint(equalToConstant: 94),
-      headImage.heightAnchor.constraint(equalToConstant: 66),
+      headImage.widthAnchor.constraint(equalToConstant: 72),
+      headImage.heightAnchor.constraint(equalToConstant: 53),
 
+    ])
+
+    NSLayoutConstraint.activate([
+      headLable.centerXAnchor.constraint(equalTo: headImage.centerXAnchor),
+      headLable.topAnchor.constraint(equalTo: headImage.bottomAnchor, constant: 10),
     ])
 
     NSLayoutConstraint.activate([
@@ -53,6 +61,15 @@ class IntroduceBrandViewController: NEBaseViewController,UITableViewDelegate, UI
     return image
   }()
 
+  private lazy var headLable: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = NSLocalizedString("brand_des", comment: "")
+    label.font = UIFont.systemFont(ofSize: 20.0)
+    label.textColor = UIColor(hexString: "333333")
+    return label
+  }()
+
   lazy var tableView: UITableView = {
     let table = UITableView()
     table.translatesAutoresizingMaskIntoConstraints = false
@@ -66,34 +83,34 @@ class IntroduceBrandViewController: NEBaseViewController,UITableViewDelegate, UI
     }
     return table
   }()
-    
-    //MARK: UITableViewDelegate, UITableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      viewModel.sectionData.count
-    }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let model = viewModel.sectionData[indexPath.row]
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "VersionCell",
-        for: indexPath
-      ) as? VersionCell {
-        cell.configData(model: model)
-        if indexPath.row == 0 {
-          cell.cellType = .version
-        } else {
-          cell.cellType = .productIntroduce
-        }
-        return cell
-      }
-      return UITableViewCell()
-    }
+  // MARK: UITableViewDelegate, UITableViewDataSource
 
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if indexPath.row == 1 {
-        let ctrl = NEAboutWebViewController(url: "https://netease.im/m/")
-        navigationController?.pushViewController(ctrl, animated: true)
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    viewModel.sectionData.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewModel.sectionData[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "VersionCell",
+      for: indexPath
+    ) as? VersionCell {
+      cell.configData(model: model)
+      if indexPath.row == 0 {
+        cell.cellType = .version
+      } else {
+        cell.cellType = .productIntroduce
       }
+      return cell
     }
+    return UITableViewCell()
+  }
+
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if indexPath.row == 1 {
+      let ctrl = NEAboutWebViewController(url: "https://netease.im/m/")
+      navigationController?.pushViewController(ctrl, animated: true)
+    }
+  }
 }
-

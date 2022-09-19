@@ -14,7 +14,7 @@ public enum EditType: Int {
   case specialSign
 }
 
-class InputPersonInfoController: NEBaseViewController,UITextFieldDelegate {
+class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
   typealias ResultCallBack = (String) -> Void
   public var contentText: String? {
     didSet {
@@ -61,7 +61,7 @@ class InputPersonInfoController: NEBaseViewController,UITextFieldDelegate {
   }
 
   func initialConfig() {
-    addRightAction("保存", #selector(saveName), self)
+    addRightAction(NSLocalizedString("save", comment: ""), #selector(saveName), self)
     view.backgroundColor = UIColor(hexString: "0xF1F1F6")
   }
 
@@ -76,16 +76,16 @@ class InputPersonInfoController: NEBaseViewController,UITextFieldDelegate {
   func configTitle(editType: EditType) {
     switch editType {
     case .nickName:
-      title = "昵称"
+      title = NSLocalizedString("nickname", comment: "")
       limitNumberCount = 30
     case .cellphone:
-      title = "手机"
+      title = NSLocalizedString("phone", comment: "")
       limitNumberCount = 11
     case .email:
-      title = "邮箱"
+      title = NSLocalizedString("email", comment: "")
       limitNumberCount = 30
     case .specialSign:
-      title = "个性签名"
+      title = NSLocalizedString("individuality_sign", comment: "")
       limitNumberCount = 50
     }
   }
@@ -111,15 +111,16 @@ class InputPersonInfoController: NEBaseViewController,UITextFieldDelegate {
     backView.translatesAutoresizingMaskIntoConstraints = false
     return backView
   }()
-    //MARK: UITextFieldDelegate
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                   replacementString string: String) -> Bool {
-      if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
-         text.count > limitNumberCount {
-        showToast("最多只能输入\(limitNumberCount)个字符哦")
-        return false
-      }
-      return true
-    }
-}
 
+  // MARK: UITextFieldDelegate
+
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                 replacementString string: String) -> Bool {
+    if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
+       text.count > limitNumberCount {
+      showToast("最多只能输入\(limitNumberCount)个字符哦")
+      return false
+    }
+    return true
+  }
+}
