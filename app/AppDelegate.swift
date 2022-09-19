@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             center.requestAuthorization(options: [.badge, .sound, .alert]) { grant, error in
                 if grant == false {
                     DispatchQueue.main.async {
-                        UIApplication.shared.keyWindow?.makeToast("请到设置中开启推送功能")
+                        UIApplication.shared.keyWindow?.makeToast(NSLocalizedString("open_push", comment: ""))
                     }
                 }
             }
