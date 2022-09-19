@@ -29,7 +29,7 @@ public class MessageUtils {
     option.compressQuality = 0.8
     imageObject.option = option
     message.messageObject = imageObject
-    message.apnsContent = localizable("发来了一张图片")
+    message.apnsContent = localizable("send_picture")
     message.setting = messageSetting()
     return message
   }
@@ -38,7 +38,7 @@ public class MessageUtils {
     let messageObject = NIMAudioObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
-    message.apnsContent = localizable("发来了一段语音")
+    message.apnsContent = localizable("send_voice")
     message.setting = messageSetting()
     return message
   }
@@ -47,7 +47,7 @@ public class MessageUtils {
     let messageObject = NIMVideoObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
-    message.apnsContent = localizable("发来了一段视频")
+    message.apnsContent = localizable("send_video")
     message.setting = messageSetting()
     return message
   }

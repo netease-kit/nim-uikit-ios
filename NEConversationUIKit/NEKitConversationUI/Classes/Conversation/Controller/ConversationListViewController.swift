@@ -197,7 +197,7 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
     }
 
     let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: "删除") { action, indexPath in
+                                            title: localizable("delete")) { action, indexPath in
 
       weakSelf?.viewModel.deleteRecentSession(recentSession: recentSession)
       weakSelf?.didDeleteConversationCell(
@@ -224,7 +224,8 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
     // 置顶和取消置顶
     let isTop = viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? "取消置顶" : "置顶") { action, indexPath in
+                                         title: isTop ? localizable("cancel_stickTop") :
+                                           localizable("stickTop")) { action, indexPath in
       if let recentSesstion = conversationModel?.recentSession {
         weakSelf?.onTopRecentAtIndexPath(
           rencent: recentSesstion,

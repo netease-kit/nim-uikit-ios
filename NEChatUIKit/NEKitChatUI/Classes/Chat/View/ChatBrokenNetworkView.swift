@@ -31,7 +31,7 @@ public class ChatBrokenNetworkView: UIView {
     label.font = DefaultTextFont(14)
     label.textColor = HexRGB(0xFC596A)
     label.textAlignment = .center
-    label.text = "当前网络不可用，请检查你当网络设置。"
+    label.text = localizable("network_unavailable")
     return label
   }()
 }

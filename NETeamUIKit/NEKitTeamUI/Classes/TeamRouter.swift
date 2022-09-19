@@ -8,7 +8,9 @@ import NEKitTeam
 import NEKitCore
 import NEKitCoreIM
 import NIMSDK
-public enum TeamRouter {
+
+@objcMembers
+public class TeamRouter:NSObject {
   public static var iconUrls = ["https://s.netease.im/safe/ABg8YjWQWvcqO6sAAAAAAAAAAAA?_im_url=1",
                                 "https://s.netease.im/safe/ABg8YjmQWvcqO6sAAAAAAAABAAA?_im_url=1",
                                 "https://s.netease.im/safe/ABg8YjyQWvcqO6sAAAAAAAABAAA?_im_url=1",

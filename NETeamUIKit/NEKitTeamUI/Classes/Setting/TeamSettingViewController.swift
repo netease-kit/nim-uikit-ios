@@ -8,7 +8,9 @@ import NEKitCommonUI
 import NEKitCoreIM
 import NIMSDK
 
-public class TeamSettingViewController: NEBaseViewController,UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UITableViewDataSource, UITableViewDelegate {
+public class TeamSettingViewController: NEBaseViewController, UICollectionViewDelegate,
+  UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDataSource,
+  UITableViewDelegate {
   let viewmodel = TeamSettingViewModel()
 
   var teamId: String?
@@ -321,189 +323,191 @@ public class TeamSettingViewController: NEBaseViewController,UICollectionViewDel
       forCellWithReuseIdentifier: "\(TeamUserCell.self)"
     )
   }
-//MARK: objc 方法
-    @objc func addUser() {
-      weak var weakSelf = self
-      Router.shared.register(ContactSelectedUsersRouter) { param in
-        print("addUser weak self ", weakSelf as Any)
-        if let accids = param["accids"] as? [String],
-           let tid = self.viewmodel.teamInfoModel?.team?.teamId,
-           let beInviteMode = self.viewmodel.teamInfoModel?.team?.beInviteMode,
-           let type = self.viewmodel.teamInfoModel?.team?.type {
-          if beInviteMode == .noAuth || type == .normal {
-            self.didAddUserAndRefreshUI(accids, tid)
-          } else {
-            self.didAddUser(accids, tid)
-          }
-        }
-      }
-      var param = [String: Any]()
-      param["nav"] = navigationController as Any
-      var filters = Set<String>()
-      viewmodel.teamInfoModel?.users.forEach { model in
-        if let uid = model.nimUser?.userId {
-          filters.insert(uid)
-        }
-      }
-      if filters.count > 0 {
-        param["filters"] = filters
-      }
 
-      param["limit"] = 200 - filters.count
-      Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
-    }
+  // MARK: objc 方法
 
-    @objc func removeTeamForMyself() {
-      weak var weakSelf = self
-      if viewmodel.isOwner(), let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
-        showAlert(message: "是否解散群聊？") {
-          weakSelf?.dismissTeam()
-        }
-      } else {
-        if let type = viewmodel.teamInfoModel?.team?.type {
-          if type == .advanced {
-            showAlert(message: "是否退出群聊?") {
-              weakSelf?.leveaTeam()
-            }
-          } else if type == .normal {
-            showAlert(message: "是否退出讨论组?") {
-              weakSelf?.leveaTeam()
-            }
-          }
-        }
-      }
-    }
-    
-    @objc func toInfoView() {
-      let info = TeamInfoViewController()
-      info.team = viewmodel.teamInfoModel?.team
-      navigationController?.pushViewController(info, animated: true)
-    }
-
-    @objc func toMemberList() {
-      let memberController = TeamMembersController()
-      memberController.datas = viewmodel.teamInfoModel?.users
-      if let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
-        memberController.isSenior = true
-      }
-      memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
-      navigationController?.pushViewController(memberController, animated: true)
-    }
-    
-    
-    //MARK: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
-    public func collectionView(_ collectionView: UICollectionView,
-                               numberOfItemsInSection section: Int) -> Int {
-      print("numberOfItemsInSection ", viewmodel.teamInfoModel?.users.count as Any)
-      return viewmodel.teamInfoModel?.users.count ?? 0
-    }
-
-    public func collectionView(_ collectionView: UICollectionView,
-                               cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      if let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: "\(TeamUserCell.self)",
-        for: indexPath
-      ) as? TeamUserCell {
-        if let user = viewmodel.teamInfoModel?.users[indexPath.row] {
-          cell.user = user
-        }
-        return cell
-      }
-      return UICollectionViewCell()
-    }
-
-    public func collectionView(_ collectionView: UICollectionView,
-                               layout collectionViewLayout: UICollectionViewLayout,
-                               sizeForItemAt indexPath: IndexPath) -> CGSize {
-      CGSize(width: 47.0, height: 32)
-    }
-
-    public func collectionView(_ collectionView: UICollectionView,
-                               didSelectItemAt indexPath: IndexPath) {
-      if let member = viewmodel.teamInfoModel?.users[indexPath.row],
-         let nimUser = member.nimUser {
-        let user = User(user: nimUser)
-        if IMKitLoginManager.instance.isMySelf(user.userId) {
-          Router.shared.use(
-            MeSettingRouter,
-            parameters: ["nav": navigationController as Any],
-            closure: nil
-          )
+  @objc func addUser() {
+    weak var weakSelf = self
+    Router.shared.register(ContactSelectedUsersRouter) { param in
+      print("addUser weak self ", weakSelf as Any)
+      if let accids = param["accids"] as? [String],
+         let tid = self.viewmodel.teamInfoModel?.team?.teamId,
+         let beInviteMode = self.viewmodel.teamInfoModel?.team?.beInviteMode,
+         let type = self.viewmodel.teamInfoModel?.team?.type {
+        if beInviteMode == .noAuth || type == .normal {
+          self.didAddUserAndRefreshUI(accids, tid)
         } else {
-          Router.shared.use(
-            ContactUserInfoPageRouter,
-            parameters: ["nav": navigationController as Any, "user": user],
-            closure: nil
-          )
+          self.didAddUser(accids, tid)
         }
       }
     }
-    
-    //MARK: UITableViewDataSource, UITableViewDelegate
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if viewmodel.sectionData.count > section {
-        let model = viewmodel.sectionData[section]
-        return model.cellModels.count
-      }
-      return 0
-    }
-
-    public func numberOfSections(in tableView: UITableView) -> Int {
-      viewmodel.sectionData.count
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(model.type)",
-        for: indexPath
-      ) as? BaseTeamSettingCell {
-        cell.configure(model)
-        return cell
-      }
-      return UITableViewCell()
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
-      if let block = model.cellClick {
-        block()
+    var param = [String: Any]()
+    param["nav"] = navigationController as Any
+    var filters = Set<String>()
+    viewmodel.teamInfoModel?.users.forEach { model in
+      if let uid = model.nimUser?.userId {
+        filters.insert(uid)
       }
     }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
-      return model.rowHeight
+    if filters.count > 0 {
+      param["filters"] = filters
     }
 
-    public func tableView(_ tableView: UITableView,
-                          heightForHeaderInSection section: Int) -> CGFloat {
-      if viewmodel.sectionData.count > section {
-        let model = viewmodel.sectionData[section]
-        if model.cellModels.count > 0 {
-          return 12.0
+    param["limit"] = 200 - filters.count
+    Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+  }
+
+  @objc func removeTeamForMyself() {
+    weak var weakSelf = self
+    if viewmodel.isOwner(), let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+      showAlert(message: localizable("dissolute_team_chat")) {
+        weakSelf?.dismissTeam()
+      }
+    } else {
+      if let type = viewmodel.teamInfoModel?.team?.type {
+        if type == .advanced {
+          showAlert(message: localizable("quit_team_chat")) {
+            weakSelf?.leveaTeam()
+          }
+        } else if type == .normal {
+          showAlert(message: localizable("quit_discuss_chat")) {
+            weakSelf?.leveaTeam()
+          }
         }
       }
-      return 0
     }
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          viewForHeaderInSection section: Int) -> UIView? {
-      let header = UIView()
-      header.backgroundColor = NEConstant.hexRGB(0xF1F1F6)
-      return header
+  @objc func toInfoView() {
+    let info = TeamInfoViewController()
+    info.team = viewmodel.teamInfoModel?.team
+    navigationController?.pushViewController(info, animated: true)
+  }
+
+  @objc func toMemberList() {
+    let memberController = TeamMembersController()
+    memberController.datas = viewmodel.teamInfoModel?.users
+    if let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+      memberController.isSenior = true
     }
+    memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
+    navigationController?.pushViewController(memberController, animated: true)
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          heightForFooterInSection section: Int) -> CGFloat {
-      if section == viewmodel.sectionData.count - 1 {
+  // MARK: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             numberOfItemsInSection section: Int) -> Int {
+    print("numberOfItemsInSection ", viewmodel.teamInfoModel?.users.count as Any)
+    return viewmodel.teamInfoModel?.users.count ?? 0
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    if let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: "\(TeamUserCell.self)",
+      for: indexPath
+    ) as? TeamUserCell {
+      if let user = viewmodel.teamInfoModel?.users[indexPath.row] {
+        cell.user = user
+      }
+      return cell
+    }
+    return UICollectionViewCell()
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             layout collectionViewLayout: UICollectionViewLayout,
+                             sizeForItemAt indexPath: IndexPath) -> CGSize {
+    CGSize(width: 47.0, height: 32)
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             didSelectItemAt indexPath: IndexPath) {
+    if let member = viewmodel.teamInfoModel?.users[indexPath.row],
+       let nimUser = member.nimUser {
+      let user = User(user: nimUser)
+      if IMKitEngine.instance.isMySelf(user.userId) {
+        Router.shared.use(
+          MeSettingRouter,
+          parameters: ["nav": navigationController as Any],
+          closure: nil
+        )
+      } else {
+        Router.shared.use(
+          ContactUserInfoPageRouter,
+          parameters: ["nav": navigationController as Any, "user": user],
+          closure: nil
+        )
+      }
+    }
+  }
+
+  // MARK: UITableViewDataSource, UITableViewDelegate
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if viewmodel.sectionData.count > section {
+      let model = viewmodel.sectionData[section]
+      return model.cellModels.count
+    }
+    return 0
+  }
+
+  public func numberOfSections(in tableView: UITableView) -> Int {
+    viewmodel.sectionData.count
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(model.type)",
+      for: indexPath
+    ) as? BaseTeamSettingCell {
+      cell.configure(model)
+      return cell
+    }
+    return UITableViewCell()
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let block = model.cellClick {
+      block()
+    }
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let model = viewmodel.sectionData[indexPath.section].cellModels[indexPath.row]
+    return model.rowHeight
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForHeaderInSection section: Int) -> CGFloat {
+    if viewmodel.sectionData.count > section {
+      let model = viewmodel.sectionData[section]
+      if model.cellModels.count > 0 {
         return 12.0
       }
-      return 0
     }
-    
+    return 0
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        viewForHeaderInSection section: Int) -> UIView? {
+    let header = UIView()
+    header.backgroundColor = NEConstant.hexRGB(0xF1F1F6)
+    return header
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForFooterInSection section: Int) -> CGFloat {
+    if section == viewmodel.sectionData.count - 1 {
+      return 12.0
+    }
+    return 0
+  }
 }
 
 extension TeamSettingViewController {
@@ -541,12 +545,10 @@ extension TeamSettingViewController {
       if let err = error {
         weakSelf?.showToast(err.localizedDescription)
       } else {
-        weakSelf?.showToast("邀请已发送")
+        weakSelf?.showToast(localizable("invite_has_send"))
       }
     }
   }
-
-
 
   func dismissTeam() {
     if let tid = teamId {
@@ -583,7 +585,6 @@ extension TeamSettingViewController {
       }
     }
   }
-
 }
 
 extension TeamSettingViewController: TeamSettingViewModelDelegate {
@@ -604,13 +605,13 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: "取消", style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
     actionSheetController.addAction(cancelActionButton)
 
-    let manager = UIAlertAction(title: "群主", style: .default) { _ in
+    let manager = UIAlertAction(title: localizable("team_owner"), style: .default) { _ in
       weakSelf?.view.makeToastActivity(.center)
       weakSelf?.viewmodel.repo.updateInviteMode(.manager, weakSelf?.teamId ?? "") { error in
         weakSelf?.view.hideToastActivity()
@@ -618,7 +619,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
           weakSelf?.showToast(err.localizedDescription)
         } else {
           weakSelf?.viewmodel.teamInfoModel?.team?.inviteMode = .manager
-          model.subTitle = "群主"
+          model.subTitle = localizable("team_owner")
           weakSelf?.contentTable.reloadData()
         }
       }
@@ -626,7 +627,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
     manager.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
     actionSheetController.addAction(manager)
 
-    let deleteActionButton = UIAlertAction(title: "所有人", style: .default) { _ in
+    let deleteActionButton = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
       weakSelf?.view.makeToastActivity(.center)
       weakSelf?.viewmodel.repo.updateInviteMode(.all, weakSelf?.teamId ?? "") { error in
         weakSelf?.view.hideToastActivity()
@@ -634,7 +635,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
           weakSelf?.showToast(err.localizedDescription)
         } else {
           weakSelf?.viewmodel.teamInfoModel?.team?.inviteMode = .all
-          model.subTitle = "所有人"
+          model.subTitle = localizable("team_all")
           weakSelf?.contentTable.reloadData()
         }
       }
@@ -648,17 +649,17 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
 
   func didUpdateTeamInfoClick(_ model: SettingCellModel) {
     let actionSheetController = UIAlertController(
-      title: "提示",
+      title: localizable("remind"),
       message: nil,
       preferredStyle: .actionSheet
     )
     weak var weakSelf = self
-    let cancelActionButton = UIAlertAction(title: "取消", style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     actionSheetController.addAction(cancelActionButton)
 
-    let manager = UIAlertAction(title: "群主", style: .default) { _ in
+    let manager = UIAlertAction(title: localizable("team_owner"), style: .default) { _ in
       weakSelf?.view.makeToastActivity(.center)
       weakSelf?.viewmodel.repo
         .updateTeamInfoPrivilege(.manager, weakSelf?.teamId ?? "") { error in
@@ -667,14 +668,14 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
             weakSelf?.showToast(err.localizedDescription)
           } else {
             weakSelf?.viewmodel.teamInfoModel?.team?.updateInfoMode = .manager
-            model.subTitle = "群主"
+            model.subTitle = localizable("team_owner")
             weakSelf?.contentTable.reloadData()
           }
         }
     }
     actionSheetController.addAction(manager)
 
-    let all = UIAlertAction(title: "所有人", style: .default) { _ in
+    let all = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
       weakSelf?.view.makeToastActivity(.center)
       weakSelf?.viewmodel.repo
         .updateTeamInfoPrivilege(.all, weakSelf?.teamId ?? "") { error in
@@ -683,7 +684,7 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
             weakSelf?.showToast(err.localizedDescription)
           } else {
             weakSelf?.viewmodel.teamInfoModel?.team?.updateInfoMode = .all
-            model.subTitle = "所有人"
+            model.subTitle = localizable("team_all")
             weakSelf?.contentTable.reloadData()
           }
         }

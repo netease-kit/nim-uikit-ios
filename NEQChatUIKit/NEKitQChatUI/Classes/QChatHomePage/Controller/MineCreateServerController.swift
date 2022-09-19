@@ -9,7 +9,8 @@ import NEKitCoreIM
 import NIMSDK
 import NEKitCommon
 
-public class MineCreateServerController: NEBaseViewController, UINavigationControllerDelegate,UITextFieldDelegate {
+public class MineCreateServerController: NEBaseViewController, UINavigationControllerDelegate,
+  UITextFieldDelegate {
   private let tag = "MineCreateServerController"
   public var serverViewModel = CreateServerViewModel()
   var headImageUrl: String?
@@ -108,7 +109,7 @@ public class MineCreateServerController: NEBaseViewController, UINavigationContr
   private lazy var uploadDesLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = localizable("上传头像")
+    label.text = localizable("upload_headImage")
     label.textColor = HexRGB(0x656A72)
     label.font = DefaultTextFont(12)
     return label
@@ -117,7 +118,7 @@ public class MineCreateServerController: NEBaseViewController, UINavigationContr
   private lazy var textField: UITextField = {
     let textField = UITextField()
     textField.setValue(NSNumber(value: 10), forKey: "paddingLeft")
-    textField.placeholder = localizable("  请输入服务器名称")
+    textField.placeholder = localizable("enter_serverName")
     textField.font = DefaultTextFont(16)
     textField.textColor = TextNormalColor
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -140,102 +141,101 @@ public class MineCreateServerController: NEBaseViewController, UINavigationContr
     button.addTarget(self, action: #selector(createServerBtnClick), for: .touchUpInside)
     return button
   }()
-    
-    
-    @objc func createServerBtnClick(sender: UIButton) {
-      guard let serverName = textField.text, serverName.count > 0 else { return }
 
-      if NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
-        sender.isEnabled = false
+  @objc func createServerBtnClick(sender: UIButton) {
+    guard let serverName = textField.text, serverName.count > 0 else { return }
+
+    if NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
+      sender.isEnabled = false
+    } else {
+      showToast(localizable("network_error"))
+      return
+    }
+
+    let param = CreateServerParam(name: textField.text!, icon: headImageUrl ?? "")
+    serverViewModel.createServer(parameter: param) { error, result in
+
+      if error != nil {
+        NELog.errorLog(self.tag, desc: "❌createServer failed,error = \(error!)")
       } else {
-        showToast("当前网络错误")
-        return
-      }
-
-      let param = CreateServerParam(name: textField.text!, icon: headImageUrl ?? "")
-      serverViewModel.createServer(parameter: param) { error, result in
-
-        if error != nil {
-          NELog.errorLog(self.tag, desc: "❌createServer failed,error = \(error!)")
+        // 创建服务器成功后，默认创建好两个频道
+        if let serverId = result?.server?.serverId {
+          NotificationCenter.default.post(
+            name: NotificationName.createServer,
+            object: serverId
+          )
+          self.navigationController?.dismiss(animated: true, completion: nil)
         } else {
-          // 创建服务器成功后，默认创建好两个频道
-          if let serverId = result?.server?.serverId {
-            NotificationCenter.default.post(
-              name: NotificationName.createServer,
-              object: serverId
-            )
-            self.navigationController?.dismiss(animated: true, completion: nil)
-          } else {
-            print("serverId is nil")
-            return
-          }
+          print("serverId is nil")
+          return
         }
       }
-      // 应对wifi切换4G请求没有回调的处理结果
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-        sender.isEnabled = true
-      }
     }
-    
-    //MARK : UITextFieldDelegate
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                          replacementString string: String) -> Bool {
-      let text = "\(textField.text ?? "")\(string)"
-      if text.count > 50 {
-        showToast("服务器命名不超过50个字符")
-        return false
-      }
-
-      return true
+    // 应对wifi切换4G请求没有回调的处理结果
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      sender.isEnabled = true
     }
+  }
 
-    // Upload the picture
-    @objc func uploadBgViewClick(sender: UIButton) {
-      showBottomAlert(self)
+  // MARK: UITextFieldDelegate
+
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                        replacementString string: String) -> Bool {
+    let text = "\(textField.text ?? "")\(string)"
+    if text.count > 50 {
+      showToast(localizable("serverName_limit"))
+      return false
     }
 
-    @objc func textContentChanged() {
-      if textField.text?.count != 0 {
-        bottomBtn.isEnabled = true
-        bottomBtn.backgroundColor = HexRGB(0x337EFF)
-      } else {
-        bottomBtn.isEnabled = false
-        bottomBtn.backgroundColor = HexRGBAlpha(0x337EFF, 0.5)
-      }
+    return true
+  }
+
+  // Upload the picture
+  @objc func uploadBgViewClick(sender: UIButton) {
+    showBottomAlert(self)
+  }
+
+  @objc func textContentChanged() {
+    if textField.text?.count != 0 {
+      bottomBtn.isEnabled = true
+      bottomBtn.backgroundColor = HexRGB(0x337EFF)
+    } else {
+      bottomBtn.isEnabled = false
+      bottomBtn.backgroundColor = HexRGBAlpha(0x337EFF, 0.5)
     }
+  }
 
-    // MARK: UIImagePickerControllerDelegate
+  // MARK: UIImagePickerControllerDelegate
 
-    func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController
-                                 .InfoKey: Any]) {
-      let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
-      uploadHeadImage(image: image)
-      dismiss(animated: true, completion: nil)
-    }
+  func imagePickerController(_ picker: UIImagePickerController,
+                             didFinishPickingMediaWithInfo info: [UIImagePickerController
+                               .InfoKey: Any]) {
+    let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
+    uploadHeadImage(image: image)
+    dismiss(animated: true, completion: nil)
+  }
 
-    public func uploadHeadImage(image: UIImage) {
-      view.makeToastActivity(.center)
-      if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-        let filePath = NSHomeDirectory().appending("/Documents/")
-          .appending(IMKitLoginManager.instance.imAccid)
-        let succcess = imageData.write(toFile: filePath, atomically: true)
+  public func uploadHeadImage(image: UIImage) {
+    view.makeToastActivity(.center)
+    if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
+      let filePath = NSHomeDirectory().appending("/Documents/")
+        .appending(IMKitEngine.instance.imAccid)
+      let succcess = imageData.write(toFile: filePath, atomically: true)
 
-        if succcess {
-          NIMSDK.shared().resourceManager
-            .upload(filePath, progress: nil) { urlString, error in
-              if error == nil {
-                // 显示设置的照片
-                self.selectHeadImage.image = image
-                self.headImageUrl = urlString
-                print("upload image success")
-              } else {
-                print("upload image failed,error = \(error!)")
-              }
-              self.view.hideToastActivity()
+      if succcess {
+        NIMSDK.shared().resourceManager
+          .upload(filePath, progress: nil) { urlString, error in
+            if error == nil {
+              // 显示设置的照片
+              self.selectHeadImage.image = image
+              self.headImageUrl = urlString
+              print("upload image success")
+            } else {
+              print("upload image failed,error = \(error!)")
             }
-        }
+            self.view.hideToastActivity()
+          }
       }
     }
+  }
 }
-

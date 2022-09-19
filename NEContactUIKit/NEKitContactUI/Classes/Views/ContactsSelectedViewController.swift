@@ -15,6 +15,9 @@ open class ContactsSelectedViewController: ContactBaseViewController {
 
   public var limit = 10 // max select count
 
+  // 单聊中对方的userId
+  public var userId: String?
+
   var selectArray = [ContactInfo]()
   let selectDic = [String: ContactInfo]()
   lazy var collection: UICollectionView = {
@@ -42,7 +45,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
     super.viewDidLoad()
 
     // Do any additional setup after loading the view.
-    title = "选择"
+    title = localizable("select")
     setupUI()
     setupNavRightItem()
 
@@ -108,7 +111,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
     let rightItem = UIBarButtonItem(customView: sureBtn)
     navigationItem.rightBarButtonItem = rightItem
     sureBtn.addTarget(self, action: #selector(sureClick(_:)), for: .touchUpInside)
-    sureBtn.setTitle("确定", for: .normal)
+    sureBtn.setTitle(localizable("alert_sure"), for: .normal)
     sureBtn.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
     sureBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     sureBtn.contentHorizontalAlignment = .right
@@ -129,7 +132,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
 extension ContactsSelectedViewController {
   @objc func sureClick(_ sender: UIButton) {
     if selectArray.count <= 0 {
-      view.makeToast("请选择联系人")
+      view.makeToast(localizable("select_contact"))
       return
     }
     if let completion = callBack {
@@ -153,6 +156,9 @@ extension ContactsSelectedViewController {
       }
     }
 
+    if let uid = userId {
+      accids.append(uid)
+    }
     let nameString = names.joined(separator: "、")
     print("name string : ", nameString)
     Router.shared.use(
@@ -293,7 +299,7 @@ extension ContactsSelectedViewController: UICollectionViewDelegate, UICollection
     if selectArray.count > 0 {
       sureBtn.setTitle("确定(\(selectArray.count))", for: .normal)
     } else {
-      sureBtn.setTitle("确定", for: .normal)
+      sureBtn.setTitle(localizable("alert_sure"), for: .normal)
     }
   }
 }

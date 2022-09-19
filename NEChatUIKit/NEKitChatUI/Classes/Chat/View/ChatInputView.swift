@@ -236,16 +236,8 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     delegate?.textFieldDidEndEditing(textView)
   }
 
-  public func textFieldDidEndEditing(_ textField: UITextField) {
-    //        delegate?.textFieldDidEndEditing(textField)
-  }
-
   public func textViewDidBeginEditing(_ textView: UITextView) {
     delegate?.textFieldDidBeginEditing(textView)
-  }
-
-  public func textFieldDidBeginEditing(_ textField: UITextField) {
-    //        delegate?.textFieldDidBeginEditing(textField)
   }
 
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {

@@ -23,12 +23,12 @@ extension String {
       if let firstDayYear = firstDayInYear() {
         let dur = date.timeIntervalSince(firstDayYear)
         if dur > 0 {
-          fmt.dateFormat = "MM月dd日 HH:mm"
+          fmt.dateFormat = localizable("mdhm")
         } else {
-          fmt.dateFormat = "yyyy年MM月dd日 HH:mm"
+          fmt.dateFormat = localizable("ymdhm")
         }
       } else {
-        fmt.dateFormat = "yyyy年MM月dd日 HH:mm"
+        fmt.dateFormat = localizable("ymdhm")
       }
     }
     return fmt.string(from: date)

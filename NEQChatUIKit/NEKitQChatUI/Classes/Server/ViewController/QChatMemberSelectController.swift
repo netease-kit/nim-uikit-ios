@@ -18,8 +18,10 @@ public protocol QChatMemberSelectControllerDelegate: AnyObject {
 //    case ChannelMember
 // }
 
-public class QChatMemberSelectController: NEBaseTableViewController, MemberSelectViewModelDelegate,UICollectionViewDelegate, UICollectionViewDataSource,
-    UICollectionViewDelegateFlowLayout,UITableViewDelegate,UITableViewDataSource,ViewModelDelegate {
+public class QChatMemberSelectController: NEBaseTableViewController, MemberSelectViewModelDelegate,
+  UICollectionViewDelegate, UICollectionViewDataSource,
+  UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource,
+  ViewModelDelegate {
   let viewmodel = MemberSelectViewModel()
   var filterBlock: FilterMembersBlock?
   var completion: SelectMemeberCompletion?
@@ -145,132 +147,132 @@ public class QChatMemberSelectController: NEBaseTableViewController, MemberSelec
       }
     }
   }
-    //MARK:
-    public func dataDidError(_ error: Error) {
-      view.makeToast(error.localizedDescription)
-    }
 
-    public func dataDidChange() {
-      tableView.reloadData()
-    }
+  // MARK:
 
-    public func collectionView(_ collectionView: UICollectionView,
-                               numberOfItemsInSection section: Int) -> Int {
-      selectArray.count
-    }
+  public func dataDidError(_ error: Error) {
+    view.makeToast(error.localizedDescription)
+  }
 
-    public func collectionView(_ collectionView: UICollectionView,
-                               cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      let user = selectArray[indexPath.row]
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: "\(NSStringFromClass(QChatUserUnCheckCell.self))",
-        for: indexPath
-      ) as? QChatUserUnCheckCell
-      cell?.configure(user)
-      return cell ?? UICollectionViewCell()
-    }
+  public func dataDidChange() {
+    tableView.reloadData()
+  }
 
-    public func collectionView(_ collectionView: UICollectionView,
-                               didSelectItemAt indexPath: IndexPath) {
-      let user = selectArray[indexPath.row]
+  public func collectionView(_ collectionView: UICollectionView,
+                             numberOfItemsInSection section: Int) -> Int {
+    selectArray.count
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    let user = selectArray[indexPath.row]
+    let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: "\(NSStringFromClass(QChatUserUnCheckCell.self))",
+      for: indexPath
+    ) as? QChatUserUnCheckCell
+    cell?.configure(user)
+    return cell ?? UICollectionViewCell()
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             didSelectItemAt indexPath: IndexPath) {
+    let user = selectArray[indexPath.row]
+    didUnselectContact(user)
+  }
+
+  public func collectionView(_ collectionView: UICollectionView,
+                             layout collectionViewLayout: UICollectionViewLayout,
+                             sizeForItemAt indexPath: IndexPath) -> CGSize {
+    CGSize(width: 46, height: 52)
+  }
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    viewmodel.datas.count
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell: QChatSelectedCell = tableView.dequeueReusableCell(
+      withIdentifier: "\(QChatSelectedCell.self)",
+      for: indexPath
+    ) as! QChatSelectedCell
+    let user = viewmodel.datas[indexPath.row]
+    cell.user = user
+    return cell
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    62
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let user = viewmodel.datas[indexPath.row]
+    let cell = tableView.cellForRow(at: indexPath) as? QChatSelectedCell
+
+    if user.select == true {
+      cell?.setUnselect()
       didUnselectContact(user)
-    }
-
-    public func collectionView(_ collectionView: UICollectionView,
-                               layout collectionViewLayout: UICollectionViewLayout,
-                               sizeForItemAt indexPath: IndexPath) -> CGSize {
-      CGSize(width: 46, height: 52)
-    }
-
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      viewmodel.datas.count
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cell: QChatSelectedCell = tableView.dequeueReusableCell(
-        withIdentifier: "\(QChatSelectedCell.self)",
-        for: indexPath
-      ) as! QChatSelectedCell
-      let user = viewmodel.datas[indexPath.row]
-      cell.user = user
-      return cell
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      62
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      let user = viewmodel.datas[indexPath.row]
-      let cell = tableView.cellForRow(at: indexPath) as? QChatSelectedCell
-
-      if user.select == true {
-        cell?.setUnselect()
-        didUnselectContact(user)
-      } else {
-        if selectArray.count >= limit {
-          // view.makeToast("超出\(limit)人限制")
-          showToast(
-            "\(localizable("exceed"))\(limit)\(localizable("person"))\(localizable("limit"))"
-          )
-          return
-        }
-        cell?.setSelect()
-        didSelectContact(user)
+    } else {
+      if selectArray.count >= limit {
+        // view.makeToast("超出\(limit)人限制")
+        showToast(
+          "\(localizable("exceed"))\(limit)\(localizable("person"))\(localizable("limit"))"
+        )
+        return
       }
-  //        tableView.reloadRows(at: [indexPath], with: .none)
+      cell?.setSelect()
+      didSelectContact(user)
     }
+    //        tableView.reloadRows(at: [indexPath], with: .none)
+  }
 
-    func didSelectContact(_ user: UserInfo) {
-      user.select = true
-      if selectArray.contains(where: { c in
-        user === c
-      }) == false {
-        selectArray.append(user)
-        if let height = collectionHeight?.constant, height <= 0 {
-          collectionHeight?.constant = 52
-        }
+  func didSelectContact(_ user: UserInfo) {
+    user.select = true
+    if selectArray.contains(where: { c in
+      user === c
+    }) == false {
+      selectArray.append(user)
+      if let height = collectionHeight?.constant, height <= 0 {
+        collectionHeight?.constant = 52
       }
+    }
+    collection.reloadData()
+    tableView.reloadData()
+    refreshSelectCount()
+  }
+
+  func didUnselectContact(_ user: UserInfo) {
+    user.select = false
+    selectArray.removeAll { c in
+      user === c
+    }
+    if selectArray.count <= 0 {
       collection.reloadData()
-      tableView.reloadData()
-      refreshSelectCount()
+      collectionHeight?.constant = 0
     }
+    collection.reloadData()
+    tableView.reloadData()
+    refreshSelectCount()
+  }
 
-    func didUnselectContact(_ user: UserInfo) {
-      user.select = false
-      selectArray.removeAll { c in
-        user === c
-      }
-      if selectArray.count <= 0 {
-        collection.reloadData()
-        collectionHeight?.constant = 0
-      }
-      collection.reloadData()
-      tableView.reloadData()
-      refreshSelectCount()
+  func refreshSelectCount() {
+    if selectArray.count > 0 {
+      rightNavBtn.setTitle("\(localizable("qchat_sure"))(\(selectArray.count))", for: .normal)
+    } else {
+      rightNavBtn.setTitle(localizable("qchat_sure"), for: .normal)
     }
+  }
 
-    func refreshSelectCount() {
-      if selectArray.count > 0 {
-        rightNavBtn.setTitle("\(localizable("qchat_sure"))(\(selectArray.count))", for: .normal)
-      } else {
-        rightNavBtn.setTitle(localizable("qchat_sure"), for: .normal)
-      }
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForHeaderInSection section: Int) -> CGFloat {
-      0
-    }
+  public func tableView(_ tableView: UITableView,
+                        heightForHeaderInSection section: Int) -> CGFloat {
+    0
+  }
 
   //    MARK: MemberSelectViewModelDelegate
 
-    func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> Void) {
-  //        查询需要筛选的用户
-      delegate?.filterMembers(accid: accid, filterMembers)
-    }
+  func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> Void) {
+    //        查询需要筛选的用户
+    delegate?.filterMembers(accid: accid, filterMembers)
+  }
 }
-
-

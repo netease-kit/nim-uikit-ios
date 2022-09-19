@@ -22,7 +22,7 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
   lazy var userLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = "该用户不存在"
+    label.text = localizable("user_not_exist")
     label.textColor = .ne_emptyTitleColor
     label.font = UIFont.systemFont(ofSize: 14.0)
     return label
@@ -30,7 +30,7 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
 
   override public func viewDidLoad() {
     super.viewDidLoad()
-    title = "添加好友"
+    title = localizable("add_friend")
     setupUI()
   }
 

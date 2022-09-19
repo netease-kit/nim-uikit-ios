@@ -219,7 +219,7 @@ public class QChatAddMemberVC: QChatSearchVC {
   private lazy var emptyView: EmptyDataView = {
     let view = EmptyDataView(
       imageName: "memberPlaceholder",
-      content: "无成员可添加",
+      content: localizable("noMember_add"),
       frame: CGRect(
         x: 0,
         y: 60,

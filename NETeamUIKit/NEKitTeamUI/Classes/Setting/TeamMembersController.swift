@@ -8,7 +8,8 @@ import NEKitTeam
 import NEKitCore
 //
 
-public class TeamMembersController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
+public class TeamMembersController: NEBaseViewController, UITableViewDelegate,
+  UITableViewDataSource {
   var datas: [TeamMemberInfoModel]?
 
   var ownerId: String?
@@ -20,7 +21,7 @@ public class TeamMembersController: NEBaseViewController,UITableViewDelegate, UI
   lazy var searchTextField: UITextField = {
     let field = UITextField()
     field.translatesAutoresizingMaskIntoConstraints = false
-    field.placeholder = "搜索好友"
+    field.placeholder = localizable("search_friend")
     field.textColor = .ne_greyText
     field.font = UIFont.systemFont(ofSize: 14.0)
     field.backgroundColor = UIColor.ne_backcolor
@@ -57,9 +58,9 @@ public class TeamMembersController: NEBaseViewController,UITableViewDelegate, UI
 
   func setupUI() {
     if isSenior {
-      title = "群成员"
+      title = localizable("group_memmber")
     } else {
-      title = "讨论组成员"
+      title = localizable("discuss_mebmer")
     }
 
     let back = UIView()
@@ -162,63 +163,62 @@ public class TeamMembersController: NEBaseViewController,UITableViewDelegate, UI
     }
     contentTable.reloadData()
   }
-    func getRealModel(_ index: Int) -> TeamMemberInfoModel? {
-      if let text = searchTextField.text, text.count > 0 {
-        return searchDatas[index]
-      }
-      return datas?[index]
+
+  func getRealModel(_ index: Int) -> TeamMemberInfoModel? {
+    if let text = searchTextField.text, text.count > 0 {
+      return searchDatas[index]
     }
-    
-    
+    return datas?[index]
+  }
+
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
-    
-    
-    //MARK: UITableViewDelegate, UITableViewDataSource
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if let text = searchTextField.text, text.count > 0 {
-        return searchDatas.count
+  // MARK: UITableViewDelegate, UITableViewDataSource
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if let text = searchTextField.text, text.count > 0 {
+      return searchDatas.count
+    }
+    return datas?.count ?? 0
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(TeamMemberCell.self)",
+      for: indexPath
+    ) as? TeamMemberCell {
+      if let model = getRealModel(indexPath.row) {
+        cell.configure(model)
+        cell.ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
       }
-      return datas?.count ?? 0
+      return cell
     }
+    return UITableViewCell()
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(TeamMemberCell.self)",
-        for: indexPath
-      ) as? TeamMemberCell {
-        if let model = getRealModel(indexPath.row) {
-          cell.configure(model)
-          cell.ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
-        }
-        return cell
-      }
-      return UITableViewCell()
-    }
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    62.0
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      62.0
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if let model = getRealModel(indexPath.row), let user = model.nimUser {
-        if IMKitLoginManager.instance.isMySelf(user.userId) {
-          Router.shared.use(
-            MeSettingRouter,
-            parameters: ["nav": navigationController as Any],
-            closure: nil
-          )
-        } else {
-          Router.shared.use(
-            ContactUserInfoPageRouter,
-            parameters: ["nav": navigationController as Any, "nim_user": user],
-            closure: nil
-          )
-        }
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if let model = getRealModel(indexPath.row), let user = model.nimUser {
+      if IMKitEngine.instance.isMySelf(user.userId) {
+        Router.shared.use(
+          MeSettingRouter,
+          parameters: ["nav": navigationController as Any],
+          closure: nil
+        )
+      } else {
+        Router.shared.use(
+          ContactUserInfoPageRouter,
+          parameters: ["nav": navigationController as Any, "nim_user": user],
+          closure: nil
+        )
       }
     }
+  }
 }

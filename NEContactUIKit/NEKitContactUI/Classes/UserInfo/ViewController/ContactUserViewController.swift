@@ -105,44 +105,44 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
     if isFriend {
       data = [
         [UserItem(
-          title: localizable("备注名"),
+          title: localizable("noteName"),
           detailTitle: user?.alias,
           value: false,
           textColor: UIColor.darkText,
           cellClass: TextWithRightArrowCell.self
         )],
         [
-          UserItem(title: localizable("手机"), detailTitle: user?.userInfo?.mobile,
+          UserItem(title: localizable("phone"), detailTitle: user?.userInfo?.mobile,
                    value: false,
                    textColor: UIColor.darkText, cellClass: TextWithDetailTextCell.self),
           UserItem(
-            title: localizable("邮箱"),
+            title: localizable("email"),
             detailTitle: user?.userInfo?.email,
             value: false,
             textColor: UIColor.darkText,
             cellClass: TextWithDetailTextCell.self
           ),
           UserItem(
-            title: localizable("个性签名"),
+            title: localizable("sign"),
             detailTitle: user?.userInfo?.sign,
             value: false,
             textColor: UIColor.darkText,
             cellClass: TextWithDetailTextCell.self
           ),
         ],
-        // UserItem(title: localizable("消息提醒"), detailTitle: "", value: false, textColor: UIColor.darkText, cellClass: TextWithSwitchCell.self) 隐藏消息提醒
+
         [UserItem(
-          title: localizable("加入黑名单"),
+          title: localizable("add_blackList"),
           detailTitle: "",
           value: isBlack,
           textColor: UIColor.darkText,
           cellClass: TextWithSwitchCell.self
         )],
         [
-          UserItem(title: localizable("聊天"), detailTitle: "", value: false,
+          UserItem(title: localizable("chat"), detailTitle: "", value: false,
                    textColor: UIColor(hexString: "#337EFF"), cellClass: CenterTextCell.self),
           UserItem(
-            title: localizable("删除好友"),
+            title: localizable("delete_friend"),
             detailTitle: "",
             value: false,
             textColor: UIColor.red,
@@ -152,7 +152,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
       ]
     } else {
       data = [[UserItem(
-        title: localizable("添加好友"),
+        title: localizable("add_friend"),
         detailTitle: user?.alias,
         value: false,
         textColor: UIColor(hexString: "#337EFF"),
@@ -194,9 +194,9 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
       c.switchButton.isOn = item.value
       c.block = { [weak self] title, value in
         print("title:\(title) value\(value)")
-        if title == localizable("加入黑名单") {
+        if title == localizable("add_blackList") {
           self?.blackList(isBlack: value)
-        } else if title == localizable("消息提醒") {}
+        } else if title == localizable("message_remind") {}
       }
 
       return c
@@ -212,7 +212,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let item = data[indexPath.section][indexPath.row]
-    if item.title == localizable("备注名") {
+    if item.title == localizable("noteName") {
       toEditRemarks()
     }
 //        if item.title == localizable("消息提醒") {
@@ -221,13 +221,13 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
 //        if item.title == localizable("加入黑名单") {
 //            blackList(isBlack: item.value)
 //        }
-    if item.title == localizable("聊天") {
+    if item.title == localizable("chat") {
       chat(user: user)
     }
-    if item.title == localizable("删除好友") {
+    if item.title == localizable("delete_friend") {
       deleteFriend(user: user)
     }
-    if item.title == localizable("添加好友") {
+    if item.title == localizable("add_friend") {
       addFriend()
     }
   }
@@ -293,16 +293,22 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
   }
 
   func deleteFriend(user: User?) {
-    print("edit remarks")
-    if let userId = user?.userId {
-      viewModel.deleteFriend(account: userId) { error in
-        if error != nil {
-          self.showToast(error?.localizedDescription ?? "")
-        } else {
-          self.navigationController?.popViewController(animated: true)
+    showAlert(
+      title: localizable("sure_delte_friend"),
+      message: "",
+      sureText: localizable("alert_sure"),
+      cancelText: localizable("alert_cancel")
+    ) { [self] in
+      if let userId = user?.userId {
+        viewModel.deleteFriend(account: userId) { error in
+          if error != nil {
+            self.showToast(error?.localizedDescription ?? "")
+          } else {
+            self.navigationController?.popViewController(animated: true)
+          }
         }
       }
-    }
+    } cancelBack: {}
   }
 
   @objc func addFriend() {
@@ -312,7 +318,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
         if let err = error {
           NELog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
         } else {
-          weakSelf?.showToast("好友申请已发送")
+          weakSelf?.showToast(localizable("send_friend_apply"))
         }
       }
     }

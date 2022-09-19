@@ -21,7 +21,6 @@
 "qchat_group_default_permission"="所有服务器成员默认权限";
 "qchat_sort"="排序";
 "qchat_create_new_id_group"="创建新身份组";
-"qchat_add_member"="添加成员";
 "qchat_group_name"="身份组名称";
 "qchat_manager_member"="成员管理";
 "qchat_edit"="编辑";
@@ -86,7 +85,7 @@
 "has_no_role"="无身份组可添加";
 "send_to"="发送给";
 "image_is_nil"= "图片为空";
-"text_is_nil"="内容为空";
+
 
 
 //MARK:toast
@@ -105,12 +104,12 @@
 "black_list"="黑名单";
 "channel_member"="频道成员";
 "delete_channel"="删除频道";
-"authority_setting"="权限设置";
+
 
 "add_group"="添加身份组";
 "add_member"="添加成员";
 "member_permission_setting"="成员权限设置";
-"group_permission_setting"="权限设置";
+
 "finish"="完成";
 "removeMember"="移除成员";
 "removeRole"="移除身份组";
@@ -130,7 +129,40 @@
 "auth12"="RemindAll";
 "auth13"="管理频道名单";
 
+//supplement
+"delete"="删除";
+"share_thoughts"="分享心得";
+"noMember_add"="无成员可添加";
+"search_serverId"="搜索服务器ID";
+"no_serverId"="暂无你要的服务器ID";
+"know"="知道了";
+"upload_headImage"="上传头像";
+"enter_serverName"="  请输入服务器名称";
+"request_sended"="请求已发送";
+"message_channel"="消息频道";
+"server_nochannel"="该服务器下暂无频道";
+"applied"="已申请";
+"join"="加入";
+"modify_nickname"="请点击编辑后修改昵称";
+"sure_exit_server"="确定退出当前服务器?";
+"sure_delete_server"="确定删除当前服务器?";
+"serverId_notbe_empty"="服务器id不能为空";
+"enter_name"="输入名称";
+"kick_currentMember"="确定踢出当前成员?";
+"sure_delete"="确定删除";
+"current_identity"="当前身份组";
+"hm"="HH:mm";
+"mdhm"="MM月dd日 HH:mm";
+"ymdhm"="yyyy年MM月dd日 HH:mm";
+
 //MARK：error toast
 "param_error"="Parameter error";
 "no_Permession"="暂无权限在该频道发言";
-
+"channelName_cannot_be_empty"="频道名称不能为空";
+"network_error"="当前网络错误";
+"cant_join"="无法加入？";
+"blocked_from_server_cant_join"="你被该服务器封禁，无法加入。";
+"serverName_limit"="服务器命名不超过50个字符";
+"add_favorite_service"="暂无服务器，\n赶紧去添加心仪的服务器吧";
+"nickName_not_empty"="昵称不能为空";
+"accid_not_empty"="accid 不能为空";

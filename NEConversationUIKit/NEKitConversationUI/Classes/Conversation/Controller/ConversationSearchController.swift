@@ -53,11 +53,16 @@ open class SearchSessionHeaderView: UITableViewHeaderFooterView {
   }()
 }
 
-public class ConversationSearchController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
+public class ConversationSearchController: NEBaseViewController, UITableViewDelegate,
+  UITableViewDataSource {
   private var viewModel = ConversationSearchViewModel()
   private let tag = "ConversationSearchController"
   private var searchStr = ""
-  private let headTitleArr = ["好友", "讨论组", "高级群"]
+  private let headTitleArr = [
+    localizable("friend"),
+    localizable("discussion_group"),
+    localizable("senior_group"),
+  ]
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -101,7 +106,7 @@ public class ConversationSearchController: NEBaseViewController,UITableViewDeleg
   }
 
   func initialConfig() {
-    title = "搜索"
+    title = localizable("search")
   }
 
   // MARK: private method
@@ -170,7 +175,7 @@ public class ConversationSearchController: NEBaseViewController,UITableViewDeleg
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always
-    textField.placeholder = localizable("搜索")
+    textField.placeholder = localizable("search")
     textField.font = UIFont.systemFont(ofSize: 14)
     textField.textColor = UIColor.ne_greyText
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -179,112 +184,116 @@ public class ConversationSearchController: NEBaseViewController,UITableViewDeleg
     textField.clearButtonMode = .whileEditing
     textField.returnKeyType = .search
     textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
-    textField.placeholder = "请输入你要搜索的关键字"
+    textField.placeholder = localizable("search_keyword")
     return textField
   }()
 
   private lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(imageName: "user_empty", content: "该用户不存在", frame: CGRect.zero)
+    let view = NEEmptyDataView(
+      imageName: "user_empty",
+      content: localizable("user_not_exist"),
+      frame: CGRect.zero
+    )
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
     return view
 
   }()
-    
-    //MARK: UITableViewDelegate, UITableViewDataSource
-    public func numberOfSections(in tableView: UITableView) -> Int {
-      return 3
-    }
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if let friend = viewModel.searchResult?.friend, section == 0 {
-        return friend.count
-      } else if let contactGroup = viewModel.searchResult?.contactGroup, section == 1 {
-        return contactGroup.count
-      } else if let seniorGroup = viewModel.searchResult?.seniorGroup, section == 2 {
-        return seniorGroup.count
-      } else {
-        return 0
+  // MARK: UITableViewDelegate, UITableViewDataSource
+
+  public func numberOfSections(in tableView: UITableView) -> Int {
+    3
+  }
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if let friend = viewModel.searchResult?.friend, section == 0 {
+      return friend.count
+    } else if let contactGroup = viewModel.searchResult?.contactGroup, section == 1 {
+      return contactGroup.count
+    } else if let seniorGroup = viewModel.searchResult?.seniorGroup, section == 2 {
+      return seniorGroup.count
+    } else {
+      return 0
+    }
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(NSStringFromClass(ConversationSearchCell.self))",
+      for: indexPath
+    ) as! ConversationSearchCell
+    if indexPath.section == 0 {
+      cell.searchModel = viewModel.searchResult?.friend[indexPath.row]
+    } else if indexPath.section == 1 {
+      cell.searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
+    } else {
+      cell.searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
+    }
+    cell.searchText = searchStr
+    return cell
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if indexPath.section == 0 {
+      let searchModel = viewModel.searchResult?.friend[indexPath.row]
+      if let userId = searchModel?.userInfo?.userId {
+        let session = NIMSession(userId, type: .P2P)
+        Router.shared.use(
+          PushP2pChatVCRouter,
+          parameters: ["nav": navigationController as Any, "session": session as Any],
+          closure: nil
+        )
+      }
+
+    } else if indexPath.section == 1 {
+      let searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
+      if let teamId = searchModel?.teamInfo?.teamId {
+        let session = NIMSession(teamId, type: .team)
+        Router.shared.use(
+          PushTeamChatVCRouter,
+          parameters: ["nav": navigationController as Any, "session": session as Any],
+          closure: nil
+        )
+      }
+    } else {
+      let searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
+      if let teamId = searchModel?.teamInfo?.teamId {
+        let session = NIMSession(teamId, type: .team)
+        Router.shared.use(
+          PushTeamChatVCRouter,
+          parameters: ["nav": navigationController as Any, "session": session as Any],
+          closure: nil
+        )
       }
     }
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(NSStringFromClass(ConversationSearchCell.self))",
-        for: indexPath
-      ) as! ConversationSearchCell
-      if indexPath.section == 0 {
-        cell.searchModel = viewModel.searchResult?.friend[indexPath.row]
-      } else if indexPath.section == 1 {
-        cell.searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
-      } else {
-        cell.searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
-      }
-      cell.searchText = searchStr
-      return cell
+  public func tableView(_ tableView: UITableView,
+                        viewForHeaderInSection section: Int) -> UIView? {
+    let sectionView = tableView
+      .dequeueReusableHeaderFooterView(
+        withIdentifier: "\(NSStringFromClass(SearchSessionHeaderView.self))"
+      ) as! SearchSessionHeaderView
+    sectionView.setUpTitle(title: headTitleArr[section])
+    sectionView.backgroundView = UIView()
+    return sectionView
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForHeaderInSection section: Int) -> CGFloat {
+    if let friend = viewModel.searchResult?.friend, friend.count > 0, section == 0 {
+      return 30
+
+    } else if let contactGroup = viewModel.searchResult?.contactGroup, contactGroup.count > 0,
+              section == 1 {
+      return 30
+    } else if let seniorGroup = viewModel.searchResult?.seniorGroup, seniorGroup.count > 0,
+              section == 2 {
+      return 30
+    } else {
+      return 0
     }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if indexPath.section == 0 {
-        let searchModel = viewModel.searchResult?.friend[indexPath.row]
-        if let userId = searchModel?.userInfo?.userId {
-          let session = NIMSession(userId, type: .P2P)
-          Router.shared.use(
-            PushP2pChatVCRouter,
-            parameters: ["nav": navigationController as Any, "session": session as Any],
-            closure: nil
-          )
-        }
-
-      } else if indexPath.section == 1 {
-        let searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
-        if let teamId = searchModel?.teamInfo?.teamId {
-          let session = NIMSession(teamId, type: .team)
-          Router.shared.use(
-            PushTeamChatVCRouter,
-            parameters: ["nav": navigationController as Any, "session": session as Any],
-            closure: nil
-          )
-        }
-      } else {
-        let searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
-        if let teamId = searchModel?.teamInfo?.teamId {
-          let session = NIMSession(teamId, type: .team)
-          Router.shared.use(
-            PushTeamChatVCRouter,
-            parameters: ["nav": navigationController as Any, "session": session as Any],
-            closure: nil
-          )
-        }
-      }
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          viewForHeaderInSection section: Int) -> UIView? {
-      let sectionView = tableView
-        .dequeueReusableHeaderFooterView(
-          withIdentifier: "\(NSStringFromClass(SearchSessionHeaderView.self))"
-        ) as! SearchSessionHeaderView
-      sectionView.setUpTitle(title: headTitleArr[section])
-      sectionView.backgroundView = UIView()
-      return sectionView
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForHeaderInSection section: Int) -> CGFloat {
-      if let friend = viewModel.searchResult?.friend, friend.count > 0, section == 0 {
-        return 30
-
-      } else if let contactGroup = viewModel.searchResult?.contactGroup, contactGroup.count > 0,
-                section == 1 {
-        return 30
-      } else if let seniorGroup = viewModel.searchResult?.seniorGroup, seniorGroup.count > 0,
-                section == 2 {
-        return 30
-      } else {
-        return 0
-      }
-    }
+  }
 }
-

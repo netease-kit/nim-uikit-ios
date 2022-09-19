@@ -8,7 +8,7 @@ import NIMSDK
 import NEKitCoreIM
 import NEKitCommonUI
 
-public class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UITableViewDelegate,
+public class ReadViewController: ChatBaseViewController, UIScrollViewDelegate, UITableViewDelegate,
   UITableViewDataSource {
   public var read: Bool = true
   public var line: UIView = .init()
@@ -37,7 +37,7 @@ public class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UIT
   func commonUI() {
     title = localizable("message_read")
     readButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-    readButton.setTitle("已读(0）", for: .normal)
+    readButton.setTitle(localizable("read"), for: .normal)
     readButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     readButton.translatesAutoresizingMaskIntoConstraints = false
     readButton.addTarget(self, action: #selector(readButtonEvent), for: .touchUpInside)
@@ -45,7 +45,7 @@ public class ReadViewController: NEBaseViewController, UIScrollViewDelegate, UIT
 
     unreadButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     unreadButton.setTitleColor(UIColor.ne_darkText, for: .normal)
-    unreadButton.setTitle("未读(0）", for: .normal)
+    unreadButton.setTitle(localizable("unread"), for: .normal)
     unreadButton.translatesAutoresizingMaskIntoConstraints = false
     unreadButton.addTarget(self, action: #selector(unreadButtonEvent), for: .touchUpInside)
 

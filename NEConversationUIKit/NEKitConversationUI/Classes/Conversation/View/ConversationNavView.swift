@@ -81,7 +81,7 @@ class ConversationNavView: UIView {
 
   private lazy var brandBtn: UIButton = {
     let button = UIButton()
-    button.setTitle(localizable("云信IM"), for: .normal)
+    button.setTitle(localizable("appName"), for: .normal)
     button.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
     button.layoutButtonImage(style: .left, space: 12)
     button.translatesAutoresizingMaskIntoConstraints = false

@@ -17,26 +17,27 @@ public class NEMessageUtil {
         text = messageText
       }
     case .audio:
-      text = "[语音]"
+      text = localizable("voice")
     case .image:
-      text = "[图片]"
+      text = localizable("picture")
     case .video:
-      text = "[视频]"
+      text = localizable("video")
     case .location:
-      text = "[位置]"
+      text = localizable("location")
     case .notification:
-      text = "[通知]"
+      text = localizable("notification")
     case .file:
-      text = "[文件]"
+      text = localizable("file")
     case .tip:
       if let messageText = message.text {
         text = messageText
       }
     case .rtcCallRecord:
       let record = message.messageObject as? NIMRtcCallRecordObject
-      text = (record?.callType == .audio) ? "[网络通话]" : "[视频聊天]"
+      text = (record?.callType == .audio) ? localizable("internet_phone") :
+        localizable("video_chat")
     default:
-      text = "[未知消息]"
+      text = localizable("unknown")
     }
 
     return text

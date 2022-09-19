@@ -5,7 +5,9 @@
 
 import Foundation
 
-public enum ConversationRouter {
+@objcMembers
+public class ConversationRouter:NSObject {
+    
   public static func register() {
     Router.shared.register(SearchContactPageRouter) { param in
       let nav = param["nav"] as? UINavigationController
@@ -19,4 +21,5 @@ public enum ConversationRouter {
       nav?.pushViewController(conversation, animated: true)
     }
   }
+    
 }

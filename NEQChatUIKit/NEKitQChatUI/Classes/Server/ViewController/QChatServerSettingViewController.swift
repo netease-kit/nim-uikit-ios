@@ -10,7 +10,8 @@ import NIMSDK
 
 typealias SaveSuccessBlock = (_ server: QChatServer?) -> Void
 
-public class QChatServerSettingViewController: NEBaseTableViewController,UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate,UINavigationControllerDelegate {
+public class QChatServerSettingViewController: NEBaseTableViewController, UITableViewDelegate,
+  UITableViewDataSource, UITextFieldDelegate, UINavigationControllerDelegate {
   let viewModel = SettingViewModel()
   var server: QChatServer?
 
@@ -173,7 +174,7 @@ public class QChatServerSettingViewController: NEBaseTableViewController,UITable
       serverNameInput.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 38),
       serverNameInput.heightAnchor.constraint(equalToConstant: 50),
     ])
-    serverNameInput.placeholder = "输入名称"
+    serverNameInput.placeholder = localizable("enter_name")
     serverNameInput.tag = 50
     if let name = server?.name {
       serverNameInput.text = name
@@ -241,253 +242,252 @@ public class QChatServerSettingViewController: NEBaseTableViewController,UITable
     textField.delegate = self
     return textField
   }
-    
-    // MARK: action
-    @objc func cameraClick() {
-      // print("camera click")
-      showBottomAlert(self)
+
+  // MARK: action
+
+  @objc func cameraClick() {
+    // print("camera click")
+    showBottomAlert(self)
+  }
+
+  @objc func saveClick() {
+    print("save click")
+
+    var name = ""
+
+    if let currentName = serverNameInput.text, currentName.count > 0 {
+      name = currentName
+    } else if let originServerName = server?.name, originServerName.count > 0 {
+      name = originServerName
     }
 
-    @objc func saveClick() {
-      print("save click")
+    if name.count <= 0 {
+      showToast(localizable("qchat_not_empty_servername"))
+      return
+    }
 
-      var name = ""
+    if let icon = headerImageUrl {
+      server?.icon = icon
+    }
 
-      if let currentName = serverNameInput.text, currentName.count > 0 {
-        name = currentName
-      } else if let originServerName = server?.name, originServerName.count > 0 {
-        name = originServerName
+    var serverParam = UpdateServerParam(name: name, icon: headerImageUrl)
+
+    guard let sid = server?.serverId else {
+      showToast(localizable("serverId_notbe_empty"))
+      return
+    }
+    serverParam.serverId = sid
+
+    if let topic = serverThemeInput.text, topic.count > 0 {
+      serverParam.custom = getJSONStringFromDictionary(["topic": topic])
+    }
+    weak var weakSelf = self
+
+    view.makeToastActivity(.center)
+    print("update param : ", serverParam)
+    QChatServerProvider.shared.updateServer(serverParam) { error in
+      print("update finish : ", error as Any)
+      weakSelf?.view.hideToastActivity()
+      if let err = error {
+        weakSelf?.showToast(err.localizedDescription)
+      } else {
+        weakSelf?.navigationController?.popViewController(animated: true)
       }
+    }
+  }
 
-      if name.count <= 0 {
-        showToast(localizable("qchat_not_empty_servername"))
-        return
-      }
-
-      if let icon = headerImageUrl {
-        server?.icon = icon
-      }
-
-      var serverParam = UpdateServerParam(name: name, icon: headerImageUrl)
-
-      guard let sid = server?.serverId else {
-        showToast("服务器id不能为空")
-        return
-      }
-      serverParam.serverId = sid
-
-      if let topic = serverThemeInput.text, topic.count > 0 {
-        serverParam.custom = getJSONStringFromDictionary(["topic": topic])
-      }
+  func leaveServer() {
+    if let serverid = server?.serverId {
       weak var weakSelf = self
-
       view.makeToastActivity(.center)
-      print("update param : ", serverParam)
-      QChatServerProvider.shared.updateServer(serverParam) { error in
-        print("update finish : ", error as Any)
+      let className = className()
+      viewModel.repo.leaveServer(serverid) { error in
         weakSelf?.view.hideToastActivity()
         if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+          NELog.errorLog(className, desc: "leave server error : \(err)")
+          weakSelf?.view.makeToast(err.localizedDescription)
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
+  }
 
-    func leaveServer() {
-      if let serverid = server?.serverId {
-        weak var weakSelf = self
-        view.makeToastActivity(.center)
-        let className = className()
-        viewModel.repo.leaveServer(serverid) { error in
-          weakSelf?.view.hideToastActivity()
-          if let err = error {
-            NELog.errorLog(className, desc: "leave server error : \(err)")
-            weakSelf?.view.makeToast(err.localizedDescription)
-          } else {
-            weakSelf?.navigationController?.popViewController(animated: true)
-          }
-        }
-      }
-    }
-
-    func deleteServer() {
-      if let serverid = server?.serverId {
-        weak var weakSelf = self
-        view.makeToastActivity(.center)
-        QChatServerProvider.shared.deleteServer(serverid) { error in
-          print("delete result : ", error as Any)
-          weakSelf?.view.hideToastActivity()
-          if let err = error {
-            weakSelf?.view.makeToast(err.localizedDescription)
-          } else {
-            weakSelf?.navigationController?.popViewController(animated: true)
-          }
-        }
-      }
-    }
-    //MARK: UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate
-    
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                          replacementString string: String) -> Bool {
-      let l = textField.tag
-      let text = "\(textField.text ?? "")\(string)"
-      print("count : ", text.count)
-      if text.count > l {
-        return false
-      }
-      return true
-    }
-
-    public func numberOfSections(in tableView: UITableView) -> Int {
-      2
-    }
-
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      print("count section : ", section)
-      if section == 0 {
-        return viewModel.permissions.count
-      } else if section == 1 {
-        return 1
-      }
-      return 0
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      if indexPath.section == 0 {
-        let textCell: QChatTextArrowCell = tableView.dequeueReusableCell(
-          withIdentifier: "\(QChatTextArrowCell.self)",
-          for: indexPath
-        ) as! QChatTextArrowCell
-        let model = viewModel.permissions[indexPath.row]
-        textCell.titleLabel.text = model.title
-        textCell.backgroundColor = .clear
-        textCell.cornerType = model.cornerType
-        return textCell
-      } else if indexPath.section == 1 {
-        let destructiveCell: QChatDestructiveCell = tableView.dequeueReusableCell(
-          withIdentifier: "\(QChatDestructiveCell.self)",
-          for: indexPath
-        ) as! QChatDestructiveCell
-
-        destructiveCell.redTextLabel
-          .text = isMyServer() ? localizable("qchat_delete_server") :
-          localizable("qchat_leave_server")
-        destructiveCell.cornerType = CornerType.bottomLeft.union(CornerType.bottomRight)
-          .union(CornerType.topLeft).union(CornerType.topRight)
-        return destructiveCell
-      }
-
-      return UITableViewCell()
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if indexPath.section == 0 {
-        if indexPath.row == 1 {
-          let idGroupController = QChatIdGroupViewController()
-          idGroupController.serverid = server?.serverId
-          if let owner = server?.owner, owner == IMKitLoginManager.instance.imAccid {
-            idGroupController.isOwner = true
-          }
-          navigationController?.pushViewController(idGroupController, animated: true)
-
-        } else if indexPath.row == 0 {
-          let memberCtrl = MemberListViewController()
-          memberCtrl.serverId = server?.serverId
-          navigationController?.pushViewController(memberCtrl, animated: true)
-        }
-
-      } else if indexPath.section == 1 {
-        print("click delete")
-        weak var weakSelf = self
-        if isMyServer() == true {
-          showAlert(message: "确定删除当前服务器?") {
-            weakSelf?.deleteServer()
-          }
+  func deleteServer() {
+    if let serverid = server?.serverId {
+      weak var weakSelf = self
+      view.makeToastActivity(.center)
+      QChatServerProvider.shared.deleteServer(serverid) { error in
+        print("delete result : ", error as Any)
+        weakSelf?.view.hideToastActivity()
+        if let err = error {
+          weakSelf?.view.makeToast(err.localizedDescription)
         } else {
-          showAlert(message: "确定退出当前服务器?") {
-            weakSelf?.leaveServer()
-          }
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      if indexPath.section == 0 {
-        return 48
-      } else if indexPath.section == 1 {
-        return 40
-      }
-      return 0
-    }
+  // MARK: UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate
 
-    public func tableView(_ tableView: UITableView,
-                          viewForHeaderInSection section: Int) -> UIView? {
-      if section == 1 {
-        return UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 24))
-      }
-      return nil
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForHeaderInSection section: Int) -> CGFloat {
-      if section == 1 {
-        return 24
-      }
-      return 0
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          heightForFooterInSection section: Int) -> CGFloat {
-      0
-    }
-
-    func isMyServer() -> Bool {
-      if let owner = server?.owner {
-        let accid = IMKitLoginManager.instance.imAccid
-        if owner == accid {
-          return true
-        }
-      }
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                        replacementString string: String) -> Bool {
+    let l = textField.tag
+    let text = "\(textField.text ?? "")\(string)"
+    print("count : ", text.count)
+    if text.count > l {
       return false
     }
-    
-    //UINavigationControllerDelegate
-    func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController
-                                 .InfoKey: Any]) {
-      let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
-      uploadHeadImage(image: image)
-      picker.dismiss(animated: true, completion: nil)
+    return true
+  }
+
+  public func numberOfSections(in tableView: UITableView) -> Int {
+    2
+  }
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    print("count section : ", section)
+    if section == 0 {
+      return viewModel.permissions.count
+    } else if section == 1 {
+      return 1
+    }
+    return 0
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    if indexPath.section == 0 {
+      let textCell: QChatTextArrowCell = tableView.dequeueReusableCell(
+        withIdentifier: "\(QChatTextArrowCell.self)",
+        for: indexPath
+      ) as! QChatTextArrowCell
+      let model = viewModel.permissions[indexPath.row]
+      textCell.titleLabel.text = model.title
+      textCell.backgroundColor = .clear
+      textCell.cornerType = model.cornerType
+      return textCell
+    } else if indexPath.section == 1 {
+      let destructiveCell: QChatDestructiveCell = tableView.dequeueReusableCell(
+        withIdentifier: "\(QChatDestructiveCell.self)",
+        for: indexPath
+      ) as! QChatDestructiveCell
+
+      destructiveCell.redTextLabel
+        .text = isMyServer() ? localizable("qchat_delete_server") :
+        localizable("qchat_leave_server")
+      destructiveCell.cornerType = CornerType.bottomLeft.union(CornerType.bottomRight)
+        .union(CornerType.topLeft).union(CornerType.topRight)
+      return destructiveCell
     }
 
-    public func uploadHeadImage(image: UIImage) {
-      view.makeToastActivity(.center)
-      if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-        let filePath = NSHomeDirectory().appending("/Documents/")
-          .appending(IMKitLoginManager.instance.imAccid)
-        let succcess = imageData.write(toFile: filePath, atomically: true)
-        weak var weakSelf = self
-        if succcess {
-          NIMSDK.shared().resourceManager
-            .upload(filePath, progress: nil) { urlString, error in
-              if error == nil {
-                // 显示设置的照片
-                weakSelf?.headerImage?.image = image
-                weakSelf?.headerImageUrl = urlString
-                weakSelf?.headerImage?.titleLabel.isHidden = true
-                print("upload image success")
-              } else {
-                print("upload image failed,error = \(error!)")
-              }
-              weakSelf?.view.hideToastActivity()
-            }
+    return UITableViewCell()
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if indexPath.section == 0 {
+      if indexPath.row == 1 {
+        let idGroupController = QChatIdGroupViewController()
+        idGroupController.serverid = server?.serverId
+        if let owner = server?.owner, owner == IMKitEngine.instance.imAccid {
+          idGroupController.isOwner = true
+        }
+        navigationController?.pushViewController(idGroupController, animated: true)
+
+      } else if indexPath.row == 0 {
+        let memberCtrl = MemberListViewController()
+        memberCtrl.serverId = server?.serverId
+        navigationController?.pushViewController(memberCtrl, animated: true)
+      }
+
+    } else if indexPath.section == 1 {
+      print("click delete")
+      weak var weakSelf = self
+      if isMyServer() == true {
+        showAlert(message: localizable("sure_delete_server")) {
+          weakSelf?.deleteServer()
+        }
+      } else {
+        showAlert(message: localizable("sure_exit_server")) {
+          weakSelf?.leaveServer()
         }
       }
     }
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    if indexPath.section == 0 {
+      return 48
+    } else if indexPath.section == 1 {
+      return 40
+    }
+    return 0
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        viewForHeaderInSection section: Int) -> UIView? {
+    if section == 1 {
+      return UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 24))
+    }
+    return nil
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForHeaderInSection section: Int) -> CGFloat {
+    if section == 1 {
+      return 24
+    }
+    return 0
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForFooterInSection section: Int) -> CGFloat {
+    0
+  }
+
+  func isMyServer() -> Bool {
+    if let owner = server?.owner {
+      let accid = IMKitEngine.instance.imAccid
+      if owner == accid {
+        return true
+      }
+    }
+    return false
+  }
+
+  // UINavigationControllerDelegate
+  func imagePickerController(_ picker: UIImagePickerController,
+                             didFinishPickingMediaWithInfo info: [UIImagePickerController
+                               .InfoKey: Any]) {
+    let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
+    uploadHeadImage(image: image)
+    picker.dismiss(animated: true, completion: nil)
+  }
+
+  public func uploadHeadImage(image: UIImage) {
+    view.makeToastActivity(.center)
+    if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
+      let filePath = NSHomeDirectory().appending("/Documents/")
+        .appending(IMKitEngine.instance.imAccid)
+      let succcess = imageData.write(toFile: filePath, atomically: true)
+      weak var weakSelf = self
+      if succcess {
+        NIMSDK.shared().resourceManager
+          .upload(filePath, progress: nil) { urlString, error in
+            if error == nil {
+              // 显示设置的照片
+              weakSelf?.headerImage?.image = image
+              weakSelf?.headerImageUrl = urlString
+              weakSelf?.headerImage?.titleLabel.isHidden = true
+              print("upload image success")
+            } else {
+              print("upload image failed,error = \(error!)")
+            }
+            weakSelf?.view.hideToastActivity()
+          }
+      }
+    }
+  }
 }
-
-
-

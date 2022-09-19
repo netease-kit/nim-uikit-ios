@@ -63,7 +63,7 @@ class ChatRecordView: UIView, UIGestureRecognizerDelegate {
     recordImageView.addGestureRecognizer(guesture)
 
     tipLabel.translatesAutoresizingMaskIntoConstraints = false
-    tipLabel.text = localizable("按住说话")
+    tipLabel.text = localizable("press_speak")
     tipLabel.font = UIFont.systemFont(ofSize: 12)
     tipLabel.textColor = .ne_lightText
     tipLabel.textAlignment = .center

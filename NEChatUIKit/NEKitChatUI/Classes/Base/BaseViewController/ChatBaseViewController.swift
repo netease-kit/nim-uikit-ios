@@ -6,18 +6,24 @@
 import UIKit
 import NEKitCore
 
-class ChatBaseViewController: NEBaseViewController {
-  override func viewDidLoad() {
+@objc open class ChatBaseViewController: UIViewController {
+  override open func viewDidLoad() {
     super.viewDidLoad()
+    view.backgroundColor = .white
+    setupBackUI()
   }
 
-  /*
-   // MARK: - Navigation
+  private func setupBackUI() {
+    let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
+    navigationItem.leftBarButtonItem = UIBarButtonItem(
+      image: image,
+      style: .plain,
+      target: self,
+      action: #selector(backEvent)
+    )
+  }
 
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       // Get the new view controller using segue.destination.
-       // Pass the selected object to the new view controller.
-   }
-   */
+  @objc func backEvent() {
+    navigationController?.popViewController(animated: true)
+  }
 }

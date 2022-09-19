@@ -184,16 +184,16 @@ open class ConversationListCell: UITableViewCell {
     let fmt = DateFormatter()
 
     if targetDate.isToday() {
-      fmt.dateFormat = "HH:mm"
+      fmt.dateFormat = localizable("hm")
       return fmt.string(from: targetDate)
 
     } else {
       if targetDate.isThisYear() {
-        fmt.dateFormat = "MM月dd日 HH:mm"
+        fmt.dateFormat = localizable("mdhm")
         return fmt.string(from: targetDate)
 
       } else {
-        fmt.dateFormat = "yyyy年MM月dd日 HH:mm"
+        fmt.dateFormat = localizable("ymdhm")
         return fmt.string(from: targetDate)
       }
     }

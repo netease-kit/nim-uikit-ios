@@ -20,7 +20,6 @@ open class P2PChatViewController: ChatViewController {
     let title = user?.showName() ?? ""
     self.title = title
     titleContent = title
-    // self.menuView.textField.placeholder = localizable("send_to") + title
     menuView.textField.placeholder = localizable("send_to") + title as NSString
   }
 

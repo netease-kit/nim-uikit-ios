@@ -3,49 +3,48 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-"mark"="标记";
-"history"="历史记录";
-"message_remind"="开启消息提醒";
-"session_set_top"="聊天置顶";
-
-"team_nick"="我在群里的昵称";
-"team_no_speak"="群禁言";
-
-"invite_permission"="邀请他人权限";
-"modify_team_info_permission"="群资料修改权限";
-"agree"="是否需要被邀请者同意";
-
-"setting"="设置";
-
-"group_memmber"="群成员";
-"discuss_mebmer"="讨论组成员";
-
-"dismiss_team"="解散群聊";
-"leave_team"="退出群聊";
-"leave_discuss"="退出讨论组";
-
-"team_header"="群头像";
-"team_name"="群名称";
-"team_intr"="群介绍";
-
-"default_icon"="选择默认图标";
-
-"senior_team"="高级群";
-"normal_team"="讨论组";
-
-"create_senior_team_noti"="成功创建高级群";
-
-"team_all"="所有人";
-"team_owner"="群主";
+"mark"="pin";
+"history"="History";
+"message_remind"="Open message remind";
+"session_set_top"="Sticky on Top";
+"team_nick"="My Alias in Group";
+"team_no_speak"="Mute";
+"invite_permission"="Invite Permission";
+"modify_team_info_permission"="Group info Permission";
+"agree"="是否需要被邀请者同意";//后期能力删除
+"setting"="Setting";
+"group_memmber"="Group Member";
+"discuss_mebmer"="Temp Group Member";
+"dismiss_team"="Disband Group";
+"leave_team"="Leave Group";
+"leave_discuss"="Leave Temp Group";
+"team_header"=" Group Avator";
+"team_name"="Group Name";
+"team_intr"="Group Info";
+"default_icon"="Select Default icon";
+"senior_team"="Group";
+"normal_team"="Temp Group";
+"create_senior_team_noti"=" Create Group successfully";
+"team_all"="all";
+"team_owner"="Group Admin";
 
 
-
-
-
-
-
-
-
-
-
-
+"modify_headImage"="Modify Avatar";
+"save"="Save";
+"historical_record"="History";
+"search"="Search";
+"no_search_results"="No content";
+"discuss_info"="Temp Group Info";
+"group_info"="Group Info";
+"discuss_introduce"="Temp Group Introduce";
+"search_friend"="Search Contact";
+"discuss_name"="Temp Group Name";
+"dissolute_team_chat"="Wether to disband Group";
+"quit_team_chat"="Wether to leave Group";
+"quit_discuss_chat"="Wether to leave Temp Group";
+"cancel"="cancel";
+"remind"="remind";
+"discuss_avatar"="Temp Group Avator";
+"discuss_name"="Temp Group Name";
+"discuss_intro"="Temp Group Introduce";
+"invite_has_send"="Invitation sent";

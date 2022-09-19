@@ -4,12 +4,31 @@
 // found in the LICENSE file.
 
 //MAKR：common
-
-"add_friend"="添加好友";
-"create_discussion_group"="创建讨论组";
-"create_senior_group"="创建高级群";
-
-
+"add_friend"="Add Contacts";
+"create_discussion_group"="Create Temp Group";
+"create_senior_group"="Create Group";
+"cancel_stickTop"="Cancel topping";
+"stickTop"="Sticky on Top";
+"delete"="Cancel";
+"friend"="Contact";
+"discussion_group"="Temp Group";
+"senior_group"="Group";
+"search"="Search";
+"search_keyword"="Enter the key words";
+"user_not_exist"="Not Exist";
+"hm"="HH:mm";
+"mdhm"="MM.dd HH:mm";
+"ymdhm"="yyyy.MM.dd HH:mm";
+"voice"="[aduio]";
+"picture"="[picture]";
+"video"="[Video]";
+"location"="[Loaction]";
+"notification"="[Tip]";
+"file"="[File]";
+"internet_phone"="[Audio_Chat]";
+"video_chat"="[Video_Chat]";
+"unknown"="[Unknown Message]";
+"appName"="CommsEase IM";
 
 
 

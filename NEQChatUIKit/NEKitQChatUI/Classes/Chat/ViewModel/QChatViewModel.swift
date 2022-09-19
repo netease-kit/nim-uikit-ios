@@ -34,7 +34,7 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
     if let cid = channel?.channelId, let sid = channel?.serverId {
       let message = NIMQChatMessage()
       message.text = text
-      message.from = IMKitLoginManager.instance.imAccid
+      message.from = IMKitEngine.instance.imAccid
       QChatSystemMessageProvider.shared.sendMessage(
         message: message,
         session: NIMSession(forQChat: Int64(cid), qchatServerId: Int64(sid))
@@ -49,7 +49,7 @@ public class QChatViewModel: NSObject, NIMQChatMessageManagerDelegate {
     if let cid = channel?.channelId, let sid = channel?.serverId {
       let message = NIMQChatMessage()
       message.messageObject = NIMImageObject(image: image)
-      message.from = IMKitLoginManager.instance.imAccid
+      message.from = IMKitEngine.instance.imAccid
       QChatSystemMessageProvider.shared.sendMessage(
         message: message,
         session: NIMSession(forQChat: Int64(cid), qchatServerId: Int64(sid))

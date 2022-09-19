@@ -28,7 +28,7 @@ class TeamMemberCell: UITableViewCell {
     label.layer.cornerRadius = 4.0
     label.layer.borderColor = NEConstant.hexRGB(0xB9D3FF).cgColor
     label.layer.borderWidth = 1.0
-    label.text = "群主"
+    label.text = localizable("team_owner")
     label.textAlignment = .center
     return label
   }()

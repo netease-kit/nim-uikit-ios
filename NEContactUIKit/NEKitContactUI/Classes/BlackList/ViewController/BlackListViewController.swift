@@ -19,7 +19,7 @@ public class BlackListViewController: UIViewController, UITableViewDelegate, UIT
   }
 
   func commonUI() {
-    title = "黑名单"
+    title = localizable("blacklist")
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     navigationItem.leftBarButtonItem = UIBarButtonItem(
       image: image,
