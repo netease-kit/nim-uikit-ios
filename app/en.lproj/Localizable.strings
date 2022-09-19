@@ -1,0 +1,58 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"open_push"="Please open the push in the setting";
+"message"="Message";
+"qchat"="Qchat";
+"contact"="Contact";
+"mine"="Me";
+"logout"="Log out";
+"about_yunxin"="About CommsEase";
+"want_to_logout"="Sure to log out?";
+"person_info"="My Proflie";
+"cancel"="Cancel";
+"setting_birthday_failure"="Set birthday Failed";
+"setting_head_failure"="Set Avatar Failed";
+"setting_nickname_failure"="Set Nick Name Failed";
+"male"="Male";
+"female"="Female";
+"change_gender_failure"="Set Sex Failed";
+"change_phone_failure"="Set mobile Failed";
+"change_email_failure"="Set e-mail Failed";
+"change_sign_failure"="Set What's up Failed";
+"copy_success"="Copy ssuccessfully";
+"save"="Save";
+"birehday"="Birthday";
+"phone"="Mobile";
+"email"="E-mail";
+"sign_remind"="sign remind";
+
+"message_remind"="Message Notification";
+"product_intro"="Product introduction";
+"receiver_mode"="Handset mode";
+"delete_friend"="删除好友是否同步删除备注";//功能移除可删除
+"message_read_function"="Read/Unread";
+"version"="Version";
+"headImage"="Avator";
+"nickname"="Nick Name";
+"account"="Account";
+"gneder"="Sex";
+"unknown"="Unknown";
+"individuality_sign"="What's up";
+"new_message_remind"="message notification";
+"ring_mode"="Ring mode";
+"vibration_mode"="Vibration mode";
+"syn_receive_push"="PC/Web同步接收推送";//功能移除可删除
+"display_message_detail"="displays the details in notification bar";
+"setting"="Setting";
+"confirm"="yes";
+"cancel"="cancel";
+"real_service"="Truly Stable IM Product";
+"appName"="CommsEase IM";
+"brand_des"="CommsEase";
+
+//image
+
+
