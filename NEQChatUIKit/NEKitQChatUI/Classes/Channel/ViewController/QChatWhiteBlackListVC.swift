@@ -73,7 +73,7 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
       ) as! QChatTextCell
       cell.backgroundColor = .white
       cell.rightStyle = .indicate
-      cell.titleLabel.text = localizable("qchat_add_member")
+      cell.titleLabel.text = localizable("add_member")
       return cell
     } else {
       let cell = tableView.dequeueReusableCell(
@@ -87,7 +87,7 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
 //            if CoreKitEngine.instance.imAccid == member?.accid, self.type == .white {
 //                cell.rightStyle = .none
 //            }
-      if IMKitLoginManager.instance.imAccid == member?.accid, type == .white {
+      if IMKitEngine.instance.imAccid == member?.accid, type == .white {
         cell.rightStyle = .none
       }
       return cell
@@ -103,7 +103,6 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
       memberSelect.delegate = self
       memberSelect.completion = { [weak self] datas in
         // 选中成员
-        print("选中成员：datas:\(datas)")
         if datas.count > 0 {
           var seletedMembers = [ServerMemeber]()
           for data in datas {
@@ -135,7 +134,7 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
 //                    return
 //                }
 
-        if IMKitLoginManager.instance.imAccid == member.accid, type == .white {
+        if IMKitEngine.instance.imAccid == member.accid, type == .white {
           return
         }
 

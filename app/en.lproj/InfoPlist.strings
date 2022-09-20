@@ -1,0 +1,10 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"NSCameraUsageDescription"="Can't take photo before agree";
+"NSPhotoLibraryAddUsageDescription"="Can't upload photo before agree";
+"NSPhotoLibraryUsageDescription"="Can't use album before agree";
+"NSMicrophoneUsageDescription"="Can't use microphone before agree";
+"CFBundleDisplayName"="CommsEase IM";

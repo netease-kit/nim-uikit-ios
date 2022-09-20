@@ -27,7 +27,7 @@ class ChannelHeaderView: UIView {
 
     titleLabel.font = .systemFont(ofSize: 18)
     titleLabel.textColor = .ne_darkText
-    titleLabel.text = "频道1"
+    titleLabel.text = localizable("first_channel")
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     addSubview(titleLabel)
     NSLayoutConstraint.activate([
@@ -39,7 +39,7 @@ class ChannelHeaderView: UIView {
 
     detailLabel.textColor = .ne_greyText
     detailLabel.font = .systemFont(ofSize: 14)
-    detailLabel.text = "分享心得"
+    detailLabel.text = localizable("share_thoughts")
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     addSubview(detailLabel)
     NSLayoutConstraint.activate([

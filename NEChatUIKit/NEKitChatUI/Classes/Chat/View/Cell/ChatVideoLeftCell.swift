@@ -81,9 +81,9 @@ class ChatVideoLeftCell: ChatImageLeftCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let videoObject = model.message?.messageObject as? NIMVideoObject {
-      if let path = videoObject.coverPath {
+      if let path = videoObject.coverUrl {
         contentImageView.sd_setImage(
-          with: URL(fileURLWithPath: path),
+          with: URL(string: path),
           placeholderImage: nil,
           options: .retryFailed,
           progress: nil,

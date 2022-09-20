@@ -9,13 +9,6 @@ import NEKitCoreIM
 class IdGroupModel {
   var idName: String?
   var subTitle: String?
-//    {
-//        didSet {
-//            if let s = subTitle, s == "0人" {
-//
-//            }
-//        }
-//    }
   var uid: Int?
   var isSelect = false
   var cornerType: CornerType = .none
@@ -32,9 +25,5 @@ class IdGroupModel {
     } else if let type = serverRole.type, type == .custom {
       subTitle = "\(serverRole.memberCount ?? 0)人"
     }
-
-//        if let s = subTitle, s == "0人" {
-//
-//        }
   }
 }

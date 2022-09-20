@@ -7,7 +7,8 @@ import UIKit
 import NEKitCommon
 import NIMSDK
 
-public class UserSettingViewController: NEBaseViewController, UserSettingViewModelDelegate,UITableViewDataSource, UITableViewDelegate{
+public class UserSettingViewController: ChatBaseViewController, UserSettingViewModelDelegate,
+  UITableViewDataSource, UITableViewDelegate {
   var userId: String?
 
   let viewmodel = UserSettingViewModel()
@@ -157,7 +158,12 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
 
     Router.shared.use(
       ContactUserSelectRouter,
-      parameters: ["nav": navigationController as Any, "filters": filters, "limit": 199],
+      parameters: [
+        "nav": navigationController as Any,
+        "filters": filters,
+        "limit": 199,
+        "uid": userId ?? "",
+      ],
       closure: nil
     )
 
@@ -209,27 +215,26 @@ public class UserSettingViewController: NEBaseViewController, UserSettingViewMod
     showToast(error.localizedDescription)
   }
 
-    //MARK: UITableViewDataSource, UITableViewDelegate
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      viewmodel.cellDatas.count
-    }
+  // MARK: UITableViewDataSource, UITableViewDelegate
 
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let model = viewmodel.cellDatas[indexPath.row]
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(UserSettingSwitchCell.self)",
-        for: indexPath
-      ) as? UserSettingBaseCell {
-        cell.configure(model)
-        return cell
-      }
-      return UITableViewCell()
-    }
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    viewmodel.cellDatas.count
+  }
 
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-  //        let model = viewmodel.cellDatas[indexPath.row]
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewmodel.cellDatas[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(UserSettingSwitchCell.self)",
+      for: indexPath
+    ) as? UserSettingBaseCell {
+      cell.configure(model)
+      return cell
     }
+    return UITableViewCell()
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    //        let model = viewmodel.cellDatas[indexPath.row]
+  }
 }
-
-

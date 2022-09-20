@@ -67,7 +67,6 @@ class ChatImageTextCell: ChatStateCell {
     name.textColor = .white
     name.textAlignment = .center
     name.font = UIFont.systemFont(ofSize: 14.0)
-    name.text = "果冻"
     return name
   }()
 

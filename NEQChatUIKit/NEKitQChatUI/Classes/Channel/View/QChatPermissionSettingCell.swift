@@ -45,7 +45,7 @@ class QChatPermissionSettingCell: QChatCornerCell {
     titleLabel.font = UIFont.systemFont(ofSize: 16)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textColor = .ne_darkText
-    titleLabel.text = "删除"
+    titleLabel.text = localizable("delete")
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 35),

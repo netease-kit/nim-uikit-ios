@@ -74,7 +74,7 @@ class PermissionModel: NSObject {
     #keyPath(PermissionModel.modifyOwnServer): localizable("qchat_modify_own_server"),
     #keyPath(PermissionModel.modifyOthersServer): localizable("qchat_modify_other_server"),
     #keyPath(PermissionModel.inviteMember): localizable("qchat_invite_member"),
-    #keyPath(PermissionModel.kickout): localizable("qchat_kickout_member"),
+    #keyPath(PermissionModel.kickout): localizable("qchat_kick_out"),
     #keyPath(PermissionModel.managerBlackAndWhite): localizable("qchat_manager_channel_list"),
   ]
 

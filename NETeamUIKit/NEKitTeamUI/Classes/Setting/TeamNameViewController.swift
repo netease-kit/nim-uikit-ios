@@ -13,7 +13,7 @@ enum ChangeType {
   case NickName
 }
 
-public class TeamNameViewController: NEBaseViewController,UITextFieldDelegate {
+public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
   var team: NIMTeam?
 //    var user: NIMUser?
   var type = ChangeType.TeamName
@@ -97,13 +97,13 @@ public class TeamNameViewController: NEBaseViewController,UITextFieldDelegate {
         textField.isEnabled = false
       }
       if let teamType = team?.type, teamType == .normal {
-        title = "讨论组名称"
+        title = localizable("discuss_name")
       } else {
-        title = "群名称"
+        title = localizable("team_name")
       }
 
     } else if type == .NickName, let n = teamMember?.nickname {
-      title = "我在群里的昵称"
+      title = localizable("team_nick")
       name = n
     }
 
@@ -121,7 +121,7 @@ public class TeamNameViewController: NEBaseViewController,UITextFieldDelegate {
       object: textField
     )
 
-    addRightAction("保存", #selector(saveName), self)
+    addRightAction(localizable("save"), #selector(saveName), self)
   }
 
   /*
@@ -139,7 +139,7 @@ public class TeamNameViewController: NEBaseViewController,UITextFieldDelegate {
       return true
     }
 
-    if let ownerId = team?.owner, IMKitLoginManager.instance.isMySelf(ownerId) {
+    if let ownerId = team?.owner, IMKitEngine.instance.isMySelf(ownerId) {
       return true
     }
     if let mode = team?.updateInfoMode, mode == .all {
@@ -157,70 +157,69 @@ public class TeamNameViewController: NEBaseViewController,UITextFieldDelegate {
     rightNavBtn.setTitleColor(NEConstant.hexRGB(0x337EFF), for: .normal)
     rightNavBtn.isEnabled = true
   }
-    
-    
-    //MARK: objc 方法
-    @objc func textFieldChange() {
-      if var text = textField.text {
-        if let lang = textField.textInputMode?.primaryLanguage, lang == "zh-Hans",
-           let selectRange = textField.markedTextRange {
-          let position = textField.position(from: selectRange.start, offset: 0)
-          if position == nil {
-            if text.count > 30 {
-              text = String(text.prefix(30))
-              textField.text = String(text.prefix(30))
-            }
-            figureTextCount(text)
+
+  // MARK: objc 方法
+
+  @objc func textFieldChange() {
+    if var text = textField.text {
+      if let lang = textField.textInputMode?.primaryLanguage, lang == "zh-Hans",
+         let selectRange = textField.markedTextRange {
+        let position = textField.position(from: selectRange.start, offset: 0)
+        if position == nil {
+          if text.count > 30 {
+            text = String(text.prefix(30))
+            textField.text = String(text.prefix(30))
           }
-        } else {
           figureTextCount(text)
         }
+      } else {
+        figureTextCount(text)
       }
     }
-    
-    @objc func saveName() {
-      weak var weakSelf = self
-      textField.resignFirstResponder()
-      if type == .TeamName, let tid = team?.teamId {
-        let n = textField.text ?? ""
-        view.makeToastActivity(.center)
-        repo.updateTeamName(n, tid) { error in
-          weakSelf?.view.hideToastActivity()
-          if let err = error {
-            weakSelf?.showToast(err.localizedDescription)
-          } else {
-            weakSelf?.team?.teamName = n
-            weakSelf?.navigationController?.popViewController(animated: true)
-          }
-        }
-      } else if type == .NickName, let tid = team?.teamId, let uid = teamMember?.userId {
-        let n = textField.text ?? ""
-        view.makeToastActivity(.center)
-        repo.updateMemberNick(uid, n, tid) { error in
+  }
 
-          weakSelf?.view.hideToastActivity()
-          if let err = error {
-            weakSelf?.showToast(err.localizedDescription)
-          } else {
-            weakSelf?.navigationController?.popViewController(animated: true)
-          }
+  @objc func saveName() {
+    weak var weakSelf = self
+    textField.resignFirstResponder()
+    if type == .TeamName, let tid = team?.teamId {
+      let n = textField.text ?? ""
+      view.makeToastActivity(.center)
+      repo.updateTeamName(n, tid) { error in
+        weakSelf?.view.hideToastActivity()
+        if let err = error {
+          weakSelf?.showToast(err.localizedDescription)
+        } else {
+          weakSelf?.team?.teamName = n
+          weakSelf?.navigationController?.popViewController(animated: true)
+        }
+      }
+    } else if type == .NickName, let tid = team?.teamId, let uid = teamMember?.userId {
+      let n = textField.text ?? ""
+      view.makeToastActivity(.center)
+      repo.updateMemberNick(uid, n, tid) { error in
+
+        weakSelf?.view.hideToastActivity()
+        if let err = error {
+          weakSelf?.showToast(err.localizedDescription)
+        } else {
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
-    //MAKR: UITextFieldDelegate
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                          replacementString string: String) -> Bool {
-      if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
-         text.count > 30 {
-        return false
-      }
-      return true
+  }
+
+  // MAKR: UITextFieldDelegate
+  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                        replacementString string: String) -> Bool {
+    if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
+       text.count > 30 {
+      return false
     }
-    
+    return true
+  }
 }
 
 extension TeamNameViewController {
-
   func figureTextCount(_ text: String) {
     countLabel.text = "\(text.count)/30"
     if type == .NickName {
@@ -232,6 +231,4 @@ extension TeamNameViewController {
       disableSubmit()
     }
   }
-
-
 }

@@ -56,7 +56,7 @@ open class GroupChatViewController: ChatViewController, TeamChatViewModelDelegat
 
   public func onTeamRemoved(team: NIMTeam) {
     // 只有群创建者 才弹弹窗
-    if team.owner == IMKitLoginManager.instance.imAccid {
+    if team.owner == IMKitEngine.instance.imAccid {
       showSingleAlert(message: localizable("team_has_been_removed")) {
         self.navigationController?.popViewController(animated: true)
       }

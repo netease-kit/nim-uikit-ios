@@ -26,9 +26,9 @@ class TeamInfoViewModel {
     intrCell.cornerType = .bottomLeft.union(.bottomRight)
 
     if let type = team?.type, type == .normal {
-      headerCell.cellName = "讨论组头像"
-      nameCell.cellName = "讨论组名称"
-      intrCell.cellName = "讨论组介绍"
+      headerCell.cellName = localizable("discuss_avatar")
+      nameCell.cellName = localizable("discuss_name")
+      intrCell.cellName = localizable("discuss_intro")
       cellDatas.append(contentsOf: [headerCell, nameCell])
       nameCell.cornerType = .bottomLeft.union(.bottomRight)
     } else {

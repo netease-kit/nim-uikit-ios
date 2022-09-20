@@ -7,13 +7,27 @@
 "ok"="确认";
 "send_to"="发送给 ";
 //MAKR：message
-"发来了一张图片"="发来了一张图";
-"发来了一段语音"="发来了一段语音";
-"发来了一段视频"="发来了一段视频";
-"按住说话"="按住说话";
+"send_picture"="发来了一张图片";
+"send_voice"="发来了一段语音";
+"send_video"="发来了一段视频";
+"press_speak"="按住说话";
 "send_after_let_go"="松开发送，按住滑到空白区域取消";
-"录音时间太短"="录音时间太短";
-"没有麦克风权限"="没有麦克风权限";
+"record_too_short"="录音时间太短";
+"no_microphone_permission"="没有麦克风权限";
+"choose"="请选择";
+"take_photo"="拍照";
+"select_from_album"="从相册选择";
+"editing"="正在输入中...";
+"read"="已读(0）";
+"unread"="未读(0）";
+"network_unavailable"="当前网络不可用，请检查你当网络设置。";
+
+
+
+
+
+
+
 
 //MARK: tips
 //MARK: team
@@ -54,12 +68,9 @@
 "team_mute"="当前群主设置为禁言";
 "team_all_mute"="群全体禁言";
 "team_all_no_mute"="取消群全体禁言";
-
 "pin_text"="标记了这条信息，对话内容双方均可见";
-
 "session_set_top"="聊天置顶";
 "message_remind"="开启消息提醒";
-
 "open_soon"="暂未开放";
 
 //MARK: operation
@@ -98,3 +109,9 @@
 "team"="群聊";
 "cancel"="取消";
 "send_to"="发送给";
+"send"="发送";
+"confirm"="确定";
+
+
+"mdhm"="MM月dd日 HH:mm";
+"ymdhm"="yyyy年MM月dd日 HH:mm";

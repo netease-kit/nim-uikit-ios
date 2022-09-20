@@ -201,13 +201,13 @@ public class ForwardAlertViewController: UIViewController {
     let canceBtn = UIButton()
     canceBtn.translatesAutoresizingMaskIntoConstraints = false
     canceBtn.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
-    canceBtn.setTitle("取消", for: .normal)
+    canceBtn.setTitle(localizable("cancel"), for: .normal)
     canceBtn.setTitleColor(.ne_greyText, for: .normal)
 
     let sureBtn = UIButton()
     sureBtn.translatesAutoresizingMaskIntoConstraints = false
     sureBtn.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
-    sureBtn.setTitle("确定", for: .normal)
+    sureBtn.setTitle(localizable("confirm"), for: .normal)
     sureBtn.setTitleColor(.ne_blueText, for: .normal)
 
     contentView.addSubview(canceBtn)

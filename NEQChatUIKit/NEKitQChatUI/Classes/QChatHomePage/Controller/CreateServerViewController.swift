@@ -5,7 +5,8 @@
 
 import UIKit
 
-public class CreateServerViewController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource  {
+public class CreateServerViewController: NEBaseViewController, UITableViewDelegate,
+  UITableViewDataSource {
   public var serverViewModel = CreateServerViewModel()
 
   override public func viewDidLoad() {
@@ -46,44 +47,40 @@ public class CreateServerViewController: NEBaseViewController,UITableViewDelegat
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     return tableView
   }()
-    
-    @objc func closeAction(sender: UIButton) {
-      navigationController?.dismiss(animated: true, completion: nil)
-    }
-    
-    
-    //MARK: UITableViewDelegate, UITableViewDataSource
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      serverViewModel.dataArray.count
-    }
 
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(NSStringFromClass(NECreateServerCell.self))",
-        for: indexPath
-      ) as! NECreateServerCell
-      let model = serverViewModel.dataArray[indexPath.row]
-      cell.model = model
-      return cell
-    }
+  @objc func closeAction(sender: UIButton) {
+    navigationController?.dismiss(animated: true, completion: nil)
+  }
 
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if indexPath.row == 0 {
-        let mineCreateCtrl = MineCreateServerController()
-        navigationController?.pushViewController(mineCreateCtrl, animated: true)
-      } else if indexPath.row == 1 {
-        let otherCtrl = JoinOtherServiceController()
-        navigationController?.pushViewController(otherCtrl, animated: true)
-      }
-    }
+  // MARK: UITableViewDelegate, UITableViewDataSource
 
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      76
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    serverViewModel.dataArray.count
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(NSStringFromClass(NECreateServerCell.self))",
+      for: indexPath
+    ) as! NECreateServerCell
+    let model = serverViewModel.dataArray[indexPath.row]
+    cell.model = model
+    return cell
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if indexPath.row == 0 {
+      let mineCreateCtrl = MineCreateServerController()
+      navigationController?.pushViewController(mineCreateCtrl, animated: true)
+    } else if indexPath.row == 1 {
+      let otherCtrl = JoinOtherServiceController()
+      navigationController?.pushViewController(otherCtrl, animated: true)
     }
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    76
+  }
 }
-
-
-
-

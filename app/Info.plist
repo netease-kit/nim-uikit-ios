@@ -17,7 +17,11 @@
 		<key>NSCameraUsageDescription</key>
 		<string>若不允许，你将无法拍摄照片</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>若不允许，你将无法导入照片上传头像。</string>
+		<string>若不允许，你将无法导入照片</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>若不允许，则无法使用相册功能</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>若不允许，则无法使用麦克风功能</string>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>

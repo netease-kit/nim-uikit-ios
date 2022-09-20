@@ -10,7 +10,8 @@ import NEKitCoreIM
 
 typealias SortChange = () -> Void
 
-public class QChatIdGroupSortController: NEBaseTableViewController,UITableViewDelegate, UITableViewDataSource,ViewModelDelegate {
+public class QChatIdGroupSortController: NEBaseTableViewController, UITableViewDelegate,
+  UITableViewDataSource, ViewModelDelegate {
   var serverId: UInt64?
 
   var isOwer = false
@@ -72,134 +73,136 @@ public class QChatIdGroupSortController: NEBaseTableViewController,UITableViewDe
     navigationController?.popViewController(animated: true)
   }
 
-    //MARK: UITableViewDelegate, UITableViewDataSource, ViewModelDelegate
-    public func dataDidChange() {
-      tableView.reloadData()
+  // MARK: UITableViewDelegate, UITableViewDataSource, ViewModelDelegate
+
+  public func dataDidChange() {
+    tableView.reloadData()
+  }
+
+  public func dataDidError(_ error: Error) {
+    view.hideToastActivity()
+    showToast(error.localizedDescription)
+  }
+
+  public func numberOfSections(in tableView: UITableView) -> Int {
+    1
+  }
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    //        if section == 0 {
+    //            return viewmodel.lockData.count
+    //        }else if section == 1 {
+    //            return viewmodel.datas.count
+    //        }
+    viewmodel.datas.count
+  }
+
+  public func tableView(_ tableView: UITableView,
+                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell: QChatSortCell = tableView.dequeueReusableCell(
+      withIdentifier: "\(QChatSortCell.self)",
+      for: indexPath
+    ) as! QChatSortCell
+    //        if indexPath.section == 0 {
+    //            let model = viewmodel.lockData[indexPath.row]
+    //            cell.configure(model)
+    //            cell.tailImage.isHighlighted = true
+    //        }else if indexPath.section == 1 {
+    //            if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
+    //                cell.configure(model)
+    //                cell.tailImage.isHighlighted = !model.hasPermission
+    //            }
+    //        }
+    if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
+      cell.configure(model)
+      cell.tailImage.isHighlighted = !model.hasPermission
     }
 
-    public func dataDidError(_ error: Error) {
-      view.hideToastActivity()
-      showToast(error.localizedDescription)
+    return cell
+  }
+
+  public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath,
+                        to destinationIndexPath: IndexPath) {
+    print("source :", sourceIndexPath.row, " destionation :", destinationIndexPath.row)
+
+    if sourceIndexPath.row > destinationIndexPath.row {
+      let src_model = viewmodel.datas.object(at: sourceIndexPath.row)
+      viewmodel.datas.remove(src_model)
+      viewmodel.datas.insert(src_model, at: destinationIndexPath.row)
+    } else {
+      let src_model = viewmodel.datas.object(at: sourceIndexPath.row)
+      viewmodel.datas.insert(src_model, at: destinationIndexPath.row + 1)
+      viewmodel.datas.removeObject(at: sourceIndexPath.row)
     }
 
-    public func numberOfSections(in tableView: UITableView) -> Int {
-      1
-    }
-
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-  //        if section == 0 {
-  //            return viewmodel.lockData.count
-  //        }else if section == 1 {
-  //            return viewmodel.datas.count
-  //        }
-      viewmodel.datas.count
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cell: QChatSortCell = tableView.dequeueReusableCell(
-        withIdentifier: "\(QChatSortCell.self)",
-        for: indexPath
-      ) as! QChatSortCell
-  //        if indexPath.section == 0 {
-  //            let model = viewmodel.lockData[indexPath.row]
-  //            cell.configure(model)
-  //            cell.tailImage.isHighlighted = true
-  //        }else if indexPath.section == 1 {
-  //            if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
-  //                cell.configure(model)
-  //                cell.tailImage.isHighlighted = !model.hasPermission
-  //            }
-  //        }
-      if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
-        cell.configure(model)
-        cell.tailImage.isHighlighted = !model.hasPermission
+    viewmodel.datas.forEach { user in
+      if let u = user as? IdGroupModel {
+        print("change name : ", u.idName as Any)
+        print("change p: ", u.role?.priority as Any)
       }
-
-      return cell
     }
+  }
 
-    public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath,
-                          to destinationIndexPath: IndexPath) {
-      print("source :", sourceIndexPath.row, " destionation :", destinationIndexPath.row)
+  public func tableView(_ tableView: UITableView,
+                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+    60
+  }
 
-      if sourceIndexPath.row > destinationIndexPath.row {
-        let src_model = viewmodel.datas.object(at: sourceIndexPath.row)
-        viewmodel.datas.remove(src_model)
-        viewmodel.datas.insert(src_model, at: destinationIndexPath.row)
-      } else {
-        let src_model = viewmodel.datas.object(at: sourceIndexPath.row)
-        viewmodel.datas.insert(src_model, at: destinationIndexPath.row + 1)
-        viewmodel.datas.removeObject(at: sourceIndexPath.row)
-      }
+  public func tableView(_ tableView: UITableView,
+                        shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+    false
+  }
 
-      viewmodel.datas.forEach { user in
-        if let u = user as? IdGroupModel {
-          print("change name : ", u.idName as Any)
-          print("change p: ", u.role?.priority as Any)
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
+      weak var weakSelf = self
+      if model.hasPermission == true {
+        showAlert(
+          message: "\(localizable("sure_delete"))\(model.idName ?? localizable("current_identity"))?"
+        ) {
+          weakSelf?.view.makeToastActivity(.center)
+          weakSelf?.viewmodel.removeRole(weakSelf?.serverId, model.role?.roleId, model) {
+            weakSelf?.didDelete = true
+            weakSelf?.view.hideToastActivity()
+          }
         }
       }
     }
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          heightForRowAt indexPath: IndexPath) -> CGFloat {
-      60
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-      false
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
-        weak var weakSelf = self
+  public func tableView(_ tableView: UITableView,
+                        targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath,
+                        toProposedIndexPath proposedDestinationIndexPath: IndexPath)
+    -> IndexPath {
+    if isOwer == true {
+      return proposedDestinationIndexPath
+    } else {
+      if let model = viewmodel.datas[proposedDestinationIndexPath.row] as? IdGroupModel {
         if model.hasPermission == true {
-          showAlert(message: "确定删除 \(model.idName ?? "当前身份组")?") {
-            weakSelf?.view.makeToastActivity(.center)
-            weakSelf?.viewmodel.removeRole(weakSelf?.serverId, model.role?.roleId, model) {
-              weakSelf?.didDelete = true
-              weakSelf?.view.hideToastActivity()
-            }
-          }
+          return proposedDestinationIndexPath
         }
       }
     }
+    return sourceIndexPath
+  }
 
-    public func tableView(_ tableView: UITableView,
-                          targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath,
-                          toProposedIndexPath proposedDestinationIndexPath: IndexPath)
-      -> IndexPath {
-      if isOwer == true {
-        return proposedDestinationIndexPath
-      } else {
-        if let model = viewmodel.datas[proposedDestinationIndexPath.row] as? IdGroupModel {
-          if model.hasPermission == true {
-            return proposedDestinationIndexPath
-          }
-        }
-      }
-      return sourceIndexPath
+  public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
+      return model.hasPermission
     }
+    return true
+  }
 
-    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-      if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
-        return model.hasPermission
-      }
-      return true
+  public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
+      return model.hasPermission
     }
+    return true
+  }
 
-    public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-      if let model = viewmodel.datas[indexPath.row] as? IdGroupModel {
-        return model.hasPermission
-      }
-      return true
-    }
-
-    public func tableView(_ tableView: UITableView,
-                          editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-      UITableViewCell.EditingStyle.none
-    }
+  public func tableView(_ tableView: UITableView,
+                        editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell
+    .EditingStyle {
+    UITableViewCell.EditingStyle.none
+  }
 }
-
-

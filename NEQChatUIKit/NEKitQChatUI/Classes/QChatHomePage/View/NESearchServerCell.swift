@@ -34,7 +34,7 @@ class NESearchServerCell: UITableViewCell {
 
       let item = QChatGetServerMemberItem(
         serverId: serverId,
-        accid: IMKitLoginManager.instance.imAccid
+        accid: IMKitEngine.instance.imAccid
       )
       let param = QChatGetServerMembersParam(serverAccIds: [item])
 
@@ -178,7 +178,7 @@ class NESearchServerCell: UITableViewCell {
   private lazy var rightContent: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = localizable("已申请")
+    label.text = localizable("applied")
     label.font = DefaultTextFont(12)
     label.textColor = UIColor.ne_emptyTitleColor
     label.isHidden = true
@@ -195,7 +195,7 @@ class NESearchServerCell: UITableViewCell {
   private lazy var joinBtn: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(localizable("加入"), for: .normal)
+    button.setTitle(localizable("join"), for: .normal)
     button.setTitleColor(UIColor.white, for: .normal)
     button.titleLabel?.font = DefaultTextFont(12)
     button.backgroundColor = HexRGB(0x337EFF)

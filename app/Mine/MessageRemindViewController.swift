@@ -8,7 +8,8 @@ import NEKitCore
 import NEKitTeamUI
 import NEKitChatUI
 
-class MessageRemindViewController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
+class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
+  UITableViewDataSource {
   public var cellClassDic =
     [SettingCellType.SettingSwitchCell.rawValue: TeamSettingSwitchCell.self]
   private var viewModel = MessageRemindViewModel()
@@ -21,7 +22,7 @@ class MessageRemindViewController: NEBaseViewController,UITableViewDelegate, UIT
   }
 
   func initialConfig() {
-    title = "消息提醒"
+    title = NSLocalizedString("message_remind", comment: "")
   }
 
   func setupSubviews() {
@@ -52,59 +53,58 @@ class MessageRemindViewController: NEBaseViewController,UITableViewDelegate, UIT
     }
     return table
   }()
-    
-    //MARK: UITableViewDelegate, UITableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if viewModel.sectionData.count > section {
-        let model = viewModel.sectionData[section]
-        return model.cellModels.count
+
+  // MARK: UITableViewDelegate, UITableViewDataSource
+
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      return model.cellModels.count
+    }
+    return 0
+  }
+
+  func numberOfSections(in tableView: UITableView) -> Int {
+    viewModel.sectionData.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(model.type)",
+      for: indexPath
+    ) as? BaseTeamSettingCell {
+      cell.configure(model)
+      return cell
+    }
+    return UITableViewCell()
+  }
+
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    //        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    //        if let block = model.cellClick {
+    //            block()
+    //        }
+  }
+
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    return model.rowHeight
+  }
+
+  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      if model.cellModels.count > 0 {
+        return 12.0
       }
-      return 0
     }
+    return 0
+  }
 
-    func numberOfSections(in tableView: UITableView) -> Int {
-      viewModel.sectionData.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(model.type)",
-        for: indexPath
-      ) as? BaseTeamSettingCell {
-        cell.configure(model)
-        return cell
-      }
-      return UITableViewCell()
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-  //        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-  //        if let block = model.cellClick {
-  //            block()
-  //        }
-    }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-      let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-      return model.rowHeight
-    }
-
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-      if viewModel.sectionData.count > section {
-        let model = viewModel.sectionData[section]
-        if model.cellModels.count > 0 {
-          return 12.0
-        }
-      }
-      return 0
-    }
-
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-      let header = UIView()
-      header.backgroundColor = UIColor(hexString: "0xF1F1F6")
-      return header
-    }
+  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let header = UIView()
+    header.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    return header
+  }
 }
-
-

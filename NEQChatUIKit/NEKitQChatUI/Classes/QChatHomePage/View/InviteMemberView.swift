@@ -46,7 +46,7 @@ class InviteMemberView: UIView {
   private lazy var content: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = localizable("请求已发送")
+    label.text = localizable("request_sended")
     label.font = DefaultTextFont(16)
     label.textColor = UIColor.ne_darkText
     return label

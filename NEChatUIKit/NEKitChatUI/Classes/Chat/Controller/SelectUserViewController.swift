@@ -8,7 +8,7 @@ import NEKitChat
 
 public typealias didSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
 
-public class SelectUserViewController: NEBaseViewController, UITableViewDelegate,
+public class SelectUserViewController: ChatBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   public var tableView = UITableView(frame: .zero, style: .plain)
   public var sessionId: String

@@ -19,19 +19,19 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
   var tableView = UITableView(frame: .zero, style: .grouped)
   var viewModel = ContactViewModel(contactHeaders: [
     ContactHeadItem(
-      name: "验证消息",
+      name: localizable("validation_message"),
       imageName: "valid",
       router: ValidationMessageRouter,
       color: UIColor(hexString: "#60CFA7")
     ),
     ContactHeadItem(
-      name: "黑名单",
+      name: localizable("blacklist"),
       imageName: "blackName",
       router: ContactBlackListRouter,
       color: UIColor(hexString: "#53C3F3")
     ),
     ContactHeadItem(
-      name: "我的群聊",
+      name: localizable("mine_groupchat"),
       imageName: "group",
       router: ContactGroupRouter,
       color: UIColor(hexString: "#BE65D9")

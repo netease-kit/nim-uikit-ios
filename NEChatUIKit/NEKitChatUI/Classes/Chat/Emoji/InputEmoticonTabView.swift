@@ -82,7 +82,7 @@ public class InputEmoticonTabView: UIControl {
   public lazy var sendButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle("发送", for: .normal)
+    button.setTitle(localizable("send"), for: .normal)
     button.titleLabel?.textColor = .white
     button.backgroundColor = UIColor.ne_blueText
     button.titleLabel?.font = DefaultTextFont(14)

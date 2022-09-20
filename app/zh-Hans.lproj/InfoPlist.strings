@@ -1,0 +1,10 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"NSCameraUsageDescription"="若不允许，你将无法拍摄照片";
+"NSPhotoLibraryAddUsageDescription"="若不允许，你将无法导入照片";
+"NSPhotoLibraryUsageDescription"="若不允许，则无法使用相册功能";
+"NSMicrophoneUsageDescription"="若不允许，则无法使用麦克风功能";
+"CFBundleDisplayName"="云信IM";

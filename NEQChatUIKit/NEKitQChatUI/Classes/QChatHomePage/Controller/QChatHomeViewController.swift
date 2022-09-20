@@ -143,7 +143,6 @@ public class QChatHomeViewController: UIViewController, ViewModelDelegate {
     weak var weakSelf = self
     view.viewmodel = serverViewModel
     view.setUpBlock = { () in
-      print("设置服务器")
       if weakSelf?.serverListArray.count == 0 {
         return
       }
@@ -315,8 +314,8 @@ extension QChatHomeViewController: NIMQChatMessageManagerDelegate {
         self.channelChange(notificationInfo: systemNotification)
       case .serverMemberKick, .serverMemberInviteDone:
 
-        if systemNotification.fromAccount != IMKitLoginManager.instance.imAccid,
-           (systemNotification.toAccids?.contains(IMKitLoginManager.instance.imAccid)) !=
+        if systemNotification.fromAccount != IMKitEngine.instance.imAccid,
+           (systemNotification.toAccids?.contains(IMKitEngine.instance.imAccid)) !=
            nil {
           self.requestData(timeTag: 0)
         }
@@ -326,7 +325,7 @@ extension QChatHomeViewController: NIMQChatMessageManagerDelegate {
           selectIndex = 0
           self.requestData(timeTag: 0)
         } else {
-          if systemNotification.fromAccount == IMKitLoginManager.instance.imAccid {
+          if systemNotification.fromAccount == IMKitEngine.instance.imAccid {
             selectIndex = 0
             self.requestData(timeTag: 0)
           }

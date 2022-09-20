@@ -85,11 +85,11 @@ class SystemNotificationCell: BaseValidationCell {
 
       switch notifModel?.handleStatus {
       case .HandleTypeOk:
-        resultLabel.text = "已同意"
+        resultLabel.text = localizable("agreed")
       case .HandleTypeNo:
-        resultLabel.text = "已拒绝"
+        resultLabel.text = localizable("refused")
       case .HandleTypeOutOfDate:
-        resultLabel.text = "已过期"
+        resultLabel.text = localizable("expired")
       default:
         resultLabel.text = ""
       }
@@ -137,7 +137,7 @@ class SystemNotificationCell: BaseValidationCell {
   var rejectBtn: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle("拒绝", for: .normal)
+    button.setTitle(localizable("refuse"), for: .normal)
     button.setTitleColor(UIColor(hexString: "333333"), for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
     button.clipsToBounds = false
@@ -150,7 +150,7 @@ class SystemNotificationCell: BaseValidationCell {
   var agreeBtn: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle("同意", for: .normal)
+    button.setTitle(localizable("agree"), for: .normal)
     let blue = UIColor(hexString: "337EFF")
     button.setTitleColor(blue, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)

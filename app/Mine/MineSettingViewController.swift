@@ -9,7 +9,7 @@ import NEKitTeamUI
 import YXLogin
 import NIMSDK
 
-class MineSettingViewController: NEBaseViewController,UITableViewDataSource, UITableViewDelegate {
+class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
   private var viewModel = MineSettingViewModel()
   public var cellClassDic = [
     SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,
@@ -30,7 +30,7 @@ class MineSettingViewController: NEBaseViewController,UITableViewDataSource, UIT
   }
 
   func initialConfig() {
-    title = "设置"
+    title = NSLocalizedString("setting", comment: "")
     viewModel.delegate = self
   }
 
@@ -79,7 +79,7 @@ class MineSettingViewController: NEBaseViewController,UITableViewDataSource, UIT
     button.setTitle(title, for: .normal)
     button.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
     button.layer.cornerRadius = 8.0
-    button.setTitle("退出登录", for: .normal)
+    button.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
     NSLayoutConstraint.activate([
       button.leftAnchor.constraint(equalTo: footer.leftAnchor, constant: 20),
       button.rightAnchor.constraint(equalTo: footer.rightAnchor, constant: -20),
@@ -89,9 +89,7 @@ class MineSettingViewController: NEBaseViewController,UITableViewDataSource, UIT
     return footer
   }
 
-    //logout action
     @objc func loginOutAction(){
-        
         NIMSDK.shared().loginManager.logout { error in
             NIMSDK.shared().qchatManager.logout { chatError in
                 if error != nil {
@@ -102,69 +100,69 @@ class MineSettingViewController: NEBaseViewController,UITableViewDataSource, UIT
                 }
             }
         }
-
-
-    }
-    
-    //MARK: UITableViewDataSource, UITableViewDelegate
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if viewModel.sectionData.count > section {
-        let model = viewModel.sectionData[section]
-        return model.cellModels.count
-      }
-      return 0
+        
     }
 
-    func numberOfSections(in tableView: UITableView) -> Int {
-      viewModel.sectionData.count
-    }
+  // MARK: UITableViewDataSource, UITableViewDelegate
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-      if let cell = tableView.dequeueReusableCell(
-        withIdentifier: "\(model.type)",
-        for: indexPath
-      ) as? BaseTeamSettingCell {
-        cell.configure(model)
-        return cell
-      }
-      return UITableViewCell()
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      return model.cellModels.count
     }
+    return 0
+  }
 
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-      let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-      if let block = model.cellClick {
-        block()
-      }
+  func numberOfSections(in tableView: UITableView) -> Int {
+    viewModel.sectionData.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(model.type)",
+      for: indexPath
+    ) as? BaseTeamSettingCell {
+      cell.configure(model)
+      return cell
     }
+    return UITableViewCell()
+  }
 
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-      let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-      return model.rowHeight
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let block = model.cellClick {
+      block()
     }
+  }
 
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-      if viewModel.sectionData.count > section {
-        let model = viewModel.sectionData[section]
-        if model.cellModels.count > 0 {
-          return 12.0
-        }
-      }
-      return 0
-    }
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    return model.rowHeight
+  }
 
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-      let header = UIView()
-      header.backgroundColor = UIColor(hexString: "0xF1F1F6")
-      return header
-    }
-
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-      if section == viewModel.sectionData.count - 1 {
+  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      if model.cellModels.count > 0 {
         return 12.0
       }
-      return 0
     }
+    return 0
+  }
+
+  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let header = UIView()
+    header.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    return header
+  }
+
+  func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    if section == viewModel.sectionData.count - 1 {
+      return 12.0
+    }
+    return 0
+  }
 }
 
 extension MineSettingViewController: MineSettingViewModelDelegate {
@@ -175,4 +173,3 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
 
   func didClickCleanCache() {}
 }
-

@@ -4,98 +4,111 @@
 // found in the LICENSE file.
 
 //MAKR：common
-"ok"="ok";
-"send_to"="To ";
-
+"ok"="OK";
+"send_to"="send to";
 //MAKR：message
-"发来了一张图片"="Send an image to you";
-"发来了一段语音"="Send an audio to you";
-"发来了一段视频"="Send an video to you";
-"按住说话"="Hold down the talk";
-"send_after_let_go"="Release to send, press and hold to swipe to an empty area to cancel";
-"录音时间太短"="Recording time is too short";
-"没有麦克风权限"="No microphone access";
+"send_picture"="get a picture";
+"send_voice"="get a audio";
+"send_video"="get a video";
+"press_speak"="Hold to talk";
+"send_after_let_go"="Release to send, Slide to the blank area to cancel";
+"record_too_short"="Time is too short";
+"no_microphone_permission"="no micro permission";
+"choose"="select";
+"take_photo"="camera";
+"select_from_album"="album";
+"editing"="typing";
+"read"="read";
+"unread"="unread";
+"network_unavailable"="No internet, Please check your setting";
+
 
 //MARK: tips
 //MARK: team
-"invite"="invite ";
-"humans"="humans ";
-"enter"="enter ";
-"unknown_system_message"="Unknown System Message";
-"You"="You ";
-"discussion_group"="discussion group";
+"invite"="Invite";
+"humans"="member";
+"enter"="enter";
+"unknown_system_message"="Unknown message";
+"You"="you";
+"discussion_group"="temp group";
 "group"="group";
-"dissolve"="dissolved ";
-"kick"="kick ";
-"out"="out ";
-"has_updated" = "has updated ";
-"team_name" = " team name ";
-"team_intro" = " introduce ";
-"team_anouncement" = " anouncement ";
-"team_avatar" = " avatar ";
-"team_join_mode" = " join mode ";
-"team_be_invited_mode" = " invited mode ";
-"team_be_invited_permission" = " invited permission ";
-"team_update_info_permission" = " permission of update info ";
-"team_be_invited_author" = "Whether the invitee is required to agree permission";
-"team_update_client_custom"="permission of update client custom text";
-"team_custom_info" = "custom info ";
-"not_mute" = " was unmuted ";
-"mute" = " was muted ";
-"team_has_been_removed" = " team has been removed ";
-"join"=" join ";
-"pass"=" pass ";
-"leave"="leave ";
-"transfer"=" transfer manager to ";
-"added_manager"=" was as group manager ";
-"removed_manager"=" group admin was revoked ";
-"accept"=" has accepted group invitation from ";
-"team_mute"="The group owner is set to mute";
-"team_all_mute"="The group was muted";
-"team_all_no_mute"="The group was unmuted";
-"session_set_top"="聊天置顶";
-"message_remind"="开启消息提醒";
-"pin_text"=" has pined this message";
+"dissolve"="dissolved";
+"kick"="将 ";
+"out"="remove";
+"has_updated" = "updated";
 
-"open_soon"="暂未开放";
+"team_name" = "name";
+"team_intro" = "Info";
+"team_anouncement" = "Notice";
+"team_avatar" = "Avatar";
+"team_join_mode" = "join mode";
+"team_be_invited_mode" = "invite mode";
+"team_be_invited_permission" = "invite permission";
+"team_be_invited_author" = "是否需要被邀请者同意权限";
+"team_update_info_permission" = "update info permission";
+"team_update_client_custom"="update custom permission";
+
+"team_custom_info" = "custom info";
+"not_mute" = "unmute";
+"mute" = "mute";
+"team_has_been_removed" = "This group was removed";
+"join"="joined";
+"pass"="Passed";
+"leave"="leave";
+"transfer"="Transferred the group leader identity to";
+"added_manager"="add to be Group administrator";
+"removed_manager"="Group administrator identity revoked";
+"accept"="Accept the group invitation from";
+"team_mute"=" Group owner set muting";
+"team_all_mute"="Mute all";
+"team_all_no_mute"="Unmute";
+
+"pin_text"="pinned this message for both";
+
+"session_set_top"="sticky to top";
+"message_remind"="open notification";
+
+"open_soon"="Not open";
+
 //MARK: operation
-"operation_copy"="Copy";
-"operation_replay"="Replay";
-"operation_forward"="Forward";
-"operation_pin"="Pin";
-"operation_select"="Select";
-"operation_collection"="Collection";
-"operation_delete"="Delete";
-"operation_recall"="Recall";
-"message_has_be_withdrawn" = "Message has be withdrawn";
-"message_reedit" = "Reedit message";
-"message_revoke_confim" = "Are you sure?";
-"message_delete_comfirm"="Are you sure?";
+"operation_copy"="copy";
+"operation_replay"="reply";
+"operation_forward"="forward";
+"operation_pin"="pin";
+"operation_cancel_pin"="unpin";
+"operation_select"="multi-select";
+"operation_collection"="favorite";
+"operation_delete"="delete";
+"operation_recall"="recall";
+"message_has_be_withdrawn" = "message recalled";
+"message_reedit" = "reedit";
+"message_revoke_confim" = "Wether to recall this message";
+"message_delete_comfirm"="Wether to delete this message";
+
 
 //MARK: toast
-"copy_success"="Copy succeeded";
-"collection_success"="Collection Success";
-"no_permession"="No permession";
+"copy_success"="Copy successfully";
+"collection_success"="Favorite";
+"no_permession"="No Permission";
+"msg_reply"="reply";
+"msg_image"="picture";
+"msg_audio"="audio";
+"msg_video"="video";
+"msg_file"="file";
+"msg_custom"="custom message";
+"msg_unknown"="Unknown message type";
+"message_read"="Reading Status";
+"message_all_unread"="all unread";
+"user_select"="notification";
+"user_select_all"="all";
 
-"msg_reply"="Reply";
-"msg_image"="Image";
-"msg_audio"="Audio";
-"msg_video"="Video";
-"msg_file"="File";
-"msg_custom"="Custom";
-"msg_unknown"="Unknown";
-"message_read"="Read status";
-"message_all_unread"="No body has readed";
-"user_select"="Select Users";
-"user_select_all"="All";
-
-"contact_user"="个人";
-"team"="群组";
-"cancel"="取消";
-"send_to"="发送给";
+"contact_user"="contacts";
+"team"="group";
+"cancel"="cancel";
+"send_to"="send to";
+"send"="send";
+"confirm"="yes";
 
 
-"contact_user"="好友";
-"team"="群聊";
-"cancel"="取消";
-"send_to"="发送给";
+"mdhm"="MM.dd HH:mm";
+"ymdhm"="yyyy.MM.dd HH:mm";
