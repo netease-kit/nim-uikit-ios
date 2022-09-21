@@ -80,13 +80,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func startLogin(account:String,token:String){
         weak var weakSelf = self
-        IMKitLoginManager.instance.loginIM(account, token) { error in
+        IMKitEngine.instance.loginIM(account, token) { error in
             if let err = error {
                 print("NEKitCore login error : ", err)
             }else {
                 ChatRouter.setupInit()
                 let param = QChatLoginParam(account,token)
-                IMKitLoginManager.instance.loginQchat(param) { error, response in
+                IMKitEngine.instance.loginQchat(param) { error, response in
                     if let err = error {
                         print("qchatLogin failed, error : ", err)
                     }else {
