@@ -37,7 +37,7 @@
 "version"="Version";
 "headImage"="Avator";
 "nickname"="Nick Name";
-"account"="Account";
+"account"="ID";
 "gneder"="Sex";
 "unknown"="Unknown";
 "individuality_sign"="What's up";
@@ -52,7 +52,12 @@
 "real_service"="Truly Stable IM Product";
 "appName"="CommsEase IM";
 "brand_des"="CommsEase";
-
-//image
-
+"register_login"="register/login";
+"email_login"="Email Login";
+"node_select"="Select Node";
+"change_node"="Change Node";
+"restart_take_effect"="The app will exit after switching nodes and take effect after restarting";
+"domestic_node"="China";
+"overseas_node"="Singapore";
+"restart"="OK";
 

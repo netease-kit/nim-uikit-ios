@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		398D733E290692FC00662649 /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732B290692FC00662649 /* NodeViewModel.swift */; };
 		398D733F290692FC00662649 /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732C290692FC00662649 /* MineSettingViewModel.swift */; };
 		398D7340290692FC00662649 /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732D290692FC00662649 /* PersonInfoViewModel.swift */; };
 		398D7341290692FC00662649 /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732E290692FC00662649 /* MessageRemindViewModel.swift */; };
@@ -16,12 +15,10 @@
 		398D7344290692FC00662649 /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7332290692FC00662649 /* NEAboutWebViewController.swift */; };
 		398D7346290692FC00662649 /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7334290692FC00662649 /* InputPersonInfoController.swift */; };
 		398D7347290692FC00662649 /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7335290692FC00662649 /* MessageRemindViewController.swift */; };
-		398D7348290692FC00662649 /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7336290692FC00662649 /* NENodeViewController.swift */; };
 		398D7349290692FC00662649 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7337290692FC00662649 /* PersonInfoViewController.swift */; };
 		398D734A290692FC00662649 /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7338290692FC00662649 /* IntroduceBrandViewController.swift */; };
 		398D734B290692FC00662649 /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733A290692FC00662649 /* MineTableViewCell.swift */; };
 		398D734C290692FC00662649 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733B290692FC00662649 /* BirthdayDatePickerView.swift */; };
-		398D734D290692FC00662649 /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733C290692FC00662649 /* NodeSelectCell.swift */; };
 		398D734E290692FC00662649 /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733D290692FC00662649 /* VersionCell.swift */; };
 		398D73512906940C00662649 /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D73502906940C00662649 /* MineSettingViewController.swift */; };
 		39A36F8128002CFF009B07A9 /* NETabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A36F8028002CFF009B07A9 /* NETabBarController.swift */; };
@@ -55,7 +52,6 @@
 		01B0A28E2816CF41009065C5 /* app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app.entitlements; sourceTree = "<group>"; };
 		01C0FC0F27BE754400C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		01C0FC1027BE754500C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		398D732B290692FC00662649 /* NodeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
 		398D732C290692FC00662649 /* MineSettingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
 		398D732D290692FC00662649 /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
 		398D732E290692FC00662649 /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
@@ -64,12 +60,10 @@
 		398D7332290692FC00662649 /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
 		398D7334290692FC00662649 /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
 		398D7335290692FC00662649 /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
-		398D7336290692FC00662649 /* NENodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
 		398D7337290692FC00662649 /* PersonInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
 		398D7338290692FC00662649 /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
 		398D733A290692FC00662649 /* MineTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
 		398D733B290692FC00662649 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
-		398D733C290692FC00662649 /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
 		398D733D290692FC00662649 /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
 		398D73502906940C00662649 /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
 		39A36F8028002CFF009B07A9 /* NETabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
@@ -121,7 +115,6 @@
 		398D732A290692FC00662649 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				398D732B290692FC00662649 /* NodeViewModel.swift */,
 				398D732C290692FC00662649 /* MineSettingViewModel.swift */,
 				398D732D290692FC00662649 /* PersonInfoViewModel.swift */,
 				398D732E290692FC00662649 /* MessageRemindViewModel.swift */,
@@ -138,7 +131,6 @@
 				398D7332290692FC00662649 /* NEAboutWebViewController.swift */,
 				398D7334290692FC00662649 /* InputPersonInfoController.swift */,
 				398D7335290692FC00662649 /* MessageRemindViewController.swift */,
-				398D7336290692FC00662649 /* NENodeViewController.swift */,
 				398D7337290692FC00662649 /* PersonInfoViewController.swift */,
 				398D7338290692FC00662649 /* IntroduceBrandViewController.swift */,
 			);
@@ -150,7 +142,6 @@
 			children = (
 				398D733A290692FC00662649 /* MineTableViewCell.swift */,
 				398D733B290692FC00662649 /* BirthdayDatePickerView.swift */,
-				398D733C290692FC00662649 /* NodeSelectCell.swift */,
 				398D733D290692FC00662649 /* VersionCell.swift */,
 			);
 			path = View;
@@ -342,11 +333,8 @@
 				398D7342290692FC00662649 /* IntroduceViewModel.swift in Sources */,
 				398D7344290692FC00662649 /* NEAboutWebViewController.swift in Sources */,
 				398D7347290692FC00662649 /* MessageRemindViewController.swift in Sources */,
-				398D733E290692FC00662649 /* NodeViewModel.swift in Sources */,
 				4B3B9BDF277AFEE50091A74E /* AppDelegate.swift in Sources */,
 				398D734E290692FC00662649 /* VersionCell.swift in Sources */,
-				398D7348290692FC00662649 /* NENodeViewController.swift in Sources */,
-				398D734D290692FC00662649 /* NodeSelectCell.swift in Sources */,
 				398D7341290692FC00662649 /* MessageRemindViewModel.swift in Sources */,
 				398D73512906940C00662649 /* MineSettingViewController.swift in Sources */,
 				398D734B290692FC00662649 /* MineTableViewCell.swift in Sources */,
