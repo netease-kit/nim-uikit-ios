@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCore
-import NEKitChatUI
+import NECoreKit
+import NEChatUIKit
 
 public enum EditType: Int {
   case nickName = 0

@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCore
-import NEKitTeamUI
+import NECoreKit
+import NETeamUIKit
 import YXLogin
 import NIMSDK
 
@@ -100,7 +100,6 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
                 }
             }
         }
-        
     }
 
   // MARK: UITableViewDataSource, UITableViewDelegate

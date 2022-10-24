@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEKitTeamUI
+import NETeamUIKit
 import NIMSDK
 
 protocol PersonInfoViewModelDelegate: AnyObject {
@@ -18,7 +18,8 @@ protocol PersonInfoViewModelDelegate: AnyObject {
   func didCopyAccount(account: String)
 }
 
-public class PersonInfoViewModel {
+@objcMembers
+public class PersonInfoViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
   public let friendProvider = FriendProvider.shared
   public let userProvider = UserInfoProvider.shared
@@ -28,7 +29,7 @@ public class PersonInfoViewModel {
 
   func getData() {
     sectionData.removeAll()
-    userInfo = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
+    userInfo = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())
   }

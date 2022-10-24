@@ -4,8 +4,10 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEKitTeamUI
-public class IntroduceViewModel {
+import NETeamUIKit
+
+@objcMembers
+public class IntroduceViewModel: NSObject {
   var sectionData = [SettingCellModel]()
 
   func getData() {

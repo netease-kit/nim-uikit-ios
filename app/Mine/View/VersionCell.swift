@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitTeamUI
+import NETeamUIKit
 
 enum IntroduceCellType: Int {
   case version = 0

@@ -16,7 +16,7 @@ class NENavigationController: UINavigationController {
       let appearance = UINavigationBarAppearance()
       appearance.backgroundImage = UIImage()
       appearance.backgroundColor = .white
-      appearance.shadowColor = .white
+      appearance.shadowColor = UIColor.ne_navLineColor
       navigationBar.standardAppearance = appearance
       navigationBar.scrollEdgeAppearance = appearance
     }

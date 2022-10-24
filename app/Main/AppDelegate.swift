@@ -3,16 +3,15 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 
 import UIKit
-import NEKitContactUI
+import NEContactUIKit
 import YXLogin
-import NEKitCore
+import NECoreKit
 import NIMSDK
-import NEKitQChatUI
-import NEKitCoreIM
-import IQKeyboardManagerSwift
-import NEKitConversationUI
-import NEKitTeamUI
-import NEKitChatUI
+import NEQChatUIKit
+import NECoreIMKit
+import NEConversationUIKit
+import NETeamUIKit
+import NEChatUIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -31,14 +30,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let option = NIMSDKOption()
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
-        IMKitEngine.instance.setupCoreKitIM(option)
+        IMKitClient.instance.setupCoreKitIM(option)
         
 
-        IQKeyboardManager.shared.enable = true
-        IQKeyboardManager.shared.shouldResignOnTouchOutside = true
+        NEKeyboardManager.shared.enable = true
+        NEKeyboardManager.shared.shouldResignOnTouchOutside = true
        
         //login action
-        startLogin(account: <#imaccid#>, token: <#imToken#>)
+        startLogin(account: <#imAccid#>, token: <#imToken#>)
     }
     
     @objc func refreshRoot(){
@@ -80,13 +79,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func startLogin(account:String,token:String){
         weak var weakSelf = self
-        IMKitEngine.instance.loginIM(account, token) { error in
+        IMKitClient.instance.loginIM(account, token) { error in
             if let err = error {
                 print("NEKitCore login error : ", err)
             }else {
                 ChatRouter.setupInit()
                 let param = QChatLoginParam(account,token)
-                IMKitEngine.instance.loginQchat(param) { error, response in
+                IMKitClient.instance.loginQchat(param) { error, response in
                     if let err = error {
                         print("qchatLogin failed, error : ", err)
                     }else {
@@ -103,14 +102,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         loadService()
     }
     
-//    regist router
+    //路由注册
     func loadService() {
-        //TODO: service
         ContactRouter.register()
         ChatRouter.register()
         TeamRouter.register()
         ConversationRouter.register()
-        
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
                 let me = PersonInfoViewController()

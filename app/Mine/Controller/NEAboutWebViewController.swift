@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCore
+import NECoreKit
 import WebKit
-import NEKitCommonUI
+import NECommonUIKit
 
 class NEAboutWebViewController: NEBaseViewController {
   private var loadUrl: String = ""

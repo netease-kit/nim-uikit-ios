@@ -7,17 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		393759D32810348E004F0AEC /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759D22810348E004F0AEC /* MineTableViewCell.swift */; };
-		393759D52810F1C5004F0AEC /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759D42810F1C5004F0AEC /* MineSettingViewController.swift */; };
-		393759D728110073004F0AEC /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759D628110073004F0AEC /* MineSettingViewModel.swift */; };
-		393759D92811367F004F0AEC /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759D82811367F004F0AEC /* IntroduceBrandViewController.swift */; };
-		393759DD28113AD6004F0AEC /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759DC28113AD6004F0AEC /* IntroduceViewModel.swift */; };
-		393759DF281142F8004F0AEC /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759DE281142F8004F0AEC /* VersionCell.swift */; };
-		393759E128115BAC004F0AEC /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759E028115BAC004F0AEC /* PersonInfoViewController.swift */; };
-		393759E328115BD7004F0AEC /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759E228115BD7004F0AEC /* PersonInfoViewModel.swift */; };
-		393759E728123DCF004F0AEC /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759E628123DCF004F0AEC /* MessageRemindViewController.swift */; };
-		393759E928123E5E004F0AEC /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759E828123E5E004F0AEC /* MessageRemindViewModel.swift */; };
-		393759EB2812951E004F0AEC /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393759EA2812951E004F0AEC /* InputPersonInfoController.swift */; };
+		398D733E290692FC00662649 /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732B290692FC00662649 /* NodeViewModel.swift */; };
+		398D733F290692FC00662649 /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732C290692FC00662649 /* MineSettingViewModel.swift */; };
+		398D7340290692FC00662649 /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732D290692FC00662649 /* PersonInfoViewModel.swift */; };
+		398D7341290692FC00662649 /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732E290692FC00662649 /* MessageRemindViewModel.swift */; };
+		398D7342290692FC00662649 /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D732F290692FC00662649 /* IntroduceViewModel.swift */; };
+		398D7343290692FC00662649 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7331290692FC00662649 /* MeViewController.swift */; };
+		398D7344290692FC00662649 /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7332290692FC00662649 /* NEAboutWebViewController.swift */; };
+		398D7346290692FC00662649 /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7334290692FC00662649 /* InputPersonInfoController.swift */; };
+		398D7347290692FC00662649 /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7335290692FC00662649 /* MessageRemindViewController.swift */; };
+		398D7348290692FC00662649 /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7336290692FC00662649 /* NENodeViewController.swift */; };
+		398D7349290692FC00662649 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7337290692FC00662649 /* PersonInfoViewController.swift */; };
+		398D734A290692FC00662649 /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D7338290692FC00662649 /* IntroduceBrandViewController.swift */; };
+		398D734B290692FC00662649 /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733A290692FC00662649 /* MineTableViewCell.swift */; };
+		398D734C290692FC00662649 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733B290692FC00662649 /* BirthdayDatePickerView.swift */; };
+		398D734D290692FC00662649 /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733C290692FC00662649 /* NodeSelectCell.swift */; };
+		398D734E290692FC00662649 /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D733D290692FC00662649 /* VersionCell.swift */; };
+		398D73512906940C00662649 /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 398D73502906940C00662649 /* MineSettingViewController.swift */; };
 		39A36F8128002CFF009B07A9 /* NETabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A36F8028002CFF009B07A9 /* NETabBarController.swift */; };
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
 		39F793C827E20434007F63FF /* NENavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F793C727E20434007F63FF /* NENavigationController.swift */; };
@@ -27,10 +33,7 @@
 		4B3B9BE8277AFEE70091A74E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE7277AFEE70091A74E /* Assets.xcassets */; };
 		4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */; };
 		8D94D1BFC1723D94D352756A /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8ECED9A11CC9DB62207FC66 /* Pods_app.framework */; };
-		9E98CA4C27BCEC15008A8738 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E98CA4B27BCEC15008A8738 /* MeViewController.swift */; };
 		9EA2014127BE4B4800F8BBD0 /* AppKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA2014027BE4B4800F8BBD0 /* AppKey.swift */; };
-		CEE0AC692812EF3000C734F3 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE0AC682812EF3000C734F3 /* BirthdayDatePickerView.swift */; };
-		CEE0AC6B281423A300C734F3 /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE0AC6A281423A300C734F3 /* NEAboutWebViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,17 +55,23 @@
 		01B0A28E2816CF41009065C5 /* app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app.entitlements; sourceTree = "<group>"; };
 		01C0FC0F27BE754400C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		01C0FC1027BE754500C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		393759D22810348E004F0AEC /* MineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
-		393759D42810F1C5004F0AEC /* MineSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
-		393759D628110073004F0AEC /* MineSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
-		393759D82811367F004F0AEC /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
-		393759DC28113AD6004F0AEC /* IntroduceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
-		393759DE281142F8004F0AEC /* VersionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
-		393759E028115BAC004F0AEC /* PersonInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
-		393759E228115BD7004F0AEC /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
-		393759E628123DCF004F0AEC /* MessageRemindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
-		393759E828123E5E004F0AEC /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
-		393759EA2812951E004F0AEC /* InputPersonInfoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
+		398D732B290692FC00662649 /* NodeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
+		398D732C290692FC00662649 /* MineSettingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
+		398D732D290692FC00662649 /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
+		398D732E290692FC00662649 /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
+		398D732F290692FC00662649 /* IntroduceViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
+		398D7331290692FC00662649 /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
+		398D7332290692FC00662649 /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
+		398D7334290692FC00662649 /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
+		398D7335290692FC00662649 /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
+		398D7336290692FC00662649 /* NENodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
+		398D7337290692FC00662649 /* PersonInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
+		398D7338290692FC00662649 /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
+		398D733A290692FC00662649 /* MineTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
+		398D733B290692FC00662649 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
+		398D733C290692FC00662649 /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
+		398D733D290692FC00662649 /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
+		398D73502906940C00662649 /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
 		39A36F8028002CFF009B07A9 /* NETabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
 		39E9E27628D87E9800A11820 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		39E9E27828D87EA000A11820 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -73,12 +82,9 @@
 		4B3B9BE5277AFEE50091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4B3B9BE7277AFEE70091A74E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4B3B9BEA277AFEE70091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9E98CA4B27BCEC15008A8738 /* MeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
 		9EA2014027BE4B4800F8BBD0 /* AppKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKey.swift; sourceTree = "<group>"; };
 		A9E4316D70F3EF2E6BD5E5CB /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
 		B831F1EC5F2E309A7BB5582D /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
-		CEE0AC682812EF3000C734F3 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
-		CEE0AC6A281423A300C734F3 /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
 		D8ECED9A11CC9DB62207FC66 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -102,25 +108,62 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		393759D1281033C9004F0AEC /* Mine */ = {
+		398D7329290692FC00662649 /* Mine */ = {
 			isa = PBXGroup;
 			children = (
-				9E98CA4B27BCEC15008A8738 /* MeViewController.swift */,
-				393759D42810F1C5004F0AEC /* MineSettingViewController.swift */,
-				393759D82811367F004F0AEC /* IntroduceBrandViewController.swift */,
-				393759E028115BAC004F0AEC /* PersonInfoViewController.swift */,
-				393759EA2812951E004F0AEC /* InputPersonInfoController.swift */,
-				393759E628123DCF004F0AEC /* MessageRemindViewController.swift */,
-				CEE0AC6A281423A300C734F3 /* NEAboutWebViewController.swift */,
-				393759D628110073004F0AEC /* MineSettingViewModel.swift */,
-				393759DC28113AD6004F0AEC /* IntroduceViewModel.swift */,
-				393759E228115BD7004F0AEC /* PersonInfoViewModel.swift */,
-				393759E828123E5E004F0AEC /* MessageRemindViewModel.swift */,
-				393759D22810348E004F0AEC /* MineTableViewCell.swift */,
-				393759DE281142F8004F0AEC /* VersionCell.swift */,
-				CEE0AC682812EF3000C734F3 /* BirthdayDatePickerView.swift */,
+				398D732A290692FC00662649 /* ViewModel */,
+				398D7330290692FC00662649 /* Controller */,
+				398D7339290692FC00662649 /* View */,
 			);
 			path = Mine;
+			sourceTree = "<group>";
+		};
+		398D732A290692FC00662649 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				398D732B290692FC00662649 /* NodeViewModel.swift */,
+				398D732C290692FC00662649 /* MineSettingViewModel.swift */,
+				398D732D290692FC00662649 /* PersonInfoViewModel.swift */,
+				398D732E290692FC00662649 /* MessageRemindViewModel.swift */,
+				398D732F290692FC00662649 /* IntroduceViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		398D7330290692FC00662649 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				398D73502906940C00662649 /* MineSettingViewController.swift */,
+				398D7331290692FC00662649 /* MeViewController.swift */,
+				398D7332290692FC00662649 /* NEAboutWebViewController.swift */,
+				398D7334290692FC00662649 /* InputPersonInfoController.swift */,
+				398D7335290692FC00662649 /* MessageRemindViewController.swift */,
+				398D7336290692FC00662649 /* NENodeViewController.swift */,
+				398D7337290692FC00662649 /* PersonInfoViewController.swift */,
+				398D7338290692FC00662649 /* IntroduceBrandViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		398D7339290692FC00662649 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				398D733A290692FC00662649 /* MineTableViewCell.swift */,
+				398D733B290692FC00662649 /* BirthdayDatePickerView.swift */,
+				398D733C290692FC00662649 /* NodeSelectCell.swift */,
+				398D733D290692FC00662649 /* VersionCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		398D734F2906931E00662649 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				39F793C727E20434007F63FF /* NENavigationController.swift */,
+				39A36F8028002CFF009B07A9 /* NETabBarController.swift */,
+				4B3B9BDE277AFEE50091A74E /* AppDelegate.swift */,
+			);
+			path = Main;
 			sourceTree = "<group>";
 		};
 		4B3B9BD2277AFEE50091A74E = {
@@ -144,14 +187,12 @@
 		4B3B9BDD277AFEE50091A74E /* app */ = {
 			isa = PBXGroup;
 			children = (
+				398D734F2906931E00662649 /* Main */,
+				398D7329290692FC00662649 /* Mine */,
 				01B0A28E2816CF41009065C5 /* app.entitlements */,
-				39F793C727E20434007F63FF /* NENavigationController.swift */,
-				39A36F8028002CFF009B07A9 /* NETabBarController.swift */,
-				4B3B9BDE277AFEE50091A74E /* AppDelegate.swift */,
 				9EA2014027BE4B4800F8BBD0 /* AppKey.swift */,
 				4B3B9BE2277AFEE50091A74E /* ViewController.swift */,
 				39E9E27528D87E9800A11820 /* Localizable.strings */,
-				393759D1281033C9004F0AEC /* Mine */,
 				4B3B9BE4277AFEE50091A74E /* Main.storyboard */,
 				4B3B9BE7277AFEE70091A74E /* Assets.xcassets */,
 				4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */,
@@ -287,25 +328,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				393759E128115BAC004F0AEC /* PersonInfoViewController.swift in Sources */,
-				CEE0AC692812EF3000C734F3 /* BirthdayDatePickerView.swift in Sources */,
-				393759D728110073004F0AEC /* MineSettingViewModel.swift in Sources */,
-				393759D52810F1C5004F0AEC /* MineSettingViewController.swift in Sources */,
-				393759E328115BD7004F0AEC /* PersonInfoViewModel.swift in Sources */,
-				393759DF281142F8004F0AEC /* VersionCell.swift in Sources */,
-				393759EB2812951E004F0AEC /* InputPersonInfoController.swift in Sources */,
-				CEE0AC6B281423A300C734F3 /* NEAboutWebViewController.swift in Sources */,
-				393759D32810348E004F0AEC /* MineTableViewCell.swift in Sources */,
-				9E98CA4C27BCEC15008A8738 /* MeViewController.swift in Sources */,
-				393759E928123E5E004F0AEC /* MessageRemindViewModel.swift in Sources */,
-				393759DD28113AD6004F0AEC /* IntroduceViewModel.swift in Sources */,
-				393759D92811367F004F0AEC /* IntroduceBrandViewController.swift in Sources */,
 				39F793C827E20434007F63FF /* NENavigationController.swift in Sources */,
-				393759E728123DCF004F0AEC /* MessageRemindViewController.swift in Sources */,
+				398D7346290692FC00662649 /* InputPersonInfoController.swift in Sources */,
+				398D7343290692FC00662649 /* MeViewController.swift in Sources */,
+				398D7349290692FC00662649 /* PersonInfoViewController.swift in Sources */,
+				398D734A290692FC00662649 /* IntroduceBrandViewController.swift in Sources */,
+				398D733F290692FC00662649 /* MineSettingViewModel.swift in Sources */,
 				9EA2014127BE4B4800F8BBD0 /* AppKey.swift in Sources */,
+				398D7340290692FC00662649 /* PersonInfoViewModel.swift in Sources */,
 				4B3B9BE3277AFEE50091A74E /* ViewController.swift in Sources */,
+				398D734C290692FC00662649 /* BirthdayDatePickerView.swift in Sources */,
 				39A36F8128002CFF009B07A9 /* NETabBarController.swift in Sources */,
+				398D7342290692FC00662649 /* IntroduceViewModel.swift in Sources */,
+				398D7344290692FC00662649 /* NEAboutWebViewController.swift in Sources */,
+				398D7347290692FC00662649 /* MessageRemindViewController.swift in Sources */,
+				398D733E290692FC00662649 /* NodeViewModel.swift in Sources */,
 				4B3B9BDF277AFEE50091A74E /* AppDelegate.swift in Sources */,
+				398D734E290692FC00662649 /* VersionCell.swift in Sources */,
+				398D7348290692FC00662649 /* NENodeViewController.swift in Sources */,
+				398D734D290692FC00662649 /* NodeSelectCell.swift in Sources */,
+				398D7341290692FC00662649 /* MessageRemindViewModel.swift in Sources */,
+				398D73512906940C00662649 /* MineSettingViewController.swift in Sources */,
+				398D734B290692FC00662649 /* MineTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,7 +540,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.2.7;
+				MARKETING_VERSION = 9.2.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -539,7 +583,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.2.7;
+				MARKETING_VERSION = 9.2.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = inHouseYunxin;

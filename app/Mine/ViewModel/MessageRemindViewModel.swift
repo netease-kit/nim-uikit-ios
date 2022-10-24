@@ -4,9 +4,10 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEKitTeamUI
+import NETeamUIKit
 
-public class MessageRemindViewModel {
+@objcMembers
+public class MessageRemindViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
 
   let repo = SettingRepo()
@@ -39,18 +40,18 @@ public class MessageRemindViewModel {
     ringBellItem.cellName = NSLocalizedString("ring_mode", comment: "")
     ringBellItem.type = SettingCellType.SettingSwitchCell.rawValue
     ringBellItem.cornerType = .topLeft.union(.topRight)
-    ringBellItem.switchOpen = repo.getPushAudioEnable()
+    ringBellItem.switchOpen = repo.getRingMode()
     ringBellItem.swichChange = { isOpen in
-      weakSelf?.repo.setPushAudioEnable(isOpen)
+      weakSelf?.repo.setRingMode(isOpen)
     }
 
     let vibrationItem = SettingCellModel()
     vibrationItem.cellName = NSLocalizedString("vibration_mode", comment: "")
     vibrationItem.type = SettingCellType.SettingSwitchCell.rawValue
     vibrationItem.cornerType = .bottomLeft.union(.bottomRight)
-    vibrationItem.switchOpen = repo.getPushShakeEnable()
+    vibrationItem.switchOpen = repo.getVibrateMode()
     vibrationItem.swichChange = { isOpen in
-      weakSelf?.repo.setPushShakeEnable(isOpen)
+      weakSelf?.repo.setVibrateMode(isOpen)
     }
     model.cellModels.append(contentsOf: [ringBellItem, vibrationItem])
     return model
@@ -72,9 +73,9 @@ public class MessageRemindViewModel {
     messageDetailItem.cellName = NSLocalizedString("display_message_detail", comment: "")
     messageDetailItem.type = SettingCellType.SettingSwitchCell.rawValue
     messageDetailItem.cornerType = .bottomLeft.union(.bottomRight)
-    messageDetailItem.switchOpen = repo.getPushDetailEnable()
+    messageDetailItem.switchOpen = repo.getPushShowDetail()
     messageDetailItem.swichChange = { isOpen in
-      weakSelf?.repo.settingProvider.setPushDetailEnable(isOpen)
+      weakSelf?.repo.setPushShowDetail(isOpen)
     }
 
     model.cellModels.append(contentsOf: [messageDetailItem])

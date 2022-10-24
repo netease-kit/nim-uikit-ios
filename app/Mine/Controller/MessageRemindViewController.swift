@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCore
-import NEKitTeamUI
-import NEKitChatUI
+import NECoreKit
+import NETeamUIKit
+import NEChatUIKit
 
 class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {

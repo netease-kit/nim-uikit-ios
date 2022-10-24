@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCore
-import NEKitTeamUI
-import NEKitChatUI
+import NECoreKit
+import NETeamUIKit
+import NEChatUIKit
 import NIMSDK
 
 class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
@@ -130,7 +130,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   // MARK: NIMUserManagerDelegate
 
   func onUserInfoChanged(_ user: NIMUser) {
-    if user.userId == IMKitEngine.instance.imAccid {
+    if user.userId == IMKitClient.instance.imAccid {
       viewModel.getData()
       tableView.reloadData()
     }
@@ -151,7 +151,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     weak var weakSelf = self
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
       let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitEngine.instance.imAccid)
+        .appending(IMKitClient.instance.imAccid)
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         NIMSDK.shared().resourceManager
@@ -167,7 +167,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
             } else {
               NELog.errorLog(
                 weakSelf?.className ?? "",
-                desc: "❌upload image failed,error = \(error!)"
+                desc: "❌CALLBACK upload image failed,error = \(error!)"
               )
             }
             self.view.hideToastActivity()

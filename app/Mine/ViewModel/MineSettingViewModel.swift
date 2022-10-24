@@ -4,14 +4,15 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEKitTeamUI
+import NETeamUIKit
 
-protocol MineSettingViewModelDelegate: AnyObject {
+public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
   func didClickCleanCache()
 }
 
-public class MineSettingViewModel {
+@objcMembers
+public class MineSettingViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
   weak var delegate: MineSettingViewModelDelegate?
 
@@ -54,10 +55,10 @@ public class MineSettingViewModel {
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
     receiverModel.cornerType = .topLeft.union(.topRight)
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
-    receiverModel.switchOpen = IMKitEngine.instance.repo.getHandSetMode()
+    receiverModel.switchOpen = IMKitClient.instance.repo.getHandsetMode()
 
     receiverModel.swichChange = { isOpen in
-      IMKitEngine.instance.repo.setHandSetMode(isOpen)
+      IMKitClient.instance.repo.setHandsetMode(isOpen)
     }
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
@@ -73,10 +74,10 @@ public class MineSettingViewModel {
 //    let deleteFriend = SettingCellModel()
 //    deleteFriend.cellName = NSLocalizedString("delete_friend", comment: "")
 //    deleteFriend.type = SettingCellType.SettingSwitchCell.rawValue
-//    deleteFriend.switchOpen = IMKitEngine.instance.repo.getDeleteFriendAlias()
+//    deleteFriend.switchOpen = IMKitClient.instance.repo.getDeleteFriendAlias()
 //
 //    deleteFriend.swichChange = { isOpen in
-//      IMKitEngine.instance.repo.setDeleteFriendAlias(isOpen)
+//      IMKitClient.instance.repo.setDeleteFriendAlias(isOpen)
 //    }
 
     // 消息已读未读功能
@@ -85,9 +86,9 @@ public class MineSettingViewModel {
     hasRead.type = SettingCellType.SettingSwitchCell.rawValue
     hasRead.cornerType = .bottomLeft.union(.bottomRight)
 //        hasRead.switchOpen = true
-    hasRead.switchOpen = IMKitEngine.instance.repo.getMessageRead()
+    hasRead.switchOpen = IMKitClient.instance.repo.getShowReadStatus()
     hasRead.swichChange = { isOpen in
-      IMKitEngine.instance.repo.setMessageRead(isOpen)
+      IMKitClient.instance.repo.setShowReadStatus(isOpen)
     }
     model.cellModels.append(contentsOf: [receiverModel, hasRead])
     return model

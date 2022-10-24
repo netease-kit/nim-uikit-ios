@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCommonUI
+import NECommonUIKit
 
 public class BirthdayDatePickerView: UIView {
   private var selectTime: String?

@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-import NEKitCommonUI
+import NECommonUIKit
 
 class ViewController: UIViewController {
   lazy var launchIcon: UIImageView = {

@@ -5,13 +5,13 @@
 
 import UIKit
 import NIMSDK
-import NEKitCore
-import NEKitQChatUI
-import NEKitCoreIM
-import NEKitConversationUI
-import NEKitTeamUI
-import NEKitChatUI
-import NEKitContactUI
+import NECoreKit
+import NEQChatUIKit
+import NECoreIMKit
+import NEConversationUIKit
+import NETeamUIKit
+import NEChatUIKit
+import NEContactUIKit
 
 class NETabBarController: UITabBarController {
   private var sessionUnreadCount = 0

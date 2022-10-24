@@ -5,17 +5,17 @@
 
 import UIKit
 import YXLogin
-import NEKitCore
+import NECoreKit
 import NIMSDK
-import NEKitCoreIM
-import NEKitQChatUI
+import NECoreIMKit
+import NEQChatUIKit
 
 class MeViewController: UIViewController {
-//    private let mineData = [["收藏":"mine_collection"],["关于云信":"about_yunxin"],["设置":"mine_setting"]]
   private let mineData = [
     [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
     [NSLocalizedString("setting", comment: ""): "mine_setting"],
   ]
+
   private let userProvider = UserInfoProvider.shared
 
   lazy var header: NEUserHeaderView = {
@@ -94,6 +94,7 @@ class MeViewController: UIViewController {
     updateUserInfo()
 
     let divider = UIView()
+    divider.backgroundColor = UIColor(hexString: "0xEFF1F4")
     view.addSubview(divider)
     divider.translatesAutoresizingMaskIntoConstraints = false
     divider.backgroundColor = UIColor(hexString: "EFF1F4")
@@ -129,8 +130,8 @@ class MeViewController: UIViewController {
   }
 
   func updateUserInfo() {
-    let user = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
-    idLabel.text = "账号:\(user?.userId ?? "")"
+    let user = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
+    idLabel.text = "\(NSLocalizedString("account", comment: "")):\(user?.userId ?? "")"
     nameLabel.text = user?.userInfo?.nickName
     header.configHeadData(headUrl: user?.userInfo?.avatarUrl, name: user?.showName() ?? "")
   }
