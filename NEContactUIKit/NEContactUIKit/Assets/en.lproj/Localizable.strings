@@ -1,0 +1,42 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+
+"alert_tip"="tip";
+"alert_sure"="ok";
+"alert_cancel"="cancel";
+"noteName"="Nick Name";
+"remove_black" = "Remove";
+
+"blacklist"="Blacklist";
+"mine_groupchat"="My Group";
+"save"="Save";
+"input_noteName"="Please enter nick name";
+"phone"="mobile";
+"email"="e-mail";
+"sign"="What's Up";
+"delete_friend"="Delete Contact";
+"add_friend"="Add Contact";
+"add_blackList"="block";
+"send_friend_apply"="Contact request sent";
+"validation_message"="Verify message";
+"clear"="Clear";
+"agreed"="Added";
+"refused"="Rejected";
+"expired"="Expired";
+"refuse"="Reject";
+"agree"="Agree";
+"select"="Select";
+"select_contact"="Please select Contact";
+"user_not_exist"="No contact";
+"chat"="Chat";
+"message_remind"="Message notification";
+"clear_all_validate_message"="Wether to clear all verification";
+"sure_delte_friend"="Wether to delete Contact？";
+"input_userId"="Input user ID";
+
+
+
+

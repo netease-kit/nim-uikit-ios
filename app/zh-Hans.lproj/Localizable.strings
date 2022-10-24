@@ -10,7 +10,7 @@
 "mine"="我";
 "logout"="退出登录";
 "about_yunxin"="关于云信";
-"want_to_logout"="确认要退出登录吗？";
+"want_to_logout"="确定要退出登录吗？";
 "person_info"="个人信息";
 "cancel"="取消";
 "setting_birthday_failure"="设置生日失败";
@@ -23,7 +23,7 @@
 "change_email_failure"="修改邮箱失败";
 "change_sign_failure"="修改签名失败";
 "copy_success"="复制成功";
-"save"="保存";
+"save"="完成";
 "birehday"="生日";
 "phone"="手机";
 "email"="邮箱";
@@ -52,5 +52,13 @@
 "real_service"="真正稳定的IM云服务";
 "appName"="云信IM";
 "brand_des"="网易云信";
-//image
+"register_login"="注册/登录";
+"email_login"="邮箱登录";
+"node_select"="节点选择";
+"change_node"="更改配置节点";
+"restart_take_effect"="切换节点后应用将退出并在重新开启后生效";
+"domestic_node"="国内节点配置";
+"overseas_node"="海外节点配置";
+"restart"="重启";
+
 
