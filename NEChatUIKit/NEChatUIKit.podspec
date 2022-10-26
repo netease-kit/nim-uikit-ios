@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "NEChatUIKit"
-  spec.version      = "9.2.8"
+  spec.version      = "9.2.9"
   spec.summary      = "Chat Module of IM."
 
   # This description is used to generate tags and improve search results.
