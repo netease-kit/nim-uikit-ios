@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class TextBaseCell: UITableViewCell {
+public class ContactBaseTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()
   public var line = UIView()
 

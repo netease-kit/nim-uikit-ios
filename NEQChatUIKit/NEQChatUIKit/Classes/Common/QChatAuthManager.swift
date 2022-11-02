@@ -6,10 +6,10 @@
 import AVFoundation
 import Photos
 
-public typealias NEAuthCompletion = (_ granted: Bool) -> Void
+public typealias QChatAuthCompletion = (_ granted: Bool) -> Void
 
 @objc
-public class YXAuthManager: NSObject {
+public class QChatAuthManager: NSObject {
   /// 查询相机授权
   @objc
   public class func hasCameraAuthorization() -> Bool {
@@ -20,7 +20,7 @@ public class YXAuthManager: NSObject {
   /// 请求相机权限
   /// @param completion 结果
   @objc
-  public class func requestCameraAuthorization(_ completion: NEAuthCompletion?) {
+  public class func requestCameraAuthorization(_ completion: QChatAuthCompletion?) {
     AVCaptureDevice.requestAccess(for: .video) { granted in
       DispatchQueue.main.async {
         completion?(granted)
@@ -30,7 +30,7 @@ public class YXAuthManager: NSObject {
 
   /// 相册权限
   /// - Parameter completion: 结果
-  class func photoAlbumPermissions(_ completion: NEAuthCompletion?) {
+  class func photoAlbumPermissions(_ completion: QChatAuthCompletion?) {
     let authStatus = PHPhotoLibrary.authorizationStatus()
     // .notDetermined  .authorized  .restricted  .denied
     if authStatus == .notDetermined {

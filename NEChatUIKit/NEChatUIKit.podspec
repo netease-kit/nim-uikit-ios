@@ -15,9 +15,9 @@ Pod::Spec.new do |spec|
   #  summary should be tweet-length, and the description more in depth.
   #
 
-  spec.name         = "NEChatUIKit"
-  spec.version      = "9.2.9"
-  spec.summary      = "Chat Module of IM."
+  spec.name         = 'NEChatUIKit'
+  spec.version      = '9.2.10'
+  spec.summary      = 'Chat Module of IM.'
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
