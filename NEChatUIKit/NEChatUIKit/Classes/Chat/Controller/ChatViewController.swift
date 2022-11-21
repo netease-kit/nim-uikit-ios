@@ -1451,12 +1451,20 @@ extension ChatViewController: ChatBaseCellDelegate {
 
         viewmodel.downLoad(urlString, path) { progress in
           NELog.infoLog(ModuleName + " " + self.tag, desc: "CALLBACK downLoad ")
-          let trueProgress = -progress / Float(object.fileLength)
-          videoModel.progress = trueProgress
-          if trueProgress >= 1.0 {
+
+          videoModel.progress = progress
+          if progress >= 1.0 {
             videoModel.state = .Success
           }
-          videoModel.cell?.uploadProgress(trueProgress)
+          videoModel.cell?.uploadProgress(progress)
+
+          // SDK返回异常导致
+//          let trueProgress = -progress / Float(object.fileLength)
+//          videoModel.progress = trueProgress
+//          if trueProgress >= 1.0 {
+//            videoModel.state = .Success
+//          }
+//          videoModel.cell?.uploadProgress(trueProgress)
         } _: { error in
           if let err = error as NSError? {
             weakSelf?.showToast(err.localizedDescription)

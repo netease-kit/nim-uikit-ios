@@ -525,6 +525,38 @@
 				<key>tag</key>
 				<string>[Sleep]</string>
 			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_65.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_65</string>
+				<key>tag</key>
+				<string>[Cloud]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_66.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_66</string>
+				<key>tag</key>
+				<string>[Rocket]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_67.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_67</string>
+				<key>tag</key>
+				<string>[Ambulance]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_68.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_68</string>
+				<key>tag</key>
+				<string>[Poop]</string>
+			</dict>
 		</array>
 		<key>info</key>
 		<dict>

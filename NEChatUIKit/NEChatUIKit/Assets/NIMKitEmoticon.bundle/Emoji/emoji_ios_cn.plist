@@ -459,7 +459,7 @@
 				<key>id</key>
 				<string>emoticon_emoji_56</string>
 				<key>tag</key>
-				<string>[不要]</string>
+				<string>[举着]</string>
 			</dict>
 			<dict>
 				<key>file</key>
@@ -524,6 +524,38 @@
 				<string>emoticon_emoji_64</string>
 				<key>tag</key>
 				<string>[睡觉]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_65.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_65</string>
+				<key>tag</key>
+				<string>[筋斗云]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_66.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_66</string>
+				<key>tag</key>
+				<string>[火箭]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_67.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_67</string>
+				<key>tag</key>
+				<string>[救护车]</string>
+			</dict>
+			<dict>
+				<key>file</key>
+				<string>emoji_68.png</string>
+				<key>id</key>
+				<string>emoticon_emoji_68</string>
+				<key>tag</key>
+				<string>[便便]</string>
 			</dict>
 		</array>
 		<key>info</key>

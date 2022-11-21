@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = 'NEChatUIKit'
-  spec.version      = '9.2.10'
+  spec.version      = '9.2.11'
   spec.summary      = 'Chat Module of IM.'
 
   # This description is used to generate tags and improve search results.
@@ -40,16 +40,16 @@ TODO: Add long description of the pod here.
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
   spec.user_target_xcconfig = { 'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES' }
-  spec.resource_bundles = {
-    'NEChatUIKit' => ['NEChatUIKit/Assets/*.png']
-  }
+#  spec.resource_bundles = {
+#    'NEChatUIKit' => ['NEChatUIKit/Assets/*.png']
+#  }
   
   spec.resource = 'NEChatUIKit/Assets/**/*'
   spec.dependency 'NEChatKit'
   spec.dependency 'NECommonUIKit'
   spec.dependency 'RSKPlaceholderTextView'
   spec.dependency 'MJRefresh'
-  spec.dependency 'NIMSDK_LITE', '9.2.5'
+  spec.dependency 'NIMSDK_LITE'
   spec.dependency 'YXAlog_iOS'
 
 end
