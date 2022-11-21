@@ -7,7 +7,7 @@ import UIKit
 
 public typealias ValueChangeBlock = (_ title: String?, _ value: Bool) -> Void
 @objcMembers
-public class TextWithSwitchCell: TextBaseCell {
+public class TextWithSwitchCell: ContactBaseTextCell {
   public var block: ValueChangeBlock?
   public var switchButton = UISwitch()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

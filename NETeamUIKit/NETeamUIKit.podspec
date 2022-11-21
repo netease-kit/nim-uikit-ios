@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NETeamUIKit'
-  s.version          = '9.2.10'
+  s.version          = '9.2.11'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -44,7 +44,7 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'NECommonUIKit'
   s.dependency 'NETeamKit'
-  s.dependency 'NIMSDK_LITE', '9.2.5'
+  s.dependency 'NIMSDK_LITE'
   s.dependency 'YXAlog_iOS'
 
 end

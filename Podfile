@@ -9,25 +9,25 @@ target 'app' do
   pod 'YXLogin', '1.0.0'
   
   #可选UI库
-  pod 'NEContactUIKit', '9.2.10'
-  pod 'NEQChatUIKit', '9.2.10'
-  pod 'NEConversationUIKit', '9.2.10'
-  pod 'NEChatUIKit', '9.2.10'
-  pod 'NETeamUIKit', '9.2.10'
+  pod 'NEContactUIKit', '9.2.11'
+  pod 'NEQChatUIKit', '9.2.11'
+  pod 'NEConversationUIKit', '9.2.11'
+  pod 'NEChatUIKit', '9.2.11'
+  pod 'NETeamUIKit', '9.2.11'
   
   
   #可选Kit库（和UIKit对应）
-  pod 'NEContactKit', '9.2.10'
-  pod 'NEQChatKit', '9.2.10'
-  pod 'NEConversationKit', '9.2.10'
-  pod 'NEChatKit', '9.2.10'
-  pod 'NETeamKit', '9.2.10'
+  pod 'NEContactKit', '9.2.11'
+  pod 'NEQChatKit', '9.2.11'
+  pod 'NEConversationKit', '9.2.11'
+  pod 'NEChatKit', '9.2.11'
+  pod 'NETeamKit', '9.2.11'
   
   #基础kit库
-  pod 'NECommonUIKit', '9.2.10'
-  pod 'NECommonKit', '9.2.10'
-  pod 'NECoreIMKit', '9.2.10'
-  pod 'NECoreKit', '9.2.10'
+  pod 'NECommonUIKit', '9.2.11'
+  pod 'NECommonKit', '9.2.11'
+  pod 'NECoreIMKit', '9.2.11'
+  pod 'NECoreKit', '9.2.11'
 
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖

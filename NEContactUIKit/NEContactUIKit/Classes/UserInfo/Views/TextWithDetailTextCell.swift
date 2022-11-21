@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class TextWithDetailTextCell: TextBaseCell {
+public class TextWithDetailTextCell: ContactBaseTextCell {
   public var detailTitleLabel = UILabel()
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
