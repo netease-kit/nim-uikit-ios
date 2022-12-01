@@ -39,6 +39,17 @@ target 'app' do
 #
 end
 
+#fix bug in Xcode 14
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == 'RSKPlaceholderTextView'
+      target.build_configurations.each do |config|
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+end
+
 #⚠️如果pod依赖报错，可打开以下注释
 #post_install do |installer|
 #  installer.pods_project.targets.each do |target|
