@@ -17,6 +17,7 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
   private let tag = "QChatViewController"
   private var viewmodel: QChatViewModel?
   private var inputViewBottomConstraint: NSLayoutConstraint?
+  private var tableViewBottomConstraint: NSLayoutConstraint?
 
   public init(channel: ChatChannel?) {
     super.init(nibName: nil, bundle: nil)
@@ -33,6 +34,7 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
     commonUI()
     addObseve()
     loadData()
+    print("current view frame :", view.frame)
   }
 
   // MARK: lazy Method
@@ -73,6 +75,9 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
     )
 
     view.addSubview(tableView)
+    tableViewBottomConstraint = tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100)
+    tableViewBottomConstraint?.isActive = true
+
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(
         equalTo: view.topAnchor,
@@ -80,7 +85,6 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
       ),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -130),
     ])
 
     tableView.register(
@@ -99,15 +103,15 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
       QChatTimeTableViewCell.self,
       forCellReuseIdentifier: "\(QChatTimeTableViewCell.self)"
     )
-
     //        IQKeyboardManager.shared.enable = false
-    NEKeyboardManager.shared.keyboardDistanceFromTextField = 60
+
+//    NEKeyboardManager.shared.keyboardDistanceFromTextField = 60
     NEKeyboardManager.shared.enable = true
     NEKeyboardManager.shared.enableAutoToolbar = false
     let inputView = QChatInputView()
     var tip = localizable("send_to")
     if let cName = viewmodel?.channel?.name {
-      tip = tip + cName
+      tip += cName
     }
     inputView.textField.placeholder = tip
 
@@ -117,8 +121,8 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
     if #available(iOS 11.0, *) {
       self.inputViewBottomConstraint = inputView.bottomAnchor
         .constraint(equalTo: self.view.bottomAnchor)
-      //            self.inputViewBottomConstraint = inputView.bottomAnchor.constraint(equalTo:
-      //            self.view.safeAreaLayoutGuide.bottomAnchor)
+//                  self.inputViewBottomConstraint = inputView.bottomAnchor.constraint(equalTo:
+//                  self.view.safeAreaLayoutGuide.bottomAnchor)
       NSLayoutConstraint.activate([
         inputView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
         inputView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
@@ -205,15 +209,15 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
       name: NotificationName.deleteChannel,
       object: nil
     )
-    //        NotificationCenter.default.addObserver(self,
-    //                                               selector: #selector(keyBoardWillShow(_ :)),
-    //                                               name: UIResponder.keyboardWillShowNotification,
-    //                                               object: nil)
-    //
-    //        NotificationCenter.default.addObserver(self,
-    //                                               selector: #selector(keyBoardWillHide(_ :)),
-    //                                               name: UIResponder.keyboardWillHideNotification,
-    //                                               object: nil)
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(keyBoardWillShow(_:)),
+                                           name: UIResponder.keyboardWillShowNotification,
+                                           object: nil)
+
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(keyBoardWillHide(_:)),
+                                           name: UIResponder.keyboardWillHideNotification,
+                                           object: nil)
   }
 
   @objc func onUpdateChannel(noti: Notification) {
@@ -231,21 +235,27 @@ public class QChatViewController: NEBaseViewController, UINavigationControllerDe
 
   // MARK: 键盘通知相关操作
 
-  //    @objc func keyBoardWillShow(_ notification:Notification) {
-  //        let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as!
-  //        NSValue).cgRectValue
-  //        self.inputViewBottomConstraint?.constant = -keyboardRect.size.height
-  //        UIView.animate(withDuration: 0.25, animations: {
-  //            self.view.layoutIfNeeded()
-  //        })
-  //    }
-  //
-  //    @objc func keyBoardWillHide(_ notification:Notification) {
-  //        self.inputViewBottomConstraint?.constant = 0
-  //        UIView.animate(withDuration: 0.25, animations: {
-  //            self.view.layoutIfNeeded()
-  //        })
-  //    }
+  @objc func keyBoardWillShow(_ notification: Notification) {
+    let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as!
+      NSValue).cgRectValue
+    inputViewBottomConstraint?.constant = -keyboardRect.size.height
+    tableViewBottomConstraint?.constant = -100 - keyboardRect.size.height
+    UIView.animate(withDuration: 0.25, animations: {
+      // self.view.layoutIfNeeded()
+    })
+    if let count = viewmodel?.messages.count, count > 0 {
+      print("count \(count)")
+      tableView.scrollToRow(at: IndexPath(row: count - 1, section: 0), at: .bottom, animated: true)
+    }
+  }
+
+  @objc func keyBoardWillHide(_ notification: Notification) {
+    inputViewBottomConstraint?.constant = 0
+    tableViewBottomConstraint?.constant = -100
+    UIView.animate(withDuration: 0.25, animations: {
+      // self.view.layoutIfNeeded()
+    })
+  }
 
   // MARK: QChatInputViewDelegate
 

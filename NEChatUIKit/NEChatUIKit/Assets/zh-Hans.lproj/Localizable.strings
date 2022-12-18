@@ -10,6 +10,8 @@
 "send_picture"="发来了一张图片";
 "send_voice"="发来了一段语音";
 "send_video"="发来了一段视频";
+"send_location"="发来了一个位置";
+"send_file"="发来了一份文件";
 "press_speak"="按住说话";
 "send_after_let_go"="松开发送，按住滑到空白区域取消";
 "record_too_short"="录音时间太短";
@@ -17,6 +19,7 @@
 "choose"="请选择";
 "take_photo"="拍照";
 "select_from_album"="从相册选择";
+"select_from_icloud"="从iCloud选择";
 "editing"="正在输入中...";
 "read"="已读(0）";
 "unread"="未读(0）";
@@ -98,6 +101,7 @@
 "msg_audio"="语音";
 "msg_video"="视频";
 "msg_file"="文件";
+"msg_location"="地理位置";
 "msg_custom"="自定义";
 "msg_unknown"="未知消息类型";
 "message_read"="消息阅读状态";
@@ -115,3 +119,19 @@
 
 "mdhm"="MM月dd日 HH:mm";
 "ymdhm"="yyyy年MM月dd日 HH:mm";
+
+"chat_takePicture"="拍摄";
+"chat_rtc"="音视频";
+"chat_location"="位置";
+"chat_file"="文件";
+"gaode_map"="高德地图";
+"tencent_map"="腾讯地图";
+"search_place"="搜索地点";
+"search_cancel"="取消";
+"distance_inner"="内";
+"search_result_empty"="未找到你要搜的地址";
+"no_map_plugin"="未集成地图模块";
+"location_not_auth"="地理位置未授权，请去设置中开启";
+"fileSize_over_limit"="当前文件大小超出发送限制，请重新选择";
+
+"message_recalled"="消息已撤回";

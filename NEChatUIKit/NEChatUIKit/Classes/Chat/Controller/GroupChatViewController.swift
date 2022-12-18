@@ -45,24 +45,17 @@ open class GroupChatViewController: ChatViewController, TeamChatViewModelDelegat
     title = team.getShowName()
     if team.inAllMuteMode(), team.owner != NIMSDK.shared().loginManager.currentAccount() {
       menuView.textField.isEditable = false
-      menuView.textField.placeholder = chatLocalizable("team_mute") as NSString
+      menuView.textField.placeholder = chatLocalizable("team_mute") as NSString?
     } else {
       menuView.textField.isEditable = true
-      menuView.textField.placeholder = chatLocalizable("send_to") + team.getShowName() as NSString
+      menuView.textField.placeholder = (chatLocalizable("send_to") + team.getShowName()) as NSString?
     }
   }
 
 //    MARK: TeamChatViewModelDelegate
 
   public func onTeamRemoved(team: NIMTeam) {
-    // 只有群创建者 才弹弹窗
-    if team.owner == IMKitEngine.instance.imAccid {
-      showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
-        self.navigationController?.popViewController(animated: true)
-      }
-    } else {
-      navigationController?.popViewController(animated: true)
-    }
+    navigationController?.popViewController(animated: true)
   }
 
   public func onTeamUpdate(team: NIMTeam) {

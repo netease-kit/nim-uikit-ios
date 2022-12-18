@@ -12,12 +12,14 @@ import NECommonKit
 import NECoreKit
 import NECommonUIKit
 import WebKit
+import NEChatKit
+import Photos
 
 @objcMembers
 open class ChatViewController: ChatBaseViewController, UINavigationControllerDelegate,
   ChatInputViewDelegate, ChatViewModelDelegate, NIMMediaManagerDelegate,
   MessageOperationViewDelegate, UIGestureRecognizerDelegate, UITableViewDataSource,
-  UITableViewDelegate {
+  UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, CLLocationManagerDelegate {
   private let tag = "ChatViewController"
   public var viewmodel: ChatViewModel
   private var inputViewTopConstraint: NSLayoutConstraint?
@@ -28,8 +30,12 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   private var atUsers = [NSRange]()
   private var timer: Timer?
   var replyView = ReplyView()
+  private var isFile = false
+  let interactionController = UIDocumentInteractionController()
 
   var titleContent = ""
+
+  private lazy var manager = CLLocationManager()
 
   public init(session: NIMSession) {
     viewmodel = ChatViewModel(session: session, anchor: nil)
@@ -104,6 +110,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     guard let items = viewmodel.avalibleOperationsForMessage(model) else {
       return
     }
+
+    if model?.isRevoked == true {
+      return
+    }
+
     viewmodel.operationModel = model
 
 //        size
@@ -244,14 +255,26 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       constant: -86 - KStatusBarHeight
     )
     tableViewBottomConstraint?.isActive = true
-    NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(
-        equalTo: view.topAnchor,
-        constant: kNavigationHeight + KStatusBarHeight
-      ),
-      tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
+    if #available(iOS 10, *) {
+      NSLayoutConstraint.activate([
+        tableView.topAnchor.constraint(
+          equalTo: view.topAnchor,
+          constant: kNavigationHeight + KStatusBarHeight
+        ),
+        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      ])
+    } else {
+      NSLayoutConstraint.activate([
+        tableView.topAnchor.constraint(
+          equalTo: view.topAnchor,
+          constant: 0
+        ),
+        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      ])
+    }
+
     tableView.register(
       ChatTimeTableViewCell.self,
       forCellReuseIdentifier: "\(ChatTimeTableViewCell.self)"
@@ -307,6 +330,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       ChatVideoRightCell.self,
       forCellReuseIdentifier: "\(ChatVideoRightCell.self)"
     )
+    tableView.register(
+      ChatFileLeftCell.self,
+      forCellReuseIdentifier: "\(ChatFileLeftCell.self)"
+    )
+    tableView.register(
+      ChatFileRightCell.self,
+      forCellReuseIdentifier: "\(ChatFileRightCell.self)"
+    )
 
     tableView.register(
       ChatReplyRightCell.self,
@@ -316,6 +347,9 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       ChatReplyLeftCell.self,
       forCellReuseIdentifier: "\(ChatReplyLeftCell.self)"
     )
+
+    tableView.register(ChatLocationLeftCell.self, forCellReuseIdentifier: "\(ChatLocationLeftCell.self)")
+    tableView.register(ChatLocationRightCell.self, forCellReuseIdentifier: "\(ChatLocationRightCell.self)")
 
     menuView.backgroundColor = UIColor(hexString: "#EFF1F3")
     menuView.translatesAutoresizingMaskIntoConstraints = false
@@ -358,9 +392,9 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         if let messages = weakSelf?.viewmodel.messages {
           for index in 0 ..< messages.count {
             let message = messages[index]
+            print("messages id : ", message.message?.messageId as Any)
             if message.message?.messageId == weakSelf?.viewmodel.anchor?.messageId {
               print("messages real index : ", index)
-              print("messages text : ", message.message?.text as Any)
             }
           }
         }
@@ -507,6 +541,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
     let keyboardRect = (notification
       .userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+    print("chat view key board size : ", keyboardRect)
     layoutInputView(offset: keyboardRect.size.height)
 
     UIView.animate(withDuration: 0.25, animations: {
@@ -574,6 +609,54 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         )
         if error != nil {
           self?.view.makeToast(error?.localizedDescription)
+        }
+      }
+    }
+  }
+
+  public func didSelectMoreCell(cell: NEInputMoreCell) {
+    if let type = cell.cellData?.type, type == .location {
+      if #available(iOS 14.0, *) {
+        if manager.authorizationStatus == .denied {
+          showToast(chatLocalizable("location_not_auth"))
+          return
+        } else if manager.authorizationStatus == .notDetermined {
+          manager.delegate = self
+          manager.requestAlwaysAuthorization()
+          manager.requestWhenInUseAuthorization()
+          return
+        }
+      } else {
+        if CLLocationManager.authorizationStatus() == .denied {
+          showToast(chatLocalizable("location_not_auth"))
+          return
+        } else if CLLocationManager.authorizationStatus() == .notDetermined {
+          manager.delegate = self
+          manager.requestAlwaysAuthorization()
+          manager.requestWhenInUseAuthorization()
+          return
+        }
+      }
+
+      didToSearchLocationView()
+
+    } else if let type = cell.cellData?.type, type == .takePicture {
+      showBottomVideoAction(self, false)
+    } else if let type = cell.cellData?.type, type == .file {
+      isFile = true
+      showBottomFileAction(self)
+    } else {}
+  }
+
+  func didToSearchLocationView() {
+    let ctrl = NEDetailMapController(type: .search)
+    navigationController?.pushViewController(ctrl, animated: true)
+    weak var weakSelf = self
+    ctrl.completion = { model in
+      NELog.infoLog(self.className(), desc: "position : \(model.yx_modelToJSONString() ?? "")")
+      weakSelf?.viewmodel.sendLocationMessage(model) { error in
+        if let err = error {
+          weakSelf?.showToast(err.localizedDescription)
         }
       }
     }
@@ -647,10 +730,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       //            showMenue(sourceView: view)
       // showBottomAlert(self, false)
       goPhotoAlbumWithVideo(self)
-    } else if index == 3 {
-      showBottomVideoAction(self, false)
     } else {
-      showToast(chatLocalizable("open_soon"))
+      // 更多
+      layoutInputView(offset: 204)
+      scrollTableViewToBottom()
+      UIApplication.shared.keyWindow?.endEditing(true)
     }
   }
 
@@ -706,19 +790,32 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     //        send message
 
     picker.dismiss(animated: true, completion: nil)
+    var imageName = "IMG_0001"
+    if isFile,
+       let imgUrl = info[.referenceURL] as? URL {
+      let fetchRes = PHAsset.fetchAssets(withALAssetURLs: [imgUrl], options: nil)
+      let asset = fetchRes.firstObject
+      if let fileName = asset?.value(forKey: "filename") as? String {
+        imageName = fileName
+      }
+    }
 
     if let url = info[.mediaURL] as? URL {
       // video
       print("image picker video : url", url)
-      //            NELog.infoLog("send video message", desc: error?.localizedDescription ?? "no error")
       weak var weakSelf = self
-      viewmodel.sendVideoMessage(url: url) { error in
-        NELog.infoLog(
-          ModuleName + " " + self.tag,
-          desc: "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
-        )
-        if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+      if isFile {
+        copyFileToSend(url: url, displayName: imageName)
+        isFile = false
+      } else {
+        viewmodel.sendVideoMessage(url: url) { error in
+          NELog.infoLog(
+            ModuleName + " " + self.tag,
+            desc: "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
+          )
+          if let err = error {
+            weakSelf?.showToast(err.localizedDescription)
+          }
         }
       }
       return
@@ -728,15 +825,116 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       showToast(chatLocalizable("image_is_nil"))
       return
     }
-    viewmodel.sendImageMessage(image: image) { [weak self] error in
-      NELog.infoLog(
-        ModuleName + " " + (self?.tag ?? "ChatViewController"),
-        desc: "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
-      )
-      if error != nil {
-        self?.view.makeToast(error?.localizedDescription)
-      } else {}
+
+    if isFile,
+       let imgData = image.pngData() {
+      let imgSize_MB = Double(imgData.count) / 1e6
+      print("@@# imgSize_MB: \(imgSize_MB) MB")
+      if let fileSizeLimit = NEKitChatConfig.shared.ui.fileSizeLimit,
+         imgSize_MB > fileSizeLimit {
+        showToast(chatLocalizable("fileSize_over_limit"))
+      } else {
+        viewmodel.sendFileMessage(data: imgData, displayName: imageName) { [weak self] error in
+          NELog.infoLog(
+            ModuleName + " " + (self?.tag ?? "ChatViewController"),
+            desc: "CALLBACK sendFileMessage \(imageName) by Data " + (error?.localizedDescription ?? "no error")
+          )
+          if error != nil {
+            self?.view.makeToast(error!.localizedDescription)
+          }
+        }
+      }
+      isFile = false
+    } else {
+      viewmodel.sendImageMessage(image: image) { [weak self] error in
+        NELog.infoLog(
+          ModuleName + " " + (self?.tag ?? "ChatViewController"),
+          desc: "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+        )
+        if error != nil {
+          self?.view.makeToast(error?.localizedDescription)
+        }
+      }
     }
+  }
+
+  public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    picker.dismiss(animated: true)
+    isFile = false
+  }
+
+  //    MARK: UIDocumentPickerDelegate
+
+  func copyFileToSend(url: URL, displayName: String) {
+    let desPath = NSTemporaryDirectory() + "\(url.lastPathComponent)"
+    let dirUrl = URL(fileURLWithPath: desPath)
+    if !FileManager.default.fileExists(atPath: desPath) {
+      print("@@# file not exist:", desPath)
+      do {
+        try FileManager.default.copyItem(at: url, to: dirUrl)
+      } catch {
+        print("❌ copyItem [\(desPath)] ERROR", error)
+      }
+    }
+    if FileManager.default.fileExists(atPath: desPath) {
+      print("@@# fileExists:", desPath)
+      do {
+        let fileAttributes = try FileManager.default.attributesOfItem(atPath: desPath)
+        if let size_B = fileAttributes[FileAttributeKey.size] as? Double {
+          print("@@# size:\(size_B)B")
+          let size_MB = size_B / 1e6
+          print("@@# size:\(size_MB)MB")
+          if let fileSizeLimit = NEKitChatConfig.shared.ui.fileSizeLimit,
+             size_MB > fileSizeLimit {
+            showToast(chatLocalizable("fileSize_over_limit"))
+            try? FileManager.default.removeItem(atPath: desPath)
+          } else {
+            viewmodel.sendFileMessage(filePath: desPath, displayName: displayName) { [weak self] error in
+              NELog.infoLog(
+                ModuleName + " " + (self?.tag ?? "ChatViewController"),
+                desc: "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
+              )
+              if error != nil {
+                self?.view.makeToast(error!.localizedDescription)
+              }
+            }
+          }
+        }
+      } catch {
+        print("@@#\(#function) get file size error:", error)
+      }
+    }
+  }
+
+  public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+    controller.dismiss(animated: true)
+    guard let url = urls.first else { return }
+    print("@@# url", url)
+
+    // 开始安全访问权限
+    let fileUrlAuthozied = url.startAccessingSecurityScopedResource()
+    if fileUrlAuthozied {
+      NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: nil) { newUrl in
+        let displayName = newUrl.lastPathComponent
+        copyFileToSend(url: newUrl, displayName: displayName)
+      }
+      // 停止安全访问权限
+      url.stopAccessingSecurityScopedResource()
+    } else {
+      print("@@#❌ fileUrlAuthozied FAILED, url:", url)
+    }
+    isFile = false
+  }
+
+  // MARK: UIDocumentInteractionControllerDelegate
+
+  public func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+    self
+  }
+
+  public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+    controller.dismiss(animated: true)
+    isFile = false
   }
 
   //    MARK: ChatViewModelDelegate
@@ -792,6 +990,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     if atIndexs.isEmpty {
       return
     }
+    print("on revoke message at indexs :", atIndexs)
+//    weak var weakSelf = self
+//    viewmodel.saveRevokeMessage(message) { error in
+//      print("message id : ", message.messageId)
+//      if let err = error {
+//        NELog.infoLog(weakSelf?.className() ?? "chat view controller", desc: err.localizedDescription)
+//      }
+//    }
     tableViewReloadIndexs(atIndexs)
   }
 
@@ -810,9 +1016,17 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   public func tableViewReloadIndexs(_ indexs: [IndexPath]) {
-    tableView.beginUpdates()
-    tableView.reloadRows(at: indexs, with: .none)
-    tableView.endUpdates()
+//      print("table view reload stack : ", Thread.callStackSymbols)
+    weak var weakSelf = self
+    if #available(iOS 11.0, *) {
+      tableView.performBatchUpdates {
+        weakSelf?.tableView.reloadRows(at: indexs, with: .none)
+      }
+    } else {
+      tableView.beginUpdates()
+      tableView.reloadRows(at: indexs, with: .none)
+      tableView.endUpdates()
+    }
   }
 
   public func didReadedMessageIndexs() {
@@ -881,7 +1095,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       playingCell = cell
       playingCell?.startAnimation()
       if let url = audio.path {
-        NIMSDK.shared().mediaManager.switch(.speaker)
+        if viewmodel.getHandSetEnable() == true {
+          NIMSDK.shared().mediaManager.switch(.receiver)
+        } else {
+          NIMSDK.shared().mediaManager.switch(.speaker)
+        }
         NIMSDK.shared().mediaManager.play(url)
       }
     }
@@ -1029,14 +1247,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       }
       if index == 0 {
         let addText = text + chatLocalizable("user_select_all") + " "
-        resultText = resultText + addText
+        resultText += addText
         length = addText.count
         let range = NSRange(location: location, length: length)
         self?.atUsers.append(range)
       } else {
         if let m = model {
           let addText = text + m.atNameInTeam() + " "
-          resultText = resultText + addText
+          resultText += addText
           length = addText.count
           let range = NSRange(location: location, length: length)
           self?.atUsers.append(range)
@@ -1105,22 +1323,28 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     if let message = viewmodel.operationModel?.message {
       var text = chatLocalizable("msg_reply")
       if let name = viewmodel.operationModel?.shortName {
-        text = text + name
+        text += name
       }
-      text = text + ":"
+      text += ":"
       switch message.messageType {
       case .text:
         if let t = message.text {
-          text = text + t
+          text += t
         }
       case .image:
-        text = text + chatLocalizable("msg_image")
+        text += "[\(chatLocalizable("msg_image"))]"
       case .audio:
-        text = text + chatLocalizable("msg_audio")
+        text += "[\(chatLocalizable("msg_audio"))]"
       case .video:
-        text = text + chatLocalizable("msg_video")
+        text += "[\(chatLocalizable("msg_video"))]"
+      case .file:
+        text += "[\(chatLocalizable("msg_file"))]"
+      case .location:
+        text += "[\(chatLocalizable("msg_location"))]"
+      case .custom:
+        text += "[\(chatLocalizable("msg_custom"))]"
       default:
-        text = text + ""
+        text += ""
       }
       replyView.textLabel.text = text
     }
@@ -1132,18 +1356,28 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   private func recallMessage() {
+    weak var weakSelf = self
     showAlert(message: chatLocalizable("message_revoke_confim")) {
-      if let message = self.viewmodel.operationModel?.message {
-        self.viewmodel.revokeMessage(message: message) { error in
+      if let message = weakSelf?.viewmodel.operationModel?.message {
+        if let messageType = weakSelf?.viewmodel.operationModel?.message?.messageType, messageType == .text {
+          weakSelf?.viewmodel.operationModel?.isRevokedText = true
+        }
+        weakSelf?.viewmodel.revokeMessage(message: message) { error in
           NELog.infoLog(
-            ModuleName + " " + self.tag,
+            ModuleName + " " + (weakSelf?.tag ?? ""),
             desc: "CALLBACK revokeMessage " + (error?.localizedDescription ?? "no error")
           )
           if error != nil {
-            self.showToast(error!.localizedDescription)
+            weakSelf?.showToast(error!.localizedDescription)
           } else {
-            //                    自己撤回成功 & 收到对方撤回 都会走回调方法 onRevokeMessage
+            // 自己撤回成功 & 收到对方撤回 都会走回调方法 onRevokeMessage
             // 撤回成功的逻辑统一在代理方法中处理 onRevokeMessage
+            weakSelf?.viewmodel.saveRevokeMessage(message) { error in
+              print("message id : ", message.messageId)
+              if let err = error {
+                NELog.infoLog(weakSelf?.className() ?? "chat view controller", desc: err.localizedDescription)
+              }
+            }
           }
         }
       }
@@ -1310,6 +1544,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
           reuseId = "\(ChatTimeTableViewCell.self)"
         case .revoke:
           reuseId = "\(ChatRevokeRightCell.self)"
+        case .location:
+          reuseId = "\(ChatLocationRightCell.self)"
+        case .file:
+          reuseId = "\(ChatFileRightCell.self)"
         default:
           reuseId = "\(ChatBaseRightCell.self)"
         }
@@ -1343,10 +1581,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
           reuseId = "\(ChatAudioLeftCell.self)"
         case .video:
           reuseId = "\(ChatVideoLeftCell.self)"
+        case .file:
+          reuseId = "\(ChatFileLeftCell.self)"
         case .time, .tip, .notification:
           reuseId = "\(ChatTimeTableViewCell.self)"
         case .revoke:
           reuseId = "\(ChatRevokeLeftCell.self)"
+        case .location:
+          reuseId = "\(ChatLocationLeftCell.self)"
         default:
           reuseId = "\(ChatBaseLeftCell.self)"
         }
@@ -1371,7 +1613,6 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    print("did select row ")
     operationView?.removeFromSuperview()
     if menuView.textField.isFirstResponder {
       menuView.textField.resignFirstResponder()
@@ -1385,6 +1626,38 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     let m = viewmodel.messages[indexPath.row]
     return CGFloat(m.height)
   }
+
+//    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+//        if #available(iOS 14.0, *) {
+//            if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
+//                didToSearchLocationView()
+//            }
+//        } else {
+//            if CLLocationManager.authorizationStatus() == .authorizedAlways || CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
+//                didToSearchLocationView()
+//            }
+//        }
+//    }
+
+  public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    if #available(iOS 14.0, *) {
+      if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
+        didToSearchLocationView()
+      }
+    } else {
+      if CLLocationManager.authorizationStatus() == .authorizedAlways || CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
+        didToSearchLocationView()
+      }
+    }
+  }
+
+  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {}
+
+  public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {}
+
+//    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+//        print(error)
+//    }
 }
 
 // MARK: ChatBaseCellDelegate
@@ -1450,7 +1723,7 @@ extension ChatViewController: ChatBaseCellDelegate {
         }
 
         viewmodel.downLoad(urlString, path) { progress in
-          NELog.infoLog(ModuleName + " " + self.tag, desc: "CALLBACK downLoad ")
+          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ChatViewController"), desc: "CALLBACK downLoad: \(progress)")
 
           videoModel.progress = progress
           if progress >= 1.0 {
@@ -1458,7 +1731,7 @@ extension ChatViewController: ChatBaseCellDelegate {
           }
           videoModel.cell?.uploadProgress(progress)
 
-          // SDK返回异常导致
+          // SDK返回异常
 //          let trueProgress = -progress / Float(object.fileLength)
 //          videoModel.progress = trueProgress
 //          if trueProgress >= 1.0 {
@@ -1491,8 +1764,54 @@ extension ChatViewController: ChatBaseCellDelegate {
           }
         }
       }
+    } else if model?.type == .location {
+      if let locationModel = model as? MessageLocationModel, let lat = locationModel.lat, let lng = locationModel.lng {
+        let mapDetail = NEDetailMapController(type: .detail)
+        mapDetail.currentPoint = CGPoint(x: lat, y: lng)
+        mapDetail.locationTitle = locationModel.title
+        mapDetail.subTitle = locationModel.subTitle
+        navigationController?.pushViewController(mapDetail, animated: true)
+      }
+    } else if model?.type == .file,
+              let object = model?.message?.messageObject as? NIMFileObject {
+      if let path = object.path, FileManager.default.fileExists(atPath: path) == true {
+        let url = URL(fileURLWithPath: path)
+        print("@@# file:\(url) has download")
+        interactionController.url = url
+        interactionController.delegate = self // UIDocumentInteractionControllerDelegate
+        if interactionController.presentPreview(animated: true) {}
+        else {
+          interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+        }
+      } else if let urlString = object.url, let path = object.path,
+                let fileModel = model as? MessageFileModel {
+        fileModel.state = .Downalod
+        if let left = cell as? ChatFileLeftCell {
+          left.setModel(fileModel)
+        } else if let right = cell as? ChatFileRightCell {
+          right.setModel(fileModel)
+        }
+
+        viewmodel.downLoad(urlString, path) { [weak self] progress in
+          NELog.infoLog(ModuleName + " " + (self?.tag ?? "ChatViewController"), desc: "@@# CALLBACK downLoad: \(progress)")
+          var newProgress = progress
+          if newProgress < 0 {
+            newProgress = abs(progress) / fileModel.size
+          }
+          fileModel.progress = newProgress
+          if newProgress >= 1.0 {
+            fileModel.state = .Success
+          }
+          fileModel.cell?.uploadProgress(newProgress)
+
+        } _: { [weak self] error in
+          if let err = error as NSError? {
+            self?.showToast(err.localizedDescription)
+          }
+        }
+      }
     } else {
-      print("else")
+      print(#function + "message did tap but type else")
     }
   }
 
@@ -1510,6 +1829,7 @@ extension ChatViewController: ChatBaseCellDelegate {
     if model?.type == .revoke, model?.message?.messageType == .text {
       menuView.textField.text = model?.message?.text
       menuView.textField.becomeFirstResponder()
+      let date = Date()
     }
   }
 

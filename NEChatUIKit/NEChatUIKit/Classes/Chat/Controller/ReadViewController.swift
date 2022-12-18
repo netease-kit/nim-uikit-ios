@@ -64,12 +64,21 @@ public class ReadViewController: ChatBaseViewController, UIScrollViewDelegate, U
       ])
     } else {
       // Fallback on earlier versions
-      NSLayoutConstraint.activate([
-        readButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-        readButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        readButton.heightAnchor.constraint(equalToConstant: 48),
-        readButton.widthAnchor.constraint(equalTo: unreadButton.widthAnchor),
-      ])
+      if #available(iOS 10.0, *) {
+        NSLayoutConstraint.activate([
+          readButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+          readButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+          readButton.heightAnchor.constraint(equalToConstant: 48),
+          readButton.widthAnchor.constraint(equalTo: unreadButton.widthAnchor),
+        ])
+      } else {
+        NSLayoutConstraint.activate([
+          readButton.topAnchor.constraint(equalTo: view.topAnchor, constant: kNavigationHeight + KStatusBarHeight),
+          readButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+          readButton.heightAnchor.constraint(equalToConstant: 48),
+          readButton.widthAnchor.constraint(equalTo: unreadButton.widthAnchor),
+        ])
+      }
     }
 
     NSLayoutConstraint.activate([

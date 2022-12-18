@@ -7,7 +7,7 @@ import UIKit
 import NECoreIMKit
 import NECoreKit
 
-public protocol ChatBaseCellDelegate: AnyObject {
+public protocol ChatBaseCellDelegate: NSObjectProtocol {
   func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?)
   func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
   func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
@@ -33,6 +33,7 @@ public class ChatBaseRightCell: ChatBaseCell {
   private let bubbleWidth = 32.0
   private var pinLabelW: NSLayoutConstraint?
   private var pinLabelH: NSLayoutConstraint?
+  private var tapGesture: UITapGestureRecognizer?
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -188,6 +189,7 @@ public class ChatBaseRightCell: ChatBaseCell {
 
     let tapReadView = UITapGestureRecognizer(target: self, action: #selector(tapReadView))
     readView.addGestureRecognizer(tapReadView)
+    tapGesture = tapReadView
   }
 
   func initSubviewsLayout() {
@@ -244,7 +246,7 @@ public class ChatBaseRightCell: ChatBaseCell {
   func setModel(_ model: MessageContentModel) {
     contentModel = model
     updatePinStatus(model)
-
+    tapGesture?.isEnabled = true
     bubbleW?.constant = model.contentSize.width
 //        print("set model width : ", model.contentSize.width)
     // avatar
@@ -308,7 +310,11 @@ public class ChatBaseRightCell: ChatBaseCell {
           let unreadCount = model.message?.teamReceiptInfo?.unreadCount ?? 0
           let total = Float(readCount + unreadCount)
           if total > 0 {
-            readView.progress = Float(readCount) / total
+            let progress = Float(readCount) / total
+            readView.progress = progress
+            if progress >= 1.0 {
+              tapGesture?.isEnabled = false
+            }
           } else {
             readView.progress = 0
           }

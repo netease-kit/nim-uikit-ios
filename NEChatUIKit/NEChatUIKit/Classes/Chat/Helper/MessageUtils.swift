@@ -53,6 +53,41 @@ public class MessageUtils: NSObject {
     return message
   }
 
+  public class func locationMessage(_ lat: Double, _ lng: Double, _ title: String, _ address: String) -> NIMMessage {
+    let messageObject = NIMLocationObject(latitude: lat, longitude: lng, title: address)
+    let message = NIMMessage()
+    message.messageObject = messageObject
+    message.text = title
+    message.apnsContent = chatLocalizable("send_location")
+    message.setting = messageSetting()
+    return message
+  }
+
+  public class func fileMessage(filePath: String, displayName: String?) -> NIMMessage {
+    let messageObject = NIMFileObject(sourcePath: filePath)
+    if let dpName = displayName {
+      messageObject.displayName = dpName
+    }
+    let message = NIMMessage()
+    message.messageObject = messageObject
+    message.apnsContent = chatLocalizable("send_file")
+    message.setting = messageSetting()
+    return message
+  }
+
+  public class func fileMessage(data: Data, displayName: String?) -> NIMMessage {
+    let dpName = displayName ?? ""
+    let pointIndex = dpName.lastIndex(of: ".") ?? dpName.startIndex
+    let suffix = dpName[dpName.index(after: pointIndex) ..< dpName.endIndex]
+    let messageObject = NIMFileObject(data: data, extension: String(suffix))
+    messageObject.displayName = dpName
+    let message = NIMMessage()
+    message.messageObject = messageObject
+    message.apnsContent = chatLocalizable("send_file")
+    message.setting = messageSetting()
+    return message
+  }
+
   public class func messageSetting() -> NIMMessageSetting {
     let setting = NIMMessageSetting()
     print("getMessageRead: \(SettingProvider.shared.getMessageRead())")

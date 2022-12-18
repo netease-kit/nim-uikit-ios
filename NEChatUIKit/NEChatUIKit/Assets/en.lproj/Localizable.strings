@@ -10,6 +10,8 @@
 "send_picture"="get a picture";
 "send_voice"="get a audio";
 "send_video"="get a video";
+"send_location"="get a location";
+"send_video"="get a file";
 "press_speak"="Hold to talk";
 "send_after_let_go"="Release to send, Slide to the blank area to cancel";
 "record_too_short"="Time is too short";
@@ -17,6 +19,7 @@
 "choose"="select";
 "take_photo"="camera";
 "select_from_album"="album";
+"select_from_icloud"="icloud";
 "editing"="typing";
 "read"="read";
 "unread"="unread";
@@ -95,6 +98,7 @@
 "msg_audio"="audio";
 "msg_video"="video";
 "msg_file"="file";
+"msg_location"="location";
 "msg_custom"="custom message";
 "msg_unknown"="Unknown message type";
 "message_read"="Reading Status";
@@ -112,3 +116,19 @@
 
 "mdhm"="MM.dd HH:mm";
 "ymdhm"="yyyy.MM.dd HH:mm";
+
+"chat_takePicture"="拍摄";
+"chat_rtc"="音视频";
+"chat_location"="位置";
+"chat_file"="文件";
+"gaode_map"="高德地图";
+"tencent_map"="腾讯地图";
+"search_place"="Search Location";
+"search_cancel"="取消";
+"distance_inner"="内";
+"search_result_empty"="Not found";
+"no_map_plugin"="未集成地图模块";
+"location_not_auth"="地理位置未授权，请去设置中开启";
+"fileSize_over_limit"="Oops！File size limit.";
+
+"message_recalled"="message recalled";

@@ -6,7 +6,7 @@
 import Foundation
 import NECoreIMKit
 
-public enum roundedType {
+public enum RoundedType {
   case none
   case top
   case bottom
@@ -17,7 +17,7 @@ public struct RoleModel {
   public var role: ChannelRole?
   public var member: MemberRole?
   public var title: String?
-  public var corner: roundedType?
+  public var corner: RoundedType?
   public var isPlacehold: Bool = false
 }
 

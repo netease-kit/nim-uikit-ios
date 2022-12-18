@@ -198,13 +198,13 @@ class QChatMemberInfoView: UIView {
 
   public func setupRoles(dataArray: [String]) {
     for i in 0 ..< dataArray.count {
-      let label = IDGroupLable(content: dataArray[i])
+      let label = IDGroupLabel(content: dataArray[i])
       label.textInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
       label.translatesAutoresizingMaskIntoConstraints = false
       groupView.addSubview(label)
       let labelSize = label.sizeThatFits(CGSize(width: maxWidth, height: labelHeight))
 
-      // 剩余宽度是否满足，下一个lable的宽度，如不满足则换行
+      // 剩余宽度是否满足，下一个label的宽度，如不满足则换行
       if (maxWidth - labelsWidth) >= labelSize.width, isFirstRow {
         NSLayoutConstraint.activate([
           i == 0 ? label.leftAnchor.constraint(

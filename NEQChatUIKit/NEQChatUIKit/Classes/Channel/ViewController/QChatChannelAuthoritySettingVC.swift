@@ -240,9 +240,9 @@ public class QChatChannelAuthoritySettingVC: QChatTableViewController {
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(QChatSectionView.self)"
       ) as! QChatSectionView
-    head.titleLable.text = sectionTitle[section]
+    head.titleLabel.text = sectionTitle[section]
     if section == 2, viewModel?.membersData.roles.count == 0 {
-      head.titleLable.text = ""
+      head.titleLabel.text = ""
     }
     return head
   }

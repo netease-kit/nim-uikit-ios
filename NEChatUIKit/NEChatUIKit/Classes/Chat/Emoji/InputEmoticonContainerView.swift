@@ -5,7 +5,7 @@
 
 import UIKit
 
-@objc public protocol InputEmoticonContainerViewDelegate: AnyObject {
+@objc public protocol InputEmoticonContainerViewDelegate: NSObjectProtocol {
   func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String)
   func didPressSend(sender: UIButton)
 }
@@ -226,7 +226,7 @@ extension InputEmoticonContainerView {
     }
 
     if coloumnIndex == layout.columes - 1 {
-      rowIndex = rowIndex + 1
+      rowIndex += 1
       coloumnIndex = -1 // 设置成-1是因为显示在第0位，有加1
     }
 

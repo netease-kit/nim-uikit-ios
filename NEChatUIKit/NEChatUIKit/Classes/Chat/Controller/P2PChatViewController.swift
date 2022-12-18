@@ -15,12 +15,11 @@ open class P2PChatViewController: ChatViewController {
   }
 
   override open func getSessionInfo(session: NIMSession) {
-    viewmodel.getUserInfo(userId: session.sessionId)
     let user = viewmodel.getUserInfo(userId: session.sessionId)
-    let title = user?.showName() ?? ""
-    self.title = title
-    titleContent = title
-    menuView.textField.placeholder = chatLocalizable("send_to") + title as NSString
+    let showName = user?.showName() ?? ""
+    title = showName
+    titleContent = showName
+    menuView.textField.placeholder = (chatLocalizable("send_to") + showName) as NSString?
   }
 
   /// 创建个人聊天页构造方法

@@ -7,8 +7,8 @@ import UIKit
 import NECoreIMKit
 
 class NESearchServerCell: UITableViewCell {
-  typealias callBack = (() -> Void)?
-  @objc var joinServerCallBack: callBack = nil
+  typealias CallBack = (() -> Void)?
+  @objc var joinServerCallBack: CallBack = nil
   public var serverViewModel = CreateServerViewModel()
   private let className = "NESearchServerCell"
 

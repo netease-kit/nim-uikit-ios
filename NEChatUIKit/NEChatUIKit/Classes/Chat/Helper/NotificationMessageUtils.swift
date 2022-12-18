@@ -45,7 +45,7 @@ public class NotificationMessageUtils: NSObject {
         case .invite:
           var str = fromName + chatLocalizable("invite")
           if let first = toNames.first {
-            str = str + first
+            str += first
           }
           if toNames.count > 1 {
             str = str + " " + String(toNames.count) + " " + chatLocalizable("humans")
@@ -57,7 +57,7 @@ public class NotificationMessageUtils: NSObject {
         case .kick:
           var str = fromName + chatLocalizable("kick")
           if let first = toNames.first {
-            str = str + first
+            str += first
           }
           if toNames.count > 1 {
             str = str + " " + String(toNames.count) + " " + chatLocalizable("humans")

@@ -60,7 +60,6 @@ public class ChatReplyRightCell: ChatBaseRightCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageTextModel {
-//            textView.text = m.text
       textView.attributedText = m.attributeStr
     }
     replyLabel.text = model.replyText

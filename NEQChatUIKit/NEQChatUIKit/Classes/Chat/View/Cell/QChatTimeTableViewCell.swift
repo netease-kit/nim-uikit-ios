@@ -9,12 +9,12 @@ class QChatTimeTableViewCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
-    contentView.addSubview(timeLable)
+    contentView.addSubview(timeLabel)
     NSLayoutConstraint.activate([
-      timeLable.topAnchor.constraint(equalTo: contentView.topAnchor),
-      timeLable.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      timeLable.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      timeLable.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      timeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
   }
 
@@ -24,11 +24,11 @@ class QChatTimeTableViewCell: UITableViewCell {
 
   public var messageFrame: QChatMessageFrame? {
     didSet {
-      timeLable.text = messageFrame?.time
+      timeLabel.text = messageFrame?.time
     }
   }
 
-  private lazy var timeLable: UILabel = {
+  private lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.font = DefaultTextFont(12)
     label.textColor = UIColor.ne_emptyTitleColor

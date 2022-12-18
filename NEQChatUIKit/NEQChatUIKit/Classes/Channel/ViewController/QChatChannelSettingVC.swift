@@ -6,12 +6,12 @@
 import UIKit
 import NECoreIMKit
 
-typealias updateChannelSuccess = (_ channel: ChatChannel?) -> Void
+typealias UpdateChannelSuccess = (_ channel: ChatChannel?) -> Void
 
 public class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellDelegate {
   var viewModel: QChatUpdateChannelViewModel?
-  var didUpdateChannel: updateChannelSuccess?
-  var didDeleteChannel: updateChannelSuccess?
+  var didUpdateChannel: UpdateChannelSuccess?
+  var didDeleteChannel: UpdateChannelSuccess?
 
   var sections: [String]?
   var cells = [String]()
@@ -142,7 +142,7 @@ public class QChatChannelSettingVC: QChatTableViewController, QChatTextEditCellD
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(QChatSectionView.self)"
       ) as! QChatSectionView
-    head.titleLable.text = sections?[section]
+    head.titleLabel.text = sections?[section]
     return head
   }
 

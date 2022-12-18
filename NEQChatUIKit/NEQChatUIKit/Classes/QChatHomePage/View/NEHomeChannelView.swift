@@ -27,7 +27,7 @@ class NEHomeChannelView: UIView {
     didSet {
       hasMore = true
       nextTimeTag = 0
-      self.titleLable.text = qchatServerModel?.name
+      self.titleLabel.text = qchatServerModel?.name
       channelArray.removeAll()
       requestData(timeTag: 0)
     }
@@ -49,7 +49,7 @@ class NEHomeChannelView: UIView {
   func setupSubviews() {
     backgroundColor = .white
 
-    addSubview(titleLable)
+    addSubview(titleLabel)
     addSubview(setUpBtn)
     addSubview(divideLineView)
     addSubview(addChannelBtn)
@@ -58,19 +58,19 @@ class NEHomeChannelView: UIView {
     addSubview(emptyView)
 
     NSLayoutConstraint.activate([
-      titleLable.topAnchor.constraint(equalTo: topAnchor, constant: 16),
-      titleLable.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
-      titleLable.rightAnchor.constraint(equalTo: rightAnchor, constant: -30),
+      titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+      titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
+      titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -30),
 
     ])
 
     NSLayoutConstraint.activate([
-      setUpBtn.centerYAnchor.constraint(equalTo: titleLable.centerYAnchor),
+      setUpBtn.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
       setUpBtn.rightAnchor.constraint(equalTo: rightAnchor, constant: -16),
     ])
 
     NSLayoutConstraint.activate([
-      divideLineView.topAnchor.constraint(equalTo: titleLable.bottomAnchor, constant: 16),
+      divideLineView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
       divideLineView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
       divideLineView.rightAnchor.constraint(equalTo: rightAnchor, constant: -12),
       divideLineView.heightAnchor.constraint(equalToConstant: 1),
@@ -124,7 +124,7 @@ class NEHomeChannelView: UIView {
 
   // MARK: lazy method
 
-  private lazy var titleLable: UILabel = {
+  private lazy var titleLabel: UILabel = {
     let title = UILabel()
     title.translatesAutoresizingMaskIntoConstraints = false
     title.textColor = UIColor.ne_darkText
@@ -252,7 +252,7 @@ extension NEHomeChannelView {
   }
 
   public func showEmptyServerView() {
-    titleLable.isHidden = true
+    titleLabel.isHidden = true
     setUpBtn.isHidden = true
     divideLineView.isHidden = true
     subTitleLable.isHidden = true
@@ -263,7 +263,7 @@ extension NEHomeChannelView {
   }
 
   public func dismissEmptyView() {
-    titleLable.isHidden = false
+    titleLabel.isHidden = false
     setUpBtn.isHidden = false
     divideLineView.isHidden = false
     subTitleLable.isHidden = false

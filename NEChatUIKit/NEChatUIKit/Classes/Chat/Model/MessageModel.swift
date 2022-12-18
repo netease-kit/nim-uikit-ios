@@ -44,6 +44,7 @@ public protocol MessageModel: NSObjectProtocol {
 //    被回复的消息
   var replyedModel: MessageModel? { get set }
   var replyText: String? { get set }
+  var isRevokedText: Bool { get set }
 
   init(message: NIMMessage?)
 }

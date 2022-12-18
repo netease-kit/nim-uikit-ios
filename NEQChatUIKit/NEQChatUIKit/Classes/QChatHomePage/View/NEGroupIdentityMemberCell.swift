@@ -38,12 +38,12 @@ class NEGroupIdentityMemberCell: UITableViewCell {
       setupSubviews()
 
       if let nick = model.nick,!nick.isEmpty {
-        titleLable.text = nick
-        subTitleLable.text = model.accid
+        titleLabel.text = nick
+        subTitleLabel.text = model.accid
         titleTopConstraint?.constant = 14
       } else {
-        titleLable.text = model.accid
-        subTitleLable.text = ""
+        titleLabel.text = model.accid
+        subTitleLabel.text = ""
         titleTopConstraint?.constant = 22
       }
     }
@@ -73,8 +73,8 @@ class NEGroupIdentityMemberCell: UITableViewCell {
 
   func setupSubviews() {
     contentView.addSubview(avatarImage)
-    contentView.addSubview(titleLable)
-    contentView.addSubview(subTitleLable)
+    contentView.addSubview(titleLabel)
+    contentView.addSubview(subTitleLabel)
     contentView.addSubview(arrowImageView)
     contentView.addSubview(labelContainerView)
     contentView.addSubview(lineView)
@@ -89,18 +89,18 @@ class NEGroupIdentityMemberCell: UITableViewCell {
       avatarImage.heightAnchor.constraint(equalToConstant: 36),
     ])
 
-    titleTopConstraint = titleLable.topAnchor.constraint(
+    titleTopConstraint = titleLabel.topAnchor.constraint(
       equalTo: contentView.topAnchor,
       constant: 14
     )
     titleTopConstraint?.isActive = true
     NSLayoutConstraint.activate([
-      titleLable.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),
     ])
 
     NSLayoutConstraint.activate([
-      subTitleLable.topAnchor.constraint(equalTo: titleLable.bottomAnchor),
-      subTitleLable.leftAnchor.constraint(equalTo: titleLable.leftAnchor),
+      subTitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+      subTitleLabel.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),
     ])
 
     NSLayoutConstraint.activate([
@@ -121,19 +121,19 @@ class NEGroupIdentityMemberCell: UITableViewCell {
       ),
     ])
 
-    // 移除contentview上复用的lable
+    // 移除contentview上复用的label
     labelContainerView.subviews.forEach { label in
       label.removeFromSuperview()
     }
     var labelsWidth: CGFloat = 0
     for i in 0 ..< dataArray.count {
-      let label = IDGroupLable(content: dataArray[i])
+      let label = IDGroupLabel(content: dataArray[i])
       label.textInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
       label.translatesAutoresizingMaskIntoConstraints = false
       labelContainerView.addSubview(label)
       let labelSize = label.sizeThatFits(CGSize(width: maxWidth, height: labelHeight))
 
-      // 剩余宽度是否满足，下一个lable的宽度，如不满足则换行
+      // 剩余宽度是否满足，下一个label的宽度，如不满足则换行
       if (maxWidth - labelsWidth) >= labelSize.width, isFirstRow {
         NSLayoutConstraint.activate([
           i == 0 ? label.leftAnchor.constraint(
@@ -195,7 +195,7 @@ class NEGroupIdentityMemberCell: UITableViewCell {
     return view
   }()
 
-  private lazy var titleLable: UILabel = {
+  private lazy var titleLabel: UILabel = {
     let name = UILabel()
     name.translatesAutoresizingMaskIntoConstraints = false
     name.textColor = .ne_darkText
@@ -203,7 +203,7 @@ class NEGroupIdentityMemberCell: UITableViewCell {
     return name
   }()
 
-  private lazy var subTitleLable: UILabel = {
+  private lazy var subTitleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = DefaultTextFont(12)
@@ -231,7 +231,7 @@ class NEGroupIdentityMemberCell: UITableViewCell {
   }()
 }
 
-class IDGroupLable: UILabel {
+class IDGroupLabel: UILabel {
   private var content: String?
 
   init(content: String) {

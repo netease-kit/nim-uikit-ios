@@ -41,7 +41,7 @@ public class QChatWhiteBlackListVC: QChatTableViewController, QChatMemberSelectC
       serverId: channel?.serverId,
       channelId: channel?.channelId,
       timeTag: 0,
-      limit: 50,
+      limit: 20,
       type: type
     )
     QChatChannelProvider.shared

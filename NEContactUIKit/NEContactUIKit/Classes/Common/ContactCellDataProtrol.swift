@@ -6,6 +6,6 @@
 import Foundation
 import UIKit
 
-public protocol ContactCellDataProtrol {
+public protocol ContactCellDataProtrol: NSObjectProtocol {
   func setModel(_ model: ContactInfo)
 }

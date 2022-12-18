@@ -35,7 +35,7 @@ func getDictionaryFromJSONString(_ jsonString: String) -> NSDictionary? {
   return nil
 }
 
-@objc public protocol ViewModelDelegate: AnyObject {
+@objc public protocol ViewModelDelegate: NSObjectProtocol {
   func dataDidChange()
   func dataDidError(_ error: Error)
   @objc optional func dataNoMore()

@@ -194,10 +194,11 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
-    } else if type == .NickName, let teamId = team?.teamId, let uid = teamMember?.userId {
+    } else if type == .NickName, let tid = team?.teamId, let uid = teamMember?.userId {
       let n = textField.text ?? ""
       view.makeToastActivity(.center)
-      repo.updateMemberNick(teamId, uid, n) { error in
+      repo.updateMemberNick(tid, uid, n) { error in
+
         weakSelf?.view.hideToastActivity()
         if let err = error {
           weakSelf?.showToast(err.localizedDescription)

@@ -61,7 +61,15 @@ public class ChatRevokeRightCell: ChatBaseRightCell {
     label.text = chatLocalizable("message_has_be_withdrawn")
     reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
     // 判断可编辑按钮的隐藏，只有文本才可以重新编辑
-    reeditButton.isHidden = model.message?.messageType == .text ? false : true
+    if model.isRevokedText == true {
+      if model.timeOut == true {
+        reeditButton.isHidden = true
+      } else {
+        reeditButton.isHidden = false
+      }
+    } else {
+      reeditButton.isHidden = true
+    }
   }
 
   func reeditEvent(button: UIButton) {

@@ -6,7 +6,11 @@ import Foundation
 import NEConversationKit
 import NIMSDK
 
-public protocol ConversationViewModelDelegate: AnyObject {
+let revokeLocalMessage = "revoke_message_local"
+let revokeLocalMessageContent = "revoke_message_local_content"
+// let firstInit = "first_init"
+
+public protocol ConversationViewModelDelegate: NSObjectProtocol {
   func didAddRecentSession()
   func didUpdateRecentSession(index: Int)
   func reloadTableView()
@@ -14,12 +18,14 @@ public protocol ConversationViewModelDelegate: AnyObject {
 
 @objcMembers
 public class ConversationViewModel: NSObject, ConversationRepoDelegate,
-  NIMConversationManagerDelegate, NIMTeamManagerDelegate, NIMUserManagerDelegate {
+  NIMConversationManagerDelegate, NIMTeamManagerDelegate, NIMUserManagerDelegate, NIMChatManagerDelegate {
   public var conversationListArray: [ConversationListModel]?
   public var stickTopInfos = [NIMSession: NIMStickTopSessionInfo]()
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
   let repo = ConversationRepo()
+
+  var cacheUpdateSessionDic = [String: NIMRecentSession]()
 
   override public init() {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
@@ -36,8 +42,18 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
                                     -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
-    repo.getSessionList(option: option) { error, conversaitonList in
+    repo.getSessionList { error, conversaitonList in
       weakSelf?.conversationListArray = conversaitonList
+      print("get session list : ", conversaitonList?.count as Any)
+      conversaitonList?.forEach { model in
+        if let recentSession = model.recentSession, let sid = recentSession.session?.sessionId {
+          if let recent = weakSelf?.cacheUpdateSessionDic[sid] {
+            if let time1 = recentSession.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 < time2 {
+              model.recentSession = recent
+            }
+          }
+        }
+      }
       completion(error, weakSelf?.conversationListArray)
     }
   }
@@ -215,6 +231,10 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
       ModuleName + " " + className,
       desc: #function + ", sessionId:" + (recentSession.session?.sessionId ?? "nil")
     )
+    print("did update last msg : ", recentSession.lastMessage?.text as Any)
+    if let sid = recentSession.session?.sessionId {
+      cacheUpdateSessionDic[sid] = recentSession
+    }
     if let _ = conversationListArray {
       for i in 0 ..< conversationListArray!.count {
         let listModel = conversationListArray![i]

@@ -68,18 +68,15 @@ class BlackListCell: TeamTableViewCell {
     self.model = user
     avatarImage.backgroundColor = UIColor.colorWithString(string: user.userId)
     // title
+    titleLabel.text = user.showName()
 
-    if let name = user.showName() {
-      titleLabel.text = name
-      if avatarImage.image == nil {
-        nameLabel.text = name
-          .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
-      }
-    }
     // avatar
     if let imageUrl = user.userInfo?.avatarUrl {
       nameLabel.text = ""
       avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
+    } else {
+      nameLabel.text = user.shortName(count: 2)
+      avatarImage.image = nil
     }
   }
 

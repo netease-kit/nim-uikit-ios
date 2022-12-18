@@ -5,7 +5,7 @@
 
 import UIKit
 
-public protocol NIMInputEmoticonButtonDelegate: AnyObject {
+public protocol NIMInputEmoticonButtonDelegate: NSObjectProtocol {
   func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String)
 }
 

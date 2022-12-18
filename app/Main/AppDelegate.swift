@@ -12,6 +12,7 @@ import NECoreIMKit
 import NEConversationUIKit
 import NETeamUIKit
 import NEChatUIKit
+import NEMapKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -38,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
        
         //login action
         startLogin(account: <#imAccid#>, token: <#imToken#>)
+
     }
     
     @objc func refreshRoot(){
@@ -114,6 +116,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 nav.pushViewController(me, animated: true)
             }
         }
+        
+        //地图map初始化
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
     }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
