@@ -192,7 +192,7 @@ public class QChatMemberManagerController: NEBaseTableViewController, UITableVie
             //                    weakSelf?.view.hideToastActivity()
             weakSelf?.showToast(localizable("qchat_add_success"))
             if let block = weakSelf?.countChangeBlock, var count = weakSelf?.memberCount {
-              count = count + successCount
+              count += successCount
               weakSelf?.memberCount = count
               block(count)
             }
@@ -211,7 +211,7 @@ public class QChatMemberManagerController: NEBaseTableViewController, UITableVie
             weakSelf?.tableView.reloadData()
             if var count = weakSelf?.memberCount,
                let block = weakSelf?.countChangeBlock {
-              count = count - 1
+              count -= 1
               weakSelf?.memberCount = count
               block(count)
             }

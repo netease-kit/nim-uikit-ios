@@ -107,7 +107,7 @@ public class MemberListViewController: NEBaseViewController, UITableViewDelegate
     //        self.navigationController?.pushViewController(contactCtrl, animated: true)
     //        weak var weakSelf = self
     //
-    //        contactCtrl.callBack = {(selectMemberarray)->Void in
+    //        contactCtrl.CallBack = {(selectMemberarray)->Void in
     //
     //            guard let serverId = weakSelf?.serverId else { return  }
     //            var accidArray = [String]()

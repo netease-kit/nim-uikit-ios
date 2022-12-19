@@ -5,12 +5,12 @@
 
 import UIKit
 
-@objc public protocol EmojiPageViewDataSource: AnyObject {
+@objc public protocol EmojiPageViewDataSource: NSObjectProtocol {
   @objc optional func numberOfPages(pageView: EmojiPageView?) -> NSInteger
   @objc optional func pageView(pageView: EmojiPageView?, index: NSInteger) -> UIView
 }
 
-@objc public protocol EmojiPageViewDelegate: AnyObject {
+@objc public protocol EmojiPageViewDelegate: NSObjectProtocol {
   @objc optional func pageViewScrollEnd(_ pageView: EmojiPageView?,
                                         currentIndex: Int,
                                         totolPages: Int)

@@ -6,12 +6,12 @@
 import UIKit
 import NECoreIMKit
 
-typealias updateSettingBlock = (_ memberRole: MemberRole?) -> Void
+typealias UpdateSettingBlock = (_ memberRole: MemberRole?) -> Void
 public class QChatMemberPermissionSettingVC: QChatTableViewController,
   QChatPermissionSettingCellDelegate {
   public var channel: ChatChannel?
   public var memberRole: MemberRole?
-//    public var didUpdateBlock: updateSettingBlock?
+//    public var didUpdateBlock: UpdateSettingBlock?
   private var commonAuths = [RoleStatusInfoExt]()
   private var messageAuths = [RoleStatusInfoExt]()
   private var memberAuths = [RoleStatusInfoExt]()
@@ -138,11 +138,11 @@ public class QChatMemberPermissionSettingVC: QChatTableViewController,
         withIdentifier: "\(QChatSectionView.self)"
       ) as? QChatSectionView
     if section == 1 {
-      view?.titleLable.text = localizable("qchat_common_permission")
+      view?.titleLabel.text = localizable("qchat_common_permission")
     } else if section == 2 {
-      view?.titleLable.text = localizable("qchat_message_permission")
+      view?.titleLabel.text = localizable("qchat_message_permission")
     } else if section == 3 {
-      view?.titleLable.text = localizable("qchat_member_permission")
+      view?.titleLabel.text = localizable("qchat_member_permission")
     }
     return view
   }

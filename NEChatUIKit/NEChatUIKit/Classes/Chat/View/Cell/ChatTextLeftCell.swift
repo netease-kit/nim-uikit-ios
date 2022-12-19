@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 public class ChatTextLeftCell: ChatBaseLeftCell {
-  public let textLable = UILabel()
+  public let contentLabel = UILabel()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -18,23 +18,23 @@ public class ChatTextLeftCell: ChatBaseLeftCell {
   }
 
   func commonUI() {
-    textLable.translatesAutoresizingMaskIntoConstraints = false
-    textLable.isEnabled = false
+    contentLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentLabel.isEnabled = false
 //        textView.isScrollEnabled = false
 //        textView.showsVerticalScrollIndicator = false
-    textLable.numberOfLines = 0
-    textLable.isUserInteractionEnabled = false
+    contentLabel.numberOfLines = 0
+    contentLabel.isUserInteractionEnabled = false
 //        textView.textContainer.lineFragmentPadding = 0;
 //        textView.textContainerInset = .zero;
-    textLable.font = DefaultTextFont(16)
+    contentLabel.font = DefaultTextFont(16)
 //        textView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    textLable.backgroundColor = .clear
-    bubbleImage.addSubview(textLable)
+    contentLabel.backgroundColor = .clear
+    bubbleImage.addSubview(contentLabel)
     NSLayoutConstraint.activate([
-      textLable.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
-      textLable.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 8),
-      textLable.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 0),
-      textLable.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
+      contentLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
+      contentLabel.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 8),
+      contentLabel.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 0),
+      contentLabel.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
     ])
   }
 
@@ -42,7 +42,7 @@ public class ChatTextLeftCell: ChatBaseLeftCell {
     super.setModel(model)
     if let m = model as? MessageTextModel {
 //            textView.text = m.text
-      textLable.attributedText = m.attributeStr
+      contentLabel.attributedText = m.attributeStr
     }
   }
 }

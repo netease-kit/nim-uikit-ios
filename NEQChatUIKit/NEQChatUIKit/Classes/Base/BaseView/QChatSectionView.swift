@@ -6,7 +6,7 @@
 import UIKit
 
 class QChatSectionView: UITableViewHeaderFooterView {
-  public var titleLable = UILabel()
+  public var titleLabel = UILabel()
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -18,16 +18,16 @@ class QChatSectionView: UITableViewHeaderFooterView {
 
   func commonUI() {
     contentView.backgroundColor = .ne_lightBackgroundColor
-    titleLable.font = UIFont.systemFont(ofSize: 12)
-    titleLable.textColor = .ne_greyText
-    titleLable.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.font = UIFont.systemFont(ofSize: 12)
+    titleLabel.textColor = .ne_greyText
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-    contentView.addSubview(titleLable)
+    contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLable.leftAnchor.constraint(equalTo: leftAnchor, constant: 33),
-      titleLable.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-      titleLable.bottomAnchor.constraint(equalTo: bottomAnchor),
-      titleLable.rightAnchor.constraint(equalTo: rightAnchor, constant: -33),
+      titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 33),
+      titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+      titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+      titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -33),
     ])
   }
 }

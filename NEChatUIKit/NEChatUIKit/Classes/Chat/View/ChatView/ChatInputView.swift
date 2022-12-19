@@ -12,12 +12,15 @@ import RSKPlaceholderTextView
   case audio
   case emoji
   case image
-  case file
+  case addMore
 }
 
-public protocol ChatInputViewDelegate: AnyObject {
+@objc
+public protocol ChatInputViewDelegate: NSObjectProtocol {
   func sendText(text: String?)
   func willSelectItem(button: UIButton, index: Int)
+  func didSelectMoreCell(cell: NEInputMoreCell)
+
   @discardableResult
   func textChanged(text: String) -> Bool
   func textDelete(range: NSRange, text: String) -> Bool
@@ -32,7 +35,7 @@ public protocol ChatInputViewDelegate: AnyObject {
 
 @objcMembers
 public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
-  InputEmoticonContainerViewDelegate, UITextViewDelegate {
+  InputEmoticonContainerViewDelegate, UITextViewDelegate, NEMoreViewDelagate {
   public weak var delegate: ChatInputViewDelegate?
   public var currentType: ChatMenuType = .text
   public var menuHeight = 100.0
@@ -76,16 +79,15 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       textField.rightAnchor.constraint(equalTo: rightAnchor, constant: -7),
       textField.heightAnchor.constraint(equalToConstant: 40),
     ])
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(textFieldChangeNoti),
-      name: UITextField.textDidChangeNotification,
-      object: nil
-    )
+//    NotificationCenter.default.addObserver(
+//      textField,
+//      selector: #selector(textFieldChangeNoti),
+//      name: UITextView.textDidChangeNotification,
+//      object: nil
+//    )
 
-    //        let imageNames = ["mic","emoji","photo","file","add"]
+    let imageNames = ["mic", "emoji", "photo", "add"]
 //    let imageNames = ["mic", "emoji", "photo", "chat_video", "add"]
-    let imageNames = ["mic", "emoji", "photo", "chat_video"]
 
     var items = [UIButton]()
     for i in 0 ... 3 {
@@ -95,9 +97,6 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       button.addTarget(self, action: #selector(buttonEvent), for: .touchUpInside)
       button.tag = i + 5
       items.append(button)
-      if i == 4 {
-        button.alpha = 0.5
-      }
     }
     let stackView = UIStackView(arrangedSubviews: items)
     stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -143,12 +142,8 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     ])
 
     contentView.addSubview(emojiView)
-    //        NSLayoutConstraint.activate([
-    //            emojiView.leftAnchor.constraint(equalTo: self.contentView.leftAnchor, constant: 0),
-    //            emojiView.rightAnchor.constraint(equalTo: self.contentView.rightAnchor, constant: 0),
-    //            emojiView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 0),
-    //            emojiView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -25)
-    //        ])
+
+    contentView.addSubview(chatAddMoreView)
   }
 
   func addRecordView() {
@@ -167,6 +162,15 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       textField.resignFirstResponder()
       contentSubView?.isHidden = true
       contentSubView = emojiView
+      contentSubView?.isHidden = false
+    }
+  }
+
+  func addMoreActionView() {
+    if currentType != .addMore {
+      currentType = .addMore
+      contentSubView?.isHidden = true
+      contentSubView = chatAddMoreView
       contentSubView?.isHidden = false
     }
   }
@@ -236,6 +240,19 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     view.delegate = self
     return view
   }()
+
+  public lazy var chatAddMoreView: NEChatMoreActionView = {
+    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.configData(data: NEChatUIKitClient.instance.getMoreActionData())
+    view.isHidden = true
+    view.delegate = self
+    return view
+  }()
+
+  public func textViewDidChange(_ textView: UITextView) {
+    delegate?.textFieldDidChange(textField)
+  }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
     delegate?.textFieldDidEndEditing(textView)
@@ -308,6 +325,8 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       addRecordView()
     case 1:
       addEmojiView()
+    case 3:
+      addMoreActionView()
     default:
       print("default")
     }
@@ -366,6 +385,12 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
   public func stopRecordAnimation() {
     greyView.isHidden = true
     recordView.stopRecordAnimation()
+  }
+
+  // MARK: NEMoreViewDelagate
+
+  public func moreViewDidSelectMoreCell(moreView: NEChatMoreActionView, cell: NEInputMoreCell) {
+    delegate?.didSelectMoreCell(cell: cell)
   }
 
   //    MARK: ChatRecordViewDelegate

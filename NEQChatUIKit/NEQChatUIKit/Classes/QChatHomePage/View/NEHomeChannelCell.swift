@@ -33,7 +33,7 @@ class NEHomeChannelCell: UITableViewCell {
         value: TextNormalColor,
         range: NSRange(location: 1, length: name.count - 1)
       )
-      channelNameLable.attributedText = attrStr
+      channelNameLabel.attributedText = attrStr
     }
   }
 
@@ -48,13 +48,13 @@ class NEHomeChannelCell: UITableViewCell {
   }
 
   func setupSubviews() {
-    contentView.addSubview(channelNameLable)
+    contentView.addSubview(channelNameLabel)
     contentView.addSubview(redAngleView)
 
     NSLayoutConstraint.activate([
-      channelNameLable.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 18),
-      channelNameLable.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      channelNameLable.rightAnchor.constraint(
+      channelNameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 18),
+      channelNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      channelNameLabel.rightAnchor.constraint(
         equalTo: contentView.rightAnchor,
         constant: -50
       ),
@@ -68,7 +68,7 @@ class NEHomeChannelCell: UITableViewCell {
     ])
   }
 
-  private lazy var channelNameLable: UILabel = {
+  private lazy var channelNameLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = DefaultTextFont(16)

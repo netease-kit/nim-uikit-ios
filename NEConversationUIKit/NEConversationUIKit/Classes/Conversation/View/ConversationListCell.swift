@@ -7,8 +7,9 @@ import UIKit
 import NIMSDK
 
 open class ConversationListCell: UITableViewCell {
-  private var viewModel = ConversationViewModel()
+//  private var viewModel = ConversationViewModel()
   public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
+  private let repo = ConversationRepo()
 
   override open func awakeFromNib() {
     super.awakeFromNib()
@@ -111,8 +112,9 @@ open class ConversationListCell: UITableViewCell {
       title.text = conversationModel.userInfo?.showName()
 
       // notifyForNewMsg
-      notifyMsg.isHidden = viewModel
-        .notifyForNewMsg(userId: conversationModel.userInfo?.userId)
+//      notifyMsg.isHidden = viewModel
+//        .notifyForNewMsg(userId: conversationModel.userInfo?.userId)
+      notifyMsg.isHidden = repo.isNeedNotify(userId: conversationModel.userInfo?.userId)
 
     } else if conversationModel.recentSession?.session?.sessionType == .team {
       // team head image
@@ -128,8 +130,9 @@ open class ConversationListCell: UITableViewCell {
       title.text = conversationModel.teamInfo?.getShowName()
 
       // notifyForNewMsg
-      let teamNotifyState = viewModel
-        .notifyStateForNewMsg(teamId: conversationModel.teamInfo?.teamId)
+//      let teamNotifyState = viewModel
+//        .notifyStateForNewMsg(teamId: conversationModel.teamInfo?.teamId)
+      let teamNotifyState = repo.isNeedNotifyForTeam(teamId: conversationModel.teamInfo?.teamId)
       notifyMsg.isHidden = teamNotifyState == .none ? false : true
     }
 

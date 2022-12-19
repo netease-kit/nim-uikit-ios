@@ -19,6 +19,7 @@ class QChatImageTableViewCell: QChatBaseTableViewCell {
     let imageView = UIImageView()
     imageView.contentMode = .scaleAspectFill
     self.contentBtn.addSubview(imageView)
+    imageView.clipsToBounds = true
     return imageView
   }()
 

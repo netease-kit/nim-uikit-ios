@@ -213,6 +213,7 @@
 				4B3B9BD9277AFEE50091A74E /* Resources */,
 				8293FFD3DEA5F5A02EBCD9D8 /* [CP] Embed Pods Frameworks */,
 				39722F9327998A14007BFC8B /* Embed Frameworks */,
+				27435CF989B8D3CA2FFB632D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -273,6 +274,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		27435CF989B8D3CA2FFB632D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		5F9B18A712AF519ACF5898F9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -513,6 +531,9 @@
 				INFOPLIST_FILE = app/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "想使用您的麦克风";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "将要保存图片到相册";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "若不允许，你将无法拍摄照片";
@@ -556,6 +577,9 @@
 				INFOPLIST_FILE = app/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "想使用您的麦克风";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "将要保存图片到相册";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "若不允许，你将无法拍摄照片";

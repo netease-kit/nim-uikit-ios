@@ -22,6 +22,9 @@ public class MessageContentModel: NSObject, MessageModel {
   public var avatar: String?
   public var replyText: String?
   public var fullNameHeight: Float = 0
+  public var isRevokedText: Bool = false
+  public var timeOut = false
+
   public var replyedModel: MessageModel? {
     didSet {
       if let reply = replyedModel as? MessageContentModel {
@@ -35,8 +38,15 @@ public class MessageContentModel: NSObject, MessageModel {
               height: CGFloat.greatestFiniteMagnitude
             )
           )
+          var width = size.width
+          if replyedModel?.type == .location {
+            let locationMinWidth: CGFloat = 76
+            if width < locationMinWidth {
+              width = locationMinWidth
+            }
+          }
           contentSize = CGSize(
-            width: max(contentSize.width, size.width),
+            width: max(contentSize.width, width),
             height: contentSize.height + chat_reply_height
           )
           height = Float(contentSize.height + qChat_margin) + fullNameHeight
@@ -49,8 +59,15 @@ public class MessageContentModel: NSObject, MessageModel {
     didSet {
       if isRevoked {
         type = .revoke
+        if let time = message?.timestamp {
+          let date = Date()
+          let currentTime = date.timeIntervalSince1970
+          if currentTime - time > 60 * 5 {
+            timeOut = true
+          }
+        }
         // 只有文本消息，才计算可编辑按钮的宽度
-        if let isSend = message?.isOutgoingMsg, isSend, message?.messageType == .text {
+        if let isSend = message?.isOutgoingMsg, isSend, message?.messageType == .text, isRevokedText == true, timeOut == false {
           contentSize = CGSize(width: 218, height: qChat_min_h)
         } else {
           contentSize = CGSize(width: 130, height: qChat_min_h)

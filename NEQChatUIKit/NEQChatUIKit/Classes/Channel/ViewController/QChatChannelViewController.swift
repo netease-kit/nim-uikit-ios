@@ -126,7 +126,7 @@ public class QChatChannelViewController: QChatTableViewController, QChatTextEdit
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(QChatSectionView.self)"
       ) as! QChatSectionView
-    sectionView.titleLable.text = dataList[section].sectionName
+    sectionView.titleLabel.text = dataList[section].sectionName
     return sectionView
   }
 

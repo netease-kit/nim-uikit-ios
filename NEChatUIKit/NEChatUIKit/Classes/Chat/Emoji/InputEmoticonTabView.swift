@@ -5,7 +5,7 @@
 
 import UIKit
 
-@objc public protocol InputEmoticonTabViewDelegate: AnyObject {
+@objc public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }
 

@@ -115,7 +115,7 @@ public class IdGroupSortViewModel: NSObject {
         } else {
           let item = UpdateServerRolePriorityItem(r, startIndex)
           items.append(item)
-          startIndex = startIndex + 1
+          startIndex += 1
           print("item priority : ", startIndex)
         }
         last = m

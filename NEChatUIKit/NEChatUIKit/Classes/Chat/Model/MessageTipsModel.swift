@@ -22,7 +22,7 @@ class MessageTipsModel: NSObject, MessageModel {
   var text: String?
   var isRevoked: Bool = false
   var replyedModel: MessageModel?
-
+  var isRevokedText: Bool = false
   required init(message: NIMMessage?) {
     if let msg = message {
       if msg.messageType == .notification {

@@ -49,7 +49,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     super.init(coder: coder)
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     weak var weakSelf = self
     viewModel.refresh = {
@@ -67,7 +67,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     }
   }
 
-  func commonUI() {
+  open func commonUI() {
     tableView.separatorStyle = .none
     tableView.delegate = self
     tableView.dataSource = self
@@ -95,7 +95,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
   }
 
-  func loadData() {
+  open func loadData() {
     viewModel.loadData { [self] error in
       tableView.reloadData()
     }
@@ -189,7 +189,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
 
       case ContactComputerRouter:
 //                let select = ContactsSelectedViewController()
-//                select.callBack = { contacts in
+//                select.CallBack = { contacts in
 //                    print("select contacs : ", contacts)
 //                }
 //                select.hidesBottomBarWhenPushed = true

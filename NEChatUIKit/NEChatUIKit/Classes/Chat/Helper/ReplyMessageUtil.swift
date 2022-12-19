@@ -9,26 +9,29 @@ public class ReplyMessageUtil: NSObject {
   public static func textForReplyModel(model: MessageContentModel) -> String {
     var text = "|"
     if let name = model.fullName {
-      text = text + name
+      text += name
     }
-    text = text + ": "
+    text += ": "
     switch model.type {
     case .text:
       if let t = model.message?.text {
-        text = text + t
+        text += t
       }
     case .image:
-      text = text + chatLocalizable("msg_image")
+      text += "[\(chatLocalizable("msg_image"))]"
     case .audio:
-      text = text + chatLocalizable("msg_audio")
+      text += "[\(chatLocalizable("msg_audio"))]"
     case .video:
-      text = text + chatLocalizable("msg_video")
+      text += "[\(chatLocalizable("msg_video"))]"
     case .file:
-      text = text + chatLocalizable("msg_file")
+      text += "[\(chatLocalizable("msg_file"))]"
     case .custom:
-      text = text + chatLocalizable("msg_custom")
+      text += "[\(chatLocalizable("msg_custom"))]"
+    case .location:
+      // text += chatLocalizable("msg_location")
+      text = "[\(chatLocalizable("msg_location"))]"
     default:
-      text = text + chatLocalizable("msg_unknown")
+      text += "[\(chatLocalizable("msg_unknown"))]"
     }
     return text
   }

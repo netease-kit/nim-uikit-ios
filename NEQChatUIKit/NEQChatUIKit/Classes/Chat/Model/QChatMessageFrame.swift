@@ -102,6 +102,15 @@ public class QChatMessageFrame: NSObject {
       // cell 高度
       cellHeight = contentSize.height + qChat_margin
 
+      if let type = message?.messageType {
+        if type == .text, contentSize.height > qChat_min_h {
+          if let height = contentFrame?.size.height {
+            contentFrame?.size.height = height + qChat_margin * 2
+          }
+          cellHeight += qChat_margin * 2
+        }
+      }
+
       // 起始位置
 //            _startX = isSend ? 0 : kChat_angle_w;
       startX = 0

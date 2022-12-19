@@ -29,3 +29,5 @@
 "video_chat"="[视频聊天]";
 "unknown"="[未知消息]";
 "appName"="云信IM";
+
+"message_recalled"="消息已撤回";

@@ -10,12 +10,12 @@ public class ChatTimeTableViewCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
-    contentView.addSubview(timeLable)
+    contentView.addSubview(timeLabel)
     NSLayoutConstraint.activate([
-      timeLable.topAnchor.constraint(equalTo: contentView.topAnchor),
-      timeLable.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      timeLable.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      timeLable.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      timeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
   }
 
@@ -24,10 +24,10 @@ public class ChatTimeTableViewCell: UITableViewCell {
   }
 
   func setModel(_ model: MessageTipsModel) {
-    timeLable.text = model.text
+    timeLabel.text = model.text
   }
 
-  private lazy var timeLable: UILabel = {
+  private lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.font = DefaultTextFont(12)
     label.textColor = NEKitChatConfig.shared.ui.timeColor

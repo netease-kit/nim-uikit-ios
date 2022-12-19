@@ -117,7 +117,7 @@ public class BlackListViewController: UIViewController, UITableViewDelegate, UIT
         if error == nil {
           suc.append(user)
         }
-        num = num - 1
+        num -= 1
         if num == 0 {
           print("add black finished")
           self?.blackList?.append(contentsOf: suc)

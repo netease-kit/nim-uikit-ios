@@ -9,7 +9,7 @@ import MJRefresh
 typealias SelectMemeberCompletion = ([UserInfo]) -> Void
 typealias FilterMembersBlock = ([UserInfo]) -> [UserInfo]?
 
-public protocol QChatMemberSelectControllerDelegate: AnyObject {
+public protocol QChatMemberSelectControllerDelegate: NSObjectProtocol {
   func filterMembers(accid: [String]?, _ filterMembers: @escaping ([String]?) -> Void)
 }
 

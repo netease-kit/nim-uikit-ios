@@ -32,6 +32,9 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   func remoteUserEndEditing()
 }
 
+let revokeLocalMessage = "revoke_message_local"
+let revokeLocalMessageContent = "revoke_message_local_content"
+
 @objcMembers
 public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDelegate,
   NIMConversationManagerDelegate, NIMSystemNotificationManagerDelegate, ChatExtendProviderDelegate {
@@ -128,6 +131,29 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
       }
   }
 
+  public func sendLocationMessage(_ model: ChatLocaitonModel, _ completion: @escaping (Error?) -> Void) {
+    let message = MessageUtils.locationMessage(model.lat, model.lng, model.title, model.address)
+    repo.sendMessage(message: message, session: session, completion)
+  }
+
+  public func sendFileMessage(filePath: String, displayName: String?, _ completion: @escaping (Error?) -> Void) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", filePath:")
+    repo.sendMessage(
+      message: MessageUtils.fileMessage(filePath: filePath, displayName: displayName),
+      session: session,
+      completion
+    )
+  }
+
+  public func sendFileMessage(data: Data, displayName: String?, _ completion: @escaping (Error?) -> Void) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", filePath:")
+    repo.sendMessage(
+      message: MessageUtils.fileMessage(data: data, displayName: displayName),
+      session: session,
+      completion
+    )
+  }
+
   public func queryRoamMsgHasMoreTime(_ completion: @escaping (Error?, NSInteger,
                                                                [MessageModel]?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
@@ -219,6 +245,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
             finalDatas.append(contentsOf: historyDatas)
             if let anchorMessage = weakSelf?.anchor {
               let model = self.modelFromMessage(message: anchorMessage)
+              weakSelf?.filterRevokeMessage([model])
               weakSelf?.messages.insert(model, at: historyDatas.count)
               finalDatas.append(model)
             }
@@ -245,6 +272,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         for msg in messageArray {
           self?.addTimeMessage(msg)
           if let model = self?.modelFromMessage(message: msg) {
+            self?.filterRevokeMessage([model])
             self?.messages.append(model)
           }
         }
@@ -600,9 +628,16 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   public func onRecvMessages(_ messages: [NIMMessage]) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messages.count: \(messages.count)")
     print("\(#function) 1messages:\(messages.count)")
-
+    var count = 0
     for msg in messages {
       if msg.session?.sessionId == session.sessionId {
+        if msg.serverID.count <= 0 {
+          continue
+        }
+        if msg.isDeleted == true {
+          continue
+        }
+        count += 1
         // 自定义消息处理
         if msg.messageType == .custom {
         } else {
@@ -612,7 +647,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         }
       }
     }
-    delegate?.onRecvMessages(messages)
+    if count > 0 { delegate?.onRecvMessages(messages) }
   }
 
   public func willSend(_ message: NIMMessage) {
@@ -639,7 +674,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
       if !isResend {
         addTimeMessage(message)
-        messages.append(modelFromMessage(message: message))
+        let model = modelFromMessage(message: message)
+        filterRevokeMessage([model])
+        messages.append(model)
       }
 
       delegate?.willSend(message)
@@ -766,6 +803,12 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     var pinItem = OperationItem.pinItem()
     var items = [OperationItem]()
     switch model?.message?.messageType {
+    case .location:
+      items.append(contentsOf: [
+        OperationItem.replayItem(),
+        OperationItem.forwardItem(),
+        OperationItem.deleteItem(),
+      ])
     case .text:
       if let isPin = model?.isPined, isPin {
         pinItem = OperationItem.removePinItem()
@@ -780,7 +823,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         OperationItem.deleteItem(),
       ]
 
-    case .image, .video:
+    case .image, .video, .file:
       if let isPin = model?.isPined, isPin {
         pinItem = OperationItem.removePinItem()
       }
@@ -849,7 +892,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         break
       } else {
         updateIndexs.append(IndexPath(row: i, section: 0))
-        i = i - 1
+        i -= 1
       }
     }
     return updateIndexs
@@ -908,12 +951,10 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
       model = MessageAudioModel(message: message)
 //                    case .video:
 //                        <#code#>
-//                    case .location:
-//                        <#code#>
     case .notification:
       model = MessageTipsModel(message: message)
-//                    case .file:
-//                        <#code#>
+    case .file:
+      model = MessageFileModel(message: message)
     case .tip:
       model = MessageTipsModel(message: message)
 //                    case .robot:
@@ -922,6 +963,8 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 //                        <#code#>
 //                    case .custom:
 //                        <#code#>
+    case .location:
+      model = MessageLocationModel(message: message)
     default:
       // 未识别的消息类型，默认为文本消息类型，text为未知消息
       message.text = "未知消息"
@@ -1224,6 +1267,35 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   public func getMessageRead() -> Bool {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     return repo.getMessageRead()
+  }
+
+  public func saveRevokeMessage(_ message: NIMMessage, _ completion: @escaping (Error?) -> Void) {
+    let messageNew = NIMMessage()
+    messageNew.text = chatLocalizable("message_recalled")
+    var muta = [String: Any]()
+    muta[revokeLocalMessage] = true
+    if message.messageType == .text {
+      muta[revokeLocalMessageContent] = message.text
+    }
+    messageNew.from = message.from
+    messageNew.localExt = muta
+    let setting = NIMMessageSetting()
+    setting.shouldBeCounted = false
+    setting.isSessionUpdate = false
+    messageNew.setting = setting
+    repo.saveMessageToDB(messageNew, session, completion)
+  }
+
+  private func filterRevokeMessage(_ messages: [MessageModel]) {
+    messages.forEach { model in
+      if let isRevoke = model.message?.localExt?[revokeLocalMessage] as? Bool, isRevoke == true {
+        if let content = model.message?.localExt?[revokeLocalMessageContent] as? String, content.count > 0 {
+          model.isRevokedText = true
+          model.message?.text = content
+        }
+        model.isRevoked = true
+      }
+    }
   }
 
 //    MARK: NIMConversationManagerDelegate

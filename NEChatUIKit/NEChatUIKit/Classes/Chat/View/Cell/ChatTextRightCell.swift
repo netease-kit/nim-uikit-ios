@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 public class ChatTextRightCell: ChatBaseRightCell {
-  public let textLable = UILabel()
+  public let contentLabel = UILabel()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -18,17 +18,17 @@ public class ChatTextRightCell: ChatBaseRightCell {
   }
 
   func commonUI() {
-    textLable.translatesAutoresizingMaskIntoConstraints = false
-    textLable.isEnabled = false
-    textLable.isUserInteractionEnabled = false
-    textLable.numberOfLines = 0
-    textLable.font = DefaultTextFont(16)
-    bubbleImage.addSubview(textLable)
+    contentLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentLabel.isEnabled = false
+    contentLabel.isUserInteractionEnabled = false
+    contentLabel.numberOfLines = 0
+    contentLabel.font = DefaultTextFont(16)
+    bubbleImage.addSubview(contentLabel)
     NSLayoutConstraint.activate([
-      textLable.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
-      textLable.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 8),
-      textLable.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 0),
-      textLable.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
+      contentLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
+      contentLabel.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 8),
+      contentLabel.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 0),
+      contentLabel.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
     ])
   }
 
@@ -36,7 +36,7 @@ public class ChatTextRightCell: ChatBaseRightCell {
     super.setModel(model)
     if let m = model as? MessageTextModel {
 //            textView.text = m.text
-      textLable.attributedText = m.attributeStr
+      contentLabel.attributedText = m.attributeStr
     }
   }
 }

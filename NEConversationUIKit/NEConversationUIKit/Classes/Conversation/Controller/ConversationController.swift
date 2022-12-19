@@ -6,9 +6,10 @@
 import UIKit
 import NECommonUIKit
 import NECoreKit
+import NIMSDK
 
 @objcMembers
-open class ConversationController: UIViewController {
+open class ConversationController: UIViewController, NIMChatManagerDelegate {
   let viewmodel = ConversationViewModel()
   private var listCtrl = ConversationListViewController()
 
@@ -20,6 +21,7 @@ open class ConversationController: UIViewController {
   override public func viewDidLoad() {
     super.viewDidLoad()
     setupSubviews()
+    NIMSDK.shared().chatManager.add(self)
   }
 
   func setupSubviews() {
@@ -175,6 +177,35 @@ extension ConversationController: ConversationNavViewDelegate {
       } else if let msg = param["msg"] as? String {
         weakSelf?.showToast(msg)
       }
+    }
+  }
+
+  // MARK: =========================NIMChatManagerDelegate========================
+
+  public func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
+    guard let msg = notification.message else {
+      return
+    }
+    saveRevokeMessage(msg) { error in
+    }
+  }
+
+  public func saveRevokeMessage(_ message: NIMMessage, _ completion: @escaping (Error?) -> Void) {
+    let messageNew = NIMMessage()
+    messageNew.text = localizable("message_recalled")
+    var muta = [String: Any]()
+    muta[revokeLocalMessage] = true
+    if message.messageType == .text {
+      muta[revokeLocalMessageContent] = message.text
+    }
+    messageNew.from = message.from
+    messageNew.localExt = muta
+    let setting = NIMMessageSetting()
+    setting.shouldBeCounted = false
+    setting.isSessionUpdate = false
+    messageNew.setting = setting
+    if let session = message.session {
+      viewmodel.repo.saveMessageToDB(messageNew, session, completion)
     }
   }
 }

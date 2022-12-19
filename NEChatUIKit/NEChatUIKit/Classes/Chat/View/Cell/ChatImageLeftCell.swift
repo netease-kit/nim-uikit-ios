@@ -41,14 +41,19 @@ public class ChatImageLeftCell: ChatBaseLeftCell {
 
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
-    if let m = model as? MessageImageModel, let url = m.imageUrl {
-      contentImageView.sd_setImage(
-        with: URL(string: url),
-        placeholderImage: nil,
-        options: .retryFailed,
-        progress: nil,
-        completed: nil
-      )
+    if let m = model as? MessageImageModel, let imageUrl = m.imageUrl {
+      if imageUrl.hasPrefix("http") {
+        contentImageView.sd_setImage(
+          with: URL(string: imageUrl),
+          placeholderImage: nil,
+          options: .retryFailed,
+          progress: nil,
+          completed: nil
+        )
+      } else {
+        contentImageView.image = UIImage(contentsOfFile: imageUrl)
+      }
+
     } else {
       contentImageView.image = nil
     }

@@ -6,7 +6,7 @@
 import UIKit
 import NEChatKit
 
-public typealias didSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
+public typealias DidSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
 
 @objcMembers
 public class SelectUserViewController: ChatBaseViewController, UITableViewDelegate,
@@ -14,7 +14,7 @@ public class SelectUserViewController: ChatBaseViewController, UITableViewDelega
   public var tableView = UITableView(frame: .zero, style: .plain)
   public var sessionId: String
   public var viewModel = TeamMemberSelectVM()
-  public var selectedBlock: didSelectedAtRow?
+  public var selectedBlock: DidSelectedAtRow?
   var teamInfo: ChatTeamInfoModel?
   private let className = "SelectUserViewController"
 
