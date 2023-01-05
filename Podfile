@@ -31,7 +31,7 @@ target 'app' do
   pod 'NECoreKit', '9.3.0'
   
   #扩展库
-  pod 'NEMapKit', '9.3.0'
+  pod 'NEMapKit', '9.3.1'
 
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
