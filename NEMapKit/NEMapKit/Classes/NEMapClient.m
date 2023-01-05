@@ -64,7 +64,7 @@ typedef void (^MapMoveCompletion)(void);
 
 - (void)setupMapSdkConfigWithAppkey:(NSString *)appkey {
   // 初始化高德SDK
-  [[AMapServices sharedServices] setApiKey:@"46a3a36bb9d26934a26c6ce2b04aab6f"];
+  [[AMapServices sharedServices] setApiKey:appkey];
   [AMapServices sharedServices].enableHTTPS = YES;
   [AMapSearchAPI updatePrivacyShow:AMapPrivacyShowStatusDidShow
                        privacyInfo:AMapPrivacyInfoStatusDidContain];
