@@ -12,7 +12,7 @@ target 'app' do
   #可选UI库
   pod 'NEContactUIKit', '9.3.0'
   pod 'NEQChatUIKit', '9.3.0'
-  pod 'NEConversationUIKit', '9.3.0'
+  pod 'NEConversationUIKit', '9.3.1'
   pod 'NEChatUIKit', '9.3.0'
   pod 'NETeamUIKit', '9.3.0'
   
