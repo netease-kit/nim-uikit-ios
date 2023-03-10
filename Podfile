@@ -29,7 +29,7 @@ target 'app' do
   pod 'NECoreKit', '9.4.0'
   
   #扩展库
-#  pod 'NEMapKit', '9.4.0'
+  pod 'NEMapKit', '9.4.0'
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
   pod 'NERtcCallUIKit', '1.8.2'

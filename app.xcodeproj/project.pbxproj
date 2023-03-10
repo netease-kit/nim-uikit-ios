@@ -87,7 +87,6 @@
 		DDFAAE7B29BACE0B00834C08 /* NENavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENavigationController.swift; sourceTree = "<group>"; };
 		DDFAAE7D29BACE0B00834C08 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DDFAAE7E29BACE0B00834C08 /* NETabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
-		DDFAAE9A29BAECF100834C08 /* app-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "app-Bridging-Header.h"; sourceTree = "<group>"; };
 		DDFAAE9E29BAFD1500834C08 /* NEUserHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEUserHeaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -140,7 +139,6 @@
 				4B3B9BE4277AFEE50091A74E /* Main.storyboard */,
 				4B3B9BE7277AFEE70091A74E /* Assets.xcassets */,
 				4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */,
-				DDFAAE9A29BAECF100834C08 /* app-Bridging-Header.h */,
 			);
 			path = app;
 			sourceTree = "<group>";
@@ -227,7 +225,7 @@
 				4B3B9BD9277AFEE50091A74E /* Resources */,
 				8293FFD3DEA5F5A02EBCD9D8 /* [CP] Embed Pods Frameworks */,
 				39722F9327998A14007BFC8B /* Embed Frameworks */,
-				27435CF989B8D3CA2FFB632D /* [CP] Copy Pods Resources */,
+				E4AF30BDBA5D645CD8868D43 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -289,23 +287,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		27435CF989B8D3CA2FFB632D /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		5F9B18A712AF519ACF5898F9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -343,6 +324,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E4AF30BDBA5D645CD8868D43 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -574,8 +572,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "app/app-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -622,7 +621,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = inHouseYunxin;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "app/app-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
