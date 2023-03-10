@@ -33,9 +33,21 @@ public class TeamRouter: NSObject {
         if name.count > 30 {
           name = String(name.prefix(30))
         }
+
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
-        repo.createNormalTeam(name, iconUrl, accids) { error, teamid, failedIds in
+
+        let option = NIMCreateTeamOption()
+        option.type = .advanced
+        option.avatarUrl = iconUrl
+        option.name = name
+        option.joinMode = .noAuth
+        option.inviteMode = .all
+        option.beInviteMode = .noAuth
+        option.updateInfoMode = .all
+        option.updateClientCustomMode = .all
+
+        repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
           var result = [String: Any]()
           if let err = error {
             result["code"] = err.code
@@ -44,6 +56,13 @@ public class TeamRouter: NSObject {
             result["code"] = 0
             result["msg"] = "ok"
             result["teamId"] = teamid
+            if let tid = teamid {
+              repo.updateTeamCustomInfo(discussTeamKey, tid) { error in
+                if let err = error {
+                  print(#function + "error: \(err.localizedDescription)")
+                }
+              }
+            }
           }
           Router.shared.use(TeamCreateDiscussResult, parameters: result, closure: nil)
         }
@@ -57,9 +76,16 @@ public class TeamRouter: NSObject {
         if name.count > 30 {
           name = String(name.prefix(30))
         }
+
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
-        repo.createAdvanceTeam(name, iconUrl, accids) { error, teamid, failedIds in
+
+        let option = NIMCreateTeamOption()
+        option.type = .advanced
+        option.avatarUrl = iconUrl
+        option.name = name
+
+        repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
           var result = [String: Any]()
           if let err = error {
             result["code"] = err.code

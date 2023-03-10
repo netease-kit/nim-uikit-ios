@@ -45,6 +45,7 @@ public protocol MessageModel: NSObjectProtocol {
   var replyedModel: MessageModel? { get set }
   var replyText: String? { get set }
   var isRevokedText: Bool { get set }
+  var isReplay: Bool { get set }
 
   init(message: NIMMessage?)
 }

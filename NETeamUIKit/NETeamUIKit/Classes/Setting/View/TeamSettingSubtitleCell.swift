@@ -7,6 +7,8 @@ import UIKit
 
 @objcMembers
 public class TeamSettingSubtitleCell: BaseTeamSettingCell {
+  var titleWidthAnchor: NSLayoutConstraint?
+
   override public func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
@@ -36,26 +38,30 @@ public class TeamSettingSubtitleCell: BaseTeamSettingCell {
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-      titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -84),
+      titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
+    titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
+    titleWidthAnchor?.isActive = true
 
     NSLayoutConstraint.activate([
       arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      arrow.widthAnchor.constraint(equalToConstant: 7),
     ])
 
     NSLayoutConstraint.activate([
+      subTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 10),
       subTitleLabel.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -10),
       subTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      subTitleLabel.widthAnchor.constraint(equalToConstant: 200),
     ])
-
-    titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
   }
 
   override public func configure(_ anyModel: Any) {
     super.configure(anyModel)
-    subTitleLabel.text = model?.subTitle
+    if let m = anyModel as? SettingCellModel {
+      titleWidthAnchor?.constant = m.titleWidth
+      subTitleLabel.text = m.subTitle
+    }
   }
 
   lazy var subTitleLabel: UILabel = {

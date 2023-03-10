@@ -78,7 +78,7 @@ public class ChatRecordView: UIView, UIGestureRecognizerDelegate {
   }
 
   func clickLabel(recognizer: UILongPressGestureRecognizer) {
-    print("location:\(recognizer.location(in: recognizer.view))")
+//    print("location:\(recognizer.location(in: recognizer.view))")
     switch recognizer.state {
     case .began:
       print("state:begin")
@@ -88,8 +88,10 @@ public class ChatRecordView: UIView, UIGestureRecognizerDelegate {
     case .ended:
       endRecord(recognizer: recognizer)
     case .cancelled:
+      endRecord(recognizer: recognizer)
       print("state:cancelled")
     case .failed:
+      endRecord(recognizer: recognizer)
       print("state:failed")
     default:
       print("state:default")

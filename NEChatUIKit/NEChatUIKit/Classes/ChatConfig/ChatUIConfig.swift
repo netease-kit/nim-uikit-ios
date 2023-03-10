@@ -39,5 +39,5 @@ public class ChatUIConfig: NSObject {
   public var messageColor = UIColor.ne_darkText
 
   /// 发送文件大小限制(单位：MB)
-  public var fileSizeLimit: Double?
+  public var fileSizeLimit: Double = 200
 }

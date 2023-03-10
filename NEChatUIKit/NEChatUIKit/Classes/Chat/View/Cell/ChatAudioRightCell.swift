@@ -7,12 +7,14 @@ import UIKit
 
 protocol ChatAudioCell {
   var isPlaying: Bool { get set }
+  var messageId: String? { get set }
   func startAnimation()
   func stopAnimation()
 }
 
 @objcMembers
 public class ChatAudioRightCell: ChatBaseRightCell, ChatAudioCell {
+  var messageId: String?
   var isPlaying: Bool = false
   var audioImageView = UIImageView(image: UIImage.ne_imageNamed(name: "audio_play"))
   var timeLabel = UILabel()
@@ -81,6 +83,7 @@ public class ChatAudioRightCell: ChatBaseRightCell, ChatAudioCell {
     if let m = model as? MessageAudioModel {
       timeLabel.text = "\(m.duration)" + "s"
       m.isPlaying ? startAnimation() : stopAnimation()
+      messageId = m.message?.messageId
     }
   }
 }

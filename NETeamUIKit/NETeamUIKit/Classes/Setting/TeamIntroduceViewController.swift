@@ -15,7 +15,7 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
 //    var block: SaveCompletion?
 
   var team: NIMTeam?
-
+  let textLimit = 100
   let repo = TeamRepo()
 
   lazy var textView: UITextView = {
@@ -96,9 +96,9 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
     ])
 
     if let intr = team?.intro {
-      countLabel.text = "\(intr.count)/100"
+      countLabel.text = "\(intr.count)/\(textLimit)"
     } else {
-      countLabel.text = "0/100"
+      countLabel.text = "0/\(textLimit)"
     }
 
     if changePermission() == false {
@@ -161,28 +161,17 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
 
   // MARK: UITextViewDelegate
 
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-                       replacementText text: String) -> Bool {
-    let currentText = textView.text ?? ""
-    guard let stringRange = Range(range, in: currentText) else { return false }
-    let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
-    return updatedText.count <= 100
-  }
-
   public func textViewDidChange(_ textView: UITextView) {
+    if let _ = textView.markedTextRange {
+      return
+    }
     if var text = textView.text {
-      if let lang = textView.textInputMode?.primaryLanguage, lang == "zh-Hans",
-         let selectRange = textView.markedTextRange {
-        let position = textView.position(from: selectRange.start, offset: 0)
-        if position == nil {
-          if text.count > 30 {
-            text = String(text.prefix(30))
-            textView.text = String(text.prefix(30))
-          }
-          countLabel.text = "\(text.count)/100"
+      if let lang = textView.textInputMode?.primaryLanguage, lang == "zh-Hans" {
+        if text.count > textLimit {
+          text = String(text.prefix(textLimit))
+          textView.text = String(text)
         }
-      } else {
-        countLabel.text = "\(text.count)/100"
+        countLabel.text = "\(text.count)/\(textLimit)"
       }
     }
   }

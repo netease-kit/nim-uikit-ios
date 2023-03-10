@@ -16,6 +16,8 @@ public class ReplyMessageUtil: NSObject {
     case .text:
       if let t = model.message?.text {
         text += t
+      } else {
+        text = chatLocalizable("message_not_found")
       }
     case .image:
       text += "[\(chatLocalizable("msg_image"))]"

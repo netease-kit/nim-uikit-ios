@@ -19,17 +19,20 @@ public class ValidationMessageViewController: ContactBaseViewController {
 
     // Do any additional setup after loading the view.
     title = localizable("validation_message")
+    emptyView.setttingContent(content: localizable("no_validation_message"))
     // viewModel.getValidationMessage()
     setupUI()
     weak var weakSelf = self
     viewModel.getValidationMessage {
-      NELog.infoLog(ModuleName + " " + self.tag, desc: "✅ getValidationMessage SUCCESS")
+      NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "✅ getValidationMessage SUCCESS")
       weakSelf?.tableView.reloadData()
     }
 
     viewModel.dataRefresh = {
+      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.datas.count ?? 0) > 0
       weakSelf?.tableView.reloadData()
     }
+    emptyView.isHidden = viewModel.datas.count > 0
   }
 
   func setupUI() {
@@ -63,6 +66,14 @@ public class ValidationMessageViewController: ContactBaseViewController {
       SystemNotificationCell.self,
       forCellReuseIdentifier: "\(SystemNotificationCell.self)"
     )
+
+    view.addSubview(emptyView)
+    NSLayoutConstraint.activate([
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
+    ])
   }
 
   func clearMessage() {
@@ -71,6 +82,7 @@ public class ValidationMessageViewController: ContactBaseViewController {
       weakSelf?.viewModel.clearAllNoti {
         NELog.infoLog(ModuleName + " " + self.tag, desc: "✅ clearAllNoti SUCCESS")
         weakSelf?.tableView.reloadData()
+        weakSelf?.emptyView.isHidden = false
       }
     }
   }

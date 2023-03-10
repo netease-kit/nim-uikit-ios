@@ -29,7 +29,7 @@ public class PersonInfoViewModel: NSObject {
 
   func getData() {
     sectionData.removeAll()
-    userInfo = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
+    userInfo = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())
   }
@@ -145,6 +145,7 @@ public class PersonInfoViewModel: NSObject {
     signItem.cellName = NSLocalizedString("individuality_sign", comment: "")
     signItem.subTitle = mineInfo.userInfo?.sign
     signItem.rowHeight = 46.0
+    signItem.titleWidth = 64
     signItem.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     weak var weakSelf = self
     signItem.cellClick = {

@@ -15,17 +15,13 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
   public var indexs: [String]?
   private var contactHeaders: [ContactHeadItem]?
   public var contactRepo = ContactRepo()
-  private var initalDict: [String: [ContactInfo]] = ["#": []]
+  private var initalDict = [String: [ContactInfo]]()
   private let className = "ContactViewModel"
 
   var unreadCount = 0
 
   var refresh: RefreshBlock?
   init(contactHeaders: [ContactHeadItem]?) {
-    NELog.infoLog(
-      ModuleName + " " + className,
-      desc: #function + ", contactHeaders.count: \(contactHeaders?.count ?? 0)"
-    )
     super.init()
     NELog.infoLog(
       ModuleName + " " + className,
@@ -49,10 +45,10 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
 
   func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
-    initalDict = ["#": []]
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
       if let users = contacts {
+        NELog.infoLog("contact loadData", desc: "contact data:\(contacts)")
         weakSelf?.contacts = users
         weakSelf?.indexs = self.getIndexs(contactSections: users)
         if let headSection = weakSelf?.headerSection(headerItem: weakSelf?.contactHeaders) {
@@ -69,6 +65,8 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     weak var weakSelf = self
     contactRepo.getFriendList { [self] friends, error in
       if var users = friends {
+        NELog.infoLog("contact bar getFriendList", desc: "friend count:\(friends?.count)")
+        weakSelf?.initalDict = [String: [ContactInfo]]()
         if let filterUsers = filters {
           users = users.filter { user in
             if let uid = user.userId, filterUsers.contains(uid) {
@@ -83,33 +81,55 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
           return
 //                return contactList
         }
+
+        let digitRegular = NSPredicate(format: "SELF MATCHES %@", "[0-9]")
+        let azRegular = NSPredicate(format: "SELF MATCHES %@", "[A-Z]")
+        var digitList = [ContactInfo]()
+        var specialCharList = [ContactInfo]()
         for contact: User in users {
           // get inital of name
           var name = contact.alias != nil ? contact.alias : contact.userInfo?.nickName
           if name == nil {
             name = contact.userId
           }
-          let inital = name?.initalLetter()
+          let inital = name?.initalLetter() ?? "#"
           let contactInfo = ContactInfo()
           contactInfo.user = contact
           contactInfo.headerBackColor = UIColor.colorWithString(string: contact.showName() ?? "")
 
-          var contactsTemp = weakSelf?.initalDict[inital!]
-          if contactsTemp == nil {
-            contactsTemp = [contactInfo]
-            weakSelf?.initalDict[inital!] = contactsTemp
-          } else {
-            weakSelf?.initalDict[inital!]?.append(contactInfo)
+          if digitRegular.evaluate(with: inital) { // [0-9]
+            digitList.append(contactInfo)
+          } else if !azRegular.evaluate(with: inital) { // [#]
+            specialCharList.append(contactInfo)
+          } else { // [A-Z]
+            if weakSelf?.initalDict[inital] != nil {
+              weakSelf?.initalDict[inital]?.append(contactInfo)
+            } else {
+              weakSelf?.initalDict[inital] = [contactInfo]
+            }
           }
         }
 
-        for key in initalDict.keys {
-          contactList.append(ContactSection(initial: key, contacts: (weakSelf?.initalDict[key]!)!))
+        digitList.sort { s1, s2 in
+          s1.user!.showName()! < s2.user!.showName()!
+        }
+        specialCharList.sort { s1, s2 in
+          s1.user!.showName()! < s2.user!.showName()!
         }
 
-        let result = contactList.sorted { s1, s2 in
+        for key in initalDict.keys {
+          if var value = weakSelf?.initalDict[key] {
+            value.sort { s1, s2 in
+              s1.user!.showName()! < s2.user!.showName()!
+            }
+            contactList.append(ContactSection(initial: key, contacts: value))
+          }
+        }
+
+        var result = contactList.sorted { s1, s2 in
           s1.initial < s2.initial
         }
+        result.append(ContactSection(initial: "#", contacts: digitList + specialCharList))
         completion(result, nil)
       }
     }
@@ -141,19 +161,26 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
   }
 
   func getIndexs(contactSections: [ContactSection]?) -> [String]? {
-    NELog.infoLog(
-      ModuleName + " " + className,
-      desc: #function + ", contactSections.count: \(contactSections?.count ?? 0)"
-    )
-    guard let sections = contactSections else {
-      return nil
-    }
-    var indexs: [String] = []
-    for section in sections {
-      if section.initial.count > 0 {
-        indexs.append(section.initial)
-      }
-    }
+    // 根据用户列表获取导航标签
+//    NELog.infoLog(
+//      ModuleName + " " + className,
+//      desc: #function + ", contactSections.count: \(contactSections?.count ?? 0)"
+//    )
+//    guard let sections = contactSections else {
+//      return nil
+//    }
+//    var indexs: [String] = []
+//    for section in sections {
+//      if section.initial.count > 0 {
+//        indexs.append(section.initial)
+//      }
+//    }
+
+    // ["A"..."Z", "#"]
+    let idx = UnicodeScalar("A").value ... UnicodeScalar("Z").value
+    var indexs = (idx.map { String(UnicodeScalar($0)!) })
+    indexs.append("#")
+
     return indexs
   }
 }

@@ -1,0 +1,753 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		39A2F20E28D9B2C400DDCAF2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F20D28D9B2C400DDCAF2 /* AppDelegate.m */; };
+		39A2F21428D9B2C400DDCAF2 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F21328D9B2C400DDCAF2 /* ViewController.m */; };
+		39A2F21728D9B2C400DDCAF2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 39A2F21528D9B2C400DDCAF2 /* Main.storyboard */; };
+		39A2F21928D9B2C500DDCAF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39A2F21828D9B2C500DDCAF2 /* Assets.xcassets */; };
+		39A2F21C28D9B2C500DDCAF2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 39A2F21A28D9B2C500DDCAF2 /* LaunchScreen.storyboard */; };
+		39A2F21F28D9B2C500DDCAF2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F21E28D9B2C500DDCAF2 /* main.m */; };
+		39A2F22928D9B2C600DDCAF2 /* IMUIKitOCExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F22828D9B2C600DDCAF2 /* IMUIKitOCExampleTests.m */; };
+		39A2F23328D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F23228D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m */; };
+		39A2F23528D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F23428D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m */; };
+		39A2F24728DABC1700DDCAF2 /* NETabbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F24628DABC1700DDCAF2 /* NETabbarController.m */; };
+		39A2F24B28DABC6700DDCAF2 /* NENavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */; };
+		39EBBACA1D04C27BC1E3AEC9 /* Pods_IMUIKitOCExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F8E39DDEB8C36F0E96A1333 /* Pods_IMUIKitOCExample.framework */; };
+		39ED7B1E290FA9C700CAE608 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39ED7B20290FA9C700CAE608 /* Localizable.strings */; };
+		DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD774A7629485F6600347A9E /* CustomRouterViewController.m */; };
+		DDC1AC8929651B6C008C085A /* ConversationController+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = DDC1AC8829651B6C008C085A /* ConversationController+Test.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		39A2F22528D9B2C600DDCAF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39A2F20128D9B2C400DDCAF2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39A2F20828D9B2C400DDCAF2;
+			remoteInfo = IMUIKitOCExample;
+		};
+		39A2F22F28D9B2C600DDCAF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39A2F20128D9B2C400DDCAF2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39A2F20828D9B2C400DDCAF2;
+			remoteInfo = IMUIKitOCExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		147F8282453DD1C889BE79CA /* Pods-IMUIKitOCExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IMUIKitOCExample.release.xcconfig"; path = "Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample.release.xcconfig"; sourceTree = "<group>"; };
+		39A2F20928D9B2C400DDCAF2 /* IMUIKitOCExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IMUIKitOCExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		39A2F20C28D9B2C400DDCAF2 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		39A2F20D28D9B2C400DDCAF2 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		39A2F21228D9B2C400DDCAF2 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		39A2F21328D9B2C400DDCAF2 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		39A2F21628D9B2C400DDCAF2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		39A2F21828D9B2C500DDCAF2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		39A2F21B28D9B2C500DDCAF2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		39A2F21D28D9B2C500DDCAF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		39A2F21E28D9B2C500DDCAF2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		39A2F22428D9B2C600DDCAF2 /* IMUIKitOCExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IMUIKitOCExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39A2F22828D9B2C600DDCAF2 /* IMUIKitOCExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IMUIKitOCExampleTests.m; sourceTree = "<group>"; };
+		39A2F22E28D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IMUIKitOCExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39A2F23228D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IMUIKitOCExampleUITests.m; sourceTree = "<group>"; };
+		39A2F23428D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IMUIKitOCExampleUITestsLaunchTests.m; sourceTree = "<group>"; };
+		39A2F24428DAAC1500DDCAF2 /* AppKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppKey.h; sourceTree = "<group>"; };
+		39A2F24528DABC1700DDCAF2 /* NETabbarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NETabbarController.h; sourceTree = "<group>"; };
+		39A2F24628DABC1700DDCAF2 /* NETabbarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NETabbarController.m; sourceTree = "<group>"; };
+		39A2F24928DABC6700DDCAF2 /* NENavigationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NENavigationController.h; sourceTree = "<group>"; };
+		39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NENavigationController.m; sourceTree = "<group>"; };
+		39ED7B1F290FA9C700CAE608 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		39ED7B24290FAA6E00CAE608 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		39ED7B25290FAA6E00CAE608 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		39ED7B26290FAA6E00CAE608 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		9F8E39DDEB8C36F0E96A1333 /* Pods_IMUIKitOCExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IMUIKitOCExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD774A7529485F6600347A9E /* CustomRouterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomRouterViewController.h; sourceTree = "<group>"; };
+		DD774A7629485F6600347A9E /* CustomRouterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomRouterViewController.m; sourceTree = "<group>"; };
+		DDC1AC8729651B6C008C085A /* ConversationController+Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ConversationController+Test.h"; sourceTree = "<group>"; };
+		DDC1AC8829651B6C008C085A /* ConversationController+Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ConversationController+Test.m"; sourceTree = "<group>"; };
+		DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMUIKitOCExample-Bridging-Header.h"; sourceTree = "<group>"; };
+		F984299B79B347145EA4AF84 /* Pods-IMUIKitOCExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IMUIKitOCExample.debug.xcconfig"; path = "Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		39A2F20628D9B2C400DDCAF2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39EBBACA1D04C27BC1E3AEC9 /* Pods_IMUIKitOCExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22128D9B2C600DDCAF2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22B28D9B2C600DDCAF2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0BEF3C37E3BB9E3AE318BAB8 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F984299B79B347145EA4AF84 /* Pods-IMUIKitOCExample.debug.xcconfig */,
+				147F8282453DD1C889BE79CA /* Pods-IMUIKitOCExample.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		39A2F20028D9B2C400DDCAF2 = {
+			isa = PBXGroup;
+			children = (
+				39A2F20B28D9B2C400DDCAF2 /* IMUIKitOCExample */,
+				39A2F22728D9B2C600DDCAF2 /* IMUIKitOCExampleTests */,
+				39A2F23128D9B2C600DDCAF2 /* IMUIKitOCExampleUITests */,
+				39A2F20A28D9B2C400DDCAF2 /* Products */,
+				0BEF3C37E3BB9E3AE318BAB8 /* Pods */,
+				6B7A97EA6BE0B274CD63D9AC /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		39A2F20A28D9B2C400DDCAF2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				39A2F20928D9B2C400DDCAF2 /* IMUIKitOCExample.app */,
+				39A2F22428D9B2C600DDCAF2 /* IMUIKitOCExampleTests.xctest */,
+				39A2F22E28D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		39A2F20B28D9B2C400DDCAF2 /* IMUIKitOCExample */ = {
+			isa = PBXGroup;
+			children = (
+				39A2F24828DABC2B00DDCAF2 /* Main */,
+				39A2F24428DAAC1500DDCAF2 /* AppKey.h */,
+				39A2F21528D9B2C400DDCAF2 /* Main.storyboard */,
+				39A2F21828D9B2C500DDCAF2 /* Assets.xcassets */,
+				39A2F21A28D9B2C500DDCAF2 /* LaunchScreen.storyboard */,
+				39A2F21D28D9B2C500DDCAF2 /* Info.plist */,
+				39A2F21E28D9B2C500DDCAF2 /* main.m */,
+			);
+			path = IMUIKitOCExample;
+			sourceTree = "<group>";
+		};
+		39A2F22728D9B2C600DDCAF2 /* IMUIKitOCExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				39A2F22828D9B2C600DDCAF2 /* IMUIKitOCExampleTests.m */,
+			);
+			path = IMUIKitOCExampleTests;
+			sourceTree = "<group>";
+		};
+		39A2F23128D9B2C600DDCAF2 /* IMUIKitOCExampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				39A2F23228D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m */,
+				39A2F23428D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m */,
+			);
+			path = IMUIKitOCExampleUITests;
+			sourceTree = "<group>";
+		};
+		39A2F24828DABC2B00DDCAF2 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				39A2F20C28D9B2C400DDCAF2 /* AppDelegate.h */,
+				39A2F20D28D9B2C400DDCAF2 /* AppDelegate.m */,
+				39A2F24528DABC1700DDCAF2 /* NETabbarController.h */,
+				39A2F24628DABC1700DDCAF2 /* NETabbarController.m */,
+				39A2F24928DABC6700DDCAF2 /* NENavigationController.h */,
+				39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */,
+				39A2F21228D9B2C400DDCAF2 /* ViewController.h */,
+				39A2F21328D9B2C400DDCAF2 /* ViewController.m */,
+				DD774A7529485F6600347A9E /* CustomRouterViewController.h */,
+				DD774A7629485F6600347A9E /* CustomRouterViewController.m */,
+				DDC1AC8729651B6C008C085A /* ConversationController+Test.h */,
+				DDC1AC8829651B6C008C085A /* ConversationController+Test.m */,
+				39ED7B20290FA9C700CAE608 /* Localizable.strings */,
+				DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		6B7A97EA6BE0B274CD63D9AC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9F8E39DDEB8C36F0E96A1333 /* Pods_IMUIKitOCExample.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		39A2F20828D9B2C400DDCAF2 /* IMUIKitOCExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39A2F23828D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExample" */;
+			buildPhases = (
+				CDCC4CE4D4082A1DA0D5A888 /* [CP] Check Pods Manifest.lock */,
+				39A2F20528D9B2C400DDCAF2 /* Sources */,
+				39A2F20628D9B2C400DDCAF2 /* Frameworks */,
+				39A2F20728D9B2C400DDCAF2 /* Resources */,
+				DB787379DE2DF44860C11CF1 /* [CP] Embed Pods Frameworks */,
+				8F14E37FD20AEF03EA4142FE /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IMUIKitOCExample;
+			productName = IMUIKitOCExample;
+			productReference = 39A2F20928D9B2C400DDCAF2 /* IMUIKitOCExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		39A2F22328D9B2C600DDCAF2 /* IMUIKitOCExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39A2F23B28D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExampleTests" */;
+			buildPhases = (
+				39A2F22028D9B2C600DDCAF2 /* Sources */,
+				39A2F22128D9B2C600DDCAF2 /* Frameworks */,
+				39A2F22228D9B2C600DDCAF2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39A2F22628D9B2C600DDCAF2 /* PBXTargetDependency */,
+			);
+			name = IMUIKitOCExampleTests;
+			productName = IMUIKitOCExampleTests;
+			productReference = 39A2F22428D9B2C600DDCAF2 /* IMUIKitOCExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		39A2F22D28D9B2C600DDCAF2 /* IMUIKitOCExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39A2F23E28D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExampleUITests" */;
+			buildPhases = (
+				39A2F22A28D9B2C600DDCAF2 /* Sources */,
+				39A2F22B28D9B2C600DDCAF2 /* Frameworks */,
+				39A2F22C28D9B2C600DDCAF2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39A2F23028D9B2C600DDCAF2 /* PBXTargetDependency */,
+			);
+			name = IMUIKitOCExampleUITests;
+			productName = IMUIKitOCExampleUITests;
+			productReference = 39A2F22E28D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		39A2F20128D9B2C400DDCAF2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					39A2F20828D9B2C400DDCAF2 = {
+						CreatedOnToolsVersion = 13.3.1;
+						LastSwiftMigration = 1410;
+					};
+					39A2F22328D9B2C600DDCAF2 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 39A2F20828D9B2C400DDCAF2;
+					};
+					39A2F22D28D9B2C600DDCAF2 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 39A2F20828D9B2C400DDCAF2;
+					};
+				};
+			};
+			buildConfigurationList = 39A2F20428D9B2C400DDCAF2 /* Build configuration list for PBXProject "IMUIKitOCExample" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 39A2F20028D9B2C400DDCAF2;
+			productRefGroup = 39A2F20A28D9B2C400DDCAF2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				39A2F20828D9B2C400DDCAF2 /* IMUIKitOCExample */,
+				39A2F22328D9B2C600DDCAF2 /* IMUIKitOCExampleTests */,
+				39A2F22D28D9B2C600DDCAF2 /* IMUIKitOCExampleUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		39A2F20728D9B2C400DDCAF2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39A2F21C28D9B2C500DDCAF2 /* LaunchScreen.storyboard in Resources */,
+				39ED7B1E290FA9C700CAE608 /* Localizable.strings in Resources */,
+				39A2F21928D9B2C500DDCAF2 /* Assets.xcassets in Resources */,
+				39A2F21728D9B2C400DDCAF2 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22228D9B2C600DDCAF2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22C28D9B2C600DDCAF2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8F14E37FD20AEF03EA4142FE /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CDCC4CE4D4082A1DA0D5A888 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-IMUIKitOCExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DB787379DE2DF44860C11CF1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		39A2F20528D9B2C400DDCAF2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39A2F21428D9B2C400DDCAF2 /* ViewController.m in Sources */,
+				39A2F20E28D9B2C400DDCAF2 /* AppDelegate.m in Sources */,
+				DDC1AC8929651B6C008C085A /* ConversationController+Test.m in Sources */,
+				39A2F24B28DABC6700DDCAF2 /* NENavigationController.m in Sources */,
+				39A2F24728DABC1700DDCAF2 /* NETabbarController.m in Sources */,
+				39A2F21F28D9B2C500DDCAF2 /* main.m in Sources */,
+				DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22028D9B2C600DDCAF2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39A2F22928D9B2C600DDCAF2 /* IMUIKitOCExampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39A2F22A28D9B2C600DDCAF2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39A2F23528D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m in Sources */,
+				39A2F23328D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		39A2F22628D9B2C600DDCAF2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39A2F20828D9B2C400DDCAF2 /* IMUIKitOCExample */;
+			targetProxy = 39A2F22528D9B2C600DDCAF2 /* PBXContainerItemProxy */;
+		};
+		39A2F23028D9B2C600DDCAF2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39A2F20828D9B2C400DDCAF2 /* IMUIKitOCExample */;
+			targetProxy = 39A2F22F28D9B2C600DDCAF2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		39A2F21528D9B2C400DDCAF2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				39A2F21628D9B2C400DDCAF2 /* Base */,
+				39ED7B24290FAA6E00CAE608 /* zh-Hans */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		39A2F21A28D9B2C500DDCAF2 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				39A2F21B28D9B2C500DDCAF2 /* Base */,
+				39ED7B25290FAA6E00CAE608 /* zh-Hans */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		39ED7B20290FA9C700CAE608 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				39ED7B1F290FA9C700CAE608 /* en */,
+				39ED7B26290FAA6E00CAE608 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		39A2F23628D9B2C600DDCAF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		39A2F23728D9B2C600DDCAF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		39A2F23928D9B2C600DDCAF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F984299B79B347145EA4AF84 /* Pods-IMUIKitOCExample.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 569GNZ5392;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IMUIKitOCExample/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "云信IM OC";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 9.2.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "IMUIKitOCExample/Main/IMUIKitOCExample-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		39A2F23A28D9B2C600DDCAF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 147F8282453DD1C889BE79CA /* Pods-IMUIKitOCExample.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 569GNZ5392;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IMUIKitOCExample/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "云信IM OC";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 9.2.9;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "IMUIKitOCExample/Main/IMUIKitOCExample-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		39A2F23C28D9B2C600DDCAF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yunbite.cn.IMUIKitOCExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IMUIKitOCExample.app/IMUIKitOCExample";
+			};
+			name = Debug;
+		};
+		39A2F23D28D9B2C600DDCAF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yunbite.cn.IMUIKitOCExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IMUIKitOCExample.app/IMUIKitOCExample";
+			};
+			name = Release;
+		};
+		39A2F23F28D9B2C600DDCAF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yunbite.cn.IMUIKitOCExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = IMUIKitOCExample;
+			};
+			name = Debug;
+		};
+		39A2F24028D9B2C600DDCAF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yunbite.cn.IMUIKitOCExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = IMUIKitOCExample;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		39A2F20428D9B2C400DDCAF2 /* Build configuration list for PBXProject "IMUIKitOCExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39A2F23628D9B2C600DDCAF2 /* Debug */,
+				39A2F23728D9B2C600DDCAF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39A2F23828D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39A2F23928D9B2C600DDCAF2 /* Debug */,
+				39A2F23A28D9B2C600DDCAF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39A2F23B28D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39A2F23C28D9B2C600DDCAF2 /* Debug */,
+				39A2F23D28D9B2C600DDCAF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39A2F23E28D9B2C600DDCAF2 /* Build configuration list for PBXNativeTarget "IMUIKitOCExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39A2F23F28D9B2C600DDCAF2 /* Debug */,
+				39A2F24028D9B2C600DDCAF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 39A2F20128D9B2C400DDCAF2 /* Project object */;
+}

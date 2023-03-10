@@ -94,17 +94,19 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
       titleLabel.text = user.showName()
       nameLabel.text = user.shortName(count: 2)
 
-//            self.nameLabel.backgroundColor = UIColor(hexString: user.userId!)
-      if let imageUrl = user.userInfo?.avatarUrl {
+      if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
+        NELog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")
         nameLabel.isHidden = true
         avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
       } else {
+        NELog.infoLog("contact p2p cell configData", desc: "imageName is nil")
         nameLabel.isHidden = false
-        avatarImage.image = nil
+        avatarImage.sd_setImage(with: nil)
       }
       arrow.isHidden = true
 
     } else {
+      NELog.infoLog("contact other cell configData", desc: "\(user.alias), image name:\(user.userInfo?.avatarUrl)")
       nameLabel.text = ""
       titleLabel.text = user.alias
       avatarImage.image = UIImage.ne_imageNamed(name: user.userInfo?.avatarUrl)

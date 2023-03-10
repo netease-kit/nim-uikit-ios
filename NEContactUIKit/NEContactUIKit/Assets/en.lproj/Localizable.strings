@@ -7,6 +7,8 @@
 "alert_tip"="tip";
 "alert_sure"="ok";
 "alert_cancel"="cancel";
+
+"account"="Account";
 "noteName"="Nick Name";
 "remove_black" = "Remove";
 
@@ -14,6 +16,7 @@
 "mine_groupchat"="My Group";
 "save"="Save";
 "input_noteName"="Please enter nick name";
+"birthday"="birthday";
 "phone"="mobile";
 "email"="e-mail";
 "sign"="What's Up";
@@ -22,6 +25,7 @@
 "add_blackList"="block";
 "send_friend_apply"="Contact request sent";
 "validation_message"="Verify message";
+"no_validation_message"="No Validation Message";
 "clear"="Clear";
 "agreed"="Added";
 "refused"="Rejected";
@@ -31,12 +35,10 @@
 "select"="Select";
 "select_contact"="Please select Contact";
 "user_not_exist"="No contact";
+"no_friend"="No Friend";
 "chat"="Chat";
 "message_remind"="Message notification";
 "clear_all_validate_message"="Wether to clear all verification";
 "sure_delte_friend"="Wether to delete Contact？";
 "input_userId"="Input user ID";
-
-
-
-
+"space_not_support"="All Spaces are not supported";

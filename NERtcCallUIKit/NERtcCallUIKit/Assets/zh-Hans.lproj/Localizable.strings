@@ -1,0 +1,36 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"switch_to_audio"="切换到语音通话";
+"switch_to_video"="切换到视频通话";
+"accept_failed"="接听失败";
+"network_error"="网络连接异常，请稍后再试";
+"switch_error"="切换失败";
+"remote_cancel"="对方取消";
+"remote_busy"="对方占线";
+"remote_timeout"="对方超时未响应";
+"remote_reject"="对方已经拒绝";
+"other_client_accept"="已被其他端接受";
+"other_client_reject"="已被其他端拒绝";
+
+"permission"="权限请求";
+"reject"="拒绝";
+"agree"="同意";
+"audio_to_video"="对方请求将音频转为视频，需要打开您的摄像头。";
+"video_to_audio"="对方请求将视频转为音频，将直接关闭您的摄像头。";
+"reject_tip"="对方拒绝了您请求";
+
+"invite_audio_call"="邀请您音频通话";
+"invite_video_call"="邀请您视频通话";
+
+"waitting_remote_response"="正在等待对方响应...";
+"call_cancel"="取消";
+"call_reject"="拒绝";
+"call_accept"="接听";
+"call_micro_phone"="麦克风";
+"call_speaker"="扬声器";
+"waitting_remote_accept"="等待对方接听……";
+"calling"="正在呼叫";
+"cancel_failed"="邀请已接受无法取消";

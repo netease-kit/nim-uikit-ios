@@ -46,6 +46,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
 
     // Do any additional setup after loading the view.
     title = localizable("select")
+    emptyView.setttingContent(content: localizable("no_friend"))
 //    setupUI()
 //    setupNavRightItem()
 
@@ -56,6 +57,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
       weakSelf?.setupUI()
       weakSelf?.setupNavRightItem()
       weakSelf?.tableView.reloadData()
+      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.contacts.count ?? 0) > 0
     }
   }
 
@@ -92,6 +94,14 @@ open class ContactsSelectedViewController: ContactBaseViewController {
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       tableView.topAnchor.constraint(equalTo: collection.bottomAnchor),
+    ])
+
+    view.addSubview(emptyView)
+    NSLayoutConstraint.activate([
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
     ])
 
     customCells.forEach { (key: Int, value: AnyClass) in

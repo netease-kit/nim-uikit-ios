@@ -8,15 +8,25 @@ import NECommonUIKit
 import NECoreIMKit
 import NIMSDK
 
+@objc
+public enum TeamSettingType: Int {
+  case Discuss = 0
+  case Senior = 1
+}
+
 @objcMembers
 public class TeamSettingViewController: NEBaseViewController, UICollectionViewDelegate,
   UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDataSource,
   UITableViewDelegate {
-  let viewmodel = TeamSettingViewModel()
+  public let viewmodel = TeamSettingViewModel()
 
-  var teamId: String?
+  public var teamId: String?
 
   var addBtnWidth: NSLayoutConstraint?
+
+  public var teamSettingType: TeamSettingType = .Discuss
+
+  public var isSeniorDiscuss = false // 是否是高级群扩展的讨论组
 
   private let className = "TeamSettingViewController"
 
@@ -104,6 +114,7 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
 
   override public func viewDidLoad() {
     super.viewDidLoad()
+
     title = localizable("setting")
     weak var weakSelf = self
     viewmodel.delegate = self
@@ -116,6 +127,18 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
         if let err = error {
           weakSelf?.showToast(err.localizedDescription)
         } else {
+          if let type = weakSelf?.viewmodel.teamInfoModel?.team?.type {
+            if type == .normal {
+              weakSelf?.teamSettingType = .Discuss
+            } else if type == .advanced {
+              if let custom = weakSelf?.viewmodel.teamInfoModel?.team?.clientCustomInfo, custom.contains(discussTeamKey) {
+                weakSelf?.teamSettingType = .Discuss
+                weakSelf?.isSeniorDiscuss = true
+              } else {
+                weakSelf?.teamSettingType = .Senior
+              }
+            }
+          }
           weakSelf?.contentTable.tableHeaderView = weakSelf?.getHeaderView()
           weakSelf?.contentTable.tableFooterView = weakSelf?.getFooterView()
           weakSelf?.contentTable.reloadData()
@@ -216,7 +239,7 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
       memberLabel.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 12),
     ])
 
-    if let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+    if teamSettingType == .Senior {
       memberLabel.text = localizable("group_memmber")
     } else {
       memberLabel.text = localizable("discuss_mebmer")
@@ -305,9 +328,9 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
   }
 
   func getBottomText() -> String? {
-    if let type = viewmodel.teamInfoModel?.team?.type, type == .normal {
+    if teamSettingType == .Discuss {
       return localizable("leave_discuss")
-    } else if let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+    } else if teamSettingType == .Senior {
       return viewmodel.isOwner() ? localizable("dismiss_team") : localizable("leave_team")
     }
     return nil
@@ -366,23 +389,54 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
 
   func removeTeamForMyself() {
     weak var weakSelf = self
-    if viewmodel.isOwner(), let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
-      showAlert(message: localizable("dissolute_team_chat")) {
-        weakSelf?.dismissTeam()
-      }
-    } else {
-      if let type = viewmodel.teamInfoModel?.team?.type {
-        if type == .advanced {
-          showAlert(message: localizable("quit_team_chat")) {
-            weakSelf?.leveaTeam()
-          }
-        } else if type == .normal {
-          showAlert(message: localizable("quit_discuss_chat")) {
-            weakSelf?.leveaTeam()
-          }
+    if teamSettingType == .Senior {
+      showAlert(message: viewmodel.isOwner() ? localizable("dissolute_team_chat") : localizable("quit_team_chat")) {
+        if weakSelf?.viewmodel.isOwner() == true {
+          weakSelf?.dismissTeam()
+        } else {
+          weakSelf?.leaveTeam()
         }
       }
+    } else if teamSettingType == .Discuss {
+      showAlert(message: localizable("quit_discuss_chat")) {
+        weakSelf?.leaveDiscuss()
+      }
     }
+    /*
+     if viewmodel.isOwner(), let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+       showAlert(message: localizable("dissolute_team_chat")) {
+         weakSelf?.dismissTeam()
+       }
+     } else {
+       if let type = viewmodel.teamInfoModel?.team?.type {
+           if let custom = viewmodel.teamInfoModel?.team?.clientCustomInfo, type == .normal || (type == .advanced && custom.contains(discussTeamKey)) {
+             showAlert(message: localizable("quit_discuss_chat")) {
+               weakSelf?.leveaTeam()
+             }
+           }else if type == .advanced {
+           showAlert(message: localizable("quit_team_chat")) {
+             weakSelf?.leveaTeam()
+           }
+         }
+       }
+     } */
+  }
+
+  func leaveDiscuss() {
+    weak var weakSelf = self
+    if isSeniorDiscuss == true, viewmodel.isOwner() {
+      view.makeToastActivity(.center)
+      viewmodel.transferTeamOwner { error in
+        weakSelf?.view.hideToastActivity()
+        if let err = error {
+          weakSelf?.showToast(err.localizedDescription)
+          return
+        }
+        weakSelf?.navigationController?.popViewController(animated: true)
+      }
+      return
+    }
+    leaveTeam()
   }
 
   func toInfoView() {
@@ -394,7 +448,7 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
   func toMemberList() {
     let memberController = TeamMembersController()
     memberController.datas = viewmodel.teamInfoModel?.users
-    if let type = viewmodel.teamInfoModel?.team?.type, type == .advanced {
+    if teamSettingType == .Senior {
       memberController.isSenior = true
     }
     memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
@@ -585,20 +639,28 @@ extension TeamSettingViewController {
     }
   }
 
-  func leveaTeam() {
+  func leaveTeam() {
     if let tid = teamId {
-      weak var weakSelf = self
       view.makeToastActivity(.center)
-      viewmodel.quitTeam(tid) { error in
+      viewmodel.quitTeam(tid) { [weak self] error in
         NELog.infoLog(
-          ModuleName + " " + self.className,
+          ModuleName + " " + (self?.className ?? "TeamSettingViewController"),
           desc: "CALLBACK quitTeam " + (error?.localizedDescription ?? "no error")
         )
-        weakSelf?.view.hideToastActivity()
+        self?.view.hideToastActivity()
         if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+          self?.showToast(err.localizedDescription)
         } else {
-          weakSelf?.navigationController?.popViewController(animated: true)
+          let session = NIMSession(tid, type: .team)
+          if let stickInfo = self?.viewmodel.getTopSessionInfo(session) {
+            self?.viewmodel.removeStickTop(params: stickInfo) { err, _ in
+              NELog.infoLog(
+                ModuleName + " " + (self?.className ?? "TeamSettingViewController"),
+                desc: "CALLBACK removeStickTop " + (error?.localizedDescription ?? "no error")
+              )
+            }
+          }
+          self?.navigationController?.popViewController(animated: true)
         }
       }
     }
@@ -612,6 +674,8 @@ extension TeamSettingViewController: TeamSettingViewModelDelegate {
 
   func didNeedRefreshUI() {
     contentTable.reloadData()
+    refreshMemberCount()
+    userinfoCollection.reloadData()
   }
 
   func didChangeInviteModeClick(_ model: SettingCellModel) {

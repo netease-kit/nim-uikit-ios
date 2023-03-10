@@ -5,6 +5,7 @@
 import UIKit
 import NEChatKit
 
+@objcMembers
 class ChatLocationLeftCell: ChatBaseLeftCell {
   private lazy var titleLabel: UILabel = {
     let label = UILabel()

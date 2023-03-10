@@ -6,7 +6,6 @@
 import UIKit
 import NIMSDK
 import NECoreKit
-import NEQChatUIKit
 import NECoreIMKit
 import NEConversationUIKit
 import NETeamUIKit
@@ -37,16 +36,6 @@ class NETabBarController: UITabBarController {
     )
     let chatNav = NENavigationController(rootViewController: chat)
 
-    // qchat
-    let qchat = QChatHomeViewController()
-    qchat.view.backgroundColor = UIColor(hexString: "#e9eff5")
-    qchat.tabBarItem = UITabBarItem(
-      title: NSLocalizedString("qchat", comment: ""),
-      image: UIImage(named: "qchat_tabbar_icon"),
-      selectedImage: UIImage(named: "qchat_tabbar_icon")?.withRenderingMode(.alwaysOriginal)
-    )
-    let qChatNav = NENavigationController(rootViewController: qchat)
-
     // Contacts
     let contactVC = ContactsViewController()
     contactVC.tabBarItem = UITabBarItem(
@@ -68,14 +57,14 @@ class NETabBarController: UITabBarController {
     let meNav = NENavigationController(rootViewController: meVC)
 
     tabBar.backgroundColor = .white
-    viewControllers = [chatNav, qChatNav, contactsNav, meNav]
+    viewControllers = [chatNav, contactsNav, meNav]
     selectedIndex = 0
   }
 
   func setUpSessionBadgeValue() {
-    sessionUnreadCount = ConversationRepo().getMsgUnreadCount(notify: true)
+    sessionUnreadCount = ConversationProvider.shared.allUnreadCount(notify: true)
     if sessionUnreadCount > 0 {
-      tabBar.showBadgOn(index: 0)
+      tabBar.showBadgOn(index: 0, tabbarItemNums: 3)
     } else {
       tabBar.hideBadg(on: 0)
     }
@@ -84,9 +73,9 @@ class NETabBarController: UITabBarController {
   func setUpContactBadgeValue() {
     contactUnreadCount = NIMSDK.shared().systemNotificationManager.allUnreadCount()
     if contactUnreadCount > 0 {
-      tabBar.showBadgOn(index: 2)
+      tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
     } else {
-      tabBar.hideBadg(on: 2)
+      tabBar.hideBadg(on: 1)
     }
   }
 

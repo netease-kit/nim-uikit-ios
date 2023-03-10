@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-
+import NECoreIMKit
 public enum NIMEmoticonType: NSInteger {
   case file = 0
   case unicode

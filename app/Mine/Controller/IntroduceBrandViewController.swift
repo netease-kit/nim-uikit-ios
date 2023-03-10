@@ -1,4 +1,3 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -25,7 +24,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
 
   func setupSubviews() {
     view.addSubview(headImage)
-    view.addSubview(headLable)
+    view.addSubview(headLabel)
 
     view.addSubview(tableView)
 
@@ -37,12 +36,11 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
       ),
       headImage.widthAnchor.constraint(equalToConstant: 72),
       headImage.heightAnchor.constraint(equalToConstant: 53),
-
     ])
 
     NSLayoutConstraint.activate([
-      headLable.centerXAnchor.constraint(equalTo: headImage.centerXAnchor),
-      headLable.topAnchor.constraint(equalTo: headImage.bottomAnchor, constant: 10),
+      headLabel.centerXAnchor.constraint(equalTo: headImage.centerXAnchor),
+      headLabel.topAnchor.constraint(equalTo: headImage.bottomAnchor, constant: 10),
     ])
 
     NSLayoutConstraint.activate([
@@ -61,7 +59,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
     return image
   }()
 
-  private lazy var headLable: UILabel = {
+  private lazy var headLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.text = NSLocalizedString("brand_des", comment: "")

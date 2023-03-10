@@ -35,7 +35,6 @@ public class ChatTextRightCell: ChatBaseRightCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageTextModel {
-//            textView.text = m.text
       contentLabel.attributedText = m.attributeStr
     }
   }

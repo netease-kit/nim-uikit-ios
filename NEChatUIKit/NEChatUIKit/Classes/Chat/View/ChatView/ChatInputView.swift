@@ -34,7 +34,7 @@ public protocol ChatInputViewDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
+public class ChatInputView: UIView, ChatRecordViewDelegate,
   InputEmoticonContainerViewDelegate, UITextViewDelegate, NEMoreViewDelagate {
   public weak var delegate: ChatInputViewDelegate?
   public var currentType: ChatMenuType = .text
@@ -43,10 +43,12 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
   public var atCache: NIMInputAtCache?
 
   var textField = RSKPlaceholderTextView()
+  var stackView = UIStackView()
   var contentView = UIView()
   public var contentSubView: UIView?
   private var greyView = UIView()
   private var recordView = ChatRecordView(frame: .zero)
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
@@ -67,9 +69,7 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     textField.clipsToBounds = true
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.backgroundColor = .white
-    //        textField.leftViewMode = .always
     textField.returnKeyType = .send
-    //        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 40))
     textField.delegate = self
     textField.allowsEditingTextAttributes = true
     addSubview(textField)
@@ -98,7 +98,8 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       button.tag = i + 5
       items.append(button)
     }
-    let stackView = UIStackView(arrangedSubviews: items)
+
+    stackView = UIStackView(arrangedSubviews: items)
     stackView.translatesAutoresizingMaskIntoConstraints = false
     stackView.distribution = .fillEqually
     addSubview(stackView)
@@ -244,7 +245,6 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
   public lazy var chatAddMoreView: NEChatMoreActionView = {
     let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.configData(data: NEChatUIKitClient.instance.getMoreActionData())
     view.isHidden = true
     view.delegate = self
     return view
@@ -294,28 +294,6 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       delegate?.textChanged(text: text)
     }
 
-    return true
-  }
-
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    guard let text = textField.text?.trimmingCharacters(in: CharacterSet.whitespaces) else {
-      return true
-    }
-    textField.text = ""
-    delegate?.sendText(text: text)
-    return true
-  }
-
-  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                        replacementString string: String) -> Bool {
-    print("range:\(range) string:\(string)")
-    if string.count == 0 {
-      if let delegate = delegate {
-        return delegate.textDelete(range: range, text: string)
-      }
-    } else {
-      delegate?.textChanged(text: string)
-    }
     return true
   }
 

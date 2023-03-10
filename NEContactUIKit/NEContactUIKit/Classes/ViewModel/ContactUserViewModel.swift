@@ -36,6 +36,11 @@ public class ContactUserViewModel: NSObject {
     return contactRepo.isBlackList(account: account)
   }
 
+  public func removeBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    return contactRepo.removeBlackList(account: account, completion)
+  }
+
   public func update(_ user: User, _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + (user.userId ?? "nil"))
     contactRepo.updateUser(user, completion)

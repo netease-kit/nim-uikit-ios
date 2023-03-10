@@ -5,34 +5,18 @@
 
 import UIKit
 import NECoreKit
-
+import NECoreIMKit
 @objcMembers
 public class FindFriendViewController: ContactBaseViewController, UITextFieldDelegate {
   let viewModel = FindFriendViewModel()
   let noResultView = UIView()
   let hasRequest = false
-
   let searchInput = UITextField()
-
-  lazy var emptyView: UIImageView = {
-    let empty = UIImageView()
-    empty.translatesAutoresizingMaskIntoConstraints = false
-    empty.image = coreLoader.loadImage("user_empty")
-    return empty
-  }()
-
-  lazy var userLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = localizable("user_not_exist")
-    label.textColor = .ne_emptyTitleColor
-    label.font = UIFont.systemFont(ofSize: 14.0)
-    return label
-  }()
 
   override public func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("add_friend")
+    emptyView.setttingContent(content: localizable("user_not_exist"))
     setupUI()
   }
 
@@ -79,6 +63,7 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
     searchInput.font = UIFont.systemFont(ofSize: 14.0)
     searchInput.returnKeyType = .search
     searchInput.delegate = self
+    searchInput.clearButtonMode = .always
 
     NotificationCenter.default.addObserver(
       self,
@@ -93,14 +78,6 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
       emptyView.topAnchor.constraint(equalTo: searchInput.bottomAnchor, constant: 74),
       // emptyView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     ])
-    emptyView.isHidden = true
-
-    view.addSubview(userLabel)
-    NSLayoutConstraint.activate([
-      userLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      userLabel.topAnchor.constraint(equalTo: emptyView.bottomAnchor, constant: 9),
-    ])
-    userLabel.isHidden = true
   }
 
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -119,7 +96,6 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
   func textFieldChange() {
     if let text = searchInput.text, text.count <= 0 {
       emptyView.isHidden = true
-      userLabel.isHidden = true
     }
   }
 
@@ -136,10 +112,8 @@ public class FindFriendViewController: ContactBaseViewController, UITextFieldDel
           let userController = ContactUserViewController(user: user)
           self.navigationController?.pushViewController(userController, animated: true)
           weakSelf?.emptyView.isHidden = true
-          weakSelf?.userLabel.isHidden = true
         } else {
           weakSelf?.emptyView.isHidden = false
-          weakSelf?.userLabel.isHidden = false
         }
       } else {
         self.showToast(error?.localizedDescription ?? "")

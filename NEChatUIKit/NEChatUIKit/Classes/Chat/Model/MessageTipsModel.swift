@@ -8,6 +8,12 @@ import NIMSDK
 
 @objcMembers
 class MessageTipsModel: NSObject, MessageModel {
+  var tipTimeStamp: TimeInterval?
+
+  var isReplay: Bool = false
+
+  var pinToAccount: String?
+  var pinFromAccount: String?
   var isPined: Bool = false
   var pinAccount: String?
   var pinShowName: String?
@@ -23,6 +29,7 @@ class MessageTipsModel: NSObject, MessageModel {
   var isRevoked: Bool = false
   var replyedModel: MessageModel?
   var isRevokedText: Bool = false
+  weak var tipMessage: NIMMessage?
   required init(message: NIMMessage?) {
     if let msg = message {
       if msg.messageType == .notification {
@@ -33,6 +40,8 @@ class MessageTipsModel: NSObject, MessageModel {
         type = .tip
       }
     }
+    tipMessage = message
+    tipTimeStamp = message?.timestamp
     contentSize = CGSize(width: kScreenWidth, height: 35)
     height = 35
   }

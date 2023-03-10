@@ -89,7 +89,7 @@ public class TeamTableViewCell: UITableViewCell {
       avatarImage.sd_setImage(with: URL(string: url), completed: nil)
     } else {
       // random avatar
-      avatarImage.image = randomAvatar(teamId: team.teamId)
+//      avatarImage.image = randomAvatar(teamId: team.teamId)
     }
   }
 
@@ -98,7 +98,7 @@ public class TeamTableViewCell: UITableViewCell {
       return nil
     }
     // mod: 0 1 2 3 4
-    let mod = Int(tid) ?? 0 % 5
+    let mod = (Int(tid) ?? 0) % 5
     let name = "icon_" + String(mod)
     return UIImage.ne_imageNamed(name: name)
   }

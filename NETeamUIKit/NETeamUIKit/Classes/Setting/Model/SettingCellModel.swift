@@ -24,6 +24,7 @@ public class SettingCellModel: NSObject {
   public var type = SettingCellType.SettingArrowCell.rawValue
   public var swichChange: SwitchChangeCompletion?
   public var rowHeight: CGFloat = 49
+  public var titleWidth: CGFloat = 32
   public var cornerType = CornerType.none
   public var headerUrl: String?
   public var cellClick: CellClick?

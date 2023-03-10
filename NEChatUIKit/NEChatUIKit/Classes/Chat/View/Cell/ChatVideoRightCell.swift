@@ -89,7 +89,7 @@ public class ChatVideoRightCell: ChatImageRightCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let videoObject = model.message?.messageObject as? NIMVideoObject {
-      if let path = videoObject.coverPath {
+      if let path = videoObject.coverPath, FileManager.default.fileExists(atPath: path) {
         contentImageView.sd_setImage(
           with: URL(fileURLWithPath: path),
           placeholderImage: nil,

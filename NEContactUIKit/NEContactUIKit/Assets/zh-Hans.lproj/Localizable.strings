@@ -7,6 +7,8 @@
 "alert_tip"="提示";
 "alert_sure"="确定";
 "alert_cancel"="取消";
+
+"account"="账号";
 "noteName"="备注名";
 "remove_black" = "解除";
 
@@ -14,6 +16,7 @@
 "mine_groupchat"="我的群聊";
 "save"="保存";
 "input_noteName"="请输入备注名";
+"birthday"="生日";
 "phone"="手机";
 "email"="邮箱";
 "sign"="个性签名";
@@ -22,6 +25,7 @@
 "add_blackList"="加入黑名单";
 "send_friend_apply"="好友申请已发送";
 "validation_message"="验证消息";
+"no_validation_message"="暂无验证消息";
 "clear"="清空";
 "agreed"="已同意";
 "refused"="已拒绝";
@@ -31,8 +35,10 @@
 "select"="选择";
 "select_contact"="请选择联系人";
 "user_not_exist"="该用户不存在";
+"no_friend"="暂无好友";
 "chat"="聊天";
 "message_remind"="消息提醒";
 "clear_all_validate_message"="是否要清除所有验证消息？";
 "sure_delte_friend"="是否确定删除好友？";
-"input_userId"="输入查找用户id";
+"input_userId"="请输入账号";
+"space_not_support"="不支持全空格";

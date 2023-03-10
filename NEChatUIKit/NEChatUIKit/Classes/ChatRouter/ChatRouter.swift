@@ -28,13 +28,17 @@ public class ChatRouter: NSObject {
       guard let session = param["session"] as? NIMSession else {
         return
       }
-      if let anchor = param["anchor"] as? NIMMessage {
-        let groupVC = GroupChatViewController(session: session, anchor: anchor)
-        nav?.pushViewController(groupVC, animated: true)
-      } else {
-        let groupVC = GroupChatViewController(session: session, anchor: nil)
-        nav?.pushViewController(groupVC, animated: true)
+
+      let anchor = param["anchor"] as? NIMMessage
+      let groupVC = GroupChatViewController(session: session, anchor: anchor)
+      for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+        if vc.isMember(of: GroupChatViewController.self) {
+          nav?.viewControllers[i] = groupVC
+          nav?.popToViewController(groupVC, animated: true)
+          return
+        }
       }
+      nav?.pushViewController(groupVC, animated: true)
     }
   }
 

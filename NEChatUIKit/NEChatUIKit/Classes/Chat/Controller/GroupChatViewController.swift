@@ -46,9 +46,20 @@ open class GroupChatViewController: ChatViewController, TeamChatViewModelDelegat
     if team.inAllMuteMode(), team.owner != NIMSDK.shared().loginManager.currentAccount() {
       menuView.textField.isEditable = false
       menuView.textField.placeholder = chatLocalizable("team_mute") as NSString?
+      layoutInputView(offset: 0)
+      menuView.stackView.isUserInteractionEnabled = false
     } else {
       menuView.textField.isEditable = true
-      menuView.textField.placeholder = (chatLocalizable("send_to") + team.getShowName()) as NSString?
+      let text = "\(chatLocalizable("send_to"))\(team.getShowName())" as NSString?
+//      let attribute = NSMutableAttributedString(string: text)
+//      let style = NSMutableParagraphStyle()
+//      style.lineBreakMode = .byTruncatingTail
+//      style.alignment = .left
+//      attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.count))
+//      attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.count))
+//      attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.count))
+      menuView.textField.placeholder = text
+      menuView.stackView.isUserInteractionEnabled = true
     }
   }
 
@@ -56,9 +67,24 @@ open class GroupChatViewController: ChatViewController, TeamChatViewModelDelegat
 
   public func onTeamRemoved(team: NIMTeam) {
     navigationController?.popViewController(animated: true)
+
+    /* 后续优化逻辑，暂时不做修改
+     if team.clientCustomInfo?.contains(discussTeamKey) == true {
+       navigationController?.popViewController(animated: true)
+       return
+     }
+     if team.teamId == viewmodel.session.sessionId {
+       weak var weakSelf = self
+       showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
+         weakSelf?.navigationController?.popViewController(animated: true)
+       }
+     } */
   }
 
   public func onTeamUpdate(team: NIMTeam) {
+    if team.teamId != viewmodel.session.sessionId {
+      return
+    }
     updateTeamInfo(team: team)
   }
 }

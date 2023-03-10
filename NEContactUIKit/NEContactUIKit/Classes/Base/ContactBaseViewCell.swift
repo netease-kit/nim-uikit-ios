@@ -29,6 +29,7 @@ open class ContactBaseViewCell: UITableViewCell {
     name.textColor = .white
     name.textAlignment = .center
     name.font = UIFont.systemFont(ofSize: 14.0)
+    name.adjustsFontSizeToFitWidth = true
     return name
   }()
 
