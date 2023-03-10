@@ -7,6 +7,18 @@ import UIKit
 
 @objcMembers
 open class ContactBaseViewController: UIViewController {
+  lazy var emptyView: NEEmptyDataView = {
+    let view = NEEmptyDataView(
+      imageName: "user_empty",
+      content: "",
+      frame: CGRect.zero
+    )
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+
+  }()
+
   override public func viewDidLoad() {
     super.viewDidLoad()
 

@@ -111,60 +111,66 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
 
     if isFriend {
       data = [
-        [UserItem(
-          title: localizable("noteName"),
-          detailTitle: user?.alias,
-          value: false,
-          textColor: UIColor.darkText,
-          cellClass: TextWithRightArrowCell.self
-        )],
         [
-          UserItem(title: localizable("phone"), detailTitle: user?.userInfo?.mobile,
+          UserItem(title: localizable("noteName"),
+                   detailTitle: user?.alias,
                    value: false,
-                   textColor: UIColor.darkText, cellClass: TextWithDetailTextCell.self),
-          UserItem(
-            title: localizable("email"),
-            detailTitle: user?.userInfo?.email,
-            value: false,
-            textColor: UIColor.darkText,
-            cellClass: TextWithDetailTextCell.self
-          ),
-          UserItem(
-            title: localizable("sign"),
-            detailTitle: user?.userInfo?.sign,
-            value: false,
-            textColor: UIColor.darkText,
-            cellClass: TextWithDetailTextCell.self
-          ),
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithRightArrowCell.self),
+        ],
+        [
+          UserItem(title: localizable("birthday"),
+                   detailTitle: user?.userInfo?.birth,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("phone"),
+                   detailTitle: user?.userInfo?.mobile,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("email"),
+                   detailTitle: user?.userInfo?.email,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("sign"),
+                   detailTitle: user?.userInfo?.sign,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
         ],
 
-        [UserItem(
-          title: localizable("add_blackList"),
-          detailTitle: "",
-          value: isBlack,
-          textColor: UIColor.darkText,
-          cellClass: TextWithSwitchCell.self
-        )],
         [
-          UserItem(title: localizable("chat"), detailTitle: "", value: false,
-                   textColor: UIColor(hexString: "#337EFF"), cellClass: CenterTextCell.self),
-          UserItem(
-            title: localizable("delete_friend"),
-            detailTitle: "",
-            value: false,
-            textColor: UIColor.red,
-            cellClass: CenterTextCell.self
-          ),
+          UserItem(title: localizable("add_blackList"),
+                   detailTitle: "",
+                   value: isBlack,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithSwitchCell.self),
+        ],
+        [
+          UserItem(title: localizable("chat"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+          UserItem(title: localizable("delete_friend"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor.red,
+                   cellClass: CenterTextCell.self),
         ],
       ]
     } else {
-      data = [[UserItem(
-        title: localizable("add_friend"),
-        detailTitle: user?.alias,
-        value: false,
-        textColor: UIColor(hexString: "#337EFF"),
-        cellClass: CenterTextCell.self
-      )]]
+      data = [
+        [
+          UserItem(title: localizable("add_friend"),
+                   detailTitle: user?.alias,
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+        ],
+      ]
     }
     tableView.reloadData()
   }
@@ -235,7 +241,12 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
       deleteFriend(user: user)
     }
     if item.title == localizable("add_friend") {
-      addFriend()
+      if let uId = user?.userId,
+         viewModel.isFriend(account: uId) {
+        loadData()
+      } else {
+        addFriend()
+      }
     }
   }
 
@@ -334,6 +345,15 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
           NELog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
         } else {
           weakSelf?.showToast(localizable("send_friend_apply"))
+          if let model = weakSelf?.viewModel,
+             model.isBlack(account: account) {
+            weakSelf?.viewModel.removeBlackList(account: account) { err in
+              NELog.infoLog(
+                self.className,
+                desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
+              )
+            }
+          }
         }
       }
     }

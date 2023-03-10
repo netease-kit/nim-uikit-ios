@@ -10,7 +10,7 @@ public class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
   var isPlaying: Bool = false
   var audioImageView = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
   var timeLabel = UILabel()
-
+  var messageId: String?
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -69,6 +69,7 @@ public class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
     if let m = model as? MessageAudioModel {
       timeLabel.text = "\(m.duration)" + "s"
       m.isPlaying ? startAnimation() : stopAnimation()
+      messageId = m.message?.messageId
     }
   }
 }

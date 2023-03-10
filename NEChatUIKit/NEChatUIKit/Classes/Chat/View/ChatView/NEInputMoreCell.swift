@@ -46,16 +46,16 @@ public class NEInputMoreCell: UICollectionViewCell {
   lazy var titleLabel: UILabel = {
     let title = UILabel()
     title.textColor = UIColor.ne_greyText
-    title.font = UIFont.systemFont(ofSize: 12)
+    title.font = UIFont.systemFont(ofSize: 10)
     title.textAlignment = .center
     title.translatesAutoresizingMaskIntoConstraints = false
     return title
   }()
 
-  func config(_ itmeModel: NEMoreItemModel) {
-    cellData = itmeModel
-    avatarImage.image = itmeModel.image
-    titleLabel.text = itmeModel.title
+  func config(_ itemModel: NEMoreItemModel) {
+    cellData = itemModel
+    avatarImage.image = itemModel.customImage == nil ? itemModel.image : itemModel.customImage
+    titleLabel.text = itemModel.title
   }
 
   /// 获取大小

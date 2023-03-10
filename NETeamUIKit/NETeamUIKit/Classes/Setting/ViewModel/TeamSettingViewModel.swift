@@ -6,6 +6,7 @@ import Foundation
 import NETeamKit
 import NIMSDK
 import UIKit
+import NECoreIMKit
 
 protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didClickChangeNick()
@@ -17,22 +18,31 @@ protocol TeamSettingViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class TeamSettingViewModel: NSObject {
-  var sectionData = [SettingSectionModel]()
+public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
+  public var sectionData = [SettingSectionModel]()
 
-  var searchResultInfos: [HistoryMessageModel]?
+  public var searchResultInfos: [HistoryMessageModel]?
 
-  var teamInfoModel: TeamInfoModel?
+  public var teamInfoModel: TeamInfoModel?
 
-  let repo = TeamRepo()
+  public let repo = TeamRepo()
 
-  var memberInTeam: NIMTeamMember?
+  public var memberInTeam: NIMTeamMember?
 
   weak var delegate: TeamSettingViewModelDelegate?
 
   private let className = "TeamSettingViewModel"
 
-  override public init() {}
+  private var usersDic = [String: TeamMemberInfoModel]()
+
+  override public init() {
+    super.init()
+    NIMSDK.shared().teamManager.add(self)
+  }
+
+  deinit {
+    NIMSDK.shared().teamManager.remove(self)
+  }
 
   func getData() {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
@@ -40,6 +50,9 @@ public class TeamSettingViewModel: NSObject {
     sectionData.append(getTwoSection())
     print("current team type : ", teamInfoModel?.team?.type.rawValue as Any)
     if let type = teamInfoModel?.team?.type, type == .advanced {
+      if teamInfoModel?.team?.clientCustomInfo?.contains(discussTeamKey) == true {
+        return
+      }
       sectionData.append(getThreeSection())
       sectionData.append(getFourSection())
     }
@@ -153,6 +166,7 @@ public class TeamSettingViewModel: NSObject {
     return model
   }
 
+  // 群昵称/群禁言
   private func getThreeSection() -> SettingSectionModel {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     let model = SettingSectionModel()
@@ -289,9 +303,16 @@ public class TeamSettingViewModel: NSObject {
     repo.fetchTeamInfo(teamId) { error, teamInfo in
       weakSelf?.teamInfoModel = teamInfo
       print("get team info user: ", teamInfo?.users as Any)
+      teamInfo?.users.forEach { member in
+        print("team meber accid : ", member.nimUser?.userId as Any)
+      }
       print("get team info team: ", teamInfo?.team as Any)
       print("get team info error: ", error as Any)
-
+      teamInfo?.users.forEach { model in
+        if let id = model.nimUser?.userId as? String {
+          weakSelf?.usersDic[id] = model
+        }
+      }
       if error == nil {
         weakSelf?.getData()
         weakSelf?.getCurrentMember(IMKitEngine.instance.imAccid, teamId)
@@ -308,6 +329,18 @@ public class TeamSettingViewModel: NSObject {
   public func quitTeam(_ teamId: String, _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     repo.quitTeam(teamId, completion)
+  }
+
+  public func getTopSessionInfo(_ session: NIMSession) -> NIMStickTopSessionInfo {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(session.sessionId)")
+    return repo.getTopSessionInfo(session)
+  }
+
+  public func removeStickTop(params: NIMStickTopSessionInfo,
+                             _ completion: @escaping (NSError?, NIMStickTopSessionInfo?)
+                               -> Void) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(params.session.sessionId)")
+    repo.removeStickTop(params: params, completion)
   }
 
   @discardableResult
@@ -327,6 +360,38 @@ public class TeamSettingViewModel: NSObject {
       }
     }
     return false
+  }
+
+  private func sampleMemberId(arr: [TeamMemberInfoModel], owner: String) -> String? {
+    var index = arc4random_uniform(UInt32(arr.count))
+    while arr[Int(index)].teamMember?.userId == owner {
+      index = arc4random_uniform(UInt32(arr.count))
+    }
+    return arr[Int(index)].teamMember?.userId
+  }
+
+  func transferTeamOwner(_ completion: @escaping (Error?) -> Void) {
+    if isOwner() == false {
+      completion(NSError(domain: "imuikit", code: -1, userInfo: [NSLocalizedDescriptionKey: "not team manager"]))
+      return
+    }
+
+    guard let members = teamInfoModel?.users, let teamId = teamInfoModel?.team?.teamId else {
+      completion(NSError(domain: "imuikit", code: -1, userInfo: [NSLocalizedDescriptionKey: "team info error"]))
+      return
+    }
+
+    var userId = NIMSDK.shared().loginManager.currentAccount()
+    if members.count == 1 {
+      dismissTeam(teamId, completion)
+      return
+    } else if let sampleOwnerId = sampleMemberId(arr: members, owner: userId) {
+      userId = sampleOwnerId
+    }
+
+    NIMSDK.shared().teamManager.transferManager(withTeam: teamId, newOwnerId: userId, isLeave: true) { error in
+      completion(error)
+    }
   }
 
   public func updateInfoMode(_ mode: NIMTeamUpdateInfoMode, _ teamId: String,
@@ -361,5 +426,25 @@ public class TeamSettingViewModel: NSObject {
         completion(error, nil)
       }
     }
+  }
+
+  public func onTeamMemberRemoved(_ team: NIMTeam, withMembers memberIDs: [String]?) {
+    if let accids = memberIDs {
+      weak var weakSelf = self
+      accids.forEach { accid in
+        if let model = weakSelf?.usersDic[accid] {
+          if let index = weakSelf?.teamInfoModel?.users.firstIndex(of: model) {
+            weakSelf?.teamInfoModel?.users.remove(at: index)
+          }
+        }
+      }
+      delegate?.didNeedRefreshUI()
+    }
+  }
+
+  public func onTeamMemberChanged(_ team: NIMTeam) {}
+
+  public func onTeamUpdated(_ team: NIMTeam) {
+    teamInfoModel?.team = team
   }
 }

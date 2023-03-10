@@ -12,6 +12,13 @@ public class UserInfoHeaderView: UIView {
   public var nameLabel = UILabel()
   public var titleLabel = UILabel()
   public var detailLabel = UILabel()
+  lazy var lineView: UIView = {
+    let view = UIView()
+    view.backgroundColor = .ne_greyLine
+    view.translatesAutoresizingMaskIntoConstraints = false
+    return view
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = .white
@@ -61,6 +68,14 @@ public class UserInfoHeaderView: UIView {
       detailLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
       detailLabel.heightAnchor.constraint(equalToConstant: 22),
     ])
+
+    addSubview(lineView)
+    NSLayoutConstraint.activate([
+      lineView.leftAnchor.constraint(equalTo: leftAnchor),
+      lineView.rightAnchor.constraint(equalTo: rightAnchor),
+      lineView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      lineView.heightAnchor.constraint(equalToConstant: 6),
+    ])
   }
 
   required init?(coder: NSCoder) {
@@ -77,7 +92,7 @@ public class UserInfoHeaderView: UIView {
       avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
       nameLabel.isHidden = true
     }
-    detailLabel.text = user.userId
+
     // title
     var showName = user.alias?.count ?? 0 > 0 ? user.alias : user.userInfo?.nickName
     if showName == nil || showName?.count == 0 {
@@ -90,5 +105,7 @@ public class UserInfoHeaderView: UIView {
           .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
       }
     }
+
+    detailLabel.text = "\(localizable("account")):\(user.userId ?? "")"
   }
 }

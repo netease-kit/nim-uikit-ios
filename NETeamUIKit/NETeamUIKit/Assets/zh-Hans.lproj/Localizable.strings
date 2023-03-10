@@ -33,7 +33,7 @@
 "save"="保存";
 "historical_record"="历史记录";
 "search"="搜索";
-"no_search_results"="暂无搜索结果";
+"no_search_results"="暂无聊天记录";
 "discuss_info"="讨论组信息";
 "group_info"="群信息";
 "discuss_introduce"="讨论组介绍";
@@ -48,3 +48,4 @@
 "discuss_name"="讨论组名称";
 "discuss_intro"="讨论组介绍";
 "invite_has_send"="邀请已发送";
+"space_not_support"="不支持全空格";

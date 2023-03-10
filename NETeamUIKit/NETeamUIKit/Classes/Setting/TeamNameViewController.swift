@@ -20,6 +20,7 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
   var type = ChangeType.TeamName
   var teamMember: NIMTeamMember?
   var repo = TeamRepo()
+  let textLimit = 30
 
   lazy var countLabel: UILabel = {
     let label = UILabel()
@@ -108,7 +109,7 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
       name = n
     }
 
-    countLabel.text = "\(name.count)/30"
+    countLabel.text = "\(name.count)/\(textLimit)"
     textField.text = name
 
     if name.count <= 0, type != .NickName {
@@ -162,24 +163,32 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
   // MARK: objc 方法
 
   func textFieldChange() {
+    if let _ = textField.markedTextRange {
+      return
+    }
     if var text = textField.text {
-      if let lang = textField.textInputMode?.primaryLanguage, lang == "zh-Hans",
-         let selectRange = textField.markedTextRange {
-        let position = textField.position(from: selectRange.start, offset: 0)
-        if position == nil {
-          if text.count > 30 {
-            text = String(text.prefix(30))
-            textField.text = String(text.prefix(30))
-          }
-          figureTextCount(text)
+      if let lang = textField.textInputMode?.primaryLanguage, lang == "zh-Hans" {
+        if text.count > textLimit {
+          text = String(text.prefix(textLimit))
+          textField.text = String(text)
         }
-      } else {
         figureTextCount(text)
       }
     }
   }
 
   func saveName() {
+    if let text = textField.text,
+       !text.isEmpty {
+      let trimText = text.trimmingCharacters(in: .whitespaces)
+      if trimText.isEmpty {
+        view.makeToast(localizable("space_not_support"), duration: 2, position: .center)
+        textField.text = trimText
+        figureTextCount(trimText)
+        return
+      }
+    }
+
     weak var weakSelf = self
     textField.resignFirstResponder()
     if type == .TeamName, let tid = team?.teamId {
@@ -208,21 +217,11 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
       }
     }
   }
-
-  // MAKR: UITextFieldDelegate
-  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                        replacementString string: String) -> Bool {
-    if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
-       text.count > 30 {
-      return false
-    }
-    return true
-  }
 }
 
 extension TeamNameViewController {
   func figureTextCount(_ text: String) {
-    countLabel.text = "\(text.count)/30"
+    countLabel.text = "\(text.count)/\(textLimit)"
     if type == .NickName {
       return
     }

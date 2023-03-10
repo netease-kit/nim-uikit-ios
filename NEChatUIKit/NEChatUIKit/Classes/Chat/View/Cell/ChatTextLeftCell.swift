@@ -20,14 +20,9 @@ public class ChatTextLeftCell: ChatBaseLeftCell {
   func commonUI() {
     contentLabel.translatesAutoresizingMaskIntoConstraints = false
     contentLabel.isEnabled = false
-//        textView.isScrollEnabled = false
-//        textView.showsVerticalScrollIndicator = false
     contentLabel.numberOfLines = 0
     contentLabel.isUserInteractionEnabled = false
-//        textView.textContainer.lineFragmentPadding = 0;
-//        textView.textContainerInset = .zero;
     contentLabel.font = DefaultTextFont(16)
-//        textView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     contentLabel.backgroundColor = .clear
     bubbleImage.addSubview(contentLabel)
     NSLayoutConstraint.activate([
@@ -41,7 +36,6 @@ public class ChatTextLeftCell: ChatBaseLeftCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageTextModel {
-//            textView.text = m.text
       contentLabel.attributedText = m.attributeStr
     }
   }

@@ -33,7 +33,7 @@
 "save"="Save";
 "historical_record"="History";
 "search"="Search";
-"no_search_results"="No content";
+"no_search_results"="No History";
 "discuss_info"="Temp Group Info";
 "group_info"="Group Info";
 "discuss_introduce"="Temp Group Introduce";
@@ -48,3 +48,4 @@
 "discuss_name"="Temp Group Name";
 "discuss_intro"="Temp Group Introduce";
 "invite_has_send"="Invitation sent";
+"space_not_support"="All Spaces are not supported";

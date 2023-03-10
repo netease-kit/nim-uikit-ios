@@ -6,6 +6,7 @@
 //MAKR：common
 "ok"="确认";
 "send_to"="发送给 ";
+
 //MAKR：message
 "send_picture"="发来了一张图片";
 "send_voice"="发来了一段语音";
@@ -61,6 +62,7 @@
 "not_mute" = "解除禁言";
 "mute" = "禁言";
 "team_has_been_removed" = "当前群聊已解散";
+"team_has_quit" = "已退出群聊";
 "join"="进入了";
 "pass"="通过了";
 "leave"="离开了";
@@ -71,7 +73,8 @@
 "team_mute"="当前群主设置为禁言";
 "team_all_mute"="群全体禁言";
 "team_all_no_mute"="取消群全体禁言";
-"pin_text"="标记了这条信息，对话内容双方均可见";
+"pin_text_P2P"="标记了这条信息，对话内容双方均可见";
+"pin_text_team"="标记了这条信息，所有群成员均可见";
 "session_set_top"="聊天置顶";
 "message_remind"="开启消息提醒";
 "open_soon"="暂未开放";
@@ -109,8 +112,8 @@
 "user_select"="选择提醒";
 "user_select_all"="所有人";
 
-"contact_user"="好友";
-"team"="群聊";
+"contact_user"="转发到个人";
+"team"="转发到群组";
 "cancel"="取消";
 "send_to"="发送给";
 "send"="发送";
@@ -121,7 +124,7 @@
 "ymdhm"="yyyy年MM月dd日 HH:mm";
 
 "chat_takePicture"="拍摄";
-"chat_rtc"="音视频";
+"chat_rtc"="音视频通话";
 "chat_location"="位置";
 "chat_file"="文件";
 "gaode_map"="高德地图";
@@ -135,3 +138,15 @@
 "fileSize_over_limit"="当前文件大小超出发送限制，请重新选择";
 
 "message_recalled"="消息已撤回";
+
+"video_call"="视频通话";
+"audio_call"="音频通话";
+
+"call_complete"="通话时长";
+"call_canceled"="已取消";
+"call_rejected"="已拒绝";
+"call_timeout"="超时未接听";
+"call_busy"="忙线未接听";
+
+"editable_time_expired"="已超过可编辑时间";
+"message_not_found"="该消息已移除";

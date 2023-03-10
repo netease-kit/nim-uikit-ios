@@ -1,6 +1,3 @@
-//
-//  NEMoreItemModel.swift
-//  NEChatUIKit
 
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
@@ -20,11 +17,20 @@ public enum NEMoreActionType: Int {
 
 public class NEMoreItemModel: NSObject {
   // 单元图标
-  var image: UIImage?
+  public var image: UIImage?
 
   // 单元名称
-  var title: String?
+  public var title: String?
 
   // 对应的单元类型
-  var type: NEMoreActionType?
+  public var type: NEMoreActionType?
+
+  // 代理类
+  public var customDelegate: AnyObject?
+
+  // 动态事件
+  public var action: Selector?
+
+  // 自定义图标
+  public var customImage: UIImage?
 }

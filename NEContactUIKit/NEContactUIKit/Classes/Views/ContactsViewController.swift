@@ -107,7 +107,9 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
   }
 
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewModel.contacts[section].contacts.count
+    NELog.infoLog(ModuleName + " " + className(), desc: "contact section: \(section), count:\(viewModel.contacts[section].contacts.count)")
+
+    return viewModel.contacts[section].contacts.count
   }
 
   public func tableView(_ tableView: UITableView,
@@ -120,7 +122,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     cell.setModel(info)
     if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
       cell.redAngleView.isHidden = false
-      cell.redAngleView.text = "\(viewModel.unreadCount)"
+      cell.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
     } else {
       cell.redAngleView.isHidden = true
     }

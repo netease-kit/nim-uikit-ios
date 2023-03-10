@@ -106,6 +106,14 @@ extension ConversationController: ConversationNavViewDelegate {
     }
     items.append(addFriend)
 
+    let createGroup = PopListItem()
+    createGroup.showName = localizable("create_discussion_group")
+    createGroup.image = UIImage.ne_imageNamed(name: "create_discussion")
+    createGroup.completion = {
+      weakSelf?.createDiscussGroup()
+    }
+    items.append(createGroup)
+
     let createDicuss = PopListItem()
     createDicuss.showName = localizable("create_senior_group")
     createDicuss.image = UIImage.ne_imageNamed(name: "create_group")
@@ -190,6 +198,7 @@ extension ConversationController: ConversationNavViewDelegate {
     if message.messageType == .text {
       muta[revokeLocalMessageContent] = message.text
     }
+    messageNew.timestamp = message.timestamp
     messageNew.from = message.from
     messageNew.localExt = muta
     let setting = NIMMessageSetting()

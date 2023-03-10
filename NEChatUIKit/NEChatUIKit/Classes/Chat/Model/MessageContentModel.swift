@@ -11,6 +11,8 @@ import NECoreIMKit
 
 @objcMembers
 public class MessageContentModel: NSObject, MessageModel {
+  public var isReplay: Bool = false
+
   public var pinAccount: String?
   public var pinShowName: String?
   public var type: MessageType = .custom
@@ -27,7 +29,7 @@ public class MessageContentModel: NSObject, MessageModel {
 
   public var replyedModel: MessageModel? {
     didSet {
-      if let reply = replyedModel as? MessageContentModel {
+      if let reply = replyedModel as? MessageContentModel, reply.isReplay == true {
         replyText = ReplyMessageUtil.textForReplyModel(model: reply)
         if let t = replyText {
           let size = String.getTextRectSize(
@@ -62,12 +64,12 @@ public class MessageContentModel: NSObject, MessageModel {
         if let time = message?.timestamp {
           let date = Date()
           let currentTime = date.timeIntervalSince1970
-          if currentTime - time > 60 * 5 {
+          if currentTime - time > 60 * 2 {
             timeOut = true
           }
         }
         // 只有文本消息，才计算可编辑按钮的宽度
-        if let isSend = message?.isOutgoingMsg, isSend, message?.messageType == .text, isRevokedText == true, timeOut == false {
+        if let isSend = message?.isOutgoingMsg, isSend, message?.messageType == .text, timeOut == false {
           contentSize = CGSize(width: 218, height: qChat_min_h)
         } else {
           contentSize = CGSize(width: 130, height: qChat_min_h)

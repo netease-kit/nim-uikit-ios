@@ -55,6 +55,7 @@
 "not_mute" = "unmute";
 "mute" = "mute";
 "team_has_been_removed" = "This group was removed";
+"team_has_quit" = "Group chat has exited";
 "join"="joined";
 "pass"="Passed";
 "leave"="leave";
@@ -66,7 +67,8 @@
 "team_all_mute"="Mute all";
 "team_all_no_mute"="Unmute";
 
-"pin_text"="pinned this message for both";
+"pin_text_P2P"="pinned this message for both";
+"pin_text_team"="pinned this message for both all";
 
 "session_set_top"="sticky to top";
 "message_remind"="open notification";
@@ -106,8 +108,8 @@
 "user_select"="notification";
 "user_select_all"="all";
 
-"contact_user"="contacts";
-"team"="group";
+"contact_user"="Forward to contacts";
+"team"="Forward to group";
 "cancel"="cancel";
 "send_to"="send to";
 "send"="send";
@@ -117,18 +119,30 @@
 "mdhm"="MM.dd HH:mm";
 "ymdhm"="yyyy.MM.dd HH:mm";
 
-"chat_takePicture"="拍摄";
-"chat_rtc"="音视频";
-"chat_location"="位置";
-"chat_file"="文件";
-"gaode_map"="高德地图";
-"tencent_map"="腾讯地图";
+"chat_takePicture"="Capture video";
+"chat_rtc"="Audio and video call";
+"chat_location"="Location";
+"chat_file"="File";
+"gaode_map"="高德 Map";
+"tencent_map"="腾讯 Map";
 "search_place"="Search Location";
-"search_cancel"="取消";
+"search_cancel"="cancel";
 "distance_inner"="内";
 "search_result_empty"="Not found";
-"no_map_plugin"="未集成地图模块";
-"location_not_auth"="地理位置未授权，请去设置中开启";
+"no_map_plugin"="Map module not integrated";
+"location_not_auth"="The geographic location is not authorized. Please open it in the settings";
 "fileSize_over_limit"="Oops！File size limit.";
 
 "message_recalled"="message recalled";
+
+"video_call"="Video call";
+"audio_call"="Audio call";
+
+"call_complete"="Talk time";
+"call_canceled"="Call cancellation";
+"call_rejected"="Rejected";
+"call_timeout"="No answer after timeout";
+"call_busy"="The busy line is not answered";
+
+"editable_time_expired"="Editable time has expired";
+"message_not_found"="This message is gone";

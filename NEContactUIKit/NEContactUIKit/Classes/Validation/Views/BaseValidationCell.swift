@@ -5,6 +5,7 @@
 
 import UIKit
 import NECoreIMKit
+import NIMSDK
 
 @objcMembers
 public class BaseValidationCell: ContactBaseViewCell {
@@ -61,20 +62,34 @@ public class BaseValidationCell: ContactBaseViewCell {
     var nickName = ""
     var teamName = ""
     // 设置操作者名称
-    if let nick = model.sourceName {
+
+    if let alias = model.userInfo?.alias {
+      nickName = alias
+    } else if let nick = model.userInfo?.userInfo?.nickName {
       nickName = nick
+    } else if let source = model.sourceName {
+      nickName = source
+    }
+
+    if model.userInfo == nil, let uid = model.sourceID {
+      let user = NIMSDK.shared().userManager.userInfo(uid)
+      if let alias = user?.alias {
+        nickName = alias
+      } else if let nick = user?.userInfo?.nickName {
+        nickName = nick
+      }
     }
     // 设置头像
-    if let headerUrl = model.userInfo?.userInfo?.avatarUrl {
+    if let headerUrl = model.userInfo?.userInfo?.avatarUrl, !headerUrl.isEmpty {
       avatarImage.sd_setImage(with: URL(string: headerUrl), completed: nil)
       titleLabel.text = ""
-    } else if let teamUrl = model.teamInfo?.avatarUrl {
+    } else if let teamUrl = model.teamInfo?.avatarUrl, !teamUrl.isEmpty {
       avatarImage.sd_setImage(with: URL(string: teamUrl), completed: nil)
       titleLabel.text = ""
     } else {
       // 无头像设置其name
-      if let name = model.sourceName {
-        showNameOnCircleHeader(name)
+      if !nickName.isEmpty {
+        showNameOnCircleHeader(nickName)
       } else {
         if let id = model.sourceID {
           showNameOnCircleHeader(id)
@@ -114,6 +129,8 @@ public class BaseValidationCell: ContactBaseViewCell {
         titleLabelContent = "\(nickName) 通过好友申请"
       case .addFriendReject:
         titleLabelContent = "\(nickName) 拒绝好友申请"
+      @unknown default:
+        titleLabelContent = "\(nickName) 未知操作"
       }
     }
 

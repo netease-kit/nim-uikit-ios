@@ -5,7 +5,7 @@
 import Foundation
 import NIMSDK
 import CoreText
-
+import NECoreIMKit
 @objc
 public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
   func onTeamRemoved(team: NIMTeam)
@@ -14,7 +14,6 @@ public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
 
 @objcMembers
 public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
-  public var team: NIMTeam?
   private let className = "TeamChatViewModel"
 //    override init(session: NIMSession) {
 //        super.init(session: session)

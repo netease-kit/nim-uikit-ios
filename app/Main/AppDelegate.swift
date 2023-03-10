@@ -1,45 +1,56 @@
 
-// Copyright (c) 2022 NetEase, Inc.  All rights reserved.
-// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
 
 import UIKit
 import NEContactUIKit
 import YXLogin
 import NECoreKit
 import NIMSDK
-import NEQChatUIKit
 import NECoreIMKit
 import NEConversationUIKit
 import NETeamUIKit
 import NEChatUIKit
 import NEMapKit
+import NERtcCallKit
+import NERtcCallUIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     public var window: UIWindow?
+    
     private var tabbarCtrl = UITabBarController()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
         window?.backgroundColor = .white
         setupInit()
         NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
         registerAPNS()
         return true
     }
+    
         
     func setupInit(){
+        
         // init
         let option = NIMSDKOption()
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
-        
 
         NEKeyboardManager.shared.enable = true
         NEKeyboardManager.shared.shouldResignOnTouchOutside = true
-       
-        //login action
-        startLogin(account: <#imAccid#>, token: <#imToken#>)
-
+        
+        weak var weakSelf = self
+        IMKitClient.instance.loginIM("<#accid#>", "<#token#>") { error in
+            if let err = error {
+                print("NEKitCore login error : ", err)
+            }else {
+                ChatRouter.setupInit()
+                weakSelf?.initializePage()
+            }
+        }
     }
     
     @objc func refreshRoot(){
@@ -79,46 +90,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NELog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
-    func startLogin(account:String,token:String){
-        weak var weakSelf = self
-        IMKitClient.instance.loginIM(account, token) { error in
-            if let err = error {
-                print("NEKitCore login error : ", err)
-            }else {
-                ChatRouter.setupInit()
-                let param = QChatLoginParam(account,token)
-                IMKitClient.instance.loginQchat(param) { error, response in
-                    if let err = error {
-                        print("qchatLogin failed, error : ", err)
-                    }else {
-                        weakSelf?.setupTabbar()
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    func setupTabbar() {
+    func initializePage() {
         self.window?.rootViewController = NETabBarController()
         loadService()
     }
     
-    //路由注册
+//    regist router
     func loadService() {
+        //TODO: service
         ContactRouter.register()
         ChatRouter.register()
         TeamRouter.register()
         ConversationRouter.register()
+        
+        //地图map初始化
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
+        
+        /* 聊天面板外部扩展示例
+        let item = NEMoreItemModel()
+        item.customDelegate = self
+        item.action = #selector(testLog)
+        item.customImage = UIImage(named: "chatSelect")
+        NEChatUIKitClient.instance.moreAction.append(item)
+         */
+        
+        //呼叫组件初始化
+        let option = NERtcCallOptions()
+        option.apnsCerName = AppKey.pushCerName
+        option.isDisableLog = true
+        let uiConfig = NERtcCallUIConfig()
+        uiConfig.option = option
+        uiConfig.appKey = AppKey.appKey
+        uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
+        NERtcCallKit.sharedInstance().timeOutSeconds = 30
+        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+       
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
                 let me = PersonInfoViewController()
                 nav.pushViewController(me, animated: true)
             }
         }
-        
-        //地图map初始化
-        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
     }
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {

@@ -8,13 +8,12 @@ import NIMSDK
 
 @objcMembers
 class MessageTextModel: MessageContentModel {
-//    public var text: String?
   public var attributeStr: NSAttributedString?
 
   required init(message: NIMMessage?) {
     super.init(message: message)
     type = .text
-//        text = message?.text
+
     attributeStr = NEEmotionTool.getAttWithStr(
       str: message?.text ?? "",
       font: NEKitChatConfig.shared.ui.messageFont
@@ -35,6 +34,6 @@ class MessageTextModel: MessageContentModel {
 
     height = Float(contentSize.height + qChat_margin) + fullNameHeight
 
-    print(">>text:\(message?.text) height:\(height)")
+//    print(">>text:\(message?.text) height:\(height)")
   }
 }

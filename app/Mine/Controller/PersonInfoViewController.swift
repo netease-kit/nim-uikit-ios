@@ -1,4 +1,3 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -9,6 +8,7 @@ import NETeamUIKit
 import NEChatUIKit
 import NIMSDK
 
+@objcMembers
 class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   UINavigationControllerDelegate, PersonInfoViewModelDelegate, UITableViewDelegate,
   UITableViewDataSource {
@@ -69,8 +69,8 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     second.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
 
     let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""),
-                               style: .cancel) { action in
-    }
+                               style: .cancel)
+
     cancel.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
 
     alert.addAction(first)
@@ -130,7 +130,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   // MARK: NIMUserManagerDelegate
 
   func onUserInfoChanged(_ user: NIMUser) {
-    if user.userId == IMKitClient.instance.imAccid {
+    if user.userId == IMKitEngine.instance.imAccid {
       viewModel.getData()
       tableView.reloadData()
     }
@@ -151,7 +151,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     weak var weakSelf = self
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
       let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitClient.instance.imAccid)
+        .appending(IMKitEngine.instance.imAccid)
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         NIMSDK.shared().resourceManager
@@ -190,7 +190,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateNickName(name: editText) { error in
         if error != nil {
-          weakSelf?.showToast(NSLocalizedString("setting_nickname_failure", comment: ""))
+          weakSelf?.showToastInWindow(NSLocalizedString("setting_nickname_failure", comment: ""))
+        } else {
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
@@ -225,7 +227,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateMobile(mobile: editText) { error in
         if error != nil {
-          weakSelf?.showToast(NSLocalizedString("change_phone_failure", comment: ""))
+          weakSelf?.showToastInWindow(NSLocalizedString("change_phone_failure", comment: ""))
+        } else {
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
@@ -240,7 +244,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateEmail(email: editText) { error in
         if error != nil {
-          weakSelf?.showToast(NSLocalizedString("change_email_failure", comment: ""))
+          weakSelf?.showToastInWindow(NSLocalizedString("change_email_failure", comment: ""))
+        } else {
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }
@@ -255,7 +261,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSign(sign: editText) { error in
         if error != nil {
-          weakSelf?.showToast(NSLocalizedString("change_sign_failure", comment: ""))
+          weakSelf?.showToastInWindow(NSLocalizedString("change_sign_failure", comment: ""))
+        } else {
+          weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
     }

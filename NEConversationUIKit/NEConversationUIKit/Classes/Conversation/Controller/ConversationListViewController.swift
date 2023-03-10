@@ -12,6 +12,18 @@ open class ConversationListViewController: UIViewController {
   private let className = "ConversationListViewController"
   private var tableViewTopConstraint: NSLayoutConstraint?
 
+  private lazy var emptyView: NEEmptyDataView = {
+    let view = NEEmptyDataView(
+      imageName: "user_empty",
+      content: localizable("session_empty"),
+      frame: CGRect.zero
+    )
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+
+  }()
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     setupSubviews()
@@ -48,6 +60,7 @@ open class ConversationListViewController: UIViewController {
 
   open func setupSubviews() {
     view.addSubview(tableView)
+    view.addSubview(emptyView)
     view.addSubview(brokenNetworkView)
 
     NSLayoutConstraint.activate([
@@ -57,6 +70,13 @@ open class ConversationListViewController: UIViewController {
     ])
     tableViewTopConstraint = tableView.topAnchor.constraint(equalTo: view.topAnchor)
     tableViewTopConstraint?.isActive = true
+
+    NSLayoutConstraint.activate([
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
+    ])
   }
 
   func requestData() {
@@ -68,8 +88,14 @@ open class ConversationListViewController: UIViewController {
     viewModel.fetchServerSessions(option: params) { error, recentSessions in
       if error == nil {
         NELog.infoLog(ModuleName + " " + self.className, desc: "✅CALLBACK fetchServerSessions SUCCESS")
-        DispatchQueue.main.async {
-          weakSelf?.tableView.reloadData()
+        if let recentList = recentSessions {
+          NELog.infoLog(ModuleName + " " + self.className, desc: "✅CALLBACK fetchServerSessions SUCCESS count : \(recentList.count)")
+          if recentList.count > 0 {
+            weakSelf?.emptyView.isHidden = true
+            weakSelf?.reloadTableView()
+          } else {
+            weakSelf?.emptyView.isHidden = false
+          }
         }
 
       } else {
@@ -77,6 +103,7 @@ open class ConversationListViewController: UIViewController {
           ModuleName + " " + self.className,
           desc: "❌CALLBACK fetchServerSessions failed，error = \(error!)"
         )
+        weakSelf?.emptyView.isHidden = false
       }
     }
   }
@@ -169,7 +196,10 @@ extension ConversationListViewController {
 
 extension ConversationListViewController: UITableViewDelegate, UITableViewDataSource {
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewModel.conversationListArray?.count ?? 0
+    let count = viewModel.conversationListArray?.count ?? 0
+    NELog.infoLog(ModuleName + " " + "ConversationListViewController",
+                  desc: "numberOfRowsInSection count : \(count)")
+    return count
   }
 
   public func tableView(_ tableView: UITableView,
@@ -178,9 +208,11 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
       withIdentifier: "\(NSStringFromClass(ConversationListCell.self))",
       for: indexPath
     ) as! ConversationListCell
-    let conversationModel = viewModel.conversationListArray?[indexPath.row]
-    cell.topStickInfos = viewModel.stickTopInfos
-    cell.configData(sessionModel: conversationModel)
+    if let count = viewModel.conversationListArray?.count, count > indexPath.row {
+      let conversationModel = viewModel.conversationListArray?[indexPath.row]
+      cell.topStickInfos = viewModel.stickTopInfos
+      cell.configData(sessionModel: conversationModel)
+    }
     return cell
   }
 
@@ -215,25 +247,6 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
         model: conversationModel ?? ConversationListModel(),
         indexPath: indexPath
       )
-
-      // 删除cell
-      if let stickTopInfo = weakSelf?.viewModel.stickTopInfoForSession(session: session) {
-        weakSelf?.viewModel
-          .removeStickTopSession(params: stickTopInfo) { error, topSessionInfo in
-            if let err = error {
-              NELog.errorLog(
-                ModuleName + " " + (weakSelf?.className ?? "ConversationListViewController"),
-                desc: "❌CALLBACK removeStickTopSession failed，error = \(err)"
-              )
-              return
-            }
-            NELog.infoLog(
-              ModuleName + " " + (weakSelf?.className ?? "ConversationListViewController"),
-              desc: "✅CALLBACK removeStickTopSession SUCCESS"
-            )
-            weakSelf?.viewModel.stickTopInfos[session] = nil
-          }
-      }
     }
 
     // 置顶和取消置顶
@@ -355,6 +368,8 @@ extension ConversationListViewController {
 
 extension ConversationListViewController: ConversationViewModelDelegate {
   public func didAddRecentSession() {
+    NELog.infoLog("ConversationListViewController", desc: "didAddRecentSession")
+    emptyView.isHidden = (viewModel.conversationListArray?.count ?? 0) > 0
     viewModel.sortRecentSession()
     tableView.reloadData()
   }
@@ -365,6 +380,7 @@ extension ConversationListViewController: ConversationViewModelDelegate {
   }
 
   public func reloadTableView() {
+    emptyView.isHidden = (viewModel.conversationListArray?.count ?? 0) > 0
     viewModel.sortRecentSession()
     tableView.reloadData()
   }

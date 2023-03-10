@@ -151,6 +151,7 @@ open class ConversationSearchController: ConversationBaseViewController, UITable
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
     tableView.delegate = self
     tableView.dataSource = self
     tableView.register(
@@ -279,6 +280,7 @@ open class ConversationSearchController: ConversationBaseViewController, UITable
       ) as! SearchSessionHeaderView
     sectionView.setUpTitle(title: headTitleArr[section])
     sectionView.backgroundView = UIView()
+    sectionView.backgroundView?.backgroundColor = .white
     return sectionView
   }
 

@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-
+import NECoreIMKit
 @objc public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }

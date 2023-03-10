@@ -7,6 +7,7 @@ import Foundation
 @_exported import NECoreKit
 @_exported import NECommonUIKit
 @_exported import NECommonKit
+@_exported import NECoreIMKit
 
 let coreLoader = CoreLoader<ChatBaseViewController>()
 func chatLocalizable(_ key: String) -> String {

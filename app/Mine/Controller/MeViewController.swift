@@ -8,7 +8,6 @@ import YXLogin
 import NECoreKit
 import NIMSDK
 import NECoreIMKit
-import NEQChatUIKit
 
 class MeViewController: UIViewController {
   private let mineData = [
@@ -59,7 +58,7 @@ class MeViewController: UIViewController {
         header.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
         header.topAnchor.constraint(
           equalTo: self.view.safeAreaLayoutGuide.topAnchor,
-          constant: 20
+          constant: 32
         ),
         header.widthAnchor.constraint(equalToConstant: 60),
         header.heightAnchor.constraint(equalToConstant: 60),
@@ -68,7 +67,7 @@ class MeViewController: UIViewController {
       // Fallback on earlier versions
       NSLayoutConstraint.activate([
         header.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-        header.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+        header.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
         header.widthAnchor.constraint(equalToConstant: 60),
         header.heightAnchor.constraint(equalToConstant: 60),
       ])
@@ -130,7 +129,7 @@ class MeViewController: UIViewController {
   }
 
   func updateUserInfo() {
-    let user = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
+    let user = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
     idLabel.text = "\(NSLocalizedString("account", comment: "")):\(user?.userId ?? "")"
     nameLabel.text = user?.userInfo?.nickName
     header.configHeadData(headUrl: user?.userInfo?.avatarUrl, name: user?.showName() ?? "")

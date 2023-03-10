@@ -31,4 +31,11 @@ class NENavigationController: UINavigationController {
     }
     super.pushViewController(viewController, animated: true)
   }
+
+  override func popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
+    if children.count > 0 {
+      viewController.hidesBottomBarWhenPushed = true
+    }
+    return super.popToViewController(viewController, animated: animated)
+  }
 }

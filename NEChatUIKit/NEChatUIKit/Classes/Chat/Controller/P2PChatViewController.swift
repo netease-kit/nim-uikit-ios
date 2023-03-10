@@ -20,6 +20,16 @@ open class P2PChatViewController: ChatViewController {
     title = showName
     titleContent = showName
     menuView.textField.placeholder = (chatLocalizable("send_to") + showName) as NSString?
+//    let text = "\(chatLocalizable("send_to"))\(showName))"
+//      menuView.textField.placeholder = text
+//    let attribute = NSMutableAttributedString(string: text)
+//    let style = NSMutableParagraphStyle()
+//    style.lineBreakMode = .byTruncatingTail
+//    style.alignment = .left
+//    attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.count))
+//    attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.count))
+//    attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.count))
+//    menuView.textField.attributedPlaceholder = attribute
   }
 
   /// 创建个人聊天页构造方法

@@ -8,7 +8,6 @@ import NIMSDK
 
 let revokeLocalMessage = "revoke_message_local"
 let revokeLocalMessageContent = "revoke_message_local_content"
-// let firstInit = "first_init"
 
 public protocol ConversationViewModelDelegate: NSObjectProtocol {
   func didAddRecentSession()
@@ -23,9 +22,10 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   public var stickTopInfos = [NIMSession: NIMStickTopSessionInfo]()
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
-  let repo = ConversationRepo()
+  public let repo = ConversationRepo()
 
   var cacheUpdateSessionDic = [String: NIMRecentSession]()
+  var cacheAddSessionDic = [String: ConversationListModel]()
 
   override public init() {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
@@ -43,18 +43,46 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
     repo.getSessionList { error, conversaitonList in
-      weakSelf?.conversationListArray = conversaitonList
-      print("get session list : ", conversaitonList?.count as Any)
-      conversaitonList?.forEach { model in
-        if let recentSession = model.recentSession, let sid = recentSession.session?.sessionId {
-          if let recent = weakSelf?.cacheUpdateSessionDic[sid] {
-            if let time1 = recentSession.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 < time2 {
-              model.recentSession = recent
+      DispatchQueue.main.async {
+        weakSelf?.conversationListArray = conversaitonList
+        NELog.infoLog(ModuleName, desc: "get session list : \(conversaitonList?.count ?? 0)")
+        var set = Set<String>()
+        conversaitonList?.forEach { model in
+          NELog.infoLog(ModuleName, desc: "get session sid : \(model.recentSession?.session?.sessionId ?? "nil")")
+          if let recentSession = model.recentSession, let sid = recentSession.session?.sessionId {
+            set.insert(sid)
+            if let recent = weakSelf?.cacheUpdateSessionDic[sid] {
+              NELog.infoLog(ModuleName, desc: "cacheUpdateSessionDic fitler sid: \(recent.session?.sessionId ?? "nil")")
+              if let time1 = recentSession.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 < time2 {
+                model.recentSession = recent
+              }
+            }
+
+            if let recent = weakSelf?.cacheAddSessionDic[sid]?.recentSession {
+              NELog.infoLog(ModuleName, desc: "cacheAddSessionDic fitler sid: \(recent.session?.sessionId ?? "nil")")
+              if let time1 = recentSession.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 < time2 {
+                model.recentSession = recent
+              }
             }
           }
         }
+        NELog.infoLog(ModuleName, desc: "cacheAddSessionDic count: \(weakSelf?.cacheAddSessionDic.count ?? 0)")
+        weakSelf?.cacheAddSessionDic.forEach { (key: String, value: ConversationListModel) in
+          NELog.infoLog(ModuleName, desc: "cacheAddSessionDic  key: \(key)")
+          if set.contains(key) == false {
+            if let recent = weakSelf?.cacheUpdateSessionDic[key] {
+              if let time1 = value.recentSession?.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 < time2 {
+                value.recentSession = recent
+              }
+            }
+            NELog.infoLog(ModuleName, desc: "cacheAddSessionDic : \(key)")
+            weakSelf?.conversationListArray?.append(value)
+          }
+        }
+        weakSelf?.cacheAddSessionDic.removeAll()
+        NELog.infoLog(ModuleName, desc: "conversationListArray count : \(weakSelf?.conversationListArray?.count ?? 0)")
+        completion(error, weakSelf?.conversationListArray)
       }
-      completion(error, weakSelf?.conversationListArray)
     }
   }
 
@@ -182,13 +210,13 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   // MARK: ==================== ConversationRepoDelegate ==========================
 
   public func onNotifyAddStickTopSession(_ newInfo: NIMStickTopSessionInfo) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + newInfo.session.sessionId)
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ",onNotifyAddStickTopSession sessionId:" + newInfo.session.sessionId)
     stickTopInfos[newInfo.session] = newInfo
     delegate?.reloadTableView()
   }
 
   public func onNotifyRemoveStickTopSession(_ removedInfo: NIMStickTopSessionInfo) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + removedInfo.session.sessionId)
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ",onNotifyRemoveStickTopSession  sessionId:" + removedInfo.session.sessionId)
     stickTopInfos[removedInfo.session] = nil
     delegate?.reloadTableView()
   }
@@ -202,25 +230,64 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
       NELog.errorLog(ModuleName + " " + className, desc: "❌sessionId is nil")
       return
     }
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", targetId:" + targetId)
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + targetId)
+    DispatchQueue.main.async {}
+    if let object = recentSession.lastMessage?.messageObject as? NIMNotificationObject, object.notificationType == .team {
+      if let content = object.content as? NIMTeamNotificationContent {
+        if content.operationType == .dismiss || (content.operationType == .leave && content.sourceID == NIMSDK.shared().loginManager.currentAccount()) {
+          NELog.infoLog(
+            ModuleName + " " + className,
+            desc: #function + "didAdd team dismiss or leave noti" + (recentSession.session?.sessionId ?? "nil")
+          )
+          repo.deleteLocalSession(recentSession: recentSession)
+          return
+        }
+      }
+    }
+
     weak var weakSelf = self
-    let listModel = ConversationListModel()
+    var listModel = ConversationListModel()
+    if let sid = recentSession.session?.sessionId {
+      print("session session id : ", sid)
+      if let model = cacheAddSessionDic[sid] {
+        listModel = model
+        NELog.infoLog(
+          ModuleName + " " + className,
+          desc: #function + "didAdd team has added" + (recentSession.session?.sessionId ?? "nil")
+        )
+      }
+      cacheAddSessionDic[sid] = listModel
+    }
     listModel.recentSession = recentSession
     if recentSession.session?.sessionType == .P2P {
       repo.getUserInfo(userId: targetId) { user, error in
         if error == nil {
-          DispatchQueue.main.async {
-            listModel.userInfo = user
+          listModel.userInfo = user
+          if let model = weakSelf?.sessionIsExist(listModel) {
+            NELog.infoLog(
+              ModuleName,
+              desc: #function + "conversation session user : " + "\(user?.userId ?? "nil")"
+            )
+            model.userInfo = user
+          } else {
             weakSelf?.conversationListArray?.append(listModel)
-            weakSelf?.delegate?.didAddRecentSession()
           }
+          weakSelf?.delegate?.didAddRecentSession()
         }
       }
 
     } else if recentSession.session?.sessionType == .team {
       repo.getTeamInfo(teamId: targetId) { error, teamInfo in
         listModel.teamInfo = teamInfo
-        weakSelf?.conversationListArray?.append(listModel)
+        if let model = weakSelf?.sessionIsExist(listModel) {
+          NELog.infoLog(
+            ModuleName,
+            desc: #function + "conversation session team : " + "\(teamInfo?.teamId ?? "nil")"
+          )
+          model.teamInfo = teamInfo
+        } else {
+          weakSelf?.conversationListArray?.append(listModel)
+        }
         weakSelf?.delegate?.didAddRecentSession()
       }
     }
@@ -229,20 +296,41 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   public func didUpdate(_ recentSession: NIMRecentSession, totalUnreadCount: Int) {
     NELog.infoLog(
       ModuleName + " " + className,
-      desc: #function + ", sessionId:" + (recentSession.session?.sessionId ?? "nil")
+      desc: #function + "recentSession, didUpdate sessionId:" + (recentSession.session?.sessionId ?? "nil")
     )
-    print("did update last msg : ", recentSession.lastMessage?.text as Any)
+
+    if let object = recentSession.lastMessage?.messageObject as? NIMNotificationObject, object.notificationType == .team {
+      if let content = object.content as? NIMTeamNotificationContent {
+        if content.operationType == .dismiss || (content.operationType == .leave && content.sourceID == NIMSDK.shared().loginManager.currentAccount()) {
+          NELog.infoLog(
+            ModuleName + " " + className,
+            desc: #function + "didUpdate team dismiss or leave noti" + (recentSession.session?.sessionId ?? "nil")
+          )
+          repo.deleteLocalSession(recentSession: recentSession)
+          return
+        }
+      }
+    }
+
     if let sid = recentSession.session?.sessionId {
       cacheUpdateSessionDic[sid] = recentSession
+      if let model = cacheAddSessionDic[sid], let recent = model.recentSession {
+        if let time1 = recentSession.lastMessage?.timestamp, let time2 = recent.lastMessage?.timestamp, time1 > time2 {
+          model.recentSession = recentSession
+        }
+      }
     }
+
     if let _ = conversationListArray {
       for i in 0 ..< conversationListArray!.count {
         let listModel = conversationListArray![i]
+        NELog.infoLog(
+          ModuleName + " " + className,
+          desc: #function + "update session id : " + (listModel.recentSession?.session?.sessionId ?? "nil")
+        )
         if recentSession.session?.sessionId == listModel.recentSession?.session?.sessionId {
-//                    conversationListArray?.remove(at: i)
           listModel.recentSession = recentSession
           delegate?.reloadTableView()
-//                    delegate?.didUpdateRecentSession(index: i)
           break
         }
       }
@@ -252,8 +340,11 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   public func didRemove(_ recentSession: NIMRecentSession, totalUnreadCount: Int) {
     NELog.infoLog(
       ModuleName + " " + className,
-      desc: #function + ", sessionId:" + (recentSession.session?.sessionId ?? "nil")
+      desc: #function + ",didRemove recentSession  sessionId:" + (recentSession.session?.sessionId ?? "nil")
     )
+    if let sid = recentSession.session?.sessionId {
+      cacheUpdateSessionDic.removeValue(forKey: sid)
+    }
     if let conversationArr = conversationListArray {
       for i in 0 ..< conversationArr.count {
         if conversationArr[i].recentSession?.session?.sessionId == recentSession.session?
@@ -266,7 +357,7 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     delegate?.reloadTableView()
   }
 
-  // MARK: ========================NIMTeamManagerDelegate=========================
+  // MARK: ========================NIMUserManagerDelegate=========================
 
   public func onFriendChanged(_ user: NIMUser) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:" + (user.userId ?? "nil"))
@@ -299,7 +390,14 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     }
   }
 
-  public func onTeamAdded(_ team: NIMTeam) {}
+  public func onTeamAdded(_ team: NIMTeam) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + "onTeamAdded, teamId:" + (team.teamId ?? "nil"))
+    guard let tid = team.teamId else {
+      return
+    }
+    let _ = repo.createTeamSession(tid)
+    delegate?.didAddRecentSession()
+  }
 
   public func onTeamRemoved(_ team: NIMTeam) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:" + (team.teamId ?? "nil"))
@@ -319,5 +417,17 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
         }
       }
     }
+  }
+
+  private func sessionIsExist(_ model: ConversationListModel) -> ConversationListModel? {
+    if let array = conversationListArray {
+      for index in 0 ..< array.count {
+        let m = array[index]
+        if m.recentSession?.session?.sessionId == model.recentSession?.session?.sessionId {
+          return m
+        }
+      }
+    }
+    return nil
   }
 }

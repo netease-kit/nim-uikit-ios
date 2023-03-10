@@ -57,10 +57,22 @@ public class ChatRevokeRightCell: ChatBaseRightCell {
   }
 
   override func setModel(_ model: MessageContentModel) {
+    if let time = model.message?.timestamp {
+      let date = Date()
+      let currentTime = date.timeIntervalSince1970
+      if currentTime - time >= 60 * 2 {
+        model.timeOut = true
+      }
+    }
+    if let isSend = model.message?.isOutgoingMsg, isSend, model.isRevokedText == true, model.timeOut == false {
+      model.contentSize = CGSize(width: 218, height: qChat_min_h)
+    } else {
+      model.contentSize = CGSize(width: 130, height: qChat_min_h)
+    }
     super.setModel(model)
     label.text = chatLocalizable("message_has_be_withdrawn")
     reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
-    // 判断可编辑按钮的隐藏，只有文本才可以重新编辑
+
     if model.isRevokedText == true {
       if model.timeOut == true {
         reeditButton.isHidden = true

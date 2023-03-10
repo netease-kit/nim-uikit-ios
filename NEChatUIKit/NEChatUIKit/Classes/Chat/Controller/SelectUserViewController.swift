@@ -5,7 +5,7 @@
 
 import UIKit
 import NEChatKit
-
+import NECoreIMKit
 public typealias DidSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
 
 @objcMembers
@@ -16,10 +16,12 @@ public class SelectUserViewController: ChatBaseViewController, UITableViewDelega
   public var viewModel = TeamMemberSelectVM()
   public var selectedBlock: DidSelectedAtRow?
   var teamInfo: ChatTeamInfoModel?
+  private var showSelf = true // 是否展示自己
   private let className = "SelectUserViewController"
 
-  init(sessionId: String) {
+  init(sessionId: String, showSelf: Bool = true) {
     self.sessionId = sessionId
+    self.showSelf = showSelf
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -113,6 +115,16 @@ public class SelectUserViewController: ChatBaseViewController, UITableViewDelega
       if error != nil {
         self?.view.makeToast(error?.localizedDescription)
         return
+      }
+
+      // 人员选择页面移除自己
+      if !(self?.showSelf ?? true),
+         let users = team?.users {
+        for (index, user) in users.enumerated() {
+          if user.nimUser?.userId == IMKitLoginManager.instance.currentAccount() {
+            team?.users.remove(at: index)
+          }
+        }
       }
       self?.teamInfo = team
       self?.tableView.reloadData()

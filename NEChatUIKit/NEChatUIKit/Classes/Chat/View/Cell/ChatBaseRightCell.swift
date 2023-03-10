@@ -6,7 +6,7 @@
 import UIKit
 import NECoreIMKit
 import NECoreKit
-
+import NIMSDK
 public protocol ChatBaseCellDelegate: NSObjectProtocol {
   func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?)
   func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?)
@@ -252,7 +252,7 @@ public class ChatBaseRightCell: ChatBaseCell {
     // avatar
     nameLabel.text = model.shortName
     avatarImage.backgroundColor = UIColor
-      .colorWithNumber(number: UInt64(model.message?.from ?? "0"))
+      .colorWithString(string: model.message?.from)
     if let avatarURL = model.avatar {
       avatarImage
         .sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
@@ -284,7 +284,8 @@ public class ChatBaseRightCell: ChatBaseCell {
     if model.message?.deliveryState == .deliveried {
       if model.message?.session?.sessionType == .P2P {
         let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
-        if receiptEnable {
+        if receiptEnable,
+           IMKitClient.instance.repo.getShowReadStatus() == true {
           readView.isHidden = false
           if let read = model.message?.isRemoteRead, read {
             readView.progress = 1
@@ -304,7 +305,8 @@ public class ChatBaseRightCell: ChatBaseCell {
 
       } else if model.message?.session?.sessionType == .team {
         let receiptEnable = model.message?.setting?.teamReceiptEnabled ?? false
-        if receiptEnable {
+        if receiptEnable,
+           IMKitClient.instance.repo.getShowReadStatus() == true {
           readView.isHidden = false
           let readCount = model.message?.teamReceiptInfo?.readCount ?? 0
           let unreadCount = model.message?.teamReceiptInfo?.unreadCount ?? 0
@@ -333,16 +335,22 @@ public class ChatBaseRightCell: ChatBaseCell {
     contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
       .chatPinColor : .white
     if model.isPined {
-      if let text = model.pinShowName {
-        pinLabel.text = text + chatLocalizable("pin_text")
+      let pinText = model.message?.session?.sessionType == .P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
+      if model.pinAccount == nil {
+        pinLabel.text = chatLocalizable("You") + pinText
+      } else if let account = model.pinAccount, account == NIMSDK.shared().loginManager.currentAccount() {
+        pinLabel.text = chatLocalizable("You") + pinText
+      } else if let text = model.pinShowName {
+        pinLabel.text = text + pinText
       }
+
       pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")
       let size = String.getTextRectSize(
-        pinLabel.text ?? chatLocalizable("pin_text"),
-        font: UIFont.systemFont(ofSize: 11.0),
+        pinLabel.text ?? pinText,
+        font: UIFont.systemFont(ofSize: 12.0),
         size: CGSize(width: kScreenWidth - 56 - 22, height: CGFloat.greatestFiniteMagnitude)
       )
-      pinLabelW?.constant = size.width
+      pinLabelW?.constant = size.width + 1
       pinLabelH?.constant = chat_pin_height
     } else {
       pinImage.image = nil

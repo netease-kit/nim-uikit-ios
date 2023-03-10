@@ -12,12 +12,24 @@ public class ContactRemakNameViewController: ContactBaseViewController, UITextFi
   typealias ModifyBlock = (_ user: User) -> Void
 
   var completion: ModifyBlock?
-
   var user: User?
-
   let viewmodel = ContactUserViewModel()
-
-  lazy var aliasInput: UITextField = getInput()
+  let textLimit = 15
+  lazy var aliasInput: UITextField = {
+    let textField = UITextField()
+    textField.backgroundColor = .white
+    textField.clipsToBounds = true
+    textField.layer.cornerRadius = 8
+    textField.font = UIFont.systemFont(ofSize: 16.0)
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    let leftSpace = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
+    textField.leftView = leftSpace
+    textField.leftViewMode = .always
+    textField.delegate = self
+    textField.clearButtonMode = .whileEditing
+    textField.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    return textField
+  }()
 
 //    lazy var rightBtn: ExpandButton = {
 //        let btn = ExpandButton(frame: CGRect(x: 0, y: 0, width: 60, height: 44))
@@ -59,26 +71,18 @@ public class ContactRemakNameViewController: ContactBaseViewController, UITextFi
     }
   }
 
-  func getInput() -> UITextField {
-    let textField = UITextField()
-    textField.backgroundColor = .white
-    textField.clipsToBounds = true
-    textField.layer.cornerRadius = 8
-    textField.font = UIFont.systemFont(ofSize: 16.0)
-    textField.translatesAutoresizingMaskIntoConstraints = false
-    let leftSpace = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
-    textField.leftView = leftSpace
-    textField.leftViewMode = .always
-    textField.delegate = self
-    textField.clearButtonMode = .whileEditing
-    return textField
-  }
-
   func saveAlias() {
 //        guard let alais = aliasInput.text, alais.count > 0 else {
 //            view.makeToast("请填写备注名", duration: 2, position: .center)
 //            return
 //        }
+    if let text = aliasInput.text,
+       text.count > 0,
+       text.trimmingCharacters(in: .whitespaces).isEmpty {
+      view.makeToast(localizable("space_not_support"), duration: 2, position: .center)
+      aliasInput.text = ""
+      return
+    }
     user?.alias = aliasInput.text
     if let u = user {
       view.makeToastActivity(.center)
@@ -115,13 +119,13 @@ public class ContactRemakNameViewController: ContactBaseViewController, UITextFi
    }
    */
 
-  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                        replacementString string: String) -> Bool {
-    let text = "\(textField.text ?? "")\(string)"
-    print("text count : ", text.count)
-    if text.count > 30 {
-      return false
+  public func textFieldChange() {
+    guard let _ = aliasInput.markedTextRange else {
+      if let text = aliasInput.text,
+         text.count > textLimit {
+        aliasInput.text = String(text.prefix(textLimit))
+      }
+      return
     }
-    return true
   }
 }

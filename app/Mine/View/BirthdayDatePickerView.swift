@@ -27,6 +27,11 @@ public class BirthdayDatePickerView: UIView {
     // 将日期选择器区域设置为中文，则选择器日期显示为中文
     datePicker.locale = Locale(identifier: "zh_CN")
     datePicker.datePickerMode = .date
+    datePicker.maximumDate = Date()
+    if #available(iOS 13.4, *) {
+      datePicker.preferredDatePickerStyle = .wheels
+    }
+
     // 注意：action里面的方法名后面需要加个冒号“：”
     datePicker.addTarget(self, action: #selector(dateChanged),
                          for: .valueChanged)

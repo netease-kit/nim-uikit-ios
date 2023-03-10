@@ -42,6 +42,7 @@
 
 - (void)setupMapSdkConfig {
   // 初始化高德SDK
+  [[AMapServices sharedServices] setApiKey:@"46a3a36bb9d26934a26c6ce2b04aab6f"];
   [AMapServices sharedServices].enableHTTPS = YES;
 }
 

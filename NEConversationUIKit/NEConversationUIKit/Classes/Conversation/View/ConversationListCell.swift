@@ -10,7 +10,7 @@ open class ConversationListCell: UITableViewCell {
 //  private var viewModel = ConversationViewModel()
   public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
   private let repo = ConversationRepo()
-
+  private var timeWidth: NSLayoutConstraint?
   override open func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
@@ -52,11 +52,12 @@ open class ConversationListCell: UITableViewCell {
     ])
 
     NSLayoutConstraint.activate([
-      redAngleView.centerXAnchor.constraint(equalTo: headImge.rightAnchor, constant: -3),
-      redAngleView.centerYAnchor.constraint(equalTo: headImge.topAnchor, constant: 3),
+      redAngleView.centerXAnchor.constraint(equalTo: headImge.rightAnchor, constant: -8),
+      redAngleView.centerYAnchor.constraint(equalTo: headImge.topAnchor, constant: 8),
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
-
+    timeWidth = timeLabel.widthAnchor.constraint(equalToConstant: 0)
+    timeWidth?.isActive = true
     NSLayoutConstraint.activate([
       timeLabel.rightAnchor.constraint(
         equalTo: contentView.rightAnchor,
@@ -160,6 +161,12 @@ open class ConversationListCell: UITableViewCell {
       timeLabel
         .text =
         dealTime(time: timestampDescriptionForRecentSession(recentSession: rencentSession))
+      if let text = timeLabel.text {
+        let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
+        let attibutes = [NSAttributedString.Key.font: timeLabel.font]
+        let labelSize = NSString(string: text).boundingRect(with: maxSize, attributes: attibutes, context: nil)
+        timeWidth?.constant = labelSize.width + 1 // ceil()
+      }
     }
 
     // backgroundColor

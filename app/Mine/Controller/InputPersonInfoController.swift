@@ -43,12 +43,21 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
         textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
       ])
     } else {
-      NSLayoutConstraint.activate([
-        textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
-        textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
-        textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
-      ])
+      if #available(iOS 10.0, *) {
+        NSLayoutConstraint.activate([
+          textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
+          textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+          textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+          textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
+        ])
+      } else {
+        NSLayoutConstraint.activate([
+          textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
+          textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+          textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
+          textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
+        ])
+      }
     }
 
     textfieldBgView.addSubview(textField)
@@ -69,7 +78,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     weak var weakSelf = self
     if let block = callBack {
       block(textField.text ?? "")
-      weakSelf?.navigationController?.popViewController(animated: true)
+//      weakSelf?.navigationController?.popViewController(animated: true)
     }
   }
 
@@ -100,6 +109,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     text.delegate = self
     text.clearButtonMode = .always
     text.becomeFirstResponder()
+    text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
     return text
   }()
 
@@ -112,15 +122,15 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     return backView
   }()
 
-  // MARK: UITextFieldDelegate
-
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                 replacementString string: String) -> Bool {
-    if let text = (textField.text as NSString?)?.replacingCharacters(in: range, with: string),
-       text.count > limitNumberCount {
-      showToast("最多只能输入\(limitNumberCount)个字符哦")
-      return false
+  @objc
+  func textFieldChange() {
+    guard let _ = textField.markedTextRange else {
+      if let text = textField.text,
+         text.count > limitNumberCount {
+        textField.text = String(text.prefix(limitNumberCount))
+        showToast(String(format: NSLocalizedString("text_count_limit", comment: ""), limitNumberCount))
+      }
+      return
     }
-    return true
   }
 }

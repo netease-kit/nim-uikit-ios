@@ -1,0 +1,37 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+
+"switch_to_audio"="Switch to audio";
+"switch_to_video"="Switch to video";
+"accept_failed"="Answer Failed";
+"network_error"="Network error, try later";
+"switch_error"="Switch Error";
+"remote_cancel"="Cancelled by the opposite";
+"remote_busy"="Busy-line";
+"remote_timeout"="No Responding";
+"remote_reject"="Reject";
+"other_client_accept"="Accept by other client";
+"other_client_reject"="Reject by other client";
+
+"permission"="Permission Require";
+"reject"="Reject";
+"agree"="Agree";
+"audio_to_video"="Opposite requests to switch to video,  have to turn on your camera";
+"video_to_audio"="Opposite requests to switch to audio,  will turn off your camera directly";
+"reject_tip"="Request Denied";
+
+"invite_audio_call"="Invite for audio call";
+"invite_video_call"="Invite for video call";
+
+"waitting_remote_response"="Waiting for response";
+"call_cancel"="Cancel";
+"call_reject"="Reject";
+"call_accept"="Accept";
+"call_micro_phone"="Microphone";
+"call_speaker"="Speaker";
+"waitting_remote_accept"="Waitting to connect";
+"calling"="Calling";
+"cancel_failed"="The invitation has been accepted and cannot be canceled";

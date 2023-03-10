@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
-
+import NIMSDK
 @objcMembers
 public class ChatBaseLeftCell: ChatBaseCell {
   public var avatarImage = UIImageView()
@@ -127,7 +127,6 @@ public class ChatBaseLeftCell: ChatBaseCell {
     contentView.addSubview(pinLabel)
     pinLabel.translatesAutoresizingMaskIntoConstraints = false
     pinLabel.textAlignment = .left
-//        pinLabel.text = localizable("pin_text")
     pinLabel.font = UIFont.systemFont(ofSize: 12)
     pinLabel.textColor = UIColor.ne_greenText
     pinLabel.isHidden = true
@@ -213,7 +212,7 @@ public class ChatBaseLeftCell: ChatBaseCell {
     }
     fullNameH?.constant = CGFloat(model.fullNameHeight)
     avatarImage.backgroundColor = UIColor
-      .colorWithNumber(number: UInt64(model.message?.from ?? "0"))
+      .colorWithString(string: model.message?.from)
     if let avatarURL = model.avatar {
       avatarImage
         .sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
@@ -246,9 +245,15 @@ public class ChatBaseLeftCell: ChatBaseCell {
     contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
       .chatPinColor : .white
     if model.isPined {
-      if let text = model.pinShowName {
-        pinLabel.text = text + chatLocalizable("pin_text")
+      let pinText = model.message?.session?.sessionType == .P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
+      if model.pinAccount == nil {
+        pinLabel.text = chatLocalizable("You") + pinText
+      } else if let account = model.pinAccount, account == NIMSDK.shared().loginManager.currentAccount() {
+        pinLabel.text = chatLocalizable("You") + pinText
+      } else if let text = model.pinShowName {
+        pinLabel.text = text + pinText
       }
+
       pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")
       pinLabelH?.constant = chat_pin_height
 

@@ -55,10 +55,10 @@ public class MineSettingViewModel: NSObject {
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
     receiverModel.cornerType = .topLeft.union(.topRight)
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
-    receiverModel.switchOpen = IMKitClient.instance.repo.getHandsetMode()
+    receiverModel.switchOpen = IMKitEngine.instance.repo.getHandsetMode()
 
     receiverModel.swichChange = { isOpen in
-      IMKitClient.instance.repo.setHandsetMode(isOpen)
+      IMKitEngine.instance.repo.setHandsetMode(isOpen)
     }
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
@@ -74,10 +74,10 @@ public class MineSettingViewModel: NSObject {
 //    let deleteFriend = SettingCellModel()
 //    deleteFriend.cellName = NSLocalizedString("delete_friend", comment: "")
 //    deleteFriend.type = SettingCellType.SettingSwitchCell.rawValue
-//    deleteFriend.switchOpen = IMKitClient.instance.repo.getDeleteFriendAlias()
+//    deleteFriend.switchOpen = IMKitEngine.instance.repo.getDeleteFriendAlias()
 //
 //    deleteFriend.swichChange = { isOpen in
-//      IMKitClient.instance.repo.setDeleteFriendAlias(isOpen)
+//      IMKitEngine.instance.repo.setDeleteFriendAlias(isOpen)
 //    }
 
     // 消息已读未读功能
@@ -86,9 +86,9 @@ public class MineSettingViewModel: NSObject {
     hasRead.type = SettingCellType.SettingSwitchCell.rawValue
     hasRead.cornerType = .bottomLeft.union(.bottomRight)
 //        hasRead.switchOpen = true
-    hasRead.switchOpen = IMKitClient.instance.repo.getShowReadStatus()
+    hasRead.switchOpen = IMKitEngine.instance.repo.getShowReadStatus()
     hasRead.swichChange = { isOpen in
-      IMKitClient.instance.repo.setShowReadStatus(isOpen)
+      IMKitEngine.instance.repo.setShowReadStatus(isOpen)
     }
     model.cellModels.append(contentsOf: [receiverModel, hasRead])
     return model
