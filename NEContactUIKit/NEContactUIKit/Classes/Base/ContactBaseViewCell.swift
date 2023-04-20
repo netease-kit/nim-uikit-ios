@@ -23,6 +23,20 @@ open class ContactBaseViewCell: UITableViewCell {
     return avatar
   }()
 
+  public lazy var redAngleView: RedAngleLabel = {
+    let label = RedAngleLabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.font = NEConstant.defaultTextFont(12)
+    label.textColor = .white
+    label.text = "99+"
+    label.backgroundColor = NEConstant.hexRGB(0xF24957)
+    label.textInsets = UIEdgeInsets(top: 3, left: 7, bottom: 3, right: 7)
+    label.layer.cornerRadius = 9
+    label.clipsToBounds = true
+    label.isHidden = true
+    return label
+  }()
+
   public lazy var nameLabel: UILabel = {
     let name = UILabel()
     name.translatesAutoresizingMaskIntoConstraints = false
@@ -34,6 +48,15 @@ open class ContactBaseViewCell: UITableViewCell {
   }()
 
   public lazy var titleLabel: UILabel = {
+    let label = UILabel()
+    label.textAlignment = .left
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.textColor = UIColor(hexString: "333333")
+    return label
+  }()
+
+  public lazy var optionLabel: UILabel = {
     let label = UILabel()
     label.textAlignment = .left
     label.translatesAutoresizingMaskIntoConstraints = false

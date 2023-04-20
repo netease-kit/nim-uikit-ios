@@ -7,18 +7,54 @@ import UIKit
 import NECoreIMKit
 import NECoreKit
 
+public protocol ContactsViewControllerDelegate {
+  func onDataLoaded()
+}
+
 @objcMembers
 open class ContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
   SystemMessageProviderDelegate, FriendProviderDelegate {
+  public var delegate: ContactsViewControllerDelegate?
+
+  // custom ui cell
   public var customCells: [Int: ContactTableViewCell.Type] = [
     ContactCellType.ContactPerson.rawValue: ContactTableViewCell.self,
     ContactCellType.ContactOthers.rawValue: ContactTableViewCell.self,
-  ] // custom ui cell
+  ]
 
   public var clickCallBacks = [Int: ConttactClickCallBack]()
+  var lastTitleIndex = 0
 
-  var tableView = UITableView(frame: .zero, style: .grouped)
-  var viewModel = ContactViewModel(contactHeaders: [
+  public var topViewHeight: CGFloat = 0 {
+    didSet {
+      topViewHeightAnchor?.constant = topViewHeight
+      topView.isHidden = topViewHeight <= 0
+    }
+  }
+
+  public var topViewHeightAnchor: NSLayoutConstraint?
+  public lazy var topView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+    return view
+  }()
+
+  public lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .grouped)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.backgroundColor = UIColor.ne_backgroundColor
+    tableView.rowHeight = 52
+    tableView.sectionHeaderHeight = 40
+    tableView.sectionFooterHeight = 0
+    tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+    return tableView
+  }()
+
+  public var viewModel = ContactViewModel(contactHeaders: [
     ContactHeadItem(
       name: localizable("validation_message"),
       imageName: "valid",
@@ -38,8 +74,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
       color: UIColor(hexString: "#BE65D9")
     ),
   ])
-
-  public init() {
+  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
     viewModel.contactRepo.addNotificationDelegate(delegate: self)
     viewModel.contactRepo.addContactDelegate(delegate: self)
@@ -59,78 +94,86 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     // 添加UI
     addNavbarAction()
     commonUI()
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
     // 刷新数据
-    viewModel.loadData { error in
+    viewModel.reLoadData { [weak self] error in
       if error == nil {
-        weakSelf?.tableView.reloadData()
+        self?.delegate?.onDataLoaded()
+        self?.tableView.reloadData()
       }
     }
   }
 
   open func commonUI() {
-    tableView.separatorStyle = .none
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.backgroundColor = UIColor.ne_backgroundColor
+    view.addSubview(topView)
+    NSLayoutConstraint.activate([
+      topView.topAnchor.constraint(equalTo: view.topAnchor),
+      topView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      topView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    topViewHeightAnchor = topView.heightAnchor.constraint(equalToConstant: topViewHeight)
+    topViewHeightAnchor?.isActive = true
 
     view.addSubview(tableView)
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      tableView.topAnchor.constraint(equalTo: topView.bottomAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    tableView.register(
-      ContactTableViewCell.self,
-      forCellReuseIdentifier: "\(ContactTableViewCell.self)"
-    )
+
     tableView.register(
       ContactSectionView.self,
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
-    tableView.rowHeight = 52
-    tableView.sectionHeaderHeight = 40
-    tableView.sectionFooterHeight = 0
-    tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+
+    customCells.forEach { (key: Int, value: ContactTableViewCell.Type) in
+      tableView.register(value, forCellReuseIdentifier: "\(key)")
+    }
   }
 
   open func loadData() {
-    viewModel.loadData { [self] error in
-      tableView.reloadData()
+    viewModel.loadData { [weak self] error in
+      if error == nil {
+        self?.delegate?.onDataLoaded()
+        self?.tableView.reloadData()
+      }
     }
   }
 
   // UITableViewDataSource
-  public func numberOfSections(in tableView: UITableView) -> Int {
+  open func numberOfSections(in tableView: UITableView) -> Int {
     viewModel.contacts.count
   }
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     NELog.infoLog(ModuleName + " " + className(), desc: "contact section: \(section), count:\(viewModel.contacts[section].contacts.count)")
 
     return viewModel.contacts[section].contacts.count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(ContactTableViewCell.self)",
-      for: indexPath
-    ) as! ContactTableViewCell
-    cell.setModel(info)
-    if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
-      cell.redAngleView.isHidden = false
-      cell.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
-    } else {
-      cell.redAngleView.isHidden = true
+    var reusedId = "\(info.contactCellType)"
+    let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
+
+    if let c = cell as? ContactTableViewCell {
+      c.setModel(info)
+      if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
+        c.redAngleView.isHidden = false
+        c.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
+      } else {
+        c.redAngleView.isHidden = true
+      }
     }
     return cell
   }
 
-  public func tableView(_ tableView: UITableView,
-                        viewForHeaderInSection section: Int) -> UIView? {
+  open func tableView(_ tableView: UITableView,
+                      viewForHeaderInSection section: Int) -> UIView? {
     let sectionView: ContactSectionView = tableView
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
@@ -139,29 +182,35 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     return sectionView
   }
 
-  public func tableView(_ tableView: UITableView,
-                        heightForHeaderInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView,
+                      heightForHeaderInSection section: Int) -> CGFloat {
     if viewModel.contacts[section].initial.count > 0 {
       return 40
     }
     return 0
   }
 
-  public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+  open func sectionIndexTitles(for tableView: UITableView) -> [String]? {
     viewModel.indexs
   }
 
-  public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String,
-                        at index: Int) -> Int {
-    index
+  open func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String,
+                      at index: Int) -> Int {
+    for (i, t) in viewModel.contacts.enumerated() {
+      if t.initial == title {
+        lastTitleIndex = i
+        return i
+      }
+    }
+    return lastTitleIndex
   }
 
-  public func tableView(_ tableView: UITableView,
-                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+  open func tableView(_ tableView: UITableView,
+                      heightForRowAt indexPath: IndexPath) -> CGFloat {
     52
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
     if let callBack = clickCallBacks[info.contactCellType] {
       callBack(indexPath.row, indexPath.section)
@@ -170,7 +219,6 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
     if info.contactCellType == ContactCellType.ContactOthers.rawValue {
       switch info.router {
       case ValidationMessageRouter:
-        viewModel.contactRepo.clearNotificationUnreadCount()
         let validationController = ValidationMessageViewController()
         validationController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(validationController, animated: true)
@@ -241,7 +289,7 @@ open class ContactsViewController: UIViewController, UITableViewDelegate, UITabl
 }
 
 extension ContactsViewController {
-  private func addNavbarAction() {
+  open func addNavbarAction() {
     edgesForExtendedLayout = []
     let addItem = UIBarButtonItem(
       image: UIImage.ne_imageNamed(name: "add"),

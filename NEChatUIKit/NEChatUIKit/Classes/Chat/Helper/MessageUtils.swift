@@ -16,6 +16,16 @@ public class MessageUtils: NSObject {
     return message
   }
 
+  public class func textMessage(text: String, remoteExt: [String: Any]?) -> NIMMessage {
+    let message = NIMMessage()
+    message.setting = messageSetting()
+    message.text = text
+    if remoteExt?.count ?? 0 > 0 {
+      message.remoteExt = remoteExt
+    }
+    return message
+  }
+
   public class func imageMessage(image: UIImage) -> NIMMessage {
     imageMessage(imageObject: NIMImageObject(image: image))
   }

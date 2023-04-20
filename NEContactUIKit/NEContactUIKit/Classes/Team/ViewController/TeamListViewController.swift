@@ -17,6 +17,10 @@ public class TeamListViewController: UIViewController, UITableViewDelegate, UITa
     super.viewDidLoad()
     commonUI()
     loadData()
+    weak var weakSelf = self
+    viewModel.refresh = {
+      weakSelf?.tableView.reloadData()
+    }
   }
 
   func commonUI() {

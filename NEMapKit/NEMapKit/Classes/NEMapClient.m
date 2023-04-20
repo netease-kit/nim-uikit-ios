@@ -33,6 +33,8 @@ typedef void (^MapMoveCompletion)(void);
 
 @property(nonatomic, strong) MapMoveCompletion mapMoveCompletion;
 
+@property(nonatomic, strong) UIImage *annoationImage;
+
 @property(nonatomic, strong) NSString *city;
 
 @property(nonatomic, assign) BOOL needSearchRound;
@@ -81,20 +83,18 @@ typedef void (^MapMoveCompletion)(void);
   _mapView.zoomLevel = 15;
   _mapView.showsUserLocation = YES;
   _mapView.userTrackingMode = MAUserTrackingModeFollow;
+}
 
-  NSLog(@"user location : %@", _mapView.userLocation);
-  if (mapType == NEMapTypeDetail) {
+- (void)setCustomAnnotationWithImage:(UIImage *)image lat:(double)lat lng:(double)lng {
+  self.annoationImage = image;
+  if (image != nil) {
     MAUserLocationRepresentation *r = [[MAUserLocationRepresentation alloc] init];
     r.showsAccuracyRing = YES;
     [self.mapView updateUserLocationRepresentation:r];
-
-  } else {
+    MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
+    pointAnnotation.coordinate = CLLocationCoordinate2DMake(lat, lng);
+    [_mapView addAnnotation:pointAnnotation];
   }
-
-  // 设置大头针
-  MAPointAnnotation *pointAnnotation = [[MAPointAnnotation alloc] init];
-  pointAnnotation.coordinate = _mapView.centerCoordinate;
-  [_mapView addAnnotation:pointAnnotation];
 }
 
 - (void)searchPositionWithKey:(NSString *)key
@@ -155,7 +155,7 @@ typedef void (^MapMoveCompletion)(void);
   // 隐藏比例尺
   mapView.showsScale = NO;
   //  mapView.maxZoomLevel = 5;
-  mapView.showsUserLocation = NO;
+  //  mapView.showsUserLocation = YES;
   mapView.userTrackingMode = MAUserTrackingModeNone;
   mapView.zoomEnabled = NO;
 
@@ -190,6 +190,17 @@ typedef void (^MapMoveCompletion)(void);
   request.location.latitude = lat;
   request.location.longitude = lng;
   [self.search AMapPOIAroundSearch:request];
+}
+
+- (void)searchMapCenterWithMapview:(id)mapview
+                        completion:(void (^)(NSArray<ChatLocaitonModel *> *_Nonnull,
+                                             NSError *_Nullable))completion {
+  if ([mapview isKindOfClass:[MAMapView class]]) {
+    self.searchRoundBlock = completion;
+    MAMapView *map = (MAMapView *)mapview;
+    [self searchRoundPositionWithLat:map.userLocation.location.coordinate.latitude
+                                 lng:map.userLocation.location.coordinate.longitude];
+  }
 }
 
 - (void)dealloc {
@@ -241,6 +252,7 @@ typedef void (^MapMoveCompletion)(void);
 - (void)mapView:(MAMapView *)mapView
     didUpdateUserLocation:(MAUserLocation *)userLocation
          updatingLocation:(BOOL)updatingLocation {
+  //  NSLog(@"didUpdateUserLocation : %d", updatingLocation);
   if (updatingLocation && self.needSearchRound) {
     AMapReGeocodeSearchRequest *regeoRequest = [[AMapReGeocodeSearchRequest alloc] init];
     regeoRequest.location = [AMapGeoPoint locationWithLatitude:userLocation.coordinate.latitude
@@ -274,6 +286,17 @@ typedef void (^MapMoveCompletion)(void);
       self.mapMoveCompletion();
     }
   }
+}
+
+- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation {
+  if (nil != self.annoationImage) {
+    MAAnnotationView *annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation
+                                                                    reuseIdentifier:nil];
+    annotationView.image = self.annoationImage;
+    self.annoationImage = nil;
+    return annotationView;
+  }
+  return nil;
 }
 
 @end

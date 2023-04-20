@@ -21,6 +21,7 @@
 "select_from_album"="album";
 "select_from_icloud"="icloud";
 "editing"="typing";
+"downloading"="downloading...";
 "read"="read";
 "unread"="unread";
 "network_unavailable"="No internet, Please check your setting";
@@ -33,32 +34,36 @@
 "enter"="enter";
 "unknown_system_message"="Unknown message";
 "You"="you";
-"discussion_group"="temp group";
+"discussion_group"="group";
 "group"="group";
+"group_chat"="group chat";
 "dissolve"="dissolved";
 "kick"="将 ";
 "out"="remove";
-"has_updated" = "updated";
+"has_updated" = "update";
+"to" = "to ";
+"only_team_owner" = "Only the group owner";
+"everyone" = "Everyone";
 
-"team_name" = "name";
-"team_intro" = "Info";
+"team_name" = "Group Name";
+"team_intro" = "Group Introduction";
 "team_anouncement" = "Notice";
-"team_avatar" = "Avatar";
+"team_avatar" = "Group Avatar";
 "team_join_mode" = "join mode";
 "team_be_invited_mode" = "invite mode";
-"team_be_invited_permission" = "invite permission";
+"team_be_invited_permission" = "Invite Permission";
 "team_be_invited_author" = "是否需要被邀请者同意权限";
 "team_update_info_permission" = "update info permission";
-"team_update_client_custom"="update custom permission";
+"team_update_client_custom"="Update Permission";
 
 "team_custom_info" = "custom info";
 "not_mute" = "unmute";
 "mute" = "mute";
-"team_has_been_removed" = "This group was removed";
+"team_has_been_removed" = "This group is disbanded";
 "team_has_quit" = "Group chat has exited";
 "join"="joined";
 "pass"="Passed";
-"leave"="leave";
+"leave"="quit";
 "transfer"="Transferred the group leader identity to";
 "added_manager"="add to be Group administrator";
 "removed_manager"="Group administrator identity revoked";
@@ -67,8 +72,8 @@
 "team_all_mute"="Mute all";
 "team_all_no_mute"="Unmute";
 
-"pin_text_P2P"="pinned this message for both";
-"pin_text_team"="pinned this message for both all";
+"pin_text_P2P"="pinned this message";
+"pin_text_team"="pinned this message";
 
 "session_set_top"="sticky to top";
 "message_remind"="open notification";
@@ -146,3 +151,14 @@
 
 "editable_time_expired"="Editable time has expired";
 "message_not_found"="This message is gone";
+
+"unkonw_pin_message"="unkonw message type";
+"pin_jump_detail"="jump to details";
+"cancel_pin_success"="Unpin";
+"no_pin_message"="No pin message";
+
+"you_were_mentioned"="[You were mentioned]";
+// MARK: error toast
+"failed_operation"="Failed Operation";
+"team_not_exist"="team not exist";
+"unpin_failed"="Unpin failed";

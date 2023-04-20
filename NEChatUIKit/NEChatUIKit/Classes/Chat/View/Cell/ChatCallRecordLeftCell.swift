@@ -32,7 +32,7 @@ class ChatCallRecordLeftCell: ChatBaseLeftCell {
     ])
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageCallRecordModel {
       contentLabel.attributedText = m.attributeStr

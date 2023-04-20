@@ -30,8 +30,7 @@ public class ReplyMessageUtil: NSObject {
     case .custom:
       text += "[\(chatLocalizable("msg_custom"))]"
     case .location:
-      // text += chatLocalizable("msg_location")
-      text = "[\(chatLocalizable("msg_location"))]"
+      text += "[\(chatLocalizable("msg_location"))]"
     default:
       text += "[\(chatLocalizable("msg_unknown"))]"
     }

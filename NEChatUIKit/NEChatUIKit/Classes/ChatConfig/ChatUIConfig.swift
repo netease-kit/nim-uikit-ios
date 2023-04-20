@@ -14,17 +14,22 @@ import NECommonKit
 
 @objcMembers
 public class ChatUIConfig: NSObject {
-  /// 头像圆角大小
+  /// UI 元素自定义
+
+  // 头像圆角大小
   public var avatarCornerRadius = 4.0
 
-  /// 头像类型
+  // 头像类型
   public var avatarType: NEChatAvatarType = .cycle
 
-  /// 设置聊天消息标记的背景色
-  public var chatPinColor = UIColor.ne_yellowBackgroundColor
+  // 设置聊天消息标记的背景色
+  public var signalBgColor = UIColor.ne_yellowBackgroundColor
 
   // 时间颜色
-  public var timeColor = UIColor.ne_emptyTitleColor
+  public var timeTextColor = UIColor.ne_emptyTitleColor
+
+  // 时间字体大小
+  public var timeTextSize: Float = 12
 
   // 右侧聊天背景气泡
   public var rightBubbleBg = UIImage.ne_imageNamed(name: "chat_message_send")
@@ -32,12 +37,53 @@ public class ChatUIConfig: NSObject {
   // 左侧聊天背景气泡
   public var leftBubbleBg = UIImage.ne_imageNamed(name: "chat_message_receive")
 
-  /// 聊天字体大小(文本类型)
-  public var messageFont = UIFont.systemFont(ofSize: 16)
+  // 聊天字体大小(文本类型)
+  public var messageTextSize = UIFont.systemFont(ofSize: 16)
 
-  /// 聊天字体颜色(文本类型)
-  public var messageColor = UIColor.ne_darkText
+  // 聊天字体颜色(文本类型)
+  public var messageTextColor = UIColor.ne_darkText
 
-  /// 发送文件大小限制(单位：MB)
+  // 自己发送的消息体的背景色
+  public var selfMessageBg: UIColor?
+
+  // 接收到的消息体的背景色
+  public var receiveMessageBg: UIColor?
+
+  // 他人发送消息内容的背景资源ID
+  // 自己发送消息内容的背景资源ID
+
+  // 不设置头像的用户所展示的文字头像中的文字颜色
+  public var userNickColor: UIColor = .white
+
+  // 不设置头像的用户所展示的文字头像中的文字字体大小
+  public var userNickTextSize: CGFloat = 12
+
+  // 单聊中是否展示已读未读状态
+  public var showP2pMessageStatus: Bool?
+  // 群聊中是否展示已读未读状态
+  public var showTeamMessageStatus: Bool?
+  // 会话界面是否展示标题栏
+  public var showTitleBar: Bool?
+  // 是否展示标题栏右侧图标按钮
+  public var showTitleBarRightIcon: Bool?
+  // 设置标题栏右侧图标按钮展示图标
+  public var titleBarRightRes: UIImage?
+  // 标题栏右侧图标的点击事件
+  public var titleBarRightClick: (() -> Void)?
+  // 设置会话界面背景色
+  public var chatViewBackground: UIColor = .white
+
+  /// 界面布局自定义
+  // 会话界面（即聊天界面）的标题视图
+  // 会话界面的消息列表上方的小块视图
+  // 会话界面的消息列表视图
+  // 会话界面的消息列表下视图
+  // 会话界面的底部输入框视图
+  // 会话界面的消息列表
+  // 会话界面的底部输入框视图
+
+  /// 用户可自定义参数
+
+  // 发送文件大小限制(单位：MB)
   public var fileSizeLimit: Double = 200
 }

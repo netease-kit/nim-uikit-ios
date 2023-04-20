@@ -15,6 +15,15 @@ extension String {
     return rect.size
   }
 
+  /// 计算 string 的行数，使用 font 的 lineHeight
+  static func calculateMaxLines(width: CGFloat, string: String, font: UIFont) -> Int {
+    let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
+    let charSize = font.lineHeight
+    let textSize = getTextRectSize(string, font: font, size: maxSize)
+    let lines = Int(textSize.height / charSize)
+    return lines
+  }
+
   static func stringFromDate(date: Date) -> String {
     let fmt = DateFormatter()
     if Calendar.current.isDateInToday(date) {

@@ -35,6 +35,7 @@
 "select"="选择";
 "select_contact"="请选择联系人";
 "user_not_exist"="该用户不存在";
+"team_not_exist"="该群不存在";
 "no_friend"="暂无好友";
 "chat"="聊天";
 "message_remind"="消息提醒";
@@ -42,3 +43,10 @@
 "sure_delte_friend"="是否确定删除好友？";
 "input_userId"="请输入账号";
 "space_not_support"="不支持全空格";
+
+
+"let_us_chat"="我已经同意了你的申请，现在开始聊天吧~";
+
+// error toast
+"validate_processed"="该验证消息已在其他端处理";
+"failed_operation"="操作失败";

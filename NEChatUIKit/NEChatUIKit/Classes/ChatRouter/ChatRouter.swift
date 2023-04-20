@@ -6,10 +6,38 @@
 import Foundation
 import NIMSDK
 import NECommonKit
+import SDWebImage
+import SDWebImageWebPCoder
+import SDWebImageSVGKitPlugin
 
 @objcMembers
 public class ChatRouter: NSObject {
   public static func register() {
+    // pin
+    Router.shared.register(PushPinMessageVCRouter) { param in
+      let nav = param["nav"] as? UINavigationController
+      guard let session = param["session"] as? NIMSession else {
+        return
+      }
+      let pin = PinMessageViewController(session: session)
+      nav?.pushViewController(pin, animated: true)
+    }
+    // sendMessage
+    Router.shared.register(ChatAddFriendRouter) { param in
+      if let text = param["text"] as? String,
+         let sessionId = param["sessionId"] as? String,
+         let sessionType = param["sessionType"] as? NIMSessionType {
+        let msg = NIMMessage()
+        msg.text = text
+        let session = NIMSession(sessionId, type: sessionType)
+        NIMSDK.shared().chatManager.send(msg, to: session) { error in
+          if let err = error {
+            NELog.errorLog("ChatAddFriendRouter", desc: "send P2P message error:\(err.localizedDescription)")
+          }
+        }
+      }
+    }
+
     // p2p
     Router.shared.register(PushP2pChatVCRouter) { param in
       print("param:\(param)")
@@ -17,7 +45,15 @@ public class ChatRouter: NSObject {
       guard let session = param["session"] as? NIMSession else {
         return
       }
-      let p2pChatVC = P2PChatViewController(session: session)
+      let anchor = param["anchor"] as? NIMMessage
+      var p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+      for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+        if vc.isMember(of: P2PChatViewController.self) {
+          nav?.viewControllers[i] = p2pChatVC
+          nav?.popToViewController(p2pChatVC, animated: true)
+          return
+        }
+      }
       nav?.pushViewController(p2pChatVC, animated: true)
     }
 
@@ -45,5 +81,9 @@ public class ChatRouter: NSObject {
   public static func setupInit() {
     NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
     NIMKitFileLocationHelper.setStaticUserId(NIMSDK.shared().loginManager.currentAccount())
+    let webpCoder = SDImageWebPCoder()
+    SDImageCodersManager.shared.addCoder(webpCoder)
+    let svgCoder = SDImageSVGKCoder.shared
+    SDImageCodersManager.shared.addCoder(svgCoder)
   }
 }

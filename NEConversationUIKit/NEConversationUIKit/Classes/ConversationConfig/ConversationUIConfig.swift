@@ -46,4 +46,16 @@ public class ConversationUIConfig: NSObject {
 
   /// 时间字体大小
   public var timeFont = UIFont.systemFont(ofSize: 12)
+
+  /// 会话列表 cell 左划置顶按钮文案内容
+  public var stickTopBottonTitle = localizable("stickTop")
+  /// 会话列表 cell 左划取消置顶按钮文案内容
+  public var stickTopBottonCancelTitle = localizable("cancel_stickTop")
+  /// 会话列表 cell 左划置顶按钮文案颜色
+  public var stickTopBottonColor = NEConstant.hexRGB(0x337EFF)
+
+  /// 会话列表 cell 左划删除按钮文案内容
+  public var deleteBottonTitle = localizable("delete")
+  /// 会话列表 cell 左划删除按钮文案颜色
+  public var deleteBottonColor = NEConstant.hexRGB(0xA8ABB6)
 }

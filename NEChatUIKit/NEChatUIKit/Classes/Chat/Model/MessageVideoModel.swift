@@ -17,7 +17,7 @@ class MessageVideoModel: MessageContentModel {
   public var imageUrl: String?
   public var state = DownloadState.Success
   public var progress: Float = 0
-  public weak var cell: ChatBaseCell?
+  public weak var cell: NEChatBaseCell?
   required init(message: NIMMessage?) {
     super.init(message: message)
     type = .video

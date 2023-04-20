@@ -78,7 +78,7 @@ public class ChatAudioRightCell: ChatBaseRightCell, ChatAudioCell {
     }
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageAudioModel {
       timeLabel.text = "\(m.duration)" + "s"

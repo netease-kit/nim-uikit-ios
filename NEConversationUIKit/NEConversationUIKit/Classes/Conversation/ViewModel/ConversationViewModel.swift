@@ -12,6 +12,7 @@ let revokeLocalMessageContent = "revoke_message_local_content"
 public protocol ConversationViewModelDelegate: NSObjectProtocol {
   func didAddRecentSession()
   func didUpdateRecentSession(index: Int)
+  func reloadData()
   func reloadTableView()
 }
 
@@ -32,9 +33,16 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     super.init()
     repo.delegate = self
     repo.addSessionDelegate(delegate: self)
+    repo.chatProvider.addDelegate(delegate: self)
     repo.addTeamDelegate(delegate: self)
     stickTopInfos = repo.getStickTopInfos()
     NIMSDK.shared().userManager.add(self)
+    NotificationCenter.default.addObserver(self, selector: #selector(atMessageChange), name: Notification.Name(AtMessageChangeNoti), object: nil)
+  }
+
+  func atMessageChange() {
+    NELog.infoLog(className(), desc: "atMessageChange")
+    delegate?.reloadTableView()
   }
 
   public func fetchServerSessions(option: NIMFetchServerSessionOption,
@@ -140,6 +148,7 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     NIMSDK.shared().userManager.remove(self)
     repo.removeSessionDelegate(delegate: self)
     repo.removeTeamDelegate(delegate: self)
+    NotificationCenter.default.removeObserver(self)
   }
 
   // MARK: ======================== private method ==============================
@@ -207,6 +216,23 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     }
   }
 
+  // MARK: ==================== NIMChatManagerDelegate ==========================
+
+  public func onRecvMessageReceipts(_ receipts: [NIMMessageReceipt]) {
+    receipts.forEach { receipt in
+      if receipt.session?.sessionType == .P2P {
+        if let listArr = conversationListArray {
+          for (i, listModel) in listArr.enumerated() {
+            if listModel.recentSession?.session?.sessionType == .P2P,
+               receipt.session?.sessionId == listModel.recentSession?.session?.sessionId {
+              delegate?.didUpdateRecentSession(index: i)
+            }
+          }
+        }
+      }
+    }
+  }
+
   // MARK: ==================== ConversationRepoDelegate ==========================
 
   public func onNotifyAddStickTopSession(_ newInfo: NIMStickTopSessionInfo) {
@@ -219,6 +245,20 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     NELog.infoLog(ModuleName + " " + className, desc: #function + ",onNotifyRemoveStickTopSession  sessionId:" + removedInfo.session.sessionId)
     stickTopInfos[removedInfo.session] = nil
     delegate?.reloadTableView()
+  }
+
+  public func onNotifySyncStickTopSessions(_ response: NIMSyncStickTopSessionResponse) {
+    loadStickTopSessionInfos { [weak self] error, sessionInfos in
+      if error != nil {
+        if let infos = self?.repo.getStickTopInfos() {
+          self?.stickTopInfos = infos
+        }
+      } else if let infos = sessionInfos {
+        self?.stickTopInfos = infos
+      }
+      self?.delegate?.reloadTableView()
+      self?.delegate?.reloadData()
+    }
   }
 
   public func didServerSessionUpdated(_ recentSession: NIMRecentSession?) {}
@@ -298,6 +338,11 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
       ModuleName + " " + className,
       desc: #function + "recentSession, didUpdate sessionId:" + (recentSession.session?.sessionId ?? "nil")
     )
+    if let sessionId = recentSession.session?.sessionId {
+      if NEAtMessageManager.instance.isAtCurrentUser(sessionId: sessionId) == true {
+        NEAtMessageManager.instance.clearAtRecord(sessionId)
+      }
+    }
 
     if let object = recentSession.lastMessage?.messageObject as? NIMNotificationObject, object.notificationType == .team {
       if let content = object.content as? NIMTeamNotificationContent {
@@ -347,8 +392,19 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     }
     if let conversationArr = conversationListArray {
       for i in 0 ..< conversationArr.count {
+        if conversationArr[i].recentSession?.session?.sessionId.count ?? 0 <= 0 {
+          NELog.infoLog(
+            ModuleName + " " + className,
+            desc: #function + ",didRemove recentSession  sessionId is empty  user: \(conversationArr[i].userInfo?.userId ?? "") team: \(conversationArr[i].teamInfo?.teamId ?? "")"
+          )
+        }
         if conversationArr[i].recentSession?.session?.sessionId == recentSession.session?
           .sessionId {
+          NELog.infoLog(
+            ModuleName + " " + className,
+            desc: #function + ",remove session list at index : \(i) sessionid : \(recentSession.session?.sessionId ?? "")"
+          )
+
           conversationListArray?.remove(at: i)
           break
         }

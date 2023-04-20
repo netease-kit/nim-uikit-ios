@@ -15,6 +15,7 @@ protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didClickHistoryMessage()
   func didNeedRefreshUI()
   func didError(_ error: Error)
+  func didClickMark()
 }
 
 @objcMembers
@@ -32,8 +33,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   weak var delegate: TeamSettingViewModelDelegate?
 
   private let className = "TeamSettingViewModel"
-
-  private var usersDic = [String: TeamMemberInfoModel]()
 
   override public init() {
     super.init()
@@ -73,17 +72,19 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     let model = SettingSectionModel()
 
-    /*
-     let mark = SettingCellModel()
-     mark.cellName = localizable("mark")
-     mark.type = SettingCellType.SettingArrowCell.rawValue
-     mark.cornerType = .topLeft.union(.topRight)
-      */
     weak var weakSelf = self
+
+    let mark = SettingCellModel()
+    mark.cellName = localizable("mark")
+    mark.type = SettingCellType.SettingArrowCell.rawValue
+    mark.cornerType = .topLeft.union(.topRight)
+    mark.cellClick = {
+      weakSelf?.delegate?.didClickMark()
+    }
+
     let history = SettingCellModel()
-    history.cellName = localizable("history")
+    history.cellName = localizable("historical_record")
     history.type = SettingCellType.SettingArrowCell.rawValue
-    history.cornerType = .topLeft.union(.topRight)
     history.cellClick = {
       weakSelf?.delegate?.didClickHistoryMessage()
     }
@@ -161,7 +162,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
-    model.cellModels.append(contentsOf: [history, remind, setTop])
+    model.cellModels.append(contentsOf: [mark, history, remind, setTop])
 
     return model
   }
@@ -308,11 +309,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
       print("get team info team: ", teamInfo?.team as Any)
       print("get team info error: ", error as Any)
-      teamInfo?.users.forEach { model in
-        if let id = model.nimUser?.userId as? String {
-          weakSelf?.usersDic[id] = model
-        }
-      }
       if error == nil {
         weakSelf?.getData()
         weakSelf?.getCurrentMember(IMKitEngine.instance.imAccid, teamId)
@@ -432,9 +428,11 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     if let accids = memberIDs {
       weak var weakSelf = self
       accids.forEach { accid in
-        if let model = weakSelf?.usersDic[accid] {
-          if let index = weakSelf?.teamInfoModel?.users.firstIndex(of: model) {
-            weakSelf?.teamInfoModel?.users.remove(at: index)
+        if let users = teamInfoModel?.users {
+          for (i, m) in users.enumerated() {
+            if m.nimUser?.userId == accid {
+              teamInfoModel?.users.remove(at: i)
+            }
           }
         }
       }

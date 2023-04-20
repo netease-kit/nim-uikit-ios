@@ -6,23 +6,26 @@
 import UIKit
 import NIMSDK
 
+public protocol ConversationListViewControllerDelegate {
+  func onDataLoaded()
+}
+
 @objcMembers
 open class ConversationListViewController: UIViewController {
-  private var viewModel = ConversationViewModel()
+  public var viewModel = ConversationViewModel()
   private let className = "ConversationListViewController"
-  private var tableViewTopConstraint: NSLayoutConstraint?
 
-  private lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(
-      imageName: "user_empty",
-      content: localizable("session_empty"),
-      frame: CGRect.zero
-    )
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
-    return view
+  public var topViewHeight: CGFloat = 0 {
+    didSet {
+      topViewHeightAnchor?.constant = topViewHeight
+      topView.isHidden = topViewHeight <= 0
+    }
+  }
 
-  }()
+  public var topViewHeightAnchor: NSLayoutConstraint?
+  public var delegate: ConversationListViewControllerDelegate?
+
+  public var registerCellDic = [0: ConversationListCell.self]
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -41,35 +44,52 @@ open class ConversationListViewController: UIViewController {
       if let infos = sessionInfos {
         weakSelf?.viewModel.stickTopInfos = infos
         weakSelf?.reloadTableView()
-      }
-    }
-    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
-      if status == .notReachable {
-        weakSelf?.brokenNetworkView.isHidden = false
-        weakSelf?.tableViewTopConstraint?.constant = 36
-      } else {
-        weakSelf?.brokenNetworkView.isHidden = true
-        weakSelf?.tableViewTopConstraint?.constant = 0
+        weakSelf?.delegate?.onDataLoaded()
       }
     }
   }
 
   open func initialConfig() {
     viewModel.delegate = self
+    weak var weakSelf = self
+    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
+      if status == .notReachable {
+        weakSelf?.brokenNetworkView.isHidden = false
+        weakSelf?.topView.isHidden = true
+        weakSelf?.topViewHeightAnchor?.constant = 36
+      } else {
+        weakSelf?.brokenNetworkView.isHidden = true
+        weakSelf?.topView.isHidden = false
+        weakSelf?.topViewHeightAnchor?.constant = weakSelf?.topViewHeight ?? 0
+      }
+    }
   }
 
   open func setupSubviews() {
+    view.addSubview(topView)
     view.addSubview(tableView)
     view.addSubview(emptyView)
     view.addSubview(brokenNetworkView)
 
     NSLayoutConstraint.activate([
+      topView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      topView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      topView.topAnchor.constraint(equalTo: view.topAnchor),
+
+    ])
+    topViewHeightAnchor = topView.heightAnchor.constraint(equalToConstant: topViewHeight)
+    topViewHeightAnchor?.isActive = true
+
+    NSLayoutConstraint.activate([
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      tableView.topAnchor.constraint(equalTo: topView.bottomAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    tableViewTopConstraint = tableView.topAnchor.constraint(equalTo: view.topAnchor)
-    tableViewTopConstraint?.isActive = true
+
+    registerCellDic.forEach { (key: Int, value: ConversationListCell.Type) in
+      tableView.register(value, forCellReuseIdentifier: "\(key)")
+    }
 
     NSLayoutConstraint.activate([
       emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
@@ -93,6 +113,7 @@ open class ConversationListViewController: UIViewController {
           if recentList.count > 0 {
             weakSelf?.emptyView.isHidden = true
             weakSelf?.reloadTableView()
+            weakSelf?.delegate?.onDataLoaded()
           } else {
             weakSelf?.emptyView.isHidden = false
           }
@@ -110,27 +131,42 @@ open class ConversationListViewController: UIViewController {
 
   // MARK: lazy method
 
-  private lazy var tableView: UITableView = {
+  public lazy var topView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+    return view
+  }()
+
+  public lazy var tableView: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
     tableView.delegate = self
     tableView.dataSource = self
-    tableView.register(
-      ConversationListCell.self,
-      forCellReuseIdentifier: "\(NSStringFromClass(ConversationListCell.self))"
-    )
     tableView.rowHeight = 62
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     tableView.backgroundColor = .white
     return tableView
   }()
 
-  private lazy var brokenNetworkView: NEBrokenNetworkView = {
+  public lazy var brokenNetworkView: NEBrokenNetworkView = {
     let view =
       NEBrokenNetworkView(frame: CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: 36))
     view.isHidden = true
     return view
+  }()
+
+  public lazy var emptyView: NEEmptyDataView = {
+    let view = NEEmptyDataView(
+      imageName: "user_empty",
+      content: localizable("session_empty"),
+      frame: CGRect.zero
+    )
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+
   }()
 }
 
@@ -195,28 +231,28 @@ extension ConversationListViewController {
 }
 
 extension ConversationListViewController: UITableViewDelegate, UITableViewDataSource {
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     let count = viewModel.conversationListArray?.count ?? 0
     NELog.infoLog(ModuleName + " " + "ConversationListViewController",
                   desc: "numberOfRowsInSection count : \(count)")
     return count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(NSStringFromClass(ConversationListCell.self))",
-      for: indexPath
-    ) as! ConversationListCell
-    if let count = viewModel.conversationListArray?.count, count > indexPath.row {
-      let conversationModel = viewModel.conversationListArray?[indexPath.row]
-      cell.topStickInfos = viewModel.stickTopInfos
-      cell.configData(sessionModel: conversationModel)
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewModel.conversationListArray?[indexPath.row]
+    var reusedId = "\(model?.customType ?? 0)"
+    let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
+
+    if let c = cell as? ConversationListCell {
+      c.topStickInfos = viewModel.stickTopInfos
+      c.configData(sessionModel: model)
     }
+
     return cell
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let conversationModel = viewModel.conversationListArray?[indexPath.row]
 
     guard let sid = conversationModel?.recentSession?.session?.sessionId else {
@@ -228,8 +264,8 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
     onselectedTableRow(sessionType: sessionType, sessionId: sid, indexPath: indexPath)
   }
 
-  public func tableView(_ tableView: UITableView,
-                        editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+  open func tableView(_ tableView: UITableView,
+                      editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     weak var weakSelf = self
     var rowActions = [UITableViewRowAction]()
 
@@ -240,44 +276,19 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
     }
 
     let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: localizable("delete")) { action, indexPath in
-
-      weakSelf?.viewModel.deleteRecentSession(recentSession: recentSession)
-      weakSelf?.didDeleteConversationCell(
-        model: conversationModel ?? ConversationListModel(),
-        indexPath: indexPath
-      )
+                                            title: NEKitConversationConfig.shared.ui.deleteBottonTitle) { action, indexPath in
+      weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
 
     // 置顶和取消置顶
     let isTop = viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? localizable("cancel_stickTop") :
-                                           localizable("stickTop")) { action, indexPath in
-      if let recentSesstion = conversationModel?.recentSession {
-        weakSelf?.onTopRecentAtIndexPath(
-          rencent: recentSesstion,
-          indexPath: indexPath,
-          isTop: isTop
-        ) { error, sessionInfo in
-          if error == nil {
-            if isTop {
-              weakSelf?.didRemoveStickTopSession(
-                model: conversationModel ?? ConversationListModel(),
-                indexPath: indexPath
-              )
-            } else {
-              weakSelf?.didAddStickTopSession(
-                model: conversationModel ?? ConversationListModel(),
-                indexPath: indexPath
-              )
-            }
-          }
-        }
-      }
+                                         title: isTop ? NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle :
+                                           NEKitConversationConfig.shared.ui.stickTopBottonTitle) { action, indexPath in
+      weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
-    deleteAction.backgroundColor = NEConstant.hexRGB(0xA8ABB6)
-    topAction.backgroundColor = NEConstant.hexRGB(0x337EFF)
+    deleteAction.backgroundColor = NEKitConversationConfig.shared.ui.deleteBottonColor
+    topAction.backgroundColor = NEKitConversationConfig.shared.ui.stickTopBottonColor
     rowActions.append(deleteAction)
     rowActions.append(topAction)
 
@@ -316,6 +327,42 @@ extension ConversationListViewController: UITableViewDelegate, UITableViewDataSo
    return actionConfig
    }
    */
+
+  open func deleteActionHandler(action: UITableViewRowAction, indexPath: IndexPath) {
+    let conversationModel = viewModel.conversationListArray?[indexPath.row]
+    if let recentSession = conversationModel?.recentSession {
+      viewModel.deleteRecentSession(recentSession: recentSession)
+      didDeleteConversationCell(
+        model: conversationModel ?? ConversationListModel(),
+        indexPath: indexPath
+      )
+    }
+  }
+
+  open func topActionHandler(action: UITableViewRowAction, indexPath: IndexPath, isTop: Bool) {
+    let conversationModel = viewModel.conversationListArray?[indexPath.row]
+    if let recentSession = conversationModel?.recentSession {
+      onTopRecentAtIndexPath(
+        rencent: recentSession,
+        indexPath: indexPath,
+        isTop: isTop
+      ) { [weak self] error, sessionInfo in
+        if error == nil {
+          if isTop {
+            self?.didRemoveStickTopSession(
+              model: conversationModel ?? ConversationListModel(),
+              indexPath: indexPath
+            )
+          } else {
+            self?.didAddStickTopSession(
+              model: conversationModel ?? ConversationListModel(),
+              indexPath: indexPath
+            )
+          }
+        }
+      }
+    }
+  }
 }
 
 // MARK: UI UIKit提供的重写方法
@@ -377,6 +424,10 @@ extension ConversationListViewController: ConversationViewModelDelegate {
   public func didUpdateRecentSession(index: Int) {
     let indexPath = IndexPath(row: index, section: 0)
     tableView.reloadRows(at: [indexPath], with: .none)
+  }
+
+  public func reloadData() {
+    delegate?.onDataLoaded()
   }
 
   public func reloadTableView() {

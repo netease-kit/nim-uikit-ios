@@ -86,25 +86,20 @@ public class UserInfoHeaderView: UIView {
     guard let user = user else {
       return
     }
-    avatarImage.backgroundColor = UIColor.colorWithString(string: user.userId)
+
     // avatar
-    if let imageUrl = user.userInfo?.avatarUrl {
+    if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
       avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
       nameLabel.isHidden = true
+    } else {
+      avatarImage.sd_setImage(with: nil)
+      avatarImage.backgroundColor = UIColor.colorWithString(string: user.userId)
+      nameLabel.text = user.shortName(showAlias: false, count: 2)
+      nameLabel.isHidden = false
     }
 
     // title
-    var showName = user.alias?.count ?? 0 > 0 ? user.alias : user.userInfo?.nickName
-    if showName == nil || showName?.count == 0 {
-      showName = user.userId
-    }
-    if let name = showName {
-      titleLabel.text = name
-      if avatarImage.image == nil {
-        nameLabel.text = name
-          .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
-      }
-    }
+    titleLabel.text = user.showName()
 
     detailLabel.text = "\(localizable("account")):\(user.userId ?? "")"
   }

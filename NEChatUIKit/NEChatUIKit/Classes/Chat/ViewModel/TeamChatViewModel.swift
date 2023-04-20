@@ -10,6 +10,7 @@ import NECoreIMKit
 public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
   func onTeamRemoved(team: NIMTeam)
   func onTeamUpdate(team: NIMTeam)
+  func onTeamMemberUpdate(team: NIMTeam)
 }
 
 @objcMembers
@@ -71,6 +72,19 @@ public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
       if let delegate = delegate as? TeamChatViewModelDelegate {
         delegate.onTeamUpdate(team: team)
       }
+    }
+  }
+
+  public func onTeamMemberUpdated(_ team: NIMTeam, withMembers memberIDs: [String]?) {
+    guard let membersIds = memberIDs else {
+      return
+    }
+    for memberId in membersIds {
+      let user = UserInfoProvider.shared.getUserInfo(userId: memberId)
+      newUserInfoDic[memberId] = user
+    }
+    if let delegate = delegate as? TeamChatViewModelDelegate {
+      delegate.onTeamMemberUpdate(team: team)
     }
   }
 }

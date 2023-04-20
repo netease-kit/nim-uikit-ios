@@ -31,7 +31,7 @@ public class ChatRevokeLeftCell: ChatBaseLeftCell {
     ])
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     label.text = chatLocalizable("message_has_be_withdrawn")
   }

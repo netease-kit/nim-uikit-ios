@@ -75,7 +75,7 @@ class BlackListCell: TeamTableViewCell {
       nameLabel.text = ""
       avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
     } else {
-      nameLabel.text = user.shortName(count: 2)
+      nameLabel.text = user.shortName(showAlias: false, count: 2)
       avatarImage.image = nil
     }
   }

@@ -34,16 +34,30 @@ public class BaseValidationCell: ContactBaseViewCell {
   func setupUI() {
     setupCommonCircleHeader()
 
+    contentView.addSubview(redAngleView)
+    NSLayoutConstraint.activate([
+      redAngleView.centerXAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: -8),
+      redAngleView.centerYAnchor.constraint(equalTo: avatarImage.topAnchor, constant: 8),
+      redAngleView.heightAnchor.constraint(equalToConstant: 18),
+    ])
+
     addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 10),
-      titleLabel.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
+      titleLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor),
     ])
     titleLabelRightMargin = titleLabel.rightAnchor.constraint(
       equalTo: contentView.rightAnchor,
       constant: -10
     )
     titleLabelRightMargin?.isActive = true
+
+    addSubview(optionLabel)
+    NSLayoutConstraint.activate([
+      optionLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 10),
+      optionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+      optionLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -180),
+    ])
 
     let line = UIView()
     addSubview(line)
@@ -58,7 +72,7 @@ public class BaseValidationCell: ContactBaseViewCell {
   }
 
   public func confige(_ model: XNotification) {
-    var titleLabelContent = ""
+    var optionLabelContent = ""
     var nickName = ""
     var teamName = ""
     // 设置操作者名称
@@ -82,10 +96,10 @@ public class BaseValidationCell: ContactBaseViewCell {
     // 设置头像
     if let headerUrl = model.userInfo?.userInfo?.avatarUrl, !headerUrl.isEmpty {
       avatarImage.sd_setImage(with: URL(string: headerUrl), completed: nil)
-      titleLabel.text = ""
+      nameLabel.text = ""
     } else if let teamUrl = model.teamInfo?.avatarUrl, !teamUrl.isEmpty {
       avatarImage.sd_setImage(with: URL(string: teamUrl), completed: nil)
-      titleLabel.text = ""
+      nameLabel.text = ""
     } else {
       // 无头像设置其name
       if !nickName.isEmpty {
@@ -98,42 +112,54 @@ public class BaseValidationCell: ContactBaseViewCell {
       avatarImage.sd_setImage(with: URL(string: ""), completed: nil)
     }
 
+    // 设置未读状态（未读数角标+底色）
+    redAngleView.isHidden = true
+    contentView.backgroundColor = .white
+    if model.unReadCount > 0 {
+      contentView.backgroundColor = UIColor(hexString: "0xF3F5F7")
+      if model.unReadCount > 1 {
+        redAngleView.isHidden = false
+        redAngleView.text = model.unReadCount > 99 ? "99+" : "\(model.unReadCount)"
+      }
+    }
+
     if let t = model.targetName {
       teamName = t
     }
     if let type = model.type {
       switch type {
       case .teamApply:
-        titleLabelContent = "\(nickName) 申请入群"
+        optionLabelContent = "申请加入群聊 \"\(teamName)\""
       case .teamApplyReject:
-        titleLabelContent = "\(nickName) 拒绝入群"
+        optionLabelContent = "拒绝入群邀请 \"\(teamName)\""
       case .teamInvite:
-        titleLabelContent = "\(nickName) 邀请你加入 \(teamName)"
+        optionLabelContent = "邀请您加入群聊 \"\(teamName)\""
       case .teamInviteReject:
-        titleLabelContent = "\(nickName) 拒绝入群邀请"
+        optionLabelContent = "拒绝入群邀请 \"\(teamName)\""
 
       case .superTeamApply:
-        titleLabelContent = "\(nickName) 申请加入超大群"
+        optionLabelContent = "申请加入超大群"
       case .superTeamApplyReject:
-        titleLabelContent = "\(nickName) 拒绝加入超大群"
+        optionLabelContent = "拒绝加入超大群"
 
       case .superTeamInvite:
-        titleLabelContent = "\(nickName) 邀请加入 \(teamName) 群"
+        optionLabelContent = "邀请您加入群聊 \"\(teamName)\""
       case .superTeamInviteReject:
-        titleLabelContent = "\(nickName) 拒绝加入 \(teamName) 群"
+        optionLabelContent = "拒绝入群邀请 \"\(teamName)\""
       case .addFriendDirectly:
-        titleLabelContent = "\(nickName) 添加你为好友"
+        optionLabelContent = "添加您为好友"
       case .addFriendRequest:
-        titleLabelContent = "\(nickName) 好友申请"
+        optionLabelContent = "好友申请"
       case .addFriendVerify:
-        titleLabelContent = "\(nickName) 通过好友申请"
+        optionLabelContent = "同意了你的好友请求"
       case .addFriendReject:
-        titleLabelContent = "\(nickName) 拒绝好友申请"
+        optionLabelContent = "拒绝了你的好友请求"
       @unknown default:
-        titleLabelContent = "\(nickName) 未知操作"
+        optionLabelContent = "未知操作"
       }
     }
 
-    titleLabel.text = titleLabelContent
+    titleLabel.text = nickName
+    optionLabel.text = optionLabelContent
   }
 }

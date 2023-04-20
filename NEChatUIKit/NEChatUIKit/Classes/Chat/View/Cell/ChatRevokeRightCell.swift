@@ -5,7 +5,7 @@
 
 import UIKit
 
-// protocol ChatRevokeRightCellDelegate: ChatBaseCellDelegate  {
+// protocol ChatRevokeRightCellDelegate: NEChatBaseCellDelegate  {
 //    func onReeditMessage(_ cell: UITableViewCell, _ model: MessageContentModel?)
 // }
 
@@ -16,7 +16,7 @@ public class ChatRevokeRightCell: ChatBaseRightCell {
   public var label = UILabel()
   public var reeditButton = UIButton(type: .custom)
 //    public var reeditBlock: ReeditBlock?
-//    public override var delegate: ChatBaseCellDelegate?
+//    public override var delegate: NEChatBaseCellDelegate?
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -56,7 +56,7 @@ public class ChatRevokeRightCell: ChatBaseRightCell {
     reeditButton.addTarget(self, action: #selector(reeditEvent), for: .touchUpInside)
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     if let time = model.message?.timestamp {
       let date = Date()
       let currentTime = date.timeIntervalSince1970

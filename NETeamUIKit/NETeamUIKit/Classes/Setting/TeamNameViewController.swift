@@ -178,6 +178,11 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
   }
 
   func saveName() {
+    guard let tid = team?.teamId else {
+      showToast(localizable("team_not_exist"))
+      return
+    }
+
     if let text = textField.text,
        !text.isEmpty {
       let trimText = text.trimmingCharacters(in: .whitespaces)
@@ -191,7 +196,7 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
 
     weak var weakSelf = self
     textField.resignFirstResponder()
-    if type == .TeamName, let tid = team?.teamId {
+    if type == .TeamName {
       let n = textField.text ?? ""
       view.makeToastActivity(.center)
       repo.updateTeamName(tid, n) { error in
@@ -203,7 +208,7 @@ public class TeamNameViewController: NEBaseViewController, UITextFieldDelegate {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
       }
-    } else if type == .NickName, let tid = team?.teamId, let uid = teamMember?.userId {
+    } else if type == .NickName, let uid = teamMember?.userId {
       let n = textField.text ?? ""
       view.makeToastActivity(.center)
       repo.updateMemberNick(tid, uid, n) { error in

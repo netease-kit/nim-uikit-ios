@@ -6,7 +6,7 @@
 import UIKit
 import NIMSDK
 @objcMembers
-public class ChatBaseLeftCell: ChatBaseCell {
+public class ChatBaseLeftCell: NEChatBaseCell {
   public var avatarImage = UIImageView()
   public var nameLabel = UILabel()
   public var fullNameLabel = UILabel()
@@ -54,8 +54,8 @@ public class ChatBaseLeftCell: ChatBaseCell {
     // name
     nameLabel.textAlignment = .center
     nameLabel.translatesAutoresizingMaskIntoConstraints = false
-    nameLabel.font = UIFont.systemFont(ofSize: 12)
-    nameLabel.textColor = .white
+    nameLabel.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.userNickTextSize)
+    nameLabel.textColor = NEKitChatConfig.shared.ui.userNickColor
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
@@ -78,7 +78,9 @@ public class ChatBaseLeftCell: ChatBaseCell {
     ])
 
 //        bubbleImage
-    if let image = NEKitChatConfig.shared.ui.leftBubbleBg {
+    if let bgColor = NEKitChatConfig.shared.ui.receiveMessageBg {
+      bubbleImage.backgroundColor = bgColor
+    } else if let image = NEKitChatConfig.shared.ui.leftBubbleBg {
       bubbleImage.image = image
         .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
     }
@@ -131,6 +133,7 @@ public class ChatBaseLeftCell: ChatBaseCell {
     pinLabel.textColor = UIColor.ne_greenText
     pinLabel.isHidden = true
     pinLabelH = pinLabel.heightAnchor.constraint(equalToConstant: 0)
+    pinLabel.lineBreakMode = .byTruncatingMiddle
 
     NSLayoutConstraint.activate([
       pinLabel.topAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 4),
@@ -145,6 +148,9 @@ public class ChatBaseLeftCell: ChatBaseCell {
 //        avatar
     let tap = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
     avatarImage.addGestureRecognizer(tap)
+
+    let avatarLongGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressAvatar))
+    avatarImage.addGestureRecognizer(avatarLongGesture)
 
     let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
     bubbleImage.addGestureRecognizer(messageTap)
@@ -176,6 +182,12 @@ public class ChatBaseLeftCell: ChatBaseCell {
     delegate?.didTapMessageView(self, contentModel)
   }
 
+  func longPressAvatar(longPress: UITapGestureRecognizer) {
+    if longPress.state == .began {
+      delegate?.didLongPressAvatar(self, contentModel)
+    }
+  }
+
   func longPress(longPress: UILongPressGestureRecognizer) {
     print(#function)
     switch longPress.state {
@@ -197,7 +209,7 @@ public class ChatBaseLeftCell: ChatBaseCell {
 
 //    MARK: set data
 
-  func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     contentModel = model
     updatePinStatus(model)
     bubbleW?.constant = model.contentSize.width
@@ -243,7 +255,7 @@ public class ChatBaseLeftCell: ChatBaseCell {
     pinLabel.isHidden = !model.isPined
     pinImage.isHidden = !model.isPined
     contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
-      .chatPinColor : .white
+      .signalBgColor : .white
     if model.isPined {
       let pinText = model.message?.session?.sessionType == .P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
       if model.pinAccount == nil {

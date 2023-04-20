@@ -31,9 +31,14 @@ public class UserSettingViewModel: NSObject {
     }
     userInfo = user
     weak var weakSelf = self
+
+    let mark = UserSettingCellModel()
+    mark.cellName = chatLocalizable("operation_pin")
+    mark.type = UserSettingType.SelectType.rawValue
+    mark.cornerType = .topLeft.union(.topRight)
+
     let remind = UserSettingCellModel()
     remind.cellName = chatLocalizable("message_remind")
-    remind.cornerType = .topLeft.union(.topRight)
     if let isNotiMsg = user.imUser?.notifyForNewMsg() {
       remind.switchOpen = isNotiMsg
     }
@@ -113,6 +118,6 @@ public class UserSettingViewModel: NSObject {
          }
      }
      */
-    cellDatas.append(contentsOf: [remind, setTop])
+    cellDatas.append(contentsOf: [mark, remind, setTop])
   }
 }

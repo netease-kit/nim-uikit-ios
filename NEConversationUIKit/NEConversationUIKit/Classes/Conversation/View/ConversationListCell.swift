@@ -22,7 +22,7 @@ open class ConversationListCell: UITableViewCell {
     // Configure the view for the selected state
   }
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setupSubviews()
     initSubviewsLayout()
@@ -94,7 +94,7 @@ open class ConversationListCell: UITableViewCell {
     }
   }
 
-  func configData(sessionModel: ConversationListModel?) {
+  open func configData(sessionModel: ConversationListModel?) {
     guard let conversationModel = sessionModel else { return }
 
     if conversationModel.recentSession?.session?.sessionType == .P2P {
@@ -103,7 +103,7 @@ open class ConversationListCell: UITableViewCell {
         headImge.setTitle("")
         headImge.sd_setImage(with: URL(string: imageName), completed: nil)
       } else {
-        headImge.setTitle(conversationModel.userInfo?.showName() ?? "")
+        headImge.setTitle(conversationModel.userInfo?.showName(false) ?? "")
         headImge.sd_setImage(with: nil, completed: nil)
         headImge.backgroundColor = UIColor
           .colorWithString(string: conversationModel.userInfo?.userId)
@@ -139,7 +139,18 @@ open class ConversationListCell: UITableViewCell {
 
     // last message
     if let lastMessage = conversationModel.recentSession?.lastMessage {
-      subTitle.text = contentForRecentSession(message: lastMessage)
+      let text = contentForRecentSession(message: lastMessage)
+      let mutaAttri = NSMutableAttributedString(string: text)
+      if let sessionId = sessionModel?.recentSession?.session?.sessionId {
+        let isAtMessage = NEAtMessageManager.instance.isAtCurrentUser(sessionId: sessionId)
+        if isAtMessage == true {
+          let atStr = localizable("you_were_mentioned")
+          mutaAttri.insert(NSAttributedString(string: atStr), at: 0)
+          mutaAttri.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_redText, range: NSMakeRange(0, atStr.count))
+          mutaAttri.addAttribute(NSAttributedString.Key.font, value: NEKitConversationConfig.shared.ui.subTitleFont, range: NSMakeRange(0, mutaAttri.length))
+        }
+      }
+      subTitle.attributedText = mutaAttri // contentForRecentSession(message: lastMessage)
     }
 
     // unRead message count
@@ -208,14 +219,14 @@ open class ConversationListCell: UITableViewCell {
     }
   }
 
-  func contentForRecentSession(message: NIMMessage) -> String {
+  open func contentForRecentSession(message: NIMMessage) -> String {
     let text = NEMessageUtil.messageContent(message: message)
     return text
   }
 
   // MARK: lazy Method
 
-  lazy var headImge: NEUserHeaderView = {
+  public lazy var headImge: NEUserHeaderView = {
     let headView = NEUserHeaderView(frame: .zero)
     headView.titleLabel.textColor = .white
     headView.titleLabel.font = NEConstant.defaultTextFont(14)
@@ -225,7 +236,7 @@ open class ConversationListCell: UITableViewCell {
     return headView
   }()
 
-  private lazy var redAngleView: RedAngleLabel = {
+  public lazy var redAngleView: RedAngleLabel = {
     let label = RedAngleLabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(12)
@@ -239,7 +250,7 @@ open class ConversationListCell: UITableViewCell {
     return label
   }()
 
-  private lazy var title: UILabel = {
+  public lazy var title: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.titleColor
@@ -248,7 +259,7 @@ open class ConversationListCell: UITableViewCell {
     return label
   }()
 
-  private lazy var subTitle: UILabel = {
+  public lazy var subTitle: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.subTitleColor
@@ -256,7 +267,7 @@ open class ConversationListCell: UITableViewCell {
     return label
   }()
 
-  private lazy var timeLabel: UILabel = {
+  public lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.timeColor
@@ -265,7 +276,7 @@ open class ConversationListCell: UITableViewCell {
     return label
   }()
 
-  private lazy var notifyMsg: UIImageView = {
+  public lazy var notifyMsg: UIImageView = {
     let notify = UIImageView()
     notify.translatesAutoresizingMaskIntoConstraints = false
     notify.image = UIImage.ne_imageNamed(name: "noNeed_notify")

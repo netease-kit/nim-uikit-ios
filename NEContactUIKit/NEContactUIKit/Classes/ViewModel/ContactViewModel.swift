@@ -43,10 +43,10 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
 
   public func onRecieveNotification(_ notification: XNotification) {}
 
-  func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?) -> Void) {
+  func loadData(fetch: Bool = false, _ filters: Set<String>? = nil, completion: @escaping (NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
-    getContactList(filters) { contacts, error in
+    getContactList(fetch, filters) { contacts, error in
       if let users = contacts {
         NELog.infoLog("contact loadData", desc: "contact data:\(contacts)")
         weakSelf?.contacts = users
@@ -59,11 +59,15 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     }
   }
 
-  func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
+  func reLoadData(completion: @escaping (NSError?) -> Void) {
+    loadData(fetch: true, completion: completion)
+  }
+
+  func getContactList(_ fetch: Bool = false, _ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", filters.count: \(filters?.count ?? 0)")
     var contactList: [ContactSection] = []
     weak var weakSelf = self
-    contactRepo.getFriendList { [self] friends, error in
+    contactRepo.getFriendList(fetch) { friends, error in
       if var users = friends {
         NELog.infoLog("contact bar getFriendList", desc: "friend count:\(friends?.count)")
         weakSelf?.initalDict = [String: [ContactInfo]]()
@@ -115,6 +119,10 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
         }
         specialCharList.sort { s1, s2 in
           s1.user!.showName()! < s2.user!.showName()!
+        }
+
+        guard let initalDict = weakSelf?.initalDict else {
+          return
         }
 
         for key in initalDict.keys {

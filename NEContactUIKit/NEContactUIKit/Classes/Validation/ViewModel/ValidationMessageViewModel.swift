@@ -56,27 +56,81 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
 //    }
 //  }
 
+  func isExist(xNoti: inout XNotification, list: inout [XNotification]) -> Bool {
+    for loopList in list {
+      if xNoti.isEqualTo(noti: loopList) {
+        if loopList.msgList == nil {
+          loopList.msgList = [xNoti]
+        } else {
+          loopList.msgList!.append(xNoti)
+        }
+        loopList.teamInfo = xNoti.teamInfo
+        loopList.userInfo = xNoti.userInfo
+        if let loopTime = loopList.timestamp,
+           let xNotiTime = xNoti.timestamp,
+           loopTime < xNotiTime {
+          loopList.timestamp = xNoti.timestamp
+        }
+        if !(xNoti.read ?? false) {
+          loopList.unReadCount += 1
+        }
+        return true
+      }
+    }
+    if !(xNoti.read ?? false) {
+      xNoti.unReadCount += 1
+    }
+    return false
+  }
+
   public func onRecieveNotification(_ notification: XNotification) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
-//        if notification.type == .addFriendDirectly {
-//            datas.insert(notification, at: 0)
-//        }
-    datas.insert(notification, at: 0)
-    contactRepo.clearNotificationUnreadCount()
+    var noti = notification
+    if !isExist(xNoti: &noti, list: &datas) {
+      datas.insert(notification, at: 0)
+    }
+    datas.sort { xNoti1, xNoti2 in
+      (xNoti1.timestamp ?? 0) > (xNoti2.timestamp ?? 0)
+    }
     if let block = dataRefresh {
       block()
     }
   }
 
-  func getValidationMessage(_ completin: () -> Void) {
+  func getValidationMessage(_ completin: @escaping () -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
-    let data = contactRepo.getNotificationList(limit: 500)
-    datas = data
-    if datas.count > 0 {
+    contactRepo.getNotificationList(limit: 500) { [weak self] xNotiList in
+      var data = [XNotification]()
+      let dateNow = Date().timeIntervalSince1970
+      for xNoti in xNotiList {
+        var noti = xNoti
+
+        // 过期事件：7天（10080s）
+        if noti.handleStatus == .HandleTypePending,
+           dateNow - (noti.timestamp ?? 0) > 10080 {
+          noti.handleStatus = .HandleTypeOutOfDate
+        }
+
+        if !self!.isExist(xNoti: &noti, list: &data) {
+          data.append(xNoti)
+        }
+      }
+      self!.datas = data.sorted(by: { xNoti1, xNoti2 in
+        (xNoti1.timestamp ?? 0) > (xNoti2.timestamp ?? 0)
+      })
+      if self!.datas.count <= 0 {
+        NELog.warn(ModuleName + " " + self!.className, desc: "⚠️NotificationList is empty")
+      }
       completin()
-    } else {
-      NELog.warn(ModuleName + " " + className, desc: "⚠️NotificationList is empty")
     }
+  }
+
+  func clearNotiUnreadCount() {
+    contactRepo.clearNotificationUnreadCount()
+  }
+
+  func clearSingleNotifyUnreadCount(notification: NIMSystemNotification) {
+    contactRepo.clearSingleNotifyUnreadCount(notification: notification)
   }
 
   func clearAllNoti(_ completion: () -> Void) {

@@ -127,15 +127,18 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
         channelName:self.callParam.channelName
          completion:^(NSError *_Nullable error) {
            NSLog(@"call error code : %@", error);
-
-           if (weakSelf.callType == NERtcCallTypeVideo) {
+           __strong typeof(self) strongSelf = weakSelf;
+           if (strongSelf.callType == NERtcCallTypeVideo) {
              if ([[SettingManager shareInstance] isGlobalInit] == YES) {
+               __weak typeof(self) weakSelf2 = strongSelf;
                dispatch_async(dispatch_get_main_queue(), ^{
+                 __strong typeof(self) strongSelf2 = weakSelf2;
                  [[NERtcCallKit sharedInstance]
-                     setupLocalView:weakSelf.videoCallingController.bigVideoView.videoView];
+                     setupLocalView:strongSelf2.videoCallingController.bigVideoView.videoView];
                });
              }
-             self.videoCallingController.bigVideoView.userID = weakSelf.callParam.currentUserAccid;
+             strongSelf.videoCallingController.bigVideoView.userID =
+                 strongSelf.callParam.currentUserAccid;
            }
 
            if (error) {
@@ -143,7 +146,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
              if (error.code == 10202 || error.code == 10201) {
                return;
              } else {
-               [weakSelf onCallEnd];
+               [strongSelf onCallEnd];
              }
              [UIApplication.sharedApplication.keyWindow makeToast:error.localizedDescription];
            }
@@ -328,15 +331,17 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
           sd_setImageWithURL:[NSURL URLWithString:self.callParam.remoteAvatar]
                    completed:^(UIImage *_Nullable image, NSError *_Nullable error,
                                SDImageCacheType cacheType, NSURL *_Nullable imageURL) {
+                     __strong typeof(self) strongSelf = weakSelf;
                      if (image == nil) {
                        image = [UIImage imageNamed:@"avator"
-                                                inBundle:self.bundle
+                                                inBundle:strongSelf.bundle
                            compatibleWithTraitCollection:nil];
                      }
-                     if (weakSelf.isCaller == false && weakSelf.callType == NERtcCallTypeVideo) {
-                       [weakSelf.blurImage setHidden:NO];
+                     if (strongSelf.isCaller == false &&
+                         strongSelf.callType == NERtcCallTypeVideo) {
+                       [strongSelf.blurImage setHidden:NO];
                      }
-                     weakSelf.blurImage.image = image;
+                     strongSelf.blurImage.image = image;
                    }];
 
     } break;
@@ -412,11 +417,14 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   [[NERtcCallKit sharedInstance] cancel:^(NSError *_Nullable error) {
     NSLog(@"cancel error %@", error);
     button.enabled = YES;
+    __strong typeof(weakSelf) strongSelf = weakSelf;
     if (error.code == 20016) {
-      [UIApplication.sharedApplication.keyWindow
-          makeToast:[self localizableWithKey:@"cancel_failed"]];
+      if ([UIApplication.sharedApplication respondsToSelector:@selector(keyWindow)]) {
+        [UIApplication.sharedApplication.keyWindow
+            makeToast:[strongSelf localizableWithKey:@"cancel_failed"]];
+      }
     } else {
-      [weakSelf destroy];
+      [strongSelf destroy];
     }
   }];
 }
@@ -428,16 +436,18 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   __weak typeof(self) weakSelf = self;
 
   if ([[SettingManager shareInstance] rejectBusyCode] == YES) {
-    [[NERtcCallKit sharedInstance] rejectWithReason:TerminalCodeBusy
-                                     withCompletion:^(NSError *_Nullable error) {
-                                       weakSelf.calledController.acceptBtn.userInteractionEnabled =
-                                           YES;
-                                       [weakSelf destroy];
-                                     }];
+    [[NERtcCallKit sharedInstance]
+        rejectWithReason:TerminalCodeBusy
+          withCompletion:^(NSError *_Nullable error) {
+            __strong typeof(self) strongSelf = weakSelf;
+            strongSelf.calledController.acceptBtn.userInteractionEnabled = YES;
+            [strongSelf destroy];
+          }];
   } else {
     [[NERtcCallKit sharedInstance] reject:^(NSError *_Nullable error) {
-      weakSelf.calledController.acceptBtn.userInteractionEnabled = YES;
-      [weakSelf destroy];
+      __strong typeof(self) strongSelf = weakSelf;
+      strongSelf.calledController.acceptBtn.userInteractionEnabled = YES;
+      [strongSelf destroy];
     }];
   }
 }
@@ -454,27 +464,30 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   [[NERtcCallKit sharedInstance]
       acceptWithToken:[[SettingManager shareInstance] customToken]
        withCompletion:^(NSError *_Nullable error) {
-         weakSelf.calledController.rejectBtn.userInteractionEnabled = YES;
-         weakSelf.calledController.acceptBtn.userInteractionEnabled = YES;
+         __strong typeof(self) strongSelf = weakSelf;
+         strongSelf.calledController.rejectBtn.userInteractionEnabled = YES;
+         strongSelf.calledController.acceptBtn.userInteractionEnabled = YES;
          if (error) {
            if (error.code != 10420) {
              [UIApplication.sharedApplication.keyWindow
-                 makeToast:[NSString stringWithFormat:@"%@ %@",
-                                                      [self localizableWithKey:@"accept_failed"],
-                                                      error.localizedDescription]];
+                 makeToast:[NSString
+                               stringWithFormat:@"%@ %@",
+                                                [strongSelf localizableWithKey:@"accept_failed"],
+                                                error.localizedDescription]];
            }
-
+           __weak typeof(self) weakSelf2 = strongSelf;
            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
                           dispatch_get_main_queue(), ^{
-                            [weakSelf destroy];
+                            __strong typeof(self) strongSelf2 = weakSelf2;
+                            [strongSelf2 destroy];
                           });
          } else {
            [[NERtcCallKit sharedInstance] memberOfAccid:@""
                                              completion:^(NIMSignalingMemberInfo *_Nullable info){
 
                                              }];
-           [weakSelf updateUIonStatus:NERtcCallStatusInCall];
-           [weakSelf startTimer];
+           [strongSelf updateUIonStatus:NERtcCallStatusInCall];
+           [strongSelf startTimer];
          }
        }];
 }
@@ -549,22 +562,24 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
       switchCallType:type
            withState:NERtcSwitchStateInvite
           completion:^(NSError *_Nullable error) {
+            __strong typeof(self) strongSelf = weakSelf;
             // weakSelf.mediaSwitchBtn.enabled = YES;
             btn.enabled = YES;
             if (error == nil) {
               NSLog(@"切换成功 : %lu", type);
               NSLog(@"switch : %d", btn.selected);
               if (type == NERtcCallTypeVideo && [SettingManager.shareInstance isVideoConfirm]) {
-                [weakSelf showBannerView];
+                [strongSelf showBannerView];
               } else if (type == NERtcCallTypeAudio &&
                          [SettingManager.shareInstance isAudioConfirm]) {
-                [weakSelf showBannerView];
+                [strongSelf showBannerView];
               }
             } else {
-              [weakSelf.view
-                  makeToast:[NSString stringWithFormat:@"%@: %@",
-                                                       [self localizableWithKey:@"switch_error"],
-                                                       error]];
+              [strongSelf.view
+                  makeToast:[NSString
+                                stringWithFormat:@"%@: %@",
+                                                 [strongSelf localizableWithKey:@"switch_error"],
+                                                 error]];
             }
           }];
 }
@@ -595,19 +610,21 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
       switchCallType:type
            withState:NERtcSwitchStateInvite
           completion:^(NSError *_Nullable error) {
-            weakSelf.mediaSwitchBtn.maskBtn.enabled = YES;
+            __strong typeof(self) strongSelf = weakSelf;
+            strongSelf.mediaSwitchBtn.maskBtn.enabled = YES;
             if (error == nil) {
               if (type == NERtcCallTypeVideo && [SettingManager.shareInstance isVideoConfirm]) {
-                [weakSelf showBannerView];
+                [strongSelf showBannerView];
               } else if (type == NERtcCallTypeAudio &&
                          [SettingManager.shareInstance isAudioConfirm]) {
-                [weakSelf showBannerView];
+                [strongSelf showBannerView];
               }
             } else {
-              [weakSelf.view
-                  makeToast:[NSString stringWithFormat:@"%@ : %@",
-                                                       [self localizableWithKey:@"switch_error"],
-                                                       error]];
+              [strongSelf.view
+                  makeToast:[NSString
+                                stringWithFormat:@"%@ : %@",
+                                                 [strongSelf localizableWithKey:@"switch_error"],
+                                                 error]];
             }
           }];
 }
@@ -826,15 +843,16 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
       sd_setImageWithURL:[NSURL URLWithString:url]
                completed:^(UIImage *_Nullable image, NSError *_Nullable error,
                            SDImageCacheType cacheType, NSURL *_Nullable imageURL) {
+                 __strong typeof(self) strongSelf = weakSelf;
                  if (image == nil) {
                    image = [UIImage imageNamed:holder
-                                            inBundle:self.bundle
+                                            inBundle:strongSelf.bundle
                        compatibleWithTraitCollection:nil];
                  }
-                 if (weakSelf.isCaller == false && weakSelf.callType == NERtcCallTypeVideo) {
-                   [weakSelf.blurImage setHidden:NO];
+                 if (strongSelf.isCaller == false && strongSelf.callType == NERtcCallTypeVideo) {
+                   [strongSelf.blurImage setHidden:NO];
                  }
-                 weakSelf.blurImage.image = image;
+                 strongSelf.blurImage.image = image;
                }];
 }
 

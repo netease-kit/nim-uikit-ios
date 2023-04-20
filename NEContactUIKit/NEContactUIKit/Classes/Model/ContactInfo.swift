@@ -18,4 +18,5 @@ public class ContactInfo {
   public var router = ContactPersonRouter
   public var isSelected = false
   public var headerBackColor: UIColor?
+  public var localExtension: [String: Any]?
 }

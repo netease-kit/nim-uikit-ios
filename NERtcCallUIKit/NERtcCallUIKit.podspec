@@ -34,11 +34,16 @@ TODO: Add long description of the pod here.
   s.resource = 'NERtcCallUIKit/Assets/**/*'
   
   s.dependency 'NERtcCallKit'
-  s.dependency 'NERtcSDK'
   s.dependency 'AFNetworking'
   s.dependency 'SDWebImage'
   s.dependency 'Toast'
   s.dependency 'NECoreKit'
   s.dependency 'NECommonKit'
+  # s.resource_bundles = {
+  #   'NERtcCallUIKit' => ['NERtcCallUIKit/Assets/*.png']
+  # }
 
+  # s.public_header_files = 'Pod/Classes/**/*.h'
+  # s.frameworks = 'UIKit', 'MapKit'
+  # s.dependency 'AFNetworking', '~> 2.3'
 end

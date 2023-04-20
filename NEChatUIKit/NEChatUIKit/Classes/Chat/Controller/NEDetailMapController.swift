@@ -59,10 +59,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
   func setupSubviews() {
     if let mapDelagate = NEChatKitClient.instance.delegate {
       weak var weakSelf = self
-//        mapDelagate.searchRoundPosition?(completion: { models, error in
-//            NELog.infoLog(self.className(), desc:"search around models : \(models)")
-//            weakSelf?.loadModels(models: models)
-//        })
+      NELog.infoLog(className(), desc: "toSearchCurrentUserLocation setupSubviews call")
       toSearchCurrentUserLocation()
 
       if let mapView = mapDelagate.getMapView?() as? UIView {
@@ -79,6 +76,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
       })
 
       if mapType == .detail, let map = mapView {
+        resetBtn.isSelected = true
         mapDelagate.setMapviewLocation?(lat: currentPoint.x, lng: currentPoint.y, mapview: map)
       } else {
         if let map = mapView {
@@ -102,8 +100,10 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     }
 
     if mapType == .detail {
+      NEChatKitClient.instance.delegate?.setCustomAnnotation?(image: coreLoader.loadImage("location_point"), lat: currentPoint.x, lng: currentPoint.y)
       addDetailSubviews()
     } else {
+      NEChatKitClient.instance.delegate?.setCustomAnnotation?(image: nil, lat: 0, lng: 0)
       addSearchSubviews()
     }
   }
@@ -386,10 +386,14 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
   @objc func resetClick() {
     if let map = mapView {
       resetBtn.isSelected = false
+      if mapType == .detail, let map = mapView {
+        NEChatKitClient.instance.delegate?.setMapCenter?(mapview: map)
+        return
+      }
+      toSearchLocalWithMapView()
       NEChatKitClient.instance.delegate?.setMapCenter?(mapview: map)
       currentIndex = 0
       tableView.reloadData()
-      toSearchCurrentUserLocation()
     }
   }
 
@@ -401,6 +405,8 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
       self.tableViewBottomConstraint?.constant = self.defaultTableHeight
     })
     searchTextField.text = ""
+    NELog.infoLog(className(), desc: "toSearchCurrentUserLocation cancel earch call")
+
     toSearchCurrentUserLocation()
     NEChatKitClient.instance.delegate?.setMapCenter?(mapview: mapView)
   }
@@ -465,18 +471,31 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
       }
     }
     if searchText.count <= 0 {
-//      locations.removeAll()
-//      tableView.reloadData()
       if let map = mapView {
         NEChatKitClient.instance.delegate?.setMapCenter?(mapview: map)
       }
-      toSearchCurrentUserLocation()
+      toSearchLocalWithMapView()
     }
+  }
+
+  func toSearchLocalWithMapView() {
+    guard let map = mapView else {
+      return
+    }
+    weak var weakSelf = self
+    NEChatKitClient.instance.delegate?.searchMapCenter?(mapview: map, completion: { models, error in
+      if let text = weakSelf?.searchTextField.text, text.count > 0 {
+        return
+      }
+      weakSelf?.loadModels(models: models)
+    })
   }
 
   func toSearchCurrentUserLocation() {
     weak var weakSelf = self
+    let className = className()
     NEChatKitClient.instance.delegate?.searchRoundPosition?(completion: { models, error in
+      NELog.infoLog(className, desc: "toSearchCurrentUserLocation end : \(models) error:  \(error?.localizedDescription ?? "") current text input : \(weakSelf?.searchTextField.text ?? "")")
       if let text = weakSelf?.searchTextField.text, text.count > 0 {
         return
       }

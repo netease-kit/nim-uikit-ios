@@ -42,6 +42,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NEKeyboardManager.shared.enable = true
         NEKeyboardManager.shared.shouldResignOnTouchOutside = true
         
+        // 登录IM之前先初始化 @ 消息监听mananger
+        let _ = NEAtMessageManager.instance
+        
         weak var weakSelf = self
         IMKitClient.instance.loginIM("<#accid#>", "<#token#>") { error in
             if let err = error {

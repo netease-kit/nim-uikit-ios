@@ -114,7 +114,7 @@ class ChatLocationLeftCell: ChatBaseLeftCell {
     }
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageLocationModel {
       titleLabel.text = m.title

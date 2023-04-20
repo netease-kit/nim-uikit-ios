@@ -8,6 +8,11 @@ import NIMSDK
 
 @objcMembers
 open class P2PChatViewController: ChatViewController {
+  public init(session: NIMSession, anchor: NIMMessage?) {
+    super.init(session: session)
+    viewmodel = ChatViewModel(session: session, anchor: anchor)
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
 
@@ -19,17 +24,17 @@ open class P2PChatViewController: ChatViewController {
     let showName = user?.showName() ?? ""
     title = showName
     titleContent = showName
-    menuView.textField.placeholder = (chatLocalizable("send_to") + showName) as NSString?
-//    let text = "\(chatLocalizable("send_to"))\(showName))"
-//      menuView.textField.placeholder = text
-//    let attribute = NSMutableAttributedString(string: text)
-//    let style = NSMutableParagraphStyle()
-//    style.lineBreakMode = .byTruncatingTail
-//    style.alignment = .left
-//    attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.count))
-//    attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.count))
-//    attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.count))
-//    menuView.textField.attributedPlaceholder = attribute
+//      menuView.textField.placeholder = chatLocalizable("send_to") + showName
+//    menuView.textField.placeholder = (chatLocalizable("send_to") + showName) as NSString?
+    let text = "\(chatLocalizable("send_to"))\(showName)"
+    let attribute = NSMutableAttributedString(string: text)
+    let style = NSMutableParagraphStyle()
+    style.lineBreakMode = .byTruncatingTail
+    style.alignment = .left
+    attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
+    attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.utf16.count))
+    attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
+    menuView.textView.attributedPlaceholder = attribute
   }
 
   /// 创建个人聊天页构造方法

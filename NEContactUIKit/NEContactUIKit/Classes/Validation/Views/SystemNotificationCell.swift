@@ -36,12 +36,11 @@ public class SystemNotificationCell: BaseValidationCell {
 
   override func setupUI() {
     super.setupUI()
-    titleLabel.numberOfLines = 1
     contentView.addSubview(agreeBtn)
     contentView.addSubview(rejectBtn)
     contentView.addSubview(resultImage)
     contentView.addSubview(resultLabel)
-    resultLabel.text = "asdasdsadsa"
+    resultLabel.text = ""
     NSLayoutConstraint.activate([
       agreeBtn.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       agreeBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
@@ -87,10 +86,13 @@ public class SystemNotificationCell: BaseValidationCell {
       switch notifModel?.handleStatus {
       case .HandleTypeOk:
         resultLabel.text = localizable("agreed")
+        resultImage.image = UIImage.ne_imageNamed(name: "finishFlag")
       case .HandleTypeNo:
         resultLabel.text = localizable("refused")
+        resultImage.image = UIImage.ne_imageNamed(name: "refused")
       case .HandleTypeOutOfDate:
         resultLabel.text = localizable("expired")
+        resultImage.image = UIImage.ne_imageNamed(name: "refused")
       default:
         resultLabel.text = ""
       }

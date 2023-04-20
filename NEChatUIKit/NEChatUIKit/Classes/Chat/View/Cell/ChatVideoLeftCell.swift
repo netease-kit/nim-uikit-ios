@@ -79,7 +79,7 @@ public class ChatVideoLeftCell: ChatImageLeftCell {
     ])
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let videoObject = model.message?.messageObject as? NIMVideoObject {
       if let path = videoObject.coverUrl {

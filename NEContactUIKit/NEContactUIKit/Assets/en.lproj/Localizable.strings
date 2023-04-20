@@ -35,6 +35,7 @@
 "select"="Select";
 "select_contact"="Please select Contact";
 "user_not_exist"="No contact";
+"team_not_exist"="No team";
 "no_friend"="No Friend";
 "chat"="Chat";
 "message_remind"="Message notification";
@@ -42,3 +43,10 @@
 "sure_delte_friend"="Wether to delete Contact？";
 "input_userId"="Input user ID";
 "space_not_support"="All Spaces are not supported";
+
+
+"let_us_chat"="Nice to meet you, let's chat";
+
+// error toast
+"validate_processed"="Already done on other devices";
+"failed_operation"="Failed Operation";

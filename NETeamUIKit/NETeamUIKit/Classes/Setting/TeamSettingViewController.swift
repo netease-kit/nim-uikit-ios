@@ -430,7 +430,6 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
         weakSelf?.view.hideToastActivity()
         if let err = error {
           weakSelf?.showToast(err.localizedDescription)
-          return
         }
         weakSelf?.navigationController?.popViewController(animated: true)
       }
@@ -446,7 +445,7 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
   }
 
   func toMemberList() {
-    let memberController = TeamMembersController()
+    let memberController = TeamMembersController(viewmodel: viewmodel)
     memberController.datas = viewmodel.teamInfoModel?.users
     if teamSettingType == .Senior {
       memberController.isSenior = true
@@ -494,11 +493,17 @@ public class TeamSettingViewController: NEBaseViewController, UICollectionViewDe
           closure: nil
         )
       } else {
-        Router.shared.use(
-          ContactUserInfoPageRouter,
-          parameters: ["nav": navigationController as Any, "user": nimUser],
-          closure: nil
-        )
+        if let uid = nimUser.userId {
+          UserInfoProvider.shared.fetchUserInfo([uid]) { [weak self] error, users in
+            if let u = users?.first {
+              Router.shared.use(
+                ContactUserInfoPageRouter,
+                parameters: ["nav": self?.navigationController as Any, "user": u],
+                closure: nil
+              )
+            }
+          }
+        }
       }
     }
   }
@@ -626,9 +631,8 @@ extension TeamSettingViewController {
         weakSelf?.view.hideToastActivity()
         if let err = error {
           weakSelf?.showToast(err.localizedDescription)
-        } else {
-          weakSelf?.navigationController?.popViewController(animated: true)
         }
+        weakSelf?.navigationController?.popViewController(animated: true)
       }
     }
   }
@@ -641,6 +645,9 @@ extension TeamSettingViewController {
 
   func leaveTeam() {
     if let tid = teamId {
+      // 需要先于 SDK 回调进行通知
+      NotificationCenter.default.post(name: NotificationName.leaveTeamBySelf, object: true)
+
       view.makeToastActivity(.center)
       viewmodel.quitTeam(tid) { [weak self] error in
         NELog.infoLog(
@@ -648,9 +655,15 @@ extension TeamSettingViewController {
           desc: "CALLBACK quitTeam " + (error?.localizedDescription ?? "no error")
         )
         self?.view.hideToastActivity()
-        if let err = error {
+        if let err = error as? NSError {
+          // 退出群聊失败则需要重置通知
+          NotificationCenter.default.post(name: NotificationName.leaveTeamBySelf, object: false)
+          if err.code == 803 {
+            self?.navigationController?.popViewController(animated: true)
+          }
           self?.showToast(err.localizedDescription)
         } else {
+          // 会话列表中移除该群聊
           let session = NIMSession(tid, type: .team)
           if let stickInfo = self?.viewmodel.getTopSessionInfo(session) {
             self?.viewmodel.removeStickTop(params: stickInfo) { err, _ in
@@ -668,6 +681,13 @@ extension TeamSettingViewController {
 }
 
 extension TeamSettingViewController: TeamSettingViewModelDelegate {
+  func didClickMark() {
+    if let tid = teamId {
+      let session = NIMSession(tid, type: .team)
+      Router.shared.use(PushPinMessageVCRouter, parameters: ["nav": navigationController as Any, "session": session as Any], closure: nil)
+    }
+  }
+
   func didError(_ error: Error) {
     showToast(error.localizedDescription)
   }

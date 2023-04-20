@@ -56,9 +56,9 @@ class MessageCallRecordModel: MessageContentModel {
         attributeStr?.insert(NSAttributedString(attachment: attachment), at: 0)
       }
 
-      attributeStr?.addAttribute(NSAttributedString.Key.font, value: NEKitChatConfig.shared.ui.messageFont, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.font, value: NEKitChatConfig.shared.ui.messageTextSize, range: NSMakeRange(0, attributeStr?.length ?? 0))
 
-      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
     let textSize = NEChatUITool.getSizeWithAtt(

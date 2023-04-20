@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 "mark"="pin";
-"history"="History";
 "message_remind"="Open message remind";
 "session_set_top"="Sticky on Top";
 "team_nick"="My Alias in Group";
@@ -32,7 +31,7 @@
 "modify_headImage"="Modify Avatar";
 "save"="Save";
 "historical_record"="History";
-"search"="Search";
+"search"="Search History";
 "no_search_results"="No History";
 "discuss_info"="Temp Group Info";
 "group_info"="Group Info";
@@ -43,9 +42,12 @@
 "quit_team_chat"="Wether to leave Group";
 "quit_discuss_chat"="Wether to leave Temp Group";
 "cancel"="cancel";
-"remind"="remind";
+"remind"="tip";
 "discuss_avatar"="Temp Group Avator";
 "discuss_name"="Temp Group Name";
 "discuss_intro"="Temp Group Introduce";
 "invite_has_send"="Invitation sent";
+
+// error toast
 "space_not_support"="All Spaces are not supported";
+"team_not_exist"="team not exist";

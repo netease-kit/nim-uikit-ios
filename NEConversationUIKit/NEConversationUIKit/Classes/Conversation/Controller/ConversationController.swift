@@ -10,15 +10,15 @@ import NIMSDK
 
 @objcMembers
 open class ConversationController: UIViewController, NIMChatManagerDelegate {
-  let viewmodel = ConversationViewModel()
-  private var listCtrl = ConversationListViewController()
+  public let viewmodel = ConversationViewModel()
+  public var listCtrl = ConversationListViewController()
 
   override public func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navigationController?.isNavigationBarHidden = true
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     setupSubviews()
     NIMSDK.shared().chatManager.add(self)
@@ -51,7 +51,7 @@ open class ConversationController: UIViewController, NIMChatManagerDelegate {
 
   // MARK: lazyMethod
 
-  private lazy var navView: ConversationNavView = {
+  public lazy var navView: ConversationNavView = {
     let nav = ConversationNavView(frame: CGRect.zero)
     nav.translatesAutoresizingMaskIntoConstraints = false
     nav.backgroundColor = .white
@@ -68,7 +68,7 @@ open class ConversationController: UIViewController, NIMChatManagerDelegate {
 }
 
 extension ConversationController: ConversationNavViewDelegate {
-  func searchAction() {
+  open func searchAction() {
     Router.shared.use(
       SearchContactPageRouter,
       parameters: ["nav": navigationController as Any],
@@ -76,7 +76,7 @@ extension ConversationController: ConversationNavViewDelegate {
     )
   }
 
-  func didClickAddBtn() {
+  open func didClickAddBtn() {
     print("add click")
 
     if children.contains(popListController) == false {

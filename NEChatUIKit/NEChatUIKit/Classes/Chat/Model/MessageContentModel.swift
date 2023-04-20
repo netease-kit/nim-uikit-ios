@@ -19,8 +19,8 @@ public class MessageContentModel: NSObject, MessageModel {
   public var message: NIMMessage?
   public var contentSize: CGSize
   public var height: Float
-  public var shortName: String?
-  public var fullName: String?
+  public var shortName: String? // 昵称 > uid
+  public var fullName: String? // 备注 >（群昵称）> 昵称 > uid
   public var avatar: String?
   public var replyText: String?
   public var fullNameHeight: Float = 0

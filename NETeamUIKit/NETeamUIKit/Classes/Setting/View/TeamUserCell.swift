@@ -14,7 +14,7 @@ import NETeamKit
 public class TeamUserCell: UICollectionViewCell {
   var user: TeamMemberInfoModel? {
     didSet {
-      if let name = user?.showNameInTeam() {
+      if let name = user?.showNickInTeam() {
         userHeader.setTitle(name)
       }
       if let url = user?.nimUser?.userInfo?.avatarUrl {

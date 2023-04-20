@@ -10,6 +10,8 @@ import NECoreKit
 @objcMembers
 public class TeamMembersController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
+  var viewmodel: TeamSettingViewModel?
+
   var datas: [TeamMemberInfoModel]?
 
   var ownerId: String?
@@ -48,6 +50,30 @@ public class TeamMembersController: NEBaseViewController, UITableViewDelegate,
 //        table.bounces = false
     return table
   }()
+
+  init(viewmodel: TeamSettingViewModel? = nil) {
+    super.init(nibName: nil, bundle: nil)
+    self.viewmodel = viewmodel
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override public func viewWillAppear(_ animated: Bool) {
+    viewmodel?.getTeamInfo(viewmodel?.teamInfoModel?.team?.teamId ?? "") { [weak self] error in
+      if let err = error as? NSError {
+        if err.code == 803 || err.code == 1 {
+          self?.showToast(localizable("team_not_exist"))
+        } else {
+          self?.showToast(err.localizedDescription)
+        }
+      } else {
+        self?.datas = self?.viewmodel?.teamInfoModel?.users
+        self?.contentTable.reloadData()
+      }
+    }
+  }
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -213,11 +239,17 @@ public class TeamMembersController: NEBaseViewController, UITableViewDelegate,
           closure: nil
         )
       } else {
-        Router.shared.use(
-          ContactUserInfoPageRouter,
-          parameters: ["nav": navigationController as Any, "nim_user": user],
-          closure: nil
-        )
+        if let uid = user.userId {
+          UserInfoProvider.shared.fetchUserInfo([uid]) { [weak self] error, users in
+            if let u = users?.first {
+              Router.shared.use(
+                ContactUserInfoPageRouter,
+                parameters: ["nav": self?.navigationController as Any, "nim_user": u],
+                closure: nil
+              )
+            }
+          }
+        }
       }
     }
   }

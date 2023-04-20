@@ -25,7 +25,7 @@ public class NEEmotionTool: NSObject {
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
     let attStr = NSMutableAttributedString(string: str, attributes: [
       NSAttributedString.Key.font: font,
-      .foregroundColor: NEKitChatConfig.shared.ui.messageColor,
+      .foregroundColor: NEKitChatConfig.shared.ui.messageTextColor,
     ])
 
     if let regArr = regularArr, regArr.count > 0, let targetEmotions = emoticons {
@@ -45,6 +45,12 @@ public class NEEmotionTool: NSObject {
       }
     }
     return attStr
+  }
+
+  class func getAttWithStr(str: String, font: UIFont, color: UIColor, _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
+    let att = getAttWithStr(str: str, font: font, offset)
+    att.addAttribute(.foregroundColor, value: color, range: NSRange(location: 0, length: att.length))
+    return att
   }
 
   class func getAttWithEmotion(emotion: NIMInputEmoticon, font: UIFont,

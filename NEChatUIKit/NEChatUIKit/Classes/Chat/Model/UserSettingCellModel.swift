@@ -5,6 +5,11 @@
 
 import Foundation
 
+enum UserSettingType: Int {
+  case SwitchType = 1
+  case SelectType = 2
+}
+
 @objcMembers
 public class UserSettingCellModel: NSObject {
   typealias SwitchChangeCompletion = (Bool) -> Void
@@ -18,4 +23,5 @@ public class UserSettingCellModel: NSObject {
 //    var headerUrl: String?
   var cellClick: CellClick?
   var switchOpen = false
+  var type = UserSettingType.SwitchType.rawValue
 }
