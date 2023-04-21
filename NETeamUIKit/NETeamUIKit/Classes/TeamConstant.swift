@@ -15,3 +15,10 @@ func localizable(_ key: String) -> String {
 }
 
 public let ModuleName = "NETeamUIKit"
+
+// 创建群/邀请入群 人数限制
+public var peopleNumberLimit: UInt = 200
+
+enum NotificationName {
+  static let leaveTeamBySelf = Notification.Name(rawValue: "team.leaveTeamBySelf")
+}

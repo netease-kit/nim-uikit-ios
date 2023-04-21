@@ -9,7 +9,7 @@ import Foundation
 import NECoreKit
 
 @objcMembers
-public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
+open class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
   public lazy var arrow: UIImageView = {
     let imageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -17,27 +17,13 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     return imageView
   }()
 
-  lazy var redAngleView: RedAngleLabel = {
-    let label = RedAngleLabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.font = UIFont.systemFont(ofSize: 12.0)
-    label.textColor = .white
-    label.text = "1"
-    label.backgroundColor = UIColor(hexString: "F24957")
-    label.textInsets = UIEdgeInsets(top: 3, left: 7, bottom: 3, right: 7)
-    label.layer.cornerRadius = 9
-    label.clipsToBounds = true
-    label.isHidden = true
-    return label
-  }()
-
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
     initSubviewsLayout()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -83,7 +69,7 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     nameLabel.textColor = UIColor.white
   }
 
-  public func setModel(_ model: ContactInfo) {
+  open func setModel(_ model: ContactInfo) {
     guard let user = model.user else {
       return
     }
@@ -92,7 +78,7 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
     if model.contactCellType == 2 {
       // person
       titleLabel.text = user.showName()
-      nameLabel.text = user.shortName(count: 2)
+      nameLabel.text = user.shortName(showAlias: false, count: 2)
 
       if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
         NELog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")
@@ -102,6 +88,7 @@ public class ContactTableViewCell: ContactBaseViewCell, ContactCellDataProtrol {
         NELog.infoLog("contact p2p cell configData", desc: "imageName is nil")
         nameLabel.isHidden = false
         avatarImage.sd_setImage(with: nil)
+        avatarImage.backgroundColor = model.headerBackColor
       }
       arrow.isHidden = true
 

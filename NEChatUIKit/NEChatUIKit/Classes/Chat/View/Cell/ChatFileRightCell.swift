@@ -103,7 +103,7 @@ public class ChatFileRightCell: ChatBaseRightCell {
     ])
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let fileObject = model.message?.messageObject as? NIMFileObject {
       if let fileModel = model as? MessageFileModel {

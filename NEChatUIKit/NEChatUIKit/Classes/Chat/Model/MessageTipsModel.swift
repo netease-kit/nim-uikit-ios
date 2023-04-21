@@ -42,7 +42,8 @@ class MessageTipsModel: NSObject, MessageModel {
     }
     tipMessage = message
     tipTimeStamp = message?.timestamp
-    contentSize = CGSize(width: kScreenWidth, height: 35)
-    height = 35
+    contentSize = CGSize(width: kScreenWidth - 64 * 2, height: kScreenHeight)
+    let size = String.getTextRectSize(text ?? "", font: DefaultTextFont(NEKitChatConfig.shared.ui.timeTextSize), size: contentSize)
+    height = Float(size.height)
   }
 }

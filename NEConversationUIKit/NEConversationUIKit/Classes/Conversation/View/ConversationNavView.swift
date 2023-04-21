@@ -6,14 +6,14 @@
 import UIKit
 import NECoreKit
 
-protocol ConversationNavViewDelegate: AnyObject {
+public protocol ConversationNavViewDelegate: AnyObject {
   func didClickAddBtn()
   func searchAction()
 }
 
 @objcMembers
 public class ConversationNavView: UIView {
-  weak var delegate: ConversationNavViewDelegate?
+  public weak var delegate: ConversationNavViewDelegate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -80,7 +80,7 @@ public class ConversationNavView: UIView {
 
   // MARK: lazy method
 
-  private lazy var brandBtn: UIButton = {
+  public lazy var brandBtn: UIButton = {
     let button = UIButton()
     button.setTitle(localizable("appName"), for: .normal)
     button.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
@@ -91,7 +91,7 @@ public class ConversationNavView: UIView {
     return button
   }()
 
-  private lazy var searchBtn: UIButton = {
+  public lazy var searchBtn: UIButton = {
     let button = UIButton()
     button.setImage(UIImage.ne_imageNamed(name: "chat_search"), for: .normal)
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -99,7 +99,7 @@ public class ConversationNavView: UIView {
     return button
   }()
 
-  private lazy var addBtn: ExpandButton = {
+  public lazy var addBtn: ExpandButton = {
     let button = ExpandButton()
     button.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +107,7 @@ public class ConversationNavView: UIView {
     return button
   }()
 
-  private lazy var bottomLine: UIView = {
+  public lazy var bottomLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = UIColor(hexString: "0xDBE0E8")

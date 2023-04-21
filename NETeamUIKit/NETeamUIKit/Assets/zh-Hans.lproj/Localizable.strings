@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 "mark"="标记";
-"history"="历史记录";
 "message_remind"="开启消息提醒";
 "session_set_top"="聊天置顶";
 "team_nick"="我在群里的昵称";
@@ -24,7 +23,7 @@
 "default_icon"="选择默认图标";
 "senior_team"="高级群";
 "normal_team"="讨论组";
-"create_senior_team_noti"="成功创建高级群";
+"create_senior_team_noti"="成功创建了群聊";
 "team_all"="所有人";
 "team_owner"="群主";
 
@@ -32,7 +31,7 @@
 "modify_headImage"="修改头像";
 "save"="保存";
 "historical_record"="历史记录";
-"search"="搜索";
+"search"="搜索聊天内容";
 "no_search_results"="暂无聊天记录";
 "discuss_info"="讨论组信息";
 "group_info"="群信息";
@@ -48,4 +47,7 @@
 "discuss_name"="讨论组名称";
 "discuss_intro"="讨论组介绍";
 "invite_has_send"="邀请已发送";
+
+// error toast
 "space_not_support"="不支持全空格";
+"team_not_exist"="群组不存在";

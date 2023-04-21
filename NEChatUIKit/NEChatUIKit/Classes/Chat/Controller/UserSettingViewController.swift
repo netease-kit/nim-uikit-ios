@@ -58,6 +58,11 @@ public class UserSettingViewController: ChatBaseViewController, UserSettingViewM
     return table
   }()
 
+  public var cellClassDic = [
+    UserSettingType.SwitchType.rawValue: UserSettingSwitchCell.self,
+    UserSettingType.SelectType.rawValue: UserSettingSelectCell.self,
+  ]
+
   override public func viewDidLoad() {
     super.viewDidLoad()
     viewmodel.delegate = self
@@ -78,10 +83,10 @@ public class UserSettingViewController: ChatBaseViewController, UserSettingViewM
       contentTable.topAnchor.constraint(equalTo: view.topAnchor),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    contentTable.register(
-      UserSettingSwitchCell.self,
-      forCellReuseIdentifier: "\(UserSettingSwitchCell.self)"
-    )
+
+    cellClassDic.forEach { (key: Int, value: UserSettingBaseCell.Type) in
+      contentTable.register(value, forCellReuseIdentifier: "\(key)")
+    }
   }
 
   func headerView() -> UIView {
@@ -113,7 +118,7 @@ public class UserSettingViewController: ChatBaseViewController, UserSettingViewM
 
     if let url = viewmodel.userInfo?.userInfo?.avatarUrl {
       userHeader.sd_setImage(with: URL(string: url), completed: nil)
-    } else if let name = viewmodel.userInfo?.showName() {
+    } else if let name = viewmodel.userInfo?.showName(false) {
       userHeader.setTitle(name)
       userHeader.backgroundColor = UIColor.colorWithString(string: viewmodel.userInfo?.userId)
     }
@@ -227,7 +232,7 @@ public class UserSettingViewController: ChatBaseViewController, UserSettingViewM
                         cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let model = viewmodel.cellDatas[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(UserSettingSwitchCell.self)",
+      withIdentifier: "\(model.type)",
       for: indexPath
     ) as? UserSettingBaseCell {
       cell.configure(model)
@@ -237,6 +242,12 @@ public class UserSettingViewController: ChatBaseViewController, UserSettingViewM
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    //        let model = viewmodel.cellDatas[indexPath.row]
+    if indexPath.row == 0 {
+      if let accid = userId {
+        let session = NIMSession(accid, type: .P2P)
+        let pin = PinMessageViewController(session: session)
+        navigationController?.pushViewController(pin, animated: true)
+      }
+    }
   }
 }

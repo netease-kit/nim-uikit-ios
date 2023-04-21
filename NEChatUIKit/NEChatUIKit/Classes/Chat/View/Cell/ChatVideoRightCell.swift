@@ -86,7 +86,7 @@ public class ChatVideoRightCell: ChatImageRightCell {
     ])
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let videoObject = model.message?.messageObject as? NIMVideoObject {
       if let path = videoObject.coverPath, FileManager.default.fileExists(atPath: path) {

@@ -66,7 +66,7 @@ public class ChatTeamMemberCell: UITableViewCell {
       headerView.setTitle("")
     } else {
       headerView.image = nil
-      headerView.setTitle(model.showNameInTeam())
+      headerView.setTitle(model.showNickInTeam())
       headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.userId)
     }
     nameLabel.text = model.atNameInTeam()

@@ -15,10 +15,11 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 //     reedit button event on revokecell
   func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?)
   func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?)
+  func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 @objcMembers
-public class ChatBaseRightCell: ChatBaseCell {
+public class ChatBaseRightCell: NEChatBaseCell {
   public var pinImage = UIImageView()
   public var avatarImage = UIImageView()
   public var nameLabel = UILabel()
@@ -67,8 +68,8 @@ public class ChatBaseRightCell: ChatBaseCell {
     // name
     nameLabel.textAlignment = .center
     nameLabel.translatesAutoresizingMaskIntoConstraints = false
-    nameLabel.font = UIFont.systemFont(ofSize: 12)
-    nameLabel.textColor = .white
+    nameLabel.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.userNickTextSize)
+    nameLabel.textColor = NEKitChatConfig.shared.ui.userNickColor
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
@@ -78,11 +79,13 @@ public class ChatBaseRightCell: ChatBaseCell {
     ])
 
 //        bubbleImage
-    bubbleImage.translatesAutoresizingMaskIntoConstraints = false
-    if let image = NEKitChatConfig.shared.ui.rightBubbleBg {
+    if let bgColor = NEKitChatConfig.shared.ui.selfMessageBg {
+      bubbleImage.backgroundColor = bgColor
+    } else if let image = NEKitChatConfig.shared.ui.rightBubbleBg {
       bubbleImage.image = image
         .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
     }
+    bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.isUserInteractionEnabled = true
     contentView.addSubview(bubbleImage)
     let top = NSLayoutConstraint(
@@ -151,8 +154,11 @@ public class ChatBaseRightCell: ChatBaseCell {
     pinLabel.textColor = UIColor.ne_greenText
     pinLabel.font = UIFont.systemFont(ofSize: 12)
     pinLabel.textAlignment = .right
+    pinLabel.lineBreakMode = .byTruncatingMiddle
+
     pinLabelW = pinLabel.widthAnchor.constraint(equalToConstant: 210)
     pinLabelH = pinLabel.heightAnchor.constraint(equalToConstant: 0)
+
     NSLayoutConstraint.activate([
       pinLabel.topAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 4),
       pinLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: 0),
@@ -243,7 +249,7 @@ public class ChatBaseRightCell: ChatBaseCell {
 
 //    MARK: set data
 
-  func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel) {
     contentModel = model
     updatePinStatus(model)
     tapGesture?.isEnabled = true
@@ -333,7 +339,7 @@ public class ChatBaseRightCell: ChatBaseCell {
     pinLabel.isHidden = !model.isPined
     pinImage.isHidden = !model.isPined
     contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
-      .chatPinColor : .white
+      .signalBgColor : .white
     if model.isPined {
       let pinText = model.message?.session?.sessionType == .P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
       if model.pinAccount == nil {

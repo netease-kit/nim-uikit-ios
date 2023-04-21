@@ -119,6 +119,7 @@ public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDele
   func searchTextFieldChange(textfield: SearchTextField) {
     if textfield.text?.count == 0 {
       viewmodel.searchResultInfos?.removeAll()
+      emptyView.isHidden = true
       tableView.reloadData()
     }
   }

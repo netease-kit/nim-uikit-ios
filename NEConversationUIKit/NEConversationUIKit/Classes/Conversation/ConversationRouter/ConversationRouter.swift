@@ -19,5 +19,11 @@ public class ConversationRouter: NSObject {
       let conversation = ConversationController()
       nav?.pushViewController(conversation, animated: true)
     }
+
+    Router.shared.register("ClearAtMessageRemind") { param in
+      if let sessionId = param["sessionId"] as? String {
+        NEAtMessageManager.instance.clearAtRecord(sessionId)
+      }
+    }
   }
 }

@@ -95,9 +95,9 @@ public class TeamMemberCell: UITableViewCell {
       headerView.setTitle("")
     } else {
       headerView.image = nil
-      headerView.setTitle(model.showNameInTeam())
+      headerView.setTitle(model.showNickInTeam())
       headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.userId)
     }
-    nameLabel.text = model.showNameInTeam()
+    nameLabel.text = model.atNameInTeam()
   }
 }

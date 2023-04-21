@@ -46,6 +46,7 @@ public class TeamRouter: NSObject {
         option.beInviteMode = .noAuth
         option.updateInfoMode = .all
         option.updateClientCustomMode = .all
+        option.maxMemberCountLimitation = peopleNumberLimit
 
         repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
           var result = [String: Any]()
@@ -56,6 +57,12 @@ public class TeamRouter: NSObject {
             result["code"] = 0
             result["msg"] = "ok"
             result["teamId"] = teamid
+            repo.sendCreateAdavanceNoti(
+              teamid ?? "",
+              localizable("create_senior_team_noti")
+            ) { error in
+              print("send noti message  : ", error as Any)
+            }
             if let tid = teamid {
               repo.updateTeamCustomInfo(discussTeamKey, tid) { error in
                 if let err = error {
@@ -84,6 +91,8 @@ public class TeamRouter: NSObject {
         option.type = .advanced
         option.avatarUrl = iconUrl
         option.name = name
+        option.beInviteMode = .noAuth
+        option.maxMemberCountLimitation = peopleNumberLimit
 
         repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
           var result = [String: Any]()

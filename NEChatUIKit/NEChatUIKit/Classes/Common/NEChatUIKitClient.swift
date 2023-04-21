@@ -9,7 +9,7 @@ import NIMSDK
 @objcMembers
 public class NEChatUIKitClient: NSObject {
   public static let instance = NEChatUIKitClient()
-
+  private var customRegisterDic = [String: UITableViewCell.Type]()
   public var moreAction = [NEMoreItemModel]()
 
   override init() {
@@ -52,5 +52,16 @@ public class NEChatUIKitClient: NSObject {
       }
     }
     return more
+  }
+
+  /// 新增聊天页针对自定义消息的cell扩展，以及现有cell样式覆盖
+  public func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
+    registerDic.forEach { (key: String, value: UITableViewCell.Type) in
+      customRegisterDic[key] = value
+    }
+  }
+
+  public func getRegisterCustomCell() -> [String: UITableViewCell.Type] {
+    customRegisterDic
   }
 }

@@ -217,9 +217,10 @@ NSString *kMouldName = @"NERtcCallUIKit";
   __weak typeof(self) weakSelf = self;
   [nav dismissViewControllerAnimated:YES
                           completion:^{
-                            NSLog(@"self window %@", weakSelf.keywindow);
-                            [weakSelf.keywindow resignKeyWindow];
-                            weakSelf.keywindow = nil;
+                            __strong typeof(self) strongSelf = weakSelf;
+                            NSLog(@"self window %@", strongSelf.keywindow);
+                            [strongSelf.keywindow resignKeyWindow];
+                            strongSelf.keywindow = nil;
                           }];
 }
 

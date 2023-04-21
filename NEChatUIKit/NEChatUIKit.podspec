@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = 'NEChatUIKit'
-  spec.version      = '9.2.10'
+  spec.version      = '9.5.0'
   spec.summary      = 'Chat Module of IM.'
 
   # This description is used to generate tags and improve search results.
@@ -49,12 +49,13 @@ TODO: Add long description of the pod here.
   spec.resource = 'NEChatUIKit/Assets/**/*'
   spec.dependency 'NEChatKit'
   spec.dependency 'NECommonUIKit'
-  spec.dependency 'RSKPlaceholderTextView'
   spec.dependency 'MJRefresh'
   spec.dependency 'NIMSDK_LITE'
+  spec.dependency 'YXAlog'
+  spec.dependency 'UITextView+Placeholder'
+  spec.dependency 'SDWebImageWebPCoder'
+  spec.dependency 'SDWebImageSVGKitPlugin'
 
-#  spec.dependency 'AMap2DMap'
-#  spec.dependency 'AMapSearch'
-#  spec.dependency 'AMapLocation'
+
 
 end

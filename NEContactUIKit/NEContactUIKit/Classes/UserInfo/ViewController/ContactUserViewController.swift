@@ -56,6 +56,13 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
         }
       }
     }
+
+    NIMSDK.shared().systemNotificationManager.add(self)
+  }
+
+  override func backToPrevious() {
+    super.backToPrevious()
+    NotificationCenter.default.post(name: NotificationName.updateFriendInfo, object: user)
   }
 
   func commonUI() {
@@ -256,6 +263,7 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
     remark.completion = { u in
       self.user = u
       self.headerView?.setData(user: u)
+      NotificationCenter.default.post(name: NotificationName.updateFriendInfo, object: u)
     }
     navigationController?.pushViewController(remark, animated: true)
 
@@ -356,6 +364,16 @@ public class ContactUserViewController: ContactBaseViewController, UITableViewDe
           }
         }
       }
+    }
+  }
+}
+
+extension ContactUserViewController: NIMSystemNotificationManagerDelegate {
+  public func onReceive(_ notification: NIMSystemNotification) {
+    if notification.type == .friendAdd,
+       let obj = notification.attachment as? NIMUserAddAttachment,
+       obj.operationType == .verify {
+      loadData()
     }
   }
 }

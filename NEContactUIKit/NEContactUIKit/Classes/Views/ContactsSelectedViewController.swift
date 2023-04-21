@@ -12,7 +12,7 @@ open class ContactsSelectedViewController: ContactBaseViewController {
   public var callBack: ContactsSelectCompletion?
 
   public var filterUsers: Set<String>?
-
+  var lastTitleIndex = 0
   public var limit = 10 // max select count
 
   // 单聊中对方的userId
@@ -250,6 +250,16 @@ extension ContactsSelectedViewController: UICollectionViewDelegate, UICollection
 
   public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
     viewModel.indexs
+  }
+
+  public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+    for (i, t) in viewModel.contacts.enumerated() {
+      if t.initial == title {
+        lastTitleIndex = i
+        return i
+      }
+    }
+    return lastTitleIndex
   }
 
   // MARK: Collection View DataSource And Delegate

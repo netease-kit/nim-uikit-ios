@@ -5,7 +5,8 @@
 
 import UIKit
 import NECommonKit
-import RSKPlaceholderTextView
+import NECoreKit
+import UITextView_Placeholder
 
 @objc public enum ChatMenuType: Int {
   case text = 0
@@ -15,9 +16,14 @@ import RSKPlaceholderTextView
   case addMore
 }
 
+public let yxAtMsg = "yxAitMsg"
+public let atRangeOffset = 1
+public let atSegmentsKey = "segments"
+public let atTextKey = "text"
+
 @objc
 public protocol ChatInputViewDelegate: NSObjectProtocol {
-  func sendText(text: String?)
+  func sendText(text: String?, attribute: NSAttributedString?)
   func willSelectItem(button: UIButton, index: Int)
   func didSelectMoreCell(cell: NEInputMoreCell)
 
@@ -34,7 +40,7 @@ public protocol ChatInputViewDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class ChatInputView: UIView, ChatRecordViewDelegate,
+open class ChatInputView: UIView, ChatRecordViewDelegate,
   InputEmoticonContainerViewDelegate, UITextViewDelegate, NEMoreViewDelagate {
   public weak var delegate: ChatInputViewDelegate?
   public var currentType: ChatMenuType = .text
@@ -42,19 +48,27 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
   public var contentHeight = 204.0
   public var atCache: NIMInputAtCache?
 
-  var textField = RSKPlaceholderTextView()
-  var stackView = UIStackView()
+  public var atRangeCache = [String: MessageAtCacheModel]()
+
+  public var nickAccidDic = [String: String]()
+
+  public var textView = UITextView() // RSKPlaceholderTextView()
+  public var stackView = UIStackView()
   var contentView = UIView()
   public var contentSubView: UIView?
   private var greyView = UIView()
   private var recordView = ChatRecordView(frame: .zero)
+  private var textInput: UITextInput?
+
+  public var textviewLeftConstraint: NSLayoutConstraint?
+  public var textviewRightConstraint: NSLayoutConstraint?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -64,30 +78,30 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
 
   func commonUI() {
     backgroundColor = UIColor(hexString: "#EFF1F3")
-    textField.layer.cornerRadius = 8
-    textField.font = UIFont.systemFont(ofSize: 16)
-    textField.clipsToBounds = true
-    textField.translatesAutoresizingMaskIntoConstraints = false
-    textField.backgroundColor = .white
-    textField.returnKeyType = .send
-    textField.delegate = self
-    textField.allowsEditingTextAttributes = true
-    addSubview(textField)
+    textView.layer.cornerRadius = 8
+    textView.font = UIFont.systemFont(ofSize: 16)
+    textView.clipsToBounds = true
+    textView.translatesAutoresizingMaskIntoConstraints = false
+    textView.backgroundColor = .white
+    textView.returnKeyType = .send
+    textView.delegate = self
+    textView.allowsEditingTextAttributes = true
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.dataDetectorTypes = []
+    addSubview(textView)
+    textviewLeftConstraint = textView.leftAnchor.constraint(equalTo: leftAnchor, constant: 7)
+    textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: -7)
+
     NSLayoutConstraint.activate([
-      textField.leftAnchor.constraint(equalTo: leftAnchor, constant: 7),
-      textField.topAnchor.constraint(equalTo: topAnchor, constant: 6),
-      textField.rightAnchor.constraint(equalTo: rightAnchor, constant: -7),
-      textField.heightAnchor.constraint(equalToConstant: 40),
+      textviewLeftConstraint!,
+      textviewRightConstraint!,
+      textView.topAnchor.constraint(equalTo: topAnchor, constant: 6),
+      textView.heightAnchor.constraint(equalToConstant: 40),
     ])
-//    NotificationCenter.default.addObserver(
-//      textField,
-//      selector: #selector(textFieldChangeNoti),
-//      name: UITextView.textDidChangeNotification,
-//      object: nil
-//    )
+    textInput = textView
 
     let imageNames = ["mic", "emoji", "photo", "add"]
-//    let imageNames = ["mic", "emoji", "photo", "chat_video", "add"]
 
     var items = [UIButton]()
     for i in 0 ... 3 {
@@ -107,7 +121,7 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
       stackView.leftAnchor.constraint(equalTo: leftAnchor),
       stackView.rightAnchor.constraint(equalTo: rightAnchor),
       stackView.heightAnchor.constraint(equalToConstant: 54),
-      stackView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 0),
+      stackView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 0),
     ])
 
     greyView.translatesAutoresizingMaskIntoConstraints = false
@@ -147,27 +161,27 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
     contentView.addSubview(chatAddMoreView)
   }
 
-  func addRecordView() {
+  public func addRecordView() {
     if currentType != .audio {
       currentType = .audio
-      textField.resignFirstResponder()
+      textView.resignFirstResponder()
       contentSubView?.isHidden = true
       contentSubView = recordView
       contentSubView?.isHidden = false
     }
   }
 
-  func addEmojiView() {
+  public func addEmojiView() {
     if currentType != .emoji {
       currentType = .emoji
-      textField.resignFirstResponder()
+      textView.resignFirstResponder()
       contentSubView?.isHidden = true
       contentSubView = emojiView
       contentSubView?.isHidden = false
     }
   }
 
-  func addMoreActionView() {
+  public func addMoreActionView() {
     if currentType != .addMore {
       currentType = .addMore
       contentSubView?.isHidden = true
@@ -176,70 +190,21 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
     }
   }
 
-  //    func doButtonDeleteText(){
-  //        let range = delRangeForLastComponent()
-  //        if range.count == 1 {
-  //
-  //        }
-  //        print("\(textField.selectedTextRange?.start)")
-  //        textField.deleteBackward()
-  //    }
-
-  //    func delRangeForLastComponent() -> NSRange{
-  //        let text = textField.text as? NSString
-  //        let selectedRange = self.textField.selectedRange
-  //        if selectedRange.location == 0 {
-  //            return NSRange.init(location: 0, length: 0)
-  //        }
-  //
-  //        let range:NSRange?
-  //        let subRange =
-  //        if selectedRange?.start >= 2 {
-  //            let subStr = text?.substring(with: NSRange.init(location: selectedRange?.start - 2,
-  //            length: 2))
-  //            isEmoji = sub
-  //        }
-  //    }
-
-  //    func rangeForPrefix(prefix:String,suffix:String) ->NSRange {
-  //        let text = textField.text as? NSString
-  //        let range = textField.selectedRange
-  //        var selectedText:String?
-  //        if range.length > 0 {
-  //            selectedText = text?.substring(with: range)
-  //        }else {
-  //            selectedText = text as? String
-  //        }
-  //        let endLocaiton = range.location
-  //        if endLocaiton <= 0{
-  //            return NSMakeRange(NSNotFound, 0)
-  //        }
-  //        let index = -1
-  //
-  //        if let selectStr = selectedText,selectStr.hasSuffix(suffix) {
-  //            let p = 20
-  //            for index = endLocaiton in
-  //
-  //
-  //
-  //        }else {
-  //            return NSMakeRange(NSNotFound, 0)
-  //
-  //        }
-  //
-  //
-  //
-  //    }
-
   // MARK: ===================== lazy method =====================
 
-  public lazy var emojiView: InputEmoticonContainerView = {
+  public lazy var emojiView: UIView = {
+    let backView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
     let view =
       InputEmoticonContainerView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    //        view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
     view.delegate = self
-    return view
+    backView.isHidden = true
+
+    backView.backgroundColor = UIColor.clear
+    backView.addSubview(view)
+    let tap = UITapGestureRecognizer()
+    backView.addGestureRecognizer(tap)
+    tap.addTarget(self, action: #selector(missClickEmoj))
+    return backView
   }()
 
   public lazy var chatAddMoreView: NEChatMoreActionView = {
@@ -251,7 +216,7 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   public func textViewDidChange(_ textView: UITextView) {
-    delegate?.textFieldDidChange(textField)
+    delegate?.textFieldDidChange(textView)
   }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
@@ -267,35 +232,111 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
     return true
   }
 
-  public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    currentType = .text
-    return true
+  public func checkRemoveAtMessage(range: NSRange, attribute: NSAttributedString) -> NSRange? {
+    var temRange: NSRange?
+    let start = range.location
+//    let end = range.location + range.length
+    attribute.enumerateAttribute(
+      NSAttributedString.Key.foregroundColor,
+      in: NSMakeRange(0, attribute.length)
+    ) { value, findRange, stop in
+      guard let findColor = value as? UIColor else {
+        return
+      }
+      if isEqualToColor(findColor, UIColor.ne_blueText) == false {
+        return
+      }
+      if findRange.location <= start, start < findRange.location + findRange.length + atRangeOffset {
+        temRange = NSMakeRange(findRange.location, findRange.length + atRangeOffset)
+        stop.pointee = true
+      }
+
+//      if (findRange.location <= start && start < findRange.location + findRange.length + atRangeOffset) ||
+//        (findRange.location < end && end <= findRange.location + findRange.length + atRangeOffset) {
+//        temRange = NSMakeRange(findRange.location, findRange.length + atRangeOffset)
+//        stop.pointee = true
+//      }
+    }
+    return temRange
   }
 
   public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                        replacementText text: String) -> Bool {
+    print("text view range : ", range)
+    print("select range : ", textView.selectedRange)
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+
     if text == "\n" {
-      guard let text = getRealSendText(textField.attributedText)?
-        .trimmingCharacters(in: CharacterSet.whitespaces) else {
+      guard var realText = getRealSendText(textView.attributedText) else {
         return true
       }
-      delegate?.sendText(text: text)
-      textField.text = ""
-//            textView.resignFirstResponder()
+      if realText.trimmingCharacters(in: .whitespaces).isEmpty {
+        realText = ""
+      }
+      delegate?.sendText(text: realText, attribute: textView.attributedText)
+      textView.text = ""
       return false
     }
 
-    print("range:\(range) string:\(text)")
-    if text.count == 0 {
-      if let delegate = delegate {
-        return delegate.textDelete(range: range, text: text)
+    if textView.attributedText.length == 0, let pasteString = UIPasteboard.general.string, text.count > 0 {
+      if pasteString == text {
+        let muta = NSMutableAttributedString(string: text)
+        muta.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16.0)], range: NSMakeRange(0, text.count))
+        textView.attributedText = muta
+        textView.selectedRange = NSMakeRange(text.count - 1, 0)
+        return false
       }
+    }
+
+    if text.count == 0 {
+//      let selectRange = textView.selectedRange
+      let temRange = checkRemoveAtMessage(range: range, attribute: textView.attributedText)
+
+      if let findRange = temRange {
+        let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
+        if mutableAttri.length >= findRange.location + findRange.length {
+          mutableAttri.removeAttribute(NSAttributedString.Key.foregroundColor, range: findRange)
+          mutableAttri.removeAttribute(NSAttributedString.Key.font, range: findRange)
+          if range.length == 1 {
+            mutableAttri.replaceCharacters(in: findRange, with: "")
+          }
+          if mutableAttri.length <= 0 {
+            textView.attributedText = nil
+          } else {
+            textView.attributedText = mutableAttri
+          }
+          textView.selectedRange = NSMakeRange(findRange.location, 0)
+        }
+        return false
+      }
+      return true
     } else {
       delegate?.textChanged(text: text)
     }
 
     return true
   }
+
+  public func textViewDidChangeSelection(_ textView: UITextView) {
+    print("textViewDidChangeSelection")
+    let range = textView.selectedRange
+    if let findRange = checkRemoveAtMessage(range: range, attribute: textView.attributedText) {
+      textView.selectedRange = NSMakeRange(findRange.location + findRange.length, 0)
+    }
+  }
+
+  @available(iOS 10.0, *)
+  public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+    print("action : ", interaction)
+
+    return true
+  }
+
+//    @available(iOS 10.0, *)
+//    public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+//
+//        return true
+//    }
 
   func buttonEvent(button: UIButton) {
     switch button.tag - 5 {
@@ -315,11 +356,10 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
 
   public func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String) {
     if emoticonID.isEmpty { // 删除键
-      //            doButtonDeleteText()
-      textField.deleteBackward()
+      textView.deleteBackward()
       print("delete ward")
     } else {
-      if let font = textField.font {
+      if let font = textView.font {
         let attribute = NEEmotionTool.getAttWithStr(
           str: description,
           font: font,
@@ -327,7 +367,7 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
         )
         print("attribute : ", attribute)
         let mutaAttribute = NSMutableAttributedString()
-        if let origin = textField.attributedText {
+        if let origin = textView.attributedText {
           mutaAttribute.append(origin)
         }
         attribute.enumerateAttribute(
@@ -344,19 +384,18 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
           value: font,
           range: NSMakeRange(0, mutaAttribute.length)
         )
-        textField.attributedText = mutaAttribute
-        textField.scrollRangeToVisible(NSMakeRange(textField.attributedText.length, 1))
-//                [_textView scrollRangeToVisible:NSMakeRange(_textView.text.length, 1)];
+        textView.attributedText = mutaAttribute
+        textView.scrollRangeToVisible(NSMakeRange(textView.attributedText.length, 1))
       }
     }
   }
 
   public func didPressSend(sender: UIButton) {
-    guard let text = getRealSendText(textField.attributedText) else {
+    guard let text = getRealSendText(textView.attributedText) else {
       return
     }
-    delegate?.sendText(text: text)
-    textField.text = ""
+    delegate?.sendText(text: text, attribute: textView.attributedText)
+    textView.text = ""
     atCache?.clean()
   }
 
@@ -391,9 +430,9 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
     delegate?.endRecord(insideView: insideView)
   }
 
-  func textFieldChangeNoti() {
-    delegate?.textFieldDidChange(textField)
-  }
+//  func textFieldChangeNoti() {
+//    delegate?.textFieldDidChange(textField)
+//  }
 
   func getRealSendText(_ attribute: NSAttributedString) -> String? {
     let muta = NSMutableString()
@@ -412,5 +451,117 @@ public class ChatInputView: UIView, ChatRecordViewDelegate,
       }
     }
     return muta as String
+  }
+
+  public func getRemoteExtension(_ attri: NSAttributedString?) -> [String: Any]? {
+    guard let attribute = attri else {
+      return nil
+    }
+    var atDic = [String: [String: Any]]()
+    let string = attribute.string
+    attribute.enumerateAttribute(
+      NSAttributedString.Key.foregroundColor,
+      in: NSMakeRange(0, attribute.length)
+    ) { value, findRange, stop in
+      guard let findColor = value as? UIColor else {
+        return
+      }
+      if isEqualToColor(findColor, UIColor.ne_blueText) == false {
+        return
+      }
+      if let range = Range(findRange, in: string) {
+        let text = string[range]
+        let model = MessageAtInfoModel()
+        print("range text : ", String(text))
+        model.start = findRange.location
+        model.end = model.start + findRange.length
+        var dic: [String: Any]?
+        var array: [Any]?
+        if let accid = nickAccidDic[String(text)] {
+          if let atCacheDic = atDic[accid] {
+            dic = atCacheDic
+          } else {
+            dic = [String: Any]()
+          }
+
+          if let atCacheArray = dic?[atSegmentsKey] as? [Any] {
+            array = atCacheArray
+          } else {
+            array = [Any]()
+          }
+
+          if let object = model.yx_modelToJSONObject() {
+            array?.append(object)
+          }
+          dic?[atSegmentsKey] = array
+          dic?[atTextKey] = String(text) + " "
+          dic?[#keyPath(MessageAtCacheModel.accid)] = accid
+          atDic[accid] = dic
+        }
+      }
+    }
+    if atDic.count > 0 {
+      return [yxAtMsg: atDic]
+    }
+    return nil
+  }
+
+  public func getAtRemoteExtension() -> [String: Any]? {
+    var atDic = [String: Any]()
+    NELog.infoLog(className(), desc: "at range cache : \(atRangeCache)")
+    atRangeCache.forEach { (key: String, value: MessageAtCacheModel) in
+      if let userValue = atDic[value.accid] as? [String: AnyObject], var array = userValue[atSegmentsKey] as? [Any], let object = value.atModel.yx_modelToJSONObject() {
+        array.append(object)
+        if var dic = atDic[value.accid] as? [String: Any] {
+          dic[atSegmentsKey] = array
+          atDic[value.accid] = dic
+        }
+      } else if let object = value.atModel.yx_modelToJSONObject() {
+        var array = [Any]()
+        array.append(object)
+        var dic = [String: Any]()
+        dic[atTextKey] = value.text
+        dic[atSegmentsKey] = array
+        atDic[value.accid] = dic
+      }
+    }
+    NELog.infoLog(className(), desc: "at dic value : \(atDic)")
+    if atDic.count > 0 {
+      return [yxAtMsg: atDic]
+    }
+    return nil
+  }
+
+  public func cleartAtCache() {
+    nickAccidDic.removeAll()
+  }
+
+  private func convertRangeToNSRange(range: UITextRange?) -> NSRange? {
+    if let start = range?.start, let end = range?.end {
+      let startIndex = textInput?.offset(from: textInput?.beginningOfDocument ?? start, to: start) ?? 0
+      let endIndex = textInput?.offset(from: textInput?.beginningOfDocument ?? end, to: end) ?? 0
+      return NSMakeRange(startIndex, endIndex - startIndex)
+    }
+    return nil
+  }
+
+  private func isEqualToColor(_ color1: UIColor, _ color2: UIColor) -> Bool {
+    guard let components1 = color1.cgColor.components,
+          let components2 = color2.cgColor.components,
+          color1.cgColor.colorSpace == color2.cgColor.colorSpace,
+          color1.cgColor.numberOfComponents == 4,
+          color2.cgColor.numberOfComponents == 4
+    else {
+      return false
+    }
+
+    return components1[0] == components2[0] && // Red
+      components1[1] == components2[1] && // Green
+      components1[2] == components2[2] && // Blue
+      components1[3] == components2[3] // Alpha
+  }
+
+  func missClickEmoj() {
+    print("click one px space")
   }
 }

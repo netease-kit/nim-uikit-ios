@@ -6,17 +6,19 @@
 import UIKit
 
 @objcMembers
-public class ChatBaseCell: UITableViewCell {
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+open class NEChatBaseCell: UITableViewCell {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   public func uploadProgress(_ progress: Float) {
     fatalError("override in sub class")
   }
+
+  open func setModel(_ model: MessageContentModel) {}
 }

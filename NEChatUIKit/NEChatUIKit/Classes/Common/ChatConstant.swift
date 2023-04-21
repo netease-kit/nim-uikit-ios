@@ -129,12 +129,14 @@ let HexRGBAlpha: ((Int, Float) -> UIColor) = { (rgbValue: Int, alpha: Float) -> 
 // MARK: notificationkey
 
 enum NotificationName {
+  static let updateFriendInfo = Notification.Name("chat.updateFriendInfo")
   // 参数 serverId: string
   static let createServer = Notification.Name(rawValue: "qchat.createServer")
   // param channel: ChatChannel
   static let createChannel = Notification.Name(rawValue: "qchat.createChannel")
   static let updateChannel = Notification.Name(rawValue: "qchat.updateChannel")
   static let deleteChannel = Notification.Name(rawValue: "qchat.deleteChannel")
+  static let leaveTeamBySelf = Notification.Name(rawValue: "team.leaveTeamBySelf")
 
 //    static let login = Notification.Name(rawValue:"qchat.login")
   static let logout = Notification.Name(rawValue: "qchat.logout")

@@ -22,17 +22,35 @@ public class ValidationMessageViewController: ContactBaseViewController {
     emptyView.setttingContent(content: localizable("no_validation_message"))
     // viewModel.getValidationMessage()
     setupUI()
-    weak var weakSelf = self
-    viewModel.getValidationMessage {
-      NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "✅ getValidationMessage SUCCESS")
-      weakSelf?.tableView.reloadData()
-    }
+    loadData()
 
+    weak var weakSelf = self
     viewModel.dataRefresh = {
       weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.datas.count ?? 0) > 0
       weakSelf?.tableView.reloadData()
     }
-    emptyView.isHidden = viewModel.datas.count > 0
+
+    NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+  }
+
+  // 返回上一级页面
+  override func backToPrevious() {
+    super.backToPrevious()
+    viewModel.clearNotiUnreadCount()
+  }
+
+  func appEnterBackground() {
+    viewModel.clearNotiUnreadCount()
+    loadData()
+  }
+
+  func loadData() {
+    weak var weakSelf = self
+    viewModel.getValidationMessage {
+      NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "✅ getValidationMessage SUCCESS")
+      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.datas.count ?? 0) > 0
+      weakSelf?.tableView.reloadData()
+    }
   }
 
   func setupUI() {
@@ -77,13 +95,10 @@ public class ValidationMessageViewController: ContactBaseViewController {
   }
 
   func clearMessage() {
-    weak var weakSelf = self
-    showAlert(message: localizable("clear_all_validate_message")) {
-      weakSelf?.viewModel.clearAllNoti {
-        NELog.infoLog(ModuleName + " " + self.tag, desc: "✅ clearAllNoti SUCCESS")
-        weakSelf?.tableView.reloadData()
-        weakSelf?.emptyView.isHidden = false
-      }
+    viewModel.clearAllNoti {
+      NELog.infoLog(ModuleName + " " + self.tag, desc: "✅ clearAllNoti SUCCESS")
+      tableView.reloadData()
+      emptyView.isHidden = false
     }
   }
 }
@@ -113,6 +128,27 @@ extension ValidationMessageViewController: UITableViewDelegate, UITableViewDataS
 }
 
 extension ValidationMessageViewController: SystemNotificationCellDelegate {
+  func changeValidationStatus(notifiModel: XNotification, notiStatus: IMHandleStatus) {
+    var notifiModels = [XNotification]()
+    if let msgList = notifiModel.msgList,
+       msgList.count > 0 {
+      for msg in msgList {
+        notifiModels.append(msg)
+      }
+    }
+
+    notifiModel.handleStatus = notiStatus
+    notifiModel.imNotification?.handleStatus = notiStatus.rawValue
+    viewModel.clearSingleNotifyUnreadCount(notification: notifiModel.imNotification!)
+    for noti in notifiModels {
+      noti.handleStatus = notiStatus
+      noti.imNotification?.handleStatus = notiStatus.rawValue
+      viewModel.clearSingleNotifyUnreadCount(notification: noti.imNotification!)
+    }
+    notifiModel.unReadCount = 0
+    loadData()
+  }
+
   func onAccept(_ notifiModel: XNotification) {
     weak var weakSelf = self
     guard let teamId = notifiModel.targetID, let invitorId = notifiModel.sourceID else {
@@ -122,29 +158,37 @@ extension ValidationMessageViewController: SystemNotificationCellDelegate {
     if notifiModel.type == .teamInvite {
       viewModel.acceptInviteWithTeam(teamId, invitorId) { error in
         NELog.infoLog(
-          ModuleName + " " + self.tag,
+          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
           desc: "CALLBACK acceptInviteWithTeam " + (error?.localizedDescription ?? "no error")
         )
-        if error != nil {
-          NELog.infoLog(ModuleName + " " + self.tag, desc: "❌CALLBACK acceptInviteWithTeam failed,error = \(error!)")
+        if let err = error as? NSError {
+          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK acceptInviteWithTeam failed,error = \(error!.localizedDescription)")
+          if err.code == 807 || err.code == 809 {
+            weakSelf?.showToast(localizable("validate_processed"))
+          } else if err.code == 803 {
+            weakSelf?.showToast(localizable("team_not_exist"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
         } else {
-          notifiModel.handleStatus = .HandleTypeOk
-          notifiModel.imNotification?.handleStatus = 1
-          weakSelf?.tableView.reloadData()
+          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
         }
       }
     } else if notifiModel.type == .addFriendRequest {
       viewModel.agreeRequest(invitorId) { error in
         NELog.infoLog(
-          ModuleName + " " + self.tag,
+          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
           desc: "CALLBACK agreeRequest " + (error?.localizedDescription ?? "no error")
         )
-        if error != nil {
+        if let err = error {
           NELog.infoLog(ModuleName + " " + self.tag, desc: "❌CALLBACK agreeRequest failed,error = \(error!)")
+          weakSelf?.showToast(localizable("failed_operation"))
         } else {
-          notifiModel.handleStatus = .HandleTypeOk
-          notifiModel.imNotification?.handleStatus = 1
-          weakSelf?.tableView.reloadData()
+          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+
+          Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
+                                                              "sessionId": invitorId,
+                                                              "sessionType": NIMSessionType.P2P])
         }
       }
     }
@@ -159,29 +203,38 @@ extension ValidationMessageViewController: SystemNotificationCellDelegate {
     if notifiModel.type == .teamInvite {
       weakSelf?.viewModel.rejectInviteWithTeam(teamId, invitorId) { error in
         NELog.infoLog(
-          ModuleName + " " + self.tag,
+          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
           desc: "CALLBACK rejectInviteWithTeam " + (error?.localizedDescription ?? "no error")
         )
-        if error != nil {
-          NELog.infoLog(ModuleName + " " + self.tag, desc: "❌CALLBACK rejectInviteWithTeam failed,error = \(error!)")
+        if let err = error as? NSError {
+          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK rejectInviteWithTeam failed,error = \(error!.localizedDescription)")
+          if err.code == 807 || err.code == 809 {
+            weakSelf?.showToast(localizable("validate_processed"))
+          } else if err.code == 803 {
+            weakSelf?.showToast(localizable("team_not_exist"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
         } else {
-          notifiModel.handleStatus = .HandleTypeNo
-          notifiModel.imNotification?.handleStatus = 2
-          weakSelf?.tableView.reloadData()
+          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
         }
       }
     } else if notifiModel.type == .addFriendRequest {
       viewModel.refuseRequest(invitorId) { error in
         NELog.infoLog(
-          ModuleName + " " + self.tag,
+          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
           desc: "CALLBACK refuseRequest " + (error?.localizedDescription ?? "no error")
         )
-        if error != nil {
-          NELog.infoLog(ModuleName + " " + self.tag, desc: "❌CALLBACK agreeRequest failed,error = \(error!)")
+        if let err = error {
+          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+          if err.code == 509 {
+            weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+            weakSelf?.showToast(localizable("validate_processed"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
         } else {
-          notifiModel.handleStatus = .HandleTypeNo
-          notifiModel.imNotification?.handleStatus = 2
-          weakSelf?.tableView.reloadData()
+          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
         }
       }
     }
