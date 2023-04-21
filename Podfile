@@ -10,26 +10,26 @@ target 'app' do
   pod 'YXLogin', '1.0.0'
   
   #可选UI库
-  pod 'NEContactUIKit', '9.4.0'
-  pod 'NEConversationUIKit', '9.4.0'
-  pod 'NEChatUIKit', '9.4.0'
-  pod 'NETeamUIKit', '9.4.0'
+  pod 'NEContactUIKit', '9.5.0'
+  pod 'NEConversationUIKit', '9.5.0'
+  pod 'NEChatUIKit', '9.5.0'
+  pod 'NETeamUIKit', '9.5.0'
   
   
   #可选Kit库（和UIKit对应）
-  pod 'NEContactKit', '9.4.0'
-  pod 'NEConversationKit', '9.4.0'
-  pod 'NEChatKit', '9.4.0'
-  pod 'NETeamKit', '9.4.0'
+  pod 'NEContactKit', '9.5.0'
+  pod 'NEConversationKit', '9.5.0'
+  pod 'NEChatKit', '9.5.0'
+  pod 'NETeamKit', '9.5.0'
   
   #基础kit库
-  pod 'NECommonUIKit', '9.4.0'
-  pod 'NECommonKit', '9.4.0'
-  pod 'NECoreIMKit', '9.4.0'
-  pod 'NECoreKit', '9.4.0'
+  pod 'NECommonUIKit', '9.5.0'
+  pod 'NECommonKit', '9.5.0'
+  pod 'NECoreIMKit', '9.5.0'
+  pod 'NECoreKit', '9.5.0'
   
   #扩展库
-  pod 'NEMapKit', '9.4.0'
+  pod 'NEMapKit', '9.5.0'
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
   pod 'NERtcCallUIKit', '1.8.2'
