@@ -11,7 +11,7 @@
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
 #import <NECoreIMKit/NECoreIMKit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
-#import <NEQChatUIKit/NEQChatUIKit-Swift.h>
+//#import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 
 @interface NETabbarController ()
 
@@ -46,16 +46,16 @@
 
   // 圈组
 
-  QChatHomeViewController *qchatCtrl = [[QChatHomeViewController alloc] init];
-  qchatCtrl.tabBarItem =
-      [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"qchat", @"")
-                                    image:[UIImage imageNamed:@"qchat_tabbar_icon"]
-                            selectedImage:[UIImage imageNamed:@"qchat_tabbar_icon"]];
-  NENavigationController *qchatNav =
-      [[NENavigationController alloc] initWithRootViewController:qchatCtrl];
+//  QChatHomeViewController *qchatCtrl = [[QChatHomeViewController alloc] init];
+//  qchatCtrl.tabBarItem =
+//      [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"qchat", @"")
+//                                    image:[UIImage imageNamed:@"qchat_tabbar_icon"]
+//                            selectedImage:[UIImage imageNamed:@"qchat_tabbar_icon"]];
+//  NENavigationController *qchatNav =
+//      [[NENavigationController alloc] initWithRootViewController:qchatCtrl];
 
   self.tabBar.backgroundColor = [UIColor whiteColor];
-  self.viewControllers = @[ sessionNav, contactNav, qchatNav ];
+  self.viewControllers = @[ sessionNav, contactNav ];
   self.selectedIndex = 0;
 }
 
