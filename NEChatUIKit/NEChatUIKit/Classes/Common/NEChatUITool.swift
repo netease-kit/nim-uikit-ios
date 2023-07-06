@@ -5,6 +5,7 @@
 
 import Foundation
 
+@objcMembers
 public class NEChatUITool {
   // 计算富文本size
   class func getSizeWithAtt(att: NSAttributedString, font: UIFont, maxSize: CGSize) -> CGSize {

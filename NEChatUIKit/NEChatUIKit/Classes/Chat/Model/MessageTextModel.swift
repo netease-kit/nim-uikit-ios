@@ -36,15 +36,10 @@ class MessageTextModel: MessageContentModel {
       }
     }
 
-    let textSize = NEChatUITool.getSizeWithAtt(
-      att: attributeStr ?? NSAttributedString(string: ""),
-      font: NEKitChatConfig.shared.ui.messageTextSize,
-      maxSize: CGSize(width: qChat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
-    )
+    let textSize = attributeStr?.finalSize(NEKitChatConfig.shared.ui.messageTextSize, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
+
     textHeight = textSize.height
-    var h = qChat_min_h
-    h = textSize.height + 24
-    contentSize = CGSize(width: textSize.width + qChat_margin * 2, height: h)
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    contentSize = CGSize(width: textSize.width + chat_content_margin * 2, height: textHeight + chat_content_margin * 2)
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }

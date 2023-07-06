@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class ContactSectionView: UITableViewHeaderFooterView {
+open class ContactSectionView: UITableViewHeaderFooterView {
   public var titleLabel = UILabel()
   var line = UIView()
 
@@ -15,32 +15,32 @@ public class ContactSectionView: UITableViewHeaderFooterView {
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   func commonUI() {
     contentView.backgroundColor = .white
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
-
-    titleLabel.textColor = NEKitContactConfig.shared.ui.indexTitleColor
+    titleLabel.backgroundColor = .white
+    titleLabel.textColor = NEKitContactConfig.shared.ui.indexTitleColor ?? UIColor.ne_emptyTitleColor
     titleLabel.font = UIFont.systemFont(ofSize: 14.0)
-    addSubview(titleLabel)
+    contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
-      titleLabel.topAnchor.constraint(equalTo: topAnchor),
-      titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-      titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 20),
     ])
 
     line.translatesAutoresizingMaskIntoConstraints = false
     line.backgroundColor = NEKitContactConfig.shared.ui.divideLineColor
-    addSubview(line)
+    contentView.addSubview(line)
     NSLayoutConstraint.activate([
       line.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),
       line.heightAnchor.constraint(equalToConstant: 1.0),
-      line.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -1.0),
-      line.rightAnchor.constraint(equalTo: rightAnchor),
+      line.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0),
+      line.rightAnchor.constraint(equalTo: contentView.rightAnchor),
     ])
   }
 }

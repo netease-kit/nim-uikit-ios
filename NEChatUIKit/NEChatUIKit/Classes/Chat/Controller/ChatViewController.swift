@@ -15,53 +15,36 @@ import WebKit
 import NEChatKit
 import Photos
 
-let leftCellTypeSufixx = "_left"
-let rightCellTypeSufixx = "_right"
-
 @objcMembers
 open class ChatViewController: ChatBaseViewController, UINavigationControllerDelegate,
   ChatInputViewDelegate, ChatViewModelDelegate, NIMMediaManagerDelegate,
-  MessageOperationViewDelegate, UIGestureRecognizerDelegate, UITableViewDataSource,
+  MessageOperationViewDelegate, UITableViewDataSource,
   UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, CLLocationManagerDelegate, UITextViewDelegate {
   private let tag = "ChatViewController"
-  public var viewmodel: ChatViewModel
-  public var inputViewTopConstraint: NSLayoutConstraint?
-  public var tableViewBottomConstraint: NSLayoutConstraint?
-  public var menuView: ChatInputView = .init()
-  public var operationView: MessageOperationView?
-  private var playingCell: ChatAudioCell?
+  private let kCallKitDismissNoti = "kCallKitDismissNoti"
+  private let kCallKitShowNoti = "kCallKitShowNoti"
+  private var playingCell: ChatAudioCellProtocol?
   private var playingModel: MessageAudioModel?
   private var atUsers = [NSRange]()
   private var timer: Timer?
-  var replyView = ReplyView()
-  private var isFile = false
-  let interactionController = UIDocumentInteractionController()
+  private var isFile: Bool? // 是否以文件形式发送
   private var needMarkReadMsgs = [NIMMessage]()
   private var isCurrentPage = true
-  var titleContent = ""
-  public var bottomExanpndHeight: CGFloat = 204 // 底部展开高度
 
-  public var registerCellDic = [
-    getLeftCellType(MessageType.text.rawValue): ChatTextLeftCell.self,
-    getRitghtCellType(MessageType.text.rawValue): ChatTextRightCell.self,
-    getLeftCellType(MessageType.rtcCallRecord.rawValue): ChatCallRecordLeftCell.self,
-    getRitghtCellType(MessageType.rtcCallRecord.rawValue): ChatCallRecordRightCell.self,
-    getLeftCellType(MessageType.audio.rawValue): ChatAudioLeftCell.self,
-    getRitghtCellType(MessageType.audio.rawValue): ChatAudioRightCell.self,
-    getLeftCellType(MessageType.image.rawValue): ChatImageLeftCell.self,
-    getRitghtCellType(MessageType.image.rawValue): ChatImageRightCell.self,
-    getLeftCellType(MessageType.revoke.rawValue): ChatRevokeLeftCell.self,
-    getRitghtCellType(MessageType.revoke.rawValue): ChatRevokeRightCell.self,
-    getLeftCellType(MessageType.video.rawValue): ChatVideoLeftCell.self,
-    getRitghtCellType(MessageType.video.rawValue): ChatVideoRightCell.self,
-    getLeftCellType(MessageType.file.rawValue): ChatFileLeftCell.self,
-    getRitghtCellType(MessageType.file.rawValue): ChatFileRightCell.self,
-    getLeftCellType(MessageType.reply.rawValue): ChatReplyLeftCell.self,
-    getRitghtCellType(MessageType.reply.rawValue): ChatReplyRightCell.self,
-    getLeftCellType(MessageType.location.rawValue): ChatLocationLeftCell.self,
-    getRitghtCellType(MessageType.location.rawValue): ChatLocationRightCell.self,
-    "\(MessageType.time.rawValue)": ChatTimeTableViewCell.self,
-  ]
+  var replyView = ReplyView()
+  public var titleContent = ""
+  let interactionController = UIDocumentInteractionController()
+
+  public var viewmodel: ChatViewModel
+  public var inputViewTopConstraint: NSLayoutConstraint?
+  public var tableViewBottomConstraint: NSLayoutConstraint?
+  public var menuView: NEBaseChatInputView!
+  public var operationView: MessageOperationView?
+  public var operationCellFilter: [OperationType]?
+  public var bottomExanpndHeight: CGFloat = 204 // 底部展开高度
+  public var normalInputHeight: CGFloat = 100
+  public var normalOffset: CGFloat = 0
+  public var registerCellDic = [String: UITableViewCell.Type]()
 
   public lazy var inputTopExtendView: UIView = {
     let content = UIView()
@@ -87,6 +70,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   public init(session: NIMSession) {
     viewmodel = ChatViewModel(session: session, anchor: nil)
     super.init(nibName: nil, bundle: nil)
+    menuView = getMenuView()
+
     NEKeyboardManager.shared.enable = false
     NEKeyboardManager.shared.enableAutoToolbar = false
     NIMSDK.shared().mediaManager.add(self)
@@ -97,7 +82,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func backEvent() {
+  override open func backEvent() {
     super.backEvent()
     cleanDelegate()
   }
@@ -112,7 +97,15 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+  func appEnterBackground() {
+    isCurrentPage = false
+  }
+
+  func appEnterForegournd() {
+    isCurrentPage = true
+  }
+
+  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     return true
   }
@@ -122,11 +115,18 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     NEKeyboardManager.shared.enable = false
     NEKeyboardManager.shared.shouldResignOnTouchOutside = false
     isCurrentPage = true
-    navigationController?.isNavigationBarHidden = false
     markNeedReadMsg()
     getSessionInfo(session: viewmodel.session)
-    tableView.reloadData()
     clearAtRemind()
+
+    weak var weakSelf = self
+    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
+      if status == .notReachable, let networkView = weakSelf?.brokenNetworkView {
+        weakSelf?.view.addSubview(networkView)
+      } else {
+        weakSelf?.brokenNetworkView.removeFromSuperview()
+      }
+    }
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
@@ -163,17 +163,15 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       return
     }
     if let uid = model?.message?.from {
-      UserInfoProvider.shared.fetchUserInfo([uid]) { [weak self] error, users in
-        if let u = users?.first {
-          Router.shared.use(
-            ContactUserInfoPageRouter,
-            parameters: ["nav": self?.navigationController as Any, "user": u],
-            closure: nil
-          )
-        }
-      }
+      Router.shared.use(
+        ContactUserInfoPageRouter,
+        parameters: ["nav": navigationController as Any, "uid": uid],
+        closure: nil
+      )
     }
   }
+
+  open func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {}
 
   /// 长按消息内容
   /// - Parameters:
@@ -186,6 +184,19 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       return
     }
 
+    var filterItems = items
+    if let filter = operationCellFilter {
+      filterItems = items.filter { item in
+        if let type = item.type {
+          return !filter.contains(type)
+        }
+        return true
+      }
+    }
+
+    // 供用户自定义 items
+    setOperationItems(items: &filterItems, model: model)
+
     if model?.isRevoked == true {
       return
     }
@@ -193,8 +204,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     viewmodel.operationModel = model
 
 //        size
-    let w = items.count <= 5 ? 60.0 * Double(items.count) + 16.0 : 60.0 * 5 + 16.0
-    let h = items.count <= 5 ? 56.0 + 16.0 : 56.0 * 2 + 16.0
+    let w = filterItems.count <= 5 ? 60.0 * Double(filterItems.count) + 16.0 : 60.0 * 5 + 16.0
+    let h = filterItems.count <= 5 ? 56.0 + 16.0 : 56.0 * 2 + 16.0
 
     if let index = tableView.indexPath(for: cell) {
       let rectInTableView = tableView.rectForRow(at: index)
@@ -213,31 +224,39 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
          msg.isOutgoingMsg {
         frameX = kScreenWidth - w
       }
-      let frame = CGRect(x: frameX, y: operationY, width: w, height: h)
+      var frame = CGRect(x: frameX, y: operationY, width: w, height: h)
+      if frame.origin.y + h < tableView.frame.origin.y {
+        frame.origin.y = tableView.frame.origin.y
+      } else if frame.origin.y + h > view.frame.size.height {
+        frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
+      }
+
       operationView = MessageOperationView(frame: frame)
       operationView!.delegate = self
-      operationView!.items = items
+      operationView!.items = filterItems
       view.addSubview(operationView!)
     }
   }
 
   // MARK: lazy Method
 
-  private lazy var brokenNetworkView: ChatBrokenNetworkView = {
+  public var networkToolHeight: CGFloat = 36
+
+  public lazy var brokenNetworkView: NEBrokenNetworkView = {
     let view =
-      ChatBrokenNetworkView(frame: CGRect(x: 0, y: kNavigationHeight + KStatusBarHeight,
-                                          width: kScreenWidth, height: 36))
+      NEBrokenNetworkView(frame: CGRect(x: 0, y: kNavigationHeight + KStatusBarHeight,
+                                        width: kScreenWidth, height: networkToolHeight))
     return view
   }()
 
-  lazy var tableView: UITableView = {
+  public lazy var tableView: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
     tableView.showsVerticalScrollIndicator = false
     tableView.delegate = self
     tableView.dataSource = self
-    tableView.backgroundColor = .white
+    tableView.backgroundColor = .clear
     tableView.mj_header = MJRefreshNormalHeader(
       refreshingTarget: self,
       refreshingAction: #selector(loadMoreData)
@@ -248,8 +267,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   // MARK: UIGestureRecognizerDelegate
 
-  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                                shouldReceive touch: UITouch) -> Bool {
+  open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                              shouldReceive touch: UITouch) -> Bool {
 //        print("touch.view:\(touch.view)")
     guard let view = touch.view else {
       return true
@@ -268,12 +287,12 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     return true
   }
 
-  public func remoteUserEditing() {
+  open func remoteUserEditing() {
     title = chatLocalizable("editing")
     trigerEndTimer()
   }
 
-  public func remoteUserEndEditing() {
+  open func remoteUserEndEditing() {
     title = titleContent
   }
 
@@ -307,29 +326,17 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   // MARK: objc 方法
 
-  public func toSetting() {
-    if viewmodel.session.sessionType == .team {
-      Router.shared.use(
-        TeamSettingViewRouter,
-        parameters: ["nav": navigationController as Any,
-                     "teamid": viewmodel.session.sessionId],
-        closure: nil
-      )
-    } else if viewmodel.session.sessionType == .P2P {
-      let userSetting = UserSettingViewController()
-      userSetting.userId = viewmodel.session.sessionId
-      navigationController?.pushViewController(userSetting, animated: true)
-    }
-  }
+  override open func toSetting() {}
 
   // MARK: private 方法
 
   open func commonUI() {
     title = viewmodel.session.sessionId
+    customNavigationView.bottomLine.isHidden = false
     view.addSubview(tableView)
     tableViewBottomConstraint = tableView.bottomAnchor.constraint(
       equalTo: view.bottomAnchor,
-      constant: -100 - inputTopExtendHeight
+      constant: -normalInputHeight - inputTopExtendHeight
     )
     tableViewBottomConstraint?.isActive = true
     view.addSubview(navigationBarBottomExtendView)
@@ -358,6 +365,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         navigationBarBottomExtendView.leftAnchor.constraint(equalTo: view.leftAnchor),
         navigationBarBottomExtendView.rightAnchor.constraint(equalTo: view.rightAnchor),
       ])
+
       NSLayoutConstraint.activate([
         tableView.topAnchor.constraint(
           equalTo: navigationBarBottomExtendView.bottomAnchor,
@@ -369,13 +377,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
 
     tableView.register(
-      ChatBaseLeftCell.self,
-      forCellReuseIdentifier: "\(ChatBaseLeftCell.self)"
-    )
-
-    tableView.register(
-      ChatBaseRightCell.self,
-      forCellReuseIdentifier: "\(ChatBaseRightCell.self)"
+      NEBaseChatMessageCell.self,
+      forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
     )
 
     NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
@@ -387,16 +390,15 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
 
     viewmodel.delegate = self
-
     menuView.backgroundColor = UIColor(hexString: "#EFF1F3")
     menuView.translatesAutoresizingMaskIntoConstraints = false
     menuView.delegate = self
-    menuView.chatAddMoreView.configData(data: NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType))
+    expandMoreAction()
     view.addSubview(menuView)
 
     inputViewTopConstraint = menuView.topAnchor.constraint(
       equalTo: view.bottomAnchor,
-      constant: -100
+      constant: -normalInputHeight
     )
     NSLayoutConstraint.activate([
       menuView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -414,35 +416,34 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       inputTopExtendView.rightAnchor.constraint(equalTo: view.rightAnchor),
     ])
 
-    weak var weakSelf = self
-    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
-      if status == .notReachable, let networkView = weakSelf?.brokenNetworkView {
-        weakSelf?.view.addSubview(networkView)
-      } else {
-        weakSelf?.brokenNetworkView.removeFromSuperview()
-        weakSelf?.viewmodel.refreshReceipts()
-      }
+    if NEKitChatConfig.shared.ui.showTitleBarRightIcon {
+      let image = NEKitChatConfig.shared.ui.titleBarRightRes ?? UIImage.ne_imageNamed(name: "three_point")
+      addRightAction(image, #selector(toSetting), self)
+      customNavigationView.setMoreButtonImage(image)
+    } else {
+      customNavigationView.moreButton.isHidden = true
     }
-    addRightAction(UIImage.ne_imageNamed(name: "three_point"), #selector(toSetting), self)
+
+    if let pan = navigationController?.interactivePopGestureRecognizer {
+      tableView.panGestureRecognizer.require(toFail: pan)
+    }
   }
 
   func loadData() {
-    //        title
-    getSessionInfo(session: viewmodel.session)
     weak var weakSelf = self
 
-    viewmodel.queryRoamMsgHasMoreTime_v2 { error, historyEnd, newEnd, models, index in
+    viewmodel.queryRoamMsgHasMoreTime_v2 { error, historyEnd, newEnd, index in
       NELog.infoLog(
         ModuleName + " " + self.tag,
-        desc: "CALLBACK queryRoamMsgHasMoreTime_v2 " + (error?.localizedDescription ?? "no error")
+        desc: #function + "CALLBACK queryRoamMsgHasMoreTime_v2 " + (error?.localizedDescription ?? "no error")
       )
-      weakSelf?.viewmodel.refreshReceipts()
-      if let ms = models, ms.count > 0 {
+
+      if let ms = weakSelf?.viewmodel.messages, ms.count > 0 {
         weakSelf?.tableView.reloadData()
         if weakSelf?.viewmodel.isHistoryChat == true {
           let indexPath = IndexPath(row: index, section: 0)
           print("queryRoamMsgHasMoreTime_v2 index : ", index)
-          weakSelf?.tableView.scrollToRow(at: indexPath, at: .none, animated: false)
+          weakSelf?.tableView.scrollToRow(at: indexPath, at: .middle, animated: false)
           if newEnd > 0 {
             weakSelf?.addBottomLoadMore()
           }
@@ -459,6 +460,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       } else if let err = error {
         weakSelf?.showToast(err.localizedDescription)
       }
+      weakSelf?.loadDataFinish()
     }
   }
 
@@ -467,7 +469,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     viewmodel.dropDownRemoteRefresh { error, count, messages in
       NELog.infoLog(
         ModuleName + " " + self.tag,
-        desc: "CALLBACK dropDownRemoteRefresh " + (error?.localizedDescription ?? "no error")
+        desc: #function + "CALLBACK dropDownRemoteRefresh " + (error?.localizedDescription ?? "no error")
       )
       print("dropDownRemoteRefresh messages count ", messages?.count as Any)
 
@@ -490,13 +492,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     viewmodel.pullRemoteRefresh { error, count, datas in
       NELog.infoLog(
         ModuleName + " " + self.tag,
-        desc: "CALLBACK pullRemoteRefresh " + (error?.localizedDescription ?? "no error")
+        desc: #function + "CALLBACK pullRemoteRefresh " + (error?.localizedDescription ?? "no error")
       )
       if count <= 0 {
         weakSelf?.removeBottomLoadMore()
       } else {
         weakSelf?.tableView.mj_footer?.endRefreshing()
-        weakSelf?.tableView.reloadData()
+        weakSelf?.didRefreshTable()
       }
     }
   }
@@ -515,30 +517,38 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
                                            selector: #selector(keyBoardWillHide(_:)),
                                            name: UIResponder.keyboardWillHideNotification,
                                            object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(didShowCallView), name: Notification.Name(kCallKitShowNoti), object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(appEnterForegournd), name: UIApplication.willEnterForegroundNotification, object: nil)
+
     let tap = UITapGestureRecognizer(target: self, action: #selector(viewTap))
     tap.delegate = self
+    tap.cancelsTouchesInView = false
     view.addGestureRecognizer(tap)
   }
 
-  func addBottomLoadMore() {
+  open func addBottomLoadMore() {
     tableView.mj_footer = MJRefreshBackNormalFooter(
       refreshingTarget: self,
       refreshingAction: #selector(loadCloserToNowData)
     )
   }
 
-  func removeBottomLoadMore() {
+  open func removeBottomLoadMore() {
     tableView.mj_footer?.endRefreshingWithNoMoreData()
     tableView.mj_footer = nil
     viewmodel.isHistoryChat = false // 转为普通聊天页面
   }
 
   func markNeedReadMsg() {
-    if isCurrentPage {
+    if isCurrentPage, needMarkReadMsgs.count > 0 {
       viewmodel.markRead(messages: needMarkReadMsgs) { error in
         NELog.infoLog(
           ModuleName + " " + self.tag,
-          desc: "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
         )
       }
       needMarkReadMsgs = [NIMMessage]()
@@ -547,33 +557,39 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   //    MARK: 键盘通知相关操作
 
-  func keyBoardWillShow(_ notification: Notification) {
+  open func keyBoardWillShow(_ notification: Notification) {
     if menuView.currentType != .text {
       return
     }
+    menuView.currentButton?.isSelected = false
+
+    menuView.contentSubView?.isHidden = true
     let oldKeyboardRect = (notification
       .userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
+
     let keyboardRect = (notification
       .userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+
+    print("chat view key board size : ", keyboardRect)
+    layoutInputView(offset: keyboardRect.size.height)
+    weak var weakSelf = self
+    UIView.animate(withDuration: 0.25, animations: {
+      weakSelf?.view.layoutIfNeeded()
+    })
 
     // 键盘已经弹出
     if oldKeyboardRect == keyboardRect {
       return
     }
 
-    print("chat view key board size : ", keyboardRect)
-    layoutInputView(offset: keyboardRect.size.height)
-
-    UIView.animate(withDuration: 0.25, animations: {
-      self.view.layoutIfNeeded()
-    })
     scrollTableViewToBottom()
   }
 
-  func keyBoardWillHide(_ notification: Notification) {
+  open func keyBoardWillHide(_ notification: Notification) {
     if menuView.currentType != .text {
       return
     }
+    menuView.currentButton?.isSelected = false
     // 解决点击operation点击无效问题
 //    if operationView?.superview != nil {
 //      operationView?.removeFromSuperview()
@@ -585,42 +601,51 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     print("self.viewmodel.messages.count\(viewmodel.messages.count)")
     print("self.tableView.numberOfRows(inSection: 0)\(tableView.numberOfRows(inSection: 0))")
     if viewmodel.messages.count > 0 {
-      let indexPath = IndexPath(row: viewmodel.messages.count - 1, section: 0)
       weak var weakSelf = self
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: DispatchWorkItem(block: {
-        weakSelf?.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        if let row = weakSelf?.tableView.numberOfRows(inSection: 0) {
+          let indexPath = IndexPath(row: row - 1, section: 0)
+          weakSelf?.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        }
       }))
     }
   }
 
-  public func layoutInputView(offset: CGFloat) {
+  open func layoutInputView(offset: CGFloat) {
     print("layoutInputView offset : ", offset)
+    print("normalOffset : ", normalOffset)
+    print("normalInputHeight : ", normalInputHeight)
     weak var weakSelf = self
+    let topValue = normalInputHeight - normalOffset
+    if offset == 0 {
+      menuView.contentSubView?.isHidden = true
+      menuView.currentButton?.isSelected = false
+    }
     UIView.animate(withDuration: 0.1, animations: {
-      weakSelf?.inputViewTopConstraint?.constant = -100 - offset
-      weakSelf?.tableViewBottomConstraint?.constant = -100 - offset - (weakSelf?.inputTopExtendHeight ?? 0)
+      weakSelf?.inputViewTopConstraint?.constant = -topValue - offset
+      weakSelf?.tableViewBottomConstraint?.constant = -topValue - offset - (weakSelf?.inputTopExtendHeight ?? 0)
     })
   }
 
   //    MARK: ChatInputViewDelegate
 
-  public func sendText(text: String?, attribute: NSAttributedString?) {
+  open func sendText(text: String?, attribute: NSAttributedString?) {
     guard let content = text, content.count > 0 else {
       return
     }
     let remoteExt = menuView.getRemoteExtension(attribute)
     menuView.cleartAtCache()
+    weak var weakSelf = self
     if viewmodel.isReplying, let msg = viewmodel.operationModel?.message {
       viewmodel.replyMessageWithoutThread(message: MessageUtils.textMessage(text: content, remoteExt: remoteExt), target: msg) { [weak self] error in
         NELog.infoLog(
           ModuleName + " " + (self?.tag ?? "ChatViewController"),
-          desc: "CALLBACK replyMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK replyMessage " + (error?.localizedDescription ?? "no error")
         )
         if error != nil {
-          self?.view.makeToast(error?.localizedDescription)
+          weakSelf?.view.makeToast(error?.localizedDescription)
         } else {
-          self?.viewmodel.isReplying = false
-          self?.replyView.removeFromSuperview()
+          weakSelf?.closeReply(button: nil)
         }
       }
 
@@ -628,16 +653,16 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       viewmodel.sendTextMessage(text: content, remoteExt: remoteExt) { [weak self] error in
         NELog.infoLog(
           ModuleName + " " + (self?.tag ?? "ChatViewController"),
-          desc: "CALLBACK sendTextMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK sendTextMessage " + (error?.localizedDescription ?? "no error")
         )
         if error != nil {
-          self?.view.makeToast(error?.localizedDescription)
+          weakSelf?.view.makeToast(error?.localizedDescription)
         }
       }
     }
   }
 
-  public func didSelectMoreCell(cell: NEInputMoreCell) {
+  open func didSelectMoreCell(cell: NEInputMoreCell) {
     if let delegate = cell.cellData?.customDelegate as? AnyObject, let action = cell.cellData?.action {
       // 用户自定义更多面板按钮
       _ = delegate.perform(action)
@@ -670,16 +695,25 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       didToSearchLocationView()
 
     } else if let type = cell.cellData?.type, type == .takePicture {
-      showBottomVideoAction(self, false)
+      isFile = false
+      showTakePicture()
     } else if let type = cell.cellData?.type, type == .file {
       isFile = true
-      showBottomFileAction(self)
+      showFileAction()
     } else if let type = cell.cellData?.type, type == .rtc {
       showRtcCallAction()
     } else {}
   }
 
-  func showRtcCallAction() {
+  open func showTakePicture() {
+    showBottomVideoAction(self, false)
+  }
+
+  open func showFileAction() {
+    showBottomFileAction(self)
+  }
+
+  open func showRtcCallAction() {
     var param = [String: AnyObject]()
     param["remoteUserAccid"] = viewmodel.session.sessionId as AnyObject
     param["currentUserAccid"] = NIMSDK.shared().loginManager.currentAccount() as AnyObject
@@ -716,7 +750,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func textChanged(text: String) -> Bool {
+  open func textChanged(text: String) -> Bool {
     if text == "@" {
       // 做p2p类型判断
       if viewmodel.session.sessionType == .P2P {
@@ -733,7 +767,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func textDelete(range: NSRange, text: String) -> Bool {
+  open func textDelete(range: NSRange, text: String) -> Bool {
     var index = -1
     var removeRange: NSRange?
     for (i, r) in atUsers.enumerated() {
@@ -785,7 +819,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     return true
   }
 
-  public func textFieldDidChange(_ textField: UITextView) {
+  open func textFieldDidChange(_ textField: UITextView) {
     if let text = textField.text {
       if text.count > 0 {
         viewmodel.sendInputTypingState()
@@ -795,35 +829,43 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func textFieldDidEndEditing(_ textField: UITextView) {
+  open func textFieldDidEndEditing(_ textField: UITextView) {
     viewmodel.sendInputTypingEndState()
   }
 
-  public func textFieldDidBeginEditing(_ textField: UITextView) {
+  open func textFieldDidBeginEditing(_ textField: UITextView) {
     if let count = textField.text?.count, count > 0 {
       viewmodel.sendInputTypingState()
     }
   }
 
-  public func willSelectItem(button: UIButton, index: Int) {
+  open func willSelectItem(button: UIButton?, index: Int) {
     operationView?.removeFromSuperview()
-    if index == 0 {
-      layoutInputView(offset: bottomExanpndHeight)
-      scrollTableViewToBottom()
-    } else if index == 1 {
-      layoutInputView(offset: bottomExanpndHeight)
-      scrollTableViewToBottom()
-    } else if index == 2 {
-      goPhotoAlbumWithVideo(self)
+    if button?.isSelected == true {
+      if index == 0 {
+        // 语音
+        layoutInputView(offset: bottomExanpndHeight)
+        scrollTableViewToBottom()
+      } else if index == 1 {
+        // emoji
+        layoutInputView(offset: bottomExanpndHeight)
+        scrollTableViewToBottom()
+      } else if index == 2 {
+        // 相册
+        isFile = false
+        goPhotoAlbumWithVideo(self)
+      } else if index == 3 {
+        // 更多
+        layoutInputView(offset: bottomExanpndHeight)
+        scrollTableViewToBottom()
+        UIApplication.shared.keyWindow?.endEditing(true)
+      }
     } else {
-      // 更多
-      layoutInputView(offset: bottomExanpndHeight)
-      scrollTableViewToBottom()
-      UIApplication.shared.keyWindow?.endEditing(true)
+      layoutInputView(offset: 0)
     }
   }
 
-  func showMenue(sourceView: UIView) {
+  open func showMenue(sourceView: UIView) {
     let alert = UIAlertController(
       title: chatLocalizable("choose"),
       message: nil,
@@ -851,7 +893,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     present(alert, animated: true, completion: nil)
   }
 
-  func willSelectImage() {
+  open func willSelectImage() {
     let imagePickerVC = UIImagePickerController()
     imagePickerVC.delegate = self
     imagePickerVC.allowsEditing = false
@@ -859,7 +901,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     present(imagePickerVC, animated: true) {}
   }
 
-  func takePhoto() {
+  open func takePhoto() {
     let imagePickerVC = UIImagePickerController()
     imagePickerVC.delegate = self
     imagePickerVC.allowsEditing = false
@@ -867,16 +909,16 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     present(imagePickerVC, animated: true) {}
   }
 
-  func clearAtRemind() {
+  open func clearAtRemind() {
     let sessionId = viewmodel.session.sessionId
     let param = ["sessionId": sessionId]
     Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
   }
 
-  func sendMediaMessage(didFinishPickingMediaWithInfo info: [UIImagePickerController
+  open func sendMediaMessage(didFinishPickingMediaWithInfo info: [UIImagePickerController
       .InfoKey: Any]) {
     var imageName = "IMG_0001"
-    if isFile,
+    if isFile == true,
        let imgUrl = info[.referenceURL] as? URL {
       let fetchRes = PHAsset.fetchAssets(withALAssetURLs: [imgUrl], options: nil)
       let asset = fetchRes.firstObject
@@ -889,14 +931,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       // video
       print("image picker video : url", url)
       weak var weakSelf = self
-      if isFile {
+      if isFile == true {
         copyFileToSend(url: url, displayName: imageName)
-        isFile = false
       } else {
         viewmodel.sendVideoMessage(url: url) { error in
           NELog.infoLog(
-            ModuleName + " " + self.tag,
-            desc: "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
+            ModuleName + " " + (weakSelf?.tag ?? "ChatViewController"),
+            desc: #function + "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
           )
           if let err = error {
             weakSelf?.showToast(err.localizedDescription)
@@ -911,29 +952,28 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       return
     }
 
-    if isFile,
+    if isFile == true,
        let imgData = image.pngData() {
       let imgSize_MB = Double(imgData.count) / 1e6
-      print("@@# imgSize_MB: \(imgSize_MB) MB")
+      NELog.infoLog(ModuleName + " " + tag, desc: #function + "imgSize_MB: \(imgSize_MB) MB")
       if imgSize_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-        showToast(chatLocalizable("fileSize_over_limit"))
+        showToast(chatLocalizable("fileSize_over_limit").replacingOccurrences(of: "XXX", with: "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
       } else {
         viewmodel.sendFileMessage(data: imgData, displayName: imageName) { [weak self] error in
           NELog.infoLog(
             ModuleName + " " + (self?.tag ?? "ChatViewController"),
-            desc: "CALLBACK sendFileMessage \(imageName) by Data " + (error?.localizedDescription ?? "no error")
+            desc: #function + "CALLBACK sendFileMessage" + (error?.localizedDescription ?? "no error")
           )
           if error != nil {
             self?.view.makeToast(error!.localizedDescription)
           }
         }
       }
-      isFile = false
     } else {
       viewmodel.sendImageMessage(image: image) { [weak self] error in
         NELog.infoLog(
           ModuleName + " " + (self?.tag ?? "ChatViewController"),
-          desc: "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
         )
         if error != nil {
           self?.view.makeToast(error?.localizedDescription)
@@ -944,9 +984,9 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   //    MARK: UIImagePickerControllerDelegate
 
-  public func imagePickerController(_ picker: UIImagePickerController,
-                                    didFinishPickingMediaWithInfo info: [UIImagePickerController
-                                      .InfoKey: Any]) {
+  open func imagePickerController(_ picker: UIImagePickerController,
+                                  didFinishPickingMediaWithInfo info: [UIImagePickerController
+                                    .InfoKey: Any]) {
 //                                          picker.dismiss(animated: true, completion: nil)
 //                                          sendMediaMessage(didFinishPickingMediaWithInfo: info)
     weak var weakSelf = self
@@ -955,9 +995,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     })
   }
 
-  public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+  open func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
     picker.dismiss(animated: true)
-    isFile = false
   }
 
   //    MARK: UIDocumentPickerDelegate
@@ -966,29 +1005,27 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     let desPath = NSTemporaryDirectory() + "\(url.lastPathComponent)"
     let dirUrl = URL(fileURLWithPath: desPath)
     if !FileManager.default.fileExists(atPath: desPath) {
-      print("@@# file not exist:", desPath)
+      NELog.infoLog(ModuleName + " " + tag, desc: #function + "file not exist")
       do {
         try FileManager.default.copyItem(at: url, to: dirUrl)
       } catch {
-        print("❌ copyItem [\(desPath)] ERROR", error)
+        NELog.errorLog(ModuleName + " " + tag, desc: #function + "copyItem [\(desPath)] ERROR: \(error)")
       }
     }
     if FileManager.default.fileExists(atPath: desPath) {
-      print("@@# fileExists:", desPath)
+      NELog.infoLog(ModuleName + " " + tag, desc: #function + "fileExists")
       do {
         let fileAttributes = try FileManager.default.attributesOfItem(atPath: desPath)
         if let size_B = fileAttributes[FileAttributeKey.size] as? Double {
-          print("@@# size:\(size_B)B")
           let size_MB = size_B / 1e6
-          print("@@# size:\(size_MB)MB")
           if size_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-            showToast(chatLocalizable("fileSize_over_limit"))
+            showToast(chatLocalizable("fileSize_over_limit").replacingOccurrences(of: "XXX", with: "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
             try? FileManager.default.removeItem(atPath: desPath)
           } else {
             viewmodel.sendFileMessage(filePath: desPath, displayName: displayName) { [weak self] error in
               NELog.infoLog(
                 ModuleName + " " + (self?.tag ?? "ChatViewController"),
-                desc: "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
+                desc: #function + "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
               )
               if error != nil {
                 self?.view.makeToast(error!.localizedDescription)
@@ -997,15 +1034,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
           }
         }
       } catch {
-        print("@@#\(#function) get file size error:", error)
+        NELog.errorLog(ModuleName + " " + tag, desc: #function + "get file size error: \(error)")
       }
     }
   }
 
-  public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+  open func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
     controller.dismiss(animated: true)
     guard let url = urls.first else { return }
-    print("@@# url", url)
 
     // 开始安全访问权限
     let fileUrlAuthozied = url.startAccessingSecurityScopedResource()
@@ -1017,46 +1053,44 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       // 停止安全访问权限
       url.stopAccessingSecurityScopedResource()
     } else {
-      print("@@#❌ fileUrlAuthozied FAILED, url:", url)
+      NELog.errorLog(ModuleName + " " + tag, desc: #function + "fileUrlAuthozied FAILED")
     }
-    isFile = false
   }
 
   // MARK: UIDocumentInteractionControllerDelegate
 
-  public func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+  open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
     self
   }
 
-  public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+  open func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
     controller.dismiss(animated: true)
-    isFile = false
   }
 
   //    MARK: ChatViewModelDelegate
 
-  public func didLeaveTeam() {
+  open func didLeaveTeam() {
     weak var weakSelf = self
     showSingleAlert(message: chatLocalizable("team_has_quit")) {
       weakSelf?.navigationController?.popViewController(animated: true)
     }
   }
 
-  public func didDismissTeam() {
+  open func didDismissTeam() {
     weak var weakSelf = self
     showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
       weakSelf?.navigationController?.popViewController(animated: true)
     }
   }
 
-  public func onRecvMessages(_ messages: [NIMMessage]) {
+  open func onRecvMessages(_ messages: [NIMMessage]) {
     insertRows()
     if isCurrentPage,
        UIApplication.shared.applicationState == .active {
       viewmodel.markRead(messages: messages) { error in
         NELog.infoLog(
           ModuleName + " " + self.tag,
-          desc: "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
         )
       }
     } else {
@@ -1064,13 +1098,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func willSend(_ message: NIMMessage) {
+  open func willSend(_ message: NIMMessage) {
     insertRows()
   }
 
-  public func send(_ message: NIMMessage, progress: Float) {}
+  open func send(_ message: NIMMessage, progress: Float) {}
 
-  public func send(_ message: NIMMessage, didCompleteWithError error: Error?) {
+  open func send(_ message: NIMMessage, didCompleteWithError error: Error?) {
     if indexPathsWithMessags([message]).count > 0 {
       tableViewReloadIndexs(indexPathsWithMessags([message]))
     }
@@ -1088,7 +1122,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     return indexPaths
   }
 
-  public func onDeleteMessage(_ message: NIMMessage, atIndexs: [IndexPath], reloadIndex: [IndexPath]) {
+  open func onDeleteMessage(_ message: NIMMessage, atIndexs: [IndexPath], reloadIndex: [IndexPath]) {
     if atIndexs.isEmpty {
       return
     }
@@ -1098,40 +1132,33 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }))
   }
 
-  public func updateDownloadProgress(_ message: NIMMessage, atIndex: IndexPath, progress: Float) {
+  open func updateDownloadProgress(_ message: NIMMessage, atIndex: IndexPath, progress: Float) {
     tableViewUpdateDownload(atIndex)
   }
 
-  public func onRevokeMessage(_ message: NIMMessage, atIndexs: [IndexPath]) {
+  open func onRevokeMessage(_ message: NIMMessage, atIndexs: [IndexPath]) {
     if atIndexs.isEmpty {
       return
     }
-    print("on revoke message at indexs :", atIndexs)
-//    weak var weakSelf = self
-//    viewmodel.saveRevokeMessage(message) { error in
-//      print("message id : ", message.messageId)
-//      if let err = error {
-//        NELog.infoLog(weakSelf?.className() ?? "chat view controller", desc: err.localizedDescription)
-//      }
-//    }
+    NELog.infoLog(className(), desc: "on revoke message at indexs \(atIndexs)")
     tableViewReloadIndexs(atIndexs)
   }
 
-  public func onAddMessagePin(_ message: NIMMessage, atIndexs: [IndexPath]) {
+  open func onAddMessagePin(_ message: NIMMessage, atIndexs: [IndexPath]) {
     tableViewReloadIndexs(atIndexs)
   }
 
-  public func onRemoveMessagePin(_ message: NIMMessage, atIndexs: [IndexPath]) {
+  open func onRemoveMessagePin(_ message: NIMMessage, atIndexs: [IndexPath]) {
     tableViewReloadIndexs(atIndexs)
   }
 
-  public func tableViewDeleteIndexs(_ indexs: [IndexPath]) {
+  open func tableViewDeleteIndexs(_ indexs: [IndexPath]) {
     tableView.beginUpdates()
     tableView.deleteRows(at: indexs, with: .none)
     tableView.endUpdates()
   }
 
-  public func tableViewReloadIndexs(_ indexs: [IndexPath]) {
+  open func tableViewReloadIndexs(_ indexs: [IndexPath]) {
     weak var weakSelf = self
     if #available(iOS 11.0, *) {
       tableView.performBatchUpdates {
@@ -1144,22 +1171,30 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func didReadedMessageIndexs() {
-    tableView.reloadData()
+  open func didReadedMessageIndexs() {
+    didRefreshTable()
   }
 
-  public func tableViewUpdateDownload(_ index: IndexPath) {
-    tableView.beginUpdates()
-    tableView.reloadRows(at: [index], with: .none)
-    tableView.endUpdates()
+  open func tableViewUpdateDownload(_ index: IndexPath) {
+    if #available(iOS 11.0, *) {
+      tableView.performBatchUpdates {
+        tableView.reloadRows(at: [index], with: .none)
+      }
+    } else {
+      tableView.beginUpdates()
+      tableView.reloadRows(at: [index], with: .none)
+      tableView.endUpdates()
+    }
   }
 
-  public func didRefreshTable() {
-    tableView.reloadData()
+  open func didRefreshTable() {
+    DispatchQueue.main.async { [weak self] in
+      self?.tableView.reloadData()
+    }
   }
 
   // record audio
-  public func startRecord() {
+  open func startRecord() {
     let dur = 60.0
     if NEAuthManager.hasAudioAuthoriztion() {
       NIMSDK.shared().mediaManager.record(forDuration: dur)
@@ -1175,11 +1210,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func moveOutView() {}
+  open func moveOutView() {}
 
-  public func moveInView() {}
+  open func moveInView() {}
 
-  public func endRecord(insideView: Bool) {
+  open func endRecord(insideView: Bool) {
     print("[record] stop:\(insideView)")
     if insideView {
       //            send
@@ -1190,7 +1225,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  func viewTap(tap: UITapGestureRecognizer) {
+  open func viewTap(tap: UITapGestureRecognizer) {
     if let opeView = operationView,
        view.subviews.contains(opeView) {
       opeView.removeFromSuperview()
@@ -1206,31 +1241,40 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   // MARK: audio play
 
-  private func startPlay(cell: ChatAudioCell?, model: MessageAudioModel?) {
-    guard let audio = model?.message?.messageObject as? NIMAudioObject else {
+  func startPlaying(audio: NIMAudioObject, isSend: Bool) {
+    playingCell?.startAnimation(byRight: isSend)
+    if let url = audio.path {
+      if viewmodel.getHandSetEnable() == true {
+        NIMSDK.shared().mediaManager.switch(.receiver)
+      } else {
+        NIMSDK.shared().mediaManager.switch(.speaker)
+      }
+      NIMSDK.shared().mediaManager.play(url)
+    }
+  }
+
+  private func startPlay(cell: ChatAudioCellProtocol?, model: MessageAudioModel?) {
+    guard let audio = model?.message?.messageObject as? NIMAudioObject,
+          let isSend = model?.message?.isOutgoingMsg else {
       return
     }
-    if NIMSDK.shared().mediaManager.isPlaying() {
-      stopPlay()
+    if playingModel == model {
+      if NIMSDK.shared().mediaManager.isPlaying() {
+        stopPlay()
+      } else {
+        startPlaying(audio: audio, isSend: isSend)
+      }
     } else {
       stopPlay()
       playingCell = cell
       playingModel = model
-      playingCell?.startAnimation()
-      if let url = audio.path {
-        if viewmodel.getHandSetEnable() == true {
-          NIMSDK.shared().mediaManager.switch(.receiver)
-        } else {
-          NIMSDK.shared().mediaManager.switch(.speaker)
-        }
-        NIMSDK.shared().mediaManager.play(url)
-      }
+      startPlaying(audio: audio, isSend: isSend)
     }
   }
 
-  private func stopPlay() {
+  public func stopPlay() {
     if NIMSDK.shared().mediaManager.isPlaying() {
-      playingCell?.startAnimation()
+      playingCell?.startAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
       NIMSDK.shared().mediaManager.stopPlay()
     }
   }
@@ -1245,54 +1289,54 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   //    MARK: NIMMediaManagerDelegate
 
   //    play
-  public func playAudio(_ filePath: String, didBeganWithError error: Error?) {
+  open func playAudio(_ filePath: String, didBeganWithError error: Error?) {
     print(#function + "\(error)")
     if let e = error {
       showToast(e.localizedDescription)
       // stop
-      playingCell?.stopAnimation()
+      playingCell?.stopAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
       playingModel?.isPlaying = false
     }
   }
 
-  public func playAudio(_ filePath: String, didCompletedWithError error: Error?) {
+  open func playAudio(_ filePath: String, didCompletedWithError error: Error?) {
     print(#function + "\(error)")
     if let e = error {
       showToast(e.localizedDescription)
     }
     // stop
-    playingCell?.stopAnimation()
+    playingCell?.stopAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
     playingModel?.isPlaying = false
   }
 
-  public func stopPlayAudio(_ filePath: String, didCompletedWithError error: Error?) {
+  open func stopPlayAudio(_ filePath: String, didCompletedWithError error: Error?) {
     print(#function + "\(error)")
     if let e = error {
       showToast(e.localizedDescription)
     }
-    playingCell?.stopAnimation()
+    playingCell?.stopAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
     playingModel?.isPlaying = false
   }
 
-  public func playAudio(_ filePath: String, progress value: Float) {}
+  open func playAudio(_ filePath: String, progress value: Float) {}
 
-  public func playAudioInterruptionEnd() {
+  open func playAudioInterruptionEnd() {
     print(#function)
   }
 
-  public func playAudioInterruptionBegin() {
+  open func playAudioInterruptionBegin() {
     print(#function)
     // stop play
-    playingCell?.stopAnimation()
+    playingCell?.stopAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
     playingModel?.isPlaying = false
   }
 
   //    record
-  public func recordAudio(_ filePath: String?, didBeganWithError error: Error?) {
+  open func recordAudio(_ filePath: String?, didBeganWithError error: Error?) {
     print("[record] sdk Began error:\(error)")
   }
 
-  public func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
+  open func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
     print("[record] sdk Completed error:\(error)")
     menuView.stopRecordAnimation()
     guard let fp = filePath else {
@@ -1306,7 +1350,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       viewmodel.sendAudioMessage(filePath: fp) { error in
         NELog.infoLog(
           ModuleName + " " + self.tag,
-          desc: "CALLBACK sendAudioMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK sendAudioMessage " + (error?.localizedDescription ?? "no error")
         )
         if let e = error {
           self.showToast(e.localizedDescription)
@@ -1317,13 +1361,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func recordAudioDidCancelled() {
+  open func recordAudioDidCancelled() {
     print("[record] sdk cancel")
   }
 
-  public func recordAudioProgress(_ currentTime: TimeInterval) {}
+  open func recordAudioProgress(_ currentTime: TimeInterval) {}
 
-  public func recordAudioInterruptionBegin() {
+  open func recordAudioInterruptionBegin() {
     print(#function)
   }
 
@@ -1352,16 +1396,30 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
 
     if !indexs.isEmpty {
-      tableView.insertRows(at: indexs, with: .none)
-      tableView.scrollToRow(
-        at: IndexPath(row: viewmodel.messages.count - 1, section: 0),
-        at: .bottom,
-        animated: false
-      )
+      if #available(iOS 11.0, *) {
+        self.tableView.performBatchUpdates {
+          self.tableView.insertRows(at: indexs, with: .bottom)
+        } completion: { finished in
+          self.tableView.scrollToRow(
+            at: IndexPath(row: self.viewmodel.messages.count - 1, section: 0),
+            at: .bottom,
+            animated: false
+          )
+        }
+      } else {
+        tableView.insertRows(at: indexs, with: .bottom)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: DispatchWorkItem(block: {
+          self.tableView.scrollToRow(
+            at: IndexPath(row: self.viewmodel.messages.count - 1, section: 0),
+            at: .bottom,
+            animated: false
+          )
+        }))
+      }
     }
   }
 
-  func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
+  open func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
     if let font = menuView.textView.font {
       let mutaString = NSMutableAttributedString(attributedString: menuView.textView.attributedText)
       let atString = NSAttributedString(string: addText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_blueText, NSAttributedString.Key.font: font])
@@ -1403,8 +1461,12 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
+  func getUserSelectVC() -> NEBaseSelectUserViewController {
+    NEBaseSelectUserViewController(sessionId: viewmodel.session.sessionId, showSelf: false)
+  }
+
   private func showUserSelectVC(text: String) {
-    let selectVC = SelectUserViewController(sessionId: viewmodel.session.sessionId, showSelf: false)
+    let selectVC = getUserSelectVC()
     selectVC.modalPresentationStyle = .formSheet
     selectVC.selectedBlock = { [weak self] index, model in
       var addText = ""
@@ -1428,7 +1490,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   //    MARK: MessageOperationViewDelegate
 
-  public func didSelectedItem(item: OperationItem) {
+  open func didSelectedItem(item: OperationItem) {
     switch item.type {
     case .copy:
       copyMessage()
@@ -1447,13 +1509,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     case .removePin:
       removePinMessage()
     default:
-      doNothing()
+      customOperation()
     }
   }
 
-  private func doNothing() {}
+  open func customOperation() {}
 
-  private func copyMessage() {
+  open func copyMessage() {
     if let model = viewmodel.operationModel as? MessageTextModel,
        let text = model.message?.text {
       let pasteboard = UIPasteboard.general
@@ -1462,18 +1524,22 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  private func deleteMessage() {
+  open func deleteMessage() {
     showAlert(message: chatLocalizable("message_delete_comfirm")) {
       if let message = self.viewmodel.operationModel?.message {
-        self.viewmodel.deleteMessage(message: message)
+        self.viewmodel.deleteMessage(message: message) { error in
+          if error != nil {
+            self.showToast(chatLocalizable("delete_failed"))
+          }
+        }
       }
     }
   }
 
-  private func showReplyMessageView(isReEdit: Bool = false) {
+  open func showReplyMessageView(isReEdit: Bool = false) {
     viewmodel.isReplying = true
     view.addSubview(replyView)
-    replyView.closeButton.addTarget(self, action: #selector(cancelReply), for: .touchUpInside)
+    replyView.closeButton.addTarget(self, action: #selector(closeReply), for: .touchUpInside)
     replyView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       replyView.leadingAnchor.constraint(equalTo: menuView.leadingAnchor),
@@ -1522,7 +1588,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         case .custom:
           text += "[\(chatLocalizable("msg_custom"))]"
         default:
-          text += ""
+          text += "[\(chatLocalizable("msg_unknown"))]"
         }
         replyView.textLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
                                                                          font: replyView.textLabel.font,
@@ -1532,12 +1598,12 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  @objc private func cancelReply(button: UIButton) {
+  open func closeReply(button: UIButton?) {
     replyView.removeFromSuperview()
     viewmodel.isReplying = false
   }
 
-  private func recallMessage() {
+  open func recallMessage() {
     weak var weakSelf = self
     showAlert(message: chatLocalizable("message_revoke_confim")) {
       if let message = weakSelf?.viewmodel.operationModel?.message {
@@ -1550,10 +1616,16 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         weakSelf?.viewmodel.revokeMessage(message: message) { error in
           NELog.infoLog(
             ModuleName + " " + (weakSelf?.tag ?? ""),
-            desc: "CALLBACK revokeMessage " + (error?.localizedDescription ?? "no error")
+            desc: #function + "CALLBACK revokeMessage " + (error?.localizedDescription ?? "no error")
           )
-          if error != nil {
-            weakSelf?.showToast(error!.localizedDescription)
+          if let err = error as? NSError {
+            if err.code == 408 {
+              weakSelf?.showToast(chatLocalizable("ravoked_failed"))
+            } else if err.code == 508 {
+              weakSelf?.showToast(chatLocalizable("ravokable_time_expired"))
+            } else {
+              weakSelf?.showToast(err.localizedDescription)
+            }
           } else {
             // 自己撤回成功 & 收到对方撤回 都会走回调方法 onRevokeMessage
             // 撤回成功的逻辑统一在代理方法中处理 onRevokeMessage
@@ -1569,12 +1641,12 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  private func collectionMessage() {
+  open func collectionMessage() {
     if let message = viewmodel.operationModel?.message {
       viewmodel.addColletion(message) { error, info in
         NELog.infoLog(
           ModuleName + " " + self.tag,
-          desc: "CALLBACK addColletion " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK addColletion " + (error?.localizedDescription ?? "no error")
         )
         if error != nil {
           self.showToast(error!.localizedDescription)
@@ -1585,84 +1657,96 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  private func forwardMessage() {
+  open func getForwardAlertController() -> NEBaseForwardAlertViewController {
+    NEBaseForwardAlertViewController()
+  }
+
+  func forwardMessageToUser(message: NIMMessage) {
+    weak var weakSelf = self
+    Router.shared.register(ContactSelectedUsersRouter) { param in
+      print("user setting accids : ", param)
+      var items = [ForwardItem]()
+
+      if let users = param["im_user"] as? [NIMUser] {
+        users.forEach { user in
+          let item = ForwardItem()
+          item.uid = user.userId
+          item.avatar = user.userInfo?.avatarUrl
+          item.name = user.userInfo?.nickName
+          items.append(item)
+        }
+
+        let forwardAlert = weakSelf?.getForwardAlertController() ?? NEBaseForwardAlertViewController()
+        forwardAlert.setItems(items)
+        if let senderName = message.senderName {
+          forwardAlert.context = senderName
+        }
+        weakSelf?.addChild(forwardAlert)
+        weakSelf?.view.addSubview(forwardAlert.view)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
+          UIApplication.shared.keyWindow?.endEditing(true)
+        }))
+
+        forwardAlert.sureBlock = {
+          print("sure click ")
+          weakSelf?.viewmodel.forwardUserMessage(message, users)
+        }
+      }
+    }
+    var param = [String: Any]()
+    param["nav"] = weakSelf?.navigationController as Any
+    param["limit"] = 6
+    if let session = weakSelf?.viewmodel.session, session.sessionType == .P2P {
+      var filters = Set<String>()
+      filters.insert(session.sessionId)
+      param["filters"] = filters
+    }
+    Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+  }
+
+  func forwardMessageToTeam(message: NIMMessage) {
+    weak var weakSelf = self
+    Router.shared.register(ContactTeamDataRouter) { param in
+      if let team = param["team"] as? NIMTeam {
+        let item = ForwardItem()
+        item.avatar = team.avatarUrl
+        item.name = team.getShowName()
+        item.uid = team.teamId
+
+        let forwardAlert = weakSelf!.getForwardAlertController()
+        forwardAlert.setItems([item])
+        if let senderName = message.senderName {
+          forwardAlert.context = senderName
+        }
+        forwardAlert.sureBlock = {
+          weakSelf?.viewmodel.forwardTeamMessage(message, team)
+        }
+        weakSelf?.addChild(forwardAlert)
+        weakSelf?.view.addSubview(forwardAlert.view)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
+          UIApplication.shared.keyWindow?.endEditing(true)
+        }))
+      }
+    }
+
+    Router.shared.use(
+      ContactTeamListRouter,
+      parameters: ["nav": weakSelf?.navigationController as Any],
+      closure: nil
+    )
+  }
+
+  open func forwardMessage() {
     if let message = viewmodel.operationModel?.message {
       weak var weakSelf = self
       let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
                                      style: .default) { action in
-
-        Router.shared.register(ContactSelectedUsersRouter) { param in
-          print("user setting accids : ", param)
-          var items = [ForwardItem]()
-
-          if let users = param["im_user"] as? [NIMUser] {
-            users.forEach { user in
-              let item = ForwardItem()
-              item.uid = user.userId
-              item.avatar = user.userInfo?.avatarUrl
-              item.name = user.userInfo?.nickName
-              items.append(item)
-            }
-
-            let forwardAlert = ForwardAlertViewController()
-            forwardAlert.setItems(items)
-            if let senderName = message.senderName {
-              forwardAlert.context = senderName
-            }
-            weakSelf?.addChild(forwardAlert)
-            weakSelf?.view.addSubview(forwardAlert.view)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-              UIApplication.shared.keyWindow?.endEditing(true)
-            }))
-
-            forwardAlert.sureBlock = {
-              print("sure click ")
-              weakSelf?.viewmodel.forwardUserMessage(message, users)
-            }
-          }
-        }
-        var param = [String: Any]()
-        param["nav"] = weakSelf?.navigationController as Any
-        param["limit"] = 6
-        if let session = weakSelf?.viewmodel.session, session.sessionType == .P2P {
-          var filters = Set<String>()
-          filters.insert(session.sessionId)
-          param["filters"] = filters
-        }
-        Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+        weakSelf?.forwardMessageToUser(message: message)
       }
 
       let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
-
-        Router.shared.register(ContactTeamDataRouter) { param in
-          if let team = param["team"] as? NIMTeam {
-            let item = ForwardItem()
-            item.avatar = team.avatarUrl
-            item.name = team.getShowName()
-            item.uid = team.teamId
-
-            let forwardAlert = ForwardAlertViewController()
-            forwardAlert.setItems([item])
-            if let senderName = message.senderName {
-              forwardAlert.context = senderName
-            }
-            forwardAlert.sureBlock = {
-              weakSelf?.viewmodel.forwardTeamMessage(message, team)
-            }
-            weakSelf?.addChild(forwardAlert)
-            weakSelf?.view.addSubview(forwardAlert.view)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-              UIApplication.shared.keyWindow?.endEditing(true)
-            }))
-          }
-        }
-
-        Router.shared.use(
-          ContactTeamListRouter,
-          parameters: ["nav": weakSelf?.navigationController as Any],
-          closure: nil
-        )
+        weakSelf?.forwardMessageToTeam(message: message)
       }
 
       let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
@@ -1673,7 +1757,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  private func pinMessage() {
+  open func pinMessage() {
     guard let optModel = viewmodel.operationModel, !optModel.isPined else {
       return
     }
@@ -1684,13 +1768,13 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       viewmodel.pinMessage(message) { [weak self] error, pinItem, index in
         NELog.infoLog(
           ModuleName + " " + (self?.tag ?? "ChatViewController"),
-          desc: "CALLBACK pinMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK pinMessage " + (error?.localizedDescription ?? "no error")
         )
         if let err = error as? NSError {
           if err.code == 408 {
-            self?.view.makeToast(chatLocalizable("failed_operation"))
+            self?.view.makeToast(commonLocalizable("network_error"), position: .center)
           } else {
-            self?.view.makeToast(error?.localizedDescription)
+            self?.view.makeToast(error?.localizedDescription, position: .center)
           }
         } else {
           //                    update UI
@@ -1702,7 +1786,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  private func removePinMessage() {
+  open func removePinMessage() {
     guard let optModel = viewmodel.operationModel, optModel.isPined else {
       return
     }
@@ -1711,15 +1795,15 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       viewmodel.removePinMessage(message) { [weak self] error, pinItem, index in
         NELog.infoLog(
           ModuleName + " " + (self?.tag ?? "ChatViewController"),
-          desc: "CALLBACK removePinMessage " + (error?.localizedDescription ?? "no error")
+          desc: #function + "CALLBACK removePinMessage " + (error?.localizedDescription ?? "no error")
         )
         if let err = error as? NSError {
           if err.code == 404 {
             return
           } else if err.code == 408 {
-            self?.view.makeToast(chatLocalizable("failed_operation"))
+            self?.view.makeToast(commonLocalizable("network_error"), position: .center)
           } else {
-            self?.view.makeToast(error?.localizedDescription)
+            self?.view.makeToast(error?.localizedDescription, position: .center)
           }
         } else {
           //                    update UI
@@ -1733,124 +1817,75 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   // MARK: UITableViewDataSource, UITableViewDelegate
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     let count = viewmodel.messages.count
     print("numberOfRowsInSection count : ", count)
     return count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let model = viewmodel.messages[indexPath.row]
     var reuseId = ""
-    if let isSend = model.message?.isOutgoingMsg, isSend {
-      if model.replyedModel?.isReplay == true {
-        reuseId = ChatViewController.getRitghtCellType(MessageType.reply.rawValue)
-      } else {
-        let key = ChatViewController.getRitghtCellType(model.type.rawValue)
-        if model.type == .custom, let object = model.message?.messageObject as? NIMCustomObject, let custom = object.attachment as? NECustomAttachmentProtocol {
-          if registerCellDic["\(custom.customType)"] != nil {
-            reuseId = "\(custom.customType)"
-          } else {
-            reuseId = "\(ChatBaseRightCell.self)"
-          }
-        } else if model.type == .time || model.type == .notification || model.type == .tip {
-          reuseId = "\(MessageType.time.rawValue)"
-        } else if registerCellDic[key] != nil {
-          reuseId = key
-        } else {
-          reuseId = "\(ChatBaseRightCell.self)"
-        }
-      }
-
-      let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath)
-      if let c = cell as? ChatTimeTableViewCell {
-        if let m = model as? MessageTipsModel {
-          c.setModel(m)
-        }
-        return c
-      } else if let c = cell as? ChatBaseRightCell {
-        c.delegate = self
-        if let m = model as? MessageContentModel {
-          c.setModel(m)
-        }
-
-        if let audioCell = cell as? ChatAudioRightCell,
-           let m = model as? MessageAudioModel,
-           m.message?.messageId == playingModel?.message?.messageId {
-          if NIMSDK.shared().mediaManager.isPlaying() {
-            playingCell = audioCell
-            playingCell?.startAnimation()
-          }
-        }
-
-        return c
-      } else if let c = cell as? NEChatBaseCell, let m = model as? MessageContentModel {
-        c.setModel(m)
-        return cell
-      } else {
-        return ChatBaseRightCell()
-      }
+    if model.replyedModel?.isReplay == true,
+       model.isRevoked == false {
+      reuseId = "\(MessageType.reply.rawValue)"
     } else {
-      if model.replyedModel?.isReplay == true {
-        reuseId = ChatViewController.getLeftCellType(MessageType.reply.rawValue)
-      } else {
-        let key = ChatViewController.getLeftCellType(model.type.rawValue)
-        if model.type == .custom, let object = model.message?.messageObject as? NIMCustomObject, let custom = object.attachment as? NECustomAttachmentProtocol {
-          if registerCellDic["\(custom.customType)"] != nil {
-            reuseId = "\(custom.customType)"
-          } else {
-            reuseId = "\(ChatBaseLeftCell.self)"
-          }
-        } else if model.type == .time || model.type == .notification || model.type == .tip {
-          reuseId = "\(MessageType.time.rawValue)"
-        } else if registerCellDic[key] != nil {
-          reuseId = key
+      let key = "\(model.type.rawValue)"
+      if model.type == .custom, let object = model.message?.messageObject as? NIMCustomObject, let custom = object.attachment as? NECustomAttachmentProtocol {
+        if registerCellDic["\(custom.customType)"] != nil {
+          reuseId = "\(custom.customType)"
         } else {
-          reuseId = "\(ChatBaseLeftCell.self)"
+          reuseId = "\(NEBaseChatMessageCell.self)"
         }
-      }
-
-      let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath)
-      if let c = cell as? ChatTimeTableViewCell {
-        if let m = model as? MessageTipsModel {
-          c.setModel(m)
-        }
-        return c
-      } else if let c = cell as? ChatBaseLeftCell {
-        c.delegate = self
-
-        // 更新好友昵称、头像
-        if let m = model as? MessageContentModel {
-          if let from = model.message?.from,
-             let user = viewmodel.newUserInfoDic[from] {
-            if let uid = user.userId,
-               viewmodel.session.sessionType == .team ||
-               viewmodel.session.sessionType == .superTeam {
-              m.fullName = viewmodel.getShowName(userId: uid, teamId: viewmodel.session.sessionId)
-              m.shortName = viewmodel.getShortName(name: user.showName(false) ?? "", length: 2)
-            }
-            m.avatar = user.userInfo?.avatarUrl
-          }
-          c.setModel(m)
-        }
-
-        if let audioCell = cell as? ChatAudioLeftCell,
-           let m = model as? MessageAudioModel,
-           m.message?.messageId == playingModel?.message?.messageId {
-          if NIMSDK.shared().mediaManager.isPlaying() {
-            playingCell = audioCell
-            playingCell?.startAnimation()
-          }
-        }
-
-        return c
-      } else if let c = cell as? NEChatBaseCell, let m = model as? MessageContentModel {
-        c.setModel(m)
-        return cell
+      } else if model.type == .time || model.type == .notification || model.type == .tip {
+        reuseId = "\(MessageType.time.rawValue)"
+      } else if registerCellDic[key] != nil {
+        reuseId = key
       } else {
-        return ChatBaseLeftCell()
+        reuseId = "\(NEBaseChatMessageCell.self)"
       }
+    }
+
+    let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath)
+    if let c = cell as? NEBaseChatMessageTipCell {
+      if let m = model as? MessageTipsModel {
+        m.resetNotiText()
+        c.setModel(m)
+      }
+      return c
+    } else if let c = cell as? NEBaseChatMessageCell {
+      c.delegate = self
+      if let m = model as? MessageContentModel {
+        // 更新好友昵称、头像
+        if let from = model.message?.from,
+           let user = viewmodel.newUserInfoDic[from] {
+          if let uid = user.userId,
+             viewmodel.session.sessionType == .team ||
+             viewmodel.session.sessionType == .superTeam {
+            m.fullName = viewmodel.getShowName(userId: uid, teamId: viewmodel.session.sessionId)
+            m.shortName = viewmodel.getShortName(name: user.showName(false) ?? "", length: 2)
+          }
+          m.avatar = user.userInfo?.avatarUrl
+        }
+        c.setModel(m)
+      }
+
+      if let audioCell = cell as? ChatAudioCellProtocol,
+         let m = model as? MessageAudioModel,
+         m.message?.messageId == playingModel?.message?.messageId {
+        if NIMSDK.shared().mediaManager.isPlaying() {
+          playingCell = audioCell
+          playingCell?.startAnimation(byRight: true)
+        }
+      }
+
+      return c
+    } else if let c = cell as? NEChatBaseCell, let m = model as? MessageContentModel {
+      c.setModel(m)
+      return cell
+    } else {
+      return NEBaseChatMessageCell()
     }
   }
 
@@ -1859,38 +1894,38 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     if menuView.textView.isFirstResponder {
       menuView.textView.resignFirstResponder()
     } else {
-      layoutInputView(offset: 0)
+//      layoutInputView(offset: 0)
     }
   }
 
-  public func tableView(_ tableView: UITableView,
-                        heightForRowAt indexPath: IndexPath) -> CGFloat {
+  open func tableView(_ tableView: UITableView,
+                      heightForRowAt indexPath: IndexPath) -> CGFloat {
     let m = viewmodel.messages[indexPath.row]
     if m.type == .custom {
       if let object = m.message?.messageObject as? NIMCustomObject, let custom = object.attachment as? NECustomAttachmentProtocol {
         return custom.cellHeight
       }
     }
-    return CGFloat(m.height)
+    return m.cellHeight()
   }
 
-  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     0
   }
 
-  public func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
     0
   }
 
   // MARK: UIScrollViewDelegate
 
-  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+  public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     operationView?.removeFromSuperview()
   }
 
   // MARK: CLLocationManagerDelegate
 
-//    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+//    open func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
 //        if #available(iOS 14.0, *) {
 //            if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
 //                didToSearchLocationView()
@@ -1902,7 +1937,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 //        }
 //    }
 
-  public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+  open func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    if isCurrentPage == false {
+      return
+    }
     if #available(iOS 14.0, *) {
       if manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse {
         didToSearchLocationView()
@@ -1914,43 +1952,23 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
-  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {}
+  open func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {}
 
-  public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {}
+  open func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {}
 
-//    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+//    open func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
 //        print(error)
 //    }
-}
 
-// MARK: ChatBaseCellDelegate
-
-extension ChatViewController: ChatBaseCellDelegate {
-  public func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    print("didLongPressAvatar")
-    if viewmodel.session.sessionType == .P2P {
-      return
-    }
-    var addText = ""
-    var accid = ""
-
-    if let m = model, let from = m.message?.from {
-      accid = from
-      addText += viewmodel.getShowName(userId: from, teamId: viewmodel.session.sessionId, false)
-    }
-
-    addText = "@" + addText + ""
-
-    addToAtUsers(addText: addText, accid: accid, true)
+  func getTextViewController(text: String) -> TextViewController {
+    let textViewController = TextViewController(content: text)
+    textViewController.view.backgroundColor = .white
+    return textViewController
   }
 
-  public func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    didTapHeadPortrait(model: model)
-  }
-
-  func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
+  open func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     if model?.type == .audio {
-      startPlay(cell: cell as? ChatAudioCell, model: model as? MessageAudioModel)
+      startPlay(cell: cell as? ChatAudioCellProtocol, model: model as? MessageAudioModel)
     } else if model?.type == .image {
       if let imageObject = model?.message?.messageObject as? NIMImageObject {
         var imageUrl = ""
@@ -1993,30 +2011,28 @@ extension ChatViewController: ChatBaseCellDelegate {
                                 animated: true)
         }
         videoModel.state = .Downalod
-        if let left = cell as? ChatVideoLeftCell {
-          left.setModel(videoModel)
-        } else if let right = cell as? ChatVideoRightCell {
-          right.setModel(videoModel)
+        if let videoCell = cell as? NEBaseChatMessageCell {
+          videoCell.setModel(videoModel)
         }
 
         viewmodel.downLoad(urlString, path) { progress in
-          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ChatViewController"), desc: "CALLBACK downLoad: \(progress)")
+          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ChatViewController"), desc: #function + "CALLBACK downLoad: \(progress)")
 
           videoModel.progress = progress
           if progress >= 1.0 {
             videoModel.state = .Success
           }
-          videoModel.cell?.uploadProgress(progress)
+          videoModel.cell?.uploadProgress(byRight: videoModel.message?.isOutgoingMsg ?? true, progress)
         } _: { error in
           if let err = error as NSError? {
             weakSelf?.showToast(err.localizedDescription)
           }
         }
       }
-    } else if replyIndex != nil, model?.type == .text {
+    } else if replyIndex != nil, model?.type == .text || model?.type == .reply {
       print("message did tap: text")
       if let text = model?.message?.text {
-        let textView = TextViewController(content: text)
+        let textView = getTextViewController(text: text)
         textView.modalPresentationStyle = .fullScreen
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
           self?.navigationController?.present(textView, animated: false)
@@ -2042,14 +2058,12 @@ extension ChatViewController: ChatBaseCellDelegate {
                                   animated: true)
           }
           fileModel.state = .Downalod
-          if let left = cell as? ChatFileLeftCell {
-            left.setModel(fileModel)
-          } else if let right = cell as? ChatFileRightCell {
-            right.setModel(fileModel)
+          if let fileCell = cell as? NEBaseChatMessageCell {
+            fileCell.setModel(fileModel)
           }
 
           viewmodel.downLoad(urlString, path) { [weak self] progress in
-            NELog.infoLog(ModuleName + " " + (self?.tag ?? "ChatViewController"), desc: "@@# CALLBACK downLoad: \(progress)")
+            NELog.infoLog(ModuleName + " " + (self?.tag ?? "ChatViewController"), desc: #function + "downLoad file progress: \(progress)")
             var newProgress = progress
             if newProgress < 0 {
               newProgress = abs(progress) / fileModel.size
@@ -2058,7 +2072,7 @@ extension ChatViewController: ChatBaseCellDelegate {
             if newProgress >= 1.0 {
               fileModel.state = .Success
             }
-            fileModel.cell?.uploadProgress(newProgress)
+            fileModel.cell?.uploadProgress(byRight: fileModel.message?.isOutgoingMsg ?? true, newProgress)
 
           } _: { [weak self] error in
             if let err = error as NSError? {
@@ -2068,7 +2082,6 @@ extension ChatViewController: ChatBaseCellDelegate {
         }
       } else {
         let url = URL(fileURLWithPath: path)
-        print("@@# file:\(url) has download")
         interactionController.url = url
         interactionController.delegate = self // UIDocumentInteractionControllerDelegate
         if interactionController.presentPreview(animated: true) {}
@@ -2095,7 +2108,47 @@ extension ChatViewController: ChatBaseCellDelegate {
     }
   }
 
-  public func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  // MARK: OVERRIDE
+
+  open func getMenuView() -> NEBaseChatInputView {
+    NEBaseChatInputView()
+  }
+
+  open func expandMoreAction() {
+    menuView.chatAddMoreView.configData(data: NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType))
+  }
+}
+
+// MARK: ChatBaseCellDelegate
+
+extension ChatViewController: ChatBaseCellDelegate {
+  open func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    print("didLongPressAvatar")
+    if viewmodel.session.sessionType == .P2P {
+      return
+    }
+    var addText = ""
+    var accid = ""
+
+    if let m = model, let from = m.message?.from {
+      accid = from
+      addText += viewmodel.getShowName(userId: from, teamId: viewmodel.session.sessionId, false)
+    }
+
+    addText = "@" + addText + ""
+
+    addToAtUsers(addText: addText, accid: accid, true)
+  }
+
+  open func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    didTapHeadPortrait(model: model)
+  }
+
+  open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    if model?.isRevoked == true {
+      return
+    }
+
     var replyId: String? = model?.message?.repliedMessageId
     if let yxReplyMsg = model?.message?.remoteExt?[keyReplyMsgKey] as? [String: Any] {
       replyId = yxReplyMsg["idClient"] as? String
@@ -2121,11 +2174,11 @@ extension ChatViewController: ChatBaseCellDelegate {
     }
   }
 
-  public func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  open func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     didLongTouchMessageView(cell, model)
   }
 
-  public func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  open func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     if playingCell?.messageId == model?.message?.messageId {
       if playingCell?.isPlaying == true {
         stopPlay()
@@ -2150,18 +2203,21 @@ extension ChatViewController: ChatBaseCellDelegate {
     }
   }
 
-  public func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  open func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     if model?.type == .revoke, model?.message?.messageType == .text, let message = model?.message {
       let time = message.timestamp
       let date = Date()
       let currentTime = date.timeIntervalSince1970
       if currentTime - time >= 60 * 2 {
         showToast(chatLocalizable("editable_time_expired"))
-        tableView.reloadData()
+        didRefreshTable()
         return
       }
       if model?.message?.remoteExt?[keyReplyMsgKey] != nil {
+        viewmodel.operationModel = model
         showReplyMessageView(isReEdit: true)
+      } else {
+        closeReply(button: nil)
       }
       guard let text = message.text else {
         return
@@ -2195,18 +2251,15 @@ extension ChatViewController: ChatBaseCellDelegate {
     }
   }
 
-  public func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    if let msg = model?.message, msg.session?.sessionType == .team {
-      let readVC = ReadViewController(message: msg)
-      navigationController?.pushViewController(readVC, animated: true)
-    }
+  open func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+
+  open func loadDataFinish() {}
+
+  // MARK: call kit noti
+
+  open func didShowCallView() {
+    stopPlay()
   }
 
-  public static func getLeftCellType(_ type: Int) -> String {
-    "\(type)\(leftCellTypeSufixx)"
-  }
-
-  public static func getRitghtCellType(_ type: Int) -> String {
-    "\(type)\(rightCellTypeSufixx)"
-  }
+  open func didDismissCallView() {}
 }

@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 
+@objc
 public protocol ContactCellDataProtrol: NSObjectProtocol {
   func setModel(_ model: ContactInfo)
 }

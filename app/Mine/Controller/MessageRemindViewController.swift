@@ -11,7 +11,7 @@ import NEChatUIKit
 class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   public var cellClassDic =
-    [SettingCellType.SettingSwitchCell.rawValue: TeamSettingSwitchCell.self]
+    [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self]
   private var viewModel = MessageRemindViewModel()
 
   override func viewDidLoad() {
@@ -23,18 +23,28 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
 
   func initialConfig() {
     title = NSLocalizedString("message_remind", comment: "")
+    if NEStyleManager.instance.isNormalStyle() {
+      view.backgroundColor = .ne_backgroundColor
+      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+    } else {
+      view.backgroundColor = .funChatBackgroundColor
+    }
   }
 
   func setupSubviews() {
     view.addSubview(tableView)
+    if NEStyleManager.instance.isNormalStyle() {
+      topConstant += 12
+    }
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      tableView.topAnchor.constraint(equalTo: view.topAnchor),
+      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: BaseTeamSettingCell.Type) in
+    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -42,7 +52,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   lazy var tableView: UITableView = {
     let table = UITableView()
     table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    table.backgroundColor = .clear
     table.dataSource = self
     table.delegate = self
     table.separatorColor = .clear
@@ -73,7 +83,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
-    ) as? BaseTeamSettingCell {
+    ) as? NEBaseTeamSettingCell {
       cell.configure(model)
       return cell
     }
@@ -93,6 +103,9 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   }
 
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    if section == 0 {
+      return 0
+    }
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
       if model.cellModels.count > 0 {
@@ -104,7 +117,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let header = UIView()
-    header.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    header.backgroundColor = .ne_lightBackgroundColor
     return header
   }
 }

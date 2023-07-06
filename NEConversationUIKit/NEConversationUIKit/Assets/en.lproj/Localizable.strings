@@ -9,11 +9,14 @@
 "create_senior_group"="Create Group";
 "cancel_stickTop"="Cancel topping";
 "stickTop"="Sticky on Top";
-"delete"="Cancel";
+"delete"="Delete";
 "friend"="Contact";
+"contact"="Contact";
+"group"="Group";
 "discussion_group"="Temp Group";
 "senior_group"="Group";
 "search"="Search";
+"cancel"="Cancel";
 "search_keyword"="Enter the key words";
 "user_not_exist"="Not Exist";
 "session_empty"="No Session";
@@ -35,13 +38,5 @@
 
 "you_were_mentioned"="[You were mentioned]";
 
-
-
-
-
-
-
-
-
-
-
+// error toast
+"network_error"="Network is not available, please check";

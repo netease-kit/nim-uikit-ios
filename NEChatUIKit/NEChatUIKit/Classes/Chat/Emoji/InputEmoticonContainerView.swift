@@ -149,6 +149,7 @@ public class InputEmoticonContainerView: UIView {
   // MAKR: lazy method
   private lazy var emoticonPageView: EmojiPageView = {
     let pageView = EmojiPageView(frame: self.bounds)
+    pageView.translatesAutoresizingMaskIntoConstraints = false
     pageView.dataSource = self
     pageView.pageViewDelegate = self
     return pageView

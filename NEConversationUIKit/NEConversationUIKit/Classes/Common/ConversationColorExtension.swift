@@ -18,7 +18,7 @@ public extension UIColor {
 
   // MARK: view background color
 
-  static let ne_lightBackgroundColor = UIColor(hexString: "#F1F1F6")
+  static let ne_lightBackgroundColor = UIColor(hexString: "#EFF1F4")
   static let ne_defautAvatarColor = UIColor(hexString: "#537FF4")
   static let ne_greenColor = UIColor(hexString: "#42C294")
 

@@ -16,10 +16,10 @@ public class ContactUIConfig: NSObject {
   public var avatarCornerRadius = 4.0
 
   /// 头像类型
-  public var avatarType: NEContactAvatarType = .cycle
+  public var avatarType: NEContactAvatarType?
 
   // 通讯录标题大小
-  public var titleFont = UIFont.systemFont(ofSize: 14)
+  public var titleFont: UIFont?
 
   /// 通讯录标题颜色
   public var titleColor = UIColor.ne_darkText
@@ -34,5 +34,5 @@ public class ContactUIConfig: NSObject {
   public var divideLineColor = UIColor.ne_borderColor
 
   /// 检索标题字体颜色
-  public var indexTitleColor = UIColor.ne_emptyTitleColor
+  public var indexTitleColor: UIColor?
 }

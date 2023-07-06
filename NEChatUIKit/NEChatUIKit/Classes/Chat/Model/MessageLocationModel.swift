@@ -20,6 +20,6 @@ class MessageLocationModel: MessageContentModel {
       title = message?.text
       contentSize = CGSize(width: 242, height: 140)
     }
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }

@@ -177,7 +177,7 @@ public class NotificationMessageUtils: NSObject {
     if let object = message.messageObject as? NIMNotificationObject {
       if let content = object.content as? NIMTeamNotificationContent {
         if content.sourceID == NIMSDK.shared().loginManager.currentAccount() {
-          return chatLocalizable("You")
+          return chatLocalizable("You") + " "
         } else {
           if let sourceId = content.sourceID {
             return getShowName(userId: sourceId, nimSession: message.session)
@@ -197,7 +197,7 @@ public class NotificationMessageUtils: NSObject {
     }
     for targetID in targetIDs {
       if targetID == NIMSDK.shared().loginManager.currentAccount() {
-        toNames.append(chatLocalizable("You"))
+        toNames.append(chatLocalizable("You") + " ")
       } else {
         toNames
           .append(getShowName(userId: targetID, nimSession: message.session))

@@ -6,7 +6,7 @@
 import UIKit
 
 @objc
-public protocol NEMoreViewDelagate: NSObjectProtocol {
+public protocol NEMoreViewDelegate: NSObjectProtocol {
   func moreViewDidSelectMoreCell(moreView: NEChatMoreActionView, cell: NEInputMoreCell)
 }
 
@@ -23,7 +23,7 @@ public class NEChatMoreActionView: UIView {
 
   private var itemIndexs: [IndexPath: NSNumber]?
 
-  public weak var delegate: NEMoreViewDelagate?
+  public weak var delegate: NEMoreViewDelegate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)

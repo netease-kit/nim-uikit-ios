@@ -48,4 +48,8 @@ public protocol MessageModel: NSObjectProtocol {
   var isReplay: Bool { get set }
 
   init(message: NIMMessage?)
+
+  var offset: CGFloat { get set }
+
+  func cellHeight() -> CGFloat
 }

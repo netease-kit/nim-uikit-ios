@@ -5,7 +5,7 @@
 
 //MAKR：common
 "ok"="OK";
-"send_to"="send to";
+
 //MAKR：message
 "send_picture"="get a picture";
 "send_voice"="get a audio";
@@ -75,6 +75,7 @@
 "pin_text_P2P"="pinned this message";
 "pin_text_team"="pinned this message";
 
+"chat_setting"="chat setting";
 "session_set_top"="sticky to top";
 "message_remind"="open notification";
 
@@ -90,6 +91,7 @@
 "operation_collection"="favorite";
 "operation_delete"="delete";
 "operation_recall"="recall";
+"withdrew_message" = "withdrew this message";
 "message_has_be_withdrawn" = "message recalled";
 "message_reedit" = "reedit";
 "message_revoke_confim" = "Wether to recall this message";
@@ -101,11 +103,11 @@
 "collection_success"="Favorite";
 "no_permession"="No Permission";
 "msg_reply"="reply";
-"msg_image"="picture";
-"msg_audio"="audio";
-"msg_video"="video";
-"msg_file"="file";
-"msg_location"="location";
+"msg_image"="picture message";
+"msg_audio"="audio message";
+"msg_video"="video message";
+"msg_file"="file message";
+"msg_location"="location message";
 "msg_custom"="custom message";
 "msg_unknown"="Unknown message type";
 "message_read"="Reading Status";
@@ -124,7 +126,8 @@
 "mdhm"="MM.dd HH:mm";
 "ymdhm"="yyyy.MM.dd HH:mm";
 
-"chat_takePicture"="Capture video";
+"chat_takePicture"="Camera";
+"chat_photo"="Album";
 "chat_rtc"="Audio and video call";
 "chat_location"="Location";
 "chat_file"="File";
@@ -136,7 +139,7 @@
 "search_result_empty"="Not found";
 "no_map_plugin"="Map module not integrated";
 "location_not_auth"="The geographic location is not authorized. Please open it in the settings";
-"fileSize_over_limit"="Oops！File size limit.";
+"fileSize_over_limit"="Oops！File size limit over XXXM.";
 
 "message_recalled"="message recalled";
 
@@ -146,10 +149,12 @@
 "call_complete"="Talk time";
 "call_canceled"="Call cancellation";
 "call_rejected"="Rejected";
-"call_timeout"="No answer after timeout";
+"call_timeout"="Unanswered";
 "call_busy"="The busy line is not answered";
 
 "editable_time_expired"="Editable time has expired";
+"ravokable_time_expired"="Ravokable time has expired";
+"ravoked_failed"="Ravoked failed";
 "message_not_found"="This message is gone";
 
 "unkonw_pin_message"="unkonw message type";
@@ -162,3 +167,18 @@
 "failed_operation"="Failed Operation";
 "team_not_exist"="team not exist";
 "unpin_failed"="Unpin failed";
+
+"fun_hold_to_talk"="Hold to talk";
+
+"release_to_send"="release to send";
+"release_to_cancel"="release to cancel";
+
+"stop_record"="Recording will stop after %d";
+
+
+// MARK: Fun UI
+"fun_chat_input_placeholder"="Enter what you want to say...";
+
+"no_location"="Please select the location you want to send";
+
+"delete_failed"="Delete failed";

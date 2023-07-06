@@ -26,39 +26,85 @@ class NETabBarController: UITabBarController {
   }
 
   func setUpControllers() {
-    // chat
-    let chat = ConversationController()
-    chat.view.backgroundColor = UIColor(hexString: "#e9eff5")
-    chat.tabBarItem = UITabBarItem(
-      title: NSLocalizedString("message", comment: ""),
-      image: UIImage(named: "chat"),
-      selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
-    )
-    let chatNav = NENavigationController(rootViewController: chat)
+    if NEStyleManager.instance.isNormalStyle() {
+      // chat
+      let chat = ConversationController()
+      chat.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("message", comment: ""),
+        image: UIImage(named: "chat"),
+        selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      let chatNav = NENavigationController(rootViewController: chat)
 
-    // Contacts
-    let contactVC = ContactsViewController()
-    contactVC.tabBarItem = UITabBarItem(
-      title: NSLocalizedString("contact", comment: ""),
-      image: UIImage(named: "contact"),
-      selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
-    )
-    contactVC.title = NSLocalizedString("contact", comment: "")
-    let contactsNav = NENavigationController(rootViewController: contactVC)
+      // Contacts
+      let contactVC = ContactsViewController()
+      contactVC.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("contact", comment: ""),
+        image: UIImage(named: "contact"),
+        selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      let contactsNav = NENavigationController(rootViewController: contactVC)
 
-    // Me
-    let meVC = MeViewController()
-    meVC.view.backgroundColor = UIColor.white
-    meVC.tabBarItem = UITabBarItem(
-      title: NSLocalizedString("mine", comment: ""),
-      image: UIImage(named: "person"),
-      selectedImage: UIImage(named: "personSelect")?.withRenderingMode(.alwaysOriginal)
-    )
-    let meNav = NENavigationController(rootViewController: meVC)
+      // Me
+      let meVC = MeViewController()
+      meVC.view.backgroundColor = UIColor.white
+      meVC.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("mine", comment: ""),
+        image: UIImage(named: "person"),
+        selectedImage: UIImage(named: "personSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      let meNav = NENavigationController(rootViewController: meVC)
 
-    tabBar.backgroundColor = .white
-    viewControllers = [chatNav, contactsNav, meNav]
-    selectedIndex = 0
+      tabBar.backgroundColor = .white
+      viewControllers = [chatNav, contactsNav, meNav]
+      selectedIndex = 0
+
+      if #available(iOS 13.0, *) {
+        let appearance = UITabBarAppearance()
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#337EFF")]
+        tabBar.standardAppearance = appearance
+      }
+    } else {
+      // chat
+      let chat = FunConversationController()
+      chat.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("message", comment: ""),
+        image: UIImage(named: "funChat"),
+        selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      setFunStyleColor(chat.tabBarItem)
+      let chatNav = NENavigationController(rootViewController: chat)
+
+      // Contacts
+      let contactVC = FunContactsViewController()
+      contactVC.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("contact", comment: ""),
+        image: UIImage(named: "funContact"),
+        selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      setFunStyleColor(contactVC.tabBarItem)
+      let contactsNav = NENavigationController(rootViewController: contactVC)
+
+      // Me
+      let meVC = MeViewController()
+      meVC.tabBarItem = UITabBarItem(
+        title: NSLocalizedString("mine", comment: ""),
+        image: UIImage(named: "funPerson"),
+        selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
+      )
+      setFunStyleColor(meVC.tabBarItem)
+      let meNav = NENavigationController(rootViewController: meVC)
+
+      tabBar.backgroundColor = .white
+      viewControllers = [chatNav, contactsNav, meNav]
+      selectedIndex = 0
+
+      if #available(iOS 13.0, *) {
+        let appearance = UITabBarAppearance()
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#58BE6B")]
+        tabBar.standardAppearance = appearance
+      }
+    }
   }
 
   func setUpSessionBadgeValue() {
@@ -81,6 +127,10 @@ class NETabBarController: UITabBarController {
 
   private func refreshSessionBadge() {
     setUpSessionBadgeValue()
+  }
+
+  private func setFunStyleColor(_ item: UITabBarItem) {
+    item.setTitleTextAttributes([.foregroundColor: UIColor(hexString: "#58BE6B")], for: .selected)
   }
 
   deinit {

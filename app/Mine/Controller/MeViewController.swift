@@ -8,14 +8,22 @@ import YXLogin
 import NECoreKit
 import NIMSDK
 import NECoreIMKit
+import NECommonUIKit
 
 class MeViewController: UIViewController {
   private let mineData = [
-    [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
     [NSLocalizedString("setting", comment: ""): "mine_setting"],
+    [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
   ]
 
   private let userProvider = UserInfoProvider.shared
+
+  lazy var headerView: UIView = {
+    let view = UIView(frame: .zero)
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .white
+    return view
+  }()
 
   lazy var header: NEUserHeaderView = {
     let view = NEUserHeaderView(frame: .zero)
@@ -42,6 +50,7 @@ class MeViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
     setupSubviews()
   }
 
@@ -73,12 +82,16 @@ class MeViewController: UIViewController {
       ])
     }
     header.clipsToBounds = true
-    header.layer.cornerRadius = 30
+    if NEStyleManager.instance.isNormalStyle() {
+      header.layer.cornerRadius = 30
+    } else {
+      header.layer.cornerRadius = 4
+    }
 
     view.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: header.rightAnchor, constant: 15),
-      nameLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      nameLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
       nameLabel.topAnchor.constraint(equalTo: header.topAnchor),
     ])
 
@@ -93,10 +106,9 @@ class MeViewController: UIViewController {
     updateUserInfo()
 
     let divider = UIView()
-    divider.backgroundColor = UIColor(hexString: "0xEFF1F4")
     view.addSubview(divider)
     divider.translatesAutoresizingMaskIntoConstraints = false
-    divider.backgroundColor = UIColor(hexString: "EFF1F4")
+    divider.backgroundColor = .clear
     NSLayoutConstraint.activate([
       divider.leftAnchor.constraint(equalTo: view.leftAnchor),
       divider.heightAnchor.constraint(equalToConstant: 6),
@@ -108,6 +120,7 @@ class MeViewController: UIViewController {
     view.addSubview(arrow)
     view.addSubview(personInfoBtn)
 
+    tableView.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor.white : UIColor.clear
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(equalTo: divider.bottomAnchor),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -126,13 +139,23 @@ class MeViewController: UIViewController {
       personInfoBtn.rightAnchor.constraint(equalTo: view.rightAnchor),
       personInfoBtn.bottomAnchor.constraint(equalTo: divider.topAnchor),
     ])
+
+    view.insertSubview(headerView, belowSubview: header)
+    NSLayoutConstraint.activate([
+      headerView.topAnchor.constraint(equalTo: view.topAnchor),
+      headerView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      headerView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      headerView.bottomAnchor.constraint(equalTo: divider.topAnchor),
+    ])
   }
 
   func updateUserInfo() {
-    let user = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
+    let user = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
     idLabel.text = "\(NSLocalizedString("account", comment: "")):\(user?.userId ?? "")"
-    nameLabel.text = user?.userInfo?.nickName
-    header.configHeadData(headUrl: user?.userInfo?.avatarUrl, name: user?.showName() ?? "")
+    nameLabel.text = user?.showName(false)
+    header.configHeadData(headUrl: user?.userInfo?.avatarUrl,
+                          name: user?.showName(false) ?? "",
+                          uid: user?.userId ?? "")
   }
 
   // MAKR: lazy method
@@ -147,7 +170,6 @@ class MeViewController: UIViewController {
       forCellReuseIdentifier: "\(NSStringFromClass(MineTableViewCell.self))"
     )
     tableView.rowHeight = 52
-    tableView.backgroundColor = .white
     return tableView
   }()
 
@@ -162,7 +184,6 @@ class MeViewController: UIViewController {
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.addTarget(self, action: #selector(personInfoBtnClick), for: .touchUpInside)
     return btn
-
   }()
 
   @objc func personInfoBtnClick(sender: UIButton) {
@@ -198,10 +219,10 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
 //        }
 
     if indexPath.row == 0 {
-      let ctrl = IntroduceBrandViewController()
+      let ctrl = MineSettingViewController()
       navigationController?.pushViewController(ctrl, animated: true)
     } else if indexPath.row == 1 {
-      let ctrl = MineSettingViewController()
+      let ctrl = IntroduceBrandViewController()
       navigationController?.pushViewController(ctrl, animated: true)
     } else if indexPath.row == 2 {}
   }

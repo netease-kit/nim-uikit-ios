@@ -4,77 +4,104 @@
 
 import Foundation
 
-class TextViewController: ChatBaseViewController {
+@objcMembers
+open class TextViewController: ChatBaseViewController {
   let leftRightMargin: CGFloat = 24
+  var contentMaxWidth: CGFloat = 0
   let textFont = UIFont.systemFont(ofSize: 24, weight: .regular)
-  lazy var textView: CopyableTextView = {
-    let textView = CopyableTextView()
-    textView.isEditable = false
-    textView.isSelectable = false
-    textView.translatesAutoresizingMaskIntoConstraints = false
-    textView.font = .systemFont(ofSize: 24, weight: .regular)
-    return textView
+
+  lazy var scrollView: UIScrollView = {
+    let scrollView = UIScrollView()
+    scrollView.isScrollEnabled = true
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    return scrollView
+  }()
+
+  var contentLabelTopAnchor: NSLayoutConstraint?
+  var contentLabelLeftAnchor: NSLayoutConstraint?
+  lazy var contentLabel: CopyableLabel = {
+    let contentLabel = CopyableLabel()
+    contentLabel.numberOfLines = 0
+    contentLabel.translatesAutoresizingMaskIntoConstraints = false
+    contentLabel.font = textFont
+    contentLabel.backgroundColor = .clear
+    return contentLabel
   }()
 
   init(content: String) {
     super.init(nibName: nil, bundle: nil)
-    textView.copyString = content
-    let att = NEEmotionTool.getAttWithStr(str: content, font: textFont)
-    textView.attributedText = att
+    contentMaxWidth = kScreenWidth - leftRightMargin * 2
+    let att = NEEmotionTool.getAttWithStr(str: content, font: textFont, CGPoint(x: 0, y: -3))
+    contentLabel.copyString = att.string
+    contentLabel.attributedText = att
     let line = String.calculateMaxLines(width: kScreenWidth - 2 * leftRightMargin,
                                         string: att.string,
                                         font: textFont)
-    textView.textAlignment = line > 1 ? .justified : .center
+    contentLabel.textAlignment = .justified
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = true
+    customNavigationView.isHidden = true
     let tap = UITapGestureRecognizer(target: self, action: #selector(viewTap))
-    textView.addGestureRecognizer(tap)
+    scrollView.addGestureRecognizer(tap)
     setupUI()
     contentSizeToFit()
   }
 
-  @objc func viewTap() {
+  open func viewTap() {
     UIMenuController.shared.setMenuVisible(false, animated: true)
     dismiss(animated: false)
   }
 
-  func setupUI() {
-    view.addSubview(textView)
+  open func setupUI() {
+    view.addSubview(scrollView)
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        textView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-        textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        textView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: leftRightMargin),
-        textView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -leftRightMargin),
+        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -0),
       ])
     } else {
       NSLayoutConstraint.activate([
-        textView.topAnchor.constraint(equalTo: view.topAnchor),
-        textView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        textView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: leftRightMargin),
-        textView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -leftRightMargin),
+        scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -0),
       ])
     }
+
+    scrollView.addSubview(contentLabel)
+    contentLabel.preferredMaxLayoutWidth = contentMaxWidth
+    contentLabelTopAnchor = contentLabel.topAnchor.constraint(equalTo: scrollView.topAnchor)
+    contentLabelLeftAnchor = contentLabel.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: leftRightMargin)
+    NSLayoutConstraint.activate([
+      contentLabelTopAnchor!,
+      contentLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+      contentLabelLeftAnchor!,
+      contentLabel.rightAnchor.constraint(equalTo: scrollView.rightAnchor, constant: -leftRightMargin),
+    ])
   }
 
   // textView 垂直居中
   func contentSizeToFit() {
-    guard !textView.text.isEmpty else {
-      return
-    }
-    let textSize = String.getTextRectSize(textView.text, font: textFont, size: CGSize(width: kScreenWidth - leftRightMargin * 2, height: CGFloat.greatestFiniteMagnitude))
+    let textSize = contentLabel.attributedText?.finalSize(textFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
     let textViewHeight = kScreenHeight - kNavigationHeight - KStatusBarHeight
     if textSize.height <= textViewHeight {
       let offsetY = (textViewHeight - textSize.height) / 2
-      let offset = UIEdgeInsets(top: offsetY, left: 0, bottom: 0, right: 0)
-      textView.contentInset = offset
+      contentLabelTopAnchor?.constant = offsetY
     }
+
+    if textSize.width <= contentMaxWidth {
+      let offsetX = (kScreenWidth - textSize.width) / 2
+      contentLabelLeftAnchor?.constant = offsetX
+    }
+    scrollView.contentSize = textSize
   }
 }

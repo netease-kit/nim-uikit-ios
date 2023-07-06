@@ -49,6 +49,7 @@ public class ChatActivityIndicatorView: UIView {
   }
 
   func commonUI() {
+    backgroundColor = .clear
     addSubview(failBtn)
     addSubview(activity)
     NSLayoutConstraint.activate([

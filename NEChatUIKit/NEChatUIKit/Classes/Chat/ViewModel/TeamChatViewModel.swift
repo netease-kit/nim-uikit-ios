@@ -6,6 +6,7 @@ import Foundation
 import NIMSDK
 import CoreText
 import NECoreIMKit
+
 @objc
 public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
   func onTeamRemoved(team: NIMTeam)

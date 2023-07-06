@@ -5,6 +5,7 @@
 import UIKit
 import NEChatKit
 
+@objcMembers
 public class NEMapAddressCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

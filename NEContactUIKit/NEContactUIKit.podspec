@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEContactUIKit'
-  s.version          = '9.5.0'
+  s.version          = '9.6.0'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -27,13 +27,12 @@ Pod::Spec.new do |s|
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '10.0'
   s.swift_version = '5.0'
 
   s.source_files = 'NEContactUIKit/Classes/**/*'
   s.resource = 'NEContactUIKit/Assets/**/*'
-  s.dependency 'NEContactKit'
+  s.dependency 'NEChatKit'
   s.dependency 'NECommonUIKit'
-  s.dependency 'YXAlog'
 
 end

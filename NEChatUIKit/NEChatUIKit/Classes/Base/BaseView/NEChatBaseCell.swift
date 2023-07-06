@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+import NECommonKit
 
 @objcMembers
 open class NEChatBaseCell: UITableViewCell {
@@ -16,7 +17,7 @@ open class NEChatBaseCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public func uploadProgress(_ progress: Float) {
+  public func uploadProgress(byRight: Bool, _ progress: Float) {
     fatalError("override in sub class")
   }
 

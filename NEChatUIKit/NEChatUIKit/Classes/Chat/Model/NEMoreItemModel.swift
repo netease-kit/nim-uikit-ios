@@ -12,7 +12,8 @@ public enum NEMoreActionType: Int {
   case game
   case file
   case remind
-  case other
+  case photo
+  case other = 100
 }
 
 public class NEMoreItemModel: NSObject {
@@ -26,7 +27,7 @@ public class NEMoreItemModel: NSObject {
   public var type: NEMoreActionType?
 
   // 代理类
-  public var customDelegate: AnyObject?
+  public weak var customDelegate: AnyObject?
 
   // 动态事件
   public var action: Selector?

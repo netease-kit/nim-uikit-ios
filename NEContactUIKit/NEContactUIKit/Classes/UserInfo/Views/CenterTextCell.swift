@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class CenterTextCell: UITableViewCell {
+open class CenterTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()
   public var line = UIView()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -34,7 +34,7 @@ public class CenterTextCell: UITableViewCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }

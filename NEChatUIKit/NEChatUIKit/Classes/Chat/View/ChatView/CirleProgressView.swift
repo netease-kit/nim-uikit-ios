@@ -29,8 +29,8 @@ public class CirleProgressView: UIView {
     }
   }
 
-  private var borderLayer = CAShapeLayer()
-  private var sectorLayer = CAShapeLayer()
+  public var borderLayer = CAShapeLayer()
+  public var sectorLayer = CAShapeLayer()
   private var imageView = UIImageView(image: UIImage.ne_imageNamed(name: "chat_unread"))
 
 //    override func draw(_ rect: CGRect) {
@@ -39,7 +39,7 @@ public class CirleProgressView: UIView {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = .white
+    backgroundColor = .clear
     imageView.frame = bounds
     imageView.contentMode = .center
     addSubview(imageView)
@@ -59,6 +59,7 @@ public class CirleProgressView: UIView {
     layer.addSublayer(borderLayer)
 
     sectorLayer.frame = bounds
+    sectorLayer.fillColor = UIColor.ne_blueText.cgColor
     layer.addSublayer(sectorLayer)
   }
 
@@ -80,6 +81,5 @@ public class CirleProgressView: UIView {
     )
     sectorPath.addLine(to: center)
     sectorLayer.path = sectorPath.cgPath
-    sectorLayer.fillColor = UIColor.ne_blueText.cgColor
   }
 }

@@ -3,12 +3,13 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEConversationKit
+import NEChatKit
 import NIMSDK
 
 let revokeLocalMessage = "revoke_message_local"
 let revokeLocalMessageContent = "revoke_message_local_content"
 
+@objc
 public protocol ConversationViewModelDelegate: NSObjectProtocol {
   func didAddRecentSession()
   func didUpdateRecentSession(index: Int)
@@ -99,7 +100,12 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
       ModuleName + " " + className,
       desc: #function + ", sessionId:" + (recentSession.session?.sessionId ?? "nil")
     )
-    repo.deleteLocalSession(recentSession: recentSession)
+    weak var weakSelf = self
+    let option = NIMDeleteRecentSessionOption()
+    option.isDeleteRoamMessage = true
+    repo.deleteRecentConversation(recentSession, option) { error in
+      weakSelf?.repo.deleteLocalSession(recentSession: recentSession)
+    }
   }
 
   public func stickTopInfoForSession(session: NIMSession) -> NIMStickTopSessionInfo? {
@@ -336,9 +342,9 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   public func didUpdate(_ recentSession: NIMRecentSession, totalUnreadCount: Int) {
     NELog.infoLog(
       ModuleName + " " + className,
-      desc: #function + "recentSession, didUpdate sessionId:" + (recentSession.session?.sessionId ?? "nil")
+      desc: #function + "recentSession, didUpdate sessionId: " + (recentSession.session?.sessionId ?? "nil" + " unread count : \(totalUnreadCount)")
     )
-    if let sessionId = recentSession.session?.sessionId {
+    if let sessionId = recentSession.session?.sessionId, recentSession.unreadCount <= 0 {
       if NEAtMessageManager.instance.isAtCurrentUser(sessionId: sessionId) == true {
         NEAtMessageManager.instance.clearAtRecord(sessionId)
       }
@@ -475,6 +481,20 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     }
   }
 
+  public func onTeamMemberChanged(_ team: NIMTeam) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:" + (team.teamId ?? "nil"))
+    guard let conversationArr = conversationListArray else {
+      return
+    }
+    for (i, listModel) in conversationArr.enumerated() {
+      if listModel.recentSession?.session?.sessionId == team.teamId {
+        listModel.teamInfo = team
+        delegate?.didUpdateRecentSession(index: i)
+        break
+      }
+    }
+  }
+
   private func sessionIsExist(_ model: ConversationListModel) -> ConversationListModel? {
     if let array = conversationListArray {
       for index in 0 ..< array.count {
@@ -485,5 +505,9 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
       }
     }
     return nil
+  }
+
+  public func onMuteListChanged() {
+    delegate?.reloadTableView()
   }
 }

@@ -4,10 +4,12 @@
 
 import UIKit
 
+@objc
 public protocol NEMapGuideBottomViewDelegate: NSObjectProtocol {
   func didClickGuide()
 }
 
+@objcMembers
 public class NEMapGuideBottomView: UIView {
   public weak var delegate: NEMapGuideBottomViewDelegate?
 
@@ -74,7 +76,7 @@ public class NEMapGuideBottomView: UIView {
     return label
   }()
 
-  @objc func guideBtnClick() {
+  func guideBtnClick() {
     if let delegate = delegate {
       delegate.didClickGuide()
     }

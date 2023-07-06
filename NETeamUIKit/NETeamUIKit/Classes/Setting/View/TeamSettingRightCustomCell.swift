@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
+open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
   override public func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
@@ -30,7 +30,7 @@ public class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
     }
   }
 
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
 
     contentView.addSubview(customRightView)
@@ -47,13 +47,13 @@ public class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
     )
   }
 
-  lazy var customRightView: UIButton = {
+  public lazy var customRightView: UIButton = {
     let btn = UIButton()
     btn.translatesAutoresizingMaskIntoConstraints = false
     return btn
   }()
 
-  func customRightViewClick() {
+  public func customRightViewClick() {
     if let block = model?.customViewClick {
       block()
     }

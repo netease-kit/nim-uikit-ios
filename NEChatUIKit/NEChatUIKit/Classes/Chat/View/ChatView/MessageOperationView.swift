@@ -5,6 +5,7 @@
 
 import UIKit
 
+@objc
 public protocol MessageOperationViewDelegate: AnyObject {
   func didSelectedItem(item: OperationItem)
 }

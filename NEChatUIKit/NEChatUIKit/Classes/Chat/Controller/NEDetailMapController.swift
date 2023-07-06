@@ -6,6 +6,7 @@ import UIKit
 import NEChatKit
 import NECoreKit
 
+@objcMembers
 public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomViewDelegate {
   // 地图展示类型
   public var mapType: NEMapType?
@@ -45,6 +46,16 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
 
   override public func viewWillAppear(_ animated: Bool) {
     navigationController?.navigationBar.isHidden = true
+    weak var weakSelf = self
+    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
+      if status == .notReachable {
+        weakSelf?.sendBtn.isEnabled = false
+        weakSelf?.sendBtn.alpha = 0.5
+      } else {
+        weakSelf?.sendBtn.isEnabled = true
+        weakSelf?.sendBtn.alpha = 1.0
+      }
+    }
   }
 
   override public func viewWillDisappear(_ animated: Bool) {
@@ -232,7 +243,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
 
   //    MARK: 键盘通知相关操作
 
-  @objc func keyBoardWillShow(_ notification: Notification) {
+  func keyBoardWillShow(_ notification: Notification) {
     foldKeyBoard = false
     searchCancelBtn.isHidden = false
     searchViewConstraint?.constant = -64
@@ -244,7 +255,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     })
   }
 
-  @objc func keyBoardWillHide(_ notification: Notification) {
+  func keyBoardWillHide(_ notification: Notification) {
     foldKeyBoard = true
 //    layoutInputView(offset: 0)
   }
@@ -369,8 +380,8 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     textField.font = UIFont.systemFont(ofSize: 14)
     textField.textColor = UIColor.ne_greyText
     textField.layer.cornerRadius = 8
-    textField.backgroundColor = UIColor(hexString: "0xEFF1F4")
-    textField.clearButtonMode = .whileEditing
+    textField.backgroundColor = .ne_lightBackgroundColor
+    textField.clearButtonMode = .always
     textField.returnKeyType = .search
     textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
     return textField
@@ -383,13 +394,14 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     return bgView
   }()
 
-  @objc func resetClick() {
+  func resetClick() {
     if let map = mapView {
       resetBtn.isSelected = false
       if mapType == .detail, let map = mapView {
         NEChatKitClient.instance.delegate?.setMapCenter?(mapview: map)
         return
       }
+      searchTextField.text = nil
       toSearchLocalWithMapView()
       NEChatKitClient.instance.delegate?.setMapCenter?(mapview: map)
       currentIndex = 0
@@ -397,7 +409,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     }
   }
 
-  @objc func cancelSearch() {
+  func cancelSearch() {
     UIApplication.shared.keyWindow?.endEditing(true)
     UIView.animate(withDuration: 0.25, animations: {
       self.searchCancelBtn.isHidden = true
@@ -421,15 +433,15 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     emptyLabel.isHidden = true
   }
 
-  @objc func backBackClick() {
+  func backBackClick() {
     navigationController?.popViewController(animated: true)
   }
 
-  @objc func cancelBtnClick() {
+  func cancelBtnClick() {
     navigationController?.popViewController(animated: true)
   }
 
-  @objc func sendBtnClick() {
+  func sendBtnClick() {
     var model: ChatLocaitonModel?
 
     if model == nil {
@@ -443,15 +455,18 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     }
 
     if let m = model {
-      if let block = completion {
-        block(m)
-      }
-    } else {}
-
-    navigationController?.popViewController(animated: true)
+      navigationController?.popViewController(animated: false)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
+        if let block = self.completion {
+          block(m)
+        }
+      }))
+    } else {
+      showToast(chatLocalizable("no_location"))
+    }
   }
 
-  @objc func searchTextFieldChange(textfield: SearchTextField) {
+  func searchTextFieldChange(textfield: SearchTextField) {
     guard let searchText = textfield.text else {
       return
     }

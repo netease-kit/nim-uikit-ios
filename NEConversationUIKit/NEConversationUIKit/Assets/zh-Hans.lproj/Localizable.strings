@@ -11,9 +11,12 @@
 "stickTop"="置顶";
 "delete"="删除";
 "friend"="好友";
+"contact"="联系人";
+"group"="群聊";
 "discussion_group"="讨论组";
 "senior_group"="高级群";
 "search"="搜索";
+"cancel"="取消";
 "search_keyword"="请输入你要搜索的关键字";
 "user_not_exist"="该用户不存在";
 "session_empty"="暂无会话";
@@ -28,9 +31,13 @@
 "file"="[文件消息]";
 "internet_phone"="[音频通话]";
 "video_chat"="[视频通话]";
-"unknown"="[未知消息]";
+"unknown"="[未知消息体]";
 "appName"="云信IM";
 
 "message_recalled"="此消息已撤回";
 
 "you_were_mentioned"="[有人@我]";
+
+
+// error toast
+"network_error"="当前网络不可用，请检查你的网络设置";

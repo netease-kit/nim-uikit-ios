@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class ContactBaseTextCell: UITableViewCell {
+open class ContactBaseTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()
   public var line = UIView()
 
@@ -19,7 +19,7 @@ public class ContactBaseTextCell: UITableViewCell {
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-      titleLabel.widthAnchor.constraint(equalToConstant: 100),
+      titleLabel.widthAnchor.constraint(equalToConstant: 90),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
@@ -36,7 +36,7 @@ public class ContactBaseTextCell: UITableViewCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

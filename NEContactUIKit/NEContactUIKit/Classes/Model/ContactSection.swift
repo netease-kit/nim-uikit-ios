@@ -4,10 +4,11 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEContactKit
+import NEChatKit
 import NECoreIMKit
 
-public class ContactSection {
+@objcMembers
+open class ContactSection {
   public var initial: String
   public var contacts: Array = [ContactInfo]()
   init(initial: String, contacts: [ContactInfo]) {

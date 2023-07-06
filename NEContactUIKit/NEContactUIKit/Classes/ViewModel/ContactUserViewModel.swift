@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEContactKit
+import NEChatKit
 import NECoreKit
 import NECoreIMKit
 import CoreMedia
@@ -50,6 +50,14 @@ public class ContactUserViewModel: NSObject {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
     contactRepo.getUserInfo(uid) { error, users in
       completion(error, users?.first)
+    }
+  }
+
+  public func fetchUserInfo(accountList: [String],
+                            _ completion: @escaping ([User]?, NSError?) -> Void) {
+    NELog.infoLog(ModuleName + " " + className, desc: #function + ", uid: \(accountList)")
+    contactRepo.fetchUserInfo(accountList: accountList) { users, error in
+      completion(users, error)
     }
   }
 }

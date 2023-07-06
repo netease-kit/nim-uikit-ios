@@ -13,7 +13,7 @@ public class ReplyMessageUtil: NSObject {
     }
     text += ": "
     switch model.type {
-    case .text:
+    case .text, .reply:
       if let t = model.message?.text {
         text += t
       } else {

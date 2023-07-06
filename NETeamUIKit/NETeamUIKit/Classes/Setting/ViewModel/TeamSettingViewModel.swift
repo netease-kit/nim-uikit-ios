@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import Foundation
-import NETeamKit
 import NIMSDK
 import UIKit
 import NECoreIMKit
@@ -14,7 +13,7 @@ protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didUpdateTeamInfoClick(_ model: SettingCellModel)
   func didClickHistoryMessage()
   func didNeedRefreshUI()
-  func didError(_ error: Error)
+  func didError(_ error: NSError)
   func didClickMark()
 }
 
@@ -101,7 +100,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
         if isOpen == true {
           // weakSelf?.repo.updateNoti(.all, tid)
           weakSelf?.repo.setTeamNotify(.all, tid) { error in
-            if let err = error {
+            if let err = error as? NSError {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
@@ -111,7 +110,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
         } else {
 //                    weakSelf?.repo.updateNoti(.none, tid)
           weakSelf?.repo.setTeamNotify(.none, tid) { error in
-            if let err = error {
+            if let err = error as? NSError {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
@@ -191,7 +190,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       if let tid = weakSelf?.teamInfoModel?.team?.teamId {
         weakSelf?.repo.muteAllMembers(isOpen, tid) { error in
           print("update mute error : ", error as Any)
-          if let err = error {
+          if let err = error as? NSError {
             forbiddenWords.switchOpen = !isOpen
             weakSelf?.delegate?.didNeedRefreshUI()
             weakSelf?.delegate?.didError(err)

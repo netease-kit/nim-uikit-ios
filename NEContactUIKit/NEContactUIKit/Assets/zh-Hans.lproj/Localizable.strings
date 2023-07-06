@@ -3,11 +3,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-
+"contact"="通讯录";
+"search"="搜索";
 "alert_tip"="提示";
 "alert_sure"="确定";
 "alert_cancel"="取消";
+"close"="关闭";
 
+"nick"="昵称";
 "account"="账号";
 "noteName"="备注名";
 "remove_black" = "解除";
@@ -21,6 +24,7 @@
 "email"="邮箱";
 "sign"="个性签名";
 "delete_friend"="删除好友";
+"delete_title"="将联系人\“XXX\”删除";
 "add_friend"="添加好友";
 "add_blackList"="加入黑名单";
 "send_friend_apply"="好友申请已发送";
@@ -50,3 +54,6 @@
 // error toast
 "validate_processed"="该验证消息已在其他端处理";
 "failed_operation"="操作失败";
+"network_error"="当前网络不可用，请检查你的网络设置";
+
+"black_tip"="   你不会收到列表中任何联系人的消息";

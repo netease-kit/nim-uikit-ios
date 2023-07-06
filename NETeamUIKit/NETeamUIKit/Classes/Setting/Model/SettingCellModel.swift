@@ -16,6 +16,7 @@ public enum SettingCellType: Int {
   case SettingSubtitleCustomCell
 }
 
+@objcMembers
 public class SettingCellModel: NSObject {
   public typealias SwitchChangeCompletion = (Bool) -> Void
   public typealias CellClick = () -> Void
