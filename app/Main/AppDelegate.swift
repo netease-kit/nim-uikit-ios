@@ -39,14 +39,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
         
-        let account = "chenyu4"
-        let token = "123456"
+        let account = "<#account#>"
+        let token = "<#token#>"
         
         weak var weakSelf = self
         IMKitClient.instance.loginIM(account, token) { error in
             if let err = error {
                 print("login error in app : ", err.localizedDescription)
             }else {
+                let _ = NEAtMessageManager.instance
                 ChatRouter.setupInit()
                 weakSelf?.initializePage()
             }
