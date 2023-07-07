@@ -24,13 +24,13 @@ class MessageVideoModel: MessageContentModel {
     if let videoObject = message?.messageObject as? NIMVideoObject {
       imageUrl = videoObject.url
       contentSize = ChatMessageHelper.getSizeWithMaxSize(
-        qChat_pic_size,
+        chat_pic_size,
         size: videoObject.coverSize,
-        miniWH: qChat_min_h
+        miniWH: chat_min_h
       )
     } else {
-      contentSize = qChat_pic_size
+      contentSize = chat_pic_size
     }
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }

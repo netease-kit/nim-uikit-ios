@@ -33,6 +33,9 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   func didLeaveTeam()
   func didDismissTeam()
   func didRefreshTable()
+
+  @objc optional
+  func getMessageModel(model: MessageModel)
 }
 
 let revokeLocalMessage = "revoke_message_local"
@@ -41,7 +44,7 @@ let removePinMessageNoti = "remove_pin_message_noti"
 
 @objcMembers
 public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDelegate,
-  NIMConversationManagerDelegate, NIMSystemNotificationManagerDelegate, ChatExtendProviderDelegate, NIMUserManagerDelegate {
+  NIMConversationManagerDelegate, NIMSystemNotificationManagerDelegate, ChatExtendProviderDelegate, FriendProviderDelegate {
   public var team: NIMTeam?
   public var session: NIMSession
   public var messages = [MessageModel]()
@@ -66,13 +69,15 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
   public var filterInviteSet = Set<String>()
 
+  public var deletingMsgDic = Set<String>()
+
   init(session: NIMSession) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + session.sessionId)
     self.session = session
     anchor = nil
     super.init()
-    NIMSDK.shared().userManager.add(self)
     repo.addChatDelegate(delegate: self)
+    repo.addContactDelegate(delegate: self)
     repo.addSessionDelegate(delegate: self)
     repo.addSystemNotificationDelegate(delegate: self)
     repo.addChatExtendDelegate(delegate: self)
@@ -87,8 +92,8 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     if anchor != nil {
       isHistoryChat = true
     }
-    NIMSDK.shared().userManager.add(self)
     repo.addChatDelegate(delegate: self)
+    repo.addContactDelegate(delegate: self)
     repo.addSessionDelegate(delegate: self)
     repo.addSystemNotificationDelegate(delegate: self)
     repo.addChatExtendDelegate(delegate: self)
@@ -249,9 +254,10 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
               // 第一条消息默认显示时间
               if i == datas.count - 1 {
-                let model = MessageTipsModel(message: msg)
-                model.type = .time
-                model.text = String.stringFromDate(date: Date(timeIntervalSince1970: msg.timestamp))
+                let timeText = String.stringFromDate(date: Date(timeIntervalSince1970: msg.timestamp))
+                let model = MessageTipsModel(message: nil,
+                                             initType: .time,
+                                             initText: timeText)
                 weakSelf?.messages.insert(model, at: 0)
               }
             } else {
@@ -281,6 +287,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
               desc: "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
             )
           }
+          weakSelf?.refreshReceipts(messages: messageArray)
         }
       } else {
         completion(error, 0, weakSelf?.messages)
@@ -288,8 +295,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
   }
 
-  public func queryRoamMsgHasMoreTime_v2(_ completion: @escaping (Error?, NSInteger, NSInteger,
-                                                                  [MessageModel]?, Int) -> Void) {
+  public func queryRoamMsgHasMoreTime_v2(_ completion: @escaping (Error?, NSInteger, NSInteger, Int) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
     // 记录可信时间戳
@@ -299,7 +305,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
           ModuleName + " " + self.className,
           desc: "CALLBACK getMessageHistory " + (error?.localizedDescription ?? "no error")
         )
-        completion(error, count, 0, models, 0)
+        completion(error, count, 0, 0)
       }
 
     } else {
@@ -325,39 +331,32 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
           historyDatas.append(contentsOf: ms)
         }
         print("drop down remote refresh : ", historyDatas.count)
-        group.leave()
-      }
-
-      group.enter()
-      weakSelf?.getMessagesModelDynamically(.asc, message: weakSelf?.anchor) { error, value, models in
-        NELog.infoLog(
-          ModuleName + " " + self.className,
-          desc: "CALLBACK pullRemoteRefresh " + (error?.localizedDescription ?? "no error")
-        )
-        newEnd = value
-        if err != nil {
-          err = error
-        }
-        if let ms = models {
-          newDatas.append(contentsOf: ms)
-        }
-        print("pull remote refresh : ", newDatas.count)
-        group.leave()
-      }
-
-      group.notify(queue: DispatchQueue.main, execute: {
-        var finalDatas = [MessageModel]()
-        finalDatas.append(contentsOf: historyDatas)
         if let anchorMessage = weakSelf?.anchor {
           let model = self.modelFromMessage(message: anchorMessage)
           weakSelf?.filterRevokeMessage([model])
           if NotificationMessageUtils.isDiscussSeniorTeamUpdateCustomNoti(message: anchorMessage) == false {
-            weakSelf?.messages.insert(model, at: moreEnd)
-            finalDatas.append(model)
+            weakSelf?.messages.append(model)
           }
         }
-        finalDatas.append(contentsOf: newDatas)
-        completion(err, moreEnd, newEnd, finalDatas, historyDatas.count)
+        weakSelf?.getMessagesModelDynamically(.asc, message: weakSelf?.anchor) { error, value, models in
+          NELog.infoLog(
+            ModuleName + " " + self.className,
+            desc: "CALLBACK pullRemoteRefresh " + (error?.localizedDescription ?? "no error")
+          )
+          newEnd = value
+          if err != nil {
+            err = error
+          }
+          if let ms = models {
+            newDatas.append(contentsOf: ms)
+          }
+          print("pull remote refresh : ", newDatas.count)
+          group.leave()
+        }
+      }
+
+      group.notify(queue: DispatchQueue.main, execute: {
+        completion(err, moreEnd, newEnd, historyDatas.count)
       })
     }
   }
@@ -515,6 +514,15 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   // 下拉获取历史消息
   public func dropDownRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [MessageModel]?)
     -> Void) {
+    // 首次会话下拉，没有锚点消息，需要手动设置锚点消息
+    if oldMsg == nil {
+      for msg in messages {
+        if let mmsg = msg.message {
+          oldMsg = mmsg
+          break
+        }
+      }
+    }
     getMessagesModelDynamically(.desc, message: oldMsg, completion)
     NELog.infoLog(ModuleName + " " + className, desc: #function)
   }
@@ -522,10 +530,6 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   // 上拉获取最新消息
   public func pullRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [MessageModel]?)
     -> Void) {
-//      var message = messages.last?.message
-//      if message == nil, let tip = messages.last as? MessageTipsModel {
-//          message = tip.tipMessage
-//      }
     getMessagesModelDynamically(.asc, message: newMsg, completion)
     NELog.infoLog(ModuleName + " " + className, desc: #function)
   }
@@ -621,16 +625,37 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         receipts.append(receipt)
       }
     }
-    repo.markTeamMessageRead(param: receipts) { error, failedReceipts in
-      print("!! chatViewModel markReadInTeam error:\(error)")
-      completion(error)
+    let receiptsChunk = receipts.chunk(50)
+    for receipt in receiptsChunk {
+      repo.markTeamMessageRead(param: receipt) { error, failedReceipts in
+        print("!! chatViewModel markReadInTeam error:\(String(describing: error))")
+        completion(error)
+      }
     }
   }
 
-  public func deleteMessage(message: NIMMessage) {
+  public func deleteMessage(message: NIMMessage, _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messageId:" + message.messageId)
-    repo.deleteMessage(message: message)
-    deleteMessageUpdateUI(message)
+    if deletingMsgDic.contains(message.messageId) {
+      return
+    }
+    deletingMsgDic.insert(message.messageId)
+    if message.serverID.count <= 0 {
+      repo.deleteMessage(message: message)
+      deleteMessageUpdateUI(message)
+      deletingMsgDic.remove(message.messageId)
+      completion(nil)
+      return
+    }
+    weak var weakSelf = self
+    repo.deleteServerMessage(message: message, ext: nil) { error in
+      if error == nil {
+        weakSelf?.deleteMessageUpdateUI(message)
+      } else {
+        completion(error)
+      }
+      weakSelf?.deletingMsgDic.remove(message.messageId)
+    }
   }
 
   public func replyMessage(_ message: NIMMessage, _ target: NIMMessage,
@@ -698,25 +723,33 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
   }
 
-  // MARK: NIMUserManagerDelegate
+  // MARK: FriendProviderDelegate
 
-  public func onFriendChanged(_ user: NIMUser) {
+  public func onFriendChanged(user: User) {
     if let uid = user.userId {
-      newUserInfoDic[uid] = User(user: user)
+      newUserInfoDic[uid] = user
       delegate?.didRefreshTable()
     }
   }
+
+  public func onUserInfoChanged(user: User) {
+    if let uid = user.userId {
+      newUserInfoDic[uid] = user
+      delegate?.didRefreshTable()
+    }
+  }
+
+  public func onBlackListChanged() {}
 
   //    MARK: NIMChatManagerDelegate
 
   // 收到消息
   public func onRecvMessages(_ messages: [NIMMessage]) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messages.count: \(messages.count)")
-    print("\(#function) 1messages:\(messages.count)")
     var count = 0
     for msg in messages {
       if msg.session?.sessionId == session.sessionId {
-        if msg.serverID.count <= 0 {
+        if msg.serverID.count <= 0, msg.messageType != .custom {
           continue
         }
         if msg.isDeleted == true {
@@ -749,12 +782,10 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
          }*/
         count += 1
         // 自定义消息处理
-        if msg.messageType == .custom {
-        } else {
-          newMsg = msg
-          addTimeMessage(msg)
-          self.messages.append(modelFromMessage(message: msg))
-        }
+        newMsg = msg
+        addTimeMessage(msg)
+        let model = modelFromMessage(message: msg)
+        self.messages.append(model)
       }
     }
     if count > 0 { delegate?.onRecvMessages(messages) }
@@ -797,7 +828,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     delegate?.send(message, progress: progress)
   }
 
-  public func send(_ message: NIMMessage, didCompleteWithError error: Error?) {
+  open func send(_ message: NIMMessage, didCompleteWithError error: Error?) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messageId: " + message.messageId)
     print("\(#function) message deliveryState:\(message.deliveryState) error:\(error)")
     for (i, msg) in messages.enumerated() {
@@ -898,13 +929,14 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     guard let msg = notification.message else {
       return
     }
+
     revokeMessageUpdateUI(msg)
   }
 
   public func onRecvMessageReceipts(_ receipts: [NIMMessageReceipt]) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", receipts.count: \(receipts.count)")
     print(
-      "chatViewModel: receipts:\(receipts.count) messageId:\(receipts.first?.messageId) messageId:\(receipts.first?.timestamp)"
+      "chatViewModel:   :\(receipts.count) messageId:\(receipts.first?.messageId) messageId:\(receipts.first?.timestamp)"
     )
     delegate?.didReadedMessageIndexs()
   }
@@ -1055,9 +1087,10 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     let curTs = message.timestamp
     let dur = firstTs - curTs
     if (dur / 60) > 5 {
-      let model = MessageTipsModel(message: message)
-      model.type = .time
-      model.text = String.stringFromDate(date: Date(timeIntervalSince1970: firstTs))
+      let timeText = String.stringFromDate(date: Date(timeIntervalSince1970: firstTs))
+      let model = MessageTipsModel(message: nil,
+                                   initType: .time,
+                                   initText: timeText)
       messages.insert(model, at: 0)
       return true
     }
@@ -1067,9 +1100,10 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   private func timeModel(_ message: NIMMessage) -> MessageModel {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messageId: " + message.messageId)
     let curTs = message.timestamp
-    let model = MessageTipsModel(message: message)
-    model.type = .time
-    model.text = String.stringFromDate(date: Date(timeIntervalSince1970: curTs))
+    let timeText = String.stringFromDate(date: Date(timeIntervalSince1970: curTs))
+    let model = MessageTipsModel(message: nil,
+                                 initType: .time,
+                                 initText: timeText)
     return model
   }
 
@@ -1092,21 +1126,12 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
       model = MessageImageModel(message: message)
     case .audio:
       model = MessageAudioModel(message: message)
-//                    case .video:
-//                        <#code#>
-    case .notification:
+    case .notification, .tip:
       model = MessageTipsModel(message: message)
     case .file:
       model = MessageFileModel(message: message)
-    case .tip:
-      model = MessageTipsModel(message: message)
-//                    case .robot:
-//                        <#code#>
-//                    case .rtcCallRecord:
-//                        <#code#>
     case .custom:
       model = MessageCustomModel(message: message)
-
     case .location:
       model = MessageLocationModel(message: message)
     case .rtcCallRecord:
@@ -1147,6 +1172,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     } else {
       model.isPined = false
     }
+    delegate?.getMessageModel?(model: model)
     return model
   }
 
@@ -1256,7 +1282,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
           replyIndex.append(i)
         }
       } else {
-        if model.message?.serverID == message.serverID {
+        if model.message?.messageId == message.messageId {
           index = i
           hasFind = true
         }
@@ -1293,6 +1319,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     var index = -1
     var replyIndex = [Int]()
     var hasFind = false
+
     for (i, model) in messages.enumerated() {
       if hasFind {
         var replyId: String? = model.message?.repliedMessageId
@@ -1310,6 +1337,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
         }
       }
     }
+
     var indexs = [IndexPath]()
     if index >= 0 {
       messages[index].isRevoked = true
@@ -1380,16 +1408,12 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
   public func forwardUserMessage(_ message: NIMMessage, _ users: [NIMUser]) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messageId: " + message.messageId)
-    weak var weakSelf = self
     users.forEach { user in
       if let uid = user.userId {
         let session = NIMSession(uid, type: .P2P)
-        // weakSelf?.repo.makeForwardMessage(message, session)
-        if let forwardMessage = weakSelf?.repo.makeForwardMessage(message) {
+        if let forwardMessage = repo.makeForwardMessage(message) {
           clearForwardAtMark(forwardMessage)
-          weakSelf?.repo.sendMessage(message: forwardMessage, session: session) { error in
-            NELog.infoLog("chat view model ", desc: "forward message : \(error?.localizedDescription ?? "")")
-          }
+          repo.sendForwardMessage(forwardMessage, session)
         }
       }
     }
@@ -1399,12 +1423,9 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", messageId: " + message.messageId)
     if let tid = team.teamId {
       let session = NIMSession(tid, type: .team)
-      // repo.makeForwardMessage(message, session)
       if let forwardMessage = repo.makeForwardMessage(message) {
         clearForwardAtMark(forwardMessage)
-        repo.sendMessage(message: forwardMessage, session: session) { error in
-          NELog.infoLog("chat view model ", desc: "forward message : \(error?.localizedDescription ?? "")")
-        }
+        repo.sendForwardMessage(forwardMessage, session)
       }
     }
   }
@@ -1534,7 +1555,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
   }
 
-  public func refreshReceipts() {
+  public func refreshReceipts(messages: [NIMMessage]) {
     if session.sessionType != .team {
       return
     }
@@ -1543,14 +1564,14 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     }
     print("refresh team id : ", session.sessionId)
     var receiptsMessages = [NIMMessage]()
-    messages.forEach { model in
-      if let message = model.message, message.setting?.teamReceiptEnabled == true,
-         let unreadCount = message.teamReceiptInfo?.unreadCount, unreadCount > 0 {
-        print("unread count : ", unreadCount as Any)
+    messages.forEach { message in
+      if message.setting?.teamReceiptEnabled == true {
         receiptsMessages.append(message)
       }
     }
-    repo.refreshReceipts(receiptsMessages)
+    for receipt in receiptsMessages.chunk(50) {
+      repo.refreshReceipts(receipt)
+    }
   }
 
   @discardableResult
@@ -1570,27 +1591,34 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
 
 //    MARK: NIMConversationManagerDelegate
 
-//    remote
-//    public func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String : String]?) {
-//        if let message = messages.first {
-//            var index = -1
-//            for (i, model) in self.messages.enumerated() {
-//                if model.message?.serverID == message.serverID {
-//                    index = i
-//                    break
-//                }
-//            }
-//            if index > 0 {
-//                self.messages.remove(at: index)
-//            }
-//            self.delegate?.onDeleteMessage(message)
-//        }
-//        print("onRecvMessagesDeleted: \(messages.first) exts:\(exts)")
-//    }
-//
-//    public func onRecvMessageDeleted(_ message: NIMMessage, ext: String?) {
-//        print("onRecvMessagesDeleted: \(message) exts:\(ext)")
-//    }
+  // remote
+  public func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String: String]?) {
+    var messageIDs = Set<String>()
+    messages.forEach { message in
+      if message.session?.sessionId != session.sessionId {
+        return
+      }
+      if message.messageId.count <= 0 {
+        return
+      }
+      messageIDs.insert(message.messageId)
+    }
+    if messageIDs.count > 0 {
+      self.messages.removeAll { model in
+        if let messageId = model.message?.messageId, messageId.count > 0 {
+          if messageIDs.contains(messageId) {
+            return true
+          }
+        }
+        return false
+      }
+      if let lastModel = self.messages.last as? MessageTipsModel, lastModel.type == .time {
+        self.messages.removeLast()
+      }
+      delegate?.didRefreshTable()
+    }
+  }
+
   deinit {
     print("deinit")
   }

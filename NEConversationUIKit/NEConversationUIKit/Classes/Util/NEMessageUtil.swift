@@ -9,7 +9,7 @@ public class NEMessageUtil {
   /// last message
   /// - Parameter message: message
   /// - Returns: result
-  class func messageContent(message: NIMMessage) -> String {
+  public class func messageContent(message: NIMMessage) -> String {
     var text = ""
     switch message.messageType {
     case .text:

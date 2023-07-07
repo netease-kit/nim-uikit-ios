@@ -28,54 +28,66 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     super.viewDidLoad()
     setupSubviews()
     initialConfig()
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+      self?.textField.becomeFirstResponder()
+    }))
   }
 
   func setupSubviews() {
     view.addSubview(textfieldBgView)
-    if #available(iOS 11.0, *) {
+    textfieldBgView.addSubview(textField)
+
+    if NEStyleManager.instance.isNormalStyle() {
       NSLayoutConstraint.activate([
         textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
         textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-        textfieldBgView.topAnchor.constraint(
-          equalTo: view.safeAreaLayoutGuide.topAnchor,
-          constant: 12
-        ),
+        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
         textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
       ])
-    } else {
-      if #available(iOS 10.0, *) {
-        NSLayoutConstraint.activate([
-          textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
-          textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-          textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
-          textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
-        ])
-      } else {
-        NSLayoutConstraint.activate([
-          textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
-          textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-          textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
-          textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
-        ])
-      }
-    }
 
-    textfieldBgView.addSubview(textField)
+    } else {
+      NSLayoutConstraint.activate([
+        textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+        textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
+        textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
+      ])
+      textfieldBgView.layer.cornerRadius = 0
+    }
     NSLayoutConstraint.activate([
       textField.leftAnchor.constraint(equalTo: textfieldBgView.leftAnchor, constant: 16),
       textField.rightAnchor.constraint(equalTo: textfieldBgView.rightAnchor, constant: -12),
-      textField.topAnchor.constraint(equalTo: textfieldBgView.topAnchor, constant: 0),
-      textField.heightAnchor.constraint(equalToConstant: 44),
+      textField.centerYAnchor.constraint(equalTo: textfieldBgView.centerYAnchor),
     ])
   }
 
   func initialConfig() {
     addRightAction(NSLocalizedString("save", comment: ""), #selector(saveName), self)
-    view.backgroundColor = UIColor(hexString: "0xF1F1F6")
+
+    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
+    customNavigationView.setMoreButtonTitle(NSLocalizedString("save", comment: ""))
+    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
+
+    if NEStyleManager.instance.isNormalStyle() {
+      view.backgroundColor = .ne_backgroundColor
+      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+      customNavigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
+    } else {
+      view.backgroundColor = .funChatBackgroundColor
+      customNavigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
+      customNavigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 17)
+    }
   }
 
   @objc func saveName() {
     weak var weakSelf = self
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      weakSelf?.showToast(commonLocalizable("network_error"))
+      return
+    }
+
     if let block = callBack {
       block(textField.text ?? "")
 //      weakSelf?.navigationController?.popViewController(animated: true)
@@ -86,10 +98,11 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     switch editType {
     case .nickName:
       title = NSLocalizedString("nickname", comment: "")
-      limitNumberCount = 30
+      limitNumberCount = 15
     case .cellphone:
       title = NSLocalizedString("phone", comment: "")
       limitNumberCount = 11
+      textField.keyboardType = .numberPad
     case .email:
       title = NSLocalizedString("email", comment: "")
       limitNumberCount = 30
@@ -108,7 +121,6 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     text.font = UIFont.systemFont(ofSize: 14)
     text.delegate = self
     text.clearButtonMode = .always
-    text.becomeFirstResponder()
     text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
     return text
   }()

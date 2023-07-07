@@ -7,7 +7,7 @@ import UIKit
 
 public typealias ValueChangeBlock = (_ title: String?, _ value: Bool) -> Void
 @objcMembers
-public class TextWithSwitchCell: ContactBaseTextCell {
+open class TextWithSwitchCell: ContactBaseTextCell {
   public var block: ValueChangeBlock?
   public var switchButton = UISwitch()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -25,7 +25,7 @@ public class TextWithSwitchCell: ContactBaseTextCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

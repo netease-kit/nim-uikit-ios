@@ -28,6 +28,6 @@ class MessageFileModel: MessageContentModel {
       fileLength = fileObject.fileLength
     }
     contentSize = chat_file_size
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }

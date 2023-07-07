@@ -5,6 +5,7 @@
 
 import UIKit
 
+@objc
 public protocol ChatRecordViewDelegate: NSObjectProtocol {
   func startRecord()
   func moveOutView()

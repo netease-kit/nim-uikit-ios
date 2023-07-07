@@ -11,14 +11,19 @@ import NECoreIMKit
 
 @objcMembers
 public class MessageContentModel: NSObject, MessageModel {
+  public var offset: CGFloat = 0
+  public func cellHeight() -> CGFloat {
+    CGFloat(height) + offset
+  }
+
   public var isReplay: Bool = false
 
   public var pinAccount: String?
   public var pinShowName: String?
   public var type: MessageType = .custom
   public var message: NIMMessage?
-  public var contentSize: CGSize
-  public var height: Float
+  public var contentSize = CGSize(width: 32.0, height: chat_min_h)
+  public var height: Float = 48
   public var shortName: String? // 昵称 > uid
   public var fullName: String? // 备注 >（群昵称）> 昵称 > uid
   public var avatar: String?
@@ -30,29 +35,9 @@ public class MessageContentModel: NSObject, MessageModel {
   public var replyedModel: MessageModel? {
     didSet {
       if let reply = replyedModel as? MessageContentModel, reply.isReplay == true {
+        type = .reply
         replyText = ReplyMessageUtil.textForReplyModel(model: reply)
-        if let t = replyText {
-          let size = String.getTextRectSize(
-            t,
-            font: UIFont.systemFont(ofSize: 12.0),
-            size: CGSize(
-              width: qChat_content_maxW,
-              height: CGFloat.greatestFiniteMagnitude
-            )
-          )
-          var width = size.width
-          if replyedModel?.type == .location {
-            let locationMinWidth: CGFloat = 76
-            if width < locationMinWidth {
-              width = locationMinWidth
-            }
-          }
-          contentSize = CGSize(
-            width: max(contentSize.width, width),
-            height: contentSize.height + chat_reply_height
-          )
-          height = Float(contentSize.height + qChat_margin) + fullNameHeight
-        }
+        // height 计算移至 getMessageModel(model:)
       }
     }
   }
@@ -70,15 +55,15 @@ public class MessageContentModel: NSObject, MessageModel {
         }
         // 只有文本消息，才计算可编辑按钮的宽度
         if let isSend = message?.isOutgoingMsg, isSend, message?.messageType == .text, timeOut == false {
-          contentSize = CGSize(width: 218, height: qChat_min_h)
+          contentSize = CGSize(width: 218, height: chat_min_h)
         } else {
-          contentSize = CGSize(width: 130, height: qChat_min_h)
+          contentSize = CGSize(width: 130, height: chat_min_h)
         }
-        height = Float(contentSize.height + qChat_margin) + fullNameHeight
+        height = Float(contentSize.height + chat_content_margin) + fullNameHeight
       } else {
         type = .custom
-        contentSize = CGSize(width: 32.0, height: qChat_min_h)
-        height = Float(qChat_min_h + qChat_margin) + fullNameHeight
+        contentSize = CGSize(width: 32.0, height: chat_min_h)
+        height = Float(chat_min_h + chat_content_margin) + fullNameHeight
       }
     }
   }
@@ -86,21 +71,19 @@ public class MessageContentModel: NSObject, MessageModel {
   public var isPined: Bool = false {
     didSet {
       if isPined {
-        height = Float(contentSize.height + qChat_margin + chat_pin_height) + fullNameHeight
+        height = Float(contentSize.height + chat_content_margin) + fullNameHeight + Float(chat_pin_height)
       } else {
-        height = Float(contentSize.height + qChat_margin) + fullNameHeight
+        height = Float(contentSize.height + chat_content_margin) + fullNameHeight
       }
     }
   }
 
   public required init(message: NIMMessage?) {
     self.message = message
-    contentSize = CGSize(width: 32.0, height: qChat_min_h)
     if message?.session?.sessionType == .team,
-       !IMKitEngine.instance.isMySelf(message?.from) {
+       !IMKitClient.instance.isMySelf(message?.from) {
       fullNameHeight = 20
     }
     print("self.fullNameHeight\(fullNameHeight)")
-    height = Float(qChat_min_h + qChat_margin) + fullNameHeight
   }
 }

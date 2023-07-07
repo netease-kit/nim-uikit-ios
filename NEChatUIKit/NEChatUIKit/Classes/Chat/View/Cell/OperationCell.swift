@@ -10,7 +10,7 @@ import UIKit
 // }
 
 @objcMembers
-public class OperationCell: UICollectionViewCell {
+open class OperationCell: UICollectionViewCell {
   public var imageView = UIImageView()
   public var label = UILabel()
 //    public weak var delegate: OperationCellDelegate?
@@ -21,7 +21,7 @@ public class OperationCell: UICollectionViewCell {
     }
   }
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(imageView)
@@ -48,7 +48,7 @@ public class OperationCell: UICollectionViewCell {
 //        self.contentView.addGestureRecognizer(tap)
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

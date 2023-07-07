@@ -9,6 +9,8 @@ import UIKit
 public class NEKitChatConfig: NSObject {
   public static let shared = NEKitChatConfig()
 
+  public var maxReadingNum = 200 // 群未读显示限制数，默认超过200人不显示已读未读进度
+
   // chat UI配置相关
   public var ui = ChatUIConfig()
 

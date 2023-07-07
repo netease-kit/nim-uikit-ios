@@ -24,7 +24,7 @@ public class OperationItem: NSObject {
   public var imageName: String = ""
   public var type: OperationType?
 
-  static func copyItem() -> OperationItem {
+  public static func copyItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_copy")
     item.imageName = "op_copy"
@@ -32,7 +32,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-  static func replayItem() -> OperationItem {
+  public static func replayItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_replay")
     item.imageName = "op_replay"
@@ -40,7 +40,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-  static func forwardItem() -> OperationItem {
+  public static func forwardItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_forward")
     item.imageName = "op_forward"
@@ -48,7 +48,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-  static func pinItem() -> OperationItem {
+  public static func pinItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_pin")
     item.imageName = "op_pin"
@@ -56,7 +56,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-  static func removePinItem() -> OperationItem {
+  public static func removePinItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_cancel_pin")
     item.imageName = "op_pin"
@@ -64,7 +64,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-//  static func selectItem() -> OperationItem {
+//  static public func selectItem() -> OperationItem {
 //    OperationItem(
 //      text: chatLocalizable("operation_select"),
 //      imageName: "op_select",
@@ -72,7 +72,7 @@ public class OperationItem: NSObject {
 //    )
 //  }
 
-//  static func collectionItem() -> OperationItem {
+//  static public func collectionItem() -> OperationItem {
 //    OperationItem(
 //      text: chatLocalizable("operation_collection"),
 //      imageName: "op_collection",
@@ -80,7 +80,7 @@ public class OperationItem: NSObject {
 //    )
 //  }
 
-  static func deleteItem() -> OperationItem {
+  public static func deleteItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_delete")
     item.imageName = "op_delete"
@@ -88,7 +88,7 @@ public class OperationItem: NSObject {
     return item
   }
 
-  static func recallItem() -> OperationItem {
+  public static func recallItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_recall")
     item.imageName = "op_recall"

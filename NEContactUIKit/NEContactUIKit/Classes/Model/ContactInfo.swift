@@ -8,7 +8,8 @@ import NECoreIMKit
 import UIKit
 import NECoreKit
 
-public class ContactInfo {
+@objcMembers
+open class ContactInfo: NSObject {
   func getRowHeight() -> CGFloat? {
     nil
   }

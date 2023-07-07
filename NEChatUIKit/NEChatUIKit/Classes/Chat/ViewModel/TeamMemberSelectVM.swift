@@ -6,6 +6,7 @@ import Foundation
 import NIMSDK
 import NEChatKit
 import NECoreIMKit
+
 @objcMembers
 public class TeamMemberSelectVM: NSObject {
   public var chatRepo: ChatRepo = .init()

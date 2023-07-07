@@ -14,7 +14,7 @@ class MessageAudioModel: MessageContentModel {
     super.init(message: message)
     type = .audio
     var audioW = 96.0
-    let audioTotalWidth = 265.0
+    let audioTotalWidth = kScreenWidth <= 325 ? 230 : 265.0
     // contentSize
     if let obj = message?.messageObject as? NIMAudioObject {
       duration = obj.duration / 1000
@@ -22,7 +22,7 @@ class MessageAudioModel: MessageContentModel {
         audioW = min(Double(duration) * 8 + audioW, audioTotalWidth)
       }
     }
-    contentSize = CGSize(width: audioW, height: qChat_min_h)
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    contentSize = CGSize(width: audioW, height: chat_min_h)
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }

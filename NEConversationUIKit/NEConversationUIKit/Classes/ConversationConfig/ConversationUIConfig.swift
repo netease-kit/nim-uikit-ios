@@ -18,7 +18,7 @@ public class ConversationUIConfig: NSObject {
   public var avatarCornerRadius = 4.0
 
   /// 头像类型
-  public var avatarType: NEConversationAvatarType = .cycle
+  public var avatarType: NEConversationAvatarType?
 
   /// 是否隐藏导航栏
   public var hiddenNav = false
@@ -30,7 +30,7 @@ public class ConversationUIConfig: NSObject {
   public var hiddenRightBtns = false
 
   // 主标题字体大小
-  public var titleFont = UIFont.systemFont(ofSize: 16)
+  public var titleFont: UIFont?
 
   // 副标题字体大小
   public var subTitleFont = UIFont.systemFont(ofSize: 13)
@@ -57,5 +57,5 @@ public class ConversationUIConfig: NSObject {
   /// 会话列表 cell 左划删除按钮文案内容
   public var deleteBottonTitle = localizable("delete")
   /// 会话列表 cell 左划删除按钮文案颜色
-  public var deleteBottonColor = NEConstant.hexRGB(0xA8ABB6)
+  public var deleteBottonColor: UIColor?
 }

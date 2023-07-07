@@ -56,7 +56,7 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
   lazy var tableView: UITableView = {
     let table = UITableView()
     table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    table.backgroundColor = .ne_lightBackgroundColor
     table.dataSource = self
     table.delegate = self
     table.separatorColor = .clear
@@ -117,7 +117,7 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let header = UIView()
-    header.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    header.backgroundColor = .ne_lightBackgroundColor
     return header
   }
 }

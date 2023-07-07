@@ -13,9 +13,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   UINavigationControllerDelegate, PersonInfoViewModelDelegate, UITableViewDelegate,
   UITableViewDataSource {
   public var cellClassDic = [
-    SettingCellType.SettingSubtitleCell.rawValue: TeamSettingSubtitleCell.self,
-    SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self,
-    SettingCellType.SettingSubtitleCustomCell.rawValue: TeamSettingRightCustomCell.self,
+    SettingCellType.SettingSubtitleCell.rawValue: CustomTeamSettingSubtitleCell.self,
+    SettingCellType.SettingHeaderCell.rawValue: CustomTeamSettingHeaderCell.self,
+    SettingCellType.SettingSubtitleCustomCell.rawValue: CustomTeamSettingRightCustomCell.self,
   ]
   private var viewModel = PersonInfoViewModel()
   private var className = "PersonInfoViewController"
@@ -27,28 +27,34 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     initialConfig()
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.setNavigationBarHidden(false, animated: false)
-  }
-
   func initialConfig() {
     title = NSLocalizedString("person_info", comment: "")
-    view.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    customNavigationView.navTitle.text = title
+
+    if NEStyleManager.instance.isNormalStyle() {
+      view.backgroundColor = .ne_backgroundColor
+      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+    } else {
+      view.backgroundColor = .funChatBackgroundColor
+    }
     viewModel.delegate = self
     NIMSDK.shared().userManager.add(self)
   }
 
   func setupSubviews() {
     view.addSubview(tableView)
+    if NEStyleManager.instance.isNormalStyle() {
+      topConstant += 12
+    }
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      tableView.topAnchor.constraint(equalTo: view.topAnchor),
+      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: BaseTeamSettingCell.Type) in
+    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -76,8 +82,21 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     alert.addAction(first)
     alert.addAction(second)
     alert.addAction(cancel)
-
+    fixAlertOnIpad(alert)
     present(alert, animated: true, completion: nil)
+  }
+
+  func showCustomAlert(firstContent: String, secondContent: String,
+                       selectValue: @escaping ((_ value: NSInteger) -> Void)) {
+    let first = NECustomAlertAction(title: firstContent) {
+      selectValue(0)
+    }
+
+    let second = NECustomAlertAction(title: secondContent) {
+      selectValue(1)
+    }
+
+    showCustomActionSheet([first, second])
   }
 
   func showDatePicker() {
@@ -88,7 +107,11 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
       if let t = time {
         weakSelf?.viewModel.updateBirthday(birthDay: t) { error in
           if error != nil {
-            weakSelf?.showToast(NSLocalizedString("setting_birthday_failure", comment: ""))
+            if error?.code == 408 {
+              weakSelf?.showToast(commonLocalizable("network_error"))
+            } else {
+              weakSelf?.showToast(NSLocalizedString("setting_birthday_failure", comment: ""))
+            }
           }
         }
       }
@@ -96,7 +119,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     NSLayoutConstraint.activate([
       pickerView.leftAnchor.constraint(equalTo: view.leftAnchor),
       pickerView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      pickerView.heightAnchor.constraint(equalToConstant: 229),
+      pickerView.topAnchor.constraint(equalTo: view.topAnchor),
       pickerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
   }
@@ -104,12 +127,11 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   lazy var tableView: UITableView = {
     let table = UITableView()
     table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    table.backgroundColor = .clear
     table.dataSource = self
     table.delegate = self
     table.separatorColor = .clear
     table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
     if #available(iOS 15.0, *) {
       table.sectionHeaderTopPadding = 0.0
     }
@@ -118,7 +140,6 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
 
   private lazy var pickerView: BirthdayDatePickerView = {
     let picker = BirthdayDatePickerView()
-    picker.backgroundColor = .white
     picker.translatesAutoresizingMaskIntoConstraints = false
     return picker
   }()
@@ -130,7 +151,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   // MARK: NIMUserManagerDelegate
 
   func onUserInfoChanged(_ user: NIMUser) {
-    if user.userId == IMKitEngine.instance.imAccid {
+    if user.userId == IMKitClient.instance.imAccid {
       viewModel.getData()
       tableView.reloadData()
     }
@@ -147,11 +168,16 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   }
 
   public func uploadHeadImage(image: UIImage) {
-    view.makeToastActivity(.center)
     weak var weakSelf = self
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      weakSelf?.showToast(commonLocalizable("network_error"))
+      return
+    }
+
+    view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
       let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitEngine.instance.imAccid)
+        .appending(IMKitClient.instance.imAccid)
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         NIMSDK.shared().resourceManager
@@ -179,7 +205,11 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   // MARK: PersonInfoViewModelDelegate
 
   func didClickHeadImage() {
-    showBottomAlert(self)
+    if NEStyleManager.instance.isNormalStyle() {
+      showBottomAlert(self)
+    } else {
+      showCustomBottomAlert(self)
+    }
   }
 
   func didClickNickName(name: String) {
@@ -202,20 +232,36 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   func didClickGender() {
     var sex = NIMUserGender.unknown
     weak var weakSelf = self
-    showAlert(
-      firstContent: NSLocalizedString("male", comment: ""),
-      secondContent: NSLocalizedString("female", comment: "")
-    ) { value in
+    let block: ((_ value: NSInteger) -> Void) = {
+      value in
       sex = value == 0 ? .male : .female
       weakSelf?.viewModel.updateSex(sex: sex) { error in
         if error != nil {
-          weakSelf?.showToast(NSLocalizedString("change_gender_failure", comment: ""))
+          if error?.code == 408 {
+            weakSelf?.showToast(commonLocalizable("network_error"))
+          } else {
+            weakSelf?.showToast(NSLocalizedString("change_gender_failure", comment: ""))
+          }
         }
       }
     }
+    if NEStyleManager.instance.isNormalStyle() {
+      showAlert(firstContent: NSLocalizedString("male", comment: ""),
+                secondContent: NSLocalizedString("female", comment: ""),
+                selectValue: block)
+    } else {
+      showCustomAlert(firstContent: NSLocalizedString("male", comment: ""),
+                      secondContent: NSLocalizedString("female", comment: ""),
+                      selectValue: block)
+    }
   }
 
-  func didClickBirthday() {
+  func didClickBirthday(birth: String) {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    if let selectDate = formatter.date(from: birth) {
+      pickerView.picker.setDate(selectDate, animated: true)
+    }
     showDatePicker()
   }
 
@@ -294,7 +340,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
-    ) as? BaseTeamSettingCell {
+    ) as? NEBaseTeamSettingCell {
       cell.configure(model)
       return cell
     }
@@ -314,6 +360,9 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   }
 
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    if section == 0 {
+      return 0
+    }
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
       if model.cellModels.count > 0 {
@@ -325,7 +374,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let header = UIView()
-    header.backgroundColor = UIColor(hexString: "0xF1F1F6")
+    header.backgroundColor = .ne_lightBackgroundColor
     return header
   }
 }

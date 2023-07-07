@@ -8,6 +8,7 @@ import NETeamUIKit
 
 public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
+  func didStyleClick()
   func didClickCleanCache()
 }
 
@@ -24,14 +25,27 @@ public class MineSettingViewModel: NSObject {
   private func getFirstSection() -> SettingSectionModel {
     let model = SettingSectionModel()
     weak var weakSelf = self
+
+    // 消息提醒
     let remind = SettingCellModel()
     remind.cellName = NSLocalizedString("message_remind", comment: "")
     remind.type = SettingCellType.SettingArrowCell.rawValue
-//        remind.cornerType = .topLeft.union(.topRight)
-    remind.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
+    remind.cornerType = .topLeft.union(.topRight)
+//    remind.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     remind.cellClick = {
       weakSelf?.delegate?.didMessageRemindClick()
     }
+    model.cellModels.append(remind)
+
+    // 外观
+    let style = SettingCellModel()
+    style.cellName = NSLocalizedString("style_selection", comment: "")
+    style.type = SettingCellType.SettingArrowCell.rawValue
+    style.cornerType = .bottomLeft.union(.bottomRight)
+    style.cellClick = {
+      weakSelf?.delegate?.didStyleClick()
+    }
+    model.cellModels.append(style)
 
 //        let cleanCache = SettingCellModel()
 //        cleanCache.cellName = "清理缓存"
@@ -40,9 +54,7 @@ public class MineSettingViewModel: NSObject {
 //        cleanCache.cellClick = {
 //            weakSelf?.delegate?.didClickCleanCache()
 //        }
-//        model.cellModels.append(contentsOf: [remind, cleanCache])
-
-    model.cellModels.append(contentsOf: [remind])
+//        model.cellModels.append(cleanCache)
 
     return model
   }

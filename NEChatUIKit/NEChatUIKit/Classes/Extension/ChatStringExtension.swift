@@ -5,6 +5,13 @@
 
 import Foundation
 
+// 缓存的用于计算高度的Label
+var tempLabelForCalc: UILabel = {
+  let label = UILabel()
+  label.numberOfLines = 0
+  return label
+}()
+
 extension String {
   // 计算文字size
   static func getTextRectSize(_ text: String, font: UIFont, size: CGSize) -> CGSize {
@@ -12,7 +19,7 @@ extension String {
     let option = NSStringDrawingOptions.usesLineFragmentOrigin
     let rect: CGRect = text.boundingRect(with: size, options: option,
                                          attributes: attributes, context: nil)
-    return rect.size
+    return CGSize(width: ceil(rect.width), height: ceil(rect.height))
   }
 
   /// 计算 string 的行数，使用 font 的 lineHeight
@@ -43,10 +50,53 @@ extension String {
     return fmt.string(from: date)
   }
 
+  static func date24To12(_ string: String?) -> String {
+    guard let str = string else {
+      return ""
+    }
+    let fmt = DateFormatter()
+    fmt.dateFormat = "HH:mm"
+    if let date = fmt.date(from: str) {
+      fmt.dateFormat = "a hh:mm"
+      return fmt.string(from: date)
+    }
+    fmt.dateFormat = chatLocalizable("mdhm")
+    if let date = fmt.date(from: str) {
+      fmt.dateFormat = "MM月dd日 a hh:mm"
+      return fmt.string(from: date)
+    }
+    fmt.dateFormat = chatLocalizable("ymdhm")
+    if let date = fmt.date(from: str) {
+      fmt.dateFormat = "yyyy年MM月dd日 a hh:mm"
+      return fmt.string(from: date)
+    }
+    return ""
+  }
+
   static func firstDayInYear() -> Date? {
     let format = DateFormatter()
     format.dateFormat = "yyyy-MM-dd"
     let year = Calendar.current.component(.year, from: Date())
     return format.date(from: "\(year)-01-01")
+  }
+}
+
+extension String {
+  // 利用 sizeThatFits 计算 UIlabel 纯文本大小
+  func finalSize(_ font: UIFont, _ size: CGSize, _ lines: Int = 0) -> CGSize {
+    tempLabelForCalc.numberOfLines = lines
+    tempLabelForCalc.font = font
+    tempLabelForCalc.text = self
+    return tempLabelForCalc.sizeThatFits(size)
+  }
+}
+
+extension NSAttributedString {
+  // 利用 sizeThatFits 计算 UIlabel 富文本大小
+  func finalSize(_ font: UIFont, _ size: CGSize, _ lines: Int = 0) -> CGSize {
+    tempLabelForCalc.numberOfLines = lines
+    tempLabelForCalc.font = font
+    tempLabelForCalc.attributedText = self
+    return tempLabelForCalc.sizeThatFits(size)
   }
 }

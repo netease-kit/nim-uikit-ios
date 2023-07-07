@@ -7,17 +7,17 @@ import Foundation
 @_exported import NECoreKit
 @_exported import NECommonUIKit
 @_exported import NECommonKit
-@_exported import NETeamKit
+@_exported import NEChatKit
 @_exported import NECoreIMKit
-let coreLoader = CoreLoader<TeamSettingViewController>()
+let coreLoader = CoreLoader<NEBaseTeamSettingViewController>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }
 
 public let ModuleName = "NETeamUIKit"
 
-// 创建群/邀请入群 人数限制
-public var peopleNumberLimit: UInt = 200
+// 邀请入群 选择人数限制
+public var inviteNumberLimit: Int = 200
 
 enum NotificationName {
   static let leaveTeamBySelf = Notification.Name(rawValue: "team.leaveTeamBySelf")

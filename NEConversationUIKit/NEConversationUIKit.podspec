@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEConversationUIKit'
-  s.version          = '9.5.0'
+  s.version          = '9.6.0'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -27,7 +27,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'ssh://git@g.hz.netease.com:22222/yunxin-app/xkit-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '10.0'
   s.swift_version = '5.0'
 
   s.source_files = 'NEConversationUIKit/Classes/**/*'
@@ -39,7 +39,5 @@ TODO: Add long description of the pod here.
     }
   
   s.dependency 'NECommonUIKit'
-  s.dependency 'NEConversationKit'
-  s.dependency 'YXAlog'
-  s.dependency 'NIMSDK_LITE'
+  s.dependency 'NEChatKit'
 end

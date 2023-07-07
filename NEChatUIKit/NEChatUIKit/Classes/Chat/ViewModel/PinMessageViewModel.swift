@@ -12,19 +12,31 @@ public protocol PinMessageViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatManagerDelegate {
+public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatManagerDelegate, NIMConversationManagerDelegate {
   public let chatRepo = ChatRepo()
   public var items = [PinMessageModel]()
   public var delegate: PinMessageViewModelDelegate?
+  public var session: NIMSession?
 
   override public init() {
     super.init()
     chatRepo.addChatDelegate(delegate: self)
     chatRepo.addChatExtendDelegate(delegate: self)
+    NIMSDK.shared().conversationManager.add(self)
+  }
+
+  public func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String: String]?) {
+    for message in messages {
+      if message.session?.sessionId == session?.sessionId {
+        delegate?.didNeedRefreshUI()
+        break
+      }
+    }
   }
 
   public func getPinitems(session: NIMSession, _ completion: @escaping (Error?) -> Void) {
     weak var weakSelf = self
+    self.session = session
     chatRepo.fetchPinMessage(session.sessionId, session.sessionType) { error, pinItems in
       if let pins = pinItems {
         if error == nil {
@@ -92,14 +104,12 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
 
   public func forwardUserMessage(_ message: NIMMessage, _ users: [NIMUser]) {
     NELog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + message.messageId)
-    weak var weakSelf = self
     users.forEach { user in
       if let uid = user.userId {
         let session = NIMSession(uid, type: .P2P)
-        if let forwardMessage = weakSelf?.chatRepo.makeForwardMessage(message) {
-          weakSelf?.clearForwardAtMark(forwardMessage)
-          weakSelf?.chatRepo.sendMessage(message: forwardMessage, session: session) { error in
-          }
+        if let forwardMessage = chatRepo.makeForwardMessage(message) {
+          clearForwardAtMark(forwardMessage)
+          chatRepo.sendForwardMessage(forwardMessage, session)
         }
       }
     }
@@ -111,9 +121,7 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
       let session = NIMSession(tid, type: .team)
       if let forwardMessage = chatRepo.makeForwardMessage(message) {
         clearForwardAtMark(forwardMessage)
-        chatRepo.sendMessage(message: forwardMessage, session: session) { error in
-          NELog.infoLog("chat view model ", desc: "forward message : \(error?.localizedDescription ?? "")")
-        }
+        chatRepo.sendForwardMessage(forwardMessage, session)
       }
     }
   }

@@ -72,7 +72,8 @@ public class MessageRemindViewModel: NSObject {
     let messageDetailItem = SettingCellModel()
     messageDetailItem.cellName = NSLocalizedString("display_message_detail", comment: "")
     messageDetailItem.type = SettingCellType.SettingSwitchCell.rawValue
-    messageDetailItem.cornerType = .bottomLeft.union(.bottomRight)
+//    messageDetailItem.cornerType = .bottomLeft.union(.bottomRight)
+    messageDetailItem.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     messageDetailItem.switchOpen = repo.getPushShowDetail()
     messageDetailItem.swichChange = { isOpen in
       weakSelf?.repo.setPushShowDetail(isOpen)

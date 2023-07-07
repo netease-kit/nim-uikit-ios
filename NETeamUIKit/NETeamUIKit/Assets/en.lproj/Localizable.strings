@@ -37,6 +37,7 @@
 "group_info"="Group Info";
 "discuss_introduce"="Temp Group Introduce";
 "search_friend"="Search Contact";
+"no_result"="No Result";
 "discuss_name"="Temp Group Name";
 "dissolute_team_chat"="Wether to disband Group";
 "quit_team_chat"="Wether to leave Group";

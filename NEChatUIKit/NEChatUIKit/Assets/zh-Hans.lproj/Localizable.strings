@@ -5,7 +5,6 @@
 
 //MAKR：common
 "ok"="确认";
-"send_to"="发送给 ";
 
 //MAKR：message
 "send_picture"="发来了一张图片";
@@ -21,7 +20,7 @@
 "take_photo"="拍照";
 "select_from_album"="从相册选择";
 "select_from_icloud"="从iCloud选择";
-"editing"="正在输入中...";
+"editing"="对方正在输入中...";
 "downloading"="正在下载中...";
 "read"="已读(0）";
 "unread"="未读(0）";
@@ -33,7 +32,7 @@
 "humans"="人";
 "enter"="加入";
 "unknown_system_message"="未知消息类型";
-"You"="你 ";
+"You"="你";
 "discussion_group"="群";
 "group"="群";
 "group_chat"="群聊";
@@ -74,6 +73,7 @@
 "team_all_no_mute"="群禁言已关闭";
 "pin_text_P2P"="标记了这条信息";
 "pin_text_team"="标记了这条信息";
+"chat_setting"="聊天设置";
 "session_set_top"="聊天置顶";
 "message_remind"="开启消息提醒";
 "open_soon"="暂未开放";
@@ -88,6 +88,7 @@
 "operation_collection"="收藏";
 "operation_delete"="删除";
 "operation_recall"="撤回";
+"withdrew_message" = "撤回了一条消息";
 "message_has_be_withdrawn" = "此消息已撤回";
 "message_reedit" = "重新编辑";
 "message_revoke_confim" = "确认要撤回该消息吗？";
@@ -99,13 +100,13 @@
 "collection_success"="已收藏";
 "no_permession"="暂无权限";
 "msg_reply"="回复";
-"msg_image"="图片";
+"msg_image"="图片消息";
 "msg_audio"="语音消息";
-"msg_video"="视频";
-"msg_file"="文件";
+"msg_video"="视频消息";
+"msg_file"="文件消息";
 "msg_location"="地理位置";
-"msg_custom"="自定义";
-"msg_unknown"="未知消息类型";
+"msg_custom"="自定义消息";
+"msg_unknown"="未知消息体";
 "message_read"="消息阅读状态";
 "message_all_unread"="全部成员未读";
 "user_select"="选择提醒";
@@ -123,6 +124,7 @@
 "ymdhm"="yyyy年MM月dd日 HH:mm";
 
 "chat_takePicture"="拍摄";
+"chat_photo"="相册";
 "chat_rtc"="音视频通话";
 "chat_location"="位置";
 "chat_file"="文件";
@@ -134,9 +136,9 @@
 "search_result_empty"="未找到你要搜的地址";
 "no_map_plugin"="未集成地图模块";
 "location_not_auth"="地理位置未授权，请去设置中开启";
-"fileSize_over_limit"="当前文件大小超出发送限制，请重新选择";
+"fileSize_over_limit"="当前文件大小超出XXXM发送限制，请重新选择";
 
-"message_recalled"="消息已撤回";
+"message_recalled"="此消息已撤回";
 
 "video_call"="视频通话";
 "audio_call"="音频通话";
@@ -144,10 +146,13 @@
 "call_complete"="通话时长";
 "call_canceled"="已取消";
 "call_rejected"="已拒绝";
-"call_timeout"="超时未接听";
+"call_timeout"="未接听";
 "call_busy"="忙线未接听";
+"remote_no_anwser"="对方未接听";
 
 "editable_time_expired"="已超过可编辑时间";
+"ravokable_time_expired"="已超过时间无法撤回";
+"ravoked_failed"="撤回失败";
 "message_not_found"="该消息已撤回或删除";
 
 "unkonw_pin_message"="暂不支持消息类型";
@@ -160,3 +165,18 @@
 "failed_operation"="操作失败";
 "team_not_exist"="群组不存在";
 "unpin_failed"="取消标记失败";
+
+"fun_hold_to_talk"="按住 说话";
+
+"release_to_send"="松开 发送";
+"release_to_cancel"="松开 取消";
+
+"stop_record"="%d″ 后将停止录音";
+
+
+// MARK: Fun UI
+"fun_chat_input_placeholder"="请输入您想说的...";
+
+"no_location"="请选择你要发送的位置信息";
+
+"delete_failed"="删除失败";

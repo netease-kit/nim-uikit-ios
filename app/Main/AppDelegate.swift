@@ -22,10 +22,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     private var tabbarCtrl = UITabBarController()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         window?.backgroundColor = .white
         setupInit()
         NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshUIStyle), name: Notification.Name(CHANGE_UI), object: nil)
         registerAPNS()
         return true
     }
@@ -38,27 +38,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
-
-        NEKeyboardManager.shared.enable = true
-        NEKeyboardManager.shared.shouldResignOnTouchOutside = true
         
-        // 登录IM之前先初始化 @ 消息监听mananger
-        let _ = NEAtMessageManager.instance
+        let account = "<#account#>"
+        let token = "<#token#>"
         
         weak var weakSelf = self
-        IMKitClient.instance.loginIM("<#accid#>", "<#token#>") { error in
+        IMKitClient.instance.loginIM(account, token) { error in
             if let err = error {
-                print("NEKitCore login error : ", err)
+                print("login error in app : ", err.localizedDescription)
             }else {
+                let _ = NEAtMessageManager.instance
                 ChatRouter.setupInit()
                 weakSelf?.initializePage()
             }
         }
+        
     }
     
     @objc func refreshRoot(){
         print("refresh root")
-        
+        //loginWithUI()
+    }
+    
+    @objc func refreshUIStyle(){
+        initializePage()
     }
     
     func registerAPNS(){
@@ -100,34 +103,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
 //    regist router
     func loadService() {
-        //TODO: service
+        
         ContactRouter.register()
         ChatRouter.register()
         TeamRouter.register()
         ConversationRouter.register()
+        if NEStyleManager.instance.isNormalStyle() == false {
+            ContactRouter.registerFun()
+            ChatRouter.registerFun()
+            TeamRouter.registerFun()
+            ConversationRouter.registerFun()
+        }
+        
+        // 自定义示例
+        customVerification()
         
         //地图map初始化
         NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
         
         /* 聊天面板外部扩展示例
+         // 新增未知类型
         let item = NEMoreItemModel()
         item.customDelegate = self
         item.action = #selector(testLog)
         item.customImage = UIImage(named: "chatSelect")
         NEChatUIKitClient.instance.moreAction.append(item)
+         
+         // 覆盖已有类型
+         let item = NEMoreItemModel()
+         item.customImage = UIImage(named: "chatSelect")
+         item.type = .rtc
+         item.title = "测试"
+         NEChatUIKitClient.instance.moreAction.append(item)
+         
+         // 移除已有类型
+         // 遍历 NEChatUIKitClient.instance.moreAction， 根据type 移除已有类型
          */
         
         //呼叫组件初始化
         let option = NERtcCallOptions()
         option.apnsCerName = AppKey.pushCerName
         option.isDisableLog = true
+        option.supportAutoJoinWhenCalled = false
         let uiConfig = NERtcCallUIConfig()
         uiConfig.option = option
         uiConfig.appKey = AppKey.appKey
         uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
         NERtcCallKit.sharedInstance().timeOutSeconds = 30
         NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
-       
+        
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
                 let me = PersonInfoViewController()
@@ -140,5 +164,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         return .portrait
     }
     
+    func customVerification(){
+        if NEStyleManager.instance.isNormalStyle() {
+            Router.shared.register(PushP2pChatVCRouter) { param in
+              print("param:\(param)")
+              let nav = param["nav"] as? UINavigationController
+              guard let session = param["session"] as? NIMSession else {
+                return
+              }
+              let anchor = param["anchor"] as? NIMMessage
+              var p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+              for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                if vc.isKind(of: ChatViewController.self) {
+                  nav?.viewControllers[i] = p2pChatVC
+                  nav?.popToViewController(p2pChatVC, animated: true)
+                  return
+                }
+              }
+              nav?.pushViewController(p2pChatVC, animated: true)
+            }
+        } else {
+            Router.shared.register(PushP2pChatVCRouter) { param in
+              print("param:\(param)")
+              let nav = param["nav"] as? UINavigationController
+              guard let session = param["session"] as? NIMSession else {
+                return
+              }
+              let anchor = param["anchor"] as? NIMMessage
+              var p2pChatVC = FunP2PChatViewController(session: session, anchor: anchor)
+              for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                if vc.isKind(of: ChatViewController.self) {
+                  nav?.viewControllers[i] = p2pChatVC
+                  nav?.popToViewController(p2pChatVC, animated: true)
+                  return
+                }
+              }
+              nav?.pushViewController(p2pChatVC, animated: true)
+            }
+        }
+    }
 }
 

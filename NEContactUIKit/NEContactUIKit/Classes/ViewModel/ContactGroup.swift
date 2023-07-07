@@ -5,4 +5,5 @@
 
 import Foundation
 
+@objcMembers
 public class ContactGroup {}

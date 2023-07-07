@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class TextWithRightArrowCell: ContactBaseTextCell {
+open class TextWithRightArrowCell: ContactBaseTextCell {
   public var arrowImage = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -21,7 +21,7 @@ public class TextWithRightArrowCell: ContactBaseTextCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

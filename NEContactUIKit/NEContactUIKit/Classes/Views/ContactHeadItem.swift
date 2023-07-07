@@ -5,7 +5,8 @@
 
 import Foundation
 
-public class ContactHeadItem {
+@objcMembers
+open class ContactHeadItem {
   public var name: String?
   public var imageName: String?
   public var color = UIColor(hexString: "#60CFA7")

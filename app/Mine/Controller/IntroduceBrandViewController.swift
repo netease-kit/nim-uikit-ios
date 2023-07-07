@@ -17,16 +17,12 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
     setupSubviews()
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.setNavigationBarHidden(false, animated: false)
-  }
-
   func setupSubviews() {
     view.addSubview(headImage)
     view.addSubview(headLabel)
-
     view.addSubview(tableView)
+    navigationController?.navigationBar.backgroundColor = .white
+    customNavigationView.backgroundColor = .white
 
     NSLayoutConstraint.activate([
       headImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),

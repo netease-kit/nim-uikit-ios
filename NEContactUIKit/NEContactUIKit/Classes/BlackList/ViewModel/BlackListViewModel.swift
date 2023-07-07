@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEContactKit
+import NEChatKit
 import NECoreKit
 import NECoreIMKit
 
 @objcMembers
 public class BlackListViewModel: NSObject, FriendProviderDelegate {
   var contactRepo = ContactRepo()
+  public weak var delegate: FriendProviderDelegate?
   private let className = "BlackListViewModel"
 
   override init() {
@@ -37,17 +38,17 @@ public class BlackListViewModel: NSObject, FriendProviderDelegate {
 
   public func onFriendChanged(user: User) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
-    print(#file + #function)
+    delegate?.onFriendChanged(user: user)
   }
 
   public func onUserInfoChanged(user: User) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
-    print(#file + #function)
+    delegate?.onUserInfoChanged(user: user)
   }
 
   public func onBlackListChanged() {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
-    print(#file + #function)
+    delegate?.onBlackListChanged()
   }
 
   public func onRecieveNotification(notification: XNotification) {

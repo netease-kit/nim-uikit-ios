@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import Foundation
-import NETeamKit
 import NIMSDK
 import NECoreIMKit
 

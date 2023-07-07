@@ -9,32 +9,50 @@
 /* Begin PBXBuildFile section */
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
 		4B3B9BE6277AFEE50091A74E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE4277AFEE50091A74E /* Main.storyboard */; };
-		4B3B9BE8277AFEE70091A74E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE7277AFEE70091A74E /* Assets.xcassets */; };
 		4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */; };
 		8D94D1BFC1723D94D352756A /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8ECED9A11CC9DB62207FC66 /* Pods_app.framework */; };
-		9EA2014127BE4B4800F8BBD0 /* AppKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA2014027BE4B4800F8BBD0 /* AppKey.swift */; };
-		DDFAAE8029BACE0B00834C08 /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6229BACE0B00834C08 /* NodeViewModel.swift */; };
-		DDFAAE8129BACE0B00834C08 /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6329BACE0B00834C08 /* MineSettingViewModel.swift */; };
-		DDFAAE8229BACE0B00834C08 /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6429BACE0B00834C08 /* PersonInfoViewModel.swift */; };
-		DDFAAE8329BACE0B00834C08 /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6529BACE0B00834C08 /* MessageRemindViewModel.swift */; };
-		DDFAAE8429BACE0B00834C08 /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6629BACE0B00834C08 /* IntroduceViewModel.swift */; };
-		DDFAAE8529BACE0B00834C08 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6829BACE0B00834C08 /* MeViewController.swift */; };
-		DDFAAE8629BACE0B00834C08 /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6929BACE0B00834C08 /* NEAboutWebViewController.swift */; };
-		DDFAAE8829BACE0B00834C08 /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6B29BACE0B00834C08 /* InputPersonInfoController.swift */; };
-		DDFAAE8929BACE0B00834C08 /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6C29BACE0B00834C08 /* MineSettingViewController.swift */; };
-		DDFAAE8A29BACE0B00834C08 /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6D29BACE0B00834C08 /* MessageRemindViewController.swift */; };
-		DDFAAE8B29BACE0B00834C08 /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6E29BACE0B00834C08 /* NENodeViewController.swift */; };
-		DDFAAE8C29BACE0B00834C08 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE6F29BACE0B00834C08 /* PersonInfoViewController.swift */; };
-		DDFAAE8D29BACE0C00834C08 /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7029BACE0B00834C08 /* IntroduceBrandViewController.swift */; };
-		DDFAAE8E29BACE0C00834C08 /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7229BACE0B00834C08 /* MineTableViewCell.swift */; };
-		DDFAAE8F29BACE0C00834C08 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7329BACE0B00834C08 /* BirthdayDatePickerView.swift */; };
-		DDFAAE9029BACE0C00834C08 /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7429BACE0B00834C08 /* NodeSelectCell.swift */; };
-		DDFAAE9129BACE0C00834C08 /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7529BACE0B00834C08 /* VersionCell.swift */; };
-		DDFAAE9329BACE0C00834C08 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7929BACE0B00834C08 /* ViewController.swift */; };
-		DDFAAE9529BACE0C00834C08 /* NENavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7B29BACE0B00834C08 /* NENavigationController.swift */; };
-		DDFAAE9729BACE0C00834C08 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7D29BACE0B00834C08 /* AppDelegate.swift */; };
-		DDFAAE9829BACE0C00834C08 /* NETabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE7E29BACE0B00834C08 /* NETabBarController.swift */; };
-		DDFAAE9F29BAFD1500834C08 /* NEUserHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFAAE9E29BAFD1500834C08 /* NEUserHeaderView.swift */; };
+		DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC82A56ABFD0091318F /* Constant.swift */; };
+		DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC92A56ABFD0091318F /* ViewController.swift */; };
+		DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DCB2A56ABFD0091318F /* NENavigationController.swift */; };
+		DD141E012A56ABFE0091318F /* UIStyleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DCD2A56ABFD0091318F /* UIStyleManager.swift */; };
+		DD141E032A56ABFE0091318F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DCF2A56ABFD0091318F /* AppDelegate.swift */; };
+		DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD02A56ABFD0091318F /* NETabBarController.swift */; };
+		DD141E052A56ABFE0091318F /* AppKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD12A56ABFD0091318F /* AppKey.swift */; };
+		DD141E062A56ABFE0091318F /* CustomP2PChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD32A56ABFD0091318F /* CustomP2PChatViewController.swift */; };
+		DD141E072A56ABFE0091318F /* CustomConversationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD42A56ABFD0091318F /* CustomConversationListViewController.swift */; };
+		DD141E082A56ABFE0091318F /* CustomContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD52A56ABFD0091318F /* CustomContactsViewController.swift */; };
+		DD141E092A56ABFE0091318F /* CustomConversationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD62A56ABFD0091318F /* CustomConversationController.swift */; };
+		DD141E0A2A56ABFE0091318F /* CustomAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD72A56ABFD0091318F /* CustomAttachment.swift */; };
+		DD141E0B2A56ABFE0091318F /* CustomContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD82A56ABFD0091318F /* CustomContactTableViewCell.swift */; };
+		DD141E0C2A56ABFE0091318F /* CustomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD92A56ABFD0091318F /* CustomChatCell.swift */; };
+		DD141E0D2A56ABFE0091318F /* CustomTopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DDA2A56ABFD0091318F /* CustomTopView.swift */; };
+		DD141E0E2A56ABFE0091318F /* CustomConversationListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DDB2A56ABFD0091318F /* CustomConversationListCell.swift */; };
+		DD141E102A56ABFE0091318F /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE02A56ABFD0091318F /* NodeViewModel.swift */; };
+		DD141E112A56ABFE0091318F /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE12A56ABFD0091318F /* MineSettingViewModel.swift */; };
+		DD141E122A56ABFE0091318F /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE22A56ABFD0091318F /* PersonInfoViewModel.swift */; };
+		DD141E132A56ABFE0091318F /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE32A56ABFD0091318F /* MessageRemindViewModel.swift */; };
+		DD141E142A56ABFE0091318F /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE42A56ABFD0091318F /* IntroduceViewModel.swift */; };
+		DD141E152A56ABFE0091318F /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE62A56ABFD0091318F /* MeViewController.swift */; };
+		DD141E162A56ABFE0091318F /* StyleSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE72A56ABFD0091318F /* StyleSelectionViewController.swift */; };
+		DD141E172A56ABFE0091318F /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE82A56ABFD0091318F /* NEAboutWebViewController.swift */; };
+		DD141E182A56ABFE0091318F /* NELoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DE92A56ABFD0091318F /* NELoginViewController.swift */; };
+		DD141E192A56ABFE0091318F /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DEA2A56ABFD0091318F /* InputPersonInfoController.swift */; };
+		DD141E1A2A56ABFE0091318F /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DEB2A56ABFD0091318F /* MineSettingViewController.swift */; };
+		DD141E1B2A56ABFE0091318F /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DEC2A56ABFD0091318F /* MessageRemindViewController.swift */; };
+		DD141E1C2A56ABFE0091318F /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DED2A56ABFD0091318F /* NENodeViewController.swift */; };
+		DD141E1D2A56ABFE0091318F /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DEE2A56ABFD0091318F /* PersonInfoViewController.swift */; };
+		DD141E1E2A56ABFE0091318F /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DEF2A56ABFD0091318F /* IntroduceBrandViewController.swift */; };
+		DD141E1F2A56ABFE0091318F /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF12A56ABFD0091318F /* MineTableViewCell.swift */; };
+		DD141E202A56ABFE0091318F /* StyleSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF22A56ABFD0091318F /* StyleSelectionCell.swift */; };
+		DD141E212A56ABFE0091318F /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF32A56ABFD0091318F /* BirthdayDatePickerView.swift */; };
+		DD141E222A56ABFE0091318F /* CustomTeamSettingRightCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF52A56ABFD0091318F /* CustomTeamSettingRightCustomCell.swift */; };
+		DD141E232A56ABFE0091318F /* CustomTeamSettingSubtitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF62A56ABFD0091318F /* CustomTeamSettingSubtitleCell.swift */; };
+		DD141E242A56ABFE0091318F /* CustomTeamArrowSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF72A56ABFD0091318F /* CustomTeamArrowSettingCell.swift */; };
+		DD141E252A56ABFE0091318F /* CustomTeamSettingHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF82A56ABFD0091318F /* CustomTeamSettingHeaderCell.swift */; };
+		DD141E262A56ABFE0091318F /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DF92A56ABFD0091318F /* CustomTeamSettingSwitchCell.swift */; };
+		DD141E272A56ABFE0091318F /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DFA2A56ABFD0091318F /* NodeSelectCell.swift */; };
+		DD141E282A56ABFE0091318F /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DFB2A56ABFD0091318F /* VersionCell.swift */; };
+		DDCE2A652A56BDB800E17751 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDCE2A642A56BDB800E17751 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -60,34 +78,52 @@
 		39E9E27828D87EA000A11820 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B3B9BDB277AFEE50091A74E /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3B9BE5277AFEE50091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4B3B9BE7277AFEE70091A74E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4B3B9BEA277AFEE70091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9EA2014027BE4B4800F8BBD0 /* AppKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKey.swift; sourceTree = "<group>"; };
 		A9E4316D70F3EF2E6BD5E5CB /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
 		B831F1EC5F2E309A7BB5582D /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
 		D8ECED9A11CC9DB62207FC66 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DDFAAE6229BACE0B00834C08 /* NodeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
-		DDFAAE6329BACE0B00834C08 /* MineSettingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
-		DDFAAE6429BACE0B00834C08 /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
-		DDFAAE6529BACE0B00834C08 /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
-		DDFAAE6629BACE0B00834C08 /* IntroduceViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
-		DDFAAE6829BACE0B00834C08 /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
-		DDFAAE6929BACE0B00834C08 /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
-		DDFAAE6B29BACE0B00834C08 /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
-		DDFAAE6C29BACE0B00834C08 /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
-		DDFAAE6D29BACE0B00834C08 /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
-		DDFAAE6E29BACE0B00834C08 /* NENodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
-		DDFAAE6F29BACE0B00834C08 /* PersonInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
-		DDFAAE7029BACE0B00834C08 /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
-		DDFAAE7229BACE0B00834C08 /* MineTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
-		DDFAAE7329BACE0B00834C08 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
-		DDFAAE7429BACE0B00834C08 /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
-		DDFAAE7529BACE0B00834C08 /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
-		DDFAAE7929BACE0B00834C08 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		DDFAAE7B29BACE0B00834C08 /* NENavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENavigationController.swift; sourceTree = "<group>"; };
-		DDFAAE7D29BACE0B00834C08 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		DDFAAE7E29BACE0B00834C08 /* NETabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
-		DDFAAE9E29BAFD1500834C08 /* NEUserHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEUserHeaderView.swift; sourceTree = "<group>"; };
+		DD141DC82A56ABFD0091318F /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		DD141DC92A56ABFD0091318F /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		DD141DCB2A56ABFD0091318F /* NENavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENavigationController.swift; sourceTree = "<group>"; };
+		DD141DCD2A56ABFD0091318F /* UIStyleManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIStyleManager.swift; sourceTree = "<group>"; };
+		DD141DCF2A56ABFD0091318F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DD141DD02A56ABFD0091318F /* NETabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
+		DD141DD12A56ABFD0091318F /* AppKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKey.swift; sourceTree = "<group>"; };
+		DD141DD32A56ABFD0091318F /* CustomP2PChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomP2PChatViewController.swift; sourceTree = "<group>"; };
+		DD141DD42A56ABFD0091318F /* CustomConversationListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationListViewController.swift; sourceTree = "<group>"; };
+		DD141DD52A56ABFD0091318F /* CustomContactsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactsViewController.swift; sourceTree = "<group>"; };
+		DD141DD62A56ABFD0091318F /* CustomConversationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationController.swift; sourceTree = "<group>"; };
+		DD141DD72A56ABFD0091318F /* CustomAttachment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAttachment.swift; sourceTree = "<group>"; };
+		DD141DD82A56ABFD0091318F /* CustomContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactTableViewCell.swift; sourceTree = "<group>"; };
+		DD141DD92A56ABFD0091318F /* CustomChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomChatCell.swift; sourceTree = "<group>"; };
+		DD141DDA2A56ABFD0091318F /* CustomTopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTopView.swift; sourceTree = "<group>"; };
+		DD141DDB2A56ABFD0091318F /* CustomConversationListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationListCell.swift; sourceTree = "<group>"; };
+		DD141DE02A56ABFD0091318F /* NodeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
+		DD141DE12A56ABFD0091318F /* MineSettingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
+		DD141DE22A56ABFD0091318F /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
+		DD141DE32A56ABFD0091318F /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
+		DD141DE42A56ABFD0091318F /* IntroduceViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
+		DD141DE62A56ABFD0091318F /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
+		DD141DE72A56ABFD0091318F /* StyleSelectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleSelectionViewController.swift; sourceTree = "<group>"; };
+		DD141DE82A56ABFD0091318F /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
+		DD141DE92A56ABFD0091318F /* NELoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NELoginViewController.swift; sourceTree = "<group>"; };
+		DD141DEA2A56ABFD0091318F /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
+		DD141DEB2A56ABFD0091318F /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
+		DD141DEC2A56ABFD0091318F /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
+		DD141DED2A56ABFD0091318F /* NENodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
+		DD141DEE2A56ABFD0091318F /* PersonInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
+		DD141DEF2A56ABFD0091318F /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
+		DD141DF12A56ABFD0091318F /* MineTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
+		DD141DF22A56ABFD0091318F /* StyleSelectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleSelectionCell.swift; sourceTree = "<group>"; };
+		DD141DF32A56ABFD0091318F /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
+		DD141DF52A56ABFD0091318F /* CustomTeamSettingRightCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingRightCustomCell.swift; sourceTree = "<group>"; };
+		DD141DF62A56ABFD0091318F /* CustomTeamSettingSubtitleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSubtitleCell.swift; sourceTree = "<group>"; };
+		DD141DF72A56ABFD0091318F /* CustomTeamArrowSettingCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamArrowSettingCell.swift; sourceTree = "<group>"; };
+		DD141DF82A56ABFD0091318F /* CustomTeamSettingHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingHeaderCell.swift; sourceTree = "<group>"; };
+		DD141DF92A56ABFD0091318F /* CustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
+		DD141DFA2A56ABFD0091318F /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
+		DD141DFB2A56ABFD0091318F /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
+		DDCE2A642A56BDB800E17751 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,13 +167,13 @@
 		4B3B9BDD277AFEE50091A74E /* app */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE7829BACE0B00834C08 /* Main */,
-				DDFAAE6029BACE0B00834C08 /* Mine */,
+				DDCE2A642A56BDB800E17751 /* Assets.xcassets */,
+				DD141DD22A56ABFD0091318F /* Custom */,
+				DD141DC62A56ABFD0091318F /* Main */,
+				DD141DDE2A56ABFD0091318F /* Mine */,
 				01B0A28E2816CF41009065C5 /* app.entitlements */,
-				9EA2014027BE4B4800F8BBD0 /* AppKey.swift */,
 				39E9E27528D87E9800A11820 /* Localizable.strings */,
 				4B3B9BE4277AFEE50091A74E /* Main.storyboard */,
-				4B3B9BE7277AFEE70091A74E /* Assets.xcassets */,
 				4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */,
 			);
 			path = app;
@@ -152,64 +188,98 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		DDFAAE6029BACE0B00834C08 /* Mine */ = {
+		DD141DC62A56ABFD0091318F /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE6129BACE0B00834C08 /* ViewModel */,
-				DDFAAE6729BACE0B00834C08 /* Controller */,
-				DDFAAE7129BACE0B00834C08 /* View */,
+				DD141DC82A56ABFD0091318F /* Constant.swift */,
+				DD141DC92A56ABFD0091318F /* ViewController.swift */,
+				DD141DCB2A56ABFD0091318F /* NENavigationController.swift */,
+				DD141DCD2A56ABFD0091318F /* UIStyleManager.swift */,
+				DD141DCF2A56ABFD0091318F /* AppDelegate.swift */,
+				DD141DD02A56ABFD0091318F /* NETabBarController.swift */,
+				DD141DD12A56ABFD0091318F /* AppKey.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		DD141DD22A56ABFD0091318F /* Custom */ = {
+			isa = PBXGroup;
+			children = (
+				DD141DD32A56ABFD0091318F /* CustomP2PChatViewController.swift */,
+				DD141DD42A56ABFD0091318F /* CustomConversationListViewController.swift */,
+				DD141DD52A56ABFD0091318F /* CustomContactsViewController.swift */,
+				DD141DD62A56ABFD0091318F /* CustomConversationController.swift */,
+				DD141DD72A56ABFD0091318F /* CustomAttachment.swift */,
+				DD141DD82A56ABFD0091318F /* CustomContactTableViewCell.swift */,
+				DD141DD92A56ABFD0091318F /* CustomChatCell.swift */,
+				DD141DDA2A56ABFD0091318F /* CustomTopView.swift */,
+				DD141DDB2A56ABFD0091318F /* CustomConversationListCell.swift */,
+			);
+			path = Custom;
+			sourceTree = "<group>";
+		};
+		DD141DDE2A56ABFD0091318F /* Mine */ = {
+			isa = PBXGroup;
+			children = (
+				DD141DDF2A56ABFD0091318F /* ViewModel */,
+				DD141DE52A56ABFD0091318F /* Controller */,
+				DD141DF02A56ABFD0091318F /* View */,
 			);
 			path = Mine;
 			sourceTree = "<group>";
 		};
-		DDFAAE6129BACE0B00834C08 /* ViewModel */ = {
+		DD141DDF2A56ABFD0091318F /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE6229BACE0B00834C08 /* NodeViewModel.swift */,
-				DDFAAE6329BACE0B00834C08 /* MineSettingViewModel.swift */,
-				DDFAAE6429BACE0B00834C08 /* PersonInfoViewModel.swift */,
-				DDFAAE6529BACE0B00834C08 /* MessageRemindViewModel.swift */,
-				DDFAAE6629BACE0B00834C08 /* IntroduceViewModel.swift */,
+				DD141DE02A56ABFD0091318F /* NodeViewModel.swift */,
+				DD141DE12A56ABFD0091318F /* MineSettingViewModel.swift */,
+				DD141DE22A56ABFD0091318F /* PersonInfoViewModel.swift */,
+				DD141DE32A56ABFD0091318F /* MessageRemindViewModel.swift */,
+				DD141DE42A56ABFD0091318F /* IntroduceViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		DDFAAE6729BACE0B00834C08 /* Controller */ = {
+		DD141DE52A56ABFD0091318F /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE6829BACE0B00834C08 /* MeViewController.swift */,
-				DDFAAE6929BACE0B00834C08 /* NEAboutWebViewController.swift */,
-				DDFAAE6B29BACE0B00834C08 /* InputPersonInfoController.swift */,
-				DDFAAE6C29BACE0B00834C08 /* MineSettingViewController.swift */,
-				DDFAAE6D29BACE0B00834C08 /* MessageRemindViewController.swift */,
-				DDFAAE6E29BACE0B00834C08 /* NENodeViewController.swift */,
-				DDFAAE6F29BACE0B00834C08 /* PersonInfoViewController.swift */,
-				DDFAAE7029BACE0B00834C08 /* IntroduceBrandViewController.swift */,
+				DD141DE62A56ABFD0091318F /* MeViewController.swift */,
+				DD141DE72A56ABFD0091318F /* StyleSelectionViewController.swift */,
+				DD141DE82A56ABFD0091318F /* NEAboutWebViewController.swift */,
+				DD141DE92A56ABFD0091318F /* NELoginViewController.swift */,
+				DD141DEA2A56ABFD0091318F /* InputPersonInfoController.swift */,
+				DD141DEB2A56ABFD0091318F /* MineSettingViewController.swift */,
+				DD141DEC2A56ABFD0091318F /* MessageRemindViewController.swift */,
+				DD141DED2A56ABFD0091318F /* NENodeViewController.swift */,
+				DD141DEE2A56ABFD0091318F /* PersonInfoViewController.swift */,
+				DD141DEF2A56ABFD0091318F /* IntroduceBrandViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		DDFAAE7129BACE0B00834C08 /* View */ = {
+		DD141DF02A56ABFD0091318F /* View */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE9E29BAFD1500834C08 /* NEUserHeaderView.swift */,
-				DDFAAE7229BACE0B00834C08 /* MineTableViewCell.swift */,
-				DDFAAE7329BACE0B00834C08 /* BirthdayDatePickerView.swift */,
-				DDFAAE7429BACE0B00834C08 /* NodeSelectCell.swift */,
-				DDFAAE7529BACE0B00834C08 /* VersionCell.swift */,
+				DD141DF12A56ABFD0091318F /* MineTableViewCell.swift */,
+				DD141DF22A56ABFD0091318F /* StyleSelectionCell.swift */,
+				DD141DF32A56ABFD0091318F /* BirthdayDatePickerView.swift */,
+				DD141DF42A56ABFD0091318F /* Theme */,
+				DD141DFA2A56ABFD0091318F /* NodeSelectCell.swift */,
+				DD141DFB2A56ABFD0091318F /* VersionCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
 		};
-		DDFAAE7829BACE0B00834C08 /* Main */ = {
+		DD141DF42A56ABFD0091318F /* Theme */ = {
 			isa = PBXGroup;
 			children = (
-				DDFAAE7929BACE0B00834C08 /* ViewController.swift */,
-				DDFAAE7B29BACE0B00834C08 /* NENavigationController.swift */,
-				DDFAAE7D29BACE0B00834C08 /* AppDelegate.swift */,
-				DDFAAE7E29BACE0B00834C08 /* NETabBarController.swift */,
+				DD141DF52A56ABFD0091318F /* CustomTeamSettingRightCustomCell.swift */,
+				DD141DF62A56ABFD0091318F /* CustomTeamSettingSubtitleCell.swift */,
+				DD141DF72A56ABFD0091318F /* CustomTeamArrowSettingCell.swift */,
+				DD141DF82A56ABFD0091318F /* CustomTeamSettingHeaderCell.swift */,
+				DD141DF92A56ABFD0091318F /* CustomTeamSettingSwitchCell.swift */,
 			);
-			path = Main;
+			path = Theme;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -279,7 +349,7 @@
 			files = (
 				4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */,
 				39E9E27728D87E9800A11820 /* Localizable.strings in Resources */,
-				4B3B9BE8277AFEE70091A74E /* Assets.xcassets in Resources */,
+				DDCE2A652A56BDB800E17751 /* Assets.xcassets in Resources */,
 				4B3B9BE6277AFEE50091A74E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,29 +420,47 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DDFAAE8129BACE0B00834C08 /* MineSettingViewModel.swift in Sources */,
-				DDFAAE8A29BACE0B00834C08 /* MessageRemindViewController.swift in Sources */,
-				DDFAAE8529BACE0B00834C08 /* MeViewController.swift in Sources */,
-				DDFAAE8929BACE0B00834C08 /* MineSettingViewController.swift in Sources */,
-				DDFAAE8D29BACE0C00834C08 /* IntroduceBrandViewController.swift in Sources */,
-				DDFAAE8029BACE0B00834C08 /* NodeViewModel.swift in Sources */,
-				DDFAAE9829BACE0C00834C08 /* NETabBarController.swift in Sources */,
-				DDFAAE8C29BACE0B00834C08 /* PersonInfoViewController.swift in Sources */,
-				DDFAAE8F29BACE0C00834C08 /* BirthdayDatePickerView.swift in Sources */,
-				DDFAAE8B29BACE0B00834C08 /* NENodeViewController.swift in Sources */,
-				9EA2014127BE4B4800F8BBD0 /* AppKey.swift in Sources */,
-				DDFAAE8829BACE0B00834C08 /* InputPersonInfoController.swift in Sources */,
-				DDFAAE9729BACE0C00834C08 /* AppDelegate.swift in Sources */,
-				DDFAAE8629BACE0B00834C08 /* NEAboutWebViewController.swift in Sources */,
-				DDFAAE9129BACE0C00834C08 /* VersionCell.swift in Sources */,
-				DDFAAE8229BACE0B00834C08 /* PersonInfoViewModel.swift in Sources */,
-				DDFAAE8429BACE0B00834C08 /* IntroduceViewModel.swift in Sources */,
-				DDFAAE9F29BAFD1500834C08 /* NEUserHeaderView.swift in Sources */,
-				DDFAAE8E29BACE0C00834C08 /* MineTableViewCell.swift in Sources */,
-				DDFAAE9329BACE0C00834C08 /* ViewController.swift in Sources */,
-				DDFAAE8329BACE0B00834C08 /* MessageRemindViewModel.swift in Sources */,
-				DDFAAE9029BACE0C00834C08 /* NodeSelectCell.swift in Sources */,
-				DDFAAE9529BACE0C00834C08 /* NENavigationController.swift in Sources */,
+				DD141E1A2A56ABFE0091318F /* MineSettingViewController.swift in Sources */,
+				DD141E142A56ABFE0091318F /* IntroduceViewModel.swift in Sources */,
+				DD141E262A56ABFE0091318F /* CustomTeamSettingSwitchCell.swift in Sources */,
+				DD141E222A56ABFE0091318F /* CustomTeamSettingRightCustomCell.swift in Sources */,
+				DD141E062A56ABFE0091318F /* CustomP2PChatViewController.swift in Sources */,
+				DD141E092A56ABFE0091318F /* CustomConversationController.swift in Sources */,
+				DD141E1E2A56ABFE0091318F /* IntroduceBrandViewController.swift in Sources */,
+				DD141E182A56ABFE0091318F /* NELoginViewController.swift in Sources */,
+				DD141E202A56ABFE0091318F /* StyleSelectionCell.swift in Sources */,
+				DD141E1D2A56ABFE0091318F /* PersonInfoViewController.swift in Sources */,
+				DD141E162A56ABFE0091318F /* StyleSelectionViewController.swift in Sources */,
+				DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */,
+				DD141E082A56ABFE0091318F /* CustomContactsViewController.swift in Sources */,
+				DD141E0B2A56ABFE0091318F /* CustomContactTableViewCell.swift in Sources */,
+				DD141E192A56ABFE0091318F /* InputPersonInfoController.swift in Sources */,
+				DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */,
+				DD141E0C2A56ABFE0091318F /* CustomChatCell.swift in Sources */,
+				DD141E242A56ABFE0091318F /* CustomTeamArrowSettingCell.swift in Sources */,
+				DD141E0A2A56ABFE0091318F /* CustomAttachment.swift in Sources */,
+				DD141E172A56ABFE0091318F /* NEAboutWebViewController.swift in Sources */,
+				DD141E132A56ABFE0091318F /* MessageRemindViewModel.swift in Sources */,
+				DD141E032A56ABFE0091318F /* AppDelegate.swift in Sources */,
+				DD141E102A56ABFE0091318F /* NodeViewModel.swift in Sources */,
+				DD141E122A56ABFE0091318F /* PersonInfoViewModel.swift in Sources */,
+				DD141E1B2A56ABFE0091318F /* MessageRemindViewController.swift in Sources */,
+				DD141E282A56ABFE0091318F /* VersionCell.swift in Sources */,
+				DD141E052A56ABFE0091318F /* AppKey.swift in Sources */,
+				DD141E0D2A56ABFE0091318F /* CustomTopView.swift in Sources */,
+				DD141E232A56ABFE0091318F /* CustomTeamSettingSubtitleCell.swift in Sources */,
+				DD141E152A56ABFE0091318F /* MeViewController.swift in Sources */,
+				DD141E252A56ABFE0091318F /* CustomTeamSettingHeaderCell.swift in Sources */,
+				DD141E0E2A56ABFE0091318F /* CustomConversationListCell.swift in Sources */,
+				DD141E012A56ABFE0091318F /* UIStyleManager.swift in Sources */,
+				DD141E212A56ABFE0091318F /* BirthdayDatePickerView.swift in Sources */,
+				DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */,
+				DD141E1C2A56ABFE0091318F /* NENodeViewController.swift in Sources */,
+				DD141E1F2A56ABFE0091318F /* MineTableViewCell.swift in Sources */,
+				DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */,
+				DD141E112A56ABFE0091318F /* MineSettingViewModel.swift in Sources */,
+				DD141E072A56ABFE0091318F /* CustomConversationListViewController.swift in Sources */,
+				DD141E272A56ABFE0091318F /* NodeSelectCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -464,7 +552,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -521,7 +609,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -562,7 +650,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -611,7 +699,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

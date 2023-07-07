@@ -8,6 +8,12 @@ import NIMSDK
 
 @objcMembers
 class MessageTipsModel: NSObject, MessageModel {
+  var offset: CGFloat = 0
+
+  func cellHeight() -> CGFloat {
+    CGFloat(height) + offset
+  }
+
   var tipTimeStamp: TimeInterval?
 
   var isReplay: Bool = false
@@ -20,8 +26,8 @@ class MessageTipsModel: NSObject, MessageModel {
   var replyText: String?
   var type: MessageType = .tip
   var message: NIMMessage?
-  var contentSize: CGSize
-  var height: Float
+  var contentSize: CGSize = .zero
+  var height: Float = 28
   var shortName: String?
   var fullName: String?
   var avatar: String?
@@ -30,7 +36,8 @@ class MessageTipsModel: NSObject, MessageModel {
   var replyedModel: MessageModel?
   var isRevokedText: Bool = false
   weak var tipMessage: NIMMessage?
-  required init(message: NIMMessage?) {
+
+  func commonInit(message: NIMMessage?) {
     if let msg = message {
       if msg.messageType == .notification {
         text = NotificationMessageUtils.textForNotification(message: msg)
@@ -39,11 +46,37 @@ class MessageTipsModel: NSObject, MessageModel {
         text = msg.text
         type = .tip
       }
+
+      tipMessage = msg
+      tipTimeStamp = msg.timestamp
     }
-    tipMessage = message
-    tipTimeStamp = message?.timestamp
-    contentSize = CGSize(width: kScreenWidth - 64 * 2, height: kScreenHeight)
-    let size = String.getTextRectSize(text ?? "", font: DefaultTextFont(NEKitChatConfig.shared.ui.timeTextSize), size: contentSize)
-    height = Float(size.height)
+
+    var font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.timeTextSize)
+
+    contentSize = String.getTextRectSize(text ?? "",
+                                         font: font,
+                                         size: CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
+    height = Float(max(contentSize.height + chat_content_margin, 28))
+  }
+
+  required init(message: NIMMessage?) {
+    super.init()
+    commonInit(message: message)
+  }
+
+  init(message: NIMMessage?, initType: MessageType = .tip, initText: String? = nil) {
+    super.init()
+    type = initType
+    text = initText
+    commonInit(message: message)
+  }
+
+  public func resetNotiText() {
+    if let msg = tipMessage {
+      if msg.messageType == .notification {
+        text = NotificationMessageUtils.textForNotification(message: msg)
+        type = .notification
+      }
+    }
   }
 }

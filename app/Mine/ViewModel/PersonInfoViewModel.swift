@@ -11,7 +11,7 @@ protocol PersonInfoViewModelDelegate: AnyObject {
   func didClickHeadImage()
   func didClickNickName(name: String)
   func didClickGender()
-  func didClickBirthday()
+  func didClickBirthday(birth: String)
   func didClickMobile(mobile: String)
   func didClickEmail(email: String)
   func didClickSign(sign: String)
@@ -100,7 +100,7 @@ public class PersonInfoViewModel: NSObject {
     birthdayItem.subTitle = mineInfo.userInfo?.birth
     birthdayItem.rowHeight = 46.0
     birthdayItem.cellClick = {
-      weakSelf?.delegate?.didClickBirthday()
+      weakSelf?.delegate?.didClickBirthday(birth: mineInfo.userInfo?.birth ?? "")
     }
     // 手机
     let telephoneItem = SettingCellModel()

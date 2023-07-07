@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEContactKit
+import NEChatKit
 import NECoreKit
 import NECoreIMKit
 import UIKit
@@ -43,7 +43,7 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
 
   public func onRecieveNotification(_ notification: XNotification) {}
 
-  func loadData(fetch: Bool = false, _ filters: Set<String>? = nil, completion: @escaping (NSError?) -> Void) {
+  func loadData(fetch: Bool = false, _ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
     getContactList(fetch, filters) { contacts, error in
@@ -54,12 +54,12 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
         if let headSection = weakSelf?.headerSection(headerItem: weakSelf?.contactHeaders) {
           weakSelf?.contacts.insert(headSection, at: 0)
         }
-        completion(nil)
+        completion(nil, users.count)
       }
     }
   }
 
-  func reLoadData(completion: @escaping (NSError?) -> Void) {
+  func reLoadData(completion: @escaping (NSError?, Int) -> Void) {
     loadData(fetch: true, completion: completion)
   }
 
@@ -67,7 +67,11 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", filters.count: \(filters?.count ?? 0)")
     var contactList: [ContactSection] = []
     weak var weakSelf = self
-    contactRepo.getFriendList(fetch) { friends, error in
+    var local = false
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      local = true
+    }
+    contactRepo.getFriendList(fetch, local: local) { friends, error in
       if var users = friends {
         NELog.infoLog("contact bar getFriendList", desc: "friend count:\(friends?.count)")
         weakSelf?.initalDict = [String: [ContactInfo]]()
@@ -99,7 +103,7 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
           let inital = name?.initalLetter() ?? "#"
           let contactInfo = ContactInfo()
           contactInfo.user = contact
-          contactInfo.headerBackColor = UIColor.colorWithString(string: contact.showName() ?? "")
+          contactInfo.headerBackColor = UIColor.colorWithString(string: contact.userId ?? "")
 
           if digitRegular.evaluate(with: inital) { // [0-9]
             digitList.append(contactInfo)
@@ -137,7 +141,11 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
         var result = contactList.sorted { s1, s2 in
           s1.initial < s2.initial
         }
-        result.append(ContactSection(initial: "#", contacts: digitList + specialCharList))
+
+        let specialList = digitList + specialCharList
+        if specialList.count > 0 {
+          result.append(ContactSection(initial: "#", contacts: specialList))
+        }
         completion(result, nil)
       }
     }

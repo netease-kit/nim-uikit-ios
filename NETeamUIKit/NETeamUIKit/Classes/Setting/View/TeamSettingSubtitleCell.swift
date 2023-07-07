@@ -6,8 +6,8 @@
 import UIKit
 
 @objcMembers
-public class TeamSettingSubtitleCell: BaseTeamSettingCell {
-  var titleWidthAnchor: NSLayoutConstraint?
+open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
+  public var titleWidthAnchor: NSLayoutConstraint?
 
   override public func awakeFromNib() {
     super.awakeFromNib()
@@ -26,11 +26,11 @@ public class TeamSettingSubtitleCell: BaseTeamSettingCell {
     setupUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func setupUI() {
+  open func setupUI() {
     contentView.addSubview(titleLabel)
     contentView.addSubview(subTitleLabel)
     contentView.addSubview(arrow)
@@ -64,7 +64,7 @@ public class TeamSettingSubtitleCell: BaseTeamSettingCell {
     }
   }
 
-  lazy var subTitleLabel: UILabel = {
+  public lazy var subTitleLabel: UILabel = {
     let label = UILabel()
     label.textColor = UIColor(hexString: "0xA6ADB6")
     label.font = NEConstant.defaultTextFont(12.0)

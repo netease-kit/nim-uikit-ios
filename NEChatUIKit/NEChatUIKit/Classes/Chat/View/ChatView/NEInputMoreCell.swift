@@ -5,6 +5,7 @@
 
 import UIKit
 
+@objcMembers
 public class NEInputMoreCell: UICollectionViewCell {
   public var cellData: NEMoreItemModel?
 

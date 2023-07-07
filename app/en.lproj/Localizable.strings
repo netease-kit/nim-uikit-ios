@@ -29,9 +29,10 @@
 "email"="E-mail";
 "sign_remind"="sign remind";
 
-"message_remind"="Message Notification";
+"message_remind"="Notification";
+"style_selection"="Skin";
 "product_intro"="Product introduction";
-"receiver_mode"="Handset mode";
+"receiver_mode"="Handset Mode";
 "delete_friend"="删除好友是否同步删除备注";//功能移除可删除
 "message_read_function"="Read/Unread";
 "version"="Version";
@@ -60,4 +61,11 @@
 "domestic_node"="China";
 "overseas_node"="Singapore";
 "restart"="OK";
+"text_count_limit"="limit %d characters";
 
+// style
+"style_default"="Base Skin";
+"style_fun"="Common Skin";
+
+"change_normal_style"="是否切换基础版？";
+"change_fun_style"="是否切换娱乐版？";

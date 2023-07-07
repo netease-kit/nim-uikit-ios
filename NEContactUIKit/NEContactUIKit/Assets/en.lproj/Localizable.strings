@@ -3,11 +3,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-
+"contact"="Contact";
+"search"="Search";
 "alert_tip"="tip";
 "alert_sure"="ok";
 "alert_cancel"="cancel";
+"close"="close";
 
+"nick"="Nick";
 "account"="Account";
 "noteName"="Nick Name";
 "remove_black" = "Remove";
@@ -21,6 +24,7 @@
 "email"="e-mail";
 "sign"="What's Up";
 "delete_friend"="Delete Contact";
+"delete_title"="Delete \"XXX\" Contact";
 "add_friend"="Add Contact";
 "add_blackList"="block";
 "send_friend_apply"="Contact request sent";
@@ -50,3 +54,6 @@
 // error toast
 "validate_processed"="Already done on other devices";
 "failed_operation"="Failed Operation";
+"network_error"="Network is not available, please check";
+
+"black_tip"="   You won't receive message from this memberlist";

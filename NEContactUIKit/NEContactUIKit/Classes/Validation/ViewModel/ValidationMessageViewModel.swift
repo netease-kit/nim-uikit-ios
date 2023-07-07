@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEContactKit
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 
@@ -105,9 +105,9 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
       for xNoti in xNotiList {
         var noti = xNoti
 
-        // 过期事件：7天（10080s）
+        // 过期事件：7天（604800s）
         if noti.handleStatus == .HandleTypePending,
-           dateNow - (noti.timestamp ?? 0) > 10080 {
+           dateNow - (noti.timestamp ?? 0) > 604_800 {
           noti.handleStatus = .HandleTypeOutOfDate
         }
 

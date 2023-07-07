@@ -5,7 +5,7 @@
 
 import UIKit
 @objcMembers
-public class TextWithDetailTextCell: ContactBaseTextCell {
+open class TextWithDetailTextCell: ContactBaseTextCell {
   public var detailTitleLabel = UILabel()
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -13,9 +13,10 @@ public class TextWithDetailTextCell: ContactBaseTextCell {
     detailTitleLabel.translatesAutoresizingMaskIntoConstraints = false
     detailTitleLabel.font = UIFont.systemFont(ofSize: 12)
     detailTitleLabel.textColor = UIColor(hexString: "#A6ADB6")
+    detailTitleLabel.textAlignment = .right
     contentView.addSubview(detailTitleLabel)
     NSLayoutConstraint.activate([
-      detailTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 20),
+      detailTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor),
       detailTitleLabel.rightAnchor.constraint(
         equalTo: contentView.rightAnchor,
         constant: -20
@@ -25,7 +26,7 @@ public class TextWithDetailTextCell: ContactBaseTextCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }

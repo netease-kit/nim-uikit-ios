@@ -61,16 +61,12 @@ class MessageCallRecordModel: MessageContentModel {
       attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
-    let textSize = NEChatUITool.getSizeWithAtt(
-      att: attributeStr ?? NSAttributedString(string: ""),
-      font: DefaultTextFont(16),
-      maxSize: CGSize(width: qChat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
-    )
+    let textSize = attributeStr?.finalSize(NEKitChatConfig.shared.ui.messageTextSize, CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
 
-    var h = qChat_min_h
+    var h = chat_min_h
     h = textSize.height + (isAuiodRecord ? 20 : 24)
-    contentSize = CGSize(width: textSize.width + qChat_cell_margin * 2, height: h)
+    contentSize = CGSize(width: textSize.width + chat_cell_margin * 2, height: h)
 
-    height = Float(contentSize.height + qChat_margin) + fullNameHeight
+    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
   }
 }
