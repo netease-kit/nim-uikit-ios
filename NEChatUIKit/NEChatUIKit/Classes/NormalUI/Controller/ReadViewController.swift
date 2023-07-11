@@ -28,7 +28,7 @@ open class ReadViewController: NEBaseReadViewController {
 
     readTableView.register(
       UserTableViewCell.self,
-      forCellReuseIdentifier: "\(UserTableViewCell.self)"
+      forCellReuseIdentifier: "\(UserBaseTableViewCell.self)"
     )
     readTableView.rowHeight = 62
   }

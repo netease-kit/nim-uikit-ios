@@ -103,7 +103,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
 
     view.addSubview(back)
     NSLayoutConstraint.activate([
-      back.topAnchor.constraint(equalTo: view.topAnchor, constant: 4.0 + NEConstant.navigationAndStatusHeight),
+      back.topAnchor.constraint(equalTo: view.topAnchor, constant: 8.0 + topConstant),
       back.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       back.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       back.heightAnchor.constraint(equalToConstant: 32),

@@ -63,11 +63,11 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
     ])
     tableView.register(
       FunConversationSearchCell.self,
-      forCellReuseIdentifier: "\(NSStringFromClass(FunConversationSearchCell.self))"
+      forCellReuseIdentifier: "\(NSStringFromClass(NEBaseConversationSearchCell.self))"
     )
     tableView.register(
       FunSearchSessionHeaderView.self,
-      forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(FunSearchSessionHeaderView.self))"
+      forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(SearchSessionBaseView.self))"
     )
     tableView.backgroundColor = .funConversationBackgroundColor
     if #available(iOS 15.0, *) {
@@ -78,28 +78,11 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
 
   // MARK: UITableViewDelegate, UITableViewDataSource
 
-//  override open func tableView(_ tableView: UITableView,
-//                               cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//    let cell = tableView.dequeueReusableCell(
-//      withIdentifier: "\(NSStringFromClass(FunConversationSearchCell.self))",
-//      for: indexPath
-//    ) as! FunConversationSearchCell
-//    if indexPath.section == 0 {
-//      cell.searchModel = viewModel.searchResult?.friend[indexPath.row]
-//    } else if indexPath.section == 1 {
-//      cell.searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
-//    } else {
-//      cell.searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
-//    }
-//    cell.searchText = searchStr
-//    return cell
-//  }
-
   override open func tableView(_ tableView: UITableView,
                                viewForHeaderInSection section: Int) -> UIView? {
     let sectionView = tableView
       .dequeueReusableHeaderFooterView(
-        withIdentifier: "\(NSStringFromClass(FunSearchSessionHeaderView.self))"
+        withIdentifier: "\(NSStringFromClass(SearchSessionBaseView.self))"
       ) as! FunSearchSessionHeaderView
     sectionView.title.textColor = .funConversationSearchHeaderViewTitleColor
     sectionView.bottomLine.backgroundColor = .funConversationLineBorderColor

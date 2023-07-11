@@ -36,6 +36,7 @@ open class ChatBaseViewController: UIViewController, UIGestureRecognizerDelegate
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationController?.isNavigationBarHidden = false
       setupBackUI()
+      topConstant = NEConstant.navigationAndStatusHeight
     } else {
       navigationController?.isNavigationBarHidden = true
       topConstant = NEConstant.navigationAndStatusHeight

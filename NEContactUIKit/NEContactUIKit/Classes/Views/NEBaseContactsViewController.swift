@@ -105,6 +105,12 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
   }
 
   override open func viewWillAppear(_ animated: Bool) {
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationController?.isNavigationBarHidden = false
+    } else {
+      navigationController?.isNavigationBarHidden = true
+    }
+
     // 刷新数据
     viewModel.reLoadData { [weak self] error, userSectionCount in
       self?.emptyView.isHidden = userSectionCount > 0

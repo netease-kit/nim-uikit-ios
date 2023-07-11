@@ -19,7 +19,7 @@ open class FunReadViewController: NEBaseReadViewController {
 
     readTableView.register(
       FunUserTableViewCell.self,
-      forCellReuseIdentifier: "\(FunUserTableViewCell.self)"
+      forCellReuseIdentifier: "\(UserBaseTableViewCell.self)"
     )
     readTableView.rowHeight = 64
 
