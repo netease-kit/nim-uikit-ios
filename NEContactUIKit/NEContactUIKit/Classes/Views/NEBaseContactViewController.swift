@@ -33,6 +33,7 @@ open class NEBaseContactViewController: UIViewController, UIGestureRecognizerDel
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationController?.isNavigationBarHidden = false
       setupBackUI()
+      topConstant = 0
     } else {
       navigationController?.isNavigationBarHidden = true
       topConstant = NEConstant.navigationAndStatusHeight

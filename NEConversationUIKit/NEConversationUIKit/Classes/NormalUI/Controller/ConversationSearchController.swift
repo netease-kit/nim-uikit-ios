@@ -59,11 +59,11 @@ open class ConversationSearchController: NEBaseConversationSearchController {
     ])
     tableView.register(
       ConversationSearchCell.self,
-      forCellReuseIdentifier: "\(NSStringFromClass(ConversationSearchCell.self))"
+      forCellReuseIdentifier: "\(NSStringFromClass(NEBaseConversationSearchCell.self))"
     )
     tableView.register(
       SearchSessionHeaderView.self,
-      forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(SearchSessionHeaderView.self))"
+      forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(SearchSessionBaseView.self))"
     )
   }
 }

@@ -146,19 +146,21 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
+    if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(NEBaseConversationSearchCell.self))",
       for: indexPath
-    ) as! NEBaseConversationSearchCell
-    if indexPath.section == 0 {
-      cell.searchModel = viewModel.searchResult?.friend[indexPath.row]
-    } else if indexPath.section == 1 {
-      cell.searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
-    } else {
-      cell.searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
+    ) as? NEBaseConversationSearchCell {
+      if indexPath.section == 0 {
+        cell.searchModel = viewModel.searchResult?.friend[indexPath.row]
+      } else if indexPath.section == 1 {
+        cell.searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
+      } else {
+        cell.searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
+      }
+      cell.searchText = searchStr
+      return cell
     }
-    cell.searchText = searchStr
-    return cell
+    return NEBaseConversationListCell()
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

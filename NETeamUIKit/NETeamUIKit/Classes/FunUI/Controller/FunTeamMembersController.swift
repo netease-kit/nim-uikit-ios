@@ -20,7 +20,7 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
     NSLayoutConstraint.activate([
       searchGrayBackView.leftAnchor.constraint(equalTo: view.leftAnchor),
       searchGrayBackView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      searchGrayBackView.topAnchor.constraint(equalTo: customNavigationView.bottomAnchor),
+      searchGrayBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       searchGrayBackView.bottomAnchor.constraint(equalTo: contentTable.topAnchor),
     ])
     back.backgroundColor = UIColor.white
