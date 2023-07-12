@@ -33,6 +33,7 @@ TODO: Add long description of the pod here.
   s.source_files = 'NERtcCallUIKit/Classes/**/*'
   s.resource = 'NERtcCallUIKit/Assets/**/*'
   
+  s.dependency 'NERtcSDK'
   s.dependency 'NERtcCallKit'
   s.dependency 'AFNetworking'
   s.dependency 'SDWebImage'
