@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextFieldDelegate,
@@ -82,6 +82,10 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     textField.returnKeyType = .search
     textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
     textField.delegate = self
+    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    textField.accessibilityIdentifier = "id.search"
     return textField
 
   }()

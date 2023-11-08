@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
-import NIMSDK
 import NEChatKit
 import NECommonKit
+import NECoreIMKit
 import NECoreKit
+import NIMSDK
 // import NEKitContact
 
 @objc
@@ -55,7 +55,7 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
   // 下拉时间戳
   private var oldMsg: NIMMessage?
 
-  public var repo: ChatRepo = .init()
+  public var repo = ChatRepo.shared
   public var operationModel: MessageContentModel?
   private var userInfo = [String: User]()
   public var isReplying = false

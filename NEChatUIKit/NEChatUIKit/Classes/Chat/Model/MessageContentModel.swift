@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import Foundation
-import NIMSDK
 import CoreAudio
-import simd
+import Foundation
 import NECoreIMKit
+import NIMSDK
+import simd
 
 @objcMembers
 public class MessageContentModel: NSObject, MessageModel {

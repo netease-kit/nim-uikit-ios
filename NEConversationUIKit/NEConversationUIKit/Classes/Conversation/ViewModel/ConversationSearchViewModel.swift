@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 public class ConversationSearchViewModel: NSObject {
-  let repo = ConversationRepo()
+  let repo = ConversationRepo.shared
   public var searchResult: (
     friend: [ConversationSearchListModel],
     contactGroup: [ConversationSearchListModel],

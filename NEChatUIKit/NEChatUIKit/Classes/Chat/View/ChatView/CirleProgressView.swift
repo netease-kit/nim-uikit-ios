@@ -40,6 +40,7 @@ public class CirleProgressView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = .clear
+    accessibilityIdentifier = "id.status"
     imageView.frame = bounds
     imageView.contentMode = .center
     addSubview(imageView)

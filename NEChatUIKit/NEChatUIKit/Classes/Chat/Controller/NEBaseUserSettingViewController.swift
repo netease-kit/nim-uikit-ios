@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingViewModelDelegate,
@@ -27,6 +27,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(coreLoader.loadImage("setting_add"), for: .normal)
+    button.accessibilityIdentifier = "id.add"
     return button
   }()
 
@@ -36,6 +37,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     label.font = NEConstant.defaultTextFont(12.0)
     label.textColor = .ne_darkText
     label.textAlignment = .center
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
@@ -244,6 +246,14 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       for: indexPath
     ) as? NEBaseUserSettingCell {
       cell.configure(model)
+      if let c = cell as? UserSettingSwitchCell {
+        if model.cellName == chatLocalizable("message_remind") {
+          c.tSwitch.accessibilityIdentifier = "id.messageRemind"
+        }
+        if model.cellName == chatLocalizable("session_set_top") {
+          c.tSwitch.accessibilityIdentifier = "id.stickTop"
+        }
+      }
       return cell
     }
     return UITableViewCell()

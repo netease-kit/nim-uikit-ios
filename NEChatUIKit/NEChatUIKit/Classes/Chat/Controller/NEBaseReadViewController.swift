@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
-import NECoreIMKit
 import NECommonUIKit
+import NECoreIMKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegate, UITableViewDelegate,

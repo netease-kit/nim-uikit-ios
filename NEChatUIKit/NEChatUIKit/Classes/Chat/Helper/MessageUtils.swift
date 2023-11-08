@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NIMSDK
 import NECoreIMKit
+import NIMSDK
 
 @objcMembers
 public class MessageUtils: NSObject {

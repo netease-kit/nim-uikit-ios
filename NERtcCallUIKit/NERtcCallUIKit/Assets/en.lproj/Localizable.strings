@@ -35,3 +35,9 @@
 "waitting_remote_accept"="Waitting to connect";
 "calling"="Calling";
 "cancel_failed"="The invitation has been accepted and cannot be canceled";
+
+"operation_failed"="operation failed";
+
+"device_not_support"="The current device does not support virtualization";
+
+"connecting"="Connecting…";

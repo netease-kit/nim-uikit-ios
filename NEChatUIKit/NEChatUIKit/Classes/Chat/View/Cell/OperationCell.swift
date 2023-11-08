@@ -26,6 +26,7 @@ open class OperationCell: UICollectionViewCell {
     imageView.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(imageView)
     imageView.contentMode = .center
+    imageView.accessibilityIdentifier = "id.menuIcon"
     NSLayoutConstraint.activate([
       imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0),
       imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
@@ -37,6 +38,7 @@ open class OperationCell: UICollectionViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.textAlignment = .center
+    label.accessibilityIdentifier = "id.menuTitle"
     contentView.addSubview(label)
     NSLayoutConstraint.activate([
       label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8),

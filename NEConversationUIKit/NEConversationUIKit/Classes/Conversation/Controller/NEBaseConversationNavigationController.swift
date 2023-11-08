@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseConversationNavigationController: UIViewController, UIGestureRecognizerDelegate {
@@ -47,12 +47,15 @@ open class NEBaseConversationNavigationController: UIViewController, UIGestureRe
 
   open func setupBackUI() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
-    navigationItem.leftBarButtonItem = UIBarButtonItem(
+    let backItem = UIBarButtonItem(
       image: image,
       style: .plain,
       target: self,
       action: #selector(backEvent)
     )
+    backItem.accessibilityIdentifier = "id.backArrow"
+
+    navigationItem.leftBarButtonItem = backItem
   }
 
   open func backEvent() {

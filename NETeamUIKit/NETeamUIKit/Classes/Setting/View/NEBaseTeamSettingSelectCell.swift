@@ -12,6 +12,7 @@ open class NEBaseTeamSettingSelectCell: NEBaseTeamSettingCell {
     label.textColor = NEConstant.hexRGB(0x999999)
     label.font = NEConstant.defaultTextFont(14.0)
     label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.subTitleValue"
     return label
   }()
 

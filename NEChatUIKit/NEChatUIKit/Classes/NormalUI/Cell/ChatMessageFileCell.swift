@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class ChatMessageFileCell: NormalChatMessageBaseCell {
@@ -15,6 +15,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let view_img = UIImageView()
     view_img.translatesAutoresizingMaskIntoConstraints = false
     view_img.backgroundColor = .clear
+    view_img.accessibilityIdentifier = "id.fileType"
     return view_img
   }()
 
@@ -33,6 +34,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     label.lineBreakMode = .byTruncatingMiddle
     label.font = DefaultTextFont(14)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.displayName"
     return label
   }()
 
@@ -42,6 +44,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     label.textColor = UIColor(hexString: "#999999")
     label.font = NEConstant.defaultTextFont(10.0)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.displaySize"
     return label
   }()
 
@@ -70,6 +73,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let view_img = UIImageView()
     view_img.translatesAutoresizingMaskIntoConstraints = false
     view_img.backgroundColor = .clear
+    view_img.accessibilityIdentifier = "id.fileType"
     return view_img
   }()
 
@@ -88,6 +92,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     label.lineBreakMode = .byTruncatingMiddle
     label.font = DefaultTextFont(14)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.displayName"
     return label
   }()
 
@@ -97,6 +102,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     label.textColor = UIColor(hexString: "#999999")
     label.font = NEConstant.defaultTextFont(10.0)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.displaySize"
     return label
   }()
 

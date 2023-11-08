@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class ContactsSelectedViewController: NEBaseContactsSelectedViewController {
@@ -22,8 +22,6 @@ open class ContactsSelectedViewController: NEBaseContactsSelectedViewController 
 
   override open func setupUI() {
     super.setupUI()
-    collectionBackViewTopMargin = 0
-    collectionBackViewTopAnchor?.constant = topConstant
 
     collection.register(
       ContactUnCheckCell.self,

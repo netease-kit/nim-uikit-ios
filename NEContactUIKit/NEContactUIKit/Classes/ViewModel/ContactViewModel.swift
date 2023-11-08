@@ -4,8 +4,8 @@
 
 import Foundation
 import NEChatKit
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
 import UIKit
 
 @objcMembers
@@ -14,7 +14,7 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
   public var contacts: [ContactSection] = []
   public var indexs: [String]?
   private var contactHeaders: [ContactHeadItem]?
-  public var contactRepo = ContactRepo()
+  public var contactRepo = ContactRepo.shared
   private var initalDict = [String: [ContactInfo]]()
   private let className = "ContactViewModel"
 

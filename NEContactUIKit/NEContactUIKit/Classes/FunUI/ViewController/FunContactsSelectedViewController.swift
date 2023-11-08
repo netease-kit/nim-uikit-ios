@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class FunContactsSelectedViewController: NEBaseContactsSelectedViewController {
@@ -19,6 +19,7 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
   }
 
   override open func setupUI() {
+    collectionBackViewTopMargin = 12
     super.setupUI()
     emptyView.setEmptyImage(name: "fun_user_empty")
     collectionBackView.backgroundColor = .white

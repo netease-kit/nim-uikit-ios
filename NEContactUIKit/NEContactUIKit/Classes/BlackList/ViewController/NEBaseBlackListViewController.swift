@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
-import NECoreIMKit
 import NECommonKit
+import NECoreIMKit
+import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
@@ -36,19 +36,24 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     title = localizable("blacklist")
     customNavigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
-    navigationItem.leftBarButtonItem = UIBarButtonItem(
+    let backItem = UIBarButtonItem(
       image: image,
       style: .plain,
       target: self,
       action: #selector(backEvent)
     )
+    backItem.accessibilityIdentifier = "id.backArrow"
+    navigationItem.leftBarButtonItem = backItem
+
     let addImage = UIImage.ne_imageNamed(name: "add")?.withRenderingMode(.alwaysOriginal)
-    navigationItem.rightBarButtonItem = UIBarButtonItem(
+    let addItem = UIBarButtonItem(
       image: addImage,
       style: .plain,
       target: self,
       action: #selector(addBlack)
     )
+    addItem.accessibilityIdentifier = "id.threePoint"
+    navigationItem.rightBarButtonItem = addItem
 
     customNavigationView.translatesAutoresizingMaskIntoConstraints = false
     customNavigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
@@ -81,6 +86,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     contentLabel.text = localizable("black_tip")
     contentLabel.textColor = UIColor.ne_emptyTitleColor
     contentLabel.font = UIFont.systemFont(ofSize: 14)
+    contentLabel.accessibilityIdentifier = "id.tips"
     headView.addSubview(contentLabel)
     tableView.tableHeaderView = headView
   }

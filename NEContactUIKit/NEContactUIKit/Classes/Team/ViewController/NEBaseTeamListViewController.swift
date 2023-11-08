@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
 import NECoreKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
@@ -36,12 +36,15 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     title = localizable("mine_groupchat")
     customNavigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
-    navigationItem.leftBarButtonItem = UIBarButtonItem(
+    let backItem = UIBarButtonItem(
       image: image,
       style: .plain,
       target: self,
       action: #selector(backEvent)
     )
+    backItem.accessibilityIdentifier = "id.backArrow"
+
+    navigationItem.leftBarButtonItem = backItem
 
     customNavigationView.translatesAutoresizingMaskIntoConstraints = false
     customNavigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))

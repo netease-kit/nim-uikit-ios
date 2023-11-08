@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #import "NetManager.h"
-#import "AFNetworking.h"
+#import <NECommonKit/YXNetworkReachabilityManager.h>
 
 @implementation NetManager
 
@@ -28,25 +28,25 @@
 
 #pragma mark - 监测网络状态
 - (void)monitorNetworkState {
-  AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
+  YXNetworkReachabilityManager *manager = [YXNetworkReachabilityManager sharedManager];
   [manager startMonitoring];
   self.isClose = [manager isReachable] ? NO : YES;
   NSLog(@"net work close state : %d", self.isClose);
-  [manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+  [manager setReachabilityStatusChangeBlock:^(YXNetworkReachabilityStatus status) {
     switch (status) {
-      case AFNetworkReachabilityStatusNotReachable:
+      case YXNetworkReachabilityStatusNotReachable:
         NSLog(@"没有网络");
         self.isClose = YES;
         break;
-      case AFNetworkReachabilityStatusUnknown:
+      case YXNetworkReachabilityStatusUnknown:
         NSLog(@"未知");
         self.isClose = YES;
         break;
-      case AFNetworkReachabilityStatusReachableViaWiFi:
+      case YXNetworkReachabilityStatusReachableViaWiFi:
         NSLog(@"WiFi");
         self.isClose = NO;
         break;
-      case AFNetworkReachabilityStatusReachableViaWWAN:
+      case YXNetworkReachabilityStatusReachableViaWWAN:
         NSLog(@"3G|4G");
         self.isClose = NO;
         break;

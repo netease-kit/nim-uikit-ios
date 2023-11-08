@@ -39,8 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
         
-        let account = "<#account#>"
-        let token = "<#token#>"
+        let account = "338920520839424"
+        let token = "16a4518a-c66f-4ccb-b54d-2e8dd58dc8d2"
         
         weak var weakSelf = self
         IMKitClient.instance.loginIM(account, token) { error in
@@ -145,8 +145,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCerName = AppKey.pushCerName
         option.isDisableLog = true
         option.supportAutoJoinWhenCalled = false
-        let uiConfig = NERtcCallUIConfig()
-        uiConfig.option = option
+        NERtcCallKit.sharedInstance().setupAppKey(AppKey.appKey, options: option)
+        let uiConfig = NECallUIKitConfig()
         uiConfig.appKey = AppKey.appKey
         uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
         NERtcCallKit.sharedInstance().timeOutSeconds = 30

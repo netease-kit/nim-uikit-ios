@@ -16,7 +16,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    self.bundle = [NSBundle bundleForClass:self.class];
+    self.bundle = [NSBundle bundleForClass:NEVideoOperationView.class];
     [self setupUI];
   }
   return self;
@@ -118,15 +118,40 @@
   return _mediaBtn;
 }
 
+- (UIButton *)virtualBtn {
+  if (nil == _virtualBtn) {
+    _virtualBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_virtualBtn setImage:[UIImage imageNamed:@"virtual_background_off"
+                                                   inBundle:self.bundle
+                              compatibleWithTraitCollection:nil]
+                 forState:UIControlStateNormal];
+    [_virtualBtn setImage:[UIImage imageNamed:@"virtual_background_on"
+                                                   inBundle:self.bundle
+                              compatibleWithTraitCollection:nil]
+                 forState:UIControlStateSelected];
+    _virtualBtn.accessibilityIdentifier = @"virtual_btn";
+  }
+  return _virtualBtn;
+}
+
 - (void)changeAudioStyle {
   [self.stack removeArrangedSubview:self.cameraBtn];
   [self.cameraBtn removeFromSuperview];
   self.mediaBtn.selected = YES;
+  if (self.enableVirtualBackground == YES) {
+    [self.stack removeArrangedSubview:self.virtualBtn];
+  }
+  self.virtualBtn.hidden = YES;
 }
 
 - (void)changeVideoStyle {
   [self.stack insertArrangedSubview:self.cameraBtn atIndex:1];
   self.mediaBtn.selected = NO;
+  if (self.enableVirtualBackground == YES) {
+    [self.stack insertArrangedSubview:self.virtualBtn atIndex:4];
+    self.virtualBtn.selected = NO;
+    self.virtualBtn.hidden = NO;
+  }
 }
 
 - (void)hideMediaSwitch {
@@ -141,6 +166,18 @@
   [self.stack removeArrangedSubview:self.speakerBtn];
   [self.mediaBtn removeFromSuperview];
   [self.speakerBtn removeFromSuperview];
+}
+
+- (void)removeMediaBtn {
+  [self.stack removeArrangedSubview:self.mediaBtn];
+  [self.mediaBtn removeFromSuperview];
+}
+
+- (void)setEnableVirtualBackground:(BOOL)enableVirtualBackground {
+  _enableVirtualBackground = enableVirtualBackground;
+  if (enableVirtualBackground == YES) {
+    [self.stack insertArrangedSubview:self.virtualBtn atIndex:4];
+  }
 }
 
 @end

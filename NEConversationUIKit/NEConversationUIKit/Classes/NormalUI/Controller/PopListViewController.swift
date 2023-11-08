@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import UIKit
 import NECommonKit
+import UIKit
 
 @objcMembers
 open class PopListViewController: NEBasePopListViewController {

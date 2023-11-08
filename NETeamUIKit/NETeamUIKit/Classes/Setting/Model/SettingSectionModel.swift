@@ -9,4 +9,20 @@ import Foundation
 public class SettingSectionModel: NSObject {
   public var cellModels = [SettingCellModel]()
   override public init() {}
+
+  // 设置圆角
+  open func setCornerType() {
+    cellModels.forEach { model in
+      if model == cellModels.first {
+        model.cornerType = .topLeft.union(.topRight)
+        if model == cellModels.last {
+          model.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
+        }
+      } else if model == cellModels.last {
+        model.cornerType = .bottomLeft.union(.bottomRight)
+      } else {
+        model.cornerType = .none
+      }
+    }
+  }
 }

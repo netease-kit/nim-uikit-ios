@@ -24,7 +24,7 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
   public var stickTopInfos = [NIMSession: NIMStickTopSessionInfo]()
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
-  public let repo = ConversationRepo()
+  public let repo = ConversationRepo.shared
 
   var cacheUpdateSessionDic = [String: NIMRecentSession]()
   var cacheAddSessionDic = [String: ConversationListModel]()
@@ -103,6 +103,7 @@ public class ConversationViewModel: NSObject, ConversationRepoDelegate,
     weak var weakSelf = self
     let option = NIMDeleteRecentSessionOption()
     option.isDeleteRoamMessage = true
+    option.shouldMarkAllMessagesReadInSessions = true
     repo.deleteRecentConversation(recentSession, option) { error in
       weakSelf?.repo.deleteLocalSession(recentSession: recentSession)
     }

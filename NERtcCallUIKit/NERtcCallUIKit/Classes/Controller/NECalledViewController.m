@@ -3,8 +3,11 @@
 // found in the LICENSE file.
 
 #import "NECalledViewController.h"
+#import <AVKit/AVKit.h>
 
 @interface NECalledViewController ()
+
+@property(nonatomic, strong) UIView *preView;
 
 @end
 
@@ -16,7 +19,16 @@
 }
 
 - (void)setupUI {
-  [super setupUI];
+  [self.view addSubview:self.preView];
+  [NSLayoutConstraint activateConstraints:@[
+    [self.preView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+    [self.preView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
+    [self.preView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor],
+    [self.preView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+  ]];
+
+  [self checkCallePreview];
+
   /// 接听和拒接按钮
   [self.view addSubview:self.rejectBtn];
   [NSLayoutConstraint activateConstraints:@[
@@ -40,6 +52,19 @@
 
   [self setupCenterRemoteAvator];
 
+  self.connectingLabel = [[UILabel alloc] init];
+  self.connectingLabel.translatesAutoresizingMaskIntoConstraints = NO;
+  self.connectingLabel.text = [self localizableWithKey:@"connecting"];
+  self.connectingLabel.textColor = [UIColor whiteColor];
+  self.connectingLabel.font = [UIFont systemFontOfSize:14];
+  self.connectingLabel.hidden = YES;
+  [self.view addSubview:self.connectingLabel];
+  [NSLayoutConstraint activateConstraints:@[
+    [self.connectingLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+    [self.connectingLabel.bottomAnchor constraintEqualToAnchor:self.acceptBtn.topAnchor
+                                                      constant:-20],
+  ]];
+
   [self refreshUI];
 }
 
@@ -48,6 +73,51 @@
                                    ? self.callParam.remoteShowName
                                    : self.callParam.remoteUserAccid;
   self.centerSubtitleLabel.text = [self getInviteText];
+}
+
+- (void)checkCallePreview {
+  if (self.callParam.isCaller == NO && self.callParam.enableCalleePreview &&
+      self.callParam.callType == NECallTypeVideo &&
+      [[[NECallEngine sharedInstance] valueForKeyPath:@"context.initRtcMode"] intValue] !=
+          InitRtcInNeedDelayToAccept) {
+    self.preView.hidden = NO;
+    NSLog(@"called preview");
+
+    __weak typeof(self) weakSelf = self;
+
+    AVAuthorizationStatus authorizationStatus =
+        [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authorizationStatus == AVAuthorizationStatusNotDetermined) {
+      // 请求摄像头权限
+      [AVCaptureDevice
+          requestAccessForMediaType:AVMediaTypeVideo
+                  completionHandler:^(BOOL granted) {
+                    if (granted) {
+                      if (weakSelf != nil) {
+                        [[NECallEngine sharedInstance] setupLocalView:weakSelf.preView];
+                      }
+                    } else {
+                      // 用户未授权
+                    }
+                  }];
+    } else if (authorizationStatus == AVAuthorizationStatusAuthorized) {
+      if (weakSelf != nil) {
+        [[NECallEngine sharedInstance] setupLocalView:weakSelf.preView];
+      }
+    } else {
+      // 用户未授权
+    }
+  } else {
+    self.preView.isHidden;
+  }
+}
+
+- (UIView *)preView {
+  if (nil == _preView) {
+    _preView = [[UIView alloc] init];
+    _preView.translatesAutoresizingMaskIntoConstraints = NO;
+  }
+  return _preView;
 }
 
 /*

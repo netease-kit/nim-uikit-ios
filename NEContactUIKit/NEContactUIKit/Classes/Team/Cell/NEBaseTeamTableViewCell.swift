@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 
 @objcMembers
 open class NEBaseTeamTableViewCell: UITableViewCell {
@@ -26,6 +26,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     avatarImage.translatesAutoresizingMaskIntoConstraints = false
     avatarImage.clipsToBounds = true
     avatarImage.contentMode = .scaleAspectFill
+    avatarImage.accessibilityIdentifier = "id.avatar"
     contentView.addSubview(avatarImage)
     NSLayoutConstraint.activate([
       avatarImage.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
@@ -47,6 +48,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     ])
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.accessibilityIdentifier = "id.name"
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),

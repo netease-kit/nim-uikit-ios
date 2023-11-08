@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECommonUIKit
 import NEChatKit
+import NECommonUIKit
+import UIKit
 
 @objcMembers
 open class NEBaseChatTeamMemberCell: UITableViewCell {
@@ -15,6 +15,7 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
     header.titleLabel.textColor = UIColor.white
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
+    header.accessibilityIdentifier = "id.atCellHeaderView"
     return header
   }()
 
@@ -22,6 +23,7 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = .ne_darkText
+    label.accessibilityIdentifier = "id.atCellName"
     return label
   }()
 

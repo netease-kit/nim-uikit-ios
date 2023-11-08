@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseContactUserViewController: NEBaseContactViewController, UITableViewDelegate,
@@ -205,7 +205,17 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       c.titleLabel.text = item.title
       c.detailTitleLabel.text = item.detailTitle
       if item.title == localizable("sign") {
+        c.detailTitleLabel.accessibilityIdentifier = "id.signature"
         c.detailTitleLabel.numberOfLines = 2
+      }
+      if item.title == localizable("email") {
+        c.detailTitleLabel.accessibilityIdentifier = "id.email"
+      }
+      if item.title == localizable("phone") {
+        c.detailTitleLabel.accessibilityIdentifier = "id.phone"
+      }
+      if item.title == localizable("birthday") {
+        c.detailTitleLabel.accessibilityIdentifier = "id.birthday"
       }
       return c
     }
@@ -216,6 +226,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       c.block = { [weak self] title, value in
         print("title:\(title) value\(value)")
         if title == localizable("add_blackList") {
+          c.switchButton.accessibilityIdentifier = "id.blackList"
           self?.blackList(isBlack: value) {
             c.switchButton.isOn = !c.switchButton.isOn
           }
@@ -228,6 +239,15 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     if let c = cell as? CenterTextCell {
       c.titleLabel.text = item.title
       c.titleLabel.textColor = item.textColor
+      if item.title == localizable("chat") {
+        c.titleLabel.accessibilityIdentifier = "id.chat"
+      }
+      if item.title == localizable("delete_friend") {
+        c.titleLabel.accessibilityIdentifier = "id.delete"
+      }
+      if item.title == localizable("add_friend") {
+        c.titleLabel.accessibilityIdentifier = "id.chat"
+      }
       return c
     }
     return cell
@@ -375,11 +395,13 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   open func deleteFriend(user: User?) {
+    let alertTitle = localizable("delete_title").replacingOccurrences(of: "XXX", with: user?.showName(true) ?? "")
     let alertController = UIAlertController(
-      title: localizable("delete_title").replacingOccurrences(of: "XXX", with: user?.showName(true) ?? ""),
+      title: alertTitle,
       message: nil,
       preferredStyle: .actionSheet
     )
+    alertController.getUILabel(string: alertTitle)?.accessibilityIdentifier = "id.title"
 
     let cancelAction = UIAlertAction(
       title: commonLocalizable("cancel"),
@@ -387,12 +409,14 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       handler: nil
     )
     cancelAction.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    cancelAction.accessibilityIdentifier = "id.negative"
 
     let deleteAction = UIAlertAction(title: localizable("delete_friend"),
                                      style: .default) { [weak self] action in
       self?.deleteFriendAction(user: user)
     }
     deleteAction.setValue(UIColor.ne_redText, forKey: "_titleTextColor")
+    deleteAction.accessibilityIdentifier = "id.positive"
 
     alertController.addAction(cancelAction)
     alertController.addAction(deleteAction)

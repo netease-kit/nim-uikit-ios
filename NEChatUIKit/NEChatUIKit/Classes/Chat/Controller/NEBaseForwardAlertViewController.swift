@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
 import NECommonUIKit
+import UIKit
 
 @objc
 public class ForwardItem: NSObject {
@@ -22,6 +22,7 @@ public class NEBaseForwardUserCell: UICollectionViewCell {
     header.translatesAutoresizingMaskIntoConstraints = false
     header.titleLabel.font = NEConstant.defaultTextFont(11.0)
     header.clipsToBounds = true
+    header.accessibilityIdentifier = "id.forwardHeaderView"
     return header
   }()
 
@@ -85,6 +86,7 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     let header = NEUserHeaderView(frame: .zero)
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
+    header.accessibilityIdentifier = "id.forwardHeaderView"
     return header
   }()
 
@@ -102,6 +104,7 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     label.font = NEConstant.defaultTextFont(14.0)
     label.textColor = .ne_darkText
     label.numberOfLines = 0
+    label.accessibilityIdentifier = "id.forwardContentText"
     return label
   }()
 
@@ -125,6 +128,7 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     tip.font = NEConstant.defaultTextFont(16.0)
     tip.textColor = .ne_darkText
     tip.text = chatLocalizable("send_to")
+    tip.accessibilityIdentifier = "id.forwardTitle"
     contentView.addSubview(tip)
     NSLayoutConstraint.activate([
       tip.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
@@ -207,11 +211,13 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     canceBtn.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
     canceBtn.setTitle(chatLocalizable("cancel"), for: .normal)
     canceBtn.setTitleColor(.ne_greyText, for: .normal)
+    canceBtn.accessibilityIdentifier = "id.forwardCancelBtn"
 
     sureBtn.translatesAutoresizingMaskIntoConstraints = false
     sureBtn.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
     sureBtn.setTitle(chatLocalizable("send"), for: .normal)
     sureBtn.setTitleColor(.ne_blueText, for: .normal)
+    sureBtn.accessibilityIdentifier = "id.forwardSendBtn"
 
     contentView.addSubview(canceBtn)
     NSLayoutConstraint.activate([

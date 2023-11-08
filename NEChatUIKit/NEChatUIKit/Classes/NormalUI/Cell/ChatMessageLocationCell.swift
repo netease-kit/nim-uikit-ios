@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NEChatKit
+import UIKit
 
 @objcMembers
 open class ChatMessageLocationCell: NormalChatMessageBaseCell {
@@ -12,6 +12,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.font = UIFont.systemFont(ofSize: 16.0)
+    label.accessibilityIdentifier = "id.locationItemTitle"
     return label
   }()
 
@@ -20,6 +21,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_lightText
     label.font = UIFont.systemFont(ofSize: 12.0)
+    label.accessibilityIdentifier = "id.locationItemAddress"
     return label
   }()
 
@@ -42,6 +44,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.font = UIFont.systemFont(ofSize: 16.0)
+    label.accessibilityIdentifier = "id.locationItemTitle"
     return label
   }()
 
@@ -50,6 +53,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_lightText
     label.font = UIFont.systemFont(ofSize: 12.0)
+    label.accessibilityIdentifier = "id.locationItemAddress"
     return label
   }()
 

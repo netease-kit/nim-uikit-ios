@@ -8,43 +8,54 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NERtcCallUIKit'
-  s.version          = '1.8.2'
+  s.version          = '2.2.0'
   s.summary          = 'Netease XKit'
-
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
-
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
-
   s.homepage         = 'http://netease.im'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :'type' => 'Copyright', :'text' => ' Copyright 2022 Netease ' }
-  s.author           = "yunxin engineering department"
-  s.source           = { :git => 'ssh://git@g.hz.netease.com:22222/yunxin-app/xkit-ios.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
-  s.ios.deployment_target = '9.0'
-
+  s.license          =  { :'type' => "Copyright", :'text' => " Copyright 2022 Netease " }
+  s.author           = 'yunxin engineering department'
+  s.ios.deployment_target = '10.0'
+  s.source = { :http => "" }
   s.source_files = 'NERtcCallUIKit/Classes/**/*'
   s.resource = 'NERtcCallUIKit/Assets/**/*'
-  
-  s.dependency 'NERtcSDK'
-  s.dependency 'NERtcCallKit'
-  s.dependency 'AFNetworking'
-  s.dependency 'SDWebImage'
-  s.dependency 'Toast'
-  s.dependency 'NECoreKit'
-  s.dependency 'NECommonKit'
-  # s.resource_bundles = {
-  #   'NERtcCallUIKit' => ['NERtcCallUIKit/Assets/*.png']
-  # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.subspec 'NOS' do |nos|
+    nos.dependency 'NERtcCallKit/NOS','2.2.0'
+    nos.dependency 'SDWebImage'
+    nos.dependency 'NECoreKit','9.6.4'
+    nos.dependency 'NECommonKit'
+    nos.dependency 'NECommonUIKit'
+    nos.dependency 'NERtcSDK'
+  end
+
+  s.subspec 'NOS_Special' do |nos|
+    nos.dependency 'NERtcCallKit/NOS_Special', "2.2.0"
+    nos.dependency 'SDWebImage'
+    nos.dependency 'NECoreKit','9.6.4'
+    nos.dependency 'NECommonKit'
+    nos.dependency 'NECommonUIKit'
+    nos.dependency 'NERtcSDK'
+
+  end
+
+  s.subspec 'FCS' do |fcs|
+    fcs.dependency 'NERtcCallKit/FCS','2.2.0'
+    fcs.dependency 'SDWebImage'
+    fcs.dependency 'NECoreKit','9.6.4'
+    fcs.dependency 'NECommonKit'
+    fcs.dependency 'NECommonUIKit'
+    fcs.dependency 'NERtcSDK'
+
+  end
+
+  s.subspec 'FCS_Special' do |fcs|
+    fcs.dependency 'NERtcCallKit/FCS_Special', "2.2.0"
+    fcs.dependency 'SDWebImage'
+    fcs.dependency 'NECoreKit','9.6.4'
+    fcs.dependency 'NECommonKit'
+    fcs.dependency 'NECommonUIKit'
+    fcs.dependency 'NERtcSDK'
+
+  end
+  s.default_subspecs = 'NOS'
+
 end

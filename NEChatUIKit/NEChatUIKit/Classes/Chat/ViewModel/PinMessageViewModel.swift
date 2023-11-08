@@ -1,10 +1,10 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NEChatKit
 import NIMSDK
+import UIKit
 
 @objc
 public protocol PinMessageViewModelDelegate: NSObjectProtocol {
@@ -13,7 +13,7 @@ public protocol PinMessageViewModelDelegate: NSObjectProtocol {
 
 @objcMembers
 public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatManagerDelegate, NIMConversationManagerDelegate {
-  public let chatRepo = ChatRepo()
+  public let chatRepo = ChatRepo.shared
   public var items = [PinMessageModel]()
   public var delegate: PinMessageViewModelDelegate?
   public var session: NIMSession?

@@ -5,8 +5,8 @@
 
 import Foundation
 import NECoreIMKit
-import UIKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 open class ContactInfo: NSObject {

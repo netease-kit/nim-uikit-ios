@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDelegate, UITableViewDataSource {
@@ -25,6 +25,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
     view.layer.cornerRadius = 4
+    view.isHidden = true
     return view
   }()
 
@@ -35,15 +36,14 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
     layout.minimumInteritemSpacing = 0
     let collect = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
     collect.contentInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+    collect.accessibilityIdentifier = "id.selected"
     return collect
   }()
 
   public var sureBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 76, height: 32))
 
-  var collectionBackViewTopMargin: CGFloat = 12
-  var collectionBackViewTopAnchor: NSLayoutConstraint?
+  var collectionBackViewTopMargin: CGFloat = 0
   var collectionBackViewHeight: CGFloat = 52
-  var collectionBackViewHeightAnchor: NSLayoutConstraint?
 
   public var customCells = [Int: NEBaseContactTableViewCell.Type]() // custom ui cell
 
@@ -61,6 +61,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
     if #available(iOS 15.0, *) {
       table.sectionHeaderTopPadding = 0
     }
+
     return table
   }()
 
@@ -87,21 +88,19 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
 
   open func setupUI() {
     view.addSubview(collectionBackView)
-    collectionBackViewTopAnchor = collectionBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + collectionBackViewTopMargin)
-    collectionBackViewHeightAnchor = collectionBackView.heightAnchor.constraint(equalToConstant: 0)
     NSLayoutConstraint.activate([
-      collectionBackViewTopAnchor!,
+      collectionBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + collectionBackViewTopMargin),
       collectionBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
       collectionBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-      collectionBackViewHeightAnchor!,
+      collectionBackView.heightAnchor.constraint(equalToConstant: collectionBackViewHeight),
     ])
 
-    view.addSubview(collection)
     collection.backgroundColor = .clear
     collection.delegate = self
     collection.dataSource = self
     collection.allowsMultipleSelection = false
     collection.translatesAutoresizingMaskIntoConstraints = false
+    collectionBackView.addSubview(collection)
     NSLayoutConstraint.activate([
       collection.centerYAnchor.constraint(equalTo: collectionBackView.centerYAnchor),
       collection.leftAnchor.constraint(equalTo: collectionBackView.leftAnchor),
@@ -308,8 +307,8 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       contact === c
     }) == false {
       selectArray.append(contact)
-      if let height = collectionBackViewHeightAnchor?.constant, height <= 0 {
-        collectionBackViewHeightAnchor?.constant = collectionBackViewHeight
+      if collectionBackView.isHidden {
+        collectionBackView.isHidden = false
         tableViewTopAnchor?.constant += collectionBackViewHeight + collectionBackViewTopMargin * 2
       }
     }
@@ -324,8 +323,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       contact === c
     }
     if selectArray.count <= 0 {
-      collection.reloadData()
-      collectionBackViewHeightAnchor?.constant = 0
+      collectionBackView.isHidden = true
       tableViewTopAnchor?.constant -= collectionBackViewHeight + collectionBackViewTopMargin * 2
     }
     collection.reloadData()

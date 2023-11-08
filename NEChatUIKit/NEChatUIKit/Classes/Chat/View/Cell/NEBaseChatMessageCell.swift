@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objc
 public protocol ChatBaseCellDelegate: NSObjectProtocol {
@@ -96,12 +96,14 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     avatarImageLeft.clipsToBounds = true
     avatarImageLeft.isUserInteractionEnabled = true
     avatarImageLeft.contentMode = .scaleAspectFill
+    avatarImageLeft.accessibilityIdentifier = "id.avatar"
 
     avatarImageRight.backgroundColor = UIColor(hexString: "#537FF4")
     avatarImageRight.translatesAutoresizingMaskIntoConstraints = false
     avatarImageRight.clipsToBounds = true
     avatarImageRight.isUserInteractionEnabled = true
     avatarImageRight.contentMode = .scaleAspectFill
+    avatarImageRight.accessibilityIdentifier = "id.avatar"
 
     // name
     nameLabelLeft.textAlignment = .center
@@ -118,6 +120,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     fullNameLabel.translatesAutoresizingMaskIntoConstraints = false
     fullNameLabel.font = UIFont.systemFont(ofSize: 12)
     fullNameLabel.textColor = UIColor.ne_lightText
+    fullNameLabel.accessibilityIdentifier = "id.fullNameLabel"
 
     //        bubbleImage
     bubbleImageLeft.backgroundColor = NEKitChatConfig.shared.ui.receiveMessageBg

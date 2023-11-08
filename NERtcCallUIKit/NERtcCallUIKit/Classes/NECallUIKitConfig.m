@@ -2,13 +2,22 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-#import "NERtcCallUIConfig.h"
+#import "NECallUIKitConfig.h"
 
 @implementation NECallUIConfig
 
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.enableAudioToVideo = YES;
+    self.enableVideoToAudio = YES;
+  }
+  return self;
+}
+
 @end
 
-@implementation NERtcCallUIConfig
+@implementation NECallUIKitConfig
 
 - (NECallUIConfig *)uiConfig {
   if (nil == _uiConfig) {

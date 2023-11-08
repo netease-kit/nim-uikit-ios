@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UITextFieldDelegate {
@@ -27,6 +27,10 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
     textField.delegate = self
     textField.clearButtonMode = .always
     textField.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    textField.accessibilityIdentifier = "id.editText"
     return textField
   }()
 

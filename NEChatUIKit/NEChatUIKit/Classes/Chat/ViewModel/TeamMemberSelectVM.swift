@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 
 import Foundation
-import NIMSDK
 import NEChatKit
 import NECoreIMKit
+import NIMSDK
 
 @objcMembers
 public class TeamMemberSelectVM: NSObject {
-  public var chatRepo: ChatRepo = .init()
+  public var chatRepo = ChatRepo.shared
   private let className = "TeamMemberSelectVM"
 
   public func fetchTeamMembers(sessionId: String,

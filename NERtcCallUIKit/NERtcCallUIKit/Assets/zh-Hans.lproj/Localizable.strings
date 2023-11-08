@@ -11,7 +11,7 @@
 "remote_cancel"="对方取消";
 "remote_busy"="对方占线";
 "remote_timeout"="对方超时未响应";
-"remote_reject"="对方已经拒绝";
+"remote_reject"="对方已拒绝";
 "other_client_accept"="已被其他端接受";
 "other_client_reject"="已被其他端拒绝";
 
@@ -34,3 +34,9 @@
 "waitting_remote_accept"="等待对方接听……";
 "calling"="正在呼叫";
 "cancel_failed"="邀请已接受无法取消";
+
+"operation_failed"="操作失败";
+
+"device_not_support"="当前设备不支持虚化";
+
+"connecting"="正在接通中…";

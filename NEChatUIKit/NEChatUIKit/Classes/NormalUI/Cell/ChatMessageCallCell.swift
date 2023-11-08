@@ -30,6 +30,7 @@ open class ChatMessageCallCell: NormalChatMessageBaseCell {
     contentLabelLeft.font = NEKitChatConfig.shared.ui.messageTextSize
     contentLabelLeft.textAlignment = .center
     contentLabelLeft.backgroundColor = .clear
+    contentLabelLeft.accessibilityIdentifier = "id.chatMessageCallText"
     bubbleImageLeft.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
@@ -47,6 +48,7 @@ open class ChatMessageCallCell: NormalChatMessageBaseCell {
     contentLabelRight.font = NEKitChatConfig.shared.ui.messageTextSize
     contentLabelRight.textAlignment = .center
     contentLabelRight.backgroundColor = .clear
+    contentLabelRight.accessibilityIdentifier = "id.chatMessageCallText"
     bubbleImageRight.addSubview(contentLabelRight)
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin),

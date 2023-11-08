@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseConversationSearchController: NEBaseConversationNavigationController, UITableViewDelegate,
@@ -111,6 +111,10 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
     textField.returnKeyType = .search
     textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
     textField.placeholder = localizable("search")
+    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    textField.accessibilityIdentifier = "id.search"
     return textField
   }()
 

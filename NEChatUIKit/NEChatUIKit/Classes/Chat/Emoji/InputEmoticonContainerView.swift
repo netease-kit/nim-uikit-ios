@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 @objc public protocol InputEmoticonContainerViewDelegate: NSObjectProtocol {
   func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String)
   func didPressSend(sender: UIButton)
@@ -210,6 +210,7 @@ extension InputEmoticonContainerView {
           catalogID: id,
           delegate: self
         )
+        button.accessibilityIdentifier = "id.emoji"
         rowIndex = indexInPage / layout.columes
         coloumnIndex = indexInPage % layout.columes
         let x = coloumnIndex * Int(layout.cellWidth) + startX

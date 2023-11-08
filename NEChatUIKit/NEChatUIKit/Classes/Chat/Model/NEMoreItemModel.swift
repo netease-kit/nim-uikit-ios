@@ -16,6 +16,8 @@ public enum NEMoreActionType: Int {
   case other = 100
 }
 
+@objc
+@objcMembers
 public class NEMoreItemModel: NSObject {
   // 单元图标
   public var image: UIImage?

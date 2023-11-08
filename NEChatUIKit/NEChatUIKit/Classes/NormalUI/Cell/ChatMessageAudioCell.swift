@@ -33,6 +33,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   open func commonUILeft() {
     audioImageViewLeft.contentMode = .center
     audioImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
+    audioImageViewLeft.accessibilityIdentifier = "id.animation"
     bubbleImageLeft.addSubview(audioImageViewLeft)
     NSLayoutConstraint.activate([
       audioImageViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 16),
@@ -45,6 +46,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
     timeLabelLeft.textColor = UIColor.ne_darkText
     timeLabelLeft.textAlignment = .left
     timeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
+    timeLabelLeft.accessibilityIdentifier = "id.time"
     bubbleImageLeft.addSubview(timeLabelLeft)
     NSLayoutConstraint.activate([
       timeLabelLeft.leftAnchor.constraint(equalTo: audioImageViewLeft.rightAnchor, constant: 12),
@@ -63,6 +65,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   open func commonUIRight() {
     audioImageViewRight.contentMode = .center
     audioImageViewRight.translatesAutoresizingMaskIntoConstraints = false
+    audioImageViewRight.accessibilityIdentifier = "id.animation"
     bubbleImageRight.addSubview(audioImageViewRight)
     NSLayoutConstraint.activate([
       audioImageViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -16),
@@ -75,6 +78,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
     timeLabelRight.textColor = UIColor.ne_darkText
     timeLabelRight.textAlignment = .right
     timeLabelRight.translatesAutoresizingMaskIntoConstraints = false
+    timeLabelRight.accessibilityIdentifier = "id.time"
     bubbleImageRight.addSubview(timeLabelRight)
     NSLayoutConstraint.activate([
       timeLabelRight.rightAnchor.constraint(equalTo: audioImageViewRight.leftAnchor, constant: -12),

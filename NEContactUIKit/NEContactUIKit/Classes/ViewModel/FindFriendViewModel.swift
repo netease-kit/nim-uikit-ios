@@ -4,12 +4,12 @@
 
 import Foundation
 import NEChatKit
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
 
 @objcMembers
 public class FindFriendViewModel: NSObject {
-  let contactRepo = ContactRepo()
+  let contactRepo = ContactRepo.shared
   private let className = "FindFriendViewModel"
 
   func searchFriend(_ text: String, _ completion: @escaping ([User]?, NSError?) -> Void) {

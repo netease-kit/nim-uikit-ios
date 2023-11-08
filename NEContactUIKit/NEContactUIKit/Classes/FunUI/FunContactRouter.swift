@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
 import NIMSDK
 
 public extension ContactRouter {
