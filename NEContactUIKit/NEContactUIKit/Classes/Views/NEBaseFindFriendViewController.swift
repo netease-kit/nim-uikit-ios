@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFieldDelegate {
@@ -60,6 +60,10 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
     searchInput.returnKeyType = .search
     searchInput.delegate = self
     searchInput.clearButtonMode = .always
+    if let clearButton = searchInput.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    searchInput.accessibilityIdentifier = "id.addFriendAccount"
 
     NotificationCenter.default.addObserver(
       self,

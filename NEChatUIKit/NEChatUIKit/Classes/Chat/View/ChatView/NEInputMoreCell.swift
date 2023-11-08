@@ -41,6 +41,7 @@ public class NEInputMoreCell: UICollectionViewCell {
     let imageView = UIImageView()
     imageView.isUserInteractionEnabled = true
     imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.accessibilityIdentifier = "id.actionIcon"
     return imageView
   }()
 

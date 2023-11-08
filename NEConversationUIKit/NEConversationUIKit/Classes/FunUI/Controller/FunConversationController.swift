@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class FunConversationController: NEBaseConversationController {

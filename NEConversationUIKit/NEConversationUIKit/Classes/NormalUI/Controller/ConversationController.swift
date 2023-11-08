@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class ConversationController: NEBaseConversationController {
@@ -27,11 +27,13 @@ open class ConversationController: NEBaseConversationController {
   override func initSystemNav() {
     super.initSystemNav()
     let searchBarButton = UIButton()
+    searchBarButton.accessibilityIdentifier = "id.titleBarSearchImg"
     searchBarButton.setImage(UIImage.ne_imageNamed(name: "chat_search"), for: .normal)
     searchBarButton.addTarget(self, action: #selector(searchAction), for: .touchUpInside)
     let searchBarItem = UIBarButtonItem(customView: searchBarButton)
 
     let addBarButton = UIButton()
+    addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
     addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
     addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
     let addBarItem = UIBarButtonItem(customView: addBarButton)

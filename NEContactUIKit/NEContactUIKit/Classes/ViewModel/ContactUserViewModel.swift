@@ -2,15 +2,15 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import CoreMedia
 import Foundation
 import NEChatKit
-import NECoreKit
 import NECoreIMKit
-import CoreMedia
+import NECoreKit
 
 @objcMembers
 public class ContactUserViewModel: NSObject {
-  let contactRepo = ContactRepo()
+  let contactRepo = ContactRepo.shared
   private let className = "ContactUserViewModel"
 
   func addFriend(_ account: String, _ completion: @escaping (NSError?) -> Void) {

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NEChatKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomViewDelegate {

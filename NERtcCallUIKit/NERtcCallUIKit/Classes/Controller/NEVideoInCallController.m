@@ -16,7 +16,6 @@
 }
 
 - (void)setupUI {
-  [super setupUI];
   [self.view addSubview:self.bigVideoView];
   [NSLayoutConstraint activateConstraints:@[
     [self.bigVideoView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],

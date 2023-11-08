@@ -74,6 +74,7 @@ public class ChatActivityIndicatorView: UIView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.imageView?.contentMode = .center
     button.setBackgroundImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
+    button.accessibilityIdentifier = "id.sendMessageFailed"
     return button
   }()
 

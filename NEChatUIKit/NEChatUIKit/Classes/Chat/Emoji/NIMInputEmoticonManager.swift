@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 public enum NIMEmoticonType: NSInteger {
   case file = 0
   case unicode

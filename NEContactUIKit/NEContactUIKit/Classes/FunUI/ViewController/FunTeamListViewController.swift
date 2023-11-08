@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
 import NECoreKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class FunTeamListViewController: NEBaseTeamListViewController {

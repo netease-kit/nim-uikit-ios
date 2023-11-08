@@ -27,6 +27,7 @@ open class NEBaseContactSelectedCell: NEBaseContactTableViewCell {
     contentView.addSubview(sImage)
     sImage.image = UIImage.ne_imageNamed(name: "unselect")
     sImage.translatesAutoresizingMaskIntoConstraints = false
+    sImage.accessibilityIdentifier = "id.selector"
   }
 
   override public func setModel(_ model: ContactInfo) {

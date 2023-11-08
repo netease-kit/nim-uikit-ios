@@ -145,8 +145,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCerName = AppKey.pushCerName
         option.isDisableLog = true
         option.supportAutoJoinWhenCalled = false
-        let uiConfig = NERtcCallUIConfig()
-        uiConfig.option = option
+        NERtcCallKit.sharedInstance().setupAppKey(AppKey.appKey, options: option)
+        let uiConfig = NECallUIKitConfig()
         uiConfig.appKey = AppKey.appKey
         uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
         NERtcCallKit.sharedInstance().timeOutSeconds = 30

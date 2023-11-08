@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -655,7 +655,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.2.9;
+				MARKETING_VERSION = 9.6.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -704,7 +704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.2.9;
+				MARKETING_VERSION = 9.6.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = inHouseYunxin;

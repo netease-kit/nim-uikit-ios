@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 @objc public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }
@@ -86,6 +86,7 @@ public class InputEmoticonTabView: UIControl {
     button.titleLabel?.textColor = .white
     button.backgroundColor = UIColor.ne_blueText
     button.titleLabel?.font = DefaultTextFont(14)
+    button.accessibilityIdentifier = "id.emojiSend"
     return button
   }()
 }

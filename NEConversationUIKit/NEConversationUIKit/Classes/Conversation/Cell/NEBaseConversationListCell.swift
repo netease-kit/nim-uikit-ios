@@ -3,14 +3,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseConversationListCell: UITableViewCell {
 //  private var viewModel = ConversationViewModel()
   public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
-  private let repo = ConversationRepo()
+  private let repo = ConversationRepo.shared
   private var timeWidth: NSLayoutConstraint?
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -190,6 +190,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     return headView
   }()
 
+  // 单条会话未读数
   public lazy var redAngleView: RedAngleLabel = {
     let label = RedAngleLabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -204,37 +205,45 @@ open class NEBaseConversationListCell: UITableViewCell {
     return label
   }()
 
+  // 会话列表会话名称
   public lazy var title: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.titleColor
     label.font = NEKitConversationConfig.shared.ui.titleFont ?? UIFont.systemFont(ofSize: 16)
     label.text = "Oliver"
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
+  // 会话列表外露消息
   public lazy var subTitle: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.subTitleColor
     label.font = NEKitConversationConfig.shared.ui.subTitleFont
+    label.accessibilityIdentifier = "id.message"
     return label
   }()
 
+  // 会话列表显示时间
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.timeColor
     label.font = NEKitConversationConfig.shared.ui.timeFont
     label.textAlignment = .right
+    label.accessibilityIdentifier = "id.time"
     return label
   }()
 
+  // 免打扰icon
   public lazy var notifyMsg: UIImageView = {
     let notify = UIImageView()
     notify.translatesAutoresizingMaskIntoConstraints = false
     notify.image = UIImage.ne_imageNamed(name: "noNeed_notify")
     notify.isHidden = true
+    notify.accessibilityIdentifier = "id.mute"
     return notify
   }()
 }

@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
+import UIKit
 
 @objcMembers
 open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
@@ -12,6 +12,7 @@ open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
     let header = NEUserHeaderView(frame: .zero)
     header.translatesAutoresizingMaskIntoConstraints = false
     header.clipsToBounds = true
+    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 

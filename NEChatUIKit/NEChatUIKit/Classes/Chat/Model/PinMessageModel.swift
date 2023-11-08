@@ -1,18 +1,18 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
-import NECoreIMKit
 import NEChatKit
+import NECoreIMKit
+import NIMSDK
+import UIKit
 
 public class PinMessageModel: NSObject {
   var chatmodel: MessageModel?
   var message: NIMMessage
   var item: NIMMessagePinItem
   var session: NIMSession
-  var repo = ChatRepo()
+  var repo = ChatRepo.shared
 
   init(message: NIMMessage, item: NIMMessagePinItem) {
     self.message = message

@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseConversationController: UIViewController, NIMChatManagerDelegate {
@@ -30,6 +30,7 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
 
   func initSystemNav() {
     let brandBarBtn = UIButton()
+    brandBarBtn.accessibilityIdentifier = "id.titleBarTitle"
     brandBarBtn.setTitle(localizable("appName"), for: .normal)
     brandBarBtn.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
     brandBarBtn.layoutButtonImage(style: .left, space: 12)

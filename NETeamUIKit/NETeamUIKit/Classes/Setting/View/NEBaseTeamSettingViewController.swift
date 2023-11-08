@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NECoreIMKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionViewDelegate,
@@ -51,6 +51,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
     imageView.titleLabel.font = NEConstant.defaultTextFont(16.0)
+    imageView.accessibilityIdentifier = "id.avatar"
     return imageView
   }()
 
@@ -59,6 +60,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
     label.textColor = NEConstant.hexRGB(0x333333)
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
@@ -67,6 +69,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
     label.textColor = NEConstant.hexRGB(0x999999)
+    label.accessibilityIdentifier = "id.count"
     return label
   }()
 
@@ -87,6 +90,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   public lazy var addBtn: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
+    button.accessibilityIdentifier = "id.add"
     return button
   }()
 
@@ -326,6 +330,17 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       for: indexPath
     ) as? NEBaseTeamSettingCell {
       cell.configure(model)
+      if let c = cell as? TeamSettingSwitchCell {
+        if model.cellName == localizable("message_remind") {
+          c.tSwitch.accessibilityIdentifier = "id.messageRemind"
+        }
+        if model.cellName == localizable("session_set_top") {
+          c.tSwitch.accessibilityIdentifier = "id.sessionPin"
+        }
+        if model.cellName == localizable("team_no_speak") {
+          c.tSwitch.accessibilityIdentifier = "id.teamMute"
+        }
+      }
       return cell
     }
     return UITableViewCell()
@@ -571,6 +586,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       weakSelf?.updateInviteModeOwnerAction(model)
     }
     ownerActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    ownerActionButton.accessibilityIdentifier = "id.teamOwner"
     actionSheetController.addAction(ownerActionButton)
 
     let allActionButton = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
@@ -578,6 +594,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     }
 
     allActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    allActionButton.accessibilityIdentifier = "id.teamAllMember"
     actionSheetController.addAction(allActionButton)
 
     navigationController?.present(actionSheetController, animated: true, completion: nil)
@@ -650,12 +667,14 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       weakSelf?.updateTeamInfoOwnerAction(model)
     }
     manager.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    manager.accessibilityIdentifier = "id.teamOwner"
     actionSheetController.addAction(manager)
 
     let all = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
       weakSelf?.updateTeamInfoAllAction(model)
     }
     all.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    all.accessibilityIdentifier = "id.teamAllMember"
     actionSheetController.addAction(all)
 
     navigationController?.present(actionSheetController, animated: true, completion: nil)

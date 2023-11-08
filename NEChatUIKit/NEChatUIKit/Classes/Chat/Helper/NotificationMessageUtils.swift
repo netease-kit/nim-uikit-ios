@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NIMSDK
 import NECoreIMKit
 import NECoreKit
+import NIMSDK
 
 public enum TeamType {
   case advanceTeam

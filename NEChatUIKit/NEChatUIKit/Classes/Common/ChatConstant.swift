@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 
 import Foundation
-@_exported import NECoreKit
-@_exported import NECommonUIKit
 @_exported import NECommonKit
+@_exported import NECommonUIKit
 @_exported import NECoreIMKit
+@_exported import NECoreKit
 
 let coreLoader = CoreLoader<ChatBaseViewController>()
 func chatLocalizable(_ key: String) -> String {

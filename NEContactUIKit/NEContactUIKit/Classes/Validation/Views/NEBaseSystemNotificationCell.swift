@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
 import NECommonUIKit
 import NECoreIMKit
+import NECoreKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseSystemNotificationCell: NEBaseValidationCell {
@@ -135,6 +135,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
     button.layer.cornerRadius = 4
     button.layer.borderColor = UIColor(hexString: "D9D9D9").cgColor
     button.layer.borderWidth = 1
+    button.accessibilityIdentifier = "id.reject"
     return button
   }()
 
@@ -149,6 +150,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
     button.layer.cornerRadius = 4
     button.layer.borderWidth = 1
     button.layer.borderColor = blue.cgColor
+    button.accessibilityIdentifier = "id.accept"
     return button
   }()
 
@@ -165,6 +167,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
     label.textColor = UIColor(hexString: "B3B7BC")
     label.font = UIFont.systemFont(ofSize: 14.0)
     label.textAlignment = .right
+    label.accessibilityIdentifier = "id.verifyResult"
     return label
   }()
 

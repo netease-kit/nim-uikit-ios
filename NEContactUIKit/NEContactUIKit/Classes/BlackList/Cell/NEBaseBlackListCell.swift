@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 
 @objc
 protocol BlackListCellDelegate: AnyObject {
@@ -34,6 +34,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     button.clipsToBounds = true
     button.addTarget(self, action: #selector(buttonEvent), for: .touchUpInside)
     button.setTitle(localizable("remove_black"), for: .normal)
+    button.accessibilityIdentifier = "id.relieve"
     contentView.addSubview(button)
     NSLayoutConstraint.activate([
       button.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),

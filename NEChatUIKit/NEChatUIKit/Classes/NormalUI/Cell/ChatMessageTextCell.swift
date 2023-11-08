@@ -16,6 +16,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.font = NEKitChatConfig.shared.ui.messageTextSize
     label.backgroundColor = .clear
     label.textAlignment = .justified
+    label.accessibilityIdentifier = "id.messageText"
     return label
   }()
 
@@ -28,6 +29,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.font = NEKitChatConfig.shared.ui.messageTextSize
     label.backgroundColor = .clear
     label.textAlignment = .justified
+    label.accessibilityIdentifier = "id.messageText"
     return label
   }()
 

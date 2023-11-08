@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
@@ -80,7 +80,7 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
       for: indexPath
     ) as? TeamDefaultIconCell {
       cell.iconImage.image = coreLoader.loadImage("icon_\(indexPath.row)")
-
+      cell.iconImage.accessibilityIdentifier = "id.default\(indexPath.row + 1)"
       return cell
     }
     return UICollectionViewCell()

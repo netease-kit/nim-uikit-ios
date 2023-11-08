@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
 import NECommonKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegate {
@@ -13,7 +13,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 //    var user: NIMUser?
   public var type = ChangeType.TeamName
   public var teamMember: NIMTeamMember?
-  public var repo = TeamRepo()
+  public var repo = TeamRepo.shared
   public let textLimit = 30
 
   public let backView = UIView()
@@ -24,6 +24,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     label.textColor = NEConstant.hexRGB(0xB3B7BC)
     label.font = NEConstant.defaultTextFont(12.0)
     label.isUserInteractionEnabled = false
+    label.accessibilityIdentifier = "id.flag"
     return label
   }()
 
@@ -33,6 +34,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     text.textColor = NEConstant.hexRGB(0x333333)
     text.font = NEConstant.defaultTextFont(14.0)
     text.delegate = self
+    text.accessibilityIdentifier = "id.nickname"
     return text
   }()
 
@@ -41,6 +43,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     text.translatesAutoresizingMaskIntoConstraints = false
     text.setImage(coreLoader.loadImage("clear_btn"), for: .normal)
     text.addTarget(self, action: #selector(clearText), for: .touchUpInside)
+    text.accessibilityIdentifier = "id.clear"
     return text
   }()
 

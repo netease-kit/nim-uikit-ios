@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDelegate {
@@ -15,7 +15,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
 
   public var team: NIMTeam?
   public let textLimit = 100
-  public let repo = TeamRepo()
+  public let repo = TeamRepo.shared
   public let backView = UIView()
 
   public lazy var textView: UITextView = {
@@ -26,6 +26,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
     text.delegate = self
     text.textContainerInset = UIEdgeInsets.zero
     text.layoutManager.allowsNonContiguousLayout = false
+    text.accessibilityIdentifier = "id.introduce"
     return text
   }()
 
@@ -34,6 +35,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
     text.translatesAutoresizingMaskIntoConstraints = false
     text.setImage(coreLoader.loadImage("clear_btn"), for: .normal)
     text.addTarget(self, action: #selector(clearText), for: .touchUpInside)
+    text.accessibilityIdentifier = "id.clear"
     return text
   }()
 
@@ -42,6 +44,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEConstant.hexRGB(0xB3B7BC)
     label.font = NEConstant.defaultTextFont(12.0)
+    label.accessibilityIdentifier = "id.flag"
     return label
   }()
 

@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
-import NIMSDK
 import NECoreIMKit
 import NECoreKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamUserCell: UICollectionViewCell {
@@ -31,6 +31,7 @@ open class NEBaseTeamUserCell: UICollectionViewCell {
     header.translatesAutoresizingMaskIntoConstraints = false
     header.titleLabel.font = NEConstant.defaultTextFont(11.0)
     header.clipsToBounds = true
+    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 

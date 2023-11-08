@@ -14,7 +14,7 @@ protocol UserSettingViewModelDelegate: NSObjectProtocol {
 
 @objcMembers
 public class UserSettingViewModel: NSObject {
-  var repo = ChatRepo()
+  var repo = ChatRepo.shared
 
   var userInfo: User?
 

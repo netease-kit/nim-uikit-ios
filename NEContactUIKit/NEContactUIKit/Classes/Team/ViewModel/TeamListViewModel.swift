@@ -4,12 +4,12 @@
 
 import Foundation
 import NEChatKit
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
 
 @objcMembers
 public class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
-  var contactRepo = ContactRepo()
+  var contactRepo = ContactRepo.shared
   var refresh: () -> Void = {}
   public var teamList = [Team]()
   private let className = "TeamListViewModel"

@@ -13,7 +13,7 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
 
   var dataRefresh: DataRefresh?
   private let className = "ValidationMessageViewModel"
-  let contactRepo = ContactRepo()
+  let contactRepo = ContactRepo.shared
   var datas = [XNotification]()
 
   override init() {

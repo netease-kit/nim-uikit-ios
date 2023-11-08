@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionViewDelegate,
@@ -13,7 +13,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
   public typealias SaveCompletion = () -> Void
   public var block: SaveCompletion?
   public var team: NIMTeam?
-  public let repo = TeamRepo()
+  public let repo = TeamRepo.shared
 
   public let headerBack = UIView()
   public let photoImage = UIImageView()
@@ -26,6 +26,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
     header.translatesAutoresizingMaskIntoConstraints = false
     header.clipsToBounds = true
     header.isUserInteractionEnabled = true
+    header.accessibilityIdentifier = "id.icon"
     return header
   }()
 
@@ -80,6 +81,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
 
     photoImage.translatesAutoresizingMaskIntoConstraints = false
     photoImage.image = coreLoader.loadImage("photo")
+    photoImage.accessibilityIdentifier = "id.camera"
     headerBack.addSubview(photoImage)
 
     let gesture = UITapGestureRecognizer()

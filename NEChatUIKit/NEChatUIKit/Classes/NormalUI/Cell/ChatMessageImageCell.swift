@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class ChatMessageImageCell: NormalChatMessageBaseCell {
@@ -28,6 +28,7 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     contentImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
     contentImageViewLeft.contentMode = .scaleAspectFill
     contentImageViewLeft.clipsToBounds = true
+    contentImageViewLeft.accessibilityIdentifier = "id.thumbnail"
     contentImageViewLeft.addCustomCorner(
       conrners: [.bottomLeft, .bottomRight, .topRight],
       radius: 8,
@@ -48,12 +49,13 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
   open func commonUIRight() {
     contentImageViewRight.translatesAutoresizingMaskIntoConstraints = false
     contentImageViewRight.contentMode = .scaleAspectFill
+    contentImageViewRight.clipsToBounds = true
+    contentImageViewRight.accessibilityIdentifier = "id.thumbnail"
     contentImageViewRight.addCustomCorner(
       conrners: [.topLeft, .bottomLeft, .bottomRight],
       radius: 8,
       backcolor: .white
     )
-    contentImageViewRight.clipsToBounds = true
 
     bubbleImageRight.addSubview(contentImageViewRight)
     NSLayoutConstraint.activate([

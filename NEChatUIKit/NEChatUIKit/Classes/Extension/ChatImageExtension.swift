@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import Foundation
 import CoreGraphics
+import Foundation
 import UIKit
 public extension UIImage {
   class func ne_imageNamed(name: String?) -> UIImage? {

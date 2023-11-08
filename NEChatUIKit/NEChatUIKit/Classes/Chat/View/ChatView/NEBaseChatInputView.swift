@@ -3,10 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
 import NECoreKit
-import UITextView_Placeholder
+import UIKit
 
 @objc
 public enum ChatMenuType: Int {
@@ -36,8 +35,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public var nickAccidDic = [String: String]()
 
-  public var textView: UITextView = {
-    let textView = UITextView()
+  public var textView: NETextView = {
+    let textView = NETextView()
+    textView.placeholderLabel.numberOfLines = 1
     textView.layer.cornerRadius = 8
     textView.font = UIFont.systemFont(ofSize: 16)
     textView.clipsToBounds = true
@@ -48,6 +48,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.dataDetectorTypes = []
+    textView.accessibilityIdentifier = "id.chatMessageInput"
     return textView
   }()
 

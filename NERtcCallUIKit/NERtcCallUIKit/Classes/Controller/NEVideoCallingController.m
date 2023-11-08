@@ -26,19 +26,6 @@
     [self.bigVideoView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
   ]];
 
-  //    [self.view addSubview:self.smallVideoView];
-  //    [NSLayoutConstraint activateConstraints:@[
-  //      [self.smallVideoView.topAnchor constraintEqualToAnchor:self.view.topAnchor
-  //                                                    constant:self.statusHeight + 20],
-  //      [self.smallVideoView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor
-  //      constant:-20], [self.smallVideoView.heightAnchor constraintEqualToConstant:160],
-  //      [self.smallVideoView.widthAnchor constraintEqualToConstant:90]
-  //    ]];
-  //
-  //    self.smallVideoView.clipsToBounds = YES;
-  //    self.smallVideoView.layer.cornerRadius = self.radius;
-  //    self.smallVideoView.hidden = YES;
-
   [self.view addSubview:self.remoteAvatorView];
   [NSLayoutConstraint activateConstraints:@[
     [self.remoteAvatorView.topAnchor constraintEqualToAnchor:self.view.topAnchor

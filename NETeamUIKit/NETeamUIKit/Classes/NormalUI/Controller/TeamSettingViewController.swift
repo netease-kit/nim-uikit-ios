@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NECoreIMKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class TeamSettingViewController: NEBaseTeamSettingViewController {
@@ -123,6 +123,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     ])
 
     let memberListBtn = UIButton()
+    memberListBtn.accessibilityIdentifier = "id.member"
     cornerView.addSubview(memberListBtn)
     memberListBtn.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([

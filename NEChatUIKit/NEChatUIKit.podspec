@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = 'NEChatUIKit'
-  s.version      = '9.6.1'
+  s.version      = '9.6.3'
   s.summary      = 'Chat Module of IM.'
 
   # This description is used to generate tags and improve search results.
@@ -46,7 +46,6 @@ TODO: Add long description of the pod here.
   s.dependency 'NECommonUIKit'
   s.dependency 'NECommonKit'
   s.dependency 'MJRefresh'
-  s.dependency 'UITextView+Placeholder'
   s.dependency 'SDWebImageWebPCoder'
   s.dependency 'SDWebImageSVGKitPlugin'
   s.dependency 'lottie-ios','2.5.3'

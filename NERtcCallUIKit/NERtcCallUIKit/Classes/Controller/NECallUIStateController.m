@@ -12,6 +12,18 @@
 
 @property(nonatomic, weak) UIView *parentView;
 
+@property(nonatomic, assign, readwrite) CGFloat statusHeight;
+
+@property(nonatomic, assign, readwrite) CGFloat radius;
+
+@property(nonatomic, assign, readwrite) CGFloat titleFontSize;
+
+@property(nonatomic, assign, readwrite) CGFloat subTitleFontSize;
+
+@property(nonatomic, assign, readwrite) CGFloat factor;
+
+@property(nonatomic, assign, readwrite) CGSize buttonSize;
+
 @end
 
 @implementation NECallUIStateController
@@ -24,15 +36,10 @@
     self.titleFontSize = 20.0;
     self.subTitleFontSize = 14.0;
     self.buttonSize = CGSizeMake(75, 103);
-    self.bundle = [NSBundle bundleForClass:self.class];
+    self.bundle = [NSBundle bundleForClass:NECallViewController.class];
   }
   return self;
 }
-
-//- (void)loadView {
-//    NSLog(@"state view load parent view %@",self.parentView);
-//    self.view = self.parentView;
-//}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -82,8 +89,15 @@ navigation
 - (void)switchVideoView:(UITapGestureRecognizer *)tap {
   self.mainController.showMyBigView = !self.mainController.showMyBigView;
   [self refreshVideoView];
-  // TODO: 代码整理
-  //  [self changeDefaultImage:self.operationView.cameraBtn.selected];
+  [self.mainController changeDefaultImage:self.operationView.cameraBtn.selected];
+
+  if (self.mainController.showMyBigView) {
+    [self.mainController changeRemoteMute:self.mainController.isRemoteMute
+                                videoView:self.smallVideoView];
+  } else {
+    [self.mainController changeRemoteMute:self.mainController.isRemoteMute
+                                videoView:self.bigVideoView];
+  }
 }
 
 - (UIImageView *)remoteAvatorView {
@@ -354,26 +368,28 @@ navigation
 }
 
 - (NSString *)getInviteText {
-  return (self.callType == NERtcCallTypeAudio ? [self localizableWithKey:@"invite_audio_call"]
-                                              : [self localizableWithKey:@"invite_video_call"]);
+  return (self.callParam.callType == NERtcCallTypeAudio
+              ? [self localizableWithKey:@"invite_audio_call"]
+              : [self localizableWithKey:@"invite_video_call"]);
 }
 
 - (void)refreshVideoView {
+  NSLog(@"show my big view : %d", self.mainController.showMyBigView);
+  NSLog(@"self.operationView.cameraBtn.selected : %d", self.operationView.cameraBtn.selected);
+
   if (self.mainController.showMyBigView) {
-    [[NERtcCallKit sharedInstance] setupLocalView:self.bigVideoView.videoView];
-    [[NERtcCallKit sharedInstance] setupRemoteView:self.smallVideoView.videoView
-                                           forUser:self.callParam.remoteUserAccid];
+    [[NECallEngine sharedInstance] setupLocalView:self.bigVideoView.videoView];
+    [[NECallEngine sharedInstance] setupRemoteView:self.smallVideoView.videoView];
     NSLog(@"show my big view");
-    self.smallVideoView.maskView.hidden = self.mainController.remoteCameraAvailable;
+    self.smallVideoView.maskView.hidden = !self.mainController.isRemoteMute;
     self.bigVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
     self.bigVideoView.userID = self.callParam.currentUserAccid;
     self.smallVideoView.userID = self.callParam.remoteUserAccid;
   } else {
-    [[NERtcCallKit sharedInstance] setupLocalView:self.smallVideoView.videoView];
-    [[NERtcCallKit sharedInstance] setupRemoteView:self.bigVideoView.videoView
-                                           forUser:self.callParam.remoteUserAccid];
+    [[NECallEngine sharedInstance] setupLocalView:self.smallVideoView.videoView];
+    [[NECallEngine sharedInstance] setupRemoteView:self.bigVideoView.videoView];
     NSLog(@"show my small view");
-    self.bigVideoView.maskView.hidden = self.mainController.remoteCameraAvailable;
+    self.bigVideoView.maskView.hidden = !self.mainController.isRemoteMute;
     self.smallVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
     self.bigVideoView.userID = self.callParam.remoteUserAccid;
     self.smallVideoView.userID = self.callParam.currentUserAccid;

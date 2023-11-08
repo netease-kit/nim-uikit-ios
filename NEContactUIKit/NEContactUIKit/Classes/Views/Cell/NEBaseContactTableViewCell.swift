@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreIMKit
 import Foundation
+import NECoreIMKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataProtrol {
@@ -14,6 +14,7 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
     let imageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.contentMode = .center
+    imageView.accessibilityIdentifier = "id.arrow"
     return imageView
   }()
 

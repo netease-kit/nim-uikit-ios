@@ -1,11 +1,11 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
-import NECommonUIKit
 import NECommonKit
+import NECommonUIKit
+import NIMSDK
+import UIKit
 
 @objc
 public protocol PinMessageCellDelegate {
@@ -29,6 +29,7 @@ open class NEBasePinMessageCell: UITableViewCell {
     header.layer.cornerRadius = 16
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
+    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 
@@ -37,6 +38,7 @@ open class NEBasePinMessageCell: UITableViewCell {
     label.font = UIFont.systemFont(ofSize: 12.0)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
@@ -111,6 +113,7 @@ open class NEBasePinMessageCell: UITableViewCell {
 
     let moreBtn = UIButton()
     moreBtn.addTarget(self, action: #selector(moreClick), for: .touchUpInside)
+    moreBtn.accessibilityIdentifier = "id.moreAction"
     moreBtn.translatesAutoresizingMaskIntoConstraints = false
     backView.addSubview(moreBtn)
     NSLayoutConstraint.activate([

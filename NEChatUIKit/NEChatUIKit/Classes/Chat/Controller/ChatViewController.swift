@@ -3,17 +3,17 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreIMKit
-import NIMSDK
-import MJRefresh
 import AVFoundation
-import NECommonKit
-import NECoreKit
-import NECommonUIKit
-import WebKit
+import MJRefresh
 import NEChatKit
+import NECommonKit
+import NECommonUIKit
+import NECoreIMKit
+import NECoreKit
+import NIMSDK
 import Photos
+import UIKit
+import WebKit
 
 @objcMembers
 open class ChatViewController: ChatBaseViewController, UINavigationControllerDelegate,
@@ -121,8 +121,19 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
     weak var weakSelf = self
     NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
-      if status == .notReachable, let networkView = weakSelf?.brokenNetworkView {
-        weakSelf?.view.addSubview(networkView)
+      if status == .notReachable,
+         let networkView = weakSelf?.brokenNetworkView,
+         let self = weakSelf {
+        self.view.addSubview(networkView)
+        NSLayoutConstraint.activate([
+          networkView.topAnchor.constraint(
+            equalTo: self.tableView.topAnchor,
+            constant: 0
+          ),
+          networkView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+          networkView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+          networkView.heightAnchor.constraint(equalToConstant: self.networkToolHeight),
+        ])
       } else {
         weakSelf?.brokenNetworkView.removeFromSuperview()
       }
@@ -246,6 +257,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     let view =
       NEBrokenNetworkView(frame: CGRect(x: 0, y: kNavigationHeight + KStatusBarHeight,
                                         width: kScreenWidth, height: networkToolHeight))
+    view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
 
@@ -1140,7 +1152,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     if atIndexs.isEmpty {
       return
     }
-    NELog.infoLog(className(), desc: "on revoke message at indexs \(atIndexs)")
+    operationView?.removeFromSuperview()
     tableViewReloadIndexs(atIndexs)
   }
 

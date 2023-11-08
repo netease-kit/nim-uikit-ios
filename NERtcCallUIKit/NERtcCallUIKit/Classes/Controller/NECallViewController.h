@@ -4,32 +4,35 @@
 
 #import <NERtcCallKit/NERtcCallKit.h>
 #import <UIKit/UIKit.h>
-#import "NECallParam.h"
-#import "NERtcCallUIConfig.h"
+#import "NECallUIKitConfig.h"
+#import "NECallViewBaseController.h"
+#import "NECustomButton.h"
+#import "NEUICallParam.h"
+#import "NEVideoView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const kCallKitDismissNoti;
 
-@interface NECallViewController : UIViewController <NERtcCallKitDelegate>
+@interface NECallViewController : NECallViewBaseController <NECallEngineDelegate>
 
 @property(nonatomic, assign) NERtcCallStatus status;
-
-@property(nonatomic, assign) NERtcCallType callType;
-
-@property(nonatomic, strong) NECallParam *callParam;
 
 @property(nonatomic, strong) NSMutableDictionary<NSString *, Class> *uiConfigDic;
 
 @property(nonatomic, strong) NECallUIConfig *config;
 
+/// 呼叫前音视频转换按钮
+@property(strong, nonatomic) NECustomButton *mediaSwitchBtn;
+
 // 当前用户视频显示位置
 @property(nonatomic, assign) BOOL showMyBigView;
 
-@property(nonatomic, assign) BOOL remoteCameraAvailable;
+- (void)changeDefaultImage:(BOOL)mute;
 
-// 主叫
-@property(nonatomic, assign) BOOL isCaller;
+- (void)changeRemoteMute:(BOOL)mute videoView:(NEVideoView *)remoteVideo;
+
+- (void)destroy;
 
 @end
 

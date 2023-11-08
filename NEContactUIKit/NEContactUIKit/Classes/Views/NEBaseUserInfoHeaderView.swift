@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreIMKit
+import UIKit
 
 @objcMembers
 open class NEBaseUserInfoHeaderView: UIView {
@@ -15,6 +15,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     avatarImage.translatesAutoresizingMaskIntoConstraints = false
     avatarImage.contentMode = .scaleAspectFill
     avatarImage.clipsToBounds = true
+    avatarImage.accessibilityIdentifier = "id.avatar"
     return avatarImage
   }()
 
@@ -32,6 +33,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.font = UIFont.boldSystemFont(ofSize: 22)
     titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
+    titleLabel.accessibilityIdentifier = "id.name"
     return titleLabel
   }()
 
@@ -40,6 +42,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
+    detailLabel.accessibilityIdentifier = "id.account"
     return detailLabel
   }()
 
@@ -48,6 +51,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
+    detailLabel.accessibilityIdentifier = "id.commentName"
     return detailLabel
   }()
 

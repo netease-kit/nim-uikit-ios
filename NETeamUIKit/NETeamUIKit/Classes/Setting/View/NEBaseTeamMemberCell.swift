@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
+import UIKit
 
 @objcMembers
 open class NEBaseTeamMemberCell: UITableViewCell {
@@ -15,6 +15,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     header.layer.cornerRadius = 21
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
+    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 
@@ -30,6 +31,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     label.layer.borderWidth = 1.0
     label.text = localizable("team_owner")
     label.textAlignment = .center
+    label.accessibilityIdentifier = "id.identify"
     return label
   }()
 
@@ -38,6 +40,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
     label.textColor = .ne_darkText
+    label.accessibilityIdentifier = "id.userName"
     return label
   }()
 

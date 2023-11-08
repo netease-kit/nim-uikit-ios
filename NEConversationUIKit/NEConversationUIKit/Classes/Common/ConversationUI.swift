@@ -5,9 +5,9 @@
 
 import Foundation
 
+@_exported import NEChatKit
 @_exported import NECommonKit
 @_exported import NECommonUIKit
-@_exported import NEChatKit
-@_exported import NIMSDK
-@_exported import NECoreKit
 @_exported import NECoreIMKit
+@_exported import NECoreKit
+@_exported import NIMSDK

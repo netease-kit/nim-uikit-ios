@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 #import <UIKit/UIKit.h>
-#import "NECallParam.h"
+#import "NECallUIKitConfig.h"
 #import "NECustomButton.h"
-#import "NERtcCallUIConfig.h"
+#import "NEUICallParam.h"
 #import "NEVideoOperationView.h"
 #import "NEVideoView.h"
 @class NECallViewController;
@@ -13,13 +13,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NECallUIStateController : UIViewController
 
+/// 视频窗口(小)
 @property(strong, nonatomic) NEVideoView *smallVideoView;
+/// 视频窗口(大)
 @property(strong, nonatomic) NEVideoView *bigVideoView;
+/// 远端用户头像(主叫状态)
 @property(strong, nonatomic) UIImageView *remoteAvatorView;
+/// 远端用户头像(被叫&音频通话模式下使用)
 @property(strong, nonatomic) UIImageView *remoteBigAvatorView;
+/// 主叫远端用户显示(正在呼叫xxxxx...)
 @property(strong, nonatomic) UILabel *titleLabel;
+/// 远端用户名显示(被叫状态)
 @property(strong, nonatomic) UILabel *centerTitleLabel;
+/// 远端操作状态标签(主叫状态)
 @property(strong, nonatomic) UILabel *subTitleLabel;
+/// 邀请通话类型&远端状态
 @property(strong, nonatomic) UILabel *centerSubtitleLabel;
 
 /// 取消呼叫
@@ -32,29 +40,26 @@ NS_ASSUME_NONNULL_BEGIN
 @property(strong, nonatomic) NECustomButton *microphoneBtn;
 /// 扬声器
 @property(strong, nonatomic) NECustomButton *speakerBtn;
-
+/// 通话中音视频操作工具栏
 @property(strong, nonatomic) NEVideoOperationView *operationView;
 
-// YES 主叫  NO 被叫
-@property(nonatomic, assign) BOOL isCaller;
-
-@property(nonatomic, weak) NECallParam *callParam;
-
+/// 呼叫参数
+@property(nonatomic, weak) NEUICallParam *callParam;
+/// 配置参数
 @property(nonatomic, weak) NECallUIConfig *config;
 
-@property(nonatomic, assign) CGFloat statusHeight;
-
-@property(assign, nonatomic) CGFloat radius;
-
-@property(assign, nonatomic) CGFloat titleFontSize;
-
-@property(assign, nonatomic) CGFloat subTitleFontSize;
-
-@property(assign, nonatomic) CGFloat factor;
-
-@property(assign, nonatomic) CGSize buttonSize;
-
-@property(nonatomic, assign) NERtcCallType callType;
+/// 状态栏高度
+@property(nonatomic, assign, readonly) CGFloat statusHeight;
+/// 内部圆角
+@property(nonatomic, assign, readonly) CGFloat radius;
+/// 标题字号
+@property(nonatomic, assign, readonly) CGFloat titleFontSize;
+/// 子标题字号
+@property(nonatomic, assign, readonly) CGFloat subTitleFontSize;
+/// 小屏幕适配系数
+@property(nonatomic, assign, readonly) CGFloat factor;
+/// 通话前按钮大小(挂断 接听 取消)
+@property(nonatomic, assign, readonly) CGSize buttonSize;
 
 @property(nonatomic, weak) NECallViewController *mainController;
 
@@ -77,6 +82,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)refreshUI;
 
 - (void)refreshVideoView;
+
+- (NSString *)localizableWithKey:(NSString *)key;
 
 @end
 

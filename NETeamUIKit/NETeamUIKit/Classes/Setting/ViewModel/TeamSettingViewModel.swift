@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import Foundation
+import NECoreIMKit
 import NIMSDK
 import UIKit
-import NECoreIMKit
 
 protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didClickChangeNick()
@@ -25,7 +25,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
 
   public var teamInfoModel: TeamInfoModel?
 
-  public let repo = TeamRepo()
+  public let repo = TeamRepo.shared
 
   public var memberInTeam: NIMTeamMember?
 
@@ -73,14 +73,15 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
 
     weak var weakSelf = self
 
+    // 标记
     let mark = SettingCellModel()
     mark.cellName = localizable("mark")
     mark.type = SettingCellType.SettingArrowCell.rawValue
-    mark.cornerType = .topLeft.union(.topRight)
     mark.cellClick = {
       weakSelf?.delegate?.didClickMark()
     }
 
+    // 历史记录
     let history = SettingCellModel()
     history.cellName = localizable("historical_record")
     history.type = SettingCellType.SettingArrowCell.rawValue
@@ -88,6 +89,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       weakSelf?.delegate?.didClickHistoryMessage()
     }
 
+    // 开启消息提醒
     let remind = SettingCellModel()
     remind.cellName = localizable("message_remind")
     remind.type = SettingCellType.SettingSwitchCell.rawValue
@@ -121,10 +123,10 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
+    // 聊天置顶
     let setTop = SettingCellModel()
     setTop.cellName = localizable("session_set_top")
     setTop.type = SettingCellType.SettingSwitchCell.rawValue
-    setTop.cornerType = .bottomLeft.union(.bottomRight)
 
     if let tid = teamInfoModel?.team?.teamId {
       let session = NIMSession(tid, type: .team)
@@ -161,8 +163,13 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
-    model.cellModels.append(contentsOf: [mark, history, remind, setTop])
-
+    model.cellModels.append(contentsOf: [
+      mark, // 标记
+      history, // 历史记录
+      remind, // 开启消息提醒
+      setTop, // 聊天置顶
+    ])
+    model.setCornerType()
     return model
   }
 
@@ -201,15 +208,11 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
+    model.cellModels.append(nick)
     if isOwner() {
-      nick.cornerType = .topLeft.union(.topRight)
-      forbiddenWords.cornerType = .bottomLeft.union(.bottomRight)
-      model.cellModels.append(contentsOf: [nick, forbiddenWords])
-    } else {
-      nick.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.topRight)
-      model.cellModels.append(contentsOf: [nick])
+      model.cellModels.append(forbiddenWords)
     }
-
+    model.setCornerType()
     return model
   }
 
@@ -233,12 +236,9 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       weakSelf?.delegate?.didChangeInviteModeClick(invitePermission)
     }
 
-    invitePermission.cornerType = .topLeft.union(.topRight)
-
     let modifyPermission = SettingCellModel()
     modifyPermission.cellName = localizable("modify_team_info_permission")
     modifyPermission.type = SettingCellType.SettingSelectCell.rawValue
-    modifyPermission.cornerType = .bottomLeft.union(.bottomRight)
     modifyPermission.rowHeight = 73
     if let updateMode = teamInfoModel?.team?.updateInfoMode, updateMode == .all {
       modifyPermission.subTitle = localizable("team_all")
@@ -254,7 +254,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
      let agreePermission = SettingCellModel()
        agreePermission.cellName = localizable("agree")
        agreePermission.type = SettingCellType.SettingSwitchCell.rawValue
-       agreePermission.cornerType = .bottomLeft.union(.bottomRight)
      if let inviteMode = teamInfoModel?.team?.beInviteMode, inviteMode == .needAuth {
          agreePermission.switchOpen = true
      }
@@ -292,6 +291,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
 
     if isOwner() {
       model.cellModels.append(contentsOf: [invitePermission, modifyPermission])
+      model.setCornerType()
     }
 
     return model

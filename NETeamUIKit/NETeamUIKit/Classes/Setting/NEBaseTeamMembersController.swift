@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
+import UIKit
 
 @objcMembers
 open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegate,
@@ -29,6 +29,10 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     field.textColor = .ne_greyText
     field.font = UIFont.systemFont(ofSize: 14.0)
     field.backgroundColor = UIColor.ne_backcolor
+    if let clearButton = field.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    field.accessibilityIdentifier = "id.search"
     return field
   }()
 

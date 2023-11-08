@@ -58,6 +58,7 @@ open class NEBaseContactViewController: UIViewController, UIGestureRecognizerDel
       target: self,
       action: #selector(backToPrevious)
     )
+    backItem.accessibilityIdentifier = "id.backArrow"
     backItem.tintColor = UIColor(hexString: "333333")
     navigationItem.leftBarButtonItem = backItem
   }

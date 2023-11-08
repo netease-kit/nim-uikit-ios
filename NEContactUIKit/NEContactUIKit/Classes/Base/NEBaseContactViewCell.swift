@@ -14,6 +14,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     avatar.clipsToBounds = true
     avatar.contentMode = .scaleAspectFill
     avatar.backgroundColor = UIColor.colorWithNumber(number: 0)
+    avatar.accessibilityIdentifier = "id.avatar"
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: avatar.leftAnchor, constant: 1),
       nameLabel.rightAnchor.constraint(equalTo: avatar.rightAnchor, constant: -1),
@@ -53,6 +54,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = UIFont.systemFont(ofSize: 14.0)
     label.textColor = UIColor(hexString: "333333")
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
@@ -62,6 +64,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = UIFont.systemFont(ofSize: 14.0)
     label.textColor = UIColor(hexString: "333333")
+    label.accessibilityIdentifier = "id.action"
     return label
   }()
 

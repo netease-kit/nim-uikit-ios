@@ -18,7 +18,7 @@ public class NEEmotionTool: NSObject {
     let regularArr = reExpression?.matches(
       in: str,
       options: .reportProgress,
-      range: NSRange(location: 0, length: str.count)
+      range: NSRange(location: 0, length: str.utf16.count)
     )
 
     let emoticons = NIMInputEmoticonManager.shared

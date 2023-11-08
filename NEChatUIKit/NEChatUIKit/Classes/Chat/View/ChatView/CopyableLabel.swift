@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECommonUIKit
 import MobileCoreServices
+import NECommonUIKit
+import UIKit
 
 @objcMembers
 open class CopyableLabel: UILabel {

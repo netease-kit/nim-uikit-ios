@@ -1,10 +1,10 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
 import NECommonKit
+import NIMSDK
+import UIKit
 
 @objcMembers
 open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, NIMUserManagerDelegate, FunChatRecordViewDelegate {
@@ -301,52 +301,55 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func showReplyMessageView(isReEdit: Bool = false) {
     viewmodel.isReplying = true
-    getFunInputView()?.showReplyMode()
-    if var message = viewmodel.operationModel?.message {
+    guard let replyView = getFunInputView() else { return }
+    replyView.showReplyMode()
+    if let message = viewmodel.operationModel?.message {
       if isReEdit {
-        if let replyMessage = viewmodel.getReplyMessageWithoutThread(message: message) as? MessageContentModel, let msg = replyMessage.message {
-          msg.text = message.text
-          message = msg
+        replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: viewmodel.operationModel?.replyText ?? "",
+                                                                          font: .systemFont(ofSize: 13),
+                                                                          color: .ne_greyText)
+        if let replyMessage = viewmodel.getReplyMessageWithoutThread(message: message) as? MessageContentModel {
           viewmodel.operationModel = replyMessage
         }
-      }
-      var text = chatLocalizable("msg_reply")
-      if let uid = message.from {
-        var showName = viewmodel.getShowName(userId: uid, teamId: viewmodel.session.sessionId, false)
-        if viewmodel.session.sessionType != .P2P,
-           !IMKitClient.instance.isMySelf(uid) {
-          addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
+      } else {
+        var text = chatLocalizable("msg_reply")
+        if let uid = message.from {
+          var showName = viewmodel.getShowName(userId: uid, teamId: viewmodel.session.sessionId, false)
+          if viewmodel.session.sessionType != .P2P,
+             !IMKitClient.instance.isMySelf(uid) {
+            addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
+          }
+          let user = viewmodel.getUserInfo(userId: uid)
+          if let alias = user?.alias {
+            showName = alias
+          }
+          text += " " + showName
         }
-        let user = viewmodel.getUserInfo(userId: uid)
-        if let alias = user?.alias {
-          showName = alias
+        text += ": "
+        switch message.messageType {
+        case .text:
+          if let t = message.text {
+            text += t
+          }
+        case .image:
+          text += "[\(chatLocalizable("msg_image"))]"
+        case .audio:
+          text += "[\(chatLocalizable("msg_audio"))]"
+        case .video:
+          text += "[\(chatLocalizable("msg_video"))]"
+        case .file:
+          text += "[\(chatLocalizable("msg_file"))]"
+        case .location:
+          text += "[\(chatLocalizable("msg_location"))]"
+        case .custom:
+          text += "[\(chatLocalizable("msg_custom"))]"
+        default:
+          text += "[\(chatLocalizable("msg_unknown"))]"
         }
-        text += " " + showName
+        replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
+                                                                          font: .systemFont(ofSize: 13),
+                                                                          color: .ne_greyText)
       }
-      text += ": "
-      switch message.messageType {
-      case .text:
-        if let t = message.text {
-          text += t
-        }
-      case .image:
-        text += "[\(chatLocalizable("msg_image"))]"
-      case .audio:
-        text += "[\(chatLocalizable("msg_audio"))]"
-      case .video:
-        text += "[\(chatLocalizable("msg_video"))]"
-      case .file:
-        text += "[\(chatLocalizable("msg_file"))]"
-      case .location:
-        text += "[\(chatLocalizable("msg_location"))]"
-      case .custom:
-        text += "[\(chatLocalizable("msg_custom"))]"
-      default:
-        text += "[\(chatLocalizable("msg_unknown"))]"
-      }
-      getFunInputView()?.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
-                                                                                 font: .systemFont(ofSize: 13),
-                                                                                 color: .ne_greyText)
       if menuView.textView.isFirstResponder {
         normalOffset = -10
         layoutInputView(offset: currentKeyboardHeight)

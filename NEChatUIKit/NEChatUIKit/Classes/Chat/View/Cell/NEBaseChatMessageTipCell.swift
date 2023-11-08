@@ -42,6 +42,7 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
     label.textColor = NEKitChatConfig.shared.ui.timeTextColor
     label.textAlignment = .center
     label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.messageTipText"
     return label
   }()
 }

@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NEChatKit
 import NECoreIMKit
+import UIKit
 public typealias DidSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
 
 @objcMembers

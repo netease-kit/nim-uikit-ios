@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
@@ -21,8 +21,8 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
     super.setupUI()
     headerView.layer.cornerRadius = 6.4
 
-    addRightAction(localizable("save"), #selector(savePhoto), self, .funTeamThemeColor)
     navigationController?.navigationBar.backgroundColor = .white
+    addRightAction(localizable("save"), #selector(savePhoto), self, .funTeamThemeColor)
     customNavigationView.backgroundColor = .white
     customNavigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
 

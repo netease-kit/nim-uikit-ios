@@ -4,12 +4,12 @@
 
 import Foundation
 import NEChatKit
-import NECoreKit
 import NECoreIMKit
+import NECoreKit
 
 @objcMembers
 public class BlackListViewModel: NSObject, FriendProviderDelegate {
-  var contactRepo = ContactRepo()
+  var contactRepo = ContactRepo.shared
   public weak var delegate: FriendProviderDelegate?
   private let className = "BlackListViewModel"
 

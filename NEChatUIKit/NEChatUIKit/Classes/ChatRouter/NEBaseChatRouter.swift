@@ -4,11 +4,11 @@
 // found in the LICENSE file.
 
 import Foundation
-import NIMSDK
 import NECommonKit
+import NIMSDK
 import SDWebImage
-import SDWebImageWebPCoder
 import SDWebImageSVGKitPlugin
+import SDWebImageWebPCoder
 
 @objcMembers
 public class ChatRouter: NSObject {

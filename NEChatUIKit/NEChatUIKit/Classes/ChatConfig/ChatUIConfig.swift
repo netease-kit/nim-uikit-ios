@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonKit
+import UIKit
 
 /// 头像枚举类型
 @objc public enum NEChatAvatarType: Int {
