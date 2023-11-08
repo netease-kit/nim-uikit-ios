@@ -39,8 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
         
-        let account = "338920520839424"
-        let token = "16a4518a-c66f-4ccb-b54d-2e8dd58dc8d2"
+        let account = "<#account#>"
+        let token = "<#token#>"
         
         weak var weakSelf = self
         IMKitClient.instance.loginIM(account, token) { error in
