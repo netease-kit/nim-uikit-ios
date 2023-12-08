@@ -8,14 +8,14 @@ import UIKit
 
 @objcMembers
 open class TeamInfoViewController: NEBaseTeamInfoViewController {
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  override public init(team: NIMTeam?) {
+    super.init(team: team)
     cellClassDic = [
       SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,
       SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self,
     ]
     view.backgroundColor = .ne_lightBackgroundColor
-    customNavigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
   }
 

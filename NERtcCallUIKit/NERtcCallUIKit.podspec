@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
   s.subspec 'NOS' do |nos|
     nos.dependency 'NERtcCallKit/NOS','2.2.0'
     nos.dependency 'SDWebImage'
-    nos.dependency 'NECoreKit','9.6.4'
+    nos.dependency 'NECoreKit','9.6.5'
     nos.dependency 'NECommonKit'
     nos.dependency 'NECommonUIKit'
     nos.dependency 'NERtcSDK'
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
   s.subspec 'NOS_Special' do |nos|
     nos.dependency 'NERtcCallKit/NOS_Special', "2.2.0"
     nos.dependency 'SDWebImage'
-    nos.dependency 'NECoreKit','9.6.4'
+    nos.dependency 'NECoreKit','9.6.5'
     nos.dependency 'NECommonKit'
     nos.dependency 'NECommonUIKit'
     nos.dependency 'NERtcSDK'
@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
   s.subspec 'FCS' do |fcs|
     fcs.dependency 'NERtcCallKit/FCS','2.2.0'
     fcs.dependency 'SDWebImage'
-    fcs.dependency 'NECoreKit','9.6.4'
+    fcs.dependency 'NECoreKit','9.6.5'
     fcs.dependency 'NECommonKit'
     fcs.dependency 'NECommonUIKit'
     fcs.dependency 'NERtcSDK'
@@ -50,7 +50,7 @@ Pod::Spec.new do |s|
   s.subspec 'FCS_Special' do |fcs|
     fcs.dependency 'NERtcCallKit/FCS_Special', "2.2.0"
     fcs.dependency 'SDWebImage'
-    fcs.dependency 'NECoreKit','9.6.4'
+    fcs.dependency 'NECoreKit','9.6.5'
     fcs.dependency 'NECommonKit'
     fcs.dependency 'NECommonUIKit'
     fcs.dependency 'NERtcSDK'

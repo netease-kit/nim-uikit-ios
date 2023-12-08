@@ -258,12 +258,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   open func toInfoView() {}
 
   open func toMemberList() {
-    let memberController = NEBaseTeamMembersController(viewmodel: viewmodel)
-    memberController.datas = viewmodel.teamInfoModel?.users
-    if teamSettingType == .Senior {
-      memberController.isSenior = true
-    }
-    memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
+    let memberController = NEBaseTeamMembersController(teamId: viewmodel.teamInfoModel?.team?.teamId)
     navigationController?.pushViewController(memberController, animated: true)
   }
 
@@ -330,17 +325,6 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       for: indexPath
     ) as? NEBaseTeamSettingCell {
       cell.configure(model)
-      if let c = cell as? TeamSettingSwitchCell {
-        if model.cellName == localizable("message_remind") {
-          c.tSwitch.accessibilityIdentifier = "id.messageRemind"
-        }
-        if model.cellName == localizable("session_set_top") {
-          c.tSwitch.accessibilityIdentifier = "id.sessionPin"
-        }
-        if model.cellName == localizable("team_no_speak") {
-          c.tSwitch.accessibilityIdentifier = "id.teamMute"
-        }
-      }
       return cell
     }
     return UITableViewCell()

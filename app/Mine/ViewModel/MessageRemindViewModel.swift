@@ -10,7 +10,7 @@ import NETeamUIKit
 public class MessageRemindViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
 
-  let repo = SettingRepo()
+  let repo = SettingRepo.shared
 
   func getData() {
     sectionData.append(getFirstSection())
@@ -21,15 +21,19 @@ public class MessageRemindViewModel: NSObject {
   private func getFirstSection() -> SettingSectionModel {
     let model = SettingSectionModel()
     weak var weakSelf = self
+
+    // 新消息通知
     let messageNotify = SettingCellModel()
     messageNotify.cellName = NSLocalizedString("new_message_remind", comment: "")
     messageNotify.type = SettingCellType.SettingSwitchCell.rawValue
-    messageNotify.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     messageNotify.switchOpen = repo.getPushEnable()
     messageNotify.swichChange = { isOpen in
       weakSelf?.repo.setPushEnable(isOpen)
     }
-    model.cellModels.append(contentsOf: [messageNotify])
+    model.cellModels.append(contentsOf: [
+      messageNotify, // 新消息通知
+    ])
+    model.setCornerType()
     return model
   }
 
@@ -39,7 +43,6 @@ public class MessageRemindViewModel: NSObject {
     let ringBellItem = SettingCellModel()
     ringBellItem.cellName = NSLocalizedString("ring_mode", comment: "")
     ringBellItem.type = SettingCellType.SettingSwitchCell.rawValue
-    ringBellItem.cornerType = .topLeft.union(.topRight)
     ringBellItem.switchOpen = repo.getRingMode()
     ringBellItem.swichChange = { isOpen in
       weakSelf?.repo.setRingMode(isOpen)
@@ -48,12 +51,15 @@ public class MessageRemindViewModel: NSObject {
     let vibrationItem = SettingCellModel()
     vibrationItem.cellName = NSLocalizedString("vibration_mode", comment: "")
     vibrationItem.type = SettingCellType.SettingSwitchCell.rawValue
-    vibrationItem.cornerType = .bottomLeft.union(.bottomRight)
     vibrationItem.switchOpen = repo.getVibrateMode()
     vibrationItem.swichChange = { isOpen in
       weakSelf?.repo.setVibrateMode(isOpen)
     }
-    model.cellModels.append(contentsOf: [ringBellItem, vibrationItem])
+    model.cellModels.append(contentsOf: [
+      ringBellItem,
+      vibrationItem,
+    ])
+    model.setCornerType()
     return model
   }
 
@@ -63,7 +69,6 @@ public class MessageRemindViewModel: NSObject {
 //    let receiveItem = SettingCellModel()
 //    receiveItem.cellName = NSLocalizedString("syn_receive_push", comment: "")
 //    receiveItem.type = SettingCellType.SettingSwitchCell.rawValue
-//    receiveItem.cornerType = .topLeft.union(.topRight)
 //    receiveItem.switchOpen = repo.getPcWebPushEnable()
 //    receiveItem.swichChange = { isOpen in
 //      weakSelf?.repo.updatePcWebPushEnable(isOpen)
@@ -72,14 +77,13 @@ public class MessageRemindViewModel: NSObject {
     let messageDetailItem = SettingCellModel()
     messageDetailItem.cellName = NSLocalizedString("display_message_detail", comment: "")
     messageDetailItem.type = SettingCellType.SettingSwitchCell.rawValue
-//    messageDetailItem.cornerType = .bottomLeft.union(.bottomRight)
-    messageDetailItem.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     messageDetailItem.switchOpen = repo.getPushShowDetail()
     messageDetailItem.swichChange = { isOpen in
       weakSelf?.repo.setPushShowDetail(isOpen)
     }
 
     model.cellModels.append(contentsOf: [messageDetailItem])
+    model.setCornerType()
     return model
   }
 }

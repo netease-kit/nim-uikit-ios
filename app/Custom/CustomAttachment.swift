@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NIMSDK
 import NEChatUIKit
+import NIMSDK
+import UIKit
 public class CustomAttachment: NSObject, NIMCustomAttachment, NECustomAttachmentProtocol {
   public var customType: Int = 0
 

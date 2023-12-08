@@ -71,8 +71,8 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
 
   func setupUI() {
     title = chatLocalizable("operation_pin")
-    customNavigationView.navTitle.text = chatLocalizable("operation_pin")
-    customNavigationView.moreButton.isHidden = true
+    navigationView.navTitle.text = chatLocalizable("operation_pin")
+    navigationView.moreButton.isHidden = true
     view.addSubview(tableView)
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
@@ -298,27 +298,32 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
 
     Router.shared.use(
       ContactTeamListRouter,
-      parameters: ["nav": weakSelf?.navigationController as Any],
+      parameters: ["nav": weakSelf?.navigationController as Any,
+                   "isClickCallBack": true],
       closure: nil
     )
   }
 
   open func forwardMessage(_ message: NIMMessage) {
-    weak var weakSelf = self
-    let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
-                                   style: .default) { action in
-      weakSelf?.forwardMessageToUser(message)
-    }
+    if IMKitClient.instance.getConfigCenter().teamEnable {
+      weak var weakSelf = self
+      let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
+                                     style: .default) { action in
+        weakSelf?.forwardMessageToUser(message)
+      }
 
-    let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
-      weakSelf?.forwardMessageToTeam(message)
-    }
+      let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
+        weakSelf?.forwardMessageToTeam(message)
+      }
 
-    let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
-                                     style: .cancel) { action in
-    }
+      let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
+                                       style: .cancel) { action in
+      }
 
-    showActionSheet([teamAction, userAction, cancelAction])
+      showActionSheet([teamAction, userAction, cancelAction])
+    } else {
+      forwardMessageToUser(message)
+    }
   }
 
   // MARK: PinMessageViewModelDelegate

@@ -12,7 +12,7 @@ open class ValidationMessageViewController: NEBaseValidationMessageViewControlle
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     tag = "ValidationMessageViewController"
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 
@@ -35,7 +35,7 @@ open class ValidationMessageViewController: NEBaseValidationMessageViewControlle
     clearItem.setTitleTextAttributes(textAttributes, for: .normal)
     navigationItem.rightBarButtonItem = clearItem
 
-    customNavigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
+    navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
 
     tableView.register(
       SystemNotificationCell.self,

@@ -24,7 +24,7 @@
 "email"="e-mail";
 "sign"="What's Up";
 "delete_friend"="Delete Contact";
-"delete_title"="Delete \"XXX\" Contact";
+"delete_title"="Delete \"%@\" Contact";
 "add_friend"="Add Contact";
 "add_blackList"="block";
 "send_friend_apply"="Contact request sent";

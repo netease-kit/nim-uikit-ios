@@ -32,7 +32,7 @@ open class FunValidationMessageViewController: NEBaseValidationMessageViewContro
     clearItem.setTitleTextAttributes(textAttributes, for: .normal)
     navigationItem.rightBarButtonItem = clearItem
 
-    customNavigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
+    navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
 
     tableView.register(
       FunSystemNotificationCell.self,

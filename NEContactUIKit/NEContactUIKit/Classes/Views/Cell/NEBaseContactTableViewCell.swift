@@ -69,9 +69,9 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
   }
 
   open func initSubviewsLayout() {
-    if NEKitContactConfig.shared.ui.avatarType == .rectangle {
-      avatarImage.layer.cornerRadius = NEKitContactConfig.shared.ui.avatarCornerRadius
-    } else if NEKitContactConfig.shared.ui.avatarType == .cycle {
+    if NEKitContactConfig.shared.ui.contactProperties.avatarType == .rectangle {
+      avatarImage.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
+    } else if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
       avatarImage.layer.cornerRadius = 18.0
     } else {
       avatarImage.layer.cornerRadius = 18.0 // Normal UI
@@ -79,7 +79,7 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
   }
 
   open func setConfig() {
-    titleLabel.textColor = NEKitContactConfig.shared.ui.titleColor
+    titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.itemTitleColor
     nameLabel.font = UIFont.systemFont(ofSize: 14.0)
     nameLabel.textColor = UIColor.white
   }

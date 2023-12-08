@@ -8,8 +8,8 @@ import UIKit
 
 @objcMembers
 open class FunUserSettingViewController: NEBaseUserSettingViewController {
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  override public init(userId: String) {
+    super.init(userId: userId)
     cellClassDic = [
       UserSettingType.SwitchType.rawValue: FunUserSettingSwitchCell.self,
       UserSettingType.SelectType.rawValue: FunUserSettingSelectCell.self,
@@ -31,8 +31,8 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
   override func setupUI() {
     super.setupUI()
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
-    customNavigationView.bottomLine.isHidden = false
+    navigationView.backgroundColor = .white
+    navigationView.titleBarBottomLine.isHidden = false
     userHeader.layer.cornerRadius = 4.0
     addBtn.setImage(coreLoader.loadImage("fun_setting_add"), for: .normal)
     contentTable.rowHeight = 56
@@ -53,12 +53,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     ])
 
     cornerBack.addSubview(userHeader)
-    NSLayoutConstraint.activate([
-      userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 22),
-      userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 22),
-      userHeader.widthAnchor.constraint(equalToConstant: 50),
-      userHeader.heightAnchor.constraint(equalToConstant: 50),
-    ])
+
     let tap = UITapGestureRecognizer()
     userHeader.addGestureRecognizer(tap)
     tap.numberOfTapsRequired = 1
@@ -74,22 +69,49 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
       userHeader.backgroundColor = UIColor.colorWithString(string: viewmodel.userInfo?.userId)
     }
 
-    cornerBack.addSubview(addBtn)
-    NSLayoutConstraint.activate([
-      addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
-      addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
-      addBtn.widthAnchor.constraint(equalToConstant: 50.0),
-      addBtn.heightAnchor.constraint(equalToConstant: 50.0),
-    ])
-    addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
-
-    cornerBack.addSubview(nameLabel)
-    NSLayoutConstraint.activate([
-      nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 3.0),
-      nameLabel.centerXAnchor.constraint(equalTo: userHeader.centerXAnchor),
-      nameLabel.widthAnchor.constraint(equalTo: userHeader.widthAnchor),
-    ])
     nameLabel.text = viewmodel.userInfo?.showName()
+    cornerBack.addSubview(nameLabel)
+
+    if IMKitClient.instance.getConfigCenter().teamEnable {
+      NSLayoutConstraint.activate([
+        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 22),
+        userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 22),
+        userHeader.widthAnchor.constraint(equalToConstant: 50),
+        userHeader.heightAnchor.constraint(equalToConstant: 50),
+      ])
+
+      nameLabel.font = NEConstant.defaultTextFont(12)
+      nameLabel.textAlignment = .center
+      NSLayoutConstraint.activate([
+        nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 3.0),
+        nameLabel.centerXAnchor.constraint(equalTo: userHeader.centerXAnchor),
+        nameLabel.widthAnchor.constraint(equalTo: userHeader.widthAnchor),
+      ])
+
+      addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
+      cornerBack.addSubview(addBtn)
+      NSLayoutConstraint.activate([
+        addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
+        addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
+        addBtn.widthAnchor.constraint(equalToConstant: 50.0),
+        addBtn.heightAnchor.constraint(equalToConstant: 50.0),
+      ])
+    } else {
+      NSLayoutConstraint.activate([
+        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
+        userHeader.centerYAnchor.constraint(equalTo: cornerBack.centerYAnchor),
+        userHeader.widthAnchor.constraint(equalToConstant: 60),
+        userHeader.heightAnchor.constraint(equalToConstant: 60),
+      ])
+
+      nameLabel.font = NEConstant.defaultTextFont(16)
+      nameLabel.textAlignment = .left
+      NSLayoutConstraint.activate([
+        nameLabel.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 16.0),
+        nameLabel.rightAnchor.constraint(equalTo: cornerBack.rightAnchor),
+        nameLabel.centerYAnchor.constraint(equalTo: userHeader.centerYAnchor),
+      ])
+    }
 
     return header
   }

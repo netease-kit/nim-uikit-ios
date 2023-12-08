@@ -29,7 +29,7 @@ open class ConversationSearchController: NEBaseConversationSearchController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     tag = "ConversationSearchController"
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 

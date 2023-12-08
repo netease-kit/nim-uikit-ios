@@ -32,16 +32,11 @@ public class MessageOperationView: UIView, UICollectionViewDataSource, UICollect
 
     super.init(frame: frame)
     backgroundColor = .white
-//        self.layer.cornerRadius = 8
-//        self.layer.shadowRadius = 4
-//        self.layer.shadowColor = UIColor.black.cgColor
-//        self.layer.shadowOffset = CGSize(width: 4.0, height: 4.0)
-//
-//        collcetionView.layer.shadowRadius = 4
-//        collcetionView.layer.shadowColor = UIColor.black.cgColor
-//        collcetionView.layer.shadowOffset = CGSize(width: 4.0, height: 4.0)
-//        collcetionView.layer.shadowOpacity = 0.8
-//
+    layer.cornerRadius = 8
+    layer.shadowOffset = CGSize(width: 0, height: 4)
+    layer.shadowColor = UIColor.ne_operationBorderColor.cgColor
+    layer.shadowOpacity = 0.25
+    layer.shadowRadius = 8
 
     collcetionView.dataSource = self
     collcetionView.delegate = self

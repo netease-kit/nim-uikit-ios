@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
+import UIKit
 
 public class BirthdayDatePickerView: UIView {
   private var selectTime: String?
@@ -17,7 +17,7 @@ public class BirthdayDatePickerView: UIView {
     button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
     button.setTitleColor(UIColor.ne_blueText, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-
+    button.addTarget(self, action: #selector(removeFromSuperview), for: .touchUpInside)
     return button
   }()
 

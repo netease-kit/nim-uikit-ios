@@ -12,11 +12,11 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     readView.borderLayer.strokeColor = UIColor.funChatThemeColor.cgColor
     readView.sectorLayer.fillColor = UIColor.funChatThemeColor.cgColor
 
-    var image = NEKitChatConfig.shared.ui.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
+    var image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
     bubbleImageLeft.image = image?
       .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
 
-    image = NEKitChatConfig.shared.ui.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
+    image = NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
     bubbleImageRight.image = image?
       .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
   }
@@ -31,11 +31,11 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   }
 
   override open func initSubviewsLayout() {
-    if NEKitChatConfig.shared.ui.avatarType == .rectangle,
-       let radius = NEKitChatConfig.shared.ui.avatarCornerRadius {
-      avatarImageRight.layer.cornerRadius = radius
-      avatarImageLeft.layer.cornerRadius = radius
-    } else if NEKitChatConfig.shared.ui.avatarType == .cycle {
+    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .rectangle,
+       NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
+      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+    } else if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
       avatarImageRight.layer.cornerRadius = 21.0
       avatarImageLeft.layer.cornerRadius = 21.0
     } else {

@@ -53,8 +53,8 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
   }
 
   open func setupUI() {
-    customNavigationView.setMoreButtonTitle(localizable("save"))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
+    navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     view.addSubview(backView)
     backView.addSubview(textView)
@@ -75,7 +75,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
       name = n
       if changePermission() == false {
         rightNavBtn.isHidden = true
-        customNavigationView.moreButton.isHidden = true
+        navigationView.moreButton.isHidden = true
         textView.isEditable = false
       }
     } else if type == .NickName {
@@ -123,15 +123,15 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
   open func disableSubmit() {
     rightNavBtn.setTitleColor(NEConstant.hexRGBAlpha(0x337EFF, 0.5), for: .normal)
     rightNavBtn.isEnabled = false
-    customNavigationView.moreButton.setTitleColor(NEConstant.hexRGBAlpha(0x337EFF, 0.5), for: .normal)
-    customNavigationView.moreButton.isEnabled = false
+    navigationView.moreButton.setTitleColor(NEConstant.hexRGBAlpha(0x337EFF, 0.5), for: .normal)
+    navigationView.moreButton.isEnabled = false
   }
 
   open func enableSubmit() {
     rightNavBtn.setTitleColor(NEConstant.hexRGB(0x337EFF), for: .normal)
     rightNavBtn.isEnabled = true
-    customNavigationView.moreButton.setTitleColor(NEConstant.hexRGB(0x337EFF), for: .normal)
-    customNavigationView.moreButton.isEnabled = true
+    navigationView.moreButton.setTitleColor(NEConstant.hexRGB(0x337EFF), for: .normal)
+    navigationView.moreButton.isEnabled = true
   }
 
   open func saveName() {

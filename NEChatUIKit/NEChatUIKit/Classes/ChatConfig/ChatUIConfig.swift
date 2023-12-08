@@ -14,10 +14,38 @@ import UIKit
 
 @objcMembers
 public class ChatUIConfig: NSObject {
-  /// UI 元素自定义
+  /// 消息页面的 UI 个性化定制
+  public var messageItemClick: ((UITableViewCell, MessageContentModel?) -> Void)?
 
+  /// 消息页面的 UI 个性化定制
+  public var messageProperties = MessageProperties()
+
+  /// 文本输入框下方 tab 按钮定制
+  public var chatInputBar: ((inout [UIButton]) -> Void)?
+
+  /// 【更多】区域功能列表
+  public var chatInputMenu: ((inout [NEMoreItemModel]) -> Void)?
+
+  /// 消息长按弹出菜单回调, 回调中会返回长按弹出菜单列表
+  public var chatPopMenu: ((inout [OperationItem], MessageContentModel?) -> Void)?
+
+  /// 消息长按弹出菜单点击事件回调
+  public var popMenuClick: ((OperationItem) -> Void)?
+
+  /// 消息列表的视图控制器回调，回调中会返回消息列表的视图控制器
+  public var customController: ((ChatViewController) -> Void)?
+
+  /// 用户可自定义参数
+
+  // 发送文件大小限制(单位：MB)
+  public var fileSizeLimit: Double = 200
+}
+
+/// 消息页面的 UI 个性化定制
+@objcMembers
+public class MessageProperties: NSObject {
   // 头像圆角大小
-  public var avatarCornerRadius: CGFloat?
+  public var avatarCornerRadius: CGFloat = 0
 
   // 头像类型
   public var avatarType: NEChatAvatarType?
@@ -38,7 +66,7 @@ public class ChatUIConfig: NSObject {
   public var leftBubbleBg: UIImage?
 
   // 聊天字体大小(文本类型)
-  public var messageTextSize = UIFont.systemFont(ofSize: 16)
+  public var messageTextSize: CGFloat = 16
 
   // 聊天字体颜色(文本类型)
   public var messageTextColor = UIColor.ne_darkText
@@ -69,9 +97,4 @@ public class ChatUIConfig: NSObject {
   public var titleBarRightClick: (() -> Void)?
   // 设置会话界面背景色
   public var chatViewBackground: UIColor?
-
-  /// 用户可自定义参数
-
-  // 发送文件大小限制(单位：MB)
-  public var fileSizeLimit: Double = 200
 }

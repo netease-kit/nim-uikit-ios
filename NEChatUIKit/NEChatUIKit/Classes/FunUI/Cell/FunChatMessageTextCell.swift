@@ -12,7 +12,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = NEKitChatConfig.shared.ui.messageTextSize
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
     label.textAlignment = .justified
     return label
@@ -24,7 +24,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = NEKitChatConfig.shared.ui.messageTextSize
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
     label.textAlignment = .justified
     return label

@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NETeamUIKit
+import UIKit
 
 enum IntroduceCellType: Int {
   case version = 0
@@ -93,6 +93,7 @@ class VersionCell: UITableViewCell {
     label.textColor = UIColor(hexString: "0x333333")
     label.font = UIFont.systemFont(ofSize: 14)
     label.isHidden = true
+    label.accessibilityIdentifier = "id.version"
     return label
   }()
 

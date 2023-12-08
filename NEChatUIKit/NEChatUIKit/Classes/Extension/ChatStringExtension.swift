@@ -80,23 +80,3 @@ extension String {
     return format.date(from: "\(year)-01-01")
   }
 }
-
-extension String {
-  // 利用 sizeThatFits 计算 UIlabel 纯文本大小
-  func finalSize(_ font: UIFont, _ size: CGSize, _ lines: Int = 0) -> CGSize {
-    tempLabelForCalc.numberOfLines = lines
-    tempLabelForCalc.font = font
-    tempLabelForCalc.text = self
-    return tempLabelForCalc.sizeThatFits(size)
-  }
-}
-
-extension NSAttributedString {
-  // 利用 sizeThatFits 计算 UIlabel 富文本大小
-  func finalSize(_ font: UIFont, _ size: CGSize, _ lines: Int = 0) -> CGSize {
-    tempLabelForCalc.numberOfLines = lines
-    tempLabelForCalc.font = font
-    tempLabelForCalc.attributedText = self
-    return tempLabelForCalc.sizeThatFits(size)
-  }
-}

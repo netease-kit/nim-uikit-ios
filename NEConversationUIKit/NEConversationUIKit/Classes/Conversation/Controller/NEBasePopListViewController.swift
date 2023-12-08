@@ -20,15 +20,28 @@ open class PopListItem: NSObject {
 
 @objcMembers
 open class NEBasePopListViewController: UIViewController {
-  public var itemDatas = [PopListItem]()
   public let shadowView = UIView()
   public var buttonHeight: CGFloat = 32.0
   let popView = UIView()
   public var popViewWidth: CGFloat = 122.0
+  var popViewHeight: CGFloat = 0
   public var popViewRadius: CGFloat = 8.0
+  public var topConstant: CGFloat = 0
+
+  public var itemDatas = [PopListItem]() {
+    didSet {
+      popViewHeight = CGFloat(itemDatas.count) * 32 + 16
+    }
+  }
 
   override public func viewDidLoad() {
     super.viewDidLoad()
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationController?.isNavigationBarHidden = false
+      topConstant = 10
+    } else {
+      topConstant = NEConstant.navigationAndStatusHeight
+    }
     setupUI()
   }
 
@@ -42,12 +55,17 @@ open class NEBasePopListViewController: UIViewController {
 
     shadowView.translatesAutoresizingMaskIntoConstraints = false
     shadowView.backgroundColor = .clear
-    view.addSubview(shadowView)
     shadowView.clipsToBounds = false
     shadowView.layer.shadowOffset = CGSize(width: 0, height: 4)
-    shadowView.layer.shadowColor = NEConstant.hexRGB(0x85888C).cgColor
+    shadowView.layer.shadowColor = UIColor.ne_operationBorderColor.cgColor
     shadowView.layer.shadowOpacity = 0.25
     shadowView.layer.shadowRadius = 7
+    view.addSubview(shadowView)
+
+    NSLayoutConstraint.activate([
+      shadowView.widthAnchor.constraint(equalToConstant: popViewWidth),
+      shadowView.heightAnchor.constraint(equalToConstant: popViewHeight),
+    ])
 
     shadowView.addSubview(popView)
     popView.clipsToBounds = true

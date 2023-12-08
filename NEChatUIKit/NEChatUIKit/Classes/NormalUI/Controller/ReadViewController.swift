@@ -12,7 +12,7 @@ import UIKit
 open class ReadViewController: NEBaseReadViewController {
   override init(message: NIMMessage) {
     super.init(message: message)
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 
@@ -22,7 +22,7 @@ open class ReadViewController: NEBaseReadViewController {
 
   override public func commonUI() {
     super.commonUI()
-    customNavigationView.bottomLine.isHidden = false
+    navigationView.titleBarBottomLine.isHidden = false
     readButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     line.backgroundColor = UIColor.ne_blueText
 

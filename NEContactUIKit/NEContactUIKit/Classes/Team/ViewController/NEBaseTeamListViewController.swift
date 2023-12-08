@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
-  public let customNavigationView = NENavigationView()
+  public let navigationView = NENavigationView()
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = TeamListViewModel()
   var isClickCallBack = false
@@ -34,7 +34,7 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
 
   func commonUI() {
     title = localizable("mine_groupchat")
-    customNavigationView.navTitle.text = title
+    navigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -46,15 +46,15 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
 
     navigationItem.leftBarButtonItem = backItem
 
-    customNavigationView.translatesAutoresizingMaskIntoConstraints = false
-    customNavigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
-    customNavigationView.moreButton.isHidden = true
-    view.addSubview(customNavigationView)
+    navigationView.translatesAutoresizingMaskIntoConstraints = false
+    navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
+    navigationView.moreButton.isHidden = true
+    view.addSubview(navigationView)
     NSLayoutConstraint.activate([
-      customNavigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      customNavigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      customNavigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      customNavigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
+      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+      navigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
     ])
 
     tableView.separatorStyle = .none

@@ -14,6 +14,7 @@ open class TextWithDetailTextCell: ContactBaseTextCell {
     detailTitleLabel.font = UIFont.systemFont(ofSize: 12)
     detailTitleLabel.textColor = UIColor(hexString: "#A6ADB6")
     detailTitleLabel.textAlignment = .right
+    detailTitleLabel.accessibilityIdentifier = "id.detailTitleLabel"
     contentView.addSubview(detailTitleLabel)
     NSLayoutConstraint.activate([
       detailTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor),

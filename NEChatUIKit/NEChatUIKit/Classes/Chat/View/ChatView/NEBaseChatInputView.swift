@@ -95,6 +95,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public func addMoreActionView() {
     currentType = .addMore
+    textView.resignFirstResponder()
     contentSubView?.isHidden = true
     contentSubView = chatAddMoreView
     contentSubView?.isHidden = false
@@ -270,7 +271,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     delegate?.willSelectItem(button: button, index: button.tag - 5)
   }
 
-  // MARK: InputEmoticonContainerViewDelegate
+  // MARK: NIMInputEmoticonContainerViewDelegate
 
   public func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String) {
     if emoticonID.isEmpty { // 删除键

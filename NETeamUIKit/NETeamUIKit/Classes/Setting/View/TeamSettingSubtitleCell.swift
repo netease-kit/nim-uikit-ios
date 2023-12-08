@@ -70,6 +70,7 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
     label.font = NEConstant.defaultTextFont(12.0)
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textAlignment = .right
+    label.accessibilityIdentifier = "id.subTitleLabel"
     return label
   }()
 }

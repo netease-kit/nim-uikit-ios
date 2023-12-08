@@ -8,7 +8,7 @@ import UIKit
 open class TeamMembersController: NEBaseTeamMembersController {
   override open func viewDidLoad() {
     super.viewDidLoad()
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
     back.backgroundColor = .ne_backcolor
     contentTable.register(TeamMemberCell.self, forCellReuseIdentifier: "\(TeamMemberCell.self)")

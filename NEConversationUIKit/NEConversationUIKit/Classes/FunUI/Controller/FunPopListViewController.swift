@@ -9,8 +9,6 @@ import UIKit
 
 @objcMembers
 open class FunPopListViewController: NEBasePopListViewController {
-  public var shadowViewTopAnchor: NSLayoutConstraint?
-
   public var triangleView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -21,16 +19,12 @@ open class FunPopListViewController: NEBasePopListViewController {
 
   override func setupUI() {
     super.setupUI()
-
-    let popViewHeight = CGFloat(itemDatas.count) * 32 + 16
-
     NSLayoutConstraint.activate([
+      shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       shadowView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
-      shadowView.widthAnchor.constraint(equalToConstant: popViewWidth),
-      shadowView.heightAnchor.constraint(equalToConstant: popViewHeight),
     ])
-    shadowViewTopAnchor = shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight)
-    shadowViewTopAnchor?.isActive = true
+
+    popView.backgroundColor = UIColor.funConversationPopViewBg
 
     view.insertSubview(triangleView, aboveSubview: shadowView)
     NSLayoutConstraint.activate([
@@ -38,7 +32,6 @@ open class FunPopListViewController: NEBasePopListViewController {
       triangleView.heightAnchor.constraint(equalToConstant: 11),
       triangleView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -25),
       triangleView.topAnchor.constraint(equalTo: popView.topAnchor, constant: -5),
-
     ])
   }
 }

@@ -10,7 +10,7 @@ open class PinMessageViewController: NEBasePinMessageViewController {
   override public func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .ne_lightBackgroundColor
-    customNavigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
   }
 

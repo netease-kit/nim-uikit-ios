@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NECommonKit
 
 @objcMembers
 open class TextViewController: ChatBaseViewController {
@@ -47,7 +48,7 @@ open class TextViewController: ChatBaseViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = true
-    customNavigationView.isHidden = true
+    navigationView.isHidden = true
     let tap = UITapGestureRecognizer(target: self, action: #selector(viewTap))
     scrollView.addGestureRecognizer(tap)
     setupUI()

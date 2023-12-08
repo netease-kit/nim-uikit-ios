@@ -38,8 +38,8 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
 
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.timeTextSize)
-    label.textColor = NEKitChatConfig.shared.ui.timeTextColor
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
     label.textAlignment = .center
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.messageTipText"

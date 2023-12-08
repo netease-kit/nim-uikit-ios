@@ -26,6 +26,15 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     return table
   }()
 
+  init(team: NIMTeam?) {
+    super.init(nibName: nil, bundle: nil)
+    self.team = team
+  }
+
+  public required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     if let type = team?.type, type == .normal {

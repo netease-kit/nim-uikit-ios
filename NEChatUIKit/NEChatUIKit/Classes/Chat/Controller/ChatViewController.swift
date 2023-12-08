@@ -23,91 +23,70 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   private let tag = "ChatViewController"
   private let kCallKitDismissNoti = "kCallKitDismissNoti"
   private let kCallKitShowNoti = "kCallKitShowNoti"
-  private var playingCell: ChatAudioCellProtocol?
-  private var playingModel: MessageAudioModel?
-  private var atUsers = [NSRange]()
-  private var timer: Timer?
-  private var isFile: Bool? // 是否以文件形式发送
-  private var needMarkReadMsgs = [NIMMessage]()
-  private var isCurrentPage = true
-
-  var replyView = ReplyView()
   public var titleContent = ""
-  let interactionController = UIDocumentInteractionController()
 
   public var viewmodel: ChatViewModel
-  public var inputViewTopConstraint: NSLayoutConstraint?
-  public var tableViewBottomConstraint: NSLayoutConstraint?
-  public var menuView: NEBaseChatInputView!
+  let interactionController = UIDocumentInteractionController()
+  private lazy var manager = CLLocationManager()
+  private var playingCell: ChatAudioCellProtocol?
+  private var playingModel: MessageAudioModel?
+  private var timer: Timer?
+  private var isFile: Bool? // 是否以文件形式发送
+  private var isCurrentPage = true
+
+  public var operationCellFilter: [OperationType]? // 消息长按菜单全局过滤列表
+  public var cellRegisterDic = [String: UITableViewCell.Type]()
+  private var needMarkReadMsgs = [NIMMessage]()
+  private var atUsers = [NSRange]()
+  let group = DispatchGroup()
+
+  var replyView = ReplyView()
+//    public var menuView: NEBaseChatInputView!
   public var operationView: MessageOperationView?
-  public var operationCellFilter: [OperationType]?
+
+  public var normalOffset: CGFloat = 0
   public var bottomExanpndHeight: CGFloat = 204 // 底部展开高度
   public var normalInputHeight: CGFloat = 100
-  public var normalOffset: CGFloat = 0
-  public var registerCellDic = [String: UITableViewCell.Type]()
+  public var brokenNetworkViewHeight: CGFloat = 36
+  public lazy var bodyTopViewHeight: CGFloat = 0 {
+    didSet {
+      bodyTopViewHeightAnchor?.constant = bodyTopViewHeight
+      bodyTopView.isHidden = bodyTopViewHeight <= 0
+    }
+  }
 
-  public lazy var inputTopExtendView: UIView = {
-    let content = UIView()
-    content.translatesAutoresizingMaskIntoConstraints = false
-    content.backgroundColor = UIColor.clear
-    return content
-  }()
+  public lazy var bodyBottomViewHeight: CGFloat = 0 {
+    didSet {
+      bodyBottomViewHeightAnchor?.constant = bodyBottomViewHeight
+      bodyBottomView.isHidden = bodyBottomViewHeight <= 0
+    }
+  }
 
-  public lazy var navigationBarBottomExtendView: UIView = {
-    let content = UIView()
-    content.translatesAutoresizingMaskIntoConstraints = false
-    content.backgroundColor = UIColor.clear
-    return content
-  }()
+  public lazy var bottomViewHeight: CGFloat = 304 {
+    didSet {
+      bottomViewHeightAnchor?.constant = bottomViewHeight
+    }
+  }
 
-  public lazy var inputTopExtendHeight: CGFloat = 0
-  public lazy var navigationBarBottomExtendHeight: CGFloat = 0
-  public var inputTopExtendHeightConstant: NSLayoutConstraint?
-  public var navigationBarBottomExtendHeightConstant: NSLayoutConstraint?
-
-  private lazy var manager = CLLocationManager()
+  public var bodyTopViewHeightAnchor: NSLayoutConstraint?
+  public var bodyBottomViewHeightAnchor: NSLayoutConstraint?
+  public var contentViewTopAnchor: NSLayoutConstraint?
+  public var bottomViewTopAnchor: NSLayoutConstraint?
+  public var bottomViewHeightAnchor: NSLayoutConstraint?
 
   public init(session: NIMSession) {
     viewmodel = ChatViewModel(session: session, anchor: nil)
     super.init(nibName: nil, bundle: nil)
-    menuView = getMenuView()
+//    menuView = getMenuView()
 
     NEKeyboardManager.shared.enable = false
     NEKeyboardManager.shared.enableAutoToolbar = false
     NIMSDK.shared().mediaManager.add(self)
-    NIMSDK.shared().mediaManager.setNeedProximityMonitor(viewmodel.getHandSetEnable())
+    NIMSDK.shared().mediaManager.switch(viewmodel.getHandSetEnable() ? .receiver : .speaker)
   }
 
   public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-
-  override open func backEvent() {
-    super.backEvent()
-    cleanDelegate()
-  }
-
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    commonUI()
-    addObseve()
-    weak var weakSelf = self
-    viewmodel.fetchPinMessage {
-      weakSelf?.loadData()
-    }
-  }
-
-  func appEnterBackground() {
-    isCurrentPage = false
-  }
-
-  func appEnterForegournd() {
-    isCurrentPage = true
-  }
-
-  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
-    return true
   }
 
   override open func viewWillAppear(_ animated: Bool) {
@@ -119,24 +98,25 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     getSessionInfo(session: viewmodel.session)
     clearAtRemind()
 
-    weak var weakSelf = self
-    NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
-      if status == .notReachable,
-         let networkView = weakSelf?.brokenNetworkView,
-         let self = weakSelf {
-        self.view.addSubview(networkView)
-        NSLayoutConstraint.activate([
-          networkView.topAnchor.constraint(
-            equalTo: self.tableView.topAnchor,
-            constant: 0
-          ),
-          networkView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-          networkView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-          networkView.heightAnchor.constraint(equalToConstant: self.networkToolHeight),
-        ])
+    NEChatDetectNetworkTool.shareInstance.netWorkReachability { [weak self] status in
+      if status == .notReachable {
+        self?.brokenNetworkView.isHidden = false
+        self?.contentViewTopAnchor?.constant = self?.brokenNetworkViewHeight ?? 36
       } else {
-        weakSelf?.brokenNetworkView.removeFromSuperview()
+        self?.brokenNetworkView.isHidden = true
+        self?.contentViewTopAnchor?.constant = 0
       }
+    }
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    viewmodel.delegate = self
+    commonUI()
+    addObseve()
+    weak var weakSelf = self
+    viewmodel.fetchPinMessage {
+      weakSelf?.loadData()
     }
   }
 
@@ -157,7 +137,87 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     stopPlay()
   }
 
+  open func commonUI() {
+    title = viewmodel.session.sessionId
+    navigationView.titleBarBottomLine.isHidden = false
+    if NEKitChatConfig.shared.ui.messageProperties.showTitleBarRightIcon {
+      let image = NEKitChatConfig.shared.ui.messageProperties.titleBarRightRes ?? UIImage.ne_imageNamed(name: "three_point")
+      addRightAction(image, #selector(toSetting), self)
+      navigationView.setMoreButtonImage(image)
+    } else {
+      navigationView.moreButton.isHidden = true
+    }
+
+    view.addSubview(bodyTopView)
+    view.addSubview(bodyView)
+    view.addSubview(bodyBottomView)
+    view.addSubview(bottomView)
+
+    var bodyTopViewTopConstant: CGFloat = 0
+    if #available(iOS 10, *) {
+      bodyTopViewTopConstant += KStatusBarHeight
+    }
+    if NEKitChatConfig.shared.ui.messageProperties.showTitleBar {
+      bodyTopViewTopConstant += kNavigationHeight
+    }
+    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
+    bodyTopViewHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: bodyTopViewTopConstant),
+      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
+      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
+    ])
+
+    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
+    bodyBottomViewHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      bodyBottomView.bottomAnchor.constraint(equalTo: chatInputView.topAnchor),
+      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+
+    bottomViewTopAnchor = bottomView.topAnchor.constraint(equalTo: view.bottomAnchor, constant: -normalInputHeight)
+    bottomViewTopAnchor?.isActive = true
+    bottomViewHeightAnchor = bottomView.heightAnchor.constraint(equalToConstant: bottomViewHeight)
+    bottomViewHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      bottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+
+    tableView.register(
+      NEBaseChatMessageCell.self,
+      forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
+    )
+
+    NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
+      cellRegisterDic[key] = value
+    }
+
+    cellRegisterDic.forEach { (key: String, value: UITableViewCell.Type) in
+      tableView.register(value, forCellReuseIdentifier: key)
+    }
+
+    expandMoreAction()
+
+    if let customController = NEKitChatConfig.shared.ui.customController {
+      customController(self)
+    }
+  }
+
   // MARK: 子类可重写方法
+
+  override open func backEvent() {
+    super.backEvent()
+    cleanDelegate()
+  }
 
   // load data的时候会调用
   open func getSessionInfo(session: NIMSession) {}
@@ -189,7 +249,16 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   ///   - cell: 长按cell
   ///   - model: cell模型
   open func didLongTouchMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    if model?.isRevoked == true {
+      return
+    }
+
+    // 底部收起
+    chatInputView.textView.resignFirstResponder()
+    layoutInputView(offset: 0)
+
     operationView?.removeFromSuperview()
+
     // get operations
     guard let items = viewmodel.avalibleOperationsForMessage(model) else {
       return
@@ -205,60 +274,108 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       }
     }
 
+    // 配置项自定义 items
+    if let chatPopMenu = NEKitChatConfig.shared.ui.chatPopMenu {
+      chatPopMenu(&filterItems, model)
+    }
+
     // 供用户自定义 items
     setOperationItems(items: &filterItems, model: model)
 
-    if model?.isRevoked == true {
-      return
-    }
-
     viewmodel.operationModel = model
+    group.notify(queue: .main) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: DispatchWorkItem(block: { [self] in
+        //        size
+        let w = filterItems.count <= 5 ? 60.0 * Double(filterItems.count) + 16.0 : 60.0 * 5 + 16.0
+        let h = filterItems.count <= 5 ? 56.0 + 16.0 : 56.0 * 2 + 16.0
 
-//        size
-    let w = filterItems.count <= 5 ? 60.0 * Double(filterItems.count) + 16.0 : 60.0 * 5 + 16.0
-    let h = filterItems.count <= 5 ? 56.0 + 16.0 : 56.0 * 2 + 16.0
+        if let index = tableView.indexPath(for: cell) {
+          let rectInTableView = tableView.rectForRow(at: index)
+          let rectInView = tableView.convert(rectInTableView, to: view)
+          let topOffset = NEConstant.navigationAndStatusHeight
+          var operationY = 0.0
+          if topOffset + h + bodyTopViewHeight > rectInView.origin.y {
+            // under the cell
+            operationY = rectInView.origin.y + rectInView.size.height
+          } else {
+            operationY = rectInView.origin.y - h
+          }
+          var frameX = 0.0
+          if let msg = model?.message,
+             msg.isOutgoingMsg {
+            frameX = kScreenWidth - w
+          }
+          var frame = CGRect(x: frameX, y: operationY, width: w, height: h)
+          if frame.origin.y + h < tableView.frame.origin.y {
+            frame.origin.y = tableView.frame.origin.y
+          } else if frame.origin.y + h > view.frame.size.height {
+            frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
+          }
 
-    if let index = tableView.indexPath(for: cell) {
-      let rectInTableView = tableView.rectForRow(at: index)
-      let rectInView = tableView.convert(rectInTableView, to: tableView.superview)
-      let topOffset = UIApplication.shared.statusBarFrame.size.height + navigationController!
-        .navigationBar.frame.size.height
-      var operationY = 0.0
-      if topOffset + h > rectInView.origin.y {
-//                under the cell
-        operationY = rectInView.origin.y + rectInView.size.height
-      } else {
-        operationY = rectInView.origin.y - h
-      }
-      var frameX = 0.0
-      if let msg = model?.message,
-         msg.isOutgoingMsg {
-        frameX = kScreenWidth - w
-      }
-      var frame = CGRect(x: frameX, y: operationY, width: w, height: h)
-      if frame.origin.y + h < tableView.frame.origin.y {
-        frame.origin.y = tableView.frame.origin.y
-      } else if frame.origin.y + h > view.frame.size.height {
-        frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
-      }
-
-      operationView = MessageOperationView(frame: frame)
-      operationView!.delegate = self
-      operationView!.items = filterItems
-      view.addSubview(operationView!)
+          operationView = MessageOperationView(frame: frame)
+          operationView!.delegate = self
+          operationView!.items = filterItems
+          view.addSubview(operationView!)
+        }
+      }))
     }
   }
 
   // MARK: lazy Method
 
-  public var networkToolHeight: CGFloat = 36
+  public lazy var bodyTopView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.clear
+    return view
+  }()
+
+  public lazy var bodyView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.clear
+    view.addSubview(brokenNetworkView)
+    view.addSubview(contentView)
+
+    NSLayoutConstraint.activate([
+      brokenNetworkView.topAnchor.constraint(equalTo: view.topAnchor),
+      brokenNetworkView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      brokenNetworkView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      brokenNetworkView.heightAnchor.constraint(equalToConstant: brokenNetworkViewHeight),
+    ])
+
+    contentViewTopAnchor = contentView.topAnchor.constraint(equalTo: view.topAnchor)
+    contentViewTopAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      contentView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      contentView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
+
+    return view
+  }()
 
   public lazy var brokenNetworkView: NEBrokenNetworkView = {
-    let view =
-      NEBrokenNetworkView(frame: CGRect(x: 0, y: kNavigationHeight + KStatusBarHeight,
-                                        width: kScreenWidth, height: networkToolHeight))
+    let view = NEBrokenNetworkView()
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
     return view
+  }()
+
+  public lazy var contentView: UIView = {
+    let content = UIView()
+    content.translatesAutoresizingMaskIntoConstraints = false
+    content.backgroundColor = UIColor.clear
+    content.addSubview(tableView)
+
+    NSLayoutConstraint.activate([
+      tableView.topAnchor.constraint(equalTo: content.topAnchor),
+      tableView.leftAnchor.constraint(equalTo: content.leftAnchor),
+      tableView.rightAnchor.constraint(equalTo: content.rightAnchor),
+      tableView.bottomAnchor.constraint(equalTo: content.bottomAnchor),
+    ])
+
+    return content
   }()
 
   public lazy var tableView: UITableView = {
@@ -277,14 +394,46 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     return tableView
   }()
 
+  public lazy var bodyBottomView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.clear
+    return view
+  }()
+
+  public lazy var bottomView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.clear
+    view.addSubview(chatInputView)
+
+    NSLayoutConstraint.activate([
+      chatInputView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      chatInputView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      chatInputView.heightAnchor.constraint(equalToConstant: 304),
+      chatInputView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
+
+    return view
+  }()
+
+  public lazy var chatInputView: NEBaseChatInputView = {
+    let menu = getMenuView()
+    menu.translatesAutoresizingMaskIntoConstraints = false
+    menu.backgroundColor = UIColor(hexString: "#EFF1F3")
+    menu.delegate = self
+    return menu
+  }()
+
   // MARK: UIGestureRecognizerDelegate
 
   open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                               shouldReceive touch: UITouch) -> Bool {
-//        print("touch.view:\(touch.view)")
     guard let view = touch.view else {
       return true
     }
+
+    // 消息操作按钮
     if view.bounds.size.width == 60 {
       return false
     }
@@ -341,105 +490,6 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   override open func toSetting() {}
 
   // MARK: private 方法
-
-  open func commonUI() {
-    title = viewmodel.session.sessionId
-    customNavigationView.bottomLine.isHidden = false
-    view.addSubview(tableView)
-    tableViewBottomConstraint = tableView.bottomAnchor.constraint(
-      equalTo: view.bottomAnchor,
-      constant: -normalInputHeight - inputTopExtendHeight
-    )
-    tableViewBottomConstraint?.isActive = true
-    view.addSubview(navigationBarBottomExtendView)
-
-    if #available(iOS 10, *) {
-      self.navigationBarBottomExtendHeightConstant = navigationBarBottomExtendView.heightAnchor.constraint(equalToConstant: navigationBarBottomExtendHeight)
-      self.navigationBarBottomExtendHeightConstant?.isActive = true
-      NSLayoutConstraint.activate([
-        navigationBarBottomExtendView.topAnchor.constraint(equalTo: view.topAnchor, constant: kNavigationHeight + KStatusBarHeight),
-        navigationBarBottomExtendView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        navigationBarBottomExtendView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      ])
-      NSLayoutConstraint.activate([
-        tableView.topAnchor.constraint(
-          equalTo: navigationBarBottomExtendView.bottomAnchor,
-          constant: 0
-        ),
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      ])
-    } else {
-      navigationBarBottomExtendHeightConstant = navigationBarBottomExtendView.heightAnchor.constraint(equalToConstant: navigationBarBottomExtendHeight)
-      navigationBarBottomExtendHeightConstant?.isActive = true
-      NSLayoutConstraint.activate([
-        navigationBarBottomExtendView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-        navigationBarBottomExtendView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        navigationBarBottomExtendView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      ])
-
-      NSLayoutConstraint.activate([
-        tableView.topAnchor.constraint(
-          equalTo: navigationBarBottomExtendView.bottomAnchor,
-          constant: 0
-        ),
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      ])
-    }
-
-    tableView.register(
-      NEBaseChatMessageCell.self,
-      forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
-    )
-
-    NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
-      registerCellDic[key] = value
-    }
-
-    registerCellDic.forEach { (key: String, value: UITableViewCell.Type) in
-      tableView.register(value, forCellReuseIdentifier: key)
-    }
-
-    viewmodel.delegate = self
-    menuView.backgroundColor = UIColor(hexString: "#EFF1F3")
-    menuView.translatesAutoresizingMaskIntoConstraints = false
-    menuView.delegate = self
-    expandMoreAction()
-    view.addSubview(menuView)
-
-    inputViewTopConstraint = menuView.topAnchor.constraint(
-      equalTo: view.bottomAnchor,
-      constant: -normalInputHeight
-    )
-    NSLayoutConstraint.activate([
-      menuView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      menuView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      menuView.heightAnchor.constraint(equalToConstant: 304),
-    ])
-    inputViewTopConstraint?.isActive = true
-
-    view.addSubview(inputTopExtendView)
-    inputTopExtendHeightConstant = inputTopExtendView.heightAnchor.constraint(equalToConstant: inputTopExtendHeight)
-    inputTopExtendHeightConstant?.isActive = true
-    NSLayoutConstraint.activate([
-      inputTopExtendView.bottomAnchor.constraint(equalTo: menuView.topAnchor),
-      inputTopExtendView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      inputTopExtendView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
-
-    if NEKitChatConfig.shared.ui.showTitleBarRightIcon {
-      let image = NEKitChatConfig.shared.ui.titleBarRightRes ?? UIImage.ne_imageNamed(name: "three_point")
-      addRightAction(image, #selector(toSetting), self)
-      customNavigationView.setMoreButtonImage(image)
-    } else {
-      customNavigationView.moreButton.isHidden = true
-    }
-
-    if let pan = navigationController?.interactivePopGestureRecognizer {
-      tableView.panGestureRecognizer.require(toFail: pan)
-    }
-  }
 
   func loadData() {
     weak var weakSelf = self
@@ -540,6 +590,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     tap.delegate = self
     tap.cancelsTouchesInView = false
     view.addGestureRecognizer(tap)
+
+    if let pan = navigationController?.interactivePopGestureRecognizer {
+      tableView.panGestureRecognizer.require(toFail: pan)
+    }
   }
 
   open func addBottomLoadMore() {
@@ -567,15 +621,24 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
+  func appEnterBackground() {
+    isCurrentPage = false
+  }
+
+  func appEnterForegournd() {
+    isCurrentPage = true
+  }
+
   //    MARK: 键盘通知相关操作
 
   open func keyBoardWillShow(_ notification: Notification) {
-    if menuView.currentType != .text {
+    operationView?.removeFromSuperview()
+    if chatInputView.currentType != .text {
       return
     }
-    menuView.currentButton?.isSelected = false
+    chatInputView.currentButton?.isSelected = false
 
-    menuView.contentSubView?.isHidden = true
+    chatInputView.contentSubView?.isHidden = true
     let oldKeyboardRect = (notification
       .userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
 
@@ -598,10 +661,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func keyBoardWillHide(_ notification: Notification) {
-    if menuView.currentType != .text {
+    if chatInputView.currentType != .text {
       return
     }
-    menuView.currentButton?.isSelected = false
+    chatInputView.currentButton?.isSelected = false
     // 解决点击operation点击无效问题
 //    if operationView?.superview != nil {
 //      operationView?.removeFromSuperview()
@@ -630,12 +693,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     weak var weakSelf = self
     let topValue = normalInputHeight - normalOffset
     if offset == 0 {
-      menuView.contentSubView?.isHidden = true
-      menuView.currentButton?.isSelected = false
+      chatInputView.contentSubView?.isHidden = true
+      chatInputView.currentButton?.isSelected = false
     }
     UIView.animate(withDuration: 0.1, animations: {
-      weakSelf?.inputViewTopConstraint?.constant = -topValue - offset
-      weakSelf?.tableViewBottomConstraint?.constant = -topValue - offset - (weakSelf?.inputTopExtendHeight ?? 0)
+      weakSelf?.bottomViewTopAnchor?.constant = -topValue - offset
     })
   }
 
@@ -645,8 +707,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     guard let content = text, content.count > 0 else {
       return
     }
-    let remoteExt = menuView.getRemoteExtension(attribute)
-    menuView.cleartAtCache()
+    let remoteExt = chatInputView.getRemoteExtension(attribute)
+    chatInputView.cleartAtCache()
     weak var weakSelf = self
     if viewmodel.isReplying, let msg = viewmodel.operationModel?.message {
       viewmodel.replyMessageWithoutThread(message: MessageUtils.textMessage(text: content, remoteExt: remoteExt), target: msg) { [weak self] error in
@@ -808,23 +870,23 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         }
 
         // 记录当前光标位置（removeSubrange后光标会直接跳到末尾）
-        var selRange = menuView.textView.selectedTextRange
-        if let oldCursor = menuView.textView.selectedTextRange {
-          if let newCursor = menuView.textView.position(from: oldCursor.start, offset: -rmRange.length) {
-            selRange = menuView.textView.textRange(from: newCursor, to: newCursor)
+        var selRange = chatInputView.textView.selectedTextRange
+        if let oldCursor = chatInputView.textView.selectedTextRange {
+          if let newCursor = chatInputView.textView.position(from: oldCursor.start, offset: -rmRange.length) {
+            selRange = chatInputView.textView.textRange(from: newCursor, to: newCursor)
           }
         }
 
         // 删除rmRange范围内的字符串（"@xxx "）
-        let subRange = menuView.textView.text.utf16.index(menuView.textView.text.startIndex, offsetBy: rmRange.location) ... menuView.textView.text.utf16.index(menuView.textView.text.startIndex, offsetBy: rmRange.location + rmRange.length - 1)
+        let subRange = chatInputView.textView.text.utf16.index(chatInputView.textView.text.startIndex, offsetBy: rmRange.location) ... chatInputView.textView.text.utf16.index(chatInputView.textView.text.startIndex, offsetBy: rmRange.location + rmRange.length - 1)
 
         let key = "\(rmRange.location)_\(rmRange.length - 1)"
-        menuView.atRangeCache.removeValue(forKey: key)
+        chatInputView.atRangeCache.removeValue(forKey: key)
 
-        menuView.textView.text.removeSubrange(subRange)
+        chatInputView.textView.text.removeSubrange(subRange)
 
         // 重新设置光标到删除前的位置
-        menuView.textView.selectedTextRange = selRange
+        chatInputView.textView.selectedTextRange = selRange
       }
       return false
     }
@@ -851,6 +913,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     }
   }
 
+  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    return true
+  }
+
   open func willSelectItem(button: UIButton?, index: Int) {
     operationView?.removeFromSuperview()
     if button?.isSelected == true {
@@ -865,12 +932,17 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       } else if index == 2 {
         // 相册
         isFile = false
-        goPhotoAlbumWithVideo(self)
+        goPhotoAlbumWithVideo(self) { [weak self] in
+          if NIMSDK.shared().mediaManager.isPlaying() {
+            NIMSDK.shared().mediaManager.stopPlay()
+            self?.playingCell?.stopAnimation(byRight: self?.playingModel?.message?.isOutgoingMsg ?? true)
+            self?.playingModel?.isPlaying = false
+          }
+        }
       } else if index == 3 {
         // 更多
         layoutInputView(offset: bottomExanpndHeight)
         scrollTableViewToBottom()
-        UIApplication.shared.keyWindow?.endEditing(true)
       }
     } else {
       layoutInputView(offset: 0)
@@ -969,7 +1041,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       let imgSize_MB = Double(imgData.count) / 1e6
       NELog.infoLog(ModuleName + " " + tag, desc: #function + "imgSize_MB: \(imgSize_MB) MB")
       if imgSize_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-        showToast(chatLocalizable("fileSize_over_limit").replacingOccurrences(of: "XXX", with: "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
+        showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
       } else {
         viewmodel.sendFileMessage(data: imgData, displayName: imageName) { [weak self] error in
           NELog.infoLog(
@@ -1031,7 +1103,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         if let size_B = fileAttributes[FileAttributeKey.size] as? Double {
           let size_MB = size_B / 1e6
           if size_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-            showToast(chatLocalizable("fileSize_over_limit").replacingOccurrences(of: "XXX", with: "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
+            showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
             try? FileManager.default.removeItem(atPath: desPath)
           } else {
             viewmodel.sendFileMessage(filePath: desPath, displayName: displayName) { [weak self] error in
@@ -1096,6 +1168,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func onRecvMessages(_ messages: [NIMMessage]) {
+    operationView?.removeFromSuperview()
     insertRows()
     if isCurrentPage,
        UIApplication.shared.applicationState == .active {
@@ -1138,6 +1211,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     if atIndexs.isEmpty {
       return
     }
+    operationView?.removeFromSuperview()
     tableViewDeleteIndexs(atIndexs)
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
       self?.tableViewReloadIndexs(reloadIndex)
@@ -1153,6 +1227,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       return
     }
     operationView?.removeFromSuperview()
+    NELog.infoLog(className(), desc: "on revoke message at indexs \(atIndexs)")
     tableViewReloadIndexs(atIndexs)
   }
 
@@ -1200,8 +1275,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func didRefreshTable() {
+    group.enter()
     DispatchQueue.main.async { [weak self] in
       self?.tableView.reloadData()
+      self?.group.leave()
     }
   }
 
@@ -1243,8 +1320,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       opeView.removeFromSuperview()
 
     } else {
-      if menuView.textView.isFirstResponder {
-        menuView.textView.resignFirstResponder()
+      if chatInputView.textView.isFirstResponder {
+        chatInputView.textView.resignFirstResponder()
       } else {
         layoutInputView(offset: 0)
       }
@@ -1334,6 +1411,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   open func playAudioInterruptionEnd() {
     print(#function)
+    playingCell?.stopAnimation(byRight: playingModel?.message?.isOutgoingMsg ?? true)
+    playingModel?.isPlaying = false
   }
 
   open func playAudioInterruptionBegin() {
@@ -1350,7 +1429,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   open func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
     print("[record] sdk Completed error:\(error)")
-    menuView.stopRecordAnimation()
+    chatInputView.stopRecordAnimation()
     guard let fp = filePath else {
       showToast(error?.localizedDescription ?? "")
       return
@@ -1432,16 +1511,16 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
-    if let font = menuView.textView.font {
-      let mutaString = NSMutableAttributedString(attributedString: menuView.textView.attributedText)
+    if let font = chatInputView.textView.font {
+      let mutaString = NSMutableAttributedString(attributedString: chatInputView.textView.attributedText)
       let atString = NSAttributedString(string: addText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_blueText, NSAttributedString.Key.font: font])
       var selectRange = NSMakeRange(0, 0)
       var location = 0
-      if menuView.textView.isFirstResponder == true {
-        location = menuView.textView.selectedRange.location
-        selectRange = menuView.textView.selectedRange
+      if chatInputView.textView.isFirstResponder == true {
+        location = chatInputView.textView.selectedRange.location
+        selectRange = chatInputView.textView.selectedRange
       } else {
-        location = menuView.textView.attributedText.length
+        location = chatInputView.textView.attributedText.length
         selectRange = NSMakeRange(location, 0)
       }
 
@@ -1451,25 +1530,25 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         temMutaString.append(spaceStr)
         mutaString.insert(temMutaString, at: location)
 
-        menuView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
-        menuView.textView.attributedText = mutaString
-        menuView.textView.selectedRange = NSMakeRange(selectRange.location + temMutaString.length, 0)
+        chatInputView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
+        chatInputView.textView.attributedText = mutaString
+        chatInputView.textView.selectedRange = NSMakeRange(selectRange.location + temMutaString.length, 0)
         return
       }
 
-      if menuView.textView.selectedRange.location > 0 {
-        mutaString.replaceCharacters(in: NSMakeRange(menuView.textView.selectedRange.location - 1, 1), with: "")
+      if chatInputView.textView.selectedRange.location > 0 {
+        mutaString.replaceCharacters(in: NSMakeRange(chatInputView.textView.selectedRange.location - 1, 1), with: "")
         let temMutaString = NSMutableAttributedString(attributedString: atString)
         let spaceStr = NSAttributedString(string: " ", attributes: [NSAttributedString.Key.font: font])
         temMutaString.append(spaceStr)
-        mutaString.insert(temMutaString, at: menuView.textView.selectedRange.location - 1)
+        mutaString.insert(temMutaString, at: chatInputView.textView.selectedRange.location - 1)
         selectRange = NSMakeRange(selectRange.location - 1, selectRange.length)
       }
 
-      menuView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
+      chatInputView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
 
-      menuView.textView.attributedText = mutaString
-      menuView.textView.selectedRange = NSMakeRange(selectRange.location + addText.count + atRangeOffset, 0)
+      chatInputView.textView.attributedText = mutaString
+      chatInputView.textView.selectedRange = NSMakeRange(selectRange.location + addText.count + atRangeOffset, 0)
     }
   }
 
@@ -1503,6 +1582,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   //    MARK: MessageOperationViewDelegate
 
   open func didSelectedItem(item: OperationItem) {
+    if let popMenuClick = NEKitChatConfig.shared.ui.popMenuClick {
+      popMenuClick(item)
+      return
+    }
+
     switch item.type {
     case .copy:
       copyMessage()
@@ -1537,7 +1621,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func deleteMessage() {
-    showAlert(message: chatLocalizable("message_delete_comfirm")) {
+    showAlert(message: chatLocalizable("message_delete_confirm")) {
       if let message = self.viewmodel.operationModel?.message {
         self.viewmodel.deleteMessage(message: message) { error in
           if error != nil {
@@ -1554,9 +1638,9 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     replyView.closeButton.addTarget(self, action: #selector(closeReply), for: .touchUpInside)
     replyView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      replyView.leadingAnchor.constraint(equalTo: menuView.leadingAnchor),
-      replyView.trailingAnchor.constraint(equalTo: menuView.trailingAnchor),
-      replyView.bottomAnchor.constraint(equalTo: menuView.topAnchor),
+      replyView.leadingAnchor.constraint(equalTo: chatInputView.leadingAnchor),
+      replyView.trailingAnchor.constraint(equalTo: chatInputView.trailingAnchor),
+      replyView.bottomAnchor.constraint(equalTo: chatInputView.topAnchor),
       replyView.heightAnchor.constraint(equalToConstant: 36),
     ])
     if let message = viewmodel.operationModel?.message {
@@ -1605,7 +1689,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
         replyView.textLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
                                                                          font: replyView.textLabel.font,
                                                                          color: replyView.textLabel.textColor)
-        menuView.textView.becomeFirstResponder()
+        chatInputView.textView.becomeFirstResponder()
       }
     }
   }
@@ -1617,7 +1701,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   open func recallMessage() {
     weak var weakSelf = self
-    showAlert(message: chatLocalizable("message_revoke_confim")) {
+    showAlert(message: chatLocalizable("message_revoke_confirm")) {
       if let message = weakSelf?.viewmodel.operationModel?.message {
         if let messageType = weakSelf?.viewmodel.operationModel?.message?.messageType, messageType == .text {
           weakSelf?.viewmodel.operationModel?.isRevokedText = true
@@ -1625,6 +1709,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 //        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(120)) {
 //          weakSelf?.tableView.reloadData()
 //        }
+        let isPin = weakSelf?.viewmodel.operationModel?.isPined ?? false
         weakSelf?.viewmodel.revokeMessage(message: message) { error in
           NELog.infoLog(
             ModuleName + " " + (weakSelf?.tag ?? ""),
@@ -1641,6 +1726,10 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
           } else {
             // 自己撤回成功 & 收到对方撤回 都会走回调方法 onRevokeMessage
             // 撤回成功的逻辑统一在代理方法中处理 onRevokeMessage
+            if isPin {
+              weakSelf?.viewmodel.removePinMessage(message) { error, pinItem, value in
+              }
+            }
             weakSelf?.viewmodel.saveRevokeMessage(message) { error in
               print("message id : ", message.messageId)
               if let err = error {
@@ -1744,28 +1833,33 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
     Router.shared.use(
       ContactTeamListRouter,
-      parameters: ["nav": weakSelf?.navigationController as Any],
+      parameters: ["nav": weakSelf?.navigationController as Any,
+                   "isClickCallBack": true],
       closure: nil
     )
   }
 
   open func forwardMessage() {
     if let message = viewmodel.operationModel?.message {
-      weak var weakSelf = self
-      let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
-                                     style: .default) { action in
-        weakSelf?.forwardMessageToUser(message: message)
-      }
+      if IMKitClient.instance.getConfigCenter().teamEnable {
+        weak var weakSelf = self
+        let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
+                                       style: .default) { action in
+          weakSelf?.forwardMessageToUser(message: message)
+        }
 
-      let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
-        weakSelf?.forwardMessageToTeam(message: message)
-      }
+        let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
+          weakSelf?.forwardMessageToTeam(message: message)
+        }
 
-      let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
-                                       style: .cancel) { action in
-      }
+        let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
+                                         style: .cancel) { action in
+        }
 
-      showActionSheet([teamAction, userAction, cancelAction])
+        showActionSheet([teamAction, userAction, cancelAction])
+      } else {
+        forwardMessageToUser(message: message)
+      }
     }
   }
 
@@ -1845,14 +1939,14 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     } else {
       let key = "\(model.type.rawValue)"
       if model.type == .custom, let object = model.message?.messageObject as? NIMCustomObject, let custom = object.attachment as? NECustomAttachmentProtocol {
-        if registerCellDic["\(custom.customType)"] != nil {
+        if cellRegisterDic["\(custom.customType)"] != nil {
           reuseId = "\(custom.customType)"
         } else {
           reuseId = "\(NEBaseChatMessageCell.self)"
         }
       } else if model.type == .time || model.type == .notification || model.type == .tip {
         reuseId = "\(MessageType.time.rawValue)"
-      } else if registerCellDic[key] != nil {
+      } else if cellRegisterDic[key] != nil {
         reuseId = key
       } else {
         reuseId = "\(NEBaseChatMessageCell.self)"
@@ -1903,8 +1997,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     operationView?.removeFromSuperview()
-    if menuView.textView.isFirstResponder {
-      menuView.textView.resignFirstResponder()
+    if chatInputView.textView.isFirstResponder {
+      chatInputView.textView.resignFirstResponder()
     } else {
 //      layoutInputView(offset: 0)
     }
@@ -2127,7 +2221,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   }
 
   open func expandMoreAction() {
-    menuView.chatAddMoreView.configData(data: NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType))
+    chatInputView.chatAddMoreView.configData(data: NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType))
   }
 }
 
@@ -2157,6 +2251,11 @@ extension ChatViewController: ChatBaseCellDelegate {
   }
 
   open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    if let tapClick = NEKitChatConfig.shared.ui.messageItemClick {
+      tapClick(cell, model)
+      return
+    }
+
     if model?.isRevoked == true {
       return
     }
@@ -2246,7 +2345,7 @@ extension ChatViewController: ChatBaseCellDelegate {
                     if text.last == " " {
                       text = String(text.prefix(text.count - 1))
                     }
-                    menuView.nickAccidDic[text] = key
+                    chatInputView.nickAccidDic[text] = key
                   }
 
                   if attributeStr.length > model.end {
@@ -2258,8 +2357,8 @@ extension ChatViewController: ChatBaseCellDelegate {
           }
         }
       }
-      menuView.textView.attributedText = attributeStr
-      menuView.textView.becomeFirstResponder()
+      chatInputView.textView.attributedText = attributeStr
+      chatInputView.textView.becomeFirstResponder()
     }
   }
 

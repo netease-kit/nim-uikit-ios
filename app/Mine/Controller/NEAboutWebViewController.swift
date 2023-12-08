@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
-import WebKit
 import NECommonUIKit
+import NECoreKit
+import UIKit
+import WebKit
 
 class NEAboutWebViewController: NEBaseViewController {
   private var loadUrl: String = ""
@@ -27,7 +27,7 @@ class NEAboutWebViewController: NEBaseViewController {
 
   func setUpSubViews() {
     title = NSLocalizedString("product_intro", comment: "")
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
 
     guard let requestUrl = URL(string: loadUrl) else {

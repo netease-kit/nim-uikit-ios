@@ -45,6 +45,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     name.textAlignment = .center
     name.font = UIFont.systemFont(ofSize: 14.0)
     name.adjustsFontSizeToFitWidth = true
+    name.accessibilityIdentifier = "id.avatar"
     return name
   }()
 

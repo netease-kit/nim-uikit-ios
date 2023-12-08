@@ -61,10 +61,10 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
     navigationItem.rightBarButtonItem = clearItem
 
     title = localizable("validation_message")
-    customNavigationView.navTitle.text = title
-    customNavigationView.setMoreButtonTitle(localizable("clear"))
-    customNavigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(clearMessage))
+    navigationView.navTitle.text = title
+    navigationView.setMoreButtonTitle(localizable("clear"))
+    navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(clearMessage))
 
     tableView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(tableView)

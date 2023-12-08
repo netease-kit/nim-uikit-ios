@@ -25,7 +25,7 @@ public class NEEmotionTool: NSObject {
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
     let attStr = NSMutableAttributedString(string: str, attributes: [
       NSAttributedString.Key.font: font,
-      .foregroundColor: NEKitChatConfig.shared.ui.messageTextColor,
+      .foregroundColor: NEKitChatConfig.shared.ui.messageProperties.messageTextColor,
     ])
 
     if let regArr = regularArr, regArr.count > 0, let targetEmotions = emoticons {

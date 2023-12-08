@@ -11,12 +11,9 @@ import UIKit
 open class PopListViewController: NEBasePopListViewController {
   override func setupUI() {
     super.setupUI()
-    let popViewHeight = CGFloat(itemDatas.count) * 32 + 16
     NSLayoutConstraint.activate([
-      shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: 2),
+      shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant - 10),
       shadowView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      shadowView.widthAnchor.constraint(equalToConstant: popViewWidth),
-      shadowView.heightAnchor.constraint(equalToConstant: popViewHeight),
     ])
 
     popView.backgroundColor = NEConstant.hexRGB(0xFFFFFF)

@@ -9,9 +9,9 @@ import UIKit
 
 @objcMembers
 open class UserSettingViewController: NEBaseUserSettingViewController {
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    customNavigationView.backgroundColor = .white
+  override public init(userId: String) {
+    super.init(userId: userId)
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
     cellClassDic = [
       UserSettingType.SwitchType.rawValue: UserSettingSwitchCell.self,
@@ -25,7 +25,7 @@ open class UserSettingViewController: NEBaseUserSettingViewController {
 
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = 21.0
+    userHeader.layer.cornerRadius = IMKitClient.instance.getConfigCenter().teamEnable ? 21.0 : 30.0
   }
 
   override func getPinMessageViewController(session: NIMSession) -> NEBasePinMessageViewController {

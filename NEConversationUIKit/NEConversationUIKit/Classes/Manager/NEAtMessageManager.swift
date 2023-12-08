@@ -24,13 +24,13 @@ public class AtMEMessageRecord: NSObject {
 
 @objcMembers
 public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManagerDelegate {
-  public static let instance = NEAtMessageManager()
+  public static var instance: NEAtMessageManager?
   private let workQueue = DispatchQueue(label: "AtMessageWorkQueue")
   private let lock = NSLock()
   private var atMessageDic = [String: AtMEMessageRecord]()
   private var currentAccid = ""
 
-  override public init() {
+  override private init() {
     super.init()
     NIMSDK.shared().chatManager.add(self)
     NIMSDK.shared().loginManager.add(self)
@@ -39,6 +39,10 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
   deinit {
     NIMSDK.shared().chatManager.remove(self)
     NIMSDK.shared().loginManager.remove(self)
+  }
+
+  public static func setupInstance() {
+    NEAtMessageManager.instance = NEAtMessageManager()
   }
 
   public func onLogin(_ step: NIMLoginStep) {

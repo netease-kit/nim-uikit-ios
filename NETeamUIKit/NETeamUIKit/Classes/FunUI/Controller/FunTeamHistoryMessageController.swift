@@ -29,7 +29,7 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
     super.viewDidLoad()
     view.backgroundColor = .funTeamBackgroundColor
     navigationController?.isNavigationBarHidden = true
-    customNavigationView.isHidden = true
+    navigationView.isHidden = true
     emptyView.backgroundColor = .clear
     emptyView.setEmptyImage(name: "fun_emptyView")
   }

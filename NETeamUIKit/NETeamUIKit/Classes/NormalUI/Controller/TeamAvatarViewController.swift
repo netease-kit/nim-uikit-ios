@@ -16,9 +16,9 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
     addRightAction(localizable("save"), #selector(savePhoto), self)
 
     view.backgroundColor = .ne_lightBackgroundColor
-    customNavigationView.backgroundColor = .ne_lightBackgroundColor
-    customNavigationView.setBackButtonTitle(localizable("cancel"))
-    customNavigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
+    navigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationView.setBackButtonTitle(localizable("cancel"))
+    navigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
 
     headerBack.layer.cornerRadius = 8.0

@@ -10,7 +10,7 @@ import UIKit
 @objcMembers
 open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingViewModelDelegate,
   UITableViewDataSource, UITableViewDelegate {
-  var userId: String?
+  public var userId: String?
 
   let viewmodel = UserSettingViewModel()
 
@@ -61,6 +61,15 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
 
   public var cellClassDic = [Int: NEBaseUserSettingCell.Type]()
 
+  public init(userId: String) {
+    super.init(nibName: nil, bundle: nil)
+    self.userId = userId
+  }
+
+  public required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override public func viewDidLoad() {
     super.viewDidLoad()
     viewmodel.delegate = self
@@ -73,9 +82,11 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   }
 
   func setupUI() {
-    view.backgroundColor = .ne_backcolor
+    view.backgroundColor = .ne_lightBackgroundColor
     title = chatLocalizable("chat_setting")
-    customNavigationView.moreButton.isHidden = true
+    navigationView.moreButton.isHidden = true
+    navigationView.backgroundColor = .ne_lightBackgroundColor
+
     view.addSubview(contentTable)
     NSLayoutConstraint.activate([
       contentTable.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -108,12 +119,6 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     ])
 
     cornerBack.addSubview(userHeader)
-    NSLayoutConstraint.activate([
-      userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
-      userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 12),
-      userHeader.widthAnchor.constraint(equalToConstant: 42),
-      userHeader.heightAnchor.constraint(equalToConstant: 42),
-    ])
     let tap = UITapGestureRecognizer()
     userHeader.addGestureRecognizer(tap)
     tap.numberOfTapsRequired = 1
@@ -129,22 +134,48 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       userHeader.backgroundColor = UIColor.colorWithString(string: viewmodel.userInfo?.userId)
     }
 
-    cornerBack.addSubview(addBtn)
-    NSLayoutConstraint.activate([
-      addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
-      addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
-      addBtn.widthAnchor.constraint(equalToConstant: 42.0),
-      addBtn.heightAnchor.constraint(equalToConstant: 42.0),
-    ])
-    addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
-
-    cornerBack.addSubview(nameLabel)
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: userHeader.leftAnchor, constant: -12.0),
-      nameLabel.rightAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 12.0),
-      nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 6.0),
-    ])
     nameLabel.text = viewmodel.userInfo?.showName()
+    cornerBack.addSubview(nameLabel)
+    if IMKitClient.instance.getConfigCenter().teamEnable {
+      NSLayoutConstraint.activate([
+        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
+        userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 12),
+        userHeader.widthAnchor.constraint(equalToConstant: 42),
+        userHeader.heightAnchor.constraint(equalToConstant: 42),
+      ])
+
+      nameLabel.font = NEConstant.defaultTextFont(12)
+      nameLabel.textAlignment = .center
+      NSLayoutConstraint.activate([
+        nameLabel.leftAnchor.constraint(equalTo: userHeader.leftAnchor, constant: -12.0),
+        nameLabel.rightAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 12.0),
+        nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 6.0),
+      ])
+
+      cornerBack.addSubview(addBtn)
+      addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
+      NSLayoutConstraint.activate([
+        addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
+        addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
+        addBtn.widthAnchor.constraint(equalToConstant: 42.0),
+        addBtn.heightAnchor.constraint(equalToConstant: 42.0),
+      ])
+    } else {
+      NSLayoutConstraint.activate([
+        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
+        userHeader.centerYAnchor.constraint(equalTo: cornerBack.centerYAnchor),
+        userHeader.widthAnchor.constraint(equalToConstant: 60),
+        userHeader.heightAnchor.constraint(equalToConstant: 60),
+      ])
+
+      nameLabel.font = NEConstant.defaultTextFont(16)
+      nameLabel.textAlignment = .left
+      NSLayoutConstraint.activate([
+        nameLabel.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 16.0),
+        nameLabel.rightAnchor.constraint(equalTo: cornerBack.rightAnchor),
+        nameLabel.centerYAnchor.constraint(equalTo: userHeader.centerYAnchor),
+      ])
+    }
 
     return header
   }
@@ -238,22 +269,14 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     viewmodel.cellDatas.count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let model = viewmodel.cellDatas[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
     ) as? NEBaseUserSettingCell {
       cell.configure(model)
-      if let c = cell as? UserSettingSwitchCell {
-        if model.cellName == chatLocalizable("message_remind") {
-          c.tSwitch.accessibilityIdentifier = "id.messageRemind"
-        }
-        if model.cellName == chatLocalizable("session_set_top") {
-          c.tSwitch.accessibilityIdentifier = "id.stickTop"
-        }
-      }
       return cell
     }
     return UITableViewCell()

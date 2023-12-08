@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECommonKit
 import NIMSDK
 import UIKit
 
@@ -56,12 +57,12 @@ class MessageCallRecordModel: MessageContentModel {
         attributeStr?.insert(NSAttributedString(attachment: attachment), at: 0)
       }
 
-      attributeStr?.addAttribute(NSAttributedString.Key.font, value: NEKitChatConfig.shared.ui.messageTextSize, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), range: NSMakeRange(0, attributeStr?.length ?? 0))
 
-      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
-    let textSize = attributeStr?.finalSize(NEKitChatConfig.shared.ui.messageTextSize, CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
+    let textSize = attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
 
     var h = chat_min_h
     h = textSize.height + (isAuiodRecord ? 20 : 24)

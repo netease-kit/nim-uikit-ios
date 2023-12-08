@@ -24,7 +24,7 @@
 "downloading"="正在下载中...";
 "read"="已读(0）";
 "unread"="未读(0）";
-"network_unavailable"="当前网络不可用，请检查你当网络设置。";
+"network_unavailable"="当前网络不可用，请检查你的网络设置";
 
 //MARK: tips
 //MARK: team
@@ -91,8 +91,8 @@
 "withdrew_message" = "撤回了一条消息";
 "message_has_be_withdrawn" = "此消息已撤回";
 "message_reedit" = "重新编辑";
-"message_revoke_confim" = "确认要撤回该消息吗？";
-"message_delete_comfirm"="确认要删除该消息吗？";
+"message_revoke_confirm" = "确认要撤回该消息吗？";
+"message_delete_confirm"="确认要删除该消息吗？";
 
 
 //MARK: toast
@@ -136,7 +136,7 @@
 "search_result_empty"="未找到你要搜的地址";
 "no_map_plugin"="未集成地图模块";
 "location_not_auth"="地理位置未授权，请去设置中开启";
-"fileSize_over_limit"="当前文件大小超出XXXM发送限制，请重新选择";
+"fileSize_over_limit"="当前文件大小超出%@M发送限制，请重新选择";
 
 "message_recalled"="此消息已撤回";
 

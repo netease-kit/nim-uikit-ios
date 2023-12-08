@@ -10,6 +10,7 @@ open class NEBaseTeamSettingSwitchCell: NEBaseTeamSettingCell {
   public var tSwitch: UISwitch = {
     let q = UISwitch()
     q.translatesAutoresizingMaskIntoConstraints = false
+    q.accessibilityIdentifier = "id.tSwitch"
     return q
   }()
 

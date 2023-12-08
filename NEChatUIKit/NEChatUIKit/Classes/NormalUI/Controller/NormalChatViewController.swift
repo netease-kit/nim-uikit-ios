@@ -9,9 +9,9 @@ import UIKit
 open class NormalChatViewController: ChatViewController {
   override public init(session: NIMSession) {
     super.init(session: session)
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
-    registerCellDic = [
+    cellRegisterDic = [
       "\(MessageType.text.rawValue)": ChatMessageTextCell.self,
       "\(MessageType.rtcCallRecord.rawValue)": ChatMessageCallCell.self,
       "\(MessageType.audio.rawValue)": ChatMessageAudioCell.self,
@@ -46,7 +46,7 @@ open class NormalChatViewController: ChatViewController {
   }
 
   override open func toSetting() {
-    if let block = NEKitChatConfig.shared.ui.titleBarRightClick {
+    if let block = NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick {
       block()
       return
     }
@@ -58,17 +58,9 @@ open class NormalChatViewController: ChatViewController {
         closure: nil
       )
     } else if viewmodel.session.sessionType == .P2P {
-      let userSetting = UserSettingViewController()
-      userSetting.userId = viewmodel.session.sessionId
+      let userSetting = UserSettingViewController(userId: viewmodel.session.sessionId)
       navigationController?.pushViewController(userSetting, animated: true)
     }
-  }
-
-  override open func didLongTouchMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    super.didLongTouchMessageView(cell, model)
-    operationView?.layer.cornerRadius = 8
-    operationView?.layer.borderColor = UIColor.ne_darkText.cgColor
-    operationView?.layer.borderWidth = 0.2
   }
 
   override open func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {

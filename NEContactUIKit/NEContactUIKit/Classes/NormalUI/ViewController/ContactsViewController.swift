@@ -10,27 +10,38 @@ import UIKit
 open class ContactsViewController: NEBaseContactsViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
-    viewModel = ContactViewModel(contactHeaders: [
-      ContactHeadItem(
-        name: localizable("validation_message"),
-        imageName: "valid",
-        router: ValidationMessageRouter,
-        color: UIColor(hexString: "#60CFA7")
-      ),
-      ContactHeadItem(
-        name: localizable("blacklist"),
-        imageName: "blackName",
-        router: ContactBlackListRouter,
-        color: UIColor(hexString: "#53C3F3")
-      ),
-      ContactHeadItem(
-        name: localizable("mine_groupchat"),
-        imageName: "group",
-        router: ContactGroupRouter,
-        color: UIColor(hexString: "#BE65D9")
-      ),
-    ])
-    customCells = [
+    var contactHeaders = [ContactHeadItem]()
+    if NEKitContactConfig.shared.ui.showHeader {
+      contactHeaders = [
+        ContactHeadItem(
+          name: localizable("validation_message"),
+          imageName: "valid",
+          router: ValidationMessageRouter,
+          color: UIColor(hexString: "#60CFA7")
+        ),
+        ContactHeadItem(
+          name: localizable("blacklist"),
+          imageName: "blackName",
+          router: ContactBlackListRouter,
+          color: UIColor(hexString: "#53C3F3")
+        ),
+      ]
+
+      if IMKitClient.instance.getConfigCenter().teamEnable {
+        contactHeaders.append(ContactHeadItem(
+          name: localizable("mine_groupchat"),
+          imageName: "group",
+          router: ContactTeamListRouter,
+          color: UIColor(hexString: "#BE65D9")
+        ))
+      }
+
+      if let headerDataCallback = NEKitContactConfig.shared.ui.headerData {
+        headerDataCallback(contactHeaders)
+      }
+    }
+    viewModel = ContactViewModel(contactHeaders: contactHeaders)
+    cellRegisterDic = [
       ContactCellType.ContactPerson.rawValue: ContactTableViewCell.self,
       ContactCellType.ContactOthers.rawValue: ContactTableViewCell.self,
     ]
@@ -40,26 +51,15 @@ open class ContactsViewController: NEBaseContactsViewController {
     super.init(coder: coder)
   }
 
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    commonUI()
-  }
-
   override open func commonUI() {
     super.commonUI()
-
-    NSLayoutConstraint.activate([
-      topView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-      topView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      topView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
 
     tableView.register(
       ContactSectionView.self,
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    customCells.forEach { (key: Int, value: NEBaseContactTableViewCell.Type) in
+    cellRegisterDic.forEach { (key: Int, value: NEBaseContactTableViewCell.Type) in
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -79,65 +79,20 @@ open class ContactsViewController: NEBaseContactsViewController {
     }
     return cell
   }
-
-  override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    if let callBack = clickCallBacks[info.contactCellType] {
-      callBack(indexPath.row, indexPath.section)
-      return
-    }
-    if info.contactCellType == ContactCellType.ContactOthers.rawValue {
-      switch info.router {
-      case ValidationMessageRouter:
-        let validationController = ValidationMessageViewController()
-        validationController.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(validationController, animated: true)
-      case ContactBlackListRouter:
-        let blackVC = BlackListViewController()
-        blackVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(blackVC, animated: true)
-
-      case ContactGroupRouter:
-        // My Team
-        let teamVC = TeamListViewController()
-        teamVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(teamVC, animated: true)
-
-      case ContactPersonRouter:
-
-        break
-
-      case ContactComputerRouter:
-        //                let select = ContactsSelectedViewController()
-        //                select.CallBack = { contacts in
-        //                    print("select contacs : ", contacts)
-        //                }
-        //                select.hidesBottomBarWhenPushed = true
-        //                self.navigationController?.pushViewController(select, animated: true)
-        break
-      default:
-        break
-      }
-    } else {
-      let userInfoVC = ContactUserViewController(user: info.user)
-      userInfoVC.hidesBottomBarWhenPushed = true
-      navigationController?.pushViewController(userInfoVC, animated: true)
-    }
-  }
 }
 
 extension ContactsViewController {
   override open func initSystemNav() {
     super.initSystemNav()
     let addItem = UIBarButtonItem(
-      image: UIImage.ne_imageNamed(name: "add"),
+      image: NEKitContactConfig.shared.ui.titleBarRightRes ?? UIImage.ne_imageNamed(name: "add"),
       style: .plain,
       target: self,
       action: #selector(goToFindFriend)
     )
     addItem.tintColor = UIColor(hexString: "333333")
     let searchItem = UIBarButtonItem(
-      image: UIImage.ne_imageNamed(name: "contact_search"),
+      image: NEKitContactConfig.shared.ui.titleBarRight2Res ?? UIImage.ne_imageNamed(name: "contact_search"),
       style: .plain,
       target: self,
       action: #selector(searchContact)
@@ -146,25 +101,25 @@ extension ContactsViewController {
     searchItem.tintColor = UIColor(hexString: "333333")
 
     navigationItem.rightBarButtonItems = [addItem, searchItem]
-    if NEKitContactConfig.shared.ui.hiddenSearchBtn {
+    if !NEKitContactConfig.shared.ui.showTitleBarRight2Icon {
       navigationItem.rightBarButtonItems = [addItem]
-      navView.searchBtn.isHidden = true
+      navigationView.searchBtn.isHidden = true
     }
-    if NEKitContactConfig.shared.ui.hiddenRightBtns {
-      navigationItem.rightBarButtonItems = []
-      navView.searchBtn.isHidden = true
-      navView.addBtn.isHidden = true
+    if !NEKitContactConfig.shared.ui.showTitleBarRightIcon {
+      navigationItem.rightBarButtonItems = [searchItem]
+      navigationView.addBtn.isHidden = true
     }
 
     let brandBarBtn = UIButton()
-    brandBarBtn.setTitle(localizable("contact"), for: .normal)
-    brandBarBtn.setTitleColor(UIColor.black, for: .normal)
+    brandBarBtn.setTitle(NEKitContactConfig.shared.ui.title ?? localizable("contact"), for: .normal)
+    brandBarBtn.setTitleColor(NEKitContactConfig.shared.ui.titleColor ?? UIColor.black, for: .normal)
     brandBarBtn.titleLabel?.font = NEConstant.textFont("PingFangSC-Medium", 20)
     let brandBtn = UIBarButtonItem(customView: brandBarBtn)
     navigationItem.leftBarButtonItem = brandBtn
 
-    navView.brandBtn.setImage(nil, for: .normal)
-    navView.brandBtn.setTitle(localizable("contact"), for: .normal)
-    navView.brandBtn.titleEdgeInsets = UIEdgeInsets.zero
+    navigationView.brandBtn.setImage(nil, for: .normal)
+    navigationView.brandBtn.setTitle(NEKitContactConfig.shared.ui.title ?? localizable("contact"), for: .normal)
+    navigationView.brandBtn.setTitleColor(NEKitContactConfig.shared.ui.titleColor ?? UIColor.black, for: .normal)
+    navigationView.brandBtn.titleEdgeInsets = UIEdgeInsets.zero
   }
 }

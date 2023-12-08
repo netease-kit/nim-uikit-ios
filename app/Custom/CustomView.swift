@@ -1,25 +1,24 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import Foundation
 import UIKit
 
-public class CustomTopView: UIView {
+public class CustomView: UIView {
+  public let btn = UIButton()
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
-//        let tap = UITapGestureRecognizer(target: self, action: #selector(tapView))
-//        addGestureRecognizer(tap)
-    let btn = UIButton()
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.addTarget(self, action: #selector(tapView), for: .touchUpInside)
+    btn.setTitle("按钮", for: .normal)
     btn.backgroundColor = .red
     addSubview(btn)
     NSLayoutConstraint.activate([
       btn.topAnchor.constraint(equalTo: topAnchor),
-      btn.leftAnchor.constraint(equalTo: leftAnchor),
-      btn.rightAnchor.constraint(equalTo: rightAnchor),
       btn.bottomAnchor.constraint(equalTo: bottomAnchor),
+      btn.widthAnchor.constraint(equalToConstant: 200),
+      btn.centerXAnchor.constraint(equalTo: centerXAnchor),
     ])
   }
 
@@ -27,5 +26,7 @@ public class CustomTopView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  @objc func tapView() {}
+  @objc func tapView() {
+    print("点击了自定义按钮")
+  }
 }

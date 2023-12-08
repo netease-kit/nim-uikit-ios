@@ -94,8 +94,8 @@
 "withdrew_message" = "withdrew this message";
 "message_has_be_withdrawn" = "message recalled";
 "message_reedit" = "reedit";
-"message_revoke_confim" = "Wether to recall this message";
-"message_delete_comfirm"="Wether to delete this message";
+"message_revoke_confirm" = "Wether to recall this message";
+"message_delete_confirm"="Wether to delete this message";
 
 
 //MARK: toast
@@ -139,7 +139,7 @@
 "search_result_empty"="Not found";
 "no_map_plugin"="Map module not integrated";
 "location_not_auth"="The geographic location is not authorized. Please open it in the settings";
-"fileSize_over_limit"="Oops！File size limit over XXXM.";
+"fileSize_over_limit"="Oops！File size limit over %@M.";
 
 "message_recalled"="message recalled";
 

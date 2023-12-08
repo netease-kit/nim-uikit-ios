@@ -67,7 +67,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
 
   open func commonUI() {
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
 
     tableView.separatorStyle = .none
     tableView.delegate = self
@@ -205,17 +205,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       c.titleLabel.text = item.title
       c.detailTitleLabel.text = item.detailTitle
       if item.title == localizable("sign") {
-        c.detailTitleLabel.accessibilityIdentifier = "id.signature"
         c.detailTitleLabel.numberOfLines = 2
-      }
-      if item.title == localizable("email") {
-        c.detailTitleLabel.accessibilityIdentifier = "id.email"
-      }
-      if item.title == localizable("phone") {
-        c.detailTitleLabel.accessibilityIdentifier = "id.phone"
-      }
-      if item.title == localizable("birthday") {
-        c.detailTitleLabel.accessibilityIdentifier = "id.birthday"
       }
       return c
     }
@@ -226,7 +216,6 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       c.block = { [weak self] title, value in
         print("title:\(title) value\(value)")
         if title == localizable("add_blackList") {
-          c.switchButton.accessibilityIdentifier = "id.blackList"
           self?.blackList(isBlack: value) {
             c.switchButton.isOn = !c.switchButton.isOn
           }
@@ -239,15 +228,6 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     if let c = cell as? CenterTextCell {
       c.titleLabel.text = item.title
       c.titleLabel.textColor = item.textColor
-      if item.title == localizable("chat") {
-        c.titleLabel.accessibilityIdentifier = "id.chat"
-      }
-      if item.title == localizable("delete_friend") {
-        c.titleLabel.accessibilityIdentifier = "id.delete"
-      }
-      if item.title == localizable("add_friend") {
-        c.titleLabel.accessibilityIdentifier = "id.chat"
-      }
       return c
     }
     return cell
@@ -360,16 +340,20 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   func chat(user: User?) {
-    print("edit remarks")
     guard let accid = self.user?.userId else {
       return
     }
     let session = NIMSession(accid, type: .P2P)
     Router.shared.use(
       PushP2pChatVCRouter,
-      parameters: ["nav": navigationController, "session": session]
-    ) { obj, routerState, str in
-      print("obj:\(obj) routerState:\(routerState) str:\(str)")
+      parameters: ["nav": navigationController as Any, "session": session],
+      closure: nil
+    )
+
+    // 移除当前页面
+    if let selfVCIndex = navigationController?.viewControllers.firstIndex(of: self),
+       selfVCIndex > 0 {
+      navigationController?.viewControllers.remove(at: selfVCIndex)
     }
   }
 
@@ -395,13 +379,13 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   open func deleteFriend(user: User?) {
-    let alertTitle = localizable("delete_title").replacingOccurrences(of: "XXX", with: user?.showName(true) ?? "")
+    let alertTitle = String(format: localizable("delete_title"), user?.showName(true) ?? "")
     let alertController = UIAlertController(
       title: alertTitle,
       message: nil,
       preferredStyle: .actionSheet
     )
-    alertController.getUILabel(string: alertTitle)?.accessibilityIdentifier = "id.title"
+    alertController.view.findLabel(with: alertTitle)?.accessibilityIdentifier = "id.action1"
 
     let cancelAction = UIAlertAction(
       title: commonLocalizable("cancel"),
@@ -409,14 +393,14 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       handler: nil
     )
     cancelAction.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    cancelAction.accessibilityIdentifier = "id.negative"
+    cancelAction.accessibilityIdentifier = "id.action3"
 
     let deleteAction = UIAlertAction(title: localizable("delete_friend"),
                                      style: .default) { [weak self] action in
       self?.deleteFriendAction(user: user)
     }
     deleteAction.setValue(UIColor.ne_redText, forKey: "_titleTextColor")
-    deleteAction.accessibilityIdentifier = "id.positive"
+    deleteAction.accessibilityIdentifier = "id.action2"
 
     alertController.addAction(cancelAction)
     alertController.addAction(deleteAction)

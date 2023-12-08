@@ -310,7 +310,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       print("get team info error: ", error as Any)
       if error == nil {
         weakSelf?.getData()
-        weakSelf?.getCurrentMember(IMKitEngine.instance.imAccid, teamId)
+        weakSelf?.getCurrentMember(IMKitClient.instance.imAccid(), teamId)
       }
       completion(error)
     }
@@ -350,7 +350,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   func isOwner() -> Bool {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     if let accid = teamInfoModel?.team?.owner {
-      if IMKitEngine.instance.isMySelf(accid) {
+      if IMKitClient.instance.isMySelf(accid) {
         return true
       }
     }

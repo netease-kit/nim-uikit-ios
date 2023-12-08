@@ -93,11 +93,7 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
                                                               font: font,
                                                               color: replyLabel.textColor)
       if let attriText = replyLabel.attributedText {
-        let textSize = NEChatUITool.getSizeWithAtt(
-          att: attriText,
-          font: font,
-          maxSize: CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)
-        )
+        let textSize = attriText.finalSize(font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
         model.contentSize.width = max(textSize.width + chat_content_margin * 2, model.contentSize.width)
       }
     }

@@ -51,7 +51,7 @@ class MessageTipsModel: NSObject, MessageModel {
       tipTimeStamp = msg.timestamp
     }
 
-    var font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.timeTextSize)
+    var font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
 
     contentSize = String.getTextRectSize(text ?? "",
                                          font: font,

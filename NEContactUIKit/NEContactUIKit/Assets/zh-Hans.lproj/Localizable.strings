@@ -24,7 +24,7 @@
 "email"="邮箱";
 "sign"="个性签名";
 "delete_friend"="删除好友";
-"delete_title"="将联系人\“XXX\”删除";
+"delete_title"="将联系人\“%@\”删除";
 "add_friend"="添加好友";
 "add_blackList"="加入黑名单";
 "send_friend_apply"="好友申请已发送";

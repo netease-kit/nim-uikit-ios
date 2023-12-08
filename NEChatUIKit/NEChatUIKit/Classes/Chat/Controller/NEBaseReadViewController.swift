@@ -37,7 +37,7 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
 
   open func commonUI() {
     title = chatLocalizable("message_read")
-    customNavigationView.moreButton.isHidden = true
+    navigationView.moreButton.isHidden = true
 
     readButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     readButton.setTitle(chatLocalizable("read"), for: .normal)

@@ -47,10 +47,35 @@ public extension ContactRouter {
       }
     }
 
+    Router.shared.register(ContactPageRouter) { param in
+      if let nav = param["nav"] as? UINavigationController {
+        let contactVC = FunContactsViewController()
+        nav.pushViewController(contactVC, animated: true)
+      }
+    }
+
+    Router.shared.register(ValidationMessageRouter) { param in
+      if let nav = param["nav"] as? UINavigationController {
+        let validationController = FunValidationMessageViewController()
+        nav.pushViewController(validationController, animated: true)
+      }
+    }
+
+    Router.shared.register(ContactBlackListRouter) { param in
+      if let nav = param["nav"] as? UINavigationController {
+        let blackVC = FunBlackListViewController()
+        nav.pushViewController(blackVC, animated: true)
+      }
+    }
+
     Router.shared.register(ContactTeamListRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
         let team = FunTeamListViewController()
-        team.isClickCallBack = true
+
+        if let isClickCallBack = param["isClickCallBack"] as? Bool {
+          team.isClickCallBack = isClickCallBack
+        }
+
         nav.pushViewController(team, animated: true)
       }
     }

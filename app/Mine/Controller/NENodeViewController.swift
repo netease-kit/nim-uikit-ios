@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
 import NETeamUIKit
+import UIKit
 
 class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
   private var viewModel = NodeViewModel()
@@ -46,7 +46,7 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
     alertController.addAction(cancelAction)
     let sureAction = UIAlertAction(title: NSLocalizedString("restart", comment: ""), style: .default) { action in
       // 设置节点
-      IMKitClient.instance.repo.setNodeValue(isDomestic)
+      IMKitClient.instance.getSettingRepo().setNodeValue(isDomestic)
       exit(0)
     }
     alertController.addAction(sureAction)

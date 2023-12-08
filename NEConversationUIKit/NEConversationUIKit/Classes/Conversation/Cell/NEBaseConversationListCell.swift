@@ -25,6 +25,10 @@ open class NEBaseConversationListCell: UITableViewCell {
 
   open func setupSubviews() {
     selectionStyle = .none
+    if let bgColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground {
+      backgroundColor = bgColor
+    }
+
     contentView.addSubview(headImge)
     contentView.addSubview(redAngleView)
     contentView.addSubview(title)
@@ -106,12 +110,12 @@ open class NEBaseConversationListCell: UITableViewCell {
       let text = contentForRecentSession(message: lastMessage)
       let mutaAttri = NSMutableAttributedString(string: text)
       if let sessionId = sessionModel?.recentSession?.session?.sessionId {
-        let isAtMessage = NEAtMessageManager.instance.isAtCurrentUser(sessionId: sessionId)
+        let isAtMessage = NEAtMessageManager.instance?.isAtCurrentUser(sessionId: sessionId)
         if isAtMessage == true {
           let atStr = localizable("you_were_mentioned")
           mutaAttri.insert(NSAttributedString(string: atStr), at: 0)
           mutaAttri.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_redText, range: NSMakeRange(0, atStr.count))
-          mutaAttri.addAttribute(NSAttributedString.Key.font, value: NEKitConversationConfig.shared.ui.subTitleFont, range: NSMakeRange(0, mutaAttri.length))
+          mutaAttri.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize : 13), range: NSMakeRange(0, mutaAttri.length))
         }
       }
       subTitle.attributedText = mutaAttri // contentForRecentSession(message: lastMessage)
@@ -209,8 +213,8 @@ open class NEBaseConversationListCell: UITableViewCell {
   public lazy var title: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = NEKitConversationConfig.shared.ui.titleColor
-    label.font = NEKitConversationConfig.shared.ui.titleFont ?? UIFont.systemFont(ofSize: 16)
+    label.textColor = NEKitConversationConfig.shared.ui.conversationProperties.itemTitleColor
+    label.font = .systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize : 16)
     label.text = "Oliver"
     label.accessibilityIdentifier = "id.name"
     return label
@@ -220,8 +224,8 @@ open class NEBaseConversationListCell: UITableViewCell {
   public lazy var subTitle: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = NEKitConversationConfig.shared.ui.subTitleColor
-    label.font = NEKitConversationConfig.shared.ui.subTitleFont
+    label.textColor = NEKitConversationConfig.shared.ui.conversationProperties.itemContentColor
+    label.font = UIFont.systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize : 13)
     label.accessibilityIdentifier = "id.message"
     return label
   }()
@@ -230,8 +234,8 @@ open class NEBaseConversationListCell: UITableViewCell {
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = NEKitConversationConfig.shared.ui.timeColor
-    label.font = NEKitConversationConfig.shared.ui.timeFont
+    label.textColor = NEKitConversationConfig.shared.ui.conversationProperties.itemDateColor
+    label.font = .systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemDateSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemDateSize : 12)
     label.textAlignment = .right
     label.accessibilityIdentifier = "id.time"
     return label

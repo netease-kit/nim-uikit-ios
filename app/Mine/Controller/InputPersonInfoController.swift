@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
 import NEChatUIKit
+import NECoreKit
+import UIKit
 
 public enum EditType: Int {
   case nickName = 0
@@ -42,7 +42,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
       NSLayoutConstraint.activate([
         textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
         textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
+        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + topConstant),
         textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
       ])
 
@@ -50,7 +50,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
       NSLayoutConstraint.activate([
         textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
         textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + kNavigationHeight + KStatusBarHeight),
+        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + topConstant),
         textfieldBgView.heightAnchor.constraint(equalToConstant: 50),
       ])
       textfieldBgView.layer.cornerRadius = 0
@@ -66,18 +66,18 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     addRightAction(NSLocalizedString("save", comment: ""), #selector(saveName), self)
 
     view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
-    customNavigationView.setMoreButtonTitle(NSLocalizedString("save", comment: ""))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
+    navigationView.setMoreButtonTitle(NSLocalizedString("save", comment: ""))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
-      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-      customNavigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
+      navigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
     } else {
       view.backgroundColor = .funChatBackgroundColor
-      customNavigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
-      customNavigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 17)
+      navigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
+      navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 17)
     }
   }
 
@@ -102,10 +102,11 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     case .cellphone:
       title = NSLocalizedString("phone", comment: "")
       limitNumberCount = 11
-      textField.keyboardType = .numberPad
+      textField.keyboardType = .phonePad
     case .email:
       title = NSLocalizedString("email", comment: "")
       limitNumberCount = 30
+      textField.keyboardType = .emailAddress
     case .specialSign:
       title = NSLocalizedString("individuality_sign", comment: "")
       limitNumberCount = 50
@@ -122,6 +123,10 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     text.delegate = self
     text.clearButtonMode = .always
     text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    if let clearButton = text.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    text.accessibilityIdentifier = "id.nickname"
     return text
   }()
 

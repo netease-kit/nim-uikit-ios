@@ -19,7 +19,7 @@ open class FunContactRemakNameViewController: NEBaseContactRemakNameViewControll
     clearItem.tintColor = .funContactThemeColor
     navigationItem.rightBarButtonItem = clearItem
 
-    customNavigationView.moreButton.setTitleColor(.funContactThemeColor, for: .normal)
+    navigationView.moreButton.setTitleColor(.funContactThemeColor, for: .normal)
 
     NSLayoutConstraint.activate([
       aliasInput.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),

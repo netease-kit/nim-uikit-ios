@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
+import UIKit
 
 public class MineTableViewCell: UITableViewCell {
 //    override func awakeFromNib() {
@@ -81,6 +81,7 @@ public class MineTableViewCell: UITableViewCell {
     name.textColor = UIColor.ne_darkText
     name.font = UIFont.systemFont(ofSize: 16.0)
     name.text = NSLocalizedString("setting", comment: "")
+    name.accessibilityIdentifier = "id.titleLabel"
     return name
   }()
 

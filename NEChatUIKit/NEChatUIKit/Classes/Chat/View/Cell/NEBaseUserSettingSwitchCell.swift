@@ -11,6 +11,7 @@ open class NEBaseUserSettingSwitchCell: NEBaseUserSettingCell {
     let q = UISwitch()
     q.translatesAutoresizingMaskIntoConstraints = false
     q.onTintColor = NEConstant.hexRGB(0x337EFF)
+    q.accessibilityIdentifier = "id.tSwitch"
     return q
   }()
 
