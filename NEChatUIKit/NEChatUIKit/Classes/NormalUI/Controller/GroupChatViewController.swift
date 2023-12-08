@@ -83,16 +83,16 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
   open func updateTeamInfo(team: NIMTeam) {
     title = team.getShowName()
     if team.inAllMuteMode(), team.owner != NIMSDK.shared().loginManager.currentAccount() {
-      menuView.textView.isEditable = false
-      menuView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
-      menuView.textView.backgroundColor = UIColor(hexString: "#E3E4E4")
+      chatInputView.textView.isEditable = false
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
+      chatInputView.textView.backgroundColor = UIColor(hexString: "#E3E4E4")
       layoutInputView(offset: 0)
-      menuView.stackView.isUserInteractionEnabled = false
+      chatInputView.stackView.isUserInteractionEnabled = false
     } else {
-      menuView.textView.isEditable = true
-      menuView.textView.attributedPlaceholder = getPlaceHolder(text: "\(chatLocalizable("send_to"))\(team.getShowName())")
-      menuView.textView.backgroundColor = .white
-      menuView.stackView.isUserInteractionEnabled = true
+      chatInputView.textView.isEditable = true
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: "\(chatLocalizable("send_to"))\(team.getShowName())")
+      chatInputView.textView.backgroundColor = .white
+      chatInputView.stackView.isUserInteractionEnabled = true
     }
   }
 
@@ -100,7 +100,7 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
 
   open func onTeamRemoved(team: NIMTeam) {
     // 退出讨论组
-    if team.clientCustomInfo?.contains(discussTeamKey) == true {
+    if team.isDisscuss() == true {
       navigationController?.popViewController(animated: true)
       return
     }

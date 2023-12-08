@@ -14,9 +14,6 @@ public enum ContactCellType: Int {
   case ContactCutom = 50 // custom type start with 50
 }
 
-public typealias ContactClickCallBack = (_ index: Int, _ section: Int?)
-  -> Void // parameter type contain ContactCellType and custom type
-
 public typealias ContactsSelectCompletion = ([ContactInfo]) -> Void?
 
 let coreLoader = CoreLoader<NEBaseContactViewController>()

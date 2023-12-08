@@ -15,6 +15,7 @@ open class CenterTextCell: UITableViewCell {
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textColor = .red
     titleLabel.textAlignment = .center
+    titleLabel.accessibilityIdentifier = "id.titleLabel"
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),

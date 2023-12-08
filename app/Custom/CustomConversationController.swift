@@ -1,14 +1,17 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import Foundation
 import NEConversationUIKit
 
-open class CustomConversationController: ConversationController {
+open class CustomConversationController: ConversationController, NEBaseConversationControllerDelegate {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    listCtrl = CustomConversationListViewController()
+    delegate = self
+
+    // 自定义cell, [ConversationListModel.customType: 需要注册的自定义cell]
+    cellRegisterDic[1] = CustomConversationListCell.self
   }
 
   public required init?(coder: NSCoder) {
@@ -17,90 +20,192 @@ open class CustomConversationController: ConversationController {
 
   override public func viewDidLoad() {
     // 通过配置项实现自定义
-    configCustom()
+    customByConfig()
 
-    // 实现协议（重写tabbar点击事件）
-    navView.delegate = self
-
-    // 自定义会话列表标题、图标、间距
-    navView.brandBtn.setTitle("消息", for: .normal)
-    navView.brandBtn.setImage(nil, for: .normal)
-    navView.brandBtn.layoutButtonImage(style: .left, space: 0)
-
-    // 自定义tabbar图标
-    navView.addBtn.setImage(UIImage.ne_imageNamed(name: "noNeed_notify"), for: .normal)
-
-    // 顶部topView中添加自定义view（需要设置topView的高度）
-    let view = CustomTopView(frame: CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: 40))
-    view.backgroundColor = .blue
-//    listCtrl.topViewHeight = 40
-    listCtrl.topView.addSubview(view)
-
-    // 自定义占位图文案、背景图片
-    listCtrl.emptyView.setEmptyImage(image: UIImage())
-    listCtrl.emptyView.settingContent(content: "")
-
-    viewmodel.repo.clearAllUnreadCount()
+    // 通过重写实现自定义
+//      customByOverread()
 
     super.viewDidLoad()
   }
 
-  open func configCustom() {
+  // 通过配置项实现自定义(这种方式不需要继承就可以实现 UI 自定义)
+  open func customByConfig() {
+    /*
+     UI 属性自定义
+     */
+
     /// 头像圆角大小
-    NEKitConversationConfig.shared.ui.avatarCornerRadius = 4.0
+    NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius = 4.0
 
     /// 头像类型
-    NEKitConversationConfig.shared.ui.avatarType = .rectangle
+    NEKitConversationConfig.shared.ui.conversationProperties.avatarType = .rectangle
 
-    /// 是否隐藏导航栏
-//        NEKitConversationConfig.shared.ui.hiddenNav = true
+    /// 是否展示界面顶部的标题栏
+    NEKitConversationConfig.shared.ui.showTitleBar = true
 
-    /// 是否隐藏搜索按钮
-    NEKitConversationConfig.shared.ui.hiddenSearchBtn = true
+    /// 是否展示标题栏次最右侧图标
+    NEKitConversationConfig.shared.ui.showTitleBarRight2Icon = true
 
-//        / 是否把顶部添加按钮和搜索按钮都隐藏
-//        NEKitConversationConfig.shared.ui.hiddenRightBtns = true
+    /// 是否展示标题栏最右侧图标
+    NEKitConversationConfig.shared.ui.showTitleBarRightIcon = true
+
+    // 自定义会话列表标题、图标
+    NEKitConversationConfig.shared.ui.titleBarTitle = "消息"
+    NEKitConversationConfig.shared.ui.titleBarTitleColor = .purple
+    NEKitConversationConfig.shared.ui.titleBarLeftRes = UIImage()
+
+    // 未被置顶的会话项的背景色
+    NEKitConversationConfig.shared.ui.conversationProperties.itemBackground = .gray
+
+    // 置顶的会话项的背景色
+    NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground = .orange
 
     // 主标题字体大小
-    NEKitConversationConfig.shared.ui.titleFont = .systemFont(ofSize: 24)
+    NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize = 24
+
+    // 主标题字体大小
+    NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize = 24
 
     // 副标题字体大小
-    NEKitConversationConfig.shared.ui.subTitleFont = .systemFont(ofSize: 18)
+    NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize = 18
 
     // 主标题字体颜色
-    NEKitConversationConfig.shared.ui.titleColor = UIColor.red
+    NEKitConversationConfig.shared.ui.conversationProperties.itemTitleColor = UIColor.red
 
     // 副标题字体颜色
-    NEKitConversationConfig.shared.ui.subTitleColor = UIColor.blue
+    NEKitConversationConfig.shared.ui.conversationProperties.itemContentColor = UIColor.blue
 
     /// 时间字体颜色
-    NEKitConversationConfig.shared.ui.timeColor = UIColor.green
+    NEKitConversationConfig.shared.ui.conversationProperties.itemDateColor = UIColor.green
 
     /// 时间字体大小
-    NEKitConversationConfig.shared.ui.timeFont = UIFont.systemFont(ofSize: 14)
+    NEKitConversationConfig.shared.ui.conversationProperties.itemDateSize = 14
 
     /// 会话列表 cell 左划置顶按钮文案内容
-    NEKitConversationConfig.shared.ui.stickTopBottonTitle = "文案"
-    /// 会话列表 cell 左划取消置顶按钮文案内容
-    NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle = "文案1"
-    /// 会话列表 cell 左划置顶按钮文案颜色
-    NEKitConversationConfig.shared.ui.stickTopBottonColor = UIColor.yellow
+    NEKitConversationConfig.shared.ui.stickTopBottonTitle = "左侧"
+    /// 会话列表 cell 左划取消置顶按钮文案内容（会话置顶后生效）
+    NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle = "左侧1"
+    /// 会话列表 cell 左划置顶按钮背景颜色
+    NEKitConversationConfig.shared.ui.stickTopBottonBackgroundColor = UIColor.brown
+    /// 会话列表 cell 左划置顶按钮点击事件
+    NEKitConversationConfig.shared.ui.stickTopBottonClick = { model, indexPath in
+      self.showToast("会话列表 cell 左划置顶按钮点击事件")
+    }
 
     /// 会话列表 cell 左划删除按钮文案内容
-    NEKitConversationConfig.shared.ui.deleteBottonTitle = "文案2"
-    /// 会话列表 cell 左划删除按钮文案颜色
-    NEKitConversationConfig.shared.ui.deleteBottonColor = UIColor.gray
-  }
+    NEKitConversationConfig.shared.ui.deleteBottonTitle = "右侧"
+    /// 会话列表 cell 左划删除按钮背景颜色
+    NEKitConversationConfig.shared.ui.deleteBottonBackgroundColor = UIColor.purple
+    /// 会话列表 cell 左划删除按钮点击事件
+    NEKitConversationConfig.shared.ui.deleteBottonClick = { model, indexPath in
+      self.showToast("会话列表 cell 左划删除按钮点击事件")
+    }
 
-  // 重写搜索按钮点击事件
-  override open func searchAction() {
-    listCtrl.topViewHeight = 80
-  }
+    /// 标题栏左侧按钮点击事件
+    NEKitConversationConfig.shared.ui.titleBarLeftClick = {
+      self.showSingleAlert(message: "titleBarLeftClick") {}
+    }
 
-  // 重写添加按钮点击事件
-  override open func didClickAddBtn() {
-    showSingleAlert(message: "override didClickAddBtn") {
-      self.listCtrl.topViewHeight = 0
+    /// 标题栏最右侧按钮点击事件，如果已经通过继承方式重写该点击事件, 则本方式会被覆盖
+    NEKitConversationConfig.shared.ui.titleBarRightClick = {
+      self.showToast("didClickAddBtn")
+    }
+
+    /// 标题栏次最右侧按钮点击事件，如果已经通过继承方式重写该点击事件, 则本方式会被覆盖
+    NEKitConversationConfig.shared.ui.titleBarRight2Click = {
+      self.showToast("didClickSearchBtn")
+    }
+
+    /// 会话列表点击事件
+    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
+      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
+    }
+
+    /*
+     布局自定义
+     */
+    /// 自定义界面UI接口，回调中会传入会话列表界面的UI布局，您可以进行UI元素调整。
+    NEKitConversationConfig.shared.ui.customController = { viewController in
+      // 更改导航栏背景色
+      viewController.navigationView.backgroundColor = .gray
+
+      // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
+      self.customTopView.btn.setTitle("通过配置项添加", for: .normal)
+      viewController.bodyTopView.backgroundColor = .purple
+      viewController.bodyTopView.addSubview(self.customTopView)
+      viewController.bodyTopViewHeight = 80
+
+      // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
+      self.customBottomView.btn.setTitle("通过配置项添加", for: .normal)
+      viewController.bodyBottomView.backgroundColor = .purple
+      viewController.bodyBottomView.addSubview(self.customBottomView)
+      viewController.bodyBottomViewHeight = 60
     }
   }
+
+  // 通过重写实现自定义布局(这种方式需要继承，拿到父类属性)
+  open func customByOverread() {
+    // 实现协议（重写tabbar点击事件）
+    navigationView.delegate = self
+
+    // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
+    customTopView.btn.setTitle("通过重写方式添加", for: .normal)
+    bodyTopView.addSubview(customTopView)
+    bodyTopViewHeight = 80
+
+    // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
+    customBottomView.btn.setTitle("通过重写方式添加", for: .normal)
+    bodyBottomView.addSubview(customBottomView)
+    bodyBottomViewHeight = 60
+
+    // 自定义占位图文案、背景图片
+    emptyView.setEmptyImage(image: UIImage())
+    emptyView.settingContent(content: "")
+  }
+
+  // 通过继承方式重写次最右侧按钮点击事件, 这种方式会覆盖配置项中的点击事件
+  override open func searchAction() {
+    bodyTopViewHeight = 80
+    bodyBottomViewHeight = 80
+  }
+
+  // 通过继承方式重写最右侧按钮点击事件, 这种方式会覆盖配置项中的点击事件
+  override open func didClickAddBtn() {
+    bodyTopViewHeight = 0
+    bodyBottomViewHeight = 0
+  }
+
+  override open func deleteActionHandler(action: UITableViewRowAction?, indexPath: IndexPath) {
+    showSingleAlert(message: "override deleteActionHandler") {}
+  }
+
+  override open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
+    showSingleAlert(message: "override topActionHandler") {
+      super.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
+    }
+  }
+
+  //  可自行处理数据
+  public func onDataLoaded() {
+    guard let conversationList = viewModel.conversationListArray else { return
+    }
+    conversationList.forEach { model in
+      model.customType = 1
+    }
+    tableView.reloadData()
+  }
+
+  // MARK: lazy load
+
+  public lazy var customTopView: CustomView = {
+    let view = CustomView(frame: CGRect(x: 0, y: 10, width: NEConstant.screenWidth, height: 40))
+    view.backgroundColor = .blue
+    return view
+  }()
+
+  public lazy var customBottomView: CustomView = {
+    let view = CustomView(frame: CGRect(x: 0, y: 10, width: NEConstant.screenWidth, height: 40))
+    view.backgroundColor = .green
+    return view
+  }()
 }

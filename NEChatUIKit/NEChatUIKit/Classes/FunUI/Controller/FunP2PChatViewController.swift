@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -19,19 +20,25 @@ open class FunP2PChatViewController: FunChatViewController {
   }
 
   override open func getSessionInfo(session: NIMSession) {
-    let user = viewmodel.getUserInfo(userId: session.sessionId)
-    let showName = user?.showName() ?? ""
-    title = showName
-    titleContent = showName
-    let text = chatLocalizable("fun_chat_input_placeholder")
-    let attribute = NSMutableAttributedString(string: text)
-    let style = NSMutableParagraphStyle()
-    style.lineBreakMode = .byTruncatingTail
-    style.alignment = .left
-    attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
-    attribute.addAttribute(.foregroundColor, value: UIColor.funChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
-    attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
-    menuView.textView.attributedPlaceholder = attribute
+    var showName = session.sessionId
+    viewmodel.getUserInfo(session.sessionId) { [weak self] user, error in
+      if let name = user?.showName() {
+        showName = name
+      }
+
+      self?.title = showName
+      self?.titleContent = showName
+      let text = chatLocalizable("fun_chat_input_placeholder")
+      let attribute = NSMutableAttributedString(string: text)
+      let style = NSMutableParagraphStyle()
+      style.lineBreakMode = .byTruncatingTail
+      style.alignment = .left
+      attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
+      attribute.addAttribute(.foregroundColor, value: UIColor.funChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
+      attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
+      self?.chatInputView.textView.attributedPlaceholder = attribute
+      self?.chatInputView.textView.setNeedsLayout()
+    }
   }
 
   /// 创建个人聊天页构造方法

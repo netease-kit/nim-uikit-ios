@@ -57,8 +57,8 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
   open func setupUI() {
     title = localizable("modify_headImage")
     addRightAction(localizable("save"), #selector(savePhoto), self)
-    customNavigationView.setMoreButtonTitle(localizable("save"))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(savePhoto))
+    navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(savePhoto))
 
     view.backgroundColor = .ne_lightBackgroundColor
 
@@ -111,7 +111,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
 
     if changePermission() == false {
       rightNavBtn.isHidden = true
-      customNavigationView.moreButton.isHidden = true
+      navigationView.moreButton.isHidden = true
       photoImage.isHidden = true
       defaultHeaderBack.isHidden = true
     }
@@ -133,8 +133,9 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
   // MARK: objc 方法
 
   open func uploadPhoto() {
-    print("upload photo")
-    showBottomAlert(self)
+    if changePermission() {
+      showBottomAlert(self)
+    }
   }
 
   open func savePhoto() {
@@ -207,7 +208,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
     view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
       let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitClient.instance.imAccid)
+        .appending(IMKitClient.instance.imAccid())
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         NIMSDK.shared().resourceManager

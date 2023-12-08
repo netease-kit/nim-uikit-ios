@@ -27,7 +27,7 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
     contentLabelLeft.isEnabled = false
     contentLabelLeft.numberOfLines = 0
     contentLabelLeft.isUserInteractionEnabled = false
-    contentLabelLeft.font = NEKitChatConfig.shared.ui.messageTextSize
+    contentLabelLeft.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     contentLabelLeft.textAlignment = .center
     contentLabelLeft.backgroundColor = .clear
     bubbleImageLeft.addSubview(contentLabelLeft)
@@ -43,7 +43,7 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
     contentLabelRight.isEnabled = false
     contentLabelRight.numberOfLines = 0
     contentLabelRight.isUserInteractionEnabled = false
-    contentLabelRight.font = NEKitChatConfig.shared.ui.messageTextSize
+    contentLabelRight.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     contentLabelRight.textAlignment = .center
     contentLabelRight.backgroundColor = .clear
     bubbleImageRight.addSubview(contentLabelRight)

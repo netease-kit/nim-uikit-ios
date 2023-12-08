@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NECommonKit
 import NIMSDK
 
 @objcMembers
@@ -17,7 +18,7 @@ class MessageTextModel: MessageContentModel {
 
     attributeStr = NEEmotionTool.getAttWithStr(
       str: message?.text ?? "",
-      font: NEKitChatConfig.shared.ui.messageTextSize
+      font: UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     )
 
     if let remoteExt = message?.remoteExt, let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
@@ -36,7 +37,7 @@ class MessageTextModel: MessageContentModel {
       }
     }
 
-    let textSize = attributeStr?.finalSize(NEKitChatConfig.shared.ui.messageTextSize, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
+    let textSize = attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
 
     textHeight = textSize.height
     contentSize = CGSize(width: textSize.width + chat_content_margin * 2, height: textHeight + chat_content_margin * 2)

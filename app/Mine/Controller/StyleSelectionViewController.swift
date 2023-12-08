@@ -2,11 +2,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECoreKit
 import NECommonKit
 import NECommonUIKit
 import NEConversationUIKit
+import NECoreKit
+import UIKit
 
 open class StyleCellModel: NSObject {
   public var styleName: String
@@ -57,7 +57,7 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
-      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
     } else {
       view.backgroundColor = .funChatBackgroundColor

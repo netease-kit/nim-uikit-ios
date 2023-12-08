@@ -54,8 +54,8 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
   }
 
   open func setupUI() {
-    customNavigationView.setMoreButtonTitle(localizable("save"))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(saveIntr))
+    navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(saveIntr))
 
     if let type = team?.type, type == .advanced {
       title = localizable("team_intr")
@@ -82,7 +82,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
     if changePermission() == false {
       textView.isEditable = false
       rightNavBtn.isHidden = true
-      customNavigationView.moreButton.isHidden = true
+      navigationView.moreButton.isHidden = true
     }
   }
 

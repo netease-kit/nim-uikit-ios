@@ -13,8 +13,8 @@ open class FunTeamIntroduceViewController: NEBaseTeamIntroduceViewController {
     view.backgroundColor = .funTeamBackgroundColor
     addRightAction(localizable("save"), #selector(saveIntr), self, .funTeamThemeColor)
     navigationController?.navigationBar.backgroundColor = .funTeamBackgroundColor
-    customNavigationView.backgroundColor = .funTeamBackgroundColor
-    customNavigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
+    navigationView.backgroundColor = .funTeamBackgroundColor
+    navigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
 
     NSLayoutConstraint.activate([
       backView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),

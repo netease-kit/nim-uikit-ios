@@ -3,12 +3,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import YXLogin
+import NECommonUIKit
+import NECoreIMKit
 import NECoreKit
 import NIMSDK
-import NECoreIMKit
-import NECommonUIKit
+import UIKit
+import YXLogin
 
 class MeViewController: UIViewController {
   private let mineData = [
@@ -22,6 +22,7 @@ class MeViewController: UIViewController {
     let view = UIView(frame: .zero)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .white
+    view.accessibilityIdentifier = "id.avatar"
     return view
   }()
 
@@ -37,6 +38,7 @@ class MeViewController: UIViewController {
     name.textColor = .ne_darkText
     name.font = UIFont.systemFont(ofSize: 22.0)
     name.translatesAutoresizingMaskIntoConstraints = false
+    name.accessibilityIdentifier = "id.name"
     return name
   }()
 
@@ -45,6 +47,7 @@ class MeViewController: UIViewController {
     label.textColor = .ne_darkText
     label.font = UIFont.systemFont(ofSize: 16.0)
     label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.account"
     return label
   }()
 
@@ -150,7 +153,7 @@ class MeViewController: UIViewController {
   }
 
   func updateUserInfo() {
-    let user = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid)
+    let user = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid())
     idLabel.text = "\(NSLocalizedString("account", comment: "")):\(user?.userId ?? "")"
     nameLabel.text = user?.showName(false)
     header.configHeadData(headUrl: user?.userInfo?.avatarUrl,
@@ -176,6 +179,7 @@ class MeViewController: UIViewController {
   private lazy var arrow: UIImageView = {
     let imageView = UIImageView(image: UIImage(named: "arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.accessibilityIdentifier = "id.rightArrow"
     return imageView
   }()
 
@@ -199,12 +203,15 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
 
   public func tableView(_ tableView: UITableView,
                         cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
+    if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(MineTableViewCell.self))",
       for: indexPath
-    ) as! MineTableViewCell
-    cell.configCell(data: mineData[indexPath.row])
-    return cell
+    ) as? MineTableViewCell {
+      let cellTitle = mineData[indexPath.row]
+      cell.configCell(data: cellTitle)
+      return cell
+    }
+    return MineTableViewCell()
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

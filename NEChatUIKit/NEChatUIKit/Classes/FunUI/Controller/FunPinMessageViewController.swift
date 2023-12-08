@@ -57,14 +57,18 @@ open class FunPinMessageViewController: NEBasePinMessageViewController {
   }
 
   override open func forwardMessage(_ message: NIMMessage) {
-    let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) { [weak self] in
-      self?.forwardMessageToUser(message)
-    }
+    if IMKitClient.instance.getConfigCenter().teamEnable {
+      let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) { [weak self] in
+        self?.forwardMessageToUser(message)
+      }
 
-    let teamAction = NECustomAlertAction(title: chatLocalizable("team")) { [weak self] in
-      self?.forwardMessageToTeam(message)
-    }
+      let teamAction = NECustomAlertAction(title: chatLocalizable("team")) { [weak self] in
+        self?.forwardMessageToTeam(message)
+      }
 
-    showCustomActionSheet([teamAction, userAction])
+      showCustomActionSheet([teamAction, userAction])
+    } else {
+      forwardMessageToUser(message)
+    }
   }
 }

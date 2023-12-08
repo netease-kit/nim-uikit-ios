@@ -11,7 +11,7 @@ import UIKit
 @objcMembers
 open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
   BlackListCellDelegate, UIGestureRecognizerDelegate {
-  public let customNavigationView = NENavigationView()
+  public let navigationView = NENavigationView()
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = BlackListViewModel()
   public var blackList: [User]?
@@ -34,7 +34,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
 
   func commonUI() {
     title = localizable("blacklist")
-    customNavigationView.navTitle.text = title
+    navigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -55,16 +55,16 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     addItem.accessibilityIdentifier = "id.threePoint"
     navigationItem.rightBarButtonItem = addItem
 
-    customNavigationView.translatesAutoresizingMaskIntoConstraints = false
-    customNavigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
-    customNavigationView.setMoreButtonImage(UIImage.ne_imageNamed(name: "add"))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(addBlack))
-    view.addSubview(customNavigationView)
+    navigationView.translatesAutoresizingMaskIntoConstraints = false
+    navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
+    navigationView.setMoreButtonImage(UIImage.ne_imageNamed(name: "add"))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(addBlack))
+    view.addSubview(navigationView)
     NSLayoutConstraint.activate([
-      customNavigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      customNavigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      customNavigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      customNavigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
+      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+      navigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
     ])
 
     tableView.separatorStyle = .none

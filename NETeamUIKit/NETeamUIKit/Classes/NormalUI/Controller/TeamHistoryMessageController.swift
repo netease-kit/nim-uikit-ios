@@ -11,7 +11,7 @@ open class TeamHistoryMessageController: NEBaseTeamHistoryMessageController {
   override public init(session: NIMSession?) {
     super.init(session: session)
     tag = "TeamHistoryMessageController"
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 

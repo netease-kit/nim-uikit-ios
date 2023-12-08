@@ -13,7 +13,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = NEKitChatConfig.shared.ui.messageTextSize
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
     label.textAlignment = .justified
     label.accessibilityIdentifier = "id.messageText"
@@ -26,7 +26,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = NEKitChatConfig.shared.ui.messageTextSize
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
     label.textAlignment = .justified
     label.accessibilityIdentifier = "id.messageText"

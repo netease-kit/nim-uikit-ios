@@ -32,7 +32,7 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
   override public func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = true
-    customNavigationView.isHidden = true
+    navigationView.isHidden = true
     commonUI()
     loadData()
   }

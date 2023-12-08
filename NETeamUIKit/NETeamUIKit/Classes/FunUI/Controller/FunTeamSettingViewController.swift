@@ -42,8 +42,8 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     teamHeader.layer.cornerRadius = 4.0
     addBtn.setImage(coreLoader.loadImage("fun_add"), for: .normal)
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
-    customNavigationView.bottomLine.isHidden = false
+    navigationView.backgroundColor = .white
+    navigationView.titleBarBottomLine.isHidden = false
   }
 
   override open func getHeaderView() -> UIView {
@@ -245,8 +245,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   // MARK: objc 方法
 
   override open func toInfoView() {
-    let info = FunTeamInfoViewController()
-    info.team = viewmodel.teamInfoModel?.team
+    let info = FunTeamInfoViewController(team: viewmodel.teamInfoModel?.team)
     navigationController?.pushViewController(info, animated: true)
   }
 
@@ -321,12 +320,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   }
 
   override open func toMemberList() {
-    let memberController = FunTeamMembersController(viewmodel: viewmodel)
-    memberController.datas = viewmodel.teamInfoModel?.users
-    if teamSettingType == .Senior {
-      memberController.isSenior = true
-    }
-    memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
+    let memberController = FunTeamMembersController(teamId: viewmodel.teamInfoModel?.team?.teamId)
     navigationController?.pushViewController(memberController, animated: true)
   }
 }

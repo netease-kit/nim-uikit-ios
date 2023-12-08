@@ -7,8 +7,8 @@ import UIKit
 
 @objcMembers
 open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  override init(team: NIMTeam?) {
+    super.init(team: team)
     cellClassDic = [
       SettingCellType.SettingArrowCell.rawValue: FunTeamArrowSettingCell.self,
       SettingCellType.SettingHeaderCell.rawValue: FunTeamSettingHeaderCell.self,
@@ -33,8 +33,8 @@ open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
   override open func setupUI() {
     super.setupUI()
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
-    customNavigationView.bottomLine.isHidden = false
+    navigationView.backgroundColor = .white
+    navigationView.titleBarBottomLine.isHidden = false
     view.backgroundColor = .funTeamBackgroundColor
   }
 

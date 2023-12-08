@@ -21,7 +21,7 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
   override open func setupUI() {
     super.setupUI()
 
-    let image = NEKitChatConfig.shared.ui.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    let image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImage.image = image?
       .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false

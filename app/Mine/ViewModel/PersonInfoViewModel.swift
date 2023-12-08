@@ -29,7 +29,7 @@ public class PersonInfoViewModel: NSObject {
 
   func getData() {
     sectionData.removeAll()
-    userInfo = userProvider.getUserInfo(userId: IMKitEngine.instance.imAccid)
+    userInfo = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid())
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())
   }
@@ -43,7 +43,6 @@ public class PersonInfoViewModel: NSObject {
 
     weak var weakSelf = self
     let headImageItem = SettingCellModel()
-    headImageItem.cornerType = .topLeft.union(.topRight)
     headImageItem.type = SettingCellType.SettingHeaderCell.rawValue
     headImageItem.cellName = NSLocalizedString("headImage", comment: "")
     headImageItem.headerUrl = userInfo?.userInfo?.avatarUrl
@@ -96,7 +95,7 @@ public class PersonInfoViewModel: NSObject {
     // 生日
     let birthdayItem = SettingCellModel()
     birthdayItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    birthdayItem.cellName = NSLocalizedString("birehday", comment: "")
+    birthdayItem.cellName = NSLocalizedString("birthday", comment: "")
     birthdayItem.subTitle = mineInfo.userInfo?.birth
     birthdayItem.rowHeight = 46.0
     birthdayItem.cellClick = {
@@ -117,7 +116,6 @@ public class PersonInfoViewModel: NSObject {
     emailItem.type = SettingCellType.SettingSubtitleCell.rawValue
     emailItem.cellName = NSLocalizedString("email", comment: "")
     emailItem.subTitle = mineInfo.userInfo?.email
-    emailItem.cornerType = .bottomLeft.union(.bottomRight)
     emailItem.rowHeight = 46.0
     emailItem.cellClick = {
       weakSelf?.delegate?.didClickEmail(email: emailItem.subTitle ?? "")
@@ -131,6 +129,7 @@ public class PersonInfoViewModel: NSObject {
       telephoneItem,
       emailItem,
     ])
+    model.setCornerType()
     return model
   }
 
@@ -146,12 +145,12 @@ public class PersonInfoViewModel: NSObject {
     signItem.subTitle = mineInfo.userInfo?.sign
     signItem.rowHeight = 46.0
     signItem.titleWidth = 64
-    signItem.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     weak var weakSelf = self
     signItem.cellClick = {
       weakSelf?.delegate?.didClickSign(sign: signItem.subTitle ?? "")
     }
     model.cellModels.append(contentsOf: [signItem])
+    model.setCornerType()
     return model
   }
 

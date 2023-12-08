@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECoreKit
 import NETeamUIKit
-import YXLogin
 import NIMSDK
+import UIKit
+import YXLogin
 
 class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
   private var viewModel = MineSettingViewModel()
@@ -20,14 +20,6 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    if userDefault.value(forKey: "HandSetModeKey") == nil {
-      SettingProvider.shared.setHandSetMode(true)
-    }
-
-    if userDefault.value(forKey: "MessageHasRead") == nil {
-      SettingProvider.shared.setMessageRead(true)
-    }
-
     viewModel.delegate = self
     viewModel.getData()
     setupSubviews()
@@ -39,7 +31,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
-      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
     } else {
       view.backgroundColor = .funChatBackgroundColor
@@ -89,7 +81,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     button.setTitle(title, for: .normal)
     button.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
     button.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
-
+    button.accessibilityIdentifier = "id.logout"
     if NEStyleManager.instance.isNormalStyle() {
       button.layer.cornerRadius = 8.0
       button.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
@@ -113,25 +105,26 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
         withCompletion: { [weak self] user, error in
           if error != nil {
             self?.view.makeToast(error?.localizedDescription)
-          } else {
-            weak var weakSelf = self
-            NotificationCenter.default.post(
-              name: Notification.Name("logout"),
-              object: nil
+            NELog.errorLog(
+              self?.tag ?? "",
+              desc: "CALLBACK logout failed,error = \(error!)"
             )
-            IMKitEngine.instance.logout { error in
-              if error == nil {
-                NIMSDK.shared().qchatManager.logout { chatError in
-                  if chatError != nil {
-                    self?.view.makeToast(chatError?.localizedDescription)
-                  } else {
-                    print("logout success")
-                  }
-                }
-              } else {
+          } else {
+            IMKitClient.instance.logout { error in
+              if error != nil {
+                self?.view.makeToast(error?.localizedDescription)
                 NELog.errorLog(
-                  weakSelf?.tag ?? "",
-                  desc: "❌CALLBACK logout failed,error = \(error!)"
+                  self?.tag ?? "",
+                  desc: "CALLBACK logout failed,error = \(error!)"
+                )
+              } else {
+                NotificationCenter.default.post(
+                  name: Notification.Name("logout"),
+                  object: nil
+                )
+                NELog.infoLog(
+                  self?.tag ?? "",
+                  desc: "CALLBACK logout SUCCESS"
                 )
               }
             }
@@ -217,4 +210,9 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
   }
 
   func didClickCleanCache() {}
+
+  func didClickConfigTest() {
+    let configTestVC = ConfigTestViewController()
+    navigationController?.pushViewController(configTestVC, animated: true)
+  }
 }

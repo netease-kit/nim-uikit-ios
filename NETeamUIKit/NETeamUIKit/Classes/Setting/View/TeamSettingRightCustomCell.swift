@@ -50,6 +50,7 @@ open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
   public lazy var customRightView: UIButton = {
     let btn = UIButton()
     btn.translatesAutoresizingMaskIntoConstraints = false
+    btn.accessibilityIdentifier = "id.accountCopy"
     return btn
   }()
 

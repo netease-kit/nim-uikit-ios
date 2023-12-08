@@ -21,7 +21,7 @@ open class FunConversationListCell: NEBaseConversationListCell {
       headImge.heightAnchor.constraint(equalToConstant: 48),
     ])
 
-    title.font = NEKitConversationConfig.shared.ui.titleFont ?? UIFont.systemFont(ofSize: 17)
+    title.font = .systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize : 17)
     NSLayoutConstraint.activate([
       title.leftAnchor.constraint(equalTo: headImge.rightAnchor, constant: 12),
       title.rightAnchor.constraint(equalTo: timeLabel.leftAnchor, constant: -5),
@@ -48,9 +48,9 @@ open class FunConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.avatarType == .rectangle {
-      headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.avatarCornerRadius
-    } else if NEKitConversationConfig.shared.ui.avatarType == .cycle {
+    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .rectangle {
+      headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
+    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
       headImge.layer.cornerRadius = 24.0
     } else {
       headImge.layer.cornerRadius = 4.0
@@ -65,9 +65,9 @@ open class FunConversationListCell: NEBaseConversationListCell {
     if let session = sessionModel?.recentSession?.session {
       let isTop = topStickInfos[session] != nil
       if isTop {
-        contentView.backgroundColor = .funConversationBackgroundColor
+        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? .funConversationBackgroundColor
       } else {
-        contentView.backgroundColor = .white
+        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
       }
     }
   }

@@ -11,7 +11,7 @@ import UIKit
 open class TeamListViewController: NEBaseTeamListViewController {
   override func commonUI() {
     super.commonUI()
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
     tableView.register(
       TeamTableViewCell.self,

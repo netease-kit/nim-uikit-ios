@@ -32,7 +32,7 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
 
   override open func setupNavRightItem() {
     super.setupNavRightItem()
-    customNavigationView.moreButton.backgroundColor = .funContactThemeColor
+    navigationView.moreButton.backgroundColor = .funContactThemeColor
     sureBtn.backgroundColor = .funContactThemeColor
   }
 
@@ -41,7 +41,7 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
       ) as! ContactSectionView
-    sectionView.titleLabel.textColor = NEKitContactConfig.shared.ui.indexTitleColor ?? .ne_greyText
+    sectionView.titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.indexTitleColor ?? .ne_greyText
     sectionView.line.isHidden = true
     sectionView.titleLabel.text = viewModel.contacts[section].initial
     return sectionView

@@ -7,42 +7,203 @@ import NECoreKit
 import UIKit
 
 @objc
-public protocol ContactsViewControllerDelegate {
+public protocol NEBaseContactsViewControllerDelegate {
   func onDataLoaded()
 }
 
 @objcMembers
 open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
   SystemMessageProviderDelegate, FriendProviderDelegate, TabNavigationViewDelegate {
-  public var delegate: ContactsViewControllerDelegate?
+  public var delegate: NEBaseContactsViewControllerDelegate?
 
   // custom ui cell
-  public var customCells = [Int: NEBaseContactTableViewCell.Type]()
+  public var cellRegisterDic = [Int: NEBaseContactTableViewCell.Type]()
 
-  public var clickCallBacks = [Int: ContactClickCallBack]()
-  var lastTitleIndex = 0
+  public var viewModel = ContactViewModel(contactHeaders: nil)
+  private var lastTitleIndex = 0
 
-  public lazy var navView: TabNavigationView = {
-    let nav = TabNavigationView(frame: CGRect.zero)
-    nav.translatesAutoresizingMaskIntoConstraints = false
-    nav.delegate = self
-    return nav
-  }()
-
-  public var topConstant: CGFloat = 0
-
-  public var topViewHeight: CGFloat = 0 {
+  public var bodyTopViewHeight: CGFloat = 0 {
     didSet {
-      topViewHeightAnchor?.constant = topViewHeight
-      topView.isHidden = topViewHeight <= 0
+      bodyTopViewHeightAnchor?.constant = bodyTopViewHeight
+      bodyTopView.isHidden = bodyTopViewHeight <= 0
     }
   }
 
-  public var topViewHeightAnchor: NSLayoutConstraint?
-  public lazy var topView: UIView = {
+  public var bodyBottomViewHeight: CGFloat = 0 {
+    didSet {
+      bodyBottomViewHeightAnchor?.constant = bodyBottomViewHeight
+      bodyBottomView.isHidden = bodyBottomViewHeight <= 0
+    }
+  }
+
+  public var topConstant: CGFloat = 0
+  private var bodyTopViewHeightAnchor: NSLayoutConstraint?
+  private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
+
+  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    super.init(nibName: nil, bundle: nil)
+    viewModel.contactRepo.addNotificationDelegate(delegate: self)
+    viewModel.contactRepo.addContactDelegate(delegate: self)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    // 刷新数据
+    viewModel.reLoadData { [weak self] error, userSectionCount in
+      self?.emptyView.isHidden = userSectionCount > 0
+      if error == nil {
+        self?.delegate?.onDataLoaded()
+        self?.tableView.reloadData()
+      }
+    }
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    showTitleBar()
+    commonUI()
+    viewModel.refresh = { [weak self] in
+      self?.tableView.reloadData()
+    }
+  }
+
+  deinit {
+    viewModel.contactRepo.removeNotificationDelegate(delegate: self)
+    viewModel.contactRepo.removeContactDelegate(delegate: self)
+  }
+
+  open func showTitleBar() {
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationView.isHidden = true
+      topConstant = 0
+      if NEKitContactConfig.shared.ui.showTitleBar {
+        navigationController?.isNavigationBarHidden = false
+      } else {
+        navigationController?.isNavigationBarHidden = true
+        if #available(iOS 10, *) {
+          topConstant += NEConstant.statusBarHeight
+        }
+      }
+    } else {
+      navigationController?.isNavigationBarHidden = true
+      if NEKitContactConfig.shared.ui.showTitleBar {
+        navigationView.isHidden = false
+        topConstant = NEConstant.navigationHeight
+      } else {
+        navigationView.isHidden = true
+        topConstant = 0
+      }
+      if #available(iOS 10, *) {
+        topConstant += NEConstant.statusBarHeight
+      }
+    }
+  }
+
+  open func commonUI() {
+    initSystemNav()
+    view.addSubview(navigationView)
+    view.addSubview(bodyTopView)
+    view.addSubview(bodyView)
+    view.addSubview(bodyBottomView)
+
+    NSLayoutConstraint.activate([
+      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navigationView.heightAnchor
+        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
+    bodyTopViewHeightAnchor?.isActive = true
+
+    NSLayoutConstraint.activate([
+      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
+      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
+    bodyBottomViewHeightAnchor?.isActive = true
+
+    if let customController = NEKitContactConfig.shared.ui.customController {
+      customController(self)
+    }
+  }
+
+  // MARK: lazy load
+
+  public lazy var navigationView: TabNavigationView = {
+    let nav = TabNavigationView(frame: CGRect.zero)
+    nav.translatesAutoresizingMaskIntoConstraints = false
+    nav.delegate = self
+
+    if let addImg = NEKitContactConfig.shared.ui.titleBarRightRes {
+      nav.addBtn.setImage(addImg, for: .normal)
+    }
+    if let searchImg = NEKitContactConfig.shared.ui.titleBarRight2Res {
+      nav.searchBtn.setImage(searchImg, for: .normal)
+    }
+    return nav
+  }()
+
+  public lazy var bodyTopView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
+    return view
+  }()
+
+  public lazy var bodyView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+    view.addSubview(contentView)
+
+    NSLayoutConstraint.activate([
+      contentView.topAnchor.constraint(equalTo: view.topAnchor),
+      contentView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      contentView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
+    return view
+  }()
+
+  public lazy var contentView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+    view.addSubview(tableView)
+    view.addSubview(emptyView)
+
+    NSLayoutConstraint.activate([
+      tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      tableView.topAnchor.constraint(equalTo: view.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
+
+    NSLayoutConstraint.activate([
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+    ])
+
     return view
   }()
 
@@ -53,8 +214,6 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     tableView.delegate = self
     tableView.dataSource = self
     tableView.backgroundColor = UIColor.ne_backgroundColor
-    tableView.rowHeight = 52
-    tableView.sectionHeaderHeight = 40
     tableView.sectionFooterHeight = 0
     tableView.sectionIndexColor = .ne_greyText
 
@@ -70,80 +229,12 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     return view
   }()
 
-  public var viewModel = ContactViewModel(contactHeaders: nil)
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nil, bundle: nil)
-    viewModel.contactRepo.addNotificationDelegate(delegate: self)
-    viewModel.contactRepo.addContactDelegate(delegate: self)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationController?.isNavigationBarHidden = false
-      topConstant = 0
-    } else {
-      navigationController?.isNavigationBarHidden = true
-      topConstant = NEConstant.navigationAndStatusHeight
-      view.addSubview(navView)
-      NSLayoutConstraint.activate([
-        navView.topAnchor.constraint(equalTo: view.topAnchor),
-        navView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        navView.rightAnchor.constraint(equalTo: view.rightAnchor),
-        navView.heightAnchor
-          .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
-      ])
-    }
-    commonUI()
-    viewModel.refresh = { [weak self] in
-      self?.tableView.reloadData()
-    }
-  }
-
-  override open func viewWillAppear(_ animated: Bool) {
-    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationController?.isNavigationBarHidden = false
-    } else {
-      navigationController?.isNavigationBarHidden = true
-    }
-
-    // 刷新数据
-    viewModel.reLoadData { [weak self] error, userSectionCount in
-      self?.emptyView.isHidden = userSectionCount > 0
-      if error == nil {
-        self?.delegate?.onDataLoaded()
-        self?.tableView.reloadData()
-      }
-    }
-  }
-
-  open func commonUI() {
-    initSystemNav()
-
-    view.addSubview(topView)
-    topViewHeightAnchor = topView.heightAnchor.constraint(equalToConstant: topViewHeight)
-    topViewHeightAnchor?.isActive = true
-
-    view.addSubview(tableView)
-    NSLayoutConstraint.activate([
-      tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      tableView.topAnchor.constraint(equalTo: topView.bottomAnchor),
-      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ])
-
-    view.addSubview(emptyView)
-    NSLayoutConstraint.activate([
-      emptyView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      emptyView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      emptyView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.screenHeight / 2),
-      emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ])
-  }
+  public lazy var bodyBottomView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+    return view
+  }()
 
   open func loadData() {
     viewModel.loadData { [weak self] error, userSectionCount in
@@ -221,7 +312,53 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     52
   }
 
-  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
+
+    if info.contactCellType == ContactCellType.ContactOthers.rawValue {
+      if let headerItemClick = NEKitContactConfig.shared.ui.headerItemClick {
+        headerItemClick(info, indexPath)
+        return
+      }
+
+      switch info.router {
+      case ValidationMessageRouter:
+        Router.shared.use(ValidationMessageRouter,
+                          parameters: ["nav": navigationController as Any],
+                          closure: nil)
+      case ContactBlackListRouter:
+        Router.shared.use(ContactBlackListRouter,
+                          parameters: ["nav": navigationController as Any],
+                          closure: nil)
+
+      case ContactTeamListRouter:
+        // My Team
+        Router.shared.use(ContactTeamListRouter,
+                          parameters: ["nav": navigationController as Any],
+                          closure: nil)
+
+      case ContactPersonRouter:
+        break
+
+      case ContactComputerRouter:
+        break
+
+      default:
+        break
+      }
+    } else {
+      if let friendItemClick = NEKitContactConfig.shared.ui.friendItemClick {
+        friendItemClick(info, indexPath)
+        return
+      }
+
+      Router.shared.use(
+        ContactUserInfoPageRouter,
+        parameters: ["nav": navigationController as Any, "user": info.user as Any],
+        closure: nil
+      )
+    }
+  }
 
 //    MARK: SystemMessageProviderDelegate
 
@@ -267,13 +404,12 @@ extension NEBaseContactsViewController {
     NEBaseFindFriendViewController()
   }
 
-  @objc open func goToFindFriend() {
+  @objc public func goToFindFriend() {
     let findFriendController = getFindFriendViewController()
-    findFriendController.hidesBottomBarWhenPushed = true
     navigationController?.pushViewController(findFriendController, animated: true)
   }
 
-  @objc open func searchContact() {
+  @objc public func searchContact() {
     Router.shared.use(
       SearchContactPageRouter,
       parameters: ["nav": navigationController as Any],
@@ -283,11 +419,19 @@ extension NEBaseContactsViewController {
 
   // MARK: TabNavigationViewDelegate
 
-  public func searchAction() {
+  open func searchAction() {
+    if let searchBlock = NEKitContactConfig.shared.ui.titleBarRight2Click {
+      searchBlock()
+      return
+    }
     searchContact()
   }
 
-  public func didClickAddBtn() {
+  open func didClickAddBtn() {
+    if let addBlock = NEKitContactConfig.shared.ui.titleBarRightClick {
+      addBlock()
+      return
+    }
     goToFindFriend()
   }
 }

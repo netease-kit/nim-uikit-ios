@@ -61,7 +61,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
   }
 
   override public func deleteFriend(user: User?) {
-    let titleAction = NECustomAlertAction(title: localizable("delete_title").replacingOccurrences(of: "XXX", with: user?.showName(true) ?? "")) {}
+    let titleAction = NECustomAlertAction(title: String(format: localizable("delete_title"), user?.showName(true) ?? "")) {}
     titleAction.contentText.font = .systemFont(ofSize: 13)
     titleAction.contentText.textColor = UIColor(hexString: "#8F8F8F")
 

@@ -80,7 +80,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
   override open func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("select")
-    customNavigationView.navTitle.text = title
+    navigationView.navTitle.text = title
     emptyView.settingContent(content: localizable("no_friend"))
     setupUI()
     setupNavRightItem()
@@ -152,14 +152,14 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       sureBtn.contentHorizontalAlignment = .center
       sureBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     } else {
-      customNavigationView.setMoreButtonTitle(localizable("alert_sure"))
-      customNavigationView.moreButton.setTitleColor(.white, for: .normal)
-      customNavigationView.moreButton.layer.cornerRadius = 4
-      customNavigationView.moreButton.contentHorizontalAlignment = .center
-      customNavigationView.addMoreButtonTarget(target: self, selector: #selector(sureClick(_:)))
-      customNavigationView.setBackButtonTitle(localizable("close"))
-      customNavigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
-      sureBtn = customNavigationView.moreButton
+      navigationView.setMoreButtonTitle(localizable("alert_sure"))
+      navigationView.moreButton.setTitleColor(.white, for: .normal)
+      navigationView.moreButton.layer.cornerRadius = 4
+      navigationView.moreButton.contentHorizontalAlignment = .center
+      navigationView.addMoreButtonTarget(target: self, selector: #selector(sureClick(_:)))
+      navigationView.setBackButtonTitle(localizable("close"))
+      navigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
+      sureBtn = navigationView.moreButton
     }
   }
 

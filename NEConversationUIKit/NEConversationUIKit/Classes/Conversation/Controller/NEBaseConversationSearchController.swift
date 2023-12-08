@@ -12,16 +12,24 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
   var viewModel = ConversationSearchViewModel()
   var tag = "ConversationSearchBaseController"
   var searchStr = ""
-  var headTitleArr = [
-    localizable("friend"),
-    localizable("discussion_group"),
-    localizable("senior_group"),
-  ]
+  var headTitleArr = [localizable("friend")]
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    setupSubviews()
     initialConfig()
+    setupSubviews()
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+      self?.searchTextField.becomeFirstResponder()
+    }))
+  }
+
+  open func initialConfig() {
+    title = localizable("search")
+
+    // 可在此处选择是否展示群聊结果
+    headTitleArr.append(contentsOf: [localizable("discussion_group"),
+                                     localizable("senior_group")])
   }
 
   open func setupSubviews() {
@@ -30,15 +38,11 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
     view.addSubview(emptyView)
 
     NSLayoutConstraint.activate([
-      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
-      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
-      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
-      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
+      emptyView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      emptyView.topAnchor.constraint(equalTo: view.topAnchor),
+      emptyView.widthAnchor.constraint(equalToConstant: 200),
+      emptyView.heightAnchor.constraint(equalToConstant: 200),
     ])
-  }
-
-  open func initialConfig() {
-    title = localizable("search")
   }
 
   // MARK: private method
@@ -110,7 +114,7 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
     textField.clearButtonMode = .always
     textField.returnKeyType = .search
     textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
-    textField.placeholder = localizable("search")
+
     if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
       clearButton.accessibilityIdentifier = "id.clear"
     }
@@ -133,7 +137,7 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
   // MARK: UITableViewDelegate, UITableViewDataSource
 
   open func numberOfSections(in tableView: UITableView) -> Int {
-    3
+    headTitleArr.count
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

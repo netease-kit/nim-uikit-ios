@@ -10,6 +10,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
   func didStyleClick()
   func didClickCleanCache()
+  func didClickConfigTest()
 }
 
 @objcMembers
@@ -30,8 +31,6 @@ public class MineSettingViewModel: NSObject {
     let remind = SettingCellModel()
     remind.cellName = NSLocalizedString("message_remind", comment: "")
     remind.type = SettingCellType.SettingArrowCell.rawValue
-    remind.cornerType = .topLeft.union(.topRight)
-//    remind.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
     remind.cellClick = {
       weakSelf?.delegate?.didMessageRemindClick()
     }
@@ -41,7 +40,6 @@ public class MineSettingViewModel: NSObject {
     let style = SettingCellModel()
     style.cellName = NSLocalizedString("style_selection", comment: "")
     style.type = SettingCellType.SettingArrowCell.rawValue
-    style.cornerType = .bottomLeft.union(.bottomRight)
     style.cellClick = {
       weakSelf?.delegate?.didStyleClick()
     }
@@ -50,12 +48,22 @@ public class MineSettingViewModel: NSObject {
 //        let cleanCache = SettingCellModel()
 //        cleanCache.cellName = "清理缓存"
 //        cleanCache.type = SettingCellType.SettingArrowCell.rawValue
-//        cleanCache.cornerType = .bottomLeft.union(.bottomRight)
 //        cleanCache.cellClick = {
 //            weakSelf?.delegate?.didClickCleanCache()
 //        }
 //        model.cellModels.append(cleanCache)
 
+    #if DEBUG
+      let configTest = SettingCellModel()
+      configTest.cellName = "配置测试页"
+      configTest.type = SettingCellType.SettingArrowCell.rawValue
+      configTest.cellClick = {
+        weakSelf?.delegate?.didClickConfigTest()
+      }
+      model.cellModels.append(configTest)
+    #endif
+
+    model.setCornerType()
     return model
   }
 
@@ -65,12 +73,11 @@ public class MineSettingViewModel: NSObject {
     let receiverModel = SettingCellModel()
     receiverModel.cellName = NSLocalizedString("receiver_mode", comment: "")
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
-    receiverModel.cornerType = .topLeft.union(.topRight)
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
-    receiverModel.switchOpen = IMKitEngine.instance.repo.getHandsetMode()
+    receiverModel.switchOpen = IMKitClient.instance.getSettingRepo().getHandsetMode()
 
     receiverModel.swichChange = { isOpen in
-      IMKitEngine.instance.repo.setHandsetMode(isOpen)
+      IMKitClient.instance.getSettingRepo().setHandsetMode(isOpen)
     }
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
@@ -86,23 +93,26 @@ public class MineSettingViewModel: NSObject {
 //    let deleteFriend = SettingCellModel()
 //    deleteFriend.cellName = NSLocalizedString("delete_friend", comment: "")
 //    deleteFriend.type = SettingCellType.SettingSwitchCell.rawValue
-//    deleteFriend.switchOpen = IMKitEngine.instance.repo.getDeleteFriendAlias()
+//    deleteFriend.switchOpen = IMKitClient.instance.getSettingRepo().getDeleteFriendAlias()
 //
 //    deleteFriend.swichChange = { isOpen in
-//      IMKitEngine.instance.repo.setDeleteFriendAlias(isOpen)
+//      IMKitClient.instance.getSettingRepo().setDeleteFriendAlias(isOpen)
 //    }
 
     // 消息已读未读功能
     let hasRead = SettingCellModel()
     hasRead.cellName = NSLocalizedString("message_read_function", comment: "")
     hasRead.type = SettingCellType.SettingSwitchCell.rawValue
-    hasRead.cornerType = .bottomLeft.union(.bottomRight)
 //        hasRead.switchOpen = true
-    hasRead.switchOpen = IMKitEngine.instance.repo.getShowReadStatus()
+    hasRead.switchOpen = IMKitClient.instance.getSettingRepo().getShowReadStatus()
     hasRead.swichChange = { isOpen in
-      IMKitEngine.instance.repo.setShowReadStatus(isOpen)
+      IMKitClient.instance.getSettingRepo().setShowReadStatus(isOpen)
     }
-    model.cellModels.append(contentsOf: [receiverModel, hasRead])
+    model.cellModels.append(contentsOf: [
+      receiverModel, // 听筒模式
+      hasRead, // 消息已读未读功能
+    ])
+    model.setCornerType()
     return model
   }
 }

@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
+import NEChatUIKit
 import NECoreKit
 import NETeamUIKit
-import NEChatUIKit
+import UIKit
 
 class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
@@ -22,13 +22,13 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
     view.addSubview(headLabel)
     view.addSubview(tableView)
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
 
     NSLayoutConstraint.activate([
       headImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       headImage.topAnchor.constraint(
         equalTo: view.topAnchor,
-        constant: kNavigationHeight + KStatusBarHeight + 20
+        constant: topConstant + 20
       ),
       headImage.widthAnchor.constraint(equalToConstant: 72),
       headImage.heightAnchor.constraint(equalToConstant: 53),
@@ -52,6 +52,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
   private lazy var headImage: UIImageView = {
     let image = UIImageView(image: UIImage(named: "yunxin_logo"))
     image.translatesAutoresizingMaskIntoConstraints = false
+    image.accessibilityIdentifier = "id.aboutLogo"
     return image
   }()
 
@@ -61,6 +62,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
     label.text = NSLocalizedString("brand_des", comment: "")
     label.font = UIFont.systemFont(ofSize: 20.0)
     label.textColor = UIColor(hexString: "333333")
+    label.accessibilityIdentifier = "id.aboutApp"
     return label
   }()
 

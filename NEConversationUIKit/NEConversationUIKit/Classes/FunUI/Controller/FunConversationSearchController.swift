@@ -20,7 +20,7 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
     super.viewDidLoad()
     view.backgroundColor = .funConversationBackgroundColor
     navigationController?.isNavigationBarHidden = true
-    customNavigationView.isHidden = true
+    navigationView.isHidden = true
     emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
@@ -73,7 +73,10 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0
     }
-    searchTextField.becomeFirstResponder()
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+      self?.searchTextField.becomeFirstResponder()
+    }))
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

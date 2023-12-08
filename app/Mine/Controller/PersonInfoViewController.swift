@@ -2,11 +2,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
+import NEChatUIKit
 import NECoreKit
 import NETeamUIKit
-import NEChatUIKit
 import NIMSDK
+import UIKit
 
 @objcMembers
 class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
@@ -29,11 +29,11 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
 
   func initialConfig() {
     title = NSLocalizedString("person_info", comment: "")
-    customNavigationView.navTitle.text = title
+    navigationView.navTitle.text = title
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
-      customNavigationView.backgroundColor = .ne_backgroundColor
+      navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
     } else {
       view.backgroundColor = .funChatBackgroundColor
@@ -68,16 +68,19 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
       selectValue(0)
     }
     first.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
+    first.accessibilityIdentifier = "id.action1"
 
     let second = UIAlertAction(title: secondContent, style: .default) { action in
       selectValue(1)
     }
     second.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
+    second.accessibilityIdentifier = "id.action2"
 
     let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""),
                                style: .cancel)
 
     cancel.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
+    cancel.accessibilityIdentifier = "id.action3"
 
     alert.addAction(first)
     alert.addAction(second)
@@ -151,7 +154,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   // MARK: NIMUserManagerDelegate
 
   func onUserInfoChanged(_ user: NIMUser) {
-    if user.userId == IMKitClient.instance.imAccid {
+    if user.userId == IMKitClient.instance.imAccid() {
       viewModel.getData()
       tableView.reloadData()
     }
@@ -177,7 +180,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
     view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
       let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitClient.instance.imAccid)
+        .appending(IMKitClient.instance.imAccid())
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         NIMSDK.shared().resourceManager

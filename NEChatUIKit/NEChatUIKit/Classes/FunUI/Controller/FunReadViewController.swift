@@ -12,7 +12,7 @@ open class FunReadViewController: NEBaseReadViewController {
   override public func commonUI() {
     super.commonUI()
     navigationController?.navigationBar.backgroundColor = .white
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
 
     readButton.setTitleColor(UIColor.funChatThemeColor, for: .normal)
     line.backgroundColor = UIColor.funChatThemeColor

@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 import NIMSDK
@@ -217,8 +218,8 @@ public class NotificationMessageUtils: NSObject {
   }
 
   public class func teamType(message: NIMMessage) -> TeamType {
-    let team = TeamProvider.shared.teamInfo(teamId: message.session?.sessionId)
-    if team?.type == .normalTeam || (team?.type == .advancedTeam && team?.nimTeam?.clientCustomInfo?.contains(discussTeamKey) == true) {
+    let team = TeamProvider.shared.getTeam(teamId: message.session?.sessionId ?? "")
+    if team?.isDisscuss() == true {
       return .discussTeam
     } else {
       return .advanceTeam

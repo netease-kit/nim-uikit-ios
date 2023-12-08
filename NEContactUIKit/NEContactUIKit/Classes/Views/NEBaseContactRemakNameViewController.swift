@@ -49,11 +49,12 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
 
   func setupUI() {
     title = localizable("noteName")
-    customNavigationView.navTitle.text = title
-    view.backgroundColor = UIColor(hexString: "F2F4F5")
+    navigationView.navTitle.text = title
+    view.backgroundColor = .ne_lightBackgroundColor
 
-    customNavigationView.setMoreButtonTitle(localizable("save"))
-    customNavigationView.addMoreButtonTarget(target: self, selector: #selector(saveAlias))
+    navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.addMoreButtonTarget(target: self, selector: #selector(saveAlias))
+    navigationView.backgroundColor = .ne_lightBackgroundColor
 
     view.addSubview(aliasInput)
     aliasInput.placeholder = localizable("input_noteName")

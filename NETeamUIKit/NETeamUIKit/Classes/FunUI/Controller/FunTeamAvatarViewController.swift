@@ -23,8 +23,8 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
 
     navigationController?.navigationBar.backgroundColor = .white
     addRightAction(localizable("save"), #selector(savePhoto), self, .funTeamThemeColor)
-    customNavigationView.backgroundColor = .white
-    customNavigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
+    navigationView.backgroundColor = .white
+    navigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
 
     view.backgroundColor = .funTeamBackgroundColor
 
@@ -75,7 +75,9 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
   }
 
   override open func uploadPhoto() {
-    showCustomBottomAlert(self)
+    if changePermission() {
+      showCustomBottomAlert(self)
+    }
   }
 
   override open func collectionView(_ collectionView: UICollectionView,

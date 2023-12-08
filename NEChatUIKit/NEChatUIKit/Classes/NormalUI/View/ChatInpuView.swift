@@ -24,7 +24,7 @@ open class ChatInputView: NEBaseChatInputView {
     let imageNamesSelected = ["mic_selected", "emoji_selected", "photo", "add_selected"]
 
     var items = [UIButton]()
-    for i in 0 ... 3 {
+    for i in 0 ..< imageNames.count {
       let button = UIButton(type: .custom)
       button.setImage(UIImage.ne_imageNamed(name: imageNames[i]), for: .normal)
       button.setImage(UIImage.ne_imageNamed(name: imageNamesSelected[i]), for: .selected)
@@ -33,6 +33,10 @@ open class ChatInputView: NEBaseChatInputView {
       button.tag = i + 5
       button.accessibilityIdentifier = "id.chatMessageActionItemBtn"
       items.append(button)
+    }
+
+    if let chatInputBar = NEKitChatConfig.shared.ui.chatInputBar {
+      chatInputBar(&items)
     }
 
     stackView = UIStackView(arrangedSubviews: items)

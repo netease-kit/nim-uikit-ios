@@ -12,11 +12,11 @@ open class TeamNameViewController: NEBaseTeamNameViewController {
   override open func setupUI() {
     super.setupUI()
     view.backgroundColor = .ne_lightBackgroundColor
-    customNavigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
     addRightAction(localizable("save"), #selector(saveName), self)
-    customNavigationView.setBackButtonTitle(localizable("cancel"))
-    customNavigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
+    navigationView.setBackButtonTitle(localizable("cancel"))
+    navigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
 
     backView.layer.cornerRadius = 8.0
     NSLayoutConstraint.activate([

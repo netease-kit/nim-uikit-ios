@@ -11,8 +11,9 @@ import UIKit
 @objcMembers
 open class ConversationController: NEBaseConversationController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    listCtrl = ConversationListViewController()
+    super.init(nibName: nil, bundle: nil)
+    className = "ConversationController"
+    cellRegisterDic = [0: ConversationListCell.self]
   }
 
   public required init?(coder: NSCoder) {
@@ -21,7 +22,7 @@ open class ConversationController: NEBaseConversationController {
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = UIColor(hexString: "#e9eff5")
+    view.backgroundColor = .ne_navLineColor
   }
 
   override func initSystemNav() {
@@ -42,92 +43,22 @@ open class ConversationController: NEBaseConversationController {
     spaceBarItem.width = NEConstant.screenInterval
 
     navigationItem.rightBarButtonItems = [addBarItem, spaceBarItem, searchBarItem]
-    if NEKitConversationConfig.shared.ui.hiddenSearchBtn {
-      navView.searchBtn.isHidden = true
+    if !NEKitConversationConfig.shared.ui.showTitleBarRight2Icon {
+      navigationView.searchBtn.isHidden = true
       navigationItem.rightBarButtonItems = [addBarItem]
     }
-    if NEKitConversationConfig.shared.ui.hiddenRightBtns {
-      navigationItem.rightBarButtonItems = []
-      navView.searchBtn.isHidden = true
-      navView.addBtn.isHidden = true
+    if !NEKitConversationConfig.shared.ui.showTitleBarRightIcon {
+      navigationView.addBtn.isHidden = true
+      navigationItem.rightBarButtonItems = [searchBarItem]
     }
   }
 
   override open func setupSubviews() {
     super.setupSubviews()
-    NSLayoutConstraint.activate([
-      listCtrl.view.topAnchor.constraint(equalTo: navView.bottomAnchor),
-      listCtrl.view.leftAnchor.constraint(equalTo: view.leftAnchor),
-      listCtrl.view.rightAnchor.constraint(equalTo: view.rightAnchor),
-      listCtrl.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ])
-  }
 
-  deinit {}
+    popListController = PopListViewController()
 
-  // MARK: lazyMethod
-
-  public lazy var popListController: PopListViewController = {
-    let popController = PopListViewController()
-    return popController
-  }()
-}
-
-extension ConversationController {
-  override open func searchAction() {
-    Router.shared.use(
-      SearchContactPageRouter,
-      parameters: ["nav": navigationController as Any],
-      closure: nil
-    )
-  }
-
-  override open func didClickAddBtn() {
-    print("add click")
-
-    if children.contains(popListController) == false {
-      popListController.itemDatas = getPopListItems()
-      addChild(popListController)
-      popListController.view.frame = listCtrl.view.frame
-    }
-    if popListController.view.superview != nil {
-      popListController.removeSelf()
-    } else {
-      view.addSubview(popListController.view)
-    }
-  }
-
-  open func getPopListItems() -> [PopListItem] {
-    weak var weakSelf = self
-    var items = [PopListItem]()
-    let addFriend = PopListItem()
-    addFriend.showName = localizable("add_friend")
-    addFriend.image = UIImage.ne_imageNamed(name: "add_friend")
-    addFriend.completion = {
-      Router.shared.use(
-        ContactAddFriendRouter,
-        parameters: ["nav": self.navigationController as Any]
-      ) { obj, routerState, str in
-      }
-    }
-    items.append(addFriend)
-
-    let createGroup = PopListItem()
-    createGroup.showName = localizable("create_discussion_group")
-    createGroup.image = UIImage.ne_imageNamed(name: "create_discussion")
-    createGroup.completion = {
-      weakSelf?.createDiscussGroup()
-    }
-    items.append(createGroup)
-
-    let createDicuss = PopListItem()
-    createDicuss.showName = localizable("create_senior_group")
-    createDicuss.image = UIImage.ne_imageNamed(name: "create_group")
-    createDicuss.completion = {
-      weakSelf?.createSeniorGroup()
-    }
-    items.append(createDicuss)
-
-    return items
+    tableView.rowHeight = 62
+    tableView.backgroundColor = .white
   }
 }

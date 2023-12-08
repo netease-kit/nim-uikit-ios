@@ -81,16 +81,16 @@ open class FunGroupChatViewController: FunChatViewController, TeamChatViewModelD
     title = team.getShowName()
     if team.inAllMuteMode(), team.owner != NIMSDK.shared().loginManager.currentAccount() {
       // 群禁言
-      menuView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
-      menuView.textView.backgroundColor = .funChatInputViewBackgroundColorInMute
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
+      chatInputView.textView.backgroundColor = .funChatInputViewBackgroundColorInMute
       layoutInputView(offset: 0)
       getFunInputView()?.hideRecordMode()
-      menuView.isUserInteractionEnabled = false
+      chatInputView.isUserInteractionEnabled = false
     } else {
       // 解除群禁言
-      menuView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
-      menuView.textView.backgroundColor = .white
-      menuView.isUserInteractionEnabled = true
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
+      chatInputView.textView.backgroundColor = .white
+      chatInputView.isUserInteractionEnabled = true
     }
   }
 
@@ -98,7 +98,7 @@ open class FunGroupChatViewController: FunChatViewController, TeamChatViewModelD
 
   open func onTeamRemoved(team: NIMTeam) {
     // 退出讨论组
-    if team.clientCustomInfo?.contains(discussTeamKey) == true {
+    if team.isDisscuss() == true {
       navigationController?.popViewController(animated: true)
       return
     }

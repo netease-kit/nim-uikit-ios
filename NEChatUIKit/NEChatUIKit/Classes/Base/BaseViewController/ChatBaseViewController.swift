@@ -10,7 +10,7 @@ import UIKit
 @objcMembers
 open class ChatBaseViewController: UIViewController, UIGestureRecognizerDelegate {
   var topConstant: CGFloat = 0
-  public let customNavigationView = NENavigationView()
+  public let navigationView = NENavigationView()
 
   override open var title: String? {
     get {
@@ -19,16 +19,16 @@ open class ChatBaseViewController: UIViewController, UIGestureRecognizerDelegate
 
     set {
       super.title = newValue
-      customNavigationView.navTitle.text = newValue
+      navigationView.navTitle.text = newValue
     }
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.interactivePopGestureRecognizer?.delegate = self
-    view.backgroundColor = NEKitChatConfig.shared.ui.chatViewBackground ?? .white
+    view.backgroundColor = NEKitChatConfig.shared.ui.messageProperties.chatViewBackground ?? .white
 
-    if !NEKitChatConfig.shared.ui.showTitleBar {
+    if !NEKitChatConfig.shared.ui.messageProperties.showTitleBar {
       navigationController?.isNavigationBarHidden = true
       return
     }
@@ -40,15 +40,15 @@ open class ChatBaseViewController: UIViewController, UIGestureRecognizerDelegate
     } else {
       navigationController?.isNavigationBarHidden = true
       topConstant = NEConstant.navigationAndStatusHeight
-      customNavigationView.translatesAutoresizingMaskIntoConstraints = false
-      customNavigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
-      customNavigationView.addMoreButtonTarget(target: self, selector: #selector(toSetting))
-      view.addSubview(customNavigationView)
+      navigationView.translatesAutoresizingMaskIntoConstraints = false
+      navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
+      navigationView.addMoreButtonTarget(target: self, selector: #selector(toSetting))
+      view.addSubview(navigationView)
       NSLayoutConstraint.activate([
-        customNavigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        customNavigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-        customNavigationView.topAnchor.constraint(equalTo: view.topAnchor),
-        customNavigationView.heightAnchor.constraint(equalToConstant: topConstant),
+        navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+        navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+        navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+        navigationView.heightAnchor.constraint(equalToConstant: topConstant),
       ])
     }
   }

@@ -16,9 +16,13 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
   override open func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("add_friend")
-    customNavigationView.navTitle.text = title
+    navigationView.navTitle.text = title
     emptyView.settingContent(content: localizable("user_not_exist"))
     setupUI()
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.52, execute: DispatchWorkItem(block: { [weak self] in
+      self?.searchInput.becomeFirstResponder()
+    }))
   }
 
   open func setupUI() {
@@ -75,8 +79,9 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
     view.addSubview(emptyView)
     NSLayoutConstraint.activate([
       emptyView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      emptyView.topAnchor.constraint(equalTo: searchInput.bottomAnchor, constant: 74),
-      // emptyView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+      emptyView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+      emptyView.widthAnchor.constraint(equalToConstant: 200),
+      emptyView.heightAnchor.constraint(equalToConstant: 200),
     ])
   }
 

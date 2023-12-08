@@ -27,7 +27,7 @@ public class TeamInfoViewModel: NSObject {
     intrCell.type = SettingCellType.SettingArrowCell.rawValue
     intrCell.cornerType = .bottomLeft.union(.bottomRight)
 
-    if let type = team?.type, type == .normal || (type == .advanced && team?.clientCustomInfo?.contains(discussTeamKey) == true) {
+    if team?.isDisscuss() == true {
       headerCell.cellName = localizable("discuss_avatar")
       nameCell.cellName = localizable("discuss_name")
       intrCell.cellName = localizable("discuss_intro")

@@ -1217,19 +1217,16 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
     return model
   }
 
-  private func getUserInfo(_ userId: String, _ completion: @escaping (User?, NSError?) -> Void) {
+  public func getUserInfo(_ userId: String, _ completion: @escaping (User?, NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + userId)
-    if let user = userInfo[userId] {
+    if let user = newUserInfoDic[userId] {
       completion(user, nil)
-    }
-    if let user = repo.getUserInfo(userId: userId) {
-      userInfo[userId] = user
-      completion(user, nil)
+      return
     }
 
     UserInfoProvider.shared.fetchUserInfo([userId]) { [weak self] error, users in
       if let user = users?.first {
-        self?.userInfo[userId] = user
+        self?.newUserInfoDic[userId] = user
         completion(user, nil)
       } else {
         completion(nil, error)

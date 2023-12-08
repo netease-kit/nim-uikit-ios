@@ -13,7 +13,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override public init(session: NIMSession) {
     super.init(session: session)
-    registerCellDic = [
+    cellRegisterDic = [
       "\(MessageType.text.rawValue)": FunChatMessageTextCell.self,
       "\(MessageType.rtcCallRecord.rawValue)": FunChatMessageCallCell.self,
       "\(MessageType.audio.rawValue)": FunChatMessageAudioCell.self,
@@ -27,8 +27,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     ]
 
     normalInputHeight = 90
-    networkToolHeight = 48
-    customNavigationView.bottomLine.backgroundColor = .funChatNavigationBottomLineColor
+    brokenNetworkViewHeight = 48
+    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
   }
 
   public required init?(coder: NSCoder) {
@@ -38,16 +38,11 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
-    view.bringSubviewToFront(menuView)
+    view.bringSubviewToFront(chatInputView)
     brokenNetworkView.errorIcon.isHidden = false
     brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
     brokenNetworkView.content.textColor = .funChatNetworkBrokenTitleColor
     getFunInputView()?.funDelegate = self
-  }
-
-  override open func didLongTouchMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    super.didLongTouchMessageView(cell, model)
-    operationView?.layer.cornerRadius = 8
   }
 
   override open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -106,7 +101,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   public func didShowReplyMode() {
     viewmodel.isReplying = true
-    menuView.textView.becomeFirstResponder()
+    chatInputView.textView.becomeFirstResponder()
   }
 
   override open func expandMoreAction() {
@@ -118,12 +113,12 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     photo.customDelegate = self
     photo.action = #selector(openPhoto)
     items.insert(photo, at: 0)
-    menuView.chatAddMoreView.configData(data: items)
+    chatInputView.chatAddMoreView.configData(data: items)
   }
 
   func openPhoto() {
     NELog.infoLog(className(), desc: "open photo")
-    willSelectItem(button: menuView.currentButton, index: showPhotoTag)
+    willSelectItem(button: chatInputView.currentButton, index: showPhotoTag)
   }
 
   override open func showRtcCallAction() {
@@ -148,22 +143,26 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func forwardMessage() {
     if let message = viewmodel.operationModel?.message {
-      weak var weakSelf = self
-      let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) {
-        weakSelf?.forwardMessageToUser(message: message)
-      }
+      if IMKitClient.instance.getConfigCenter().teamEnable {
+        weak var weakSelf = self
+        let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) {
+          weakSelf?.forwardMessageToUser(message: message)
+        }
 
-      let teamAction = NECustomAlertAction(title: chatLocalizable("team")) {
-        weakSelf?.forwardMessageToTeam(message: message)
-      }
+        let teamAction = NECustomAlertAction(title: chatLocalizable("team")) {
+          weakSelf?.forwardMessageToTeam(message: message)
+        }
 
-      showCustomActionSheet([teamAction, userAction])
+        showCustomActionSheet([teamAction, userAction])
+      } else {
+        forwardMessageToUser(message: message)
+      }
     }
   }
 
   /// 设置按钮点击事件
   override open func toSetting() {
-    if let block = NEKitChatConfig.shared.ui.titleBarRightClick {
+    if let block = NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick {
       block()
       return
     }
@@ -175,8 +174,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         closure: nil
       )
     } else if viewmodel.session.sessionType == .P2P {
-      let userSetting = FunUserSettingViewController()
-      userSetting.userId = viewmodel.session.sessionId
+      let userSetting = FunUserSettingViewController(userId: viewmodel.session.sessionId)
       navigationController?.pushViewController(userSetting, animated: true)
     }
   }
@@ -287,7 +285,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   func getFunInputView() -> FunChatInputView? {
-    if let funInput = menuView as? FunChatInputView {
+    if let funInput = inputView as? FunChatInputView {
       return funInput
     }
     return nil
@@ -346,15 +344,15 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         default:
           text += "[\(chatLocalizable("msg_unknown"))]"
         }
-        replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
-                                                                          font: .systemFont(ofSize: 13),
-                                                                          color: .ne_greyText)
+        getFunInputView()?.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
+                                                                                   font: .systemFont(ofSize: 13),
+                                                                                   color: .ne_greyText)
       }
-      if menuView.textView.isFirstResponder {
+      if chatInputView.textView.isFirstResponder {
         normalOffset = -10
         layoutInputView(offset: currentKeyboardHeight)
       } else {
-        menuView.textView.becomeFirstResponder()
+        chatInputView.textView.becomeFirstResponder()
       }
     }
   }

@@ -52,6 +52,11 @@ public class NEChatUIKitClient: NSObject {
         more.append(model)
       }
     }
+
+    if let chatInputMenu = NEKitChatConfig.shared.ui.chatInputMenu {
+      chatInputMenu(&more)
+    }
+
     return more
   }
 

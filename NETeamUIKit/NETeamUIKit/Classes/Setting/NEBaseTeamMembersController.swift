@@ -9,7 +9,7 @@ import UIKit
 @objcMembers
 open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  public var viewmodel: TeamSettingViewModel?
+  public var teamId: String?
 
   public var datas: [TeamMemberInfoModel]?
 
@@ -62,9 +62,9 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     return view
   }()
 
-  init(viewmodel: TeamSettingViewModel? = nil) {
+  public init(teamId: String?) {
     super.init(nibName: nil, bundle: nil)
-    self.viewmodel = viewmodel
+    self.teamId = teamId
   }
 
   public required init?(coder: NSCoder) {
@@ -72,7 +72,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   }
 
   override open func viewWillAppear(_ animated: Bool) {
-    viewmodel?.getTeamInfo(viewmodel?.teamInfoModel?.team?.teamId ?? "") { [weak self] error in
+    TeamRepo.shared.fetchTeamInfo(teamId ?? "") { [weak self] error, teamModel in
       if let err = error as? NSError {
         if err.code == 803 || err.code == 1 {
           self?.showToast(localizable("team_not_exist"))
@@ -80,7 +80,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
           self?.showToast(err.localizedDescription)
         }
       } else {
-        self?.datas = self?.viewmodel?.teamInfoModel?.users
+        self?.datas = teamModel?.users
         self?.contentTable.reloadData()
       }
     }
@@ -89,7 +89,12 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   override open func viewDidLoad() {
     super.viewDidLoad()
 
-    // Do any additional setup after loading the view.
+    let team = TeamProvider.shared.getTeam(teamId: teamId ?? "")
+    ownerId = team?.owner
+    if team?.isDisscuss() == false {
+      isSenior = true
+    }
+
     setupUI()
   }
 

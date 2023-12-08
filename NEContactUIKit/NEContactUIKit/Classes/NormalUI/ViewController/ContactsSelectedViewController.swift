@@ -12,7 +12,7 @@ open class ContactsSelectedViewController: NEBaseContactsSelectedViewController 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     customCells = [ContactCellType.ContactPerson.rawValue: ContactSelectedCell.self]
     view.backgroundColor = .ne_backcolor
-    customNavigationView.backgroundColor = .white
+    navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 
@@ -32,8 +32,8 @@ open class ContactsSelectedViewController: NEBaseContactsSelectedViewController 
 
   override open func setupNavRightItem() {
     super.setupNavRightItem()
-    customNavigationView.moreButton.backgroundColor = .white
-    customNavigationView.moreButton.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
+    navigationView.moreButton.backgroundColor = .white
+    navigationView.moreButton.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
     sureBtn.backgroundColor = .white
     sureBtn.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
   }

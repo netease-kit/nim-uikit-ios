@@ -13,8 +13,8 @@ open class FunTeamNameViewController: NEBaseTeamNameViewController {
     view.backgroundColor = .funTeamBackgroundColor
     navigationController?.navigationBar.backgroundColor = .funTeamBackgroundColor
     addRightAction(localizable("save"), #selector(saveName), self, .funTeamThemeColor)
-    customNavigationView.backgroundColor = .funTeamBackgroundColor
-    customNavigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
+    navigationView.backgroundColor = .funTeamBackgroundColor
+    navigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
 
     NSLayoutConstraint.activate([
       backView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
@@ -41,14 +41,14 @@ open class FunTeamNameViewController: NEBaseTeamNameViewController {
   override open func disableSubmit() {
     rightNavBtn.setTitleColor(.funTeamThemeDisableColor, for: .normal)
     rightNavBtn.isEnabled = false
-    customNavigationView.moreButton.setTitleColor(.funTeamThemeDisableColor, for: .normal)
-    customNavigationView.moreButton.isEnabled = false
+    navigationView.moreButton.setTitleColor(.funTeamThemeDisableColor, for: .normal)
+    navigationView.moreButton.isEnabled = false
   }
 
   override open func enableSubmit() {
     rightNavBtn.setTitleColor(.funTeamThemeColor, for: .normal)
     rightNavBtn.isEnabled = true
-    customNavigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
-    customNavigationView.moreButton.isEnabled = true
+    navigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
+    navigationView.moreButton.isEnabled = true
   }
 }

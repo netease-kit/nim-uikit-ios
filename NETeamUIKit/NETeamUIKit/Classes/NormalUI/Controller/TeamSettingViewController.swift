@@ -12,7 +12,7 @@ import UIKit
 open class TeamSettingViewController: NEBaseTeamSettingViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    customNavigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
     className = "TeamSettingViewController"
     cellClassDic = [
@@ -234,8 +234,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   // MARK: objc 方法
 
   override open func toInfoView() {
-    let info = TeamInfoViewController()
-    info.team = viewmodel.teamInfoModel?.team
+    let info = TeamInfoViewController(team: viewmodel.teamInfoModel?.team)
     navigationController?.pushViewController(info, animated: true)
   }
 
@@ -279,12 +278,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   }
 
   override open func toMemberList() {
-    let memberController = TeamMembersController(viewmodel: viewmodel)
-    memberController.datas = viewmodel.teamInfoModel?.users
-    if teamSettingType == .Senior {
-      memberController.isSenior = true
-    }
-    memberController.ownerId = viewmodel.teamInfoModel?.team?.owner
+    let memberController = TeamMembersController(teamId: viewmodel.teamInfoModel?.team?.teamId)
     navigationController?.pushViewController(memberController, animated: true)
   }
 }

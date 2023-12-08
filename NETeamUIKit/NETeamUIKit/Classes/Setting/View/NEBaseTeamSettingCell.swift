@@ -25,6 +25,7 @@ open class NEBaseTeamSettingCell: CornerCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEConstant.hexRGB(0x333333)
     label.font = NEConstant.defaultTextFont(16.0)
+    label.accessibilityIdentifier = "id.titleLabel"
     return label
   }()
 

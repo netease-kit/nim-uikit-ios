@@ -36,9 +36,9 @@ open class ConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.avatarType == .rectangle {
-      headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.avatarCornerRadius
-    } else if NEKitConversationConfig.shared.ui.avatarType == .cycle {
+    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .rectangle {
+      headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
+    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
       headImge.layer.cornerRadius = 21.0
     } else {
       headImge.layer.cornerRadius = 21.0
@@ -52,9 +52,9 @@ open class ConversationListCell: NEBaseConversationListCell {
     if let session = sessionModel?.recentSession?.session {
       let isTop = topStickInfos[session] != nil
       if isTop {
-        contentView.backgroundColor = UIColor(hexString: "0xF3F5F7")
+        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
       } else {
-        contentView.backgroundColor = .white
+        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
       }
     }
   }

@@ -210,7 +210,6 @@ extension InputEmoticonContainerView {
           catalogID: id,
           delegate: self
         )
-        button.accessibilityIdentifier = "id.emoji"
         rowIndex = indexInPage / layout.columes
         coloumnIndex = indexInPage % layout.columes
         let x = coloumnIndex * Int(layout.cellWidth) + startX
