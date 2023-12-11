@@ -6,7 +6,7 @@
 public struct AppKey {
     #if DEBUG
     public static let pushCerName = "<#请输入推送证书#>"
-    public static let appKey = "<#请输入appkey#>"
+    public static let appKey = "3e215d27b6a6a9e27dad7ef36dd5b65c"
     public static let gaodeMapAppkey = "<#输入高德地图key#>"
     #else
     public static let pushCerName = "<#请输入推送证书#>"

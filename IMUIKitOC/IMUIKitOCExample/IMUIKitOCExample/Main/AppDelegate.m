@@ -8,11 +8,12 @@
 #import "AppKey.h"
 #import "NETabbarController.h"
 
+#import <NECoreKit/NECoreKit-Swift.h>
+#import <NECoreIMKit/NECoreIMKit-Swift.h>
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
-#import <NECoreIMKit/NECoreIMKit-Swift.h>
-#import <NECoreKit/NECoreKit-Swift.h>
+#import <NETeamUIKit/NETeamUIKit-Swift.h>
 //#import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 #import "CustomRouterViewController.h"
 
@@ -44,7 +45,7 @@
     [[IMKitClient instance] setupCoreKitIM:option];
     
     // 登录IM之前先初始化 @ 消息监听mananger
-    NEAtMessageManager * _ = [NEAtMessageManager instance];
+    [NEAtMessageManager setupInstance];
     
     [[IMKitClient instance] loginIM:@"imaccid" :@"imToken" :^(NSError * _Nullable error) {
         if (error != nil) {
@@ -65,6 +66,7 @@
   [ChatRouter register];
   [ConversationRouter register];
   [ContactRouter register];
+  [TeamRouter register];
 
   [[Router shared] register:@"imkit://chat/p2pChat.page"
                     closure:^(NSDictionary<NSString *, id> *_Nonnull param) {

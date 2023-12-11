@@ -10,10 +10,10 @@ target 'app' do
   pod 'YXLogin', '1.0.0'
   
   #可选UI库
-  pod 'NEContactUIKit', '9.6.5'
-  pod 'NEConversationUIKit', '9.6.5'
-  pod 'NEChatUIKit', '9.6.5'
-  pod 'NETeamUIKit', '9.6.5'
+#  pod 'NEContactUIKit', '9.6.5'
+#  pod 'NEConversationUIKit', '9.6.5'
+#  pod 'NEChatUIKit', '9.6.5'
+#  pod 'NETeamUIKit', '9.6.5'
 
   #可选Kit库（和UIKit对应）
   pod 'NEChatKit', '9.6.5'
@@ -26,21 +26,22 @@ target 'app' do
   pod 'NECoreKit', '9.6.5'
 
   #扩展库
-  pod 'NEMapKit', '9.6.5'
+#  pod 'NEMapKit', '9.6.5'
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
+  pod 'NIMSDK_LITE','9.14.0'
   pod 'NERtcCallKit/NOS_Special', '2.2.0'
-  pod 'NERtcCallUIKit/NOS_Special', '2.2.0'
+#  pod 'NERtcCallUIKit/NOS_Special', '2.2.0'
   pod 'NERtcSDK', '5.5.2'
 
 
   # # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-  # pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
-  # pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
-  # pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
-  # pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
-  # pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
-  # pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
+   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
+   pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
+   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
+   pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
+   pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
+   pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
 
 
 end
@@ -50,7 +51,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
     end
   end
 end

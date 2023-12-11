@@ -33,14 +33,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
     func setupInit(){
         
-        // init
+        // 初始化NIMSDK
         let option = NIMSDKOption()
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
         
-        let account = "<#account#>"
-        let token = "<#token#>"
+        // 登录IM之前先初始化 @ 消息监听mananger
+        NEAtMessageManager.setupInstance()
+        
+        let account = "chenyu3"
+        let token = "123456"
         
         weak var weakSelf = self
         IMKitClient.instance.loginIM(account, token) { error in
