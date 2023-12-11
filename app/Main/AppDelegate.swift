@@ -42,8 +42,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // 登录IM之前先初始化 @ 消息监听mananger
         NEAtMessageManager.setupInstance()
         
-        let account = "chenyu3"
-        let token = "123456"
+        let account = "<#account#>"
+        let token = "<#token#>"
         
         weak var weakSelf = self
         IMKitClient.instance.loginIM(account, token) { error in
