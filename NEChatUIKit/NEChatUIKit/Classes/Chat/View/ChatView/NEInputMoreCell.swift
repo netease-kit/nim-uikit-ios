@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class NEInputMoreCell: UICollectionViewCell {
+open class NEInputMoreCell: UICollectionViewCell {
   public var cellData: NEMoreItemModel?
 
   override init(frame: CGRect) {
@@ -14,7 +14,7 @@ public class NEInputMoreCell: UICollectionViewCell {
     setupViews()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
@@ -51,6 +51,7 @@ public class NEInputMoreCell: UICollectionViewCell {
     title.font = UIFont.systemFont(ofSize: 10)
     title.textAlignment = .center
     title.translatesAutoresizingMaskIntoConstraints = false
+    title.accessibilityIdentifier = "id.menuIcon"
     return title
   }()
 

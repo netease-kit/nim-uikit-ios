@@ -75,11 +75,8 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     contentImageViewRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
     if let m = model as? MessageImageModel, let imageUrl = m.imageUrl {
@@ -92,7 +89,8 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
           completed: nil
         )
       } else {
-        contentImageView.image = UIImage(contentsOfFile: imageUrl)
+        let url = URL(fileURLWithPath: imageUrl)
+        contentImageView.sd_setImage(with: url)
       }
     } else {
       contentImageView.image = nil

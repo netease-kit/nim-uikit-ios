@@ -11,7 +11,7 @@ public protocol MessageOperationViewDelegate: AnyObject {
 }
 
 @objcMembers
-public class MessageOperationView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
+open class MessageOperationView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   var collcetionView: UICollectionView
   public weak var delegate: MessageOperationViewDelegate?
   public var items = [OperationItem]() {
@@ -56,19 +56,19 @@ public class MessageOperationView: UIView, UICollectionViewDataSource, UICollect
     addSubview(collcetionView)
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
 //    MARK: UICollectionViewDataSource
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             numberOfItemsInSection section: Int) -> Int {
+  open func collectionView(_ collectionView: UICollectionView,
+                           numberOfItemsInSection section: Int) -> Int {
     items.count
   }
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  open func collectionView(_ collectionView: UICollectionView,
+                           cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: "\(OperationCell.self)",
       for: indexPath
@@ -80,8 +80,8 @@ public class MessageOperationView: UIView, UICollectionViewDataSource, UICollect
 
 //    MARK: UICollectionViewDelegate
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             didSelectItemAt indexPath: IndexPath) {
+  open func collectionView(_ collectionView: UICollectionView,
+                           didSelectItemAt indexPath: IndexPath) {
     removeFromSuperview()
     delegate?.didSelectedItem(item: items[indexPath.row])
   }

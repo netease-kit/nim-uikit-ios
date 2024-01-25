@@ -7,18 +7,7 @@ import UIKit
 
 @objcMembers
 open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
-  override public func configure(_ anyModel: Any) {
+  override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
     if let icon = model?.rightCustomViewIcon, icon.count > 0 {
       customRightView.isHidden = false
@@ -54,7 +43,7 @@ open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
     return btn
   }()
 
-  public func customRightViewClick() {
+  open func customRightViewClick() {
     if let block = model?.customViewClick {
       block()
     }

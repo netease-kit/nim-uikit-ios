@@ -27,7 +27,7 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
     return label
   }()
 
-  override public func setSelected(_ selected: Bool, animated: Bool) {
+  override open func setSelected(_ selected: Bool, animated: Bool) {
     super.setSelected(selected, animated: animated)
 
     // Configure the view for the selected state
@@ -61,7 +61,7 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
   }
 
   open func configure(_ model: ChatTeamMemberInfoModel) {
-    if let url = model.nimUser?.userInfo?.avatarUrl {
+    if let url = model.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {

@@ -10,7 +10,7 @@ open class NEBaseConversationNavigationController: UIViewController, UIGestureRe
   var topConstant: CGFloat = 0
   public let navigationView = NENavigationView()
 
-  override open var title: String? {
+  override public var title: String? {
     get {
       super.title
     }

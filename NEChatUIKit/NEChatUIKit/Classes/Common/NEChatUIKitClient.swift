@@ -8,7 +8,7 @@ import UIKit
 
 @objc
 @objcMembers
-public class NEChatUIKitClient: NSObject {
+open class NEChatUIKitClient: NSObject {
   public static let instance = NEChatUIKitClient()
   private var customRegisterDic = [String: UITableViewCell.Type]()
   public var moreAction = [NEMoreItemModel]()
@@ -43,7 +43,7 @@ public class NEChatUIKitClient: NSObject {
 
   /// 获取更多面板数据
   /// - Returns: 返回更多操作数据
-  public func getMoreActionData(sessionType: NIMSessionType) -> [NEMoreItemModel] {
+  open func getMoreActionData(sessionType: NIMSessionType) -> [NEMoreItemModel] {
     var more = [NEMoreItemModel]()
     moreAction.forEach { model in
       if model.type != .rtc {
@@ -61,13 +61,13 @@ public class NEChatUIKitClient: NSObject {
   }
 
   /// 新增聊天页针对自定义消息的cell扩展，以及现有cell样式覆盖
-  public func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
+  open func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
     registerDic.forEach { (key: String, value: UITableViewCell.Type) in
       customRegisterDic[key] = value
     }
   }
 
-  public func getRegisterCustomCell() -> [String: UITableViewCell.Type] {
+  open func getRegisterCustomCell() -> [String: UITableViewCell.Type] {
     customRegisterDic
   }
 }

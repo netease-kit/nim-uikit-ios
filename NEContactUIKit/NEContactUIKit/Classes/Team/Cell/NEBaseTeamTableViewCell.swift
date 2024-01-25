@@ -69,8 +69,8 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
 //        ])
   }
 
-  public func setModel(_ model: Any) {
-    guard let team = model as? Team else {
+  open func setModel(_ model: Any) {
+    guard let team = model as? NETeam else {
       return
     }
     guard let name = team.teamName else {
@@ -78,7 +78,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     }
     titleLabel.text = name
 //        self.nameLabel.text = name.count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
-    if let url = team.thumbAvatarUrl {
+    if let url = team.thumbAvatarUrl, !url.isEmpty {
       avatarImage.sd_setImage(with: URL(string: url), completed: nil)
       avatarImage.backgroundColor = .clear
     } else {

@@ -123,11 +123,8 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     ])
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
     let timeView = isSend ? timeViewRight : timeViewLeft
     let timeLabel = isSend ? timeLabelRight : timeLabelLeft

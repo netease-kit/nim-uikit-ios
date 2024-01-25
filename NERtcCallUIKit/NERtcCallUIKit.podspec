@@ -17,45 +17,11 @@ Pod::Spec.new do |s|
   s.source = { :http => "" }
   s.source_files = 'NERtcCallUIKit/Classes/**/*'
   s.resource = 'NERtcCallUIKit/Assets/**/*'
-
-  s.subspec 'NOS' do |nos|
-    nos.dependency 'NERtcCallKit/NOS','2.2.0'
-    nos.dependency 'SDWebImage'
-    nos.dependency 'NECoreKit','9.6.5'
-    nos.dependency 'NECommonKit'
-    nos.dependency 'NECommonUIKit'
-    nos.dependency 'NERtcSDK'
-  end
-
-  s.subspec 'NOS_Special' do |nos|
-    nos.dependency 'NERtcCallKit/NOS_Special', "2.2.0"
-    nos.dependency 'SDWebImage'
-    nos.dependency 'NECoreKit','9.6.5'
-    nos.dependency 'NECommonKit'
-    nos.dependency 'NECommonUIKit'
-    nos.dependency 'NERtcSDK'
-
-  end
-
-  s.subspec 'FCS' do |fcs|
-    fcs.dependency 'NERtcCallKit/FCS','2.2.0'
-    fcs.dependency 'SDWebImage'
-    fcs.dependency 'NECoreKit','9.6.5'
-    fcs.dependency 'NECommonKit'
-    fcs.dependency 'NECommonUIKit'
-    fcs.dependency 'NERtcSDK'
-
-  end
-
-  s.subspec 'FCS_Special' do |fcs|
-    fcs.dependency 'NERtcCallKit/FCS_Special', "2.2.0"
-    fcs.dependency 'SDWebImage'
-    fcs.dependency 'NECoreKit','9.6.5'
-    fcs.dependency 'NECommonKit'
-    fcs.dependency 'NECommonUIKit'
-    fcs.dependency 'NERtcSDK'
-
-  end
-  s.default_subspecs = 'NOS'
+  s.dependency 'NERtcCallKit/NOS_Special','2.2.0'
+  s.dependency 'SDWebImage'
+  s.dependency 'NECoreKit'
+  s.dependency 'NECommonKit'
+  s.dependency 'NECommonUIKit'
+  s.dependency 'NERtcSDK'
 
 end

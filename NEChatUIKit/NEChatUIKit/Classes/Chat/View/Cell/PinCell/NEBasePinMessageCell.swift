@@ -10,6 +10,7 @@ import UIKit
 @objc
 public protocol PinMessageCellDelegate {
   func didClickMore(_ model: PinMessageModel?)
+  func didClickContent(_ model: PinMessageModel?, _ cell: NEBasePinMessageCell)
 }
 
 @objcMembers
@@ -22,6 +23,8 @@ open class NEBasePinMessageCell: UITableViewCell {
 
   public var delegate: PinMessageCellDelegate?
 
+  public var contentGesture: UITapGestureRecognizer?
+
   lazy var headerView: NEUserHeaderView = {
     let header = NEUserHeaderView(frame: .zero)
     header.titleLabel.font = NEConstant.defaultTextFont(12)
@@ -29,7 +32,6 @@ open class NEBasePinMessageCell: UITableViewCell {
     header.layer.cornerRadius = 16
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
-    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 
@@ -66,6 +68,7 @@ open class NEBasePinMessageCell: UITableViewCell {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     backgroundColor = .clear
+    contentGesture = UITapGestureRecognizer(target: self, action: #selector(contentClick))
     setupUI()
   }
 
@@ -153,20 +156,24 @@ open class NEBasePinMessageCell: UITableViewCell {
     line.backgroundColor = .ne_greyLine
   }
 
-  public func configure(_ item: PinMessageModel) {
+  open func configure(_ item: PinMessageModel) {
     pinModel = item
-    headerView.configHeadData(headUrl: item.chatmodel?.avatar,
-                              name: item.chatmodel?.fullName ?? "",
-                              uid: item.chatmodel?.message?.from ?? "")
-    nameLabel.text = item.chatmodel?.fullName
+    headerView.configHeadData(headUrl: item.chatmodel.avatar,
+                              name: item.chatmodel.fullName ?? "",
+                              uid: item.chatmodel.message?.from ?? "")
+    nameLabel.text = item.chatmodel.fullName
     print("config time : ", item.message.timestamp)
     timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: item.message.timestamp))
 
-    contentWidth?.constant = item.chatmodel?.contentSize.width ?? 0
-    contentHeight?.constant = item.chatmodel?.contentSize.height ?? 0
+    contentWidth?.constant = item.chatmodel.contentSize.width
+    contentHeight?.constant = item.chatmodel.contentSize.height
   }
 
   func moreClick() {
     delegate?.didClickMore(pinModel)
+  }
+
+  open func contentClick() {
+    delegate?.didClickContent(pinModel, self)
   }
 }

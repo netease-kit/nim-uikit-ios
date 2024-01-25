@@ -8,11 +8,11 @@ import NECommonKit
 import NIMSDK
 
 @objcMembers
-class MessageTextModel: MessageContentModel {
+open class MessageTextModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
   public var textHeight: CGFloat = 0
 
-  required init(message: NIMMessage?) {
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .text
 
@@ -41,6 +41,6 @@ class MessageTextModel: MessageContentModel {
 
     textHeight = textSize.height
     contentSize = CGSize(width: textSize.width + chat_content_margin * 2, height: textHeight + chat_content_margin * 2)
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

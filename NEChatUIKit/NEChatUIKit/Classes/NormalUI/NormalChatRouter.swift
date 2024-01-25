@@ -40,7 +40,8 @@ public extension ChatRouter {
         return
       }
       let anchor = param["anchor"] as? NIMMessage
-      var p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+      let p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
           nav?.viewControllers[i] = p2pChatVC
@@ -48,6 +49,11 @@ public extension ChatRouter {
           return
         }
       }
+
+      if let remove = param["removeUserVC"] as? Bool, remove {
+        nav?.viewControllers.removeLast()
+      }
+
       nav?.pushViewController(p2pChatVC, animated: true)
     }
 

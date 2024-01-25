@@ -20,8 +20,29 @@ open class TeamMembersController: NEBaseTeamMembersController {
       for: indexPath
     ) as? TeamMemberCell {
       if let model = getRealModel(indexPath.row) {
+        var isShowRemove = false
+        if isOwner(model.nimUser?.userId) {
+          cell.ownerLabel.isHidden = false
+          cell.ownerLabel.text = localizable("team_owner")
+          cell.ownerWidth?.constant = 40
+        } else if model.teamMember?.type == .manager {
+          cell.ownerLabel.isHidden = false
+          cell.ownerLabel.text = localizable("team_manager")
+          cell.ownerWidth?.constant = 52
+          if isOwner(IMKitClient.instance.imAccid()) {
+            isShowRemove = true
+          }
+        } else {
+          if isOwner(IMKitClient.instance.imAccid()) || viewmodel.currentMember?.type == .manager {
+            isShowRemove = true
+          }
+          cell.ownerLabel.isHidden = true
+        }
+        cell.index = indexPath.row
+        cell.delegate = self
         cell.configure(model)
-        cell.ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
+        cell.removeBtn.isHidden = !isShowRemove
+        cell.removeLabel.isHidden = !isShowRemove
       }
       return cell
     }

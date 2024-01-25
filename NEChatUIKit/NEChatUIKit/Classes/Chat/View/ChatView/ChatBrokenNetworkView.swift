@@ -6,13 +6,13 @@
 import UIKit
 
 @objcMembers
-public class ChatBrokenNetworkView: UIView {
+open class ChatBrokenNetworkView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -32,7 +32,7 @@ public class ChatBrokenNetworkView: UIView {
     label.font = DefaultTextFont(14)
     label.textColor = HexRGB(0xFC596A)
     label.textAlignment = .center
-    label.text = chatLocalizable("network_unavailable")
+    label.text = commonLocalizable("network_error")
     return label
   }()
 }

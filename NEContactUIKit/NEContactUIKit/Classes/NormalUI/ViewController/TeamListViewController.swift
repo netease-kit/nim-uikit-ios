@@ -20,8 +20,8 @@ open class TeamListViewController: NEBaseTeamListViewController {
     tableView.rowHeight = 62
   }
 
-  override public func tableView(_ tableView: UITableView,
-                                 cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override open func tableView(_ tableView: UITableView,
+                               cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(TeamTableViewCell.self))",
       for: indexPath

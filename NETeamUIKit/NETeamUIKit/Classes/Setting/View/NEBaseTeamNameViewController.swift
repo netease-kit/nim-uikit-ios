@@ -10,13 +10,14 @@ import UIKit
 @objcMembers
 open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegate {
   public var team: NIMTeam?
-//    var user: NIMUser?
   public var type = ChangeType.TeamName
   public var teamMember: NIMTeamMember?
   public var repo = TeamRepo.shared
   public let textLimit = 30
 
   public let backView = UIView()
+
+  let viewModel = TeamNameViewModel()
 
   public lazy var countLabel: UILabel = {
     let label = UILabel()
@@ -49,6 +50,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    viewModel.getCurrentUserTeamMember(team?.teamId)
     setupUI()
   }
 
@@ -117,6 +119,9 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     if let mode = team?.updateInfoMode, mode == .all {
       return true
     }
+    if let member = viewModel.currentTeamMember, member.type == .manager {
+      return true
+    }
     return false
   }
 
@@ -136,7 +141,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 
   open func saveName() {
     guard let tid = team?.teamId else {
-      showToast(localizable("team_not_exist"))
+      showToast(localizable("failed_operation"))
       return
     }
 
@@ -163,7 +168,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
       repo.updateTeamName(tid, n) { error in
         weakSelf?.view.hideToastActivity()
         if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+          weakSelf?.showToast(localizable("failed_operation"))
         } else {
           weakSelf?.team?.teamName = n
           weakSelf?.navigationController?.popViewController(animated: true)
@@ -176,7 +181,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 
         weakSelf?.view.hideToastActivity()
         if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+          weakSelf?.showToast(localizable("failed_operation"))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
@@ -204,7 +209,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 
   // MARK: UITextViewDelegate
 
-  public func textViewDidChange(_ textView: UITextView) {
+  open func textViewDidChange(_ textView: UITextView) {
     if let _ = textView.markedTextRange {
       return
     }

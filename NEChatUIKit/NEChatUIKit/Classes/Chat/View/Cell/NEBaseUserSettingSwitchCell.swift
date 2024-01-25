@@ -15,17 +15,6 @@ open class NEBaseUserSettingSwitchCell: NEBaseUserSettingCell {
     return q
   }()
 
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none

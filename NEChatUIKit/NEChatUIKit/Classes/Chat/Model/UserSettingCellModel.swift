@@ -5,13 +5,13 @@
 
 import Foundation
 
-enum UserSettingType: Int {
+public enum UserSettingType: Int {
   case SwitchType = 1
   case SelectType = 2
 }
 
 @objcMembers
-public class UserSettingCellModel: NSObject {
+open class UserSettingCellModel: NSObject {
   typealias SwitchChangeCompletion = (Bool) -> Void
   typealias CellClick = () -> Void
   var cellName: String?

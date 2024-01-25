@@ -24,7 +24,7 @@ public class PersonInfoViewModel: NSObject {
   public let friendProvider = FriendProvider.shared
   public let userProvider = UserInfoProvider.shared
 
-  private var userInfo: User?
+  private var userInfo: NEKitUser?
   weak var delegate: PersonInfoViewModelDelegate?
 
   func getData() {

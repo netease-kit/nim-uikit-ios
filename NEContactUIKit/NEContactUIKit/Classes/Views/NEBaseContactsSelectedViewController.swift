@@ -67,14 +67,13 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
 
   var tableViewTopAnchor: NSLayoutConstraint?
 
-  override open func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    weak var weakSelf = self
-    viewModel.loadData(filterUsers) { error, userSectionCount in
-      weakSelf?.emptyView.isHidden = userSectionCount > 0
-      weakSelf?.tableView.reloadData()
-      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.contacts.count ?? 0) > 0
-    }
+  init(filterUsers: Set<String>? = nil) {
+    super.init(nibName: nil, bundle: nil)
+    self.filterUsers = filterUsers
+  }
+
+  public required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   override open func viewDidLoad() {
@@ -84,6 +83,12 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
     emptyView.settingContent(content: localizable("no_friend"))
     setupUI()
     setupNavRightItem()
+
+    weak var weakSelf = self
+    viewModel.loadData(filterUsers) { error, userSectionCount in
+      weakSelf?.emptyView.isHidden = userSectionCount > 0
+      weakSelf?.tableView.reloadData()
+    }
   }
 
   open func setupUI() {
@@ -176,7 +181,10 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
 
     if let completion = callBack {
       completion(selectArray)
+      navigationController?.popViewController(animated: true)
+      return
     }
+
     var accids = [String]()
     var names = [String]()
 

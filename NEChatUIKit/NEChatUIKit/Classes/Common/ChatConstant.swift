@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEChatKit
 @_exported import NECommonKit
 @_exported import NECommonUIKit
 @_exported import NECoreIMKit
@@ -14,7 +15,7 @@ func chatLocalizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }
 
-func getJSONStringFromDictionary(_ dictionary: [String: Any]) -> String {
+public func getJSONStringFromDictionary(_ dictionary: [String: Any]) -> String {
   if !JSONSerialization.isValidJSONObject(dictionary) {
     print("not parse to json string")
     return ""
@@ -26,7 +27,7 @@ func getJSONStringFromDictionary(_ dictionary: [String: Any]) -> String {
   return ""
 }
 
-func getDictionaryFromJSONString(_ jsonString: String) -> NSDictionary? {
+public func getDictionaryFromJSONString(_ jsonString: String) -> NSDictionary? {
   if let jsonData = jsonString.data(using: .utf8),
      let dict = try? JSONSerialization.jsonObject(
        with: jsonData,
@@ -112,6 +113,9 @@ let DefaultTextFont: ((Float) -> UIFont) = {
 let TextNormalColor: UIColor = HexRGB(0x333333)
 let SubTextColor: UIColor = HexRGB(0x666666)
 let PlaceholderTextColor: UIColor = HexRGB(0xA6ADB6)
+let multiForwardLineColor: UIColor = HexRGB(0xF0F1F5)
+let forwardLineColor: UIColor = HexRGB(0xE1E6E8)
+let multiForwardborderColor: UIColor = HexRGB(0xE4E9F2)
 
 let HexRGB: ((Int) -> UIColor) = { (rgbValue: Int) -> UIColor in
   HexRGBAlpha(rgbValue, 1.0)
@@ -128,8 +132,7 @@ let HexRGBAlpha: ((Int, Float) -> UIColor) = { (rgbValue: Int, alpha: Float) -> 
 
 // MARK: notificationkey
 
-enum NotificationName {
-  static let updateFriendInfo = Notification.Name("chat.updateFriendInfo")
+extension NENotificationName {
   // 参数 serverId: string
   static let createServer = Notification.Name(rawValue: "qchat.createServer")
   // param channel: ChatChannel
@@ -137,6 +140,7 @@ enum NotificationName {
   static let updateChannel = Notification.Name(rawValue: "qchat.updateChannel")
   static let deleteChannel = Notification.Name(rawValue: "qchat.deleteChannel")
   static let leaveTeamBySelf = Notification.Name(rawValue: "team.leaveTeamBySelf")
+  static let popGroupChatVC = Notification.Name(rawValue: "team.popGroupChatVC")
 
 //    static let login = Notification.Name(rawValue:"qchat.login")
   static let logout = Notification.Name(rawValue: "qchat.logout")

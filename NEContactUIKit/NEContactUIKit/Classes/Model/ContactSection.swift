@@ -7,6 +7,11 @@ import Foundation
 import NEChatKit
 import NECoreIMKit
 
+/*
+     通讯录 section 数据模型
+     // initial: tableView 对应 section 的标题
+     // contacts: tableView 对应 section 的数据
+ */
 @objcMembers
 open class ContactSection {
   public var initial: String

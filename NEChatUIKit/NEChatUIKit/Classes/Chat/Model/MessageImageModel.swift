@@ -7,9 +7,10 @@ import Foundation
 import NIMSDK
 
 @objcMembers
-class MessageImageModel: MessageContentModel {
+open class MessageImageModel: MessageContentModel {
   public var imageUrl: String?
-  required init(message: NIMMessage?) {
+
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .image
     if let imageObject = message?.messageObject as? NIMImageObject {
@@ -26,6 +27,6 @@ class MessageImageModel: MessageContentModel {
     } else {
       contentSize = chat_pic_size
     }
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

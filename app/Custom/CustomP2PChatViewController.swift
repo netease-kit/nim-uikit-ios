@@ -6,9 +6,10 @@ import NEChatUIKit
 import NIMSDK
 import UIKit
 class CustomP2PChatViewController: P2PChatViewController {
+  let customMessageType = 20
   override func viewDidLoad() {
-    // 自定义消息以及外部扩展 覆盖cell UI 样式示例
-//    customMessage()
+    // 自定义消息cell绑定需要放在 super.viewDidLoad() 之前
+    NEChatUIKitClient.instance.regsiterCustomCell(["\(customMessageType)": CustomChatCell.self])
 
     // 通过配置项实现自定义
     customByConfig()
@@ -17,6 +18,9 @@ class CustomP2PChatViewController: P2PChatViewController {
 //    customByOverread()
 
     super.viewDidLoad()
+
+    // 自定义消息以及外部扩展 覆盖cell UI 样式示例
+    customMessage()
   }
 
   /// 通过配置项实现 UI 自定义
@@ -200,7 +204,6 @@ class CustomP2PChatViewController: P2PChatViewController {
   func customMessage() {
     // 注册自定义消息的解析器
     NIMCustomObject.registerCustomDecoder(CustomAttachmentDecoder())
-    NEChatUIKitClient.instance.regsiterCustomCell(["20": CustomChatCell.self])
 
     // 测试自定义消息发送按钮
     let testBtn = UIButton()
@@ -269,9 +272,8 @@ class CustomP2PChatViewController: P2PChatViewController {
   }
 
   @objc func sendCustomButton() {
-    let attachment = CustomAttachment()
-    attachment.customType = 20
-    attachment.cellHeight = 50
+    let data = ["type": customMessageType]
+    let attachment = CustomAttachment(customType: customMessageType, cellHeight: 50, data: data)
     let message = NIMMessage()
     let object = NIMCustomObject()
     object.attachment = attachment

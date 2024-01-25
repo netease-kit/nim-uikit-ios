@@ -51,7 +51,6 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
     imageView.titleLabel.font = NEConstant.defaultTextFont(16.0)
-    imageView.accessibilityIdentifier = "id.avatar"
     return imageView
   }()
 
@@ -97,7 +96,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     if let model = viewmodel.teamInfoModel {
-      if let url = model.team?.avatarUrl {
+      if let url = model.team?.avatarUrl, !url.isEmpty {
         teamHeader.sd_setImage(with: URL(string: url))
       }
       if let name = model.team?.teamName {
@@ -118,8 +117,12 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
           ModuleName + " " + self.className,
           desc: "CALLBACK getTeamInfo " + (error?.localizedDescription ?? "no error")
         )
-        if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+        if let err = error as? NSError {
+          if err.code == noNetworkCode {
+            weakSelf?.showToast(commonLocalizable("network_error"))
+          } else {
+            weakSelf?.showToast(localizable("team_not_exist"))
+          }
         } else {
           if let type = weakSelf?.viewmodel.teamInfoModel?.team?.type {
             if type == .normal {
@@ -133,20 +136,29 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
               }
             }
           }
+          if let type = weakSelf?.teamSettingType {
+            weakSelf?.viewmodel.teamSettingType = type
+          }
           weakSelf?.reloadSectionData()
           weakSelf?.contentTable.tableHeaderView = weakSelf?.getHeaderView()
           weakSelf?.contentTable.tableFooterView = weakSelf?.getFooterView()
           weakSelf?.contentTable.reloadData()
-          weakSelf?.userinfoCollection.reloadData()
+          weakSelf?.didRefreshUserinfoCollection()
           weakSelf?.checkoutAddShowOrHide()
         }
       }
     }
     // Do any additional setup after loading the view.
     setupUI()
+
+    NotificationCenter.default.addObserver(self, selector: #selector(didRefreshUserinfoCollection), name: NENotificationName.updateFriendInfo, object: nil)
   }
 
   open func reloadSectionData() {}
+
+  open func didRefreshUserinfoCollection() {
+    userinfoCollection.reloadData()
+  }
 
   open func setupUI() {
     view.backgroundColor = .ne_lightBackgroundColor
@@ -241,13 +253,9 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       viewmodel.transferTeamOwner { error in
         weakSelf?.view.hideToastActivity()
         if let err = error as? NSError {
-          if err.code == 408 {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else {
-            weakSelf?.showToast(err.localizedDescription)
-          }
+          weakSelf?.didError(err)
         } else {
-          weakSelf?.navigationController?.popViewController(animated: true)
+          NotificationCenter.default.post(name: NotificationName.popGroupChatVC, object: nil)
         }
       }
       return
@@ -372,20 +380,26 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   func didAddUserAndRefreshUI(_ accids: [String], _ tid: String) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
-    viewmodel.repo.inviteUser(accids, tid, nil, nil) { error, members in
+    viewmodel.inviterUsers(accids, tid) { error, members in
       if let err = error {
         weakSelf?.view.hideToastActivity()
-        weakSelf?.showToast(err.localizedDescription)
+        if err.code == noNetworkCode {
+          weakSelf?.showToast(commonLocalizable("network_error"))
+        } else if err.code == noPermissionCode {
+          weakSelf?.showToast(localizable("no_permission_tip"))
+        } else {
+          weakSelf?.showToast(localizable("failed_operation"))
+        }
       } else {
         print("add users success : ", members as Any)
         if let ms = members, let model = weakSelf?.viewmodel.teamInfoModel {
           weakSelf?.viewmodel.repo.splitGroupMember(ms, model) { error, team in
             weakSelf?.view.hideToastActivity()
-            if let e = error {
-              weakSelf?.showToast(e.localizedDescription)
+            if let err = error as? NSError {
+              weakSelf?.didError(err)
             } else {
               weakSelf?.refreshMemberCount()
-              weakSelf?.userinfoCollection.reloadData()
+              weakSelf?.didRefreshUserinfoCollection()
               weakSelf?.checkoutAddShowOrHide()
             }
           }
@@ -405,8 +419,8 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         desc: "CALLBACK inviteUser " + (error?.localizedDescription ?? "no error")
       )
       weakSelf?.view.hideToastActivity()
-      if let err = error {
-        weakSelf?.showToast(err.localizedDescription)
+      if let err = error as? NSError {
+        weakSelf?.didError(err)
       } else {
         weakSelf?.showToast(localizable("invite_has_send"))
       }
@@ -424,29 +438,22 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         )
         weakSelf?.view.hideToastActivity()
         if let err = error as? NSError {
-          if err.code == 408 {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else {
-            weakSelf?.showToast(err.localizedDescription)
-          }
+          weakSelf?.didError(err)
         } else {
-          weakSelf?.navigationController?.popViewController(animated: true)
+          NotificationCenter.default.post(name: NotificationName.popGroupChatVC, object: nil)
         }
       }
     }
   }
 
   func refreshMemberCount() {
-    if let count = viewmodel.teamInfoModel?.users.count {
+    if let count = viewmodel.teamInfoModel?.team?.memberNumber {
       memberCountLabel.text = "\(count)"
     }
   }
 
   func leaveTeam() {
     if let tid = teamId {
-      // 需要先于 SDK 回调进行通知
-      NotificationCenter.default.post(name: NotificationName.leaveTeamBySelf, object: true)
-
       view.makeToastActivity(.center)
       viewmodel.quitTeam(tid) { [weak self] error in
         NELog.infoLog(
@@ -455,27 +462,18 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         )
         self?.view.hideToastActivity()
         if let err = error as? NSError {
-          // 退出群聊失败则需要重置通知
-          NotificationCenter.default.post(name: NotificationName.leaveTeamBySelf, object: false)
-          if err.code == 803 {
-            self?.navigationController?.popViewController(animated: true)
-          } else if err.code == 408 {
-            self?.showToast(commonLocalizable("network_error"))
-          } else {
-            self?.showToast(err.localizedDescription)
-          }
+          self?.didError(err)
         } else {
-          // 会话列表中移除该群聊
-          let session = NIMSession(tid, type: .team)
-          if let stickInfo = self?.viewmodel.getTopSessionInfo(session) {
-            self?.viewmodel.removeStickTop(params: stickInfo) { err, _ in
-              NELog.infoLog(
-                ModuleName + " " + (self?.className ?? "TeamSettingViewController"),
-                desc: "CALLBACK removeStickTop " + (error?.localizedDescription ?? "no error")
-              )
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            self?.viewmodel.getTeamInfo(tid) { _ in
+              if self?.viewmodel.teamInfoModel?.team?.memberNumber == 1,
+                 self?.viewmodel.isOwner() == true {
+                self?.dismissTeam()
+              } else {
+                NotificationCenter.default.post(name: NotificationName.popGroupChatVC, object: nil)
+              }
             }
           }
-          self?.navigationController?.popViewController(animated: true)
         }
       }
     }
@@ -489,19 +487,21 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   }
 
   func didError(_ error: NSError) {
-    if error.code == 408 {
+    if error.code == noNetworkCode {
       showToast(commonLocalizable("network_error"))
     } else {
-      showToast(error.localizedDescription)
+      showToast(localizable("failed_operation"))
     }
   }
 
   func didNeedRefreshUI() {
     contentTable.reloadData()
     refreshMemberCount()
-    userinfoCollection.reloadData()
+    didRefreshUserinfoCollection()
     checkoutAddShowOrHide()
   }
+
+  open func didClickTeamManage() {}
 
   open func checkoutAddShowOrHide() {}
 
@@ -515,11 +515,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       )
       weakSelf?.view.hideToastActivity()
       if let err = error as? NSError {
-        if err.code == 408 {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else {
-          weakSelf?.showToast(err.localizedDescription)
-        }
+        weakSelf?.didError(err)
       } else {
         weakSelf?.viewmodel.teamInfoModel?.team?.inviteMode = .manager
         model.subTitle = localizable("team_owner")
@@ -538,11 +534,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       )
       weakSelf?.view.hideToastActivity()
       if let err = error as? NSError {
-        if err.code == 408 {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else {
-          weakSelf?.showToast(err.localizedDescription)
-        }
+        weakSelf?.didError(err)
       } else {
         weakSelf?.viewmodel.teamInfoModel?.team?.inviteMode = .all
         model.subTitle = localizable("team_all")
@@ -595,11 +587,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         )
         weakSelf?.view.hideToastActivity()
         if let err = error as? NSError {
-          if err.code == 408 {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else {
-            weakSelf?.showToast(err.localizedDescription)
-          }
+          weakSelf?.didError(err)
         } else {
           weakSelf?.viewmodel.teamInfoModel?.team?.updateInfoMode = .manager
           model.subTitle = localizable("team_owner")
@@ -619,11 +607,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         )
         weakSelf?.view.hideToastActivity()
         if let err = error as? NSError {
-          if err.code == 408 {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else {
-            weakSelf?.showToast(err.localizedDescription)
-          }
+          weakSelf?.didError(err)
         } else {
           weakSelf?.viewmodel.teamInfoModel?.team?.updateInfoMode = .all
           model.subTitle = localizable("team_all")
@@ -667,4 +651,14 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   open func didClickChangeNick() {}
 
   open func didClickHistoryMessage() {}
+
+  open func getManaterUsers() -> [TeamMemberInfoModel] {
+    var members = [TeamMemberInfoModel]()
+    viewmodel.teamInfoModel?.users.forEach { model in
+      if model.teamMember?.type == .manager {
+        members.append(model)
+      }
+    }
+    return members
+  }
 }

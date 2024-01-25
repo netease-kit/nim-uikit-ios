@@ -6,7 +6,7 @@
 import Foundation
 
 @objcMembers
-public class SettingSectionModel: NSObject {
+open class SettingSectionModel: NSObject {
   public var cellModels = [SettingCellModel]()
   override public init() {}
 

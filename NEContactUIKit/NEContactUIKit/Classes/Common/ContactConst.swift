@@ -22,9 +22,3 @@ func localizable(_ key: String) -> String {
 }
 
 public let ModuleName = "NEContactUIKit"
-
-// MARK: notificationkey
-
-enum NotificationName {
-  static let updateFriendInfo = Notification.Name("chat.updateFriendInfo")
-}

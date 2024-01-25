@@ -17,7 +17,7 @@ public enum SettingCellType: Int {
 }
 
 @objcMembers
-public class SettingCellModel: NSObject {
+open class SettingCellModel: NSObject {
   public typealias SwitchChangeCompletion = (Bool) -> Void
   public typealias CellClick = () -> Void
   public var cellName: String?

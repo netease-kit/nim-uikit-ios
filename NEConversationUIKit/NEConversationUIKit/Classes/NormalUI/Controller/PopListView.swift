@@ -8,12 +8,12 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open class PopListViewController: NEBasePopListViewController {
+open class PopListView: NEBasePopListView {
   override func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
-      shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant - 10),
-      shadowView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant - 10),
+      shadowView.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
     ])
 
     popView.backgroundColor = NEConstant.hexRGB(0xFFFFFF)

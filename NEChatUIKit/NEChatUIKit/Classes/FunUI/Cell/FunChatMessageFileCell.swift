@@ -14,6 +14,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let view_img = UIImageView()
     view_img.translatesAutoresizingMaskIntoConstraints = false
     view_img.backgroundColor = .clear
+    view_img.accessibilityIdentifier = "id.fileType"
     return view_img
   }()
 
@@ -21,6 +22,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let state = FileStateView()
     state.translatesAutoresizingMaskIntoConstraints = false
     state.backgroundColor = .clear
+    state.accessibilityIdentifier = "id.fileStatus"
     return state
   }()
 
@@ -69,6 +71,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let view_img = UIImageView()
     view_img.translatesAutoresizingMaskIntoConstraints = false
     view_img.backgroundColor = .clear
+    view_img.accessibilityIdentifier = "id.fileType"
     return view_img
   }()
 
@@ -76,6 +79,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let state = FileStateView()
     state.translatesAutoresizingMaskIntoConstraints = false
     state.backgroundColor = .clear
+    state.accessibilityIdentifier = "id.fileStatus"
     return state
   }()
 
@@ -149,10 +153,10 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
       imgViewLeft.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    addSubview(stateViewLeft)
+    imgViewLeft.addSubview(stateViewLeft)
     NSLayoutConstraint.activate([
-      stateViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 10),
-      stateViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: 10),
+      stateViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.leftAnchor, constant: 0),
+      stateViewLeft.topAnchor.constraint(equalTo: imgViewLeft.topAnchor, constant: 0),
       stateViewLeft.widthAnchor.constraint(equalToConstant: 32),
       stateViewLeft.heightAnchor.constraint(equalToConstant: 32),
     ])
@@ -181,10 +185,10 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
       imgViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    addSubview(stateViewRight)
+    imgViewRight.addSubview(stateViewRight)
     NSLayoutConstraint.activate([
-      stateViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 10),
-      stateViewRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: 10),
+      stateViewRight.leftAnchor.constraint(equalTo: imgViewRight.leftAnchor, constant: 0),
+      stateViewRight.topAnchor.constraint(equalTo: imgViewRight.topAnchor, constant: 0),
       stateViewRight.widthAnchor.constraint(equalToConstant: 32),
       stateViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
@@ -209,11 +213,8 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     labelViewRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let stateView = isSend ? stateViewRight : stateViewLeft
     let imgView = isSend ? imgViewRight : imgViewLeft
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft

@@ -10,6 +10,8 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
   var audioTimeLabel = UILabel()
   public var bubbleImage = UIImageView()
 
+  public var isPlaying = false
+
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
@@ -23,7 +25,7 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
 
     let image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImage.image = image?
-      .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
+      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.isUserInteractionEnabled = true
     backView.addSubview(bubbleImage)
@@ -45,8 +47,14 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
       audioImageView.widthAnchor.constraint(equalToConstant: 28),
       audioImageView.heightAnchor.constraint(equalToConstant: 28),
     ])
+    audioImageView.animationDuration = 1
+    if let leftImage1 = UIImage.ne_imageNamed(name: "left_play_1"),
+       let leftmage2 = UIImage.ne_imageNamed(name: "left_play_2"),
+       let leftmage3 = UIImage.ne_imageNamed(name: "left_play_3") {
+      audioImageView.animationImages = [leftImage1, leftmage2, leftmage3]
+    }
 
-    audioTimeLabel.font = UIFont.systemFont(ofSize: 14)
+    audioTimeLabel.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
     audioTimeLabel.textColor = UIColor.ne_darkText
     audioTimeLabel.textAlignment = .left
     audioTimeLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -57,12 +65,37 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
       audioTimeLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: -12),
       audioTimeLabel.heightAnchor.constraint(equalToConstant: 28),
     ])
+
+    if let gesture = contentGesture {
+      bubbleImage.addGestureRecognizer(gesture)
+    }
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
     if let m = item.chatmodel as? MessageAudioModel {
       audioTimeLabel.text = "\(m.duration)" + "s"
+      m.isPlaying == true ? startAnimation() : stopAnimation()
+    }
+  }
+
+  open func startAnimation() {
+    if !audioImageView.isAnimating {
+      audioImageView.startAnimating()
+    }
+    if let m = pinModel?.chatmodel as? MessageAudioModel {
+      m.isPlaying = true
+      isPlaying = true
+    }
+  }
+
+  open func stopAnimation() {
+    if audioImageView.isAnimating {
+      audioImageView.stopAnimating()
+    }
+    if let m = pinModel?.chatmodel as? MessageAudioModel {
+      m.isPlaying = false
+      isPlaying = false
     }
   }
 }

@@ -79,7 +79,7 @@ open class FunConversationController: NEBaseConversationController {
       searchView.heightAnchor.constraint(equalToConstant: 36),
     ])
 
-    popListController = FunPopListViewController()
+    popListView = FunPopListView()
 
     tableView.rowHeight = 72
     tableView.backgroundColor = .funConversationBackgroundColor

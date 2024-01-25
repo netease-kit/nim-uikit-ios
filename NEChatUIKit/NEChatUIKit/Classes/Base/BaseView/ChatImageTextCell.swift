@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class ChatImageTextCell: ChatStateCell {
+open class ChatImageTextCell: ChatStateCell {
   var circleView = UIImageView()
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -50,7 +50,7 @@ public class ChatImageTextCell: ChatStateCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -80,7 +80,7 @@ public class ChatImageTextCell: ChatStateCell {
     return label
   }()
 
-  public func setup(accid: String?, nickName: String?) {
+  open func setup(accid: String?, nickName: String?) {
     let name = nickName?.count ?? 0 > 0 ? nickName : accid
     nameLabel.text = name
     guard let n = name else { return }

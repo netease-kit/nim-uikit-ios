@@ -7,10 +7,11 @@ import Foundation
 import NIMSDK
 
 @objcMembers
-class MessageAudioModel: MessageContentModel {
+open class MessageAudioModel: MessageContentModel {
   public var duration: Int = 0
   public var isPlaying = false
-  required init(message: NIMMessage?) {
+
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .audio
     var audioW = 96.0
@@ -23,6 +24,6 @@ class MessageAudioModel: MessageContentModel {
       }
     }
     contentSize = CGSize(width: audioW, height: chat_min_h)
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

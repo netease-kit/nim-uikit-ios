@@ -7,6 +7,13 @@ import UIKit
 
 @objcMembers
 open class NEBasePinMessageFileCell: NEBasePinMessageCell {
+  public lazy var stateView: FileStateView = {
+    let state = FileStateView()
+    state.translatesAutoresizingMaskIntoConstraints = false
+    state.backgroundColor = .clear
+    return state
+  }()
+
   public var bubbleImage = UIImageView()
 
   lazy var imgView: UIImageView = {
@@ -95,7 +102,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
       bubbleImage.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 12),
     ])
 
-    backView.addSubview(imgView)
+    bubbleImage.addSubview(imgView)
     NSLayoutConstraint.activate([
       imgView.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 10),
       imgView.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 10),
@@ -103,18 +110,43 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
       imgView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    backView.addSubview(labelView)
+    bubbleImage.addSubview(labelView)
     NSLayoutConstraint.activate([
       labelView.leftAnchor.constraint(equalTo: imgView.rightAnchor, constant: 15),
       labelView.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 10),
       labelView.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: -10),
       labelView.bottomAnchor.constraint(equalTo: bubbleImage.bottomAnchor, constant: 0),
     ])
+
+    bubbleImage.addSubview(stateView)
+    NSLayoutConstraint.activate([
+      stateView.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 10),
+      stateView.topAnchor.constraint(equalTo: bubbleImage.topAnchor, constant: 10),
+      stateView.widthAnchor.constraint(equalToConstant: 32),
+      stateView.heightAnchor.constraint(equalToConstant: 32),
+    ])
+
+    if let gesture = contentGesture {
+      bubbleImage.addGestureRecognizer(gesture)
+    }
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
     if let fileObject = item.message.messageObject as? NIMFileObject {
+      if let fileModel = item.pinFileModel {
+        fileModel.cell = self
+        if fileModel.state == .Success {
+          stateView.state = .FileOpen
+        } else {
+          stateView.state = .FileDownload
+          stateView.setProgress(fileModel.progress)
+          if fileModel.progress >= 1 {
+            fileModel.state = .Success
+          }
+        }
+      }
+
       var imageName = "file_unknown"
       var displayName = "未知文件"
       if let filePath = fileObject.path as? NSString {
@@ -164,5 +196,9 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
       }
       sizeLabel.text = size_str
     }
+  }
+
+  open func uploadProgress(progress: Float) {
+    stateView.setProgress(progress)
   }
 }

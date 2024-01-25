@@ -8,13 +8,13 @@ import NECoreIMKit
 import NECoreKit
 
 @objcMembers
-public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate {
+open class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate {
   typealias DataRefresh = () -> Void
 
   var dataRefresh: DataRefresh?
   private let className = "ValidationMessageViewModel"
   let contactRepo = ContactRepo.shared
-  var datas = [XNotification]()
+  var datas = [NENotification]()
 
   override init() {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
@@ -22,10 +22,10 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
     contactRepo.notiDelegate = self
   }
 
-  public func onNotificationUnreadCountChanged(_ count: Int) {}
+  open func onNotificationUnreadCountChanged(_ count: Int) {}
 
   // 内容待完善
-//  public func onRecieveNotification(_ notification: XNotification) {
+//  open func onRecieveNotification(_ notification: XNotification) {
 //    NELog.infoLog(className, desc: #function)
 //    var isInsert = true
 //    for notify in datas {
@@ -56,7 +56,7 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
 //    }
 //  }
 
-  func isExist(xNoti: inout XNotification, list: inout [XNotification]) -> Bool {
+  func isExist(xNoti: inout NENotification, list: inout [NENotification]) -> Bool {
     for loopList in list {
       if xNoti.isEqualTo(noti: loopList) {
         if loopList.msgList == nil {
@@ -83,7 +83,7 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
     return false
   }
 
-  public func onRecieveNotification(_ notification: XNotification) {
+  open func onRecieveNotification(_ notification: NENotification) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     var noti = notification
     if !isExist(xNoti: &noti, list: &datas) {
@@ -100,7 +100,7 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
   func getValidationMessage(_ completin: @escaping () -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     contactRepo.getNotificationList(limit: 500) { [weak self] xNotiList in
-      var data = [XNotification]()
+      var data = [NENotification]()
       let dateNow = Date().timeIntervalSince1970
       for xNoti in xNotiList {
         var noti = xNoti
@@ -140,21 +140,21 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
     completion()
   }
 
-  public func acceptInviteWithTeam(_ teamId: String, _ invitorId: String,
-                                   _ completion: @escaping (Error?) -> Void) {
+  open func acceptInviteWithTeam(_ teamId: String, _ invitorId: String,
+                                 _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     contactRepo.acceptTeamInvite(teamId, invitorId, completion)
   }
 
-  public func rejectInviteWithTeam(_ teamId: String, _ invitorId: String,
-                                   _ completion: @escaping (Error?) -> Void) {
+  open func rejectInviteWithTeam(_ teamId: String, _ invitorId: String,
+                                 _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     contactRepo.rejectTeamInvite(teamId, invitorId, completion)
   }
 
   func agreeRequest(_ account: String, _ completion: @escaping (NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", account:\(account)")
-    let request = AddFriendRequest()
+    let request = NEAddFriendRequest()
     request.account = account
     request.operationType = .verify
     contactRepo.addFriend(request: request, completion)
@@ -163,7 +163,7 @@ public class ValidationMessageViewModel: NSObject, ContactRepoSystemNotiDelegate
   func refuseRequest(_ account: String, _ completion: @escaping (NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", account:\(account)")
     print("account : ", account)
-    let request = AddFriendRequest()
+    let request = NEAddFriendRequest()
     request.account = account
     request.operationType = .reject
     contactRepo.addFriend(request: request, completion)

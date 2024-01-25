@@ -34,7 +34,7 @@ open class BlackListViewController: NEBaseBlackListViewController {
     ContactsSelectedViewController()
   }
 
-  override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(BlackListCell.self))",
       for: indexPath

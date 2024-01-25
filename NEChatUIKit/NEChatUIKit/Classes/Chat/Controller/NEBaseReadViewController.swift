@@ -15,8 +15,8 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
   public var line: UIView = .init()
   public var lineLeftCons: NSLayoutConstraint?
   public var readTableView = UITableView(frame: .zero, style: .plain)
-  public var readUsers = [User]()
-  public var unReadUsers = [User]()
+  public var readUsers = [NEKitUser]()
+  public var unReadUsers = [NEKitUser]()
   public let readButton = UIButton(type: .custom)
   public let unreadButton = UIButton(type: .custom)
   private var message: NIMMessage
@@ -44,22 +44,24 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
     readButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     readButton.translatesAutoresizingMaskIntoConstraints = false
     readButton.addTarget(self, action: #selector(readButtonEvent), for: .touchUpInside)
-    view.addSubview(readButton)
+    readButton.accessibilityIdentifier = "id.tabHasRead"
 
     unreadButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     unreadButton.setTitle(chatLocalizable("unread"), for: .normal)
     unreadButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     unreadButton.translatesAutoresizingMaskIntoConstraints = false
     unreadButton.addTarget(self, action: #selector(unreadButtonEvent), for: .touchUpInside)
+    readButton.accessibilityIdentifier = "id.tabUnRead"
 
-    view.addSubview(unreadButton)
+    view.addSubview(readButton)
     NSLayoutConstraint.activate([
       readButton.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       readButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       readButton.heightAnchor.constraint(equalToConstant: 48),
-      readButton.widthAnchor.constraint(equalTo: unreadButton.widthAnchor),
+      readButton.widthAnchor.constraint(equalToConstant: kScreenWidth / 2.0),
     ])
 
+    view.addSubview(unreadButton)
     NSLayoutConstraint.activate([
       unreadButton.topAnchor.constraint(equalTo: readButton.topAnchor),
       unreadButton.leadingAnchor.constraint(equalTo: readButton.trailingAnchor),
@@ -166,7 +168,7 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
     NIMSDK.shared().chatManager.queryMessageReceiptDetail(message) { anError, receiptInfo in
       print("anError:\(anError) receiptInfo:\(receiptInfo)")
       if let error = anError as? NSError {
-        if error.code == 408 {
+        if error.code == noNetworkCode {
           self.showToast(commonLocalizable("network_error"))
         } else {
           self.showToast(error.localizedDescription)

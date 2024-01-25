@@ -11,18 +11,7 @@ open class NormalChatViewController: ChatViewController {
     super.init(session: session)
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
-    cellRegisterDic = [
-      "\(MessageType.text.rawValue)": ChatMessageTextCell.self,
-      "\(MessageType.rtcCallRecord.rawValue)": ChatMessageCallCell.self,
-      "\(MessageType.audio.rawValue)": ChatMessageAudioCell.self,
-      "\(MessageType.image.rawValue)": ChatMessageImageCell.self,
-      "\(MessageType.revoke.rawValue)": ChatMessageRevokeCell.self,
-      "\(MessageType.video.rawValue)": ChatMessageVideoCell.self,
-      "\(MessageType.file.rawValue)": ChatMessageFileCell.self,
-      "\(MessageType.reply.rawValue)": ChatMessageReplyCell.self,
-      "\(MessageType.location.rawValue)": ChatMessageLocationCell.self,
-      "\(MessageType.time.rawValue)": ChatMessageTipCell.self,
-    ]
+    cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: false)
   }
 
   public required init?(coder: NSCoder) {
@@ -34,50 +23,116 @@ open class NormalChatViewController: ChatViewController {
   }
 
   override open func getMenuView() -> NEBaseChatInputView {
-    ChatInputView()
+    let chat = ChatInputView()
+    chat.multipleLineDelegate = self
+    return chat
   }
 
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     ForwardAlertViewController()
   }
 
+  override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
+                                                   _ messageAttachmentFilePath: String,
+                                                   _ messageAttachmentMD5: String?) -> MultiForwardViewController {
+    NormalMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
+  }
+
   override func getUserSelectVC() -> NEBaseSelectUserViewController {
     SelectUserViewController(sessionId: viewmodel.session.sessionId, showSelf: false)
   }
 
-  override open func toSetting() {
-    if let block = NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick {
-      block()
-      return
-    }
-    if viewmodel.session.sessionType == .team {
-      Router.shared.use(
-        TeamSettingViewRouter,
-        parameters: ["nav": navigationController as Any,
-                     "teamid": viewmodel.session.sessionId],
-        closure: nil
-      )
-    } else if viewmodel.session.sessionType == .P2P {
-      let userSetting = UserSettingViewController(userId: viewmodel.session.sessionId)
-      navigationController?.pushViewController(userSetting, animated: true)
-    }
-  }
-
-  override open func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    if let msg = model?.message, msg.session?.sessionType == .team {
-      let readVC = ReadViewController(message: msg)
-      navigationController?.pushViewController(readVC, animated: true)
-    }
-  }
-
-  public func getMessageModel(model: MessageModel) {
+  open func getMessageModel(model: MessageModel) {
     if model.type == .reply {
       let normalMoreHeight = chat_reply_height + chat_content_margin
       model.contentSize = CGSize(
         width: model.contentSize.width,
         height: model.contentSize.height + normalMoreHeight
       )
-      model.height += Float(normalMoreHeight)
+      model.height += normalMoreHeight
     }
+  }
+
+  override open func expandButtonDidClick() {
+    print("expandButtonDidClick ")
+    super.expandButtonDidClick()
+    chatInputView.changeToMultipleLineStyle()
+    normalInputHeight = 296
+    bottomViewTopAnchor?.constant = -normalInputHeight
+    chatInputView.textView.resignFirstResponder()
+    chatInputView.titleField.resignFirstResponder()
+    checkAndRemoveReplyView()
+  }
+
+  override open func didHideMultipleButtonClick() {
+    super.didHideMultipleButtonClick()
+
+    if chatInputView.chatInpuMode == .normal {
+      normalInputHeight = 100
+    } else {
+      normalInputHeight = 150
+    }
+    bottomViewTopAnchor?.constant = -normalInputHeight
+    checkAndRestoreReplyView()
+  }
+
+  // 切换到多行消息模式隐藏回复
+  func checkAndRemoveReplyView() {
+    if chatInputView.chatInpuMode == .multipleReturn {
+      if replyView.superview != nil {
+        replyView.removeFromSuperview()
+      }
+    }
+  }
+
+  // 切换到单行输入框如果有回复显示回复视图
+  func checkAndRestoreReplyView() {
+    if viewmodel.isReplying == true, replyView.superview == nil {
+      view.addSubview(replyView)
+      replyView.closeButton.addTarget(self, action: #selector(closeReply), for: .touchUpInside)
+      replyView.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        replyView.leadingAnchor.constraint(equalTo: chatInputView.leadingAnchor),
+        replyView.trailingAnchor.constraint(equalTo: chatInputView.trailingAnchor),
+        replyView.bottomAnchor.constraint(equalTo: chatInputView.topAnchor),
+        replyView.heightAnchor.constraint(equalToConstant: 36),
+      ])
+    }
+  }
+
+  override open func titleTextDidClearEmpty() {
+    if chatInputView.chatInpuMode == .multipleSend {
+      chatInputView.chatInpuMode = .normal
+      if chatInputView.chatInpuMode == .normal {
+        normalInputHeight = 100
+      } else {
+        normalInputHeight = 150
+      }
+      chatInputView.restoreNormalInputStyle()
+      layoutInputViewWithAnimation(offset: currentKeyboardHeight)
+      chatInputView.textView.becomeFirstResponder()
+    }
+  }
+
+  override open func keyBoardWillShow(_ notification: Notification) {
+    let keyboardRect = (notification
+      .userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
+    currentKeyboardHeight = keyboardRect.height
+    super.keyBoardWillShow(notification)
+  }
+
+  override open func keyBoardWillHide(_ notification: Notification) {
+    currentKeyboardHeight = 0
+    super.keyBoardWillHide(notification)
+  }
+
+  // 减小多行输入框高度，不收回键盘
+  override open func didHideMultiple() {
+    if chatInputView.chatInpuMode == .normal {
+      normalInputHeight = 100
+    } else {
+      normalInputHeight = 150
+    }
+    bottomViewTopAnchor?.constant = -(normalInputHeight + currentKeyboardHeight)
   }
 }

@@ -7,7 +7,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomViewDelegate {
+open class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomViewDelegate {
   // 地图展示类型
   public var mapType: NEMapType?
   public var currentPoint = CGPoint(x: 0, y: 0)
@@ -19,9 +19,6 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
   private var searchViewConstraint: NSLayoutConstraint?
   // 记录键盘弹起状态
   private var foldKeyBoard = true
-
-//  private let defaultFieldFrame = CGRect(x: 12, y: 12, width: kScreenWidth - 24, height: 32)
-//  private let focusFieldFrame = CGRect(x: 12, y: 12, width: kScreenWidth - 64, height: 32)
 
   private let defaultTableHeight: CGFloat = 230
 
@@ -40,11 +37,11 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     super.init(nibName: nil, bundle: nil)
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override public func viewWillAppear(_ animated: Bool) {
+  override open func viewWillAppear(_ animated: Bool) {
     navigationController?.navigationBar.isHidden = true
     weak var weakSelf = self
     NEChatDetectNetworkTool.shareInstance.netWorkReachability { status in
@@ -58,11 +55,11 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     }
   }
 
-  override public func viewWillDisappear(_ animated: Bool) {
+  override open func viewWillDisappear(_ animated: Bool) {
     navigationController?.navigationBar.isHidden = false
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     setupSubviews()
   }
@@ -257,14 +254,10 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
 
   func keyBoardWillHide(_ notification: Notification) {
     foldKeyBoard = true
-//    layoutInputView(offset: 0)
   }
 
   private func layoutInputView(offset: CGFloat) {
     tableViewBottomConstraint?.constant = defaultTableHeight + offset
-//    UIView.animate(withDuration: 0.25, animations: {
-//      self.view.layoutIfNeeded()
-//    })
   }
 
   lazy var backBtn: UIButton = {
@@ -364,7 +357,6 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     )
     tableView.rowHeight = 72
     tableView.backgroundColor = .white
-//    tableView.tableHeaderView = searchBgView
     tableView.keyboardDismissMode = .onDrag
     return tableView
   }()
@@ -388,7 +380,6 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
   }()
 
   lazy var searchBgView: UIView = {
-    // let bgView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 60))
     let bgView = UIView()
     bgView.translatesAutoresizingMaskIntoConstraints = false
     return bgView
@@ -520,7 +511,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
 
   // MARK: NEMapGuideBottomViewDelegate
 
-  public func didClickGuide() {
+  open func didClickGuide() {
     showBottomSelectAlert(firstContent: chatLocalizable("gaode_map"), secondContent: chatLocalizable("tencent_map")) { value in
 
       if value == 0 {
@@ -571,7 +562,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     }
   }
 
-  public func loadModels(models: [ChatLocaitonModel]) {
+  open func loadModels(models: [ChatLocaitonModel]) {
     currentIndex = 0
     locations.removeAll()
     if let keyword = searchTextField.text, keyword.count > 0 {
@@ -596,7 +587,7 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
     refreshCurrentCache()
   }
 
-  public func refreshCurrentCache() {
+  open func refreshCurrentCache() {
     if locations.count > currentIndex {
       currentModel = locations[currentIndex]
     }
@@ -604,12 +595,12 @@ public class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomView
 }
 
 extension NEDetailMapController: UITableViewDelegate, UITableViewDataSource {
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     locations.count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: reuseId,
       for: indexPath
@@ -619,7 +610,7 @@ extension NEDetailMapController: UITableViewDelegate, UITableViewDataSource {
     return cell
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if let preiousCell = tableView.cellForRow(at: IndexPath(row: currentIndex, section: 0)) as? NEMapAddressCell {
       preiousCell.selectImg.isHidden = true
     }

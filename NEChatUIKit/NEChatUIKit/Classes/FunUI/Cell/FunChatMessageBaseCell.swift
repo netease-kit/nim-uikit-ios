@@ -9,16 +9,20 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   public let funMargin: CGFloat = 5.2
   override open func initProperty() {
     super.initProperty()
+    timeLabel.backgroundColor = .funChatBackgroundColor
+
     readView.borderLayer.strokeColor = UIColor.funChatThemeColor.cgColor
     readView.sectorLayer.fillColor = UIColor.funChatThemeColor.cgColor
 
     var image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
     bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
+      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
 
     image = NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
     bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25))
+      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+
+    seletedBtn.setImage(.ne_imageNamed(name: "fun_select"), for: .selected)
   }
 
   override open func baseCommonUI() {
@@ -26,8 +30,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     setAvatarImgSize(size: 42)
 
     contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .left, constant: 8 + funMargin)
-    contentView.removeLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .top)
-    fullNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
+    contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .top, constant: -4)
   }
 
   override open func initSubviewsLayout() {

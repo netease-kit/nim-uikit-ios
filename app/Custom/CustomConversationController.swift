@@ -117,9 +117,9 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     }
 
     /// 会话列表点击事件
-    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
-      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
-    }
+//    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
+//      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
+//    }
 
     /*
      布局自定义
@@ -147,6 +147,14 @@ open class CustomConversationController: ConversationController, NEBaseConversat
   open func customByOverread() {
     // 实现协议（重写tabbar点击事件）
     navigationView.delegate = self
+
+    // 自定义会话列表标题、图标、间距
+    navigationView.brandBtn.setTitle("消息", for: .normal)
+    navigationView.brandBtn.setImage(nil, for: .normal)
+    navigationView.brandBtn.layoutButtonImage(style: .left, space: 0)
+
+    // 自定义添加按钮图标
+    navigationView.addBtn.setImage(UIImage.ne_imageNamed(name: "noNeed_notify"), for: .normal)
 
     // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
     customTopView.btn.setTitle("通过重写方式添加", for: .normal)

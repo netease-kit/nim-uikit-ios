@@ -56,7 +56,7 @@ open class ConversationController: NEBaseConversationController {
   override open func setupSubviews() {
     super.setupSubviews()
 
-    popListController = PopListViewController()
+    popListView = PopListView()
 
     tableView.rowHeight = 62
     tableView.backgroundColor = .white

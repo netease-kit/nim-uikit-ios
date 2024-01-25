@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class NEEmotionTool: NSObject {
+open class NEEmotionTool: NSObject {
   class func getAttWithStr(str: String, font: UIFont,
                            _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
     let regular = "\\[[^\\[|^\\]]+\\]"

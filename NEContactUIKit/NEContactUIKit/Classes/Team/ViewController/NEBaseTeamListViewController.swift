@@ -14,7 +14,7 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
   var viewModel = TeamListViewModel()
   var isClickCallBack = false
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
     navigationController?.interactivePopGestureRecognizer?.delegate = self
@@ -76,16 +76,16 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     tableView.reloadData()
   }
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewModel.teamList.count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     UITableViewCell()
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let model = viewModel.teamList[indexPath.row]
     if isClickCallBack == true {
       Router.shared.use(

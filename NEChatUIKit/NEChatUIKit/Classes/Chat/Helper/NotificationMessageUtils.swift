@@ -14,8 +14,8 @@ public enum TeamType {
   case discussTeam
 }
 
-public class NotificationMessageUtils: NSObject {
-  public class func textForNotification(message: NIMMessage) -> String {
+open class NotificationMessageUtils: NSObject {
+  open class func textForNotification(message: NIMMessage) -> String {
     if message.messageType != .notification {
       return ""
     }
@@ -37,7 +37,7 @@ public class NotificationMessageUtils: NSObject {
   }
 
   /// 是否是群通知
-  public class func isDiscussSeniorTeamNoti(message: NIMMessage) -> Bool {
+  open class func isDiscussSeniorTeamNoti(message: NIMMessage) -> Bool {
     if let object = message.messageObject as? NIMNotificationObject,
        let _ = object.content as? NIMTeamNotificationContent {
       return true
@@ -45,7 +45,7 @@ public class NotificationMessageUtils: NSObject {
     return false
   }
 
-  public class func isDiscussSeniorTeamUpdateCustomNoti(message: NIMMessage) -> Bool {
+  open class func isDiscussSeniorTeamUpdateCustomNoti(message: NIMMessage) -> Bool {
     if let object = message.messageObject as? NIMNotificationObject {
       guard let content = object.content as? NIMTeamNotificationContent else {
         return false
@@ -73,7 +73,7 @@ public class NotificationMessageUtils: NSObject {
     return false
   }
 
-  public class func isTeamLeaveOrDismiss(message: NIMMessage) -> (isLeave: Bool, isDismiss: Bool) {
+  open class func isTeamLeaveOrDismiss(message: NIMMessage) -> (isLeave: Bool, isDismiss: Bool) {
     var leave = false
     var dismiss = false
     if let object = message.messageObject as? NIMNotificationObject, object.notificationType == .team {
@@ -93,7 +93,7 @@ public class NotificationMessageUtils: NSObject {
     return (leave, dismiss)
   }
 
-  public class func textForTeamNotificationMessage(message: NIMMessage) -> String {
+  open class func textForTeamNotificationMessage(message: NIMMessage) -> String {
     var text = chatLocalizable("unknown_system_message")
     if let object = message.messageObject as? NIMNotificationObject {
       if let content = object.content as? NIMTeamNotificationContent {
@@ -130,7 +130,7 @@ public class NotificationMessageUtils: NSObject {
         case .transferOwner:
           text = fromName + chatLocalizable("transfer") + toFirstName
         case .addManager:
-          text = toFirstName + chatLocalizable("added_manager")
+          text = toNamestext + chatLocalizable("added_manager")
         case .removeManager:
           text = toFirstName + chatLocalizable("removed_manager")
         case .acceptInvitation:
@@ -154,34 +154,14 @@ public class NotificationMessageUtils: NSObject {
     return text
   }
 
-  //    获取展示的用户名字，p2p： 备注 > 昵称 > ID  team: 备注 > 群昵称 > 昵称 > ID
-  public class func getShowName(userId: String, nimSession: NIMSession?) -> String {
-    let user = UserInfoProvider.shared.getUserInfo(userId: userId)
-    var fullName = userId
-    if let nickName = user?.userInfo?.nickName {
-      fullName = nickName
-    }
-    if let session = nimSession, session.sessionType == .team {
-      // team
-      let teamMember = TeamProvider.shared.teamMember(userId, session.sessionId)
-      if let teamNickname = teamMember?.nickname {
-        fullName = teamNickname
-      }
-    }
-    if let alias = user?.alias {
-      fullName = alias
-    }
-    return fullName
-  }
-
-  public class func fromName(message: NIMMessage) -> String {
+  open class func fromName(message: NIMMessage) -> String {
     if let object = message.messageObject as? NIMNotificationObject {
       if let content = object.content as? NIMTeamNotificationContent {
         if content.sourceID == NIMSDK.shared().loginManager.currentAccount() {
           return chatLocalizable("You") + " "
         } else {
           if let sourceId = content.sourceID {
-            return getShowName(userId: sourceId, nimSession: message.session)
+            return ChatUserCache.getShowName(userId: sourceId, teamId: message.session?.sessionId)
           }
         }
       }
@@ -189,7 +169,7 @@ public class NotificationMessageUtils: NSObject {
     return ""
   }
 
-  public class func toName(message: NIMMessage) -> [String] {
+  open class func toName(message: NIMMessage) -> [String] {
     var toNames = [String]()
     guard let object = message.messageObject as? NIMNotificationObject,
           let content = object.content as? NIMTeamNotificationContent,
@@ -201,13 +181,13 @@ public class NotificationMessageUtils: NSObject {
         toNames.append(chatLocalizable("You") + " ")
       } else {
         toNames
-          .append(getShowName(userId: targetID, nimSession: message.session))
+          .append(ChatUserCache.getShowName(userId: targetID, teamId: message.session?.sessionId))
       }
     }
     return toNames
   }
 
-  public class func teamName(message: NIMMessage) -> String {
+  open class func teamName(message: NIMMessage) -> String {
     let teamtype = teamType(message: message)
     switch teamtype {
     case .advanceTeam:
@@ -217,7 +197,7 @@ public class NotificationMessageUtils: NSObject {
     }
   }
 
-  public class func teamType(message: NIMMessage) -> TeamType {
+  open class func teamType(message: NIMMessage) -> TeamType {
     let team = TeamProvider.shared.getTeam(teamId: message.session?.sessionId ?? "")
     if team?.isDisscuss() == true {
       return .discussTeam

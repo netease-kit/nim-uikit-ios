@@ -8,9 +8,10 @@ import UIKit
 open class NEBasePinMessageTextCell: NEBasePinMessageCell {
   lazy var contentLabel: UILabel = {
     let label = UILabel()
-    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
+    label.isUserInteractionEnabled = true
     label.numberOfLines = 3
     return label
   }()
@@ -38,6 +39,10 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
 
   override open func setupUI() {
     super.setupUI()
+    commonUI()
+  }
+
+  open func commonUI() {
     replyLabel.font = UIFont.systemFont(ofSize: 12)
     replyLabel.textColor = UIColor(hexString: "#929299")
     replyLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -54,9 +59,12 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
       contentLabel.rightAnchor.constraint(equalTo: line.rightAnchor),
       contentLabel.topAnchor.constraint(equalTo: replyLabel.bottomAnchor, constant: 1),
     ])
+    if let gesture = contentGesture {
+      contentLabel.addGestureRecognizer(gesture)
+    }
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
     if let model = item.chatmodel as? MessageTextModel {
       contentLabel.attributedText = model.attributeStr

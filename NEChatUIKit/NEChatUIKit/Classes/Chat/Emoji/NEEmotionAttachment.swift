@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class NEEmotionAttachment: NSTextAttachment {
+open class NEEmotionAttachment: NSTextAttachment {
   private var _emotion: NIMInputEmoticon?
 
   public var emotion: NIMInputEmoticon? {

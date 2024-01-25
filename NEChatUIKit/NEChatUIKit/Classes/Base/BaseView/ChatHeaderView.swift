@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class ChatHeaderView: UIView {
+open class ChatHeaderView: UIView {
   public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.font = DefaultTextFont(12)
@@ -28,7 +28,7 @@ public class ChatHeaderView: UIView {
     setupUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
@@ -42,7 +42,7 @@ public class ChatHeaderView: UIView {
     backgroundColor = .clear
   }
 
-  public func setTitle(_ name: String) {
+  open func setTitle(_ name: String) {
     titleLabel.text = name
       .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
   }

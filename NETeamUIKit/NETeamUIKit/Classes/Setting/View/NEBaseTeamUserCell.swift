@@ -16,7 +16,10 @@ open class NEBaseTeamUserCell: UICollectionViewCell {
       if let name = user?.showNickInTeam() {
         userHeader.setTitle(name)
       }
-      if let url = user?.nimUser?.userInfo?.avatarUrl {
+      if let userId = user?.nimUser?.userId, let nimUser = ChatUserCache.getUserInfo(userId) {
+        user?.nimUser = nimUser
+      }
+      if let url = user?.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
         userHeader.sd_setImage(with: URL(string: url), completed: nil)
         userHeader.setTitle("")
       } else if let id = user?.nimUser?.userId {
@@ -31,7 +34,6 @@ open class NEBaseTeamUserCell: UICollectionViewCell {
     header.translatesAutoresizingMaskIntoConstraints = false
     header.titleLabel.font = NEConstant.defaultTextFont(11.0)
     header.clipsToBounds = true
-    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 

@@ -7,6 +7,7 @@ import NEConversationUIKit
 import UIKit
 
 open class CustomConversationListCell: ConversationListCell {
+  // 新增 UI 元素，用于展示在线状态
   private lazy var onlineView: UIImageView = {
     let notify = UIImageView()
     notify.translatesAutoresizingMaskIntoConstraints = false
@@ -16,6 +17,8 @@ open class CustomConversationListCell: ConversationListCell {
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+    // 头像右下角
     contentView.addSubview(onlineView)
     NSLayoutConstraint.activate([
       onlineView.rightAnchor.constraint(equalTo: headImge.rightAnchor),
@@ -29,8 +32,9 @@ open class CustomConversationListCell: ConversationListCell {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // 此方法用于数据和 UI 的绑定，可在此处在数据展示前对数据进行处理
   override open func configData(sessionModel: ConversationListModel?) {
     super.configData(sessionModel: sessionModel)
-//        subTitle.text = "[自定义类型文案]"
+//    subTitle.text = "[自定义类型文案]"
   }
 }

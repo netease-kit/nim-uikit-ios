@@ -3,14 +3,17 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECoreIMKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class GroupChatViewController: NormalChatViewController, TeamChatViewModelDelegate {
-  private var isLeaveTeamBySelf = false // 是否是主动退出群聊
+  private var isLeaveTeamByOther = false // 是否被移出群聊
+  private var isLeaveTeamBySelf = false // 是否多端登录另一端退出群聊
   private var isdismissTeam = false // 群聊是否已解散
+  private var isdismissDiscuss = false // 讨论组是否已解散
   private var onCurrentPage = false // 是否位于聊天详情页
 
   public init(session: NIMSession, anchor: NIMMessage?) {
@@ -31,12 +34,30 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
     fatalError("init(coder:) has not been implemented")
   }
 
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     onCurrentPage = true
-    // 被动解散群聊
+
+    // 多端登录另一端解散、退出讨论组
+    // 多端登录另一端退出群聊
+    if isdismissDiscuss || isLeaveTeamBySelf {
+      popGroupChatVC()
+    }
+
+    weak var weakSelf = self
+    // 被移除群聊
+    if isLeaveTeamByOther {
+      showSingleAlert(message: chatLocalizable("team_has_been_quit")) {
+        weakSelf?.navigationController?.popViewController(animated: true)
+      }
+    }
+
+    // 解散群聊
     if isdismissTeam {
-      weak var weakSelf = self
       showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
         weakSelf?.navigationController?.popViewController(animated: true)
       }
@@ -50,7 +71,7 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    NotificationCenter.default.addObserver(self, selector: #selector(leaveTeamBySelf), name: NotificationName.leaveTeamBySelf, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(popGroupChatVC), name: NENotificationName.popGroupChatVC, object: nil)
   }
 
   override open func getSessionInfo(session: NIMSession) {
@@ -63,9 +84,21 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
 
   //    MARK: private method
 
-  func leaveTeamBySelf(noti: Notification) {
-    if let flag = noti.object as? Bool {
-      isLeaveTeamBySelf = flag
+  func popGroupChatVC() {
+    var beforeChat: UIViewController?
+    var loopCount = 0
+    for vc in navigationController?.viewControllers ?? [] {
+      if vc.isKind(of: ChatViewController.self) {
+        if loopCount <= 1 {
+          navigationController?.popToRootViewController(animated: true)
+          return
+        }
+        navigationController?.popToViewController(beforeChat!, animated: true)
+        return
+      } else {
+        beforeChat = vc
+        loopCount += 1
+      }
     }
   }
 
@@ -82,47 +115,81 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
 
   open func updateTeamInfo(team: NIMTeam) {
     title = team.getShowName()
-    if team.inAllMuteMode(), team.owner != NIMSDK.shared().loginManager.currentAccount() {
+
+    if team.inAllMuteMode(), viewmodel.teamMember?.type != .manager, viewmodel.teamMember?.type != .owner {
+      // 群禁言
+      isMute = true
       chatInputView.textView.isEditable = false
       chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
       chatInputView.textView.backgroundColor = UIColor(hexString: "#E3E4E4")
       layoutInputView(offset: 0)
       chatInputView.stackView.isUserInteractionEnabled = false
+      chatInputView.setMuteInputStyle()
+      if chatInputView.chatInpuMode != .normal {
+        chatInputView.titleField.text = nil
+        didHideMultipleButtonClick()
+      }
+      closeReply(button: nil)
     } else {
+      // 解除群禁言
+      isMute = false
       chatInputView.textView.isEditable = true
       chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: "\(chatLocalizable("send_to"))\(team.getShowName())")
+
       chatInputView.textView.backgroundColor = .white
       chatInputView.stackView.isUserInteractionEnabled = true
+      chatInputView.setUnMuteInputStyle()
+    }
+  }
+
+  override open func onRecvMessages(_ messages: [NIMMessage]) {
+    super.onRecvMessages(messages)
+    for message in messages {
+      if let object = message.messageObject as? NIMNotificationObject,
+         let content = object.content as? NIMTeamNotificationContent {
+        if content.operationType == .leave,
+           IMKitClient.instance.isMySelf(content.sourceID) {
+          isLeaveTeamBySelf = true
+          if onCurrentPage {
+            popGroupChatVC()
+          }
+        } else if content.operationType == .kick,
+                  let targetIDs = content.targetIDs,
+                  targetIDs.contains(IMKitClient.instance.imAccid()) {
+          // 被移出群聊
+          isLeaveTeamByOther = true
+          if onCurrentPage {
+            showSingleAlert(message: chatLocalizable("team_has_been_quit")) { [weak self] in
+              self?.navigationController?.popViewController(animated: true)
+            }
+          }
+        } else if content.operationType == .dismiss {
+          if isdismissDiscuss {
+            return
+          }
+
+          // 解散群聊
+          isdismissTeam = true
+          if onCurrentPage {
+            showSingleAlert(message: chatLocalizable("team_has_been_removed")) { [weak self] in
+              self?.navigationController?.popViewController(animated: true)
+            }
+          }
+        }
+      }
     }
   }
 
   //    MARK: TeamChatViewModelDelegate
 
   open func onTeamRemoved(team: NIMTeam) {
-    // 退出讨论组
+    // 多端登录另一端解散、退出讨论组
     if team.isDisscuss() == true {
-      navigationController?.popViewController(animated: true)
-      return
-    }
-
-    // 离开群聊
-    if team.teamId == viewmodel.session.sessionId {
-      if team.owner != NIMSDK.shared().loginManager.currentAccount() { // 退出群聊
-        if isLeaveTeamBySelf {
-          navigationController?.popViewController(animated: true)
-        } else {
-          isdismissTeam = true
-          // 被动解散群聊
-          if onCurrentPage {
-            weak var weakSelf = self
-            showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
-              weakSelf?.navigationController?.popViewController(animated: true)
-            }
-          }
-        }
-      } else { // 主动解散
-        navigationController?.popViewController(animated: true)
+      isdismissDiscuss = true
+      if onCurrentPage {
+        popGroupChatVC()
       }
+      return
     }
   }
 
@@ -133,7 +200,15 @@ open class GroupChatViewController: NormalChatViewController, TeamChatViewModelD
     updateTeamInfo(team: team)
   }
 
-  public func onTeamMemberUpdate(team: NIMTeam) {
+  open func onTeamMemberUpdate(team: NIMTeam) {
     didRefreshTable()
+  }
+
+  override public func onTeamMemberChange(team: NIMTeam) {
+    if viewmodel.session.sessionId != team.teamId {
+      return
+    }
+    (viewmodel as? TeamChatViewModel)?.getTeamMember()
+    updateTeamInfo(team: team)
   }
 }

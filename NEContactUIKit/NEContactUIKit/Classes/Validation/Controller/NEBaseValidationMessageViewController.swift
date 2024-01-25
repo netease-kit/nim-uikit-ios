@@ -97,7 +97,7 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
     }
   }
 
-  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     viewModel.clearNotiUnreadCount()
     return true
   }
@@ -120,8 +120,8 @@ extension NEBaseValidationMessageViewController: UITableViewDelegate, UITableVie
 }
 
 extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate {
-  public func changeValidationStatus(notifiModel: XNotification, notiStatus: IMHandleStatus) {
-    var notifiModels = [XNotification]()
+  open func changeValidationStatus(notifiModel: NENotification, notiStatus: NEHandleStatus) {
+    var notifiModels = [NENotification]()
     if let msgList = notifiModel.msgList,
        msgList.count > 0 {
       for msg in msgList {
@@ -141,7 +141,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
     loadData()
   }
 
-  open func onAccept(_ notifiModel: XNotification) {
+  open func onAccept(_ notifiModel: NENotification) {
     weak var weakSelf = self
     guard let teamId = notifiModel.targetID, let invitorId = notifiModel.sourceID else {
       return
@@ -157,7 +157,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
           NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK acceptInviteWithTeam failed,error = \(error!.localizedDescription)")
           if err.code == 807 || err.code == 809 {
             weakSelf?.showToast(localizable("validate_processed"))
-          } else if err.code == 803 {
+          } else if err.code == teamNotExistCode {
             weakSelf?.showToast(localizable("team_not_exist"))
           } else {
             weakSelf?.showToast(localizable("failed_operation"))
@@ -186,7 +186,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
     }
   }
 
-  open func onRefuse(_ notifiModel: XNotification) {
+  open func onRefuse(_ notifiModel: NENotification) {
     weak var weakSelf = self
     guard let teamId = notifiModel.targetID, let invitorId = notifiModel.sourceID else {
       return
@@ -202,7 +202,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
           NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK rejectInviteWithTeam failed,error = \(error!.localizedDescription)")
           if err.code == 807 || err.code == 809 {
             weakSelf?.showToast(localizable("validate_processed"))
-          } else if err.code == 803 {
+          } else if err.code == teamNotExistCode {
             weakSelf?.showToast(localizable("team_not_exist"))
           } else {
             weakSelf?.showToast(localizable("failed_operation"))

@@ -19,9 +19,9 @@ import UIKit
   @objc optional func needScrollAnimation() -> Bool
 }
 
-public class EmojiPageView: UIView {
-  public weak var dataSource: EmojiPageViewDataSource?
-  public weak var pageViewDelegate: EmojiPageViewDelegate?
+open class EmojiPageView: UIView {
+  open weak var dataSource: EmojiPageViewDataSource?
+  open weak var pageViewDelegate: EmojiPageViewDelegate?
   private var currentPage: NSInteger = 0
   private var pages = [AnyObject]()
   private let className = "EmojiPageView"
@@ -31,7 +31,7 @@ public class EmojiPageView: UIView {
     setupControls()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -52,14 +52,14 @@ public class EmojiPageView: UIView {
     addSubview(scrollView)
   }
 
-  public func scrollToPage(page: NSInteger) {
+  open func scrollToPage(page: NSInteger) {
     if currentPage != page || page == 0 {
       currentPage = page
       reloadData()
     }
   }
 
-  public func reloadData() {
+  open func reloadData() {
     calculatePageNumbers()
     setupInit()
 //       reloadPage()
@@ -187,7 +187,7 @@ public class EmojiPageView: UIView {
     }
   }
 
-  override public func layoutSubviews() {
+  override open func layoutSubviews() {
     super.layoutSubviews()
     let size = bounds.size
     scrollView.contentSize = CGSize(

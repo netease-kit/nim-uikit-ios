@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
-import NECommonKit
-import YXLogin
-import NECoreIMKit
 import NEChatUIKit
+import NECommonKit
+import NECoreIMKit
+import UIKit
+import YXLogin
 
 public class NELoginViewController: UIViewController {
   // 登录成功
@@ -156,6 +156,7 @@ public class NELoginViewController: UIViewController {
     label.text = NSLocalizedString("appName", comment: "")
     label.font = UIFont.systemFont(ofSize: 24.0)
     label.textColor = UIColor(hexString: "333333")
+    label.accessibilityIdentifier = "id.appYunxin"
     return label
   }()
 
@@ -168,6 +169,7 @@ public class NELoginViewController: UIViewController {
     btn.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
     btn.setTitle(NSLocalizedString("register_login", comment: ""), for: .normal)
     btn.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
+    btn.accessibilityIdentifier = "id.loginButton"
     return btn
   }()
 
@@ -178,7 +180,7 @@ public class NELoginViewController: UIViewController {
     btn.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
     btn.setTitle(NSLocalizedString("email_login", comment: ""), for: .normal)
     btn.addTarget(self, action: #selector(emailLoginBtnClick), for: .touchUpInside)
-
+    btn.accessibilityIdentifier = "id.emailLogin"
     return btn
   }()
 
@@ -196,7 +198,7 @@ public class NELoginViewController: UIViewController {
     btn.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
     btn.setTitle(NSLocalizedString("node_select", comment: ""), for: .normal)
     btn.addTarget(self, action: #selector(nodeBtnClick), for: .touchUpInside)
-
+    btn.accessibilityIdentifier = "id.serverConfig"
     return btn
   }()
 }

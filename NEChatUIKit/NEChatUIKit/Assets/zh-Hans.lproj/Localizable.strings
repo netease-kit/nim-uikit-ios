@@ -24,7 +24,6 @@
 "downloading"="正在下载中...";
 "read"="已读(0）";
 "unread"="未读(0）";
-"network_unavailable"="当前网络不可用，请检查你的网络设置";
 
 //MARK: tips
 //MARK: team
@@ -41,7 +40,7 @@
 "out"="移除了 ";
 "has_updated" = "更新了";
 "to" = "为 ";
-"only_team_owner" = "仅群主";
+"only_team_owner" = "群主和管理员";
 "everyone" = "所有人";
 
 "team_name" = "名称";
@@ -60,13 +59,14 @@
 "not_mute" = "解除禁言";
 "mute" = "禁言";
 "team_has_been_removed" = "当前群聊已解散";
+"team_has_been_quit" = "您已被移除群聊";
 "team_has_quit" = "已退出群聊";
 "join"="进入了";
 "pass"="通过了";
 "leave"="退出了";
 "transfer"="转移了群主身份给";
-"added_manager"="被添加为群管理员";
-"removed_manager"="被撤销了群管理员身份";
+"added_manager"="被任命为群管理员";
+"removed_manager"="被移除管理员";
 "accept"="接受入群邀请来自";
 "team_mute"="当前群主设置为禁言";
 "team_all_mute"="群禁言已开启";
@@ -89,7 +89,6 @@
 "operation_delete"="删除";
 "operation_recall"="撤回";
 "withdrew_message" = "撤回了一条消息";
-"message_has_be_withdrawn" = "此消息已撤回";
 "message_reedit" = "重新编辑";
 "message_revoke_confirm" = "确认要撤回该消息吗？";
 "message_delete_confirm"="确认要删除该消息吗？";
@@ -100,13 +99,16 @@
 "collection_success"="已收藏";
 "no_permession"="暂无权限";
 "msg_reply"="回复";
-"msg_image"="图片消息";
-"msg_audio"="语音消息";
-"msg_video"="视频消息";
-"msg_file"="文件消息";
-"msg_location"="地理位置";
-"msg_custom"="自定义消息";
-"msg_unknown"="未知消息体";
+"msg_image"="[图片消息]";
+"msg_audio"="[语音消息]";
+"msg_video"="[视频消息]";
+"msg_file"="[文件消息]";
+"msg_location"="[地理位置]";
+"msg_rtc_audio"="[语音通话]";
+"msg_rtc_video"="[视频通话]";
+"msg_rtc_call"="[音视频通话]";
+"msg_custom"="[自定义消息]";
+"msg_unknown"="[未知消息体]";
 "message_read"="消息阅读状态";
 "message_all_unread"="全部成员未读";
 "user_select"="选择提醒";
@@ -141,7 +143,7 @@
 "message_recalled"="此消息已撤回";
 
 "video_call"="视频通话";
-"audio_call"="音频通话";
+"audio_call"="语音通话";
 
 "call_complete"="通话时长";
 "call_canceled"="已取消";
@@ -179,4 +181,21 @@
 
 "no_location"="请选择你要发送的位置信息";
 
-"delete_failed"="删除失败";
+// 多选
+"select_multi"="合并转发";
+"select_per_item"="逐条转发";
+"chat_history"="聊天记录";
+"chat_history_by"="的消息";
+"leave_message"="留言";
+"exist_invalid"="存在不可转发的消息体，是否去除后发送？";
+"forward_failed"="系统异常，转发失败";
+"multiForward_open_failed"="信息获取失败";
+"file_check_failed"="文件校验失败";
+"per_item_forward_limit"="逐条转发限制%d条消息";
+"multiForward_forward_limit"="合并转发限制%d条消息";
+"exception_description"="异常说明";
+
+"multiple_line_placleholder"="请输入标题";
+"null_message_not_support"="不支持发送空消息";
+
+"black_list_tip"="对方已将您拉黑，消息无法发送";

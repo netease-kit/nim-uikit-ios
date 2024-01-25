@@ -22,6 +22,8 @@
 		39ED7B1E290FA9C700CAE608 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39ED7B20290FA9C700CAE608 /* Localizable.strings */; };
 		DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD774A7629485F6600347A9E /* CustomRouterViewController.m */; };
 		DDC1AC8929651B6C008C085A /* ConversationController+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = DDC1AC8829651B6C008C085A /* ConversationController+Test.m */; };
+		DDE8123A29E950440040E401 /* InhertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8123929E950440040E401 /* InhertViewController.swift */; };
+		DDE8123C29E9510F0040E401 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8123B29E9510F0040E401 /* TestViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +74,8 @@
 		DD774A7629485F6600347A9E /* CustomRouterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomRouterViewController.m; sourceTree = "<group>"; };
 		DDC1AC8729651B6C008C085A /* ConversationController+Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ConversationController+Test.h"; sourceTree = "<group>"; };
 		DDC1AC8829651B6C008C085A /* ConversationController+Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ConversationController+Test.m"; sourceTree = "<group>"; };
+		DDE8123929E950440040E401 /* InhertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InhertViewController.swift; sourceTree = "<group>"; };
+		DDE8123B29E9510F0040E401 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMUIKitOCExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		F984299B79B347145EA4AF84 /* Pods-IMUIKitOCExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IMUIKitOCExample.debug.xcconfig"; path = "Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,6 +183,8 @@
 				DD774A7629485F6600347A9E /* CustomRouterViewController.m */,
 				DDC1AC8729651B6C008C085A /* ConversationController+Test.h */,
 				DDC1AC8829651B6C008C085A /* ConversationController+Test.m */,
+				DDE8123B29E9510F0040E401 /* TestViewController.swift */,
+				DDE8123929E950440040E401 /* InhertViewController.swift */,
 				39ED7B20290FA9C700CAE608 /* Localizable.strings */,
 				DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */,
 			);
@@ -205,7 +211,7 @@
 				39A2F20628D9B2C400DDCAF2 /* Frameworks */,
 				39A2F20728D9B2C400DDCAF2 /* Resources */,
 				DB787379DE2DF44860C11CF1 /* [CP] Embed Pods Frameworks */,
-				8F14E37FD20AEF03EA4142FE /* [CP] Copy Pods Resources */,
+				2A3377106BCBB5C08F3A27B1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -325,7 +331,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8F14E37FD20AEF03EA4142FE /* [CP] Copy Pods Resources */ = {
+		2A3377106BCBB5C08F3A27B1 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -394,6 +400,8 @@
 				39A2F24B28DABC6700DDCAF2 /* NENavigationController.m in Sources */,
 				39A2F24728DABC1700DDCAF2 /* NETabbarController.m in Sources */,
 				39A2F21F28D9B2C500DDCAF2 /* main.m in Sources */,
+				DDE8123A29E950440040E401 /* InhertViewController.swift in Sources */,
+				DDE8123C29E9510F0040E401 /* TestViewController.swift in Sources */,
 				DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -593,7 +601,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -629,7 +637,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -647,6 +655,7 @@
 		39A2F23C28D9B2C600DDCAF2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -664,6 +673,7 @@
 		39A2F23D28D9B2C600DDCAF2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -681,6 +691,7 @@
 		39A2F23F28D9B2C600DDCAF2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -696,6 +707,7 @@
 		39A2F24028D9B2C600DDCAF2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

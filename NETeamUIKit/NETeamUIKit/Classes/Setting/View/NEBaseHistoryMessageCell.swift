@@ -10,17 +10,6 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
   public var searchText: String?
   public var rangeTextColor = UIColor.ne_blueText
 
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setupSubviews()
@@ -44,21 +33,20 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
 
     guard let searchStr = searchText else { return }
 
-    if let range = resultText.findAllIndex(searchStr).first {
-      let attributedStr = NSMutableAttributedString(string: resultText)
-      // range必须要加，参数分别表示从索引几开始取几个字符
-      attributedStr.addAttribute(
-        .foregroundColor,
-        value: rangeTextColor,
-        range: range
-      )
-      subTitle.attributedText = attributedStr
-    }
+    let attributedStr = NSMutableAttributedString(string: resultText)
+    // range 表示从索引几开始取几个字符
+    let range = attributedStr.mutableString.range(of: searchStr)
+    attributedStr.addAttribute(
+      .foregroundColor,
+      value: rangeTextColor,
+      range: range
+    )
+    subTitle.attributedText = attributedStr
 
     title.text = message?.name
     timeLabel.text = message?.time
 
-    if let imageName = message?.avatar {
+    if let imageName = message?.avatar, !imageName.isEmpty {
       headImge.setTitle("")
       headImge.sd_setImage(with: URL(string: imageName), completed: nil)
     } else {

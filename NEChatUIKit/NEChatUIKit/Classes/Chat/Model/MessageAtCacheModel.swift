@@ -5,7 +5,7 @@
 import UIKit
 
 @objcMembers
-public class MessageAtCacheModel: NSObject {
+open class MessageAtCacheModel: NSObject {
   public var atModel: MessageAtInfoModel
   public var accid: String
   public var text: String?

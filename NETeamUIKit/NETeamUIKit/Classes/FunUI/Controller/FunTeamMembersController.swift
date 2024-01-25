@@ -4,6 +4,8 @@
 
 import NECommonKit
 import UIKit
+
+@objcMembers
 open class FunTeamMembersController: NEBaseTeamMembersController {
   let searchGrayBackView: UIView = {
     let view = UIView()
@@ -36,7 +38,29 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
     ) as? FunTeamMemberCell {
       if let model = getRealModel(indexPath.row) {
         cell.configure(model)
-        cell.ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
+        var isShowRemove = false
+        if isOwner(model.nimUser?.userId) {
+          cell.ownerLabel.isHidden = false
+          cell.ownerLabel.text = localizable("team_owner")
+          cell.setOwnerStyle()
+        } else if model.teamMember?.type == .manager {
+          cell.ownerLabel.isHidden = false
+          cell.ownerLabel.text = localizable("team_manager")
+          cell.setManagerStyle()
+          if isOwner(IMKitClient.instance.imAccid()) {
+            isShowRemove = true
+          }
+        } else {
+          if isOwner(IMKitClient.instance.imAccid()) || viewmodel.currentMember?.type == .manager {
+            isShowRemove = true
+          }
+          cell.ownerLabel.isHidden = true
+        }
+        cell.index = indexPath.row
+        cell.delegate = self
+        cell.configure(model)
+        cell.removeBtn.isHidden = !isShowRemove
+        cell.removeLabel.isHidden = !isShowRemove
       }
       if isLastRow(indexPath.row) {
         cell.dividerLine.isHidden = true
@@ -58,7 +82,7 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
         return true
       }
     }
-    if let originDatas = datas, originDatas.count - 1 == index {
+    if viewmodel.datas.count - 1 == index {
       return true
     }
     return false

@@ -10,17 +10,6 @@ open class NEBaseContactSelectedCell: NEBaseContactTableViewCell {
 
   var sModel: ContactInfo?
 
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   override open func commonUI() {
     super.commonUI()
     leftConstraint?.constant = 50
@@ -30,7 +19,7 @@ open class NEBaseContactSelectedCell: NEBaseContactTableViewCell {
     sImage.accessibilityIdentifier = "id.selector"
   }
 
-  override public func setModel(_ model: ContactInfo) {
+  override open func setModel(_ model: ContactInfo) {
     super.setModel(model)
     if model.isSelected == false {
       sImage.isHighlighted = false

@@ -28,7 +28,7 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
     tableView.rowHeight = 64
   }
 
-  override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(FunBlackListCell.self))",
       for: indexPath
@@ -39,7 +39,7 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
     return cell
   }
 
-  override public func getContactSelectVC() -> NEBaseContactsSelectedViewController {
+  override open func getContactSelectVC() -> NEBaseContactsSelectedViewController {
     FunContactsSelectedViewController()
   }
 }

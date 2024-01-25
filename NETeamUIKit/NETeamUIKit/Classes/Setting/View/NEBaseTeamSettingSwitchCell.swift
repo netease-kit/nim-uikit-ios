@@ -24,7 +24,7 @@ open class NEBaseTeamSettingSwitchCell: NEBaseTeamSettingCell {
     super.init(coder: coder)
   }
 
-  override public func configure(_ anyModel: Any) {
+  override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
     if let open = model?.switchOpen {
       tSwitch.isOn = open
@@ -37,7 +37,7 @@ open class NEBaseTeamSettingSwitchCell: NEBaseTeamSettingCell {
     tSwitch.addTarget(self, action: #selector(switchChange(_:)), for: .touchUpInside)
   }
 
-  public func switchChange(_ s: UISwitch) {
+  open func switchChange(_ s: UISwitch) {
     if let block = model?.swichChange {
       block(s.isOn)
     }

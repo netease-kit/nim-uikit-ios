@@ -15,7 +15,7 @@ open class FunTeamArrowSettingCell: NEBaseTeamArrowSettingCell {
     super.init(coder: coder)
   }
 
-  override public func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .left, constant: 16)
     contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .right, constant: 0)

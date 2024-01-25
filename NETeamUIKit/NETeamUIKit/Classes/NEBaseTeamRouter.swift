@@ -3,12 +3,13 @@
 // found in the LICENSE file.
 
 import Foundation
+import NECommonKit
 import NECoreIMKit
 import NECoreKit
 import NIMSDK
 
 @objcMembers
-public class TeamRouter: NSObject {
+open class TeamRouter: NSObject {
   public static let repo = TeamRepo.shared
   public static var iconUrls = ["https://s.netease.im/safe/ABg8YjWQWvcqO6sAAAAAAAAAAAA?_im_url=1",
                                 "https://s.netease.im/safe/ABg8YjmQWvcqO6sAAAAAAAABAAA?_im_url=1",
@@ -42,6 +43,12 @@ public class TeamRouter: NSObject {
         option.beInviteMode = .noAuth
         option.updateInfoMode = .all
         option.updateClientCustomMode = .all
+        var disucssFlag = [String: Any]()
+        disucssFlag[discussTeamKey] = true
+        let jsonString = NECommonUtil.getJSONStringFromDictionary(disucssFlag)
+        if jsonString.count > 0 {
+          option.clientCustomInfo = jsonString
+        }
 
         repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
           var result = [String: Any]()
@@ -52,19 +59,6 @@ public class TeamRouter: NSObject {
             result["code"] = 0
             result["msg"] = "ok"
             result["teamId"] = teamid
-            repo.sendCreateAdavanceNoti(
-              teamid ?? "",
-              localizable("create_senior_team_noti")
-            ) { error in
-              print("send noti message  : ", error as Any)
-            }
-            if let tid = teamid {
-              repo.updateTeamCustomInfo(discussTeamKey, tid) { error in
-                if let err = error {
-                  print(#function + "error: \(err.localizedDescription)")
-                }
-              }
-            }
           }
           Router.shared.use(TeamCreateDiscussResult, parameters: result, closure: nil)
         }

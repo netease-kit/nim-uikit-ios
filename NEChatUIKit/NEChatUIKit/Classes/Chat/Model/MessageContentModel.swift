@@ -10,25 +10,38 @@ import NIMSDK
 import simd
 
 @objcMembers
-public class MessageContentModel: NSObject, MessageModel {
+open class MessageContentModel: NSObject, MessageModel {
   public var offset: CGFloat = 0
-  public func cellHeight() -> CGFloat {
+  open func cellHeight() -> CGFloat {
     CGFloat(height) + offset
   }
 
   public var isReplay: Bool = false
+  public var showSelect: Bool = false // 多选按钮是否展示
+  public var isSelected: Bool = false // 多选是否选中
+  public var inMultiForward: Bool = false { // 是否是合并消息中的子消息
+    didSet {
+//      fullNameHeight = 0 // 合并消息中的子消息不显示昵称
+      fullNameHeight = 20 // 合并消息中的子消息显示昵称
+      if inMultiForward {
+        height += fullNameHeight
+      } else if oldValue {
+        height -= fullNameHeight
+      }
+    }
+  }
 
   public var pinAccount: String?
   public var pinShowName: String?
   public var type: MessageType = .custom
   public var message: NIMMessage?
   public var contentSize = CGSize(width: 32.0, height: chat_min_h)
-  public var height: Float = 48
+  public var height: CGFloat = 48
   public var shortName: String? // 昵称 > uid
   public var fullName: String? // 备注 >（群昵称）> 昵称 > uid
   public var avatar: String?
   public var replyText: String?
-  public var fullNameHeight: Float = 0
+  public var fullNameHeight: CGFloat = 0
   public var isRevokedText: Bool = false
   public var timeOut = false
 
@@ -59,11 +72,21 @@ public class MessageContentModel: NSObject, MessageModel {
         } else {
           contentSize = CGSize(width: 130, height: chat_min_h)
         }
-        height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+        height = contentSize.height + chat_content_margin + fullNameHeight
+
+        // time
+        if let time = timeContent, !time.isEmpty {
+          height += chat_timeCellH
+        }
       } else {
         type = .custom
         contentSize = CGSize(width: 32.0, height: chat_min_h)
-        height = Float(chat_min_h + chat_content_margin) + fullNameHeight
+        height = chat_min_h + chat_content_margin + fullNameHeight
+
+        // time
+        if let time = timeContent, !time.isEmpty {
+          height += chat_timeCellH
+        }
       }
     }
   }
@@ -71,9 +94,18 @@ public class MessageContentModel: NSObject, MessageModel {
   public var isPined: Bool = false {
     didSet {
       if isPined {
-        height = Float(contentSize.height + chat_content_margin) + fullNameHeight + Float(chat_pin_height)
-      } else {
-        height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+        height += chat_pin_height
+      } else if oldValue {
+        height -= chat_pin_height
+      }
+    }
+  }
+
+  // 是否显示时间
+  public var timeContent: String? {
+    didSet {
+      if let time = timeContent, !time.isEmpty, time != oldValue {
+        height += chat_timeCellH
       }
     }
   }
@@ -82,8 +114,8 @@ public class MessageContentModel: NSObject, MessageModel {
     self.message = message
     if message?.session?.sessionType == .team,
        !IMKitClient.instance.isMySelf(message?.from) {
-      fullNameHeight = 20
+      fullNameHeight = NEKitChatConfig.shared.ui.messageProperties.showTeamMessageNick ? 20 : 0
     }
-    print("self.fullNameHeight\(fullNameHeight)")
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

@@ -68,7 +68,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
       teamHeader.widthAnchor.constraint(equalToConstant: 50),
       teamHeader.heightAnchor.constraint(equalToConstant: 50),
     ])
-    if let url = viewmodel.teamInfoModel?.team?.avatarUrl {
+    if let url = viewmodel.teamInfoModel?.team?.avatarUrl, !url.isEmpty {
       print("icon url : ", url)
       teamHeader.sd_setImage(with: URL(string: url), completed: nil)
     } else {
@@ -164,7 +164,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     addBtn.addTarget(self, action: #selector(addUser), for: .touchUpInside)
 
     if viewmodel.isNormalTeam() == false, viewmodel.isOwner() == false,
-       let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, inviteMode == .manager {
+       let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, let member = viewmodel.memberInTeam, inviteMode == .manager, member.type != .manager {
       addBtnWidth?.constant = 0
       addBtn.isHidden = true
     }
@@ -229,8 +229,22 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   override open func checkoutAddShowOrHide() {
     if viewmodel.isNormalTeam() == false, viewmodel.isOwner() == false,
        let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, inviteMode == .manager {
-      return
+      if let member = viewmodel.memberInTeam, member.type == .manager {
+        addBtn.isHidden = false
+        addBtnWidth?.constant = 36.0
+        addBtnLeftMargin?.constant = 16
+        checkMemberCountLimit()
+      } else {
+        addBtn.isHidden = true
+        addBtnWidth?.constant = 0
+        addBtnLeftMargin?.constant = 0
+      }
+    } else {
+      checkMemberCountLimit()
     }
+  }
+
+  func checkMemberCountLimit() {
     if viewmodel.teamInfoModel?.team?.level == viewmodel.teamInfoModel?.team?.memberNumber {
       addBtn.isHidden = true
       addBtnWidth?.constant = 0
@@ -294,6 +308,13 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
       parameters: ["nav": navigationController as Any, "teamId": tid],
       closure: nil
     )
+  }
+
+  override open func didClickTeamManage() {
+    let manageTeam = FunTeamManageController()
+    manageTeam.managerUsers = getManaterUsers()
+    manageTeam.viewmodel.teamInfoModel = viewmodel.teamInfoModel
+    navigationController?.pushViewController(manageTeam, animated: true)
   }
 
   override open func collectionView(_ collectionView: UICollectionView,

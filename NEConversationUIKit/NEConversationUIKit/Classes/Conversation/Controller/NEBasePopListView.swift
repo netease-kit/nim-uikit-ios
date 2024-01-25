@@ -19,7 +19,7 @@ open class PopListItem: NSObject {
 }
 
 @objcMembers
-open class NEBasePopListViewController: UIViewController {
+open class NEBasePopListView: UIView {
   public let shadowView = UIView()
   public var buttonHeight: CGFloat = 32.0
   let popView = UIView()
@@ -31,27 +31,25 @@ open class NEBasePopListViewController: UIViewController {
   public var itemDatas = [PopListItem]() {
     didSet {
       popViewHeight = CGFloat(itemDatas.count) * 32 + 16
+      setupUI()
     }
   }
 
-  override public func viewDidLoad() {
-    super.viewDidLoad()
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationController?.isNavigationBarHidden = false
       topConstant = 10
     } else {
       topConstant = NEConstant.navigationAndStatusHeight
     }
-    setupUI()
   }
 
-  override public func viewDidDisappear(_ animated: Bool) {
-    super.viewDidDisappear(animated)
-    removeSelf()
+  public required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   func setupUI() {
-    view.backgroundColor = .clear
+    backgroundColor = .clear
 
     shadowView.translatesAutoresizingMaskIntoConstraints = false
     shadowView.backgroundColor = .clear
@@ -60,7 +58,7 @@ open class NEBasePopListViewController: UIViewController {
     shadowView.layer.shadowColor = UIColor.ne_operationBorderColor.cgColor
     shadowView.layer.shadowOpacity = 0.25
     shadowView.layer.shadowRadius = 7
-    view.addSubview(shadowView)
+    addSubview(shadowView)
 
     NSLayoutConstraint.activate([
       shadowView.widthAnchor.constraint(equalToConstant: popViewWidth),
@@ -79,6 +77,7 @@ open class NEBasePopListViewController: UIViewController {
       popView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor),
     ])
 
+    popView.subviews.forEach { $0.removeFromSuperview() }
     let offset: CGFloat = 8
     for index in 0 ..< itemDatas.count {
       let item = itemDatas[index]
@@ -119,11 +118,11 @@ open class NEBasePopListViewController: UIViewController {
     removeSelf()
   }
 
-  public func removeSelf() {
-    view.removeFromSuperview()
+  open func removeSelf() {
+    removeFromSuperview()
   }
 
-  override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+  override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     print("pop list view touchesBegan")
     removeSelf()
   }

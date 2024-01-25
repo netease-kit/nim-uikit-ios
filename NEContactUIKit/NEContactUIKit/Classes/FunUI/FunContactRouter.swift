@@ -13,10 +13,8 @@ public extension ContactRouter {
     Router.shared.register(ContactUserSelectRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
-      let contactSelectVC = FunContactsSelectedViewController()
-      if let fiters = param["filters"] as? Set<String> {
-        contactSelectVC.filterUsers = fiters
-      }
+      let filters = param["filters"] as? Set<String>
+      let contactSelectVC = FunContactsSelectedViewController(filterUsers: filters)
       if let limit = param["limit"] as? Int, limit > 0 {
         contactSelectVC.limit = limit
       }
@@ -34,10 +32,10 @@ public extension ContactRouter {
 
     Router.shared.register(ContactUserInfoPageRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
-        if let user = param["user"] as? User {
+        if let user = param["user"] as? NEKitUser {
           let userInfoVC = FunContactUserViewController(user: user)
           nav.pushViewController(userInfoVC, animated: true)
-        } else if let nimUser = param["nim_user"] as? User {
+        } else if let nimUser = param["nim_user"] as? NEKitUser {
           let userInfoVC = FunContactUserViewController(user: nimUser)
           nav.pushViewController(userInfoVC, animated: true)
         } else if let uid = param["uid"] as? String {

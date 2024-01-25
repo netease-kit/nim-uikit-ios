@@ -24,29 +24,51 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
     headerView.layer.cornerRadius = 4.0
 
     contentView.addSubview(ownerLabel)
+    ownerWidth = ownerLabel.widthAnchor.constraint(equalToConstant: 48.0)
     NSLayoutConstraint.activate([
-      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -55),
       ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ownerLabel.heightAnchor.constraint(equalToConstant: 25.0),
-      ownerLabel.widthAnchor.constraint(equalToConstant: 48.0),
+      ownerWidth!,
     ])
 
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
       nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -70),
+      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -115),
     ])
-    ownerLabel.textColor = UIColor.funTeamMemberOwnerFlagColor
-    ownerLabel.backgroundColor = UIColor.funTeamMemberOwnerFlagColor.withAlphaComponent(0.1)
-    ownerLabel.layer.borderColor = UIColor.funTeamMemberOwnerFlagColor.cgColor
+    setOwnerStyle()
 
     contentView.addSubview(dividerLine)
     NSLayoutConstraint.activate([
       dividerLine.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-      dividerLine.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      dividerLine.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0),
       dividerLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       dividerLine.heightAnchor.constraint(equalToConstant: 1),
     ])
+
+    contentView.addSubview(removeLabel)
+    removeLabel.textColor = .funTeamRemoveLabelColor
+    NSLayoutConstraint.activate([
+      removeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      removeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+    ])
+
+    setupRemoveButton()
+  }
+
+  func setOwnerStyle() {
+    ownerLabel.textColor = UIColor.funTeamMemberOwnerFlagColor
+    ownerLabel.backgroundColor = UIColor.funTeamMemberOwnerFlagColor.withAlphaComponent(0.1)
+    ownerLabel.layer.borderColor = UIColor.funTeamMemberOwnerFlagColor.cgColor
+    ownerWidth?.constant = 48
+  }
+
+  func setManagerStyle() {
+    ownerLabel.textColor = UIColor.funTeamMangerLabelTextColor
+    ownerLabel.backgroundColor = UIColor.funTeamManagerLabelBorderColor.withAlphaComponent(0.1)
+    ownerLabel.layer.borderColor = UIColor.funTeamManagerLabelBorderColor.cgColor
+    ownerWidth?.constant = 60
   }
 }

@@ -9,14 +9,12 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDelegate {
-//    typealias SaveCompletion = () -> Void
-//
-//    var block: SaveCompletion?
-
   public var team: NIMTeam?
   public let textLimit = 100
   public let repo = TeamRepo.shared
   public let backView = UIView()
+
+  public let viewmodel = TeamIntroduceViewModel()
 
   public lazy var textView: UITextView = {
     let text = UITextView()
@@ -50,6 +48,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    viewmodel.getCurrentUserTeamMember(team?.teamId)
     setupUI()
   }
 
@@ -93,6 +92,9 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
     if let mode = team?.updateInfoMode, mode == .all {
       return true
     }
+    if let member = viewmodel.currentTeamMember, member.type == .manager {
+      return true
+    }
     return false
   }
 
@@ -113,8 +115,12 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
           desc: "CALLBACK updateTeamIntroduce " + (error?.localizedDescription ?? "no error")
         )
         weakSelf?.view.hideToastActivity()
-        if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
+        if let err = error as? NSError {
+          if err.code == noNetworkCode {
+            weakSelf?.showToast(commonLocalizable("network_error"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
         } else {
           weakSelf?.team?.intro = text
           weakSelf?.navigationController?.popViewController(animated: true)

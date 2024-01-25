@@ -118,9 +118,13 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
         emptyLabel.bottomAnchor.constraint(equalTo: back.bottomAnchor, constant: -40),
       ])
     }
+    mapView?.isUserInteractionEnabled = false
+    if let gesture = contentGesture {
+      back.addGestureRecognizer(gesture)
+    }
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
     if let m = item.chatmodel as? MessageLocationModel {
       locationTitleLabel.text = m.title

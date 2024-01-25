@@ -6,14 +6,14 @@
 import UIKit
 
 @objcMembers
-public class ChatSectionView: UITableViewHeaderFooterView {
+open class ChatSectionView: UITableViewHeaderFooterView {
   public var titleLabel = UILabel()
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

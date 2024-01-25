@@ -105,24 +105,17 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
   // MARK: private method
 
   func searchTextFieldChange(textfield: SearchTextField) {
-    if textfield.text?.count == 0 {
+    guard let searchText = textfield.text else {
+      return
+    }
+    if searchText.count <= 0 {
       viewmodel.searchResultInfos?.removeAll()
       emptyView.isHidden = true
       tableView.reloadData()
-    }
-  }
-
-  // MARK: UITextFieldDelegate
-
-  open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    guard let searchText = textField.text else {
-      return false
-    }
-    if searchText.count <= 0 {
-      return false
+      return
     }
     guard let session = teamSession else {
-      return false
+      return
     }
     weak var weakSelf = self
     searchStr = searchText
@@ -147,8 +140,6 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
         )
       }
     }
-
-    return true
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

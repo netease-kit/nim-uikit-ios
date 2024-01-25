@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class FunUserInfoHeaderView: NEBaseUserInfoHeaderView {
-  override public func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     avatarImage.layer.cornerRadius = 4
 
@@ -19,7 +19,7 @@ open class FunUserInfoHeaderView: NEBaseUserInfoHeaderView {
     ])
   }
 
-  override public func setData(user: User?) {
+  override open func setData(user: NEKitUser?) {
     super.setData(user: user)
     guard let u = user else {
       return

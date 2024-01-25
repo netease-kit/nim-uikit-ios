@@ -15,10 +15,11 @@ protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
   func didError(_ error: NSError)
   func didClickMark()
+  func didClickTeamManage()
 }
 
 @objcMembers
-public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
+open class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   public var sectionData = [SettingSectionModel]()
 
   public var searchResultInfos: [HistoryMessageModel]?
@@ -32,6 +33,8 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   weak var delegate: TeamSettingViewModelDelegate?
 
   private let className = "TeamSettingViewModel"
+
+  public var teamSettingType: TeamSettingType = .Discuss
 
   override public init() {
     super.init()
@@ -52,7 +55,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
         return
       }
       sectionData.append(getThreeSection())
-      sectionData.append(getFourSection())
     }
   }
 
@@ -110,7 +112,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
             }
           }
         } else {
-//                    weakSelf?.repo.updateNoti(.none, tid)
+          //                    weakSelf?.repo.updateNoti(.none, tid)
           weakSelf?.repo.setTeamNotify(.none, tid) { error in
             if let err = error as? NSError {
               weakSelf?.delegate?.didNeedRefreshUI()
@@ -137,9 +139,14 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       if let tid = weakSelf?.teamInfoModel?.team?.teamId {
         let session = NIMSession(tid, type: .team)
         if isOpen {
+          // 不存在最近会话的置顶，先创建最近会话
+          if weakSelf?.getRecenterSession() == nil {
+            NELog.infoLog(weakSelf?.className() ?? "", desc: #function + "addRecentetSession")
+            weakSelf?.addRecentetSession()
+          }
           let params = NIMAddStickTopSessionParams(session: session)
           weakSelf?.repo.addStickTop(params: params) { error, info in
-            print("add stick : ", error as Any)
+            NELog.infoLog(weakSelf?.className() ?? "", desc: #function + "addStickTop error : \(error?.localizedDescription ?? "") ")
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
@@ -150,7 +157,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
         } else {
           if let info = weakSelf?.repo.getTopSessionInfo(session) {
             weakSelf?.repo.removeStickTop(params: info) { error, info in
-              print("remote stick : ", error as Any)
+              NELog.infoLog(weakSelf?.className() ?? "", desc: #function + "removeStickTop error : \(error?.localizedDescription ?? "") ")
               if let err = error {
                 weakSelf?.delegate?.didNeedRefreshUI()
                 weakSelf?.delegate?.didError(err)
@@ -163,12 +170,21 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
-    model.cellModels.append(contentsOf: [
-      mark, // 标记
-      history, // 历史记录
-      remind, // 开启消息提醒
-      setTop, // 聊天置顶
-    ])
+    let nick = SettingCellModel()
+    nick.cellName = localizable("team_nick")
+    nick.type = SettingCellType.SettingArrowCell.rawValue
+    nick.cellClick = {
+      weakSelf?.delegate?.didClickChangeNick()
+    }
+
+    model.cellModels.append(mark)
+    model.cellModels.append(history)
+    model.cellModels.append(remind)
+    model.cellModels.append(setTop)
+    if isNormalTeam() == false {
+      model.cellModels.append(nick)
+    }
+
     model.setCornerType()
     return model
   }
@@ -177,14 +193,7 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   private func getThreeSection() -> SettingSectionModel {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     let model = SettingSectionModel()
-
     weak var weakSelf = self
-    let nick = SettingCellModel()
-    nick.cellName = localizable("team_nick")
-    nick.type = SettingCellType.SettingArrowCell.rawValue
-    nick.cellClick = {
-      weakSelf?.delegate?.didClickChangeNick()
-    }
 
     let forbiddenWords = SettingCellModel()
     forbiddenWords.cellName = localizable("team_no_speak")
@@ -208,9 +217,20 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       }
     }
 
-    model.cellModels.append(nick)
+    // 群管理
+    let teamManager = SettingCellModel()
+    teamManager.cellName = localizable("manage_team")
+    teamManager.type = SettingCellType.SettingArrowCell.rawValue
+    teamManager.cellClick = {
+      weakSelf?.delegate?.didClickTeamManage()
+    }
+
     if isOwner() {
       model.cellModels.append(forbiddenWords)
+    }
+
+    if isOwner() || isManager() {
+      model.cellModels.append(teamManager)
     }
     model.setCornerType()
     return model
@@ -249,45 +269,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     modifyPermission.cellClick = {
       weakSelf?.delegate?.didUpdateTeamInfoClick(modifyPermission)
     }
-    // 产品策略调整，暂时移除该功能
-    /*
-     let agreePermission = SettingCellModel()
-       agreePermission.cellName = localizable("agree")
-       agreePermission.type = SettingCellType.SettingSwitchCell.rawValue
-     if let inviteMode = teamInfoModel?.team?.beInviteMode, inviteMode == .needAuth {
-         agreePermission.switchOpen = true
-     }
-       agreePermission.swichChange = { isOpen in
-       if let tid = weakSelf?.teamInfoModel?.team?.teamId {
-         if isOpen == true {
-           weakSelf?.repo.updateBeInviteMode(.needAuth, tid) { error in
-             print("join mode : ", error as Any)
-             if let err = error {
-                 agreePermission.switchOpen = false
-               weakSelf?.delegate?.didNeedRefreshUI()
-               weakSelf?.delegate?.didError(err)
-             } else {
-               weakSelf?.teamInfoModel?.team?.joinMode = .needAuth
-                 agreePermission.switchOpen = true
-             }
-           }
-
-         } else {
-           weakSelf?.repo.updateBeInviteMode(.noAuth, tid) { error in
-             print("join mode : ", error as Any)
-             if let err = error {
-                 agreePermission.switchOpen = true
-               weakSelf?.delegate?.didNeedRefreshUI()
-               weakSelf?.delegate?.didError(err)
-             } else {
-               weakSelf?.teamInfoModel?.team?.joinMode = .noAuth
-                 agreePermission.switchOpen = false
-             }
-           }
-         }
-       }
-     }
-     */
 
     if isOwner() {
       model.cellModels.append(contentsOf: [invitePermission, modifyPermission])
@@ -302,12 +283,6 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     weak var weakSelf = self
     repo.fetchTeamInfo(teamId) { error, teamInfo in
       weakSelf?.teamInfoModel = teamInfo
-      print("get team info user: ", teamInfo?.users as Any)
-      teamInfo?.users.forEach { member in
-        print("team meber accid : ", member.nimUser?.userId as Any)
-      }
-      print("get team info team: ", teamInfo?.team as Any)
-      print("get team info error: ", error as Any)
       if error == nil {
         weakSelf?.getData()
         weakSelf?.getCurrentMember(IMKitClient.instance.imAccid(), teamId)
@@ -321,19 +296,19 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     repo.dismissTeam(teamId, completion)
   }
 
-  public func quitTeam(_ teamId: String, _ completion: @escaping (Error?) -> Void) {
+  open func quitTeam(_ teamId: String, _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     repo.quitTeam(teamId, completion)
   }
 
-  public func getTopSessionInfo(_ session: NIMSession) -> NIMStickTopSessionInfo {
+  open func getTopSessionInfo(_ session: NIMSession) -> NIMStickTopSessionInfo {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(session.sessionId)")
     return repo.getTopSessionInfo(session)
   }
 
-  public func removeStickTop(params: NIMStickTopSessionInfo,
-                             _ completion: @escaping (NSError?, NIMStickTopSessionInfo?)
-                               -> Void) {
+  open func removeStickTop(params: NIMStickTopSessionInfo,
+                           _ completion: @escaping (NSError?, NIMStickTopSessionInfo?)
+                             -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(params.session.sessionId)")
     repo.removeStickTop(params: params, completion)
   }
@@ -349,8 +324,18 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
 
   func isOwner() -> Bool {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
+
     if let accid = teamInfoModel?.team?.owner {
       if IMKitClient.instance.isMySelf(accid) {
+        return true
+      }
+    }
+    return false
+  }
+
+  func isManager() -> Bool {
+    if let tid = teamInfoModel?.team?.teamId, let currentTeamMebmer = repo.getMemberInfo(IMKitClient.instance.imAccid(), tid) {
+      if currentTeamMebmer.type == .manager {
         return true
       }
     }
@@ -360,6 +345,9 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
   private func sampleMemberId(arr: [TeamMemberInfoModel], owner: String) -> String? {
     var index = arc4random_uniform(UInt32(arr.count))
     while arr[Int(index)].teamMember?.userId == owner {
+      if arr.count == 1 {
+        return owner
+      }
       index = arc4random_uniform(UInt32(arr.count))
     }
     return arr[Int(index)].teamMember?.userId
@@ -384,33 +372,41 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
       userId = sampleOwnerId
     }
 
+    if userId == NIMSDK.shared().loginManager.currentAccount() {
+      dismissTeam(teamId, completion)
+      return
+    }
+
     NIMSDK.shared().teamManager.transferManager(withTeam: teamId, newOwnerId: userId, isLeave: true) { error in
       completion(error)
     }
   }
 
-  public func updateInfoMode(_ mode: NIMTeamUpdateInfoMode, _ teamId: String,
-                             _ completion: @escaping (Error?) -> Void) {
+  open func updateInfoMode(_ mode: NIMTeamUpdateInfoMode, _ teamId: String,
+                           _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", mode:\(mode.rawValue)")
     repo.updateTeamInfoPrivilege(mode, teamId, completion)
   }
 
-  public func updateInviteMode(_ mode: NIMTeamInviteMode, _ teamId: String,
-                               _ completion: @escaping (Error?) -> Void) {
+  open func updateInviteMode(_ mode: NIMTeamInviteMode, _ teamId: String,
+                             _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", mode:\(mode.rawValue)")
     repo.updateInviteMode(mode, teamId, completion)
   }
 
-  public func isNormalTeam() -> Bool {
+  open func isNormalTeam() -> Bool {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     if let type = teamInfoModel?.team?.type, type == .normal {
+      return true
+    }
+    if teamInfoModel?.team?.clientCustomInfo?.contains(discussTeamKey) == true {
       return true
     }
     return false
   }
 
-  public func searchMessages(_ session: NIMSession, option: NIMMessageSearchOption,
-                             _ completion: @escaping (NSError?, [HistoryMessageModel]?) -> Void) {
+  open func searchMessages(_ session: NIMSession, option: NIMMessageSearchOption,
+                           _ completion: @escaping (NSError?, [HistoryMessageModel]?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", session:\(session.sessionId)")
     weak var weakSelf = self
     repo.searchMessages(session, option: option) { error, messages in
@@ -423,9 +419,8 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     }
   }
 
-  public func onTeamMemberRemoved(_ team: NIMTeam, withMembers memberIDs: [String]?) {
+  open func onTeamMemberRemoved(_ team: NIMTeam, withMembers memberIDs: [String]?) {
     if let accids = memberIDs {
-      weak var weakSelf = self
       accids.forEach { accid in
         if let users = teamInfoModel?.users {
           for (i, m) in users.enumerated() {
@@ -439,9 +434,41 @@ public class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
     }
   }
 
-  public func onTeamMemberChanged(_ team: NIMTeam) {}
-
-  public func onTeamUpdated(_ team: NIMTeam) {
+  public func onTeamMemberChanged(_ team: NIMTeam) {
+    if let tid = teamInfoModel?.team?.teamId, tid != team.teamId {
+      return
+    }
     teamInfoModel?.team = team
+    getCurrentMember(IMKitClient.instance.imAccid(), teamInfoModel?.team?.teamId)
+    getData()
+    delegate?.didNeedRefreshUI()
+  }
+
+  open func onTeamUpdated(_ team: NIMTeam) {
+    if let teamId = teamInfoModel?.team?.teamId, teamId != team.teamId {
+      return
+    }
+    teamInfoModel?.team = team
+  }
+
+  open func inviterUsers(_ accids: [String], _ tid: String, _ completion: @escaping (NSError?, [NIMTeamMember]?) -> Void) {
+    repo.inviteUser(accids, tid, nil, nil) { error, members in
+      completion(error as NSError?, members)
+    }
+  }
+
+  public func addRecentetSession() {
+    if let tid = teamInfoModel?.team?.teamId {
+      let currentSession = NIMSession(tid, type: .team)
+      repo.addRecentSession(currentSession)
+    }
+  }
+
+  public func getRecenterSession() -> NIMRecentSession? {
+    if let tid = teamInfoModel?.team?.teamId {
+      let currentSession = NIMSession(tid, type: .team)
+      return repo.getRecentSession(currentSession)
+    }
+    return nil
   }
 }

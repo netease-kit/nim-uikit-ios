@@ -7,18 +7,18 @@ import NIMSDK
 import UIKit
 
 @objc
-enum DownloadState: Int {
+public enum DownloadState: Int {
   case Success = 1
   case Downalod
 }
 
 @objcMembers
-class MessageVideoModel: MessageContentModel {
+open class MessageVideoModel: MessageContentModel {
   public var imageUrl: String?
   public var state = DownloadState.Success
   public var progress: Float = 0
   public weak var cell: NEChatBaseCell?
-  required init(message: NIMMessage?) {
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .video
     if let videoObject = message?.messageObject as? NIMVideoObject {
@@ -31,6 +31,6 @@ class MessageVideoModel: MessageContentModel {
     } else {
       contentSize = chat_pic_size
     }
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

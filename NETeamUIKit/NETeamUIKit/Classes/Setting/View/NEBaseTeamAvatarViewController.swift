@@ -21,6 +21,8 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
   public let tag = UILabel()
   public var iconUrls = TeamRouter.iconUrls
 
+  public var viewmodel = TeamAvatarViewModel()
+
   public lazy var headerView: NEUserHeaderView = {
     let header = NEUserHeaderView(frame: .zero)
     header.translatesAutoresizingMaskIntoConstraints = false
@@ -51,6 +53,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    viewmodel.getCurrentUserTeamMember(team?.teamId)
     setupUI()
   }
 
@@ -74,7 +77,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
       headerView.heightAnchor.constraint(equalToConstant: 80.0),
       headerView.widthAnchor.constraint(equalToConstant: 80.0),
     ])
-    if let url = team?.avatarUrl {
+    if let url = team?.avatarUrl, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerUrl = url
     }
@@ -127,6 +130,9 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
     if let mode = team?.updateInfoMode, mode == .all {
       return true
     }
+    if let member = viewmodel.currentTeamMember, member.type == .manager {
+      return true
+    }
     return false
   }
 
@@ -147,10 +153,10 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
         NELog.infoLog(ModuleName + " " + self.className(), desc: #function + "CALLBACK " + (error?.localizedDescription ?? "no error"))
         weakSelf?.view.hideToastActivity()
         if let err = error as? NSError {
-          if err.code == 408 {
+          if err.code == noNetworkCode {
             weakSelf?.showToast(commonLocalizable("network_error"))
           } else {
-            weakSelf?.showToast(err.localizedDescription)
+            weakSelf?.showToast(localizable("failed_operation"))
           }
         } else {
           weakSelf?.team?.avatarUrl = weakSelf?.headerUrl

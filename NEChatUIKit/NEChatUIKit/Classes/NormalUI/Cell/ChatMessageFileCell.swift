@@ -23,6 +23,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let state = FileStateView()
     state.translatesAutoresizingMaskIntoConstraints = false
     state.backgroundColor = .clear
+    state.accessibilityIdentifier = "id.fileStatus"
     return state
   }()
 
@@ -81,6 +82,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let state = FileStateView()
     state.translatesAutoresizingMaskIntoConstraints = false
     state.backgroundColor = .clear
+    state.accessibilityIdentifier = "id.fileStatus"
     return state
   }()
 
@@ -156,10 +158,10 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
       imgViewLeft.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    contentView.addSubview(stateViewLeft)
+    imgViewLeft.addSubview(stateViewLeft)
     NSLayoutConstraint.activate([
-      stateViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 10),
-      stateViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: 10),
+      stateViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.leftAnchor, constant: 0),
+      stateViewLeft.topAnchor.constraint(equalTo: imgViewLeft.topAnchor, constant: 0),
       stateViewLeft.widthAnchor.constraint(equalToConstant: 32),
       stateViewLeft.heightAnchor.constraint(equalToConstant: 32),
     ])
@@ -188,10 +190,10 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
       imgViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    contentView.addSubview(stateViewRight)
+    imgViewRight.addSubview(stateViewRight)
     NSLayoutConstraint.activate([
-      stateViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 10),
-      stateViewRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: 10),
+      stateViewRight.leftAnchor.constraint(equalTo: imgViewRight.leftAnchor, constant: 0),
+      stateViewRight.topAnchor.constraint(equalTo: imgViewRight.topAnchor, constant: 0),
       stateViewRight.widthAnchor.constraint(equalToConstant: 32),
       stateViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
@@ -216,11 +218,8 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     labelViewRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let stateView = isSend ? stateViewRight : stateViewLeft
     let imgView = isSend ? imgViewRight : imgViewLeft
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft

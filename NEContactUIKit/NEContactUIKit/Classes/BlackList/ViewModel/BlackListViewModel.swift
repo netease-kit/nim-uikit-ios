@@ -8,7 +8,7 @@ import NECoreIMKit
 import NECoreKit
 
 @objcMembers
-public class BlackListViewModel: NSObject, FriendProviderDelegate {
+open class BlackListViewModel: NSObject, FriendProviderDelegate {
   var contactRepo = ContactRepo.shared
   public weak var delegate: FriendProviderDelegate?
   private let className = "BlackListViewModel"
@@ -19,7 +19,7 @@ public class BlackListViewModel: NSObject, FriendProviderDelegate {
     contactRepo.addContactDelegate(delegate: self)
   }
 
-  func getBlackList() -> [User]? {
+  func getBlackList() -> [NEKitUser]? {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     return contactRepo.getBlackList()
   }
@@ -36,12 +36,12 @@ public class BlackListViewModel: NSObject, FriendProviderDelegate {
 
   // MARK: callback
 
-  public func onFriendChanged(user: User) {
+  public func onFriendChanged(user: NEKitUser) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
     delegate?.onFriendChanged(user: user)
   }
 
-  public func onUserInfoChanged(user: User) {
+  public func onUserInfoChanged(user: NEKitUser) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
     delegate?.onUserInfoChanged(user: user)
   }
@@ -51,7 +51,7 @@ public class BlackListViewModel: NSObject, FriendProviderDelegate {
     delegate?.onBlackListChanged()
   }
 
-  public func onRecieveNotification(notification: XNotification) {
+  public func onRecieveNotification(notification: NENotification) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     print(#file + #function)
   }

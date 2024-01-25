@@ -4,6 +4,7 @@
 
 import CoreText
 import Foundation
+import NEChatKit
 import NECoreIMKit
 import NIMSDK
 
@@ -15,37 +16,23 @@ public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
 }
 
 @objcMembers
-public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
+open class TeamChatViewModel: ChatViewModel {
   private let className = "TeamChatViewModel"
-//    override init(session: NIMSession) {
-//        super.init(session: session)
-//        repo.addTeamDelegate(delegate: self)
-//
-//    }
 
   override init(session: NIMSession, anchor: NIMMessage?) {
     super.init(session: session, anchor: anchor)
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId: " + session.sessionId)
     repo.addTeamDelegate(delegate: self)
-//        self.session = session
-//        self.anchor = anchor
-//        super.init()
-//        if anchor != nil {
-//            isHistoryChat = true
-//        }
-//        repo.addChatDelegate(delegate: self)
-//        repo.addConversationDelegate(delegate: self)
-//        repo.addSystemNotiDelegate(delegate: self)
-//        repo.addChatExtDelegate(delegate: self)
+    getTeamMember()
   }
 
-  public func getTeam(teamId: String) -> NIMTeam? {
+  open func getTeam(teamId: String) -> NIMTeam? {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + teamId)
     return repo.getTeamInfo(teamId: teamId)
   }
 
-  public func fetchTeamInfo(teamId: String,
-                            _ completion: @escaping (NSError?, NIMTeam?) -> Void) {
+  open func fetchTeamInfo(teamId: String,
+                          _ completion: @escaping (NSError?, NIMTeam?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + teamId)
     repo.getTeamInfo(teamId: teamId) { [weak self] error, team in
       if error == nil {
@@ -57,7 +44,7 @@ public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
 
 //    MARK: NIMTeamManagerDelegate
 
-  public func onTeamRemoved(_ team: NIMTeam) {
+  open func onTeamRemoved(_ team: NIMTeam) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + (team.teamId ?? "nil"))
     if session.sessionId == team.teamId {
       if let delegate = delegate as? TeamChatViewModelDelegate {
@@ -66,7 +53,7 @@ public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
     }
   }
 
-  public func onTeamUpdated(_ team: NIMTeam) {
+  open func onTeamUpdated(_ team: NIMTeam) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + (team.teamId ?? "nil"))
     if session.sessionId == team.teamId {
       self.team = team
@@ -76,16 +63,21 @@ public class TeamChatViewModel: ChatViewModel, NIMTeamManagerDelegate {
     }
   }
 
-  public func onTeamMemberUpdated(_ team: NIMTeam, withMembers memberIDs: [String]?) {
+  open func onTeamMemberUpdated(_ team: NIMTeam, withMembers memberIDs: [String]?) {
     guard let membersIds = memberIDs else {
       return
     }
     for memberId in membersIds {
-      let user = UserInfoProvider.shared.getUserInfo(userId: memberId)
-      newUserInfoDic[memberId] = user
+      if let user = UserInfoProvider.shared.getUserInfo(userId: memberId) {
+        ChatUserCache.updateUserInfo(user)
+      }
     }
     if let delegate = delegate as? TeamChatViewModelDelegate {
       delegate.onTeamMemberUpdate(team: team)
     }
+  }
+
+  public func getTeamMember() {
+    teamMember = getTeamMember(userId: IMKitClient.instance.imAccid(), teamId: session.sessionId)
   }
 }

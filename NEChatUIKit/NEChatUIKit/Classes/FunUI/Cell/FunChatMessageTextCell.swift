@@ -14,7 +14,6 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
-    label.textAlignment = .justified
     return label
   }()
 
@@ -26,7 +25,6 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
-    label.textAlignment = .justified
     return label
   }()
 
@@ -65,11 +63,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     contentLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
 

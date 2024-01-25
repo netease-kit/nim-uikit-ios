@@ -14,10 +14,10 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
   public let navigationView = NENavigationView()
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = BlackListViewModel()
-  public var blackList: [User]?
+  public var blackList: [NEKitUser]?
   var className = "BlackListBaseViewController"
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
     navigationController?.interactivePopGestureRecognizer?.delegate = self
@@ -96,12 +96,12 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     tableView.reloadData()
   }
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     blackList?.count ?? 0
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     UITableViewCell()
   }
 
@@ -117,7 +117,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     let contactSelectVC = getContactSelectVC()
     navigationController?.pushViewController(contactSelectVC, animated: true)
     contactSelectVC.callBack = { [weak self] selectMemberarray in
-      var users = [User]()
+      var users = [NEKitUser]()
       selectMemberarray.forEach { memberInfo in
         if let u = memberInfo.user {
           users.append(u)
@@ -127,9 +127,9 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     }
   }
 
-  func addBlackUsers(users: [User]) {
+  func addBlackUsers(users: [NEKitUser]) {
     var num = users.count
-    var suc = [User]()
+    var suc = [NEKitUser]()
     for user in users {
       viewModel.addBlackList(account: user.userId ?? "") { [weak self] error in
         NELog.infoLog(
@@ -179,9 +179,9 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
 // MARK: FriendProviderDelegate
 
 extension NEBaseBlackListViewController: FriendProviderDelegate {
-  public func onFriendChanged(user: NECoreIMKit.User) {}
+  public func onFriendChanged(user: NECoreIMKit.NEKitUser) {}
 
-  public func onUserInfoChanged(user: NECoreIMKit.User) {}
+  public func onUserInfoChanged(user: NECoreIMKit.NEKitUser) {}
 
   public func onBlackListChanged() {
     loadData()

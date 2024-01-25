@@ -172,6 +172,7 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    weak var weakSelf = self
     if indexPath.section == 0 {
       let searchModel = viewModel.searchResult?.friend[indexPath.row]
       if let userId = searchModel?.userInfo?.userId {
@@ -186,22 +187,44 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
     } else if indexPath.section == 1 {
       let searchModel = viewModel.searchResult?.contactGroup[indexPath.row]
       if let teamId = searchModel?.teamInfo?.teamId {
-        let session = NIMSession(teamId, type: .team)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": navigationController as Any, "session": session as Any],
-          closure: nil
-        )
+        TeamRepo.shared.fetchTeamInfo(teamId) { error, teamInfo in
+          if let err = error as? NSError {
+            if err.code == noNetworkCode {
+              weakSelf?.showToast(commonLocalizable("network_error"))
+            } else {
+              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+            }
+          } else {
+            let session = NIMSession(teamId, type: .team)
+            Router.shared.use(
+              PushTeamChatVCRouter,
+              parameters: ["nav": weakSelf?.navigationController as Any,
+                           "session": session as Any],
+              closure: nil
+            )
+          }
+        }
       }
     } else {
       let searchModel = viewModel.searchResult?.seniorGroup[indexPath.row]
       if let teamId = searchModel?.teamInfo?.teamId {
-        let session = NIMSession(teamId, type: .team)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": navigationController as Any, "session": session as Any],
-          closure: nil
-        )
+        TeamRepo.shared.fetchTeamInfo(teamId) { error, teamInfo in
+          if let err = error as? NSError {
+            if err.code == noNetworkCode {
+              weakSelf?.showToast(commonLocalizable("network_error"))
+            } else {
+              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+            }
+          } else {
+            let session = NIMSession(teamId, type: .team)
+            Router.shared.use(
+              PushTeamChatVCRouter,
+              parameters: ["nav": weakSelf?.navigationController as Any,
+                           "session": session as Any],
+              closure: nil
+            )
+          }
+        }
       }
     }
   }

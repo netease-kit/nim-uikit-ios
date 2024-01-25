@@ -5,12 +5,14 @@
 import NIMSDK
 import UIKit
 
-class MessageLocationModel: MessageContentModel {
+@objcMembers
+open class MessageLocationModel: MessageContentModel {
   public var lat: Double?
   public var lng: Double?
   public var title: String?
   public var subTitle: String?
-  required init(message: NIMMessage?) {
+
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .location
     if let locationObject = message?.messageObject as? NIMLocationObject {
@@ -20,6 +22,6 @@ class MessageLocationModel: MessageContentModel {
       title = message?.text
       contentSize = CGSize(width: 242, height: 140)
     }
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

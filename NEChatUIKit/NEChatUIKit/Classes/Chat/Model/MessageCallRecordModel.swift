@@ -8,10 +8,10 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-class MessageCallRecordModel: MessageContentModel {
+open class MessageCallRecordModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
 
-  required init(message: NIMMessage?) {
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .rtcCallRecord
     var isAuiodRecord = false
@@ -68,6 +68,6 @@ class MessageCallRecordModel: MessageContentModel {
     h = textSize.height + (isAuiodRecord ? 20 : 24)
     contentSize = CGSize(width: textSize.width + chat_cell_margin * 2, height: h)
 
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

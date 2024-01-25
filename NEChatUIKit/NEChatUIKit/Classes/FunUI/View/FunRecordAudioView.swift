@@ -219,7 +219,7 @@ open class FunRecordAudioView: UIView {
     return windowWidth / 375.0 * 128.0
   }
 
-  public func changeToCancelStyle() {
+  open func changeToCancelStyle() {
     if releaseToSendLabel.isHidden == true {
       return
     }
@@ -231,7 +231,7 @@ open class FunRecordAudioView: UIView {
     triangleView.backgroundColor = UIColor.funRecordAudioProgressCancelColor
   }
 
-  public func changeToNormalStyle() {
+  open func changeToNormalStyle() {
     if releaseToSendLabel.isHidden == false {
       return
     }
@@ -243,7 +243,7 @@ open class FunRecordAudioView: UIView {
     triangleView.backgroundColor = UIColor.funRecordAudioProgressNormalColor
   }
 
-  public func isRecordNormalStyle() -> Bool {
+  open func isRecordNormalStyle() -> Bool {
     if releaseToSendLabel.isHidden == false {
       return true
     }

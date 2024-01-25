@@ -15,4 +15,9 @@ extension UIColor {
   static let funTeamBackgroundColor = UIColor(hexString: "#EDEDED")
   static let funTeamLineBorderColor = UIColor(hexString: "#E5E5E5")
   static let funTeamHistoryCellTitleTextColor = UIColor(hexString: "#737373")
+  static let funTeamRemoveLabelColor = UIColor(hexString: "#505D75")
+
+  static let funTeamMangerLabelTextColor = UIColor(hexString: "#EA8339")
+  static let funTeamMangerLabelBackColor = UIColor(hexString: "#F2C46B", 0.1)
+  static let funTeamManagerLabelBorderColor = UIColor(hexString: "#F2C46B")
 }

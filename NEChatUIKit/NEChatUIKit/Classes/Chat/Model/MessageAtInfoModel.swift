@@ -5,7 +5,7 @@
 import UIKit
 
 @objcMembers
-public class MessageAtInfoModel: NSObject {
+open class MessageAtInfoModel: NSObject {
   public var start = 0
   public var end = 0
   public var broken = false

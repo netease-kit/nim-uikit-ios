@@ -14,7 +14,7 @@ public protocol ChatRecordViewDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class ChatRecordView: UIView, UIGestureRecognizerDelegate {
+open class ChatRecordView: UIView, UIGestureRecognizerDelegate {
   var recordImageView = UIImageView()
   var topTipLabel = UILabel()
   var tipLabel = UILabel()
@@ -25,7 +25,7 @@ public class ChatRecordView: UIView, UIGestureRecognizerDelegate {
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -99,7 +99,7 @@ public class ChatRecordView: UIView, UIGestureRecognizerDelegate {
     }
   }
 
-  public func stopRecordAnimation() {
+  open func stopRecordAnimation() {
     topTipLabel.isHidden = true
     recordImageView.stopAnimating()
   }

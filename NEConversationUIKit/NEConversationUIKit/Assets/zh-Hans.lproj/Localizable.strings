@@ -29,8 +29,10 @@
 "location"="[地理位置]";
 "notification"="[通知消息]";
 "file"="[文件消息]";
-"internet_phone"="[音频通话]";
+"internet_phone"="[语音通话]";
 "video_chat"="[视频通话]";
+"custom"="[自定义消息]";
+"chat_history"="[聊天记录]";
 "unknown"="[未知消息体]";
 "appName"="云信IM";
 
@@ -41,3 +43,7 @@
 
 // error toast
 "network_error"="当前网络不可用，请检查你的网络设置";
+
+"tip"="[提醒消息]";
+"leave_team"="离开群聊";
+"leave_team_desc"="您已被移除群聊或群聊已解散";
