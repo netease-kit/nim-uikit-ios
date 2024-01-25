@@ -126,11 +126,8 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
     timeLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     if let m = model as? MessageAudioModel {
       if isSend {
         timeLabelRight.text = "\(m.duration)" + "″"

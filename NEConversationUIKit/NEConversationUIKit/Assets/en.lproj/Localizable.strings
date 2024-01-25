@@ -31,6 +31,8 @@
 "file"="[File Message]";
 "internet_phone"="[Audio_Chat]";
 "video_chat"="[Video_Chat]";
+"custom"="[Custom Message]";
+"chat_history"="[Chat History]";
 "unknown"="[Unknown Message]";
 "appName"="CommsEase IM";
 
@@ -40,3 +42,8 @@
 
 // error toast
 "network_error"="Network is not available, please check";
+
+
+"tip"="[tip message]";
+"leave_team"="离开群聊";
+"leave_team_desc"="您已被移除群聊或群聊已解散";

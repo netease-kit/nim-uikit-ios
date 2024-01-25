@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class CirleProgressView: UIView {
+open class CirleProgressView: UIView {
 //    0~1
   public var progress: Float = 0 {
     didSet {
@@ -40,7 +40,6 @@ public class CirleProgressView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = .clear
-    accessibilityIdentifier = "id.status"
     imageView.frame = bounds
     imageView.contentMode = .center
     addSubview(imageView)
@@ -64,7 +63,7 @@ public class CirleProgressView: UIView {
     layer.addSublayer(sectorLayer)
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

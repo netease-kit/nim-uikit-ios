@@ -26,4 +26,6 @@ public extension UIColor {
   static let funChatInputViewBackgroundColorInMute = UIColor(hexString: "#E0E0E0")
   static let funChatNetworkBrokenBackgroundColor = UIColor(hexString: "#FCEEEE")
   static let funChatNetworkBrokenTitleColor = UIColor(white: 0, alpha: 0.5)
+
+  static let funChatMultiForwardContentColor = UIColor(hexString: "#BBBBBB")
 }

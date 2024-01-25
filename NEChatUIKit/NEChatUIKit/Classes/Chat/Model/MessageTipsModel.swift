@@ -7,37 +7,15 @@ import Foundation
 import NIMSDK
 
 @objcMembers
-class MessageTipsModel: NSObject, MessageModel {
-  var offset: CGFloat = 0
+open class MessageTipsModel: MessageContentModel {
+  var text: String?
 
-  func cellHeight() -> CGFloat {
-    CGFloat(height) + offset
+  public required init(message: NIMMessage?) {
+    super.init(message: message)
+    commonInit()
   }
 
-  var tipTimeStamp: TimeInterval?
-
-  var isReplay: Bool = false
-
-  var pinToAccount: String?
-  var pinFromAccount: String?
-  var isPined: Bool = false
-  var pinAccount: String?
-  var pinShowName: String?
-  var replyText: String?
-  var type: MessageType = .tip
-  var message: NIMMessage?
-  var contentSize: CGSize = .zero
-  var height: Float = 28
-  var shortName: String?
-  var fullName: String?
-  var avatar: String?
-  var text: String?
-  var isRevoked: Bool = false
-  var replyedModel: MessageModel?
-  var isRevokedText: Bool = false
-  weak var tipMessage: NIMMessage?
-
-  func commonInit(message: NIMMessage?) {
+  func setText() {
     if let msg = message {
       if msg.messageType == .notification {
         text = NotificationMessageUtils.textForNotification(message: msg)
@@ -46,37 +24,19 @@ class MessageTipsModel: NSObject, MessageModel {
         text = msg.text
         type = .tip
       }
-
-      tipMessage = msg
-      tipTimeStamp = msg.timestamp
     }
-
-    var font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-
-    contentSize = String.getTextRectSize(text ?? "",
-                                         font: font,
-                                         size: CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
-    height = Float(max(contentSize.height + chat_content_margin, 28))
   }
 
-  required init(message: NIMMessage?) {
-    super.init()
-    commonInit(message: message)
-  }
+  func commonInit() {
+    setText()
+    let font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
 
-  init(message: NIMMessage?, initType: MessageType = .tip, initText: String? = nil) {
-    super.init()
-    type = initType
-    text = initText
-    commonInit(message: message)
-  }
+    contentSize = text?.finalSize(font, CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
+    height = ceil(contentSize.height)
 
-  public func resetNotiText() {
-    if let msg = tipMessage {
-      if msg.messageType == .notification {
-        text = NotificationMessageUtils.textForNotification(message: msg)
-        type = .notification
-      }
+    // time
+    if let time = timeContent, !time.isEmpty {
+      height += chat_timeCellH
     }
   }
 }

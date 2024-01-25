@@ -6,9 +6,13 @@ import NIMSDK
 import UIKit
 
 @objc
-public class MessageCustomModel: MessageContentModel {
-  required init(message: NIMMessage?) {
+open class MessageCustomModel: MessageContentModel {
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .custom
+    if let attachment = NECustomAttachment.attachmentOfCustomMessage(message: message) {
+      contentSize = CGSize(width: 0, height: Int(attachment.cellHeight))
+      height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    }
   }
 }

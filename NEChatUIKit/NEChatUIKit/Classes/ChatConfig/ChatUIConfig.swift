@@ -77,16 +77,24 @@ public class MessageProperties: NSObject {
   // 接收到的消息体的背景色
   public var receiveMessageBg: UIColor = .clear
 
+  // 背景图片拉伸参数（边距偏移）
+  public var backgroundImageCapInsets = UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25)
+
   // 不设置头像的用户所展示的文字头像中的文字颜色
   public var userNickColor: UIColor = .white
 
   // 不设置头像的用户所展示的文字头像中的文字字体大小
   public var userNickTextSize: CGFloat = 12
 
+  // 标记列表字体大小(文本类型)
+  public var pinMessageTextSize: CGFloat = 14
+
   // 单聊中是否展示已读未读状态
   public var showP2pMessageStatus: Bool = true
   // 群聊中是否展示已读未读状态
   public var showTeamMessageStatus: Bool = true
+  // 群聊中是否展示好友昵称
+  public var showTeamMessageNick: Bool = true
   // 会话界面是否展示标题栏
   public var showTitleBar: Bool = true
   // 是否展示标题栏右侧图标按钮

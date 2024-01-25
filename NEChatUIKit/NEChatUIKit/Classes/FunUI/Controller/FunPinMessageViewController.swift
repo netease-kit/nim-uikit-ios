@@ -7,23 +7,23 @@ import UIKit
 
 @objcMembers
 open class FunPinMessageViewController: NEBasePinMessageViewController {
-  override public func viewDidLoad() {
+  override public init(session: NIMSession) {
+    super.init(session: session)
+    pin_content_maxW = (kScreenWidth - 32)
+  }
+
+  public required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor
     emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
-  override open func getRegisterCellDic() -> [Int: NEBasePinMessageCell.Type] {
-    let cellClassDic = [
-      NIMMessageType.text.rawValue: FunPinMessageTextCell.self,
-      NIMMessageType.image.rawValue: FunPinMessageImageCell.self,
-      NIMMessageType.audio.rawValue: FunPinMessageAudioCell.self,
-      NIMMessageType.video.rawValue: FunPinMessageVideoCell.self,
-      NIMMessageType.location.rawValue: FunPinMessageLocationCell.self,
-      NIMMessageType.file.rawValue: FunPinMessageFileCell.self,
-      PinMessageDefaultType: FunPinMessageDefaultCell.self,
-    ]
-    return cellClassDic
+  override open func getRegisterCellDic() -> [String: NEBasePinMessageCell.Type] {
+    ChatMessageHelper.getPinCellRegisterDic(isFun: true)
   }
 
   override open func showAction(item: PinMessageModel) {
@@ -70,5 +70,11 @@ open class FunPinMessageViewController: NEBasePinMessageViewController {
     } else {
       forwardMessageToUser(message)
     }
+  }
+
+  override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
+                                                   _ messageAttachmentFilePath: String,
+                                                   _ messageAttachmentMD5: String?) -> MultiForwardViewController {
+    FunMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
 }

@@ -8,7 +8,7 @@ import NECommonUIKit
 import UIKit
 
 @objcMembers
-public class FunForwardUserCell: NEBaseForwardUserCell {
+open class FunForwardUserCell: NEBaseForwardUserCell {
   override func setupUI() {
     super.setupUI()
     userHeader.layer.cornerRadius = 4
@@ -16,8 +16,8 @@ public class FunForwardUserCell: NEBaseForwardUserCell {
 }
 
 @objcMembers
-public class FunForwardAlertViewController: NEBaseForwardAlertViewController {
-  override public func setupUI() {
+open class FunForwardAlertViewController: NEBaseForwardAlertViewController {
+  override open func setupUI() {
     super.setupUI()
     tip.font = .systemFont(ofSize: 16, weight: .semibold)
     oneUserHead.layer.cornerRadius = 4.0
@@ -28,7 +28,7 @@ public class FunForwardAlertViewController: NEBaseForwardAlertViewController {
     )
   }
 
-  override public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  override open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     if let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: "\(FunForwardUserCell.self)",
       for: indexPath

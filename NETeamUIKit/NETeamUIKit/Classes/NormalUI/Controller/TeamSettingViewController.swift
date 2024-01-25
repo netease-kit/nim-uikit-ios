@@ -55,7 +55,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
       teamHeader.widthAnchor.constraint(equalToConstant: 42),
       teamHeader.heightAnchor.constraint(equalToConstant: 42),
     ])
-    if let url = viewmodel.teamInfoModel?.team?.avatarUrl {
+    if let url = viewmodel.teamInfoModel?.team?.avatarUrl, !url.isEmpty {
       print("icon url : ", url)
       teamHeader.sd_setImage(with: URL(string: url), completed: nil)
     } else {
@@ -152,7 +152,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     addBtn.addTarget(self, action: #selector(addUser), for: .touchUpInside)
 
     if viewmodel.isNormalTeam() == false, viewmodel.isOwner() == false,
-       let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, inviteMode == .manager {
+       let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, let member = viewmodel.memberInTeam, inviteMode == .manager, member.type != .manager {
       addBtnWidth?.constant = 0
       addBtn.isHidden = true
     }
@@ -176,8 +176,22 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   override open func checkoutAddShowOrHide() {
     if viewmodel.isNormalTeam() == false, viewmodel.isOwner() == false,
        let inviteMode = viewmodel.teamInfoModel?.team?.inviteMode, inviteMode == .manager {
-      return
+      if let member = viewmodel.memberInTeam, member.type == .manager {
+        addBtn.isHidden = false
+        addBtnWidth?.constant = 36.0
+        addBtnLeftMargin?.constant = 16
+        checkMemberCountLimit()
+      } else {
+        addBtn.isHidden = true
+        addBtnWidth?.constant = 0
+        addBtnLeftMargin?.constant = 0
+      }
+    } else {
+      checkMemberCountLimit()
     }
+  }
+
+  func checkMemberCountLimit() {
     if viewmodel.teamInfoModel?.team?.level == viewmodel.teamInfoModel?.team?.memberNumber {
       addBtn.isHidden = true
       addBtnWidth?.constant = 0
@@ -257,6 +271,13 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     )
   }
 
+  override open func didClickTeamManage() {
+    let manageTeam = TeamManageController()
+    manageTeam.managerUsers = getManaterUsers()
+    manageTeam.viewmodel.teamInfoModel = viewmodel.teamInfoModel
+    navigationController?.pushViewController(manageTeam, animated: true)
+  }
+
   override open func collectionView(_ collectionView: UICollectionView,
                                     cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     if let cell = collectionView.dequeueReusableCell(
@@ -264,6 +285,9 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
       for: indexPath
     ) as? TeamUserCell {
       if let user = viewmodel.teamInfoModel?.users[indexPath.row] {
+        if let userId = user.nimUser?.userId, let nimUser = ChatUserCache.getUserInfo(userId) {
+          user.nimUser = nimUser
+        }
         cell.user = user
       }
       return cell

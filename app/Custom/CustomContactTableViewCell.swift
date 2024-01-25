@@ -29,6 +29,7 @@ public class CustomContactTableViewCell: ContactTableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // 根据数据模型设置 cell 内容
   override public func setModel(_ model: ContactInfo) {
     super.setModel(model)
     onlineView.isHidden = false

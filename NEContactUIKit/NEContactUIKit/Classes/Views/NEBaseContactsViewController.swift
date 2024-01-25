@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 import UIKit
@@ -13,7 +14,7 @@ public protocol NEBaseContactsViewControllerDelegate {
 
 @objcMembers
 open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
-  SystemMessageProviderDelegate, FriendProviderDelegate, TabNavigationViewDelegate {
+  SystemMessageProviderDelegate, FriendProviderDelegate, TabNavigationViewDelegate, UIGestureRecognizerDelegate {
   public var delegate: NEBaseContactsViewControllerDelegate?
 
   // custom ui cell
@@ -51,12 +52,19 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
   }
 
   override open func viewWillAppear(_ animated: Bool) {
-    // 刷新数据
-    viewModel.reLoadData { [weak self] error, userSectionCount in
-      self?.emptyView.isHidden = userSectionCount > 0
-      if error == nil {
-        self?.delegate?.onDataLoaded()
-        self?.tableView.reloadData()
+    super.viewWillAppear(animated)
+
+    // 通讯录异步进行远端加载
+    if IMKitConfigCenter.shared.contactAsyncLoadEnable {
+      DispatchQueue.main.async {
+        self.loadData(fetch: true)
+      }
+    }
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: NEBaseContactsViewController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
       }
     }
   }
@@ -66,8 +74,12 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     showTitleBar()
     commonUI()
     viewModel.refresh = { [weak self] in
-      self?.tableView.reloadData()
+      self?.didRefreshTable()
     }
+
+    loadData(fetch: true)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(didRefreshTable), name: NENotificationName.updateFriendInfo, object: nil)
   }
 
   deinit {
@@ -143,6 +155,16 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     if let customController = NEKitContactConfig.shared.ui.customController {
       customController(self)
     }
+  }
+
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
   }
 
   // MARK: lazy load
@@ -236,12 +258,12 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     return view
   }()
 
-  open func loadData() {
-    viewModel.loadData { [weak self] error, userSectionCount in
+  open func loadData(fetch: Bool = false) {
+    viewModel.loadData(fetch: fetch) { [weak self] error, userSectionCount in
       self?.emptyView.isHidden = userSectionCount > 0
       if error == nil {
         self?.delegate?.onDataLoaded()
-        self?.tableView.reloadData()
+        self?.didRefreshTable()
       }
     }
   }
@@ -360,9 +382,13 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     }
   }
 
+  func didRefreshTable() {
+    tableView.reloadData()
+  }
+
 //    MARK: SystemMessageProviderDelegate
 
-  open func onRecieveNotification(notification: XNotification) {
+  open func onRecieveNotification(notification: NENotification) {
     print("onRecieveNotification type:\(notification.type)")
     if notification.type == .addFriendDirectly {
       loadData()
@@ -372,12 +398,12 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
   open func onNotificationUnreadCountChanged(count: Int) {
     print("unread count:\(count)")
     viewModel.unreadCount = count
-    tableView.reloadData()
+    didRefreshTable()
   }
 
 //    MARK: FriendProviderDelegate
 
-  open func onFriendChanged(user: User) {
+  open func onFriendChanged(user: NEKitUser) {
     print("onFriendChanged:\(user.userId)")
     loadData()
   }
@@ -387,7 +413,7 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     loadData()
   }
 
-  open func onUserInfoChanged(user: User) {
+  open func onUserInfoChanged(user: NEKitUser) {
     print("onUserInfoChanged:\(user.userId)")
     loadData()
   }
@@ -404,12 +430,12 @@ extension NEBaseContactsViewController {
     NEBaseFindFriendViewController()
   }
 
-  @objc public func goToFindFriend() {
+  @objc open func goToFindFriend() {
     let findFriendController = getFindFriendViewController()
     navigationController?.pushViewController(findFriendController, animated: true)
   }
 
-  @objc public func searchContact() {
+  @objc open func searchContact() {
     Router.shared.use(
       SearchContactPageRouter,
       parameters: ["nav": navigationController as Any],

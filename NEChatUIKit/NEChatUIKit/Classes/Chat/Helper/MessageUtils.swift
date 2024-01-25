@@ -8,15 +8,15 @@ import NECoreIMKit
 import NIMSDK
 
 @objcMembers
-public class MessageUtils: NSObject {
-  public class func textMessage(text: String) -> NIMMessage {
+open class MessageUtils: NSObject {
+  open class func textMessage(text: String) -> NIMMessage {
     let message = NIMMessage()
     message.setting = messageSetting()
     message.text = text
     return message
   }
 
-  public class func textMessage(text: String, remoteExt: [String: Any]?) -> NIMMessage {
+  open class func textMessage(text: String, remoteExt: [String: Any]?) -> NIMMessage {
     let message = NIMMessage()
     message.setting = messageSetting()
     message.text = text
@@ -26,15 +26,19 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func imageMessage(image: UIImage) -> NIMMessage {
+  open class func imageMessage(image: UIImage) -> NIMMessage {
     imageMessage(imageObject: NIMImageObject(image: image))
   }
 
-  public class func imageMessage(path: String) -> NIMMessage {
+  open class func imageMessage(path: String) -> NIMMessage {
     imageMessage(imageObject: NIMImageObject(filepath: path))
   }
 
-  public class func imageMessage(imageObject: NIMImageObject) -> NIMMessage {
+  open class func imageMessage(data: Data, ext: String) -> NIMMessage {
+    imageMessage(imageObject: NIMImageObject(data: data, extension: ext))
+  }
+
+  open class func imageMessage(imageObject: NIMImageObject) -> NIMMessage {
     let message = NIMMessage()
     let option = NIMImageOption()
     option.compressQuality = 0.8
@@ -45,7 +49,7 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func audioMessage(filePath: String) -> NIMMessage {
+  open class func audioMessage(filePath: String) -> NIMMessage {
     let messageObject = NIMAudioObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
@@ -54,7 +58,7 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func videoMessage(filePath: String) -> NIMMessage {
+  open class func videoMessage(filePath: String) -> NIMMessage {
     let messageObject = NIMVideoObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
@@ -63,7 +67,7 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func locationMessage(_ lat: Double, _ lng: Double, _ title: String, _ address: String) -> NIMMessage {
+  open class func locationMessage(_ lat: Double, _ lng: Double, _ title: String, _ address: String) -> NIMMessage {
     let messageObject = NIMLocationObject(latitude: lat, longitude: lng, title: address)
     let message = NIMMessage()
     message.messageObject = messageObject
@@ -73,7 +77,7 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func fileMessage(filePath: String, displayName: String?) -> NIMMessage {
+  open class func fileMessage(filePath: String, displayName: String?) -> NIMMessage {
     let messageObject = NIMFileObject(sourcePath: filePath)
     if let dpName = displayName {
       messageObject.displayName = dpName
@@ -85,7 +89,7 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func fileMessage(data: Data, displayName: String?) -> NIMMessage {
+  open class func fileMessage(data: Data, displayName: String?) -> NIMMessage {
     let dpName = displayName ?? ""
     let pointIndex = dpName.lastIndex(of: ".") ?? dpName.startIndex
     let suffix = dpName[dpName.index(after: pointIndex) ..< dpName.endIndex]
@@ -98,10 +102,21 @@ public class MessageUtils: NSObject {
     return message
   }
 
-  public class func messageSetting() -> NIMMessageSetting {
+  open class func customMessage(attachment: NIMCustomAttachment?,
+                                remoteExt: [String: Any]?,
+                                apnsContent: String?) -> NIMMessage {
+    let messageObject = NIMCustomObject()
+    messageObject.attachment = attachment
+    let message = NIMMessage()
+    message.messageObject = messageObject
+    message.apnsContent = apnsContent
+    message.remoteExt = remoteExt
+    message.setting = messageSetting()
+    return message
+  }
+
+  open class func messageSetting() -> NIMMessageSetting {
     let setting = NIMMessageSetting()
-    print("getMessageRead: \(SettingProvider.shared.getMessageRead())")
-//        FIXME:
     setting.teamReceiptEnabled = SettingProvider.shared.getMessageRead()
     return setting
   }

@@ -62,11 +62,8 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
     contentLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     if let m = model as? MessageCallRecordModel {
       contentLabel.attributedText = m.attributeStr

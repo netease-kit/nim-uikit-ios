@@ -8,8 +8,8 @@ import NIMSDK
 import UIKit
 
 public protocol SystemNotificationCellDelegate: AnyObject {
-  func onAccept(_ notifiModel: XNotification)
-  func onRefuse(_ notifiModel: XNotification)
+  func onAccept(_ notifiModel: NENotification)
+  func onRefuse(_ notifiModel: NENotification)
 }
 
 enum NotificationHandleType: Int {
@@ -23,17 +23,6 @@ enum NotificationHandleType: Int {
 open class NEBaseValidationCell: NEBaseContactViewCell {
   public var titleLabelRightMargin: NSLayoutConstraint?
   let line = UIView()
-
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -83,7 +72,7 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
     line.backgroundColor = UIColor(hexString: "#F5F8FC")
   }
 
-  open func confige(_ model: XNotification) {
+  open func confige(_ model: NENotification) {
     var optionLabelContent = ""
     var nickName = ""
     var teamName = ""
@@ -99,9 +88,9 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
 
     if model.userInfo == nil, let uid = model.sourceID {
       let user = NIMSDK.shared().userManager.userInfo(uid)
-      if let alias = user?.alias {
+      if let alias = user?.alias, !alias.isEmpty {
         nickName = alias
-      } else if let nick = user?.userInfo?.nickName {
+      } else if let nick = user?.userInfo?.nickName, !nick.isEmpty {
         nickName = nick
       }
     }

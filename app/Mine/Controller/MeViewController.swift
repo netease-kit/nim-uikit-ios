@@ -10,7 +10,7 @@ import NIMSDK
 import UIKit
 import YXLogin
 
-class MeViewController: UIViewController {
+class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   private let mineData = [
     [NSLocalizedString("setting", comment: ""): "mine_setting"],
     [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
@@ -22,7 +22,6 @@ class MeViewController: UIViewController {
     let view = UIView(frame: .zero)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .white
-    view.accessibilityIdentifier = "id.avatar"
     return view
   }()
 
@@ -61,6 +60,13 @@ class MeViewController: UIViewController {
     navigationController?.setNavigationBarHidden(true, animated: false)
     updateUserInfo()
     super.viewWillAppear(animated)
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: MeViewController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
+      }
+    }
   }
 
   func setupSubviews() {
@@ -232,5 +238,15 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
       let ctrl = IntroduceBrandViewController()
       navigationController?.pushViewController(ctrl, animated: true)
     } else if indexPath.row == 2 {}
+  }
+
+  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
   }
 }

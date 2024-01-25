@@ -10,7 +10,7 @@ public protocol NEMapGuideBottomViewDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class NEMapGuideBottomView: UIView {
+open class NEMapGuideBottomView: UIView {
   public weak var delegate: NEMapGuideBottomViewDelegate?
 
   override public init(frame: CGRect) {
@@ -18,7 +18,7 @@ public class NEMapGuideBottomView: UIView {
     setupSubviews()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

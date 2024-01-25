@@ -9,4 +9,4 @@ import NECoreKit
 import NIMSDK
 
 @objcMembers
-public class ContactRouter: NSObject {}
+open class ContactRouter: NSObject {}

@@ -12,7 +12,6 @@ open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
     let header = NEUserHeaderView(frame: .zero)
     header.translatesAutoresizingMaskIntoConstraints = false
     header.clipsToBounds = true
-    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 
@@ -27,9 +26,9 @@ open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
     setupUI()
   }
 
-  override public func configure(_ anyModel: Any) {
+  override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
-    if let url = model?.headerUrl {
+    if let url = model?.headerUrl, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {

@@ -14,7 +14,7 @@ public protocol NEBaseConversationControllerDelegate {
 }
 
 @objcMembers
-open class NEBaseConversationController: UIViewController, NIMChatManagerDelegate {
+open class NEBaseConversationController: UIViewController, NIMChatManagerDelegate, UIGestureRecognizerDelegate {
   var className = "NEBaseConversationController"
   public var deleteBottonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
 
@@ -23,7 +23,7 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
   private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
   public var contentViewTopAnchor: NSLayoutConstraint?
   public var topConstant: CGFloat = 0
-  public var popListController = NEBasePopListViewController()
+  public var popListView = NEBasePopListView()
 
   public var delegate: NEBaseConversationControllerDelegate?
 
@@ -76,6 +76,14 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
         self?.contentViewTopAnchor?.constant = 0
       }
     }
+
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: NEBaseConversationController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
+      }
+    }
   }
 
   override open func viewDidLoad() {
@@ -85,14 +93,25 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
     requestData()
     initialConfig()
     NIMSDK.shared().chatManager.add(self)
+    NotificationCenter.default.addObserver(self, selector: #selector(didRefreshTable), name: NENotificationName.updateFriendInfo, object: nil)
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
-    popListController.removeSelf()
+    popListView.removeSelf()
   }
 
   deinit {
     NIMSDK.shared().chatManager.remove(self)
+  }
+
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
   }
 
   open func showTitleBar() {
@@ -366,8 +385,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     )
   }
 
-  open func getPopListController() -> NEBasePopListViewController {
-    NEBasePopListViewController()
+  open func getPopListView() -> NEBasePopListView {
+    NEBasePopListView()
   }
 
   open func getPopListItems() -> [PopListItem] {
@@ -411,10 +430,10 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     }
 
     if IMKitClient.instance.getConfigCenter().teamEnable {
-      popListController.itemDatas = getPopListItems()
-      popListController.view.frame = CGRect(origin: .zero, size: view.frame.size)
-      popListController.removeSelf()
-      view.addSubview(popListController.view)
+      popListView.itemDatas = getPopListItems()
+      popListView.frame = CGRect(origin: .zero, size: view.frame.size)
+      popListView.removeSelf()
+      view.addSubview(popListView)
     } else {
       Router.shared.use(
         ContactAddFriendRouter,
@@ -485,7 +504,11 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     guard let msg = notification.message else {
       return
     }
-    saveRevokeMessage(msg) { error in
+
+    if ConversationDeduplicationHelper.instance.isRevokeMessageSaved(messageId: msg.messageId) {
+      return
+    }
+    saveRevokeMessage(msg) { [weak self] error in
     }
   }
 
@@ -580,7 +603,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
   /*
    @available(iOS 11.0, *)
-   public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+   open func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 
    var rowActions = [UIContextualAction]()
 
@@ -692,8 +715,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
             desc: "✅CALLBACK removeStickTopSession SUCCESS"
           )
           weakSelf?.viewModel.stickTopInfos[session] = nil
-          weakSelf?.viewModel.sortRecentSession()
-          weakSelf?.tableView.reloadData()
+          weakSelf?.reloadTableView()
           completion(nil, topSessionInfo)
         }
       }
@@ -711,8 +733,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
           NELog.infoLog(ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
                         desc: "✅CALLBACK addStickTopSession callback SUCCESS")
           weakSelf?.viewModel.stickTopInfos[session] = newInfo
-          weakSelf?.viewModel.sortRecentSession()
-          weakSelf?.tableView.reloadData()
+          weakSelf?.reloadTableView()
           completion(nil, newInfo)
         }
       }
@@ -771,9 +792,7 @@ extension NEBaseConversationController {
 extension NEBaseConversationController: ConversationViewModelDelegate {
   open func didAddRecentSession() {
     NELog.infoLog("ConversationController", desc: "didAddRecentSession")
-    emptyView.isHidden = (viewModel.conversationListArray?.count ?? 0) > 0
-    viewModel.sortRecentSession()
-    tableView.reloadData()
+    reloadTableView()
   }
 
   open func didUpdateRecentSession(index: Int) {
@@ -785,9 +804,13 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
     delegate?.onDataLoaded()
   }
 
+  open func didRefreshTable() {
+    tableView.reloadData()
+  }
+
   open func reloadTableView() {
     emptyView.isHidden = (viewModel.conversationListArray?.count ?? 0) > 0
     viewModel.sortRecentSession()
-    tableView.reloadData()
+    didRefreshTable()
   }
 }

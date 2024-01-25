@@ -7,12 +7,14 @@ import NECoreIMKit
 import NIMSDK
 import UIKit
 
-public class PinMessageModel: NSObject {
-  var chatmodel: MessageModel?
+@objcMembers
+open class PinMessageModel: NSObject {
+  var chatmodel: MessageModel = MessageTextModel(message: nil)
   var message: NIMMessage
   var item: NIMMessagePinItem
   var session: NIMSession
   var repo = ChatRepo.shared
+  var pinFileModel: PinMessageFileModel?
 
   init(message: NIMMessage, item: NIMMessagePinItem) {
     self.message = message
@@ -20,56 +22,23 @@ public class PinMessageModel: NSObject {
     self.item = item
     super.init()
     chatmodel = modelFromMessage(message: message)
+    if chatmodel.type == .file {
+      pinFileModel = PinMessageFileModel()
+      if let filemodel = chatmodel as? MessageFileModel {
+        pinFileModel?.size = filemodel.size
+      }
+    }
   }
 
   private func modelFromMessage(message: NIMMessage) -> MessageModel {
-    var model: MessageModel
-    switch message.messageType {
-    case .video:
-      model = MessageVideoModel(message: message)
-    case .text:
-      model = MessageTextModel(message: message)
-    case .image:
-      model = MessageImageModel(message: message)
-    case .audio:
-      model = MessageAudioModel(message: message)
-    case .notification:
-      model = MessageTipsModel(message: message)
-    case .file:
-      model = MessageFileModel(message: message)
-    case .tip:
-      model = MessageTipsModel(message: message)
-    case .location:
-      model = MessageLocationModel(message: message)
-    case .rtcCallRecord:
-      model = MessageCallRecordModel(message: message)
-    default:
-      // 未识别的消息类型，默认为文本消息类型，text为未知消息
-      message.text = "未知消息"
-      model = MessageContentModel(message: message)
-    }
+    let model = ChatMessageHelper.modelFromMessage(message: message)
 
     if let uid = message.from {
-      let user = UserInfoProvider.shared.getUserInfo(userId: uid)
-      var fullName = uid
-      if let nickName = user?.userInfo?.nickName {
-        fullName = nickName
-      }
+      let user = ChatUserCache.getUserInfo(uid)
+      let fullName = ChatUserCache.getShowName(userId: uid, teamId: session.sessionId)
       model.avatar = user?.userInfo?.avatarUrl
-      if session.sessionType == .team {
-        // team
-        let teamMember = TeamProvider.shared.teamMember(uid, session.sessionId)
-        if let teamNickname = teamMember?.nickname {
-          fullName = teamNickname
-        }
-      }
-      if let alias = user?.alias {
-        fullName = alias
-      }
       model.fullName = fullName
-      model.shortName = fullName
-        .count > 2 ? String(fullName[fullName.index(fullName.endIndex, offsetBy: -2)...]) :
-        fullName
+      model.shortName = ChatUserCache.getShortName(name: user?.showName(false) ?? "", length: 2)
     }
 
 //    model.replyedModel = getReplyMessageWithoutThread(message: message)
@@ -84,37 +53,34 @@ public class PinMessageModel: NSObject {
     return model
   }
 
-  public func getMessageType() -> Int {
-    if message.messageType == .file ||
-      message.messageType == .audio ||
-      message.messageType == .text ||
-      message.messageType == .image ||
-      message.messageType == .video ||
-      message.messageType == .location {
-      return message.messageType.rawValue
-    }
-    return PinMessageDefaultType
-  }
-
-  public func cellHeight() -> CGFloat {
-    var height = chatmodel?.contentSize.height ?? 0
+  open func cellHeight(pinContentMaxW: CGFloat) -> CGFloat {
+    var height = chatmodel.contentSize.height
     if let textModel = chatmodel as? MessageTextModel {
-      height = textModel.textHeight
+      // 文本消息最多显示 3 行
+      let textSize = textModel.attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize), CGSize(width: pinContentMaxW, height: CGFloat.greatestFiniteMagnitude), 3) ?? .zero
+      height = textSize.height
     }
+
+    if let textModel = chatmodel as? MessageRichTextModel {
+      // 换行消息中的标题最多显示 1 行
+      let titleSize = textModel.titleAttributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize, weight: .semibold), CGSize(width: pinContentMaxW, height: CGFloat.greatestFiniteMagnitude), 1) ?? .zero
+      height = titleSize.height
+
+      // 换行消息中的内容最多显示 2 行
+      let textSize = textModel.attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize), CGSize(width: pinContentMaxW, height: CGFloat.greatestFiniteMagnitude), 2) ?? .zero
+      height += textSize.height
+    }
+
     height += 100
 
-    if chatmodel?.type == .text, height > 162 {
-      height = 162
-    }
-
-    if chatmodel?.replyedModel?.isReplay == true {
+    if chatmodel.replyedModel?.isReplay == true {
       height += 12
     }
 
     return height
   }
 
-  public func getReplyMessageWithoutThread(message: NIMMessage) -> MessageModel? {
+  open func getReplyMessageWithoutThread(message: NIMMessage) -> MessageModel? {
     var replyId: String? = message.repliedMessageId
     if let yxReplyMsg = message.remoteExt?[keyReplyMsgKey] as? [String: Any] {
       replyId = yxReplyMsg["idClient"] as? String
@@ -134,33 +100,5 @@ public class PinMessageModel: NSObject {
     let model = modelFromMessage(message: message)
     model.isReplay = true
     return model
-  }
-
-  //    获取展示的用户名字，p2p： 备注 > 昵称 > ID  team: 备注 > 群昵称 > 昵称 > ID
-  private func getShowName(userId: String, teamId: String?) -> String {
-    let user = getUserInfo(userId: userId)
-    var fullName = userId
-    if let nickName = user?.userInfo?.nickName {
-      fullName = nickName
-    }
-    if let tID = teamId, session.sessionType == .team {
-      // team
-      let teamMember = getTeamMember(userId: userId, teamId: tID)
-      if let teamNickname = teamMember?.nickname {
-        fullName = teamNickname
-      }
-    }
-    if let alias = user?.alias {
-      fullName = alias
-    }
-    return fullName
-  }
-
-  public func getUserInfo(userId: String) -> User? {
-    repo.getUserInfo(userId: userId)
-  }
-
-  public func getTeamMember(userId: String, teamId: String) -> NIMTeamMember? {
-    repo.getTeamMemberList(userId: userId, teamId: teamId)
   }
 }

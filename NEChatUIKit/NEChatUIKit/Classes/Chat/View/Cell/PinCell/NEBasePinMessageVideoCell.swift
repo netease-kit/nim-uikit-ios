@@ -47,7 +47,7 @@ open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
     super.init(coder: coder)
   }
 
-  override public func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     contentImageView.addSubview(stateView)
     contentImageView.addCustomCorner(conrners: [.topLeft], radius: 8, backcolor: .white)
@@ -67,10 +67,10 @@ open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
     stateView.isUserInteractionEnabled = false
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
 
-    if let videoObject = item.chatmodel?.message?.messageObject as? NIMVideoObject {
+    if let videoObject = item.chatmodel.message?.messageObject as? NIMVideoObject {
       if let path = videoObject.coverUrl {
         contentImageView.sd_setImage(
           with: URL(string: path),

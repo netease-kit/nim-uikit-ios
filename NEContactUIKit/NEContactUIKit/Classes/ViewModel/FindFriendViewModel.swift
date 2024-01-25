@@ -8,11 +8,11 @@ import NECoreIMKit
 import NECoreKit
 
 @objcMembers
-public class FindFriendViewModel: NSObject {
+open class FindFriendViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "FindFriendViewModel"
 
-  func searchFriend(_ text: String, _ completion: @escaping ([User]?, NSError?) -> Void) {
+  func searchFriend(_ text: String, _ completion: @escaping ([NEKitUser]?, NSError?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
     contactRepo.fetchUserInfo(accountList: [text], completion)
   }

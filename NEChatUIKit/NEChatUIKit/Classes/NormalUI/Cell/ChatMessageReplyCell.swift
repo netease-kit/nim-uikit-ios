@@ -11,8 +11,8 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
     let replyLabel = UILabel()
     replyLabel.font = UIFont.systemFont(ofSize: 13)
     replyLabel.textColor = UIColor(hexString: "#929299")
-    replyLabel.textAlignment = .justified
     replyLabel.translatesAutoresizingMaskIntoConstraints = false
+    replyLabel.accessibilityIdentifier = "id.messageReply"
     return replyLabel
   }()
 
@@ -20,8 +20,8 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
     let replyLabel = UILabel()
     replyLabel.font = UIFont.systemFont(ofSize: 13)
     replyLabel.textColor = UIColor(hexString: "#929299")
-    replyLabel.textAlignment = .justified
     replyLabel.translatesAutoresizingMaskIntoConstraints = false
+    replyLabel.accessibilityIdentifier = "id.messageReply"
     return replyLabel
   }()
 
@@ -81,15 +81,12 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
     replyLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     let replyLabel = isSend ? replyLabelRight : replyLabelLeft
 
     if let text = model.replyText,
        let font = replyLabel.font {
-      replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
+      replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: "| " + text,
                                                               font: font,
                                                               color: replyLabel.textColor)
       if let attriText = replyLabel.attributedText {
@@ -98,6 +95,6 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
       }
     }
 
-    super.setModel(model)
+    super.setModel(model, isSend)
   }
 }

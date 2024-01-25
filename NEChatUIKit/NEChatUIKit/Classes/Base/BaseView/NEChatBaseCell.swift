@@ -17,9 +17,10 @@ open class NEChatBaseCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public func uploadProgress(byRight: Bool, _ progress: Float) {
+  open func uploadProgress(byRight: Bool, _ progress: Float) {
     fatalError("override in sub class")
   }
 
   open func setModel(_ model: MessageContentModel) {}
+  open func setModel(_ model: MessageContentModel, _ isSend: Bool = false) {}
 }

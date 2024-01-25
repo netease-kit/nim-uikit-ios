@@ -37,6 +37,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     revokeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelLeft.textColor = UIColor.ne_greyText
     revokeLabelLeft.font = UIFont.systemFont(ofSize: 16.0)
+    revokeLabelLeft.accessibilityIdentifier = "id.messageText"
     bubbleImageLeft.addSubview(revokeLabelLeft)
     NSLayoutConstraint.activate([
       revokeLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 16),
@@ -50,6 +51,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     revokeLabelRight.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelRight.textColor = UIColor.ne_greyText
     revokeLabelRight.font = UIFont.systemFont(ofSize: 16.0)
+    revokeLabelRight.accessibilityIdentifier = "id.messageText"
     bubbleImageRight.addSubview(revokeLabelRight)
     NSLayoutConstraint.activate([
       revokeLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 16),
@@ -59,6 +61,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     ])
 
     reeditButton.translatesAutoresizingMaskIntoConstraints = false
+    reeditButton.accessibilityIdentifier = "id.reeditButton"
     reeditButton.setImage(UIImage.ne_imageNamed(name: "right_arrow"), for: .normal)
     reeditButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     reeditButton.setTitleColor(UIColor.ne_blueText, for: .normal)
@@ -80,6 +83,10 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     super.showLeftOrRight(showRight: showRight)
     revokeLabelLeft.isHidden = showRight
     revokeLabelRight.isHidden = !showRight
+//    reeditButton.isHidden = !showRight
+
+    activityView.isHidden = true
+    readView.isHidden = true
     seletedBtn.isHidden = true
     pinLabelLeft.isHidden = true
     pinImageLeft.isHidden = true
@@ -87,7 +94,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     pinImageRight.isHidden = true
   }
 
-  override open func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     if let time = model.message?.timestamp {
       let date = Date()
       let currentTime = date.timeIntervalSince1970
@@ -95,24 +102,22 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
         model.timeOut = true
       }
     }
-    if let isSend = model.message?.isOutgoingMsg, isSend, model.isRevokedText == true, model.timeOut == false {
+    if isSend,
+       model.isRevokedText == true,
+       model.timeOut == false {
       reeditButtonW?.constant = 86
       reeditButton.isHidden = false
+      reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
       model.contentSize = CGSize(width: 218, height: chat_min_h)
     } else {
       reeditButtonW?.constant = 0
       reeditButton.isHidden = true
       model.contentSize = CGSize(width: 130, height: chat_min_h)
     }
-    super.setModel(model)
 
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+    super.setModel(model, isSend)
     let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
-
-    revokeLabel.text = chatLocalizable("message_has_be_withdrawn")
-    reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
+    revokeLabel.text = chatLocalizable("message_recalled")
   }
 
   func reeditEvent(button: UIButton) {

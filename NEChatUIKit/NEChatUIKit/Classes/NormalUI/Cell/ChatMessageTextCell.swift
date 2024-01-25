@@ -15,7 +15,6 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
-    label.textAlignment = .justified
     label.accessibilityIdentifier = "id.messageText"
     return label
   }()
@@ -28,7 +27,6 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
     label.backgroundColor = .clear
-    label.textAlignment = .justified
     label.accessibilityIdentifier = "id.messageText"
     return label
   }()
@@ -66,13 +64,9 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     contentLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let contentLabel = isSend ? contentLabelRight : contentLabelLeft
-
     if let m = model as? MessageTextModel {
       contentLabel.attributedText = m.attributeStr
     }

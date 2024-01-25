@@ -22,7 +22,7 @@ open class P2PChatViewController: NormalChatViewController {
 
   override open func getSessionInfo(session: NIMSession) {
     var showName = session.sessionId
-    viewmodel.getUserInfo(session.sessionId) { [weak self] user, error in
+    ChatUserCache.getUserInfo(session.sessionId) { [weak self] user, error in
       if let name = user?.showName() {
         showName = name
       }

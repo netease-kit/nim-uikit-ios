@@ -17,7 +17,8 @@ public protocol ChatInputViewDelegate: NSObjectProtocol {
   func moveOutView()
   func moveInView()
   func endRecord(insideView: Bool)
-  func textFieldDidChange(_ textField: UITextView)
-  func textFieldDidEndEditing(_ textField: UITextView)
-  func textFieldDidBeginEditing(_ textField: UITextView)
+  func textFieldDidChange(_ text: String?)
+  func textFieldDidEndEditing(_ text: String?)
+  func textFieldDidBeginEditing(_ text: String?)
+  func titleTextDidClearEmpty()
 }

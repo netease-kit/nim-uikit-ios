@@ -3,16 +3,17 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UITextFieldDelegate {
-  typealias ModifyBlock = (_ user: User) -> Void
+  typealias ModifyBlock = (_ user: NEKitUser) -> Void
 
   var completion: ModifyBlock?
-  var user: User?
+  var user: NEKitUser?
   let viewmodel = ContactUserViewModel()
   let textLimit = 15
   lazy var aliasInput: UITextField = {
@@ -42,7 +43,7 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
 //        return btn
 //    }()
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
   }
@@ -58,7 +59,7 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
 
     view.addSubview(aliasInput)
     aliasInput.placeholder = localizable("input_noteName")
-    if let alias = user?.alias {
+    if let alias = user?.alias, !alias.isEmpty {
       aliasInput.text = alias
     }
   }
@@ -82,7 +83,11 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
       return
     }
 
-    user?.alias = aliasInput.text
+    if user?.alias != aliasInput.text {
+      user?.alias = aliasInput.text
+      NotificationCenter.default.post(name: NENotificationName.updateFriendInfo, object: user)
+    }
+
     if let u = user {
       view.makeToastActivity(.center)
       viewmodel.update(u) { error in
@@ -117,7 +122,7 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
    }
    */
 
-  public func textFieldChange() {
+  open func textFieldChange() {
     guard let _ = aliasInput.markedTextRange else {
       if let text = aliasInput.text,
          text.count > textLimit {

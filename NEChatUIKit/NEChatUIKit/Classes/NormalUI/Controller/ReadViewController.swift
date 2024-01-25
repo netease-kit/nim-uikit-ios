@@ -20,7 +20,7 @@ open class ReadViewController: NEBaseReadViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override public func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     navigationView.titleBarBottomLine.isHidden = false
     readButton.setTitleColor(UIColor.ne_darkText, for: .normal)

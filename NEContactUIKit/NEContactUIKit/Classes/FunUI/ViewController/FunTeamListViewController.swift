@@ -18,8 +18,8 @@ open class FunTeamListViewController: NEBaseTeamListViewController {
     tableView.rowHeight = 72
   }
 
-  override public func tableView(_ tableView: UITableView,
-                                 cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override open func tableView(_ tableView: UITableView,
+                               cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(FunTeamTableViewCell.self))",
       for: indexPath

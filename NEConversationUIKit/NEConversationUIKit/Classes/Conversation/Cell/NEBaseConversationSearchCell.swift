@@ -22,7 +22,7 @@ open class NEBaseConversationSearchCell: TextBaseCell {
           titleLabel.text = userInfo.showName()
           subTitleLabel.text = userInfo.userId
 
-          if let imageName = userInfo.userInfo?.avatarUrl {
+          if let imageName = userInfo.userInfo?.avatarUrl, !imageName.isEmpty {
             headImge.setTitle("")
             headImge.sd_setImage(with: URL(string: imageName), completed: nil)
             headImge.backgroundColor = .clear
@@ -35,7 +35,7 @@ open class NEBaseConversationSearchCell: TextBaseCell {
         if let teamInfo = searchModel?.teamInfo {
           titleLabel.text = teamInfo.getShowName()
           subTitleLabel.text = nil
-          if let imageName = teamInfo.avatarUrl {
+          if let imageName = teamInfo.avatarUrl, !imageName.isEmpty {
             headImge.setTitle("")
             headImge.sd_setImage(with: URL(string: imageName), completed: nil)
             headImge.backgroundColor = .clear
@@ -51,10 +51,10 @@ open class NEBaseConversationSearchCell: TextBaseCell {
 
   public var searchText: String = "" {
     didSet {
-      if let titleText = titleLabel.text,
-         let range = titleText.findAllIndex(searchText).first {
+      if let titleText = titleLabel.text {
         let attributedStr = NSMutableAttributedString(string: titleText)
-        // range必须要加，参数分别表示从索引几开始取几个字符
+        // range 表示从索引几开始取几个字符
+        let range = attributedStr.mutableString.range(of: searchText)
         attributedStr.addAttribute(
           .foregroundColor,
           value: getRangeTextColor(),
@@ -65,10 +65,11 @@ open class NEBaseConversationSearchCell: TextBaseCell {
         titleLabelTopAnchor?.isActive = false
         subTitleLabel.isHidden = true
       }
-      if let subTitleText = subTitleLabel.text,
-         let range = subTitleText.findAllIndex(searchText).first {
+
+      if let subTitleText = subTitleLabel.text {
         let attributedStr = NSMutableAttributedString(string: subTitleText)
-        // range必须要加，参数分别表示从索引几开始取几个字符
+        // range 表示从索引几开始取几个字符
+        let range = attributedStr.mutableString.range(of: searchText)
         attributedStr.addAttribute(
           .foregroundColor,
           value: getRangeTextColor(),

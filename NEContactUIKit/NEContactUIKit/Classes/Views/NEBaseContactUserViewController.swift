@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 import NIMSDK
@@ -11,7 +12,7 @@ import UIKit
 @objcMembers
 open class NEBaseContactUserViewController: NEBaseContactViewController, UITableViewDelegate,
   UITableViewDataSource {
-  var user: User?
+  var user: NEKitUser?
   var uid: String?
   public var isBlack: Bool = false
   var className = "ContactUserViewController"
@@ -21,7 +22,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   var data = [[UserItem]]()
   public var headerView = NEBaseUserInfoHeaderView()
 
-  public init(user: User?) {
+  public init(user: NEKitUser?) {
     super.init(nibName: nil, bundle: nil)
     self.user = user
     uid = user?.userId
@@ -56,7 +57,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
           weakSelf?.showToast(err.localizedDescription)
         } else if let u = users?.first {
           weakSelf?.user = u
-          NotificationCenter.default.post(name: NotificationName.updateFriendInfo, object: u)
+          ChatUserCache.updateUserInfo(u)
           weakSelf?.loadData()
         }
       }
@@ -233,24 +234,24 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     return cell
   }
 
-  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     if section == 0 {
       return 0
     }
     return 6.0
   }
 
-  public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+  open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let header = UIView()
     header.backgroundColor = UIColor.clear
     return header
   }
 
-  public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
     0
   }
 
-  public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+  open func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
     nil
   }
 
@@ -291,7 +292,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     remark.completion = { [weak self] u in
       self?.user = u
       self?.headerView.setData(user: u)
-      NotificationCenter.default.post(name: NotificationName.updateFriendInfo, object: u)
+      ChatUserCache.updateUserInfo(u)
     }
     navigationController?.pushViewController(remark, animated: true)
 
@@ -339,25 +340,20 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     }
   }
 
-  func chat(user: User?) {
+  func chat(user: NEKitUser?) {
     guard let accid = self.user?.userId else {
       return
     }
+
     let session = NIMSession(accid, type: .P2P)
     Router.shared.use(
       PushP2pChatVCRouter,
-      parameters: ["nav": navigationController as Any, "session": session],
+      parameters: ["nav": navigationController as Any, "session": session, "removeUserVC": true],
       closure: nil
     )
-
-    // 移除当前页面
-    if let selfVCIndex = navigationController?.viewControllers.firstIndex(of: self),
-       selfVCIndex > 0 {
-      navigationController?.viewControllers.remove(at: selfVCIndex)
-    }
   }
 
-  func deleteFriendAction(user: User?) {
+  func deleteFriendAction(user: NEKitUser?) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
@@ -372,13 +368,14 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
         if error != nil {
           self.showToast(error?.localizedDescription ?? "")
         } else {
+          ChatUserCache.removeUserInfo(userId)
           self.navigationController?.popViewController(animated: true)
         }
       }
     }
   }
 
-  open func deleteFriend(user: User?) {
+  open func deleteFriend(user: NEKitUser?) {
     let alertTitle = String(format: localizable("delete_title"), user?.showName(true) ?? "")
     let alertController = UIAlertController(
       title: alertTitle,

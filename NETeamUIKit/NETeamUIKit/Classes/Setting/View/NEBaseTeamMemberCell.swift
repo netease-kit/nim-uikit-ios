@@ -6,8 +6,22 @@
 import NECommonUIKit
 import UIKit
 
+protocol TeamMemberCellDelegate: NSObject {
+  func didClickRemoveButton(_ model: TeamMemberInfoModel?, _ index: Int)
+}
+
 @objcMembers
 open class NEBaseTeamMemberCell: UITableViewCell {
+  var currentModel: TeamMemberInfoModel?
+
+  weak var delegate: TeamMemberCellDelegate?
+
+  public var ownerWidth: NSLayoutConstraint?
+
+  public var nameLabelRightMargin: NSLayoutConstraint?
+
+  var index = 0
+
   lazy var headerView: NEUserHeaderView = {
     let header = NEUserHeaderView(frame: .zero)
     header.titleLabel.font = NEConstant.defaultTextFont(14)
@@ -15,7 +29,6 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     header.layer.cornerRadius = 21
     header.clipsToBounds = true
     header.translatesAutoresizingMaskIntoConstraints = false
-    header.accessibilityIdentifier = "id.avatar"
     return header
   }()
 
@@ -44,16 +57,20 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     return label
   }()
 
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
+  lazy var removeLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = localizable("team_member_remove")
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.textAlignment = .center
+    return label
+  }()
 
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
+  lazy var removeBtn: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    return button
+  }()
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -74,25 +91,30 @@ open class NEBaseTeamMemberCell: UITableViewCell {
       headerView.heightAnchor.constraint(equalToConstant: 42),
     ])
 
-    contentView.addSubview(ownerLabel)
-    NSLayoutConstraint.activate([
-      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      ownerLabel.heightAnchor.constraint(equalToConstant: 25.0),
-      ownerLabel.widthAnchor.constraint(equalToConstant: 48.0),
-    ])
-
+    nameLabelRightMargin = nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -116)
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
       nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -70),
+      nameLabelRightMargin!,
+    ])
+
+    ownerWidth = ownerLabel.widthAnchor.constraint(equalToConstant: 48.0)
+    contentView.addSubview(ownerLabel)
+    NSLayoutConstraint.activate([
+      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -70),
+      ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      ownerLabel.heightAnchor.constraint(equalToConstant: 22.0),
+      ownerWidth!,
     ])
   }
 
   func configure(_ model: TeamMemberInfoModel) {
-//        ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
-    if let url = model.nimUser?.userInfo?.avatarUrl {
+    if let userId = model.nimUser?.userId, let user = ChatUserCache.getUserInfo(userId) {
+      model.nimUser = user
+    }
+    currentModel = model
+    if let url = model.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {
@@ -101,5 +123,20 @@ open class NEBaseTeamMemberCell: UITableViewCell {
       headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.userId)
     }
     nameLabel.text = model.atNameInTeam()
+  }
+
+  func setupRemoveButton() {
+    contentView.addSubview(removeBtn)
+    NSLayoutConstraint.activate([
+      removeBtn.topAnchor.constraint(equalTo: contentView.topAnchor),
+      removeBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      removeBtn.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      removeBtn.widthAnchor.constraint(equalToConstant: 100),
+    ])
+    removeBtn.addTarget(self, action: #selector(didClickRemove), for: .touchUpInside)
+  }
+
+  func didClickRemove() {
+    delegate?.didClickRemoveButton(currentModel, index)
   }
 }

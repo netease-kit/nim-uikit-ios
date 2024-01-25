@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEChatKit
 import NECoreIMKit
 import NECoreKit
 import UIKit
@@ -63,8 +64,9 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
 
     contentView.addSubview(redAngleView)
     NSLayoutConstraint.activate([
-      redAngleView.centerYAnchor.constraint(equalTo: arrow.centerYAnchor),
+      redAngleView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       redAngleView.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -10),
+      redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
   }
 
@@ -85,10 +87,14 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
   }
 
   open func setModel(_ model: ContactInfo) {
-    guard let user = model.user else {
+    guard var user = model.user else {
       return
     }
     setConfig()
+
+    if let userId = user.userId, let u = ChatUserCache.getUserInfo(userId) {
+      user = u
+    }
 
     if model.contactCellType == 1 {
       NELog.infoLog("contact other cell configData", desc: "\(user.alias), image name:\(user.userInfo?.avatarUrl)")

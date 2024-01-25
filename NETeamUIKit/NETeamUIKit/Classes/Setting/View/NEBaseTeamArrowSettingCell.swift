@@ -17,7 +17,7 @@ open class NEBaseTeamArrowSettingCell: NEBaseTeamSettingCell {
     super.init(coder: coder)
   }
 
-  override public func configure(_ anyModel: Any) {
+  override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
   }
 

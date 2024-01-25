@@ -85,7 +85,7 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
     ])
   }
 
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+  open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     guard let text = textField.text else {
       return false
     }

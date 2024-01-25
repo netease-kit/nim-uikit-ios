@@ -1,4 +1,3 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -6,21 +5,19 @@
 import NEChatUIKit
 import NIMSDK
 import UIKit
-public class CustomAttachment: NSObject, NIMCustomAttachment, NECustomAttachmentProtocol {
-  public var customType: Int = 0
-
-  public var cellHeight: CGFloat = 0
-
-  public var type = 0
-
+public class CustomAttachment: NECustomAttachment {
   public var goodsName = "name"
 
   public var goodsURL = "url"
 
-  public func encode() -> String {
-    let info = ["goodsName": goodsName, "goodsURL": goodsURL, "type": type] as [String: Any]
+  override public func encode() -> String {
+    // 自定义序列化方法之前必须调用父类的序列化方法
+    let neContent = super.encode()
+    var info: [String: Any] = getDictionaryFromJSONString(neContent) as? [String: Any] ?? [:]
+    info["goodsName"] = goodsName
+    info["goodsURL"] = goodsURL
 
-    let jsonData = try? JSONSerialization.data(withJSONObject: info, options: .prettyPrinted)
+    let jsonData = try? JSONSerialization.data(withJSONObject: info, options: [])
     var content = ""
     if let data = jsonData {
       content = String(data: data, encoding: .utf8) ?? ""
@@ -29,41 +26,18 @@ public class CustomAttachment: NSObject, NIMCustomAttachment, NECustomAttachment
   }
 }
 
-public class CustomAttachmentDecoder: NSObject, NIMCustomAttachmentCoding {
-  public func decodeAttachment(_ content: String?) -> NIMCustomAttachment? {
-    var attachment: NIMCustomAttachment?
-    let data = content?.data(using: .utf8)
-    guard let dataInfo = data else {
-      return attachment
+public class CustomAttachmentDecoder: NECustomAttachmentDecoder {
+  override public func decodeCustomMessage(info: [String: Any]) -> CustomAttachment {
+    // 自定义反序列化方法之前必须调用父类的反序列化方法
+    let neCustomAttachment = super.decodeCustomMessage(info: info)
+    let customAttachment = CustomAttachment(customType: neCustomAttachment.customType,
+                                            cellHeight: neCustomAttachment.cellHeight,
+                                            data: neCustomAttachment.data)
+    if customAttachment.customType == 20 {
+      customAttachment.cellHeight = 50
     }
-
-    let infoDict = try? JSONSerialization.jsonObject(
-      with: dataInfo,
-      options: .mutableContainers
-    )
-    let infoResult = infoDict as? [String: Any]
-    let type = infoResult?["type"] as? Int
-
-    switch type {
-    case 0:
-      attachment =
-        decodeCustomMessage(info: infoDict as? [String: Any] ?? [String(): String()])
-    default:
-      print("test")
-    }
-
-    return attachment
-  }
-
-  func decodeCustomMessage(info: [String: Any]) -> CustomAttachment {
-    let customAttachment = CustomAttachment()
     customAttachment.goodsName = info["goodsName"] as? String ?? ""
     customAttachment.goodsURL = info["goodsURL"] as? String ?? ""
-    if let type = info["type"] as? Int {
-      customAttachment.type = type
-    }
-    customAttachment.customType = 20
-    customAttachment.cellHeight = 50
 
     return customAttachment
   }

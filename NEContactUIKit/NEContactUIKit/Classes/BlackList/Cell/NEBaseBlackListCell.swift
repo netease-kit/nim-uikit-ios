@@ -14,7 +14,7 @@ protocol BlackListCellDelegate: AnyObject {
 open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
   weak var delegate: BlackListCellDelegate?
   var index = 0
-  private var model: User?
+  private var model: NEKitUser?
   var button = UIButton()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -58,8 +58,8 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     delegate?.removeUser(account: model?.userId, index: index)
   }
 
-  override public func setModel(_ model: Any) {
-    guard let user = model as? User else {
+  override open func setModel(_ model: Any) {
+    guard let user = model as? NEKitUser else {
       return
     }
     self.model = user
@@ -68,7 +68,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     titleLabel.text = user.showName()
 
     // avatar
-    if let imageUrl = user.userInfo?.avatarUrl {
+    if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
       nameLabel.text = ""
       avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
       avatarImage.backgroundColor = .clear

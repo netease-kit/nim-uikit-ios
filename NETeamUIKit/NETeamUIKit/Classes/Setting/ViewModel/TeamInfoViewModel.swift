@@ -7,7 +7,7 @@ import NECoreIMKit
 import NIMSDK
 
 @objcMembers
-public class TeamInfoViewModel: NSObject {
+open class TeamInfoViewModel: NSObject {
   var cellDatas = [SettingCellModel]()
 
   func getData(_ team: NIMTeam?) {

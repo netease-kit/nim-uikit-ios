@@ -13,7 +13,7 @@ var tempLabelForCalc: UILabel = {
 }()
 
 extension String {
-  // 计算文字size
+  /// 计算 string 的 size
   static func getTextRectSize(_ text: String, font: UIFont, size: CGSize) -> CGSize {
     let attributes = [NSAttributedString.Key.font: font]
     let option = NSStringDrawingOptions.usesLineFragmentOrigin
@@ -23,10 +23,19 @@ extension String {
   }
 
   /// 计算 string 的行数，使用 font 的 lineHeight
-  static func calculateMaxLines(width: CGFloat, string: String, font: UIFont) -> Int {
+  static func calculateMaxLines(width: CGFloat, string: String?, font: UIFont) -> Int {
     let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
     let charSize = font.lineHeight
-    let textSize = getTextRectSize(string, font: font, size: maxSize)
+    let textSize = string?.finalSize(font, maxSize) ?? .zero
+    let lines = Int(textSize.height / charSize)
+    return lines
+  }
+
+  /// 计算 label 的行数，使用 font 的 lineHeight
+  static func calculateMaxLines(width: CGFloat, attributeString: NSAttributedString?, font: UIFont) -> Int {
+    let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
+    let charSize = font.lineHeight
+    let textSize = attributeString?.finalSize(font, maxSize) ?? .zero
     let lines = Int(textSize.height / charSize)
     return lines
   }

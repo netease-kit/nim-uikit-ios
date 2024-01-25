@@ -7,8 +7,8 @@ import NECommonKit
 import NECommonUIKit
 import UIKit
 
-@objc
-public class ForwardItem: NSObject {
+@objcMembers
+open class ForwardItem: NSObject {
   var name: String?
   var uid: String?
   var avatar: String?
@@ -16,7 +16,7 @@ public class ForwardItem: NSObject {
 }
 
 @objcMembers
-public class NEBaseForwardUserCell: UICollectionViewCell {
+open class NEBaseForwardUserCell: UICollectionViewCell {
   lazy var userHeader: NEUserHeaderView = {
     let header = NEUserHeaderView(frame: .zero)
     header.translatesAutoresizingMaskIntoConstraints = false
@@ -31,7 +31,7 @@ public class NEBaseForwardUserCell: UICollectionViewCell {
     setupUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
@@ -47,17 +47,19 @@ public class NEBaseForwardUserCell: UICollectionViewCell {
 }
 
 @objcMembers
-public class NEBaseForwardAlertViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource,
+open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource,
   UICollectionViewDelegateFlowLayout {
   var datas = [ForwardItem]()
 
-  typealias ForwardCallBack = () -> Void
+  typealias ForwardCallBack = (String?) -> Void
   var cancelBlock: ForwardCallBack?
   var sureBlock: ForwardCallBack?
+  var type = chatLocalizable("operation_forward") // 合并转发/逐条转发/转发
   var context = ""
 
   public let sureBtn = UIButton()
   public let tip = UILabel()
+  public var contentViewCenterYAnchor: NSLayoutConstraint?
 
   lazy var userCollection: UICollectionView = {
     let flow = UICollectionViewFlowLayout()
@@ -103,25 +105,61 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(14.0)
     label.textColor = .ne_darkText
-    label.numberOfLines = 0
+    label.numberOfLines = 1
+    label.lineBreakMode = .byTruncatingMiddle
     label.accessibilityIdentifier = "id.forwardContentText"
     return label
   }()
 
-  override public func viewDidLoad() {
-    super.viewDidLoad()
+  // 留言
+  lazy var commentTextFeild: UITextField = {
+    let textFeild = UITextField()
+    textFeild.translatesAutoresizingMaskIntoConstraints = false
+    textFeild.placeholder = chatLocalizable("leave_message")
+    textFeild.layer.cornerRadius = 4
+    textFeild.layer.borderWidth = 1
+    textFeild.layer.borderColor = forwardLineColor.cgColor
+    textFeild.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
+    textFeild.leftViewMode = .always
+    textFeild.font = .systemFont(ofSize: 14)
+    return textFeild
+  }()
 
-    // Do any additional setup after loading the view.
-    setupUI()
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    if let parent = parent as? ChatViewController {
+      parent.isCurrentPage = false
+    }
   }
 
-  public func setupUI() {
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    setupUI()
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(keyBoardWillShow(_:)),
+                                           name: UIResponder.keyboardWillShowNotification,
+                                           object: nil)
+
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(keyBoardWillHide(_:)),
+                                           name: UIResponder.keyboardWillHideNotification,
+                                           object: nil)
+  }
+
+  override open func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    navigationController?.viewControllers.last?.view.endEditing(false)
+  }
+
+  open func setupUI() {
     view.backgroundColor = NEConstant.hexRGB(0x000000).withAlphaComponent(0.4)
     view.addSubview(contentView)
+    contentViewCenterYAnchor = contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     NSLayoutConstraint.activate([
       contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      contentViewCenterYAnchor!,
       contentView.widthAnchor.constraint(equalToConstant: 276),
+      contentView.heightAnchor.constraint(equalToConstant: 250),
     ])
 
     tip.translatesAutoresizingMaskIntoConstraints = false
@@ -181,24 +219,32 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
       contentText.topAnchor.constraint(equalTo: textBack.topAnchor, constant: 7),
       contentText.bottomAnchor.constraint(equalTo: textBack.bottomAnchor, constant: -7),
     ])
-    contentText.text = "[转发]\(context)的会话记录"
+    contentText.text = "[\(type)]\(context)的会话记录"
+
+    // 留言
+    contentView.addSubview(commentTextFeild)
+    NSLayoutConstraint.activate([
+      commentTextFeild.leftAnchor.constraint(equalTo: textBack.leftAnchor),
+      commentTextFeild.rightAnchor.constraint(equalTo: textBack.rightAnchor),
+      commentTextFeild.topAnchor.constraint(equalTo: textBack.bottomAnchor, constant: 16),
+      commentTextFeild.heightAnchor.constraint(equalToConstant: 32),
+    ])
 
     let verticalLine = UIView()
     verticalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(verticalLine)
-    verticalLine.backgroundColor = NEConstant.hexRGB(0xE1E6E8)
+    verticalLine.backgroundColor = forwardLineColor
     NSLayoutConstraint.activate([
       verticalLine.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      verticalLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       verticalLine.widthAnchor.constraint(equalToConstant: 1.0),
       verticalLine.heightAnchor.constraint(equalToConstant: 51),
-      verticalLine.topAnchor.constraint(equalTo: textBack.bottomAnchor, constant: 16.0),
+      verticalLine.topAnchor.constraint(equalTo: commentTextFeild.bottomAnchor, constant: 24.0),
     ])
 
     let horizontalLine = UIView()
     horizontalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(horizontalLine)
-    horizontalLine.backgroundColor = NEConstant.hexRGB(0xE1E6E8)
+    horizontalLine.backgroundColor = forwardLineColor
     NSLayoutConstraint.activate([
       horizontalLine.leftAnchor.constraint(equalTo: contentView.leftAnchor),
       horizontalLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
@@ -236,7 +282,25 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     ])
   }
 
-  public func setItems(_ items: [ForwardItem]) {
+  //    MARK: 键盘通知相关操作
+
+  open func keyBoardWillShow(_ notification: Notification) {
+    contentViewCenterYAnchor?.constant = -60
+
+    UIView.animate(withDuration: 0.5) {
+      self.view.layoutIfNeeded()
+    }
+  }
+
+  open func keyBoardWillHide(_ notification: Notification) {
+    contentViewCenterYAnchor?.constant = 0
+
+    UIView.animate(withDuration: 0.5) {
+      self.view.layoutIfNeeded()
+    }
+  }
+
+  open func setItems(_ items: [ForwardItem]) {
     datas.append(contentsOf: items)
     if datas.count == 1 {
       let item = datas[0]
@@ -247,7 +311,7 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
         oneUserHead.setTitle(uid)
         oneUserName.text = uid
       }
-      if let url = item.avatar {
+      if let url = item.avatar, !url.isEmpty {
         oneUserHead.sd_setImage(with: URL(string: url), completed: nil)
         oneUserHead.titleLabel.text = ""
         oneUserHead.backgroundColor = .clear
@@ -264,35 +328,38 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
 
   func sureClick() {
     if let block = sureBlock {
-      block()
+      block(commentTextFeild.text)
     }
     removeSelf()
   }
 
   func cancelClick() {
     if let block = cancelBlock {
-      block()
+      block(commentTextFeild.text)
     }
     removeSelf()
   }
 
-  override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    removeSelf()
+  override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    view.endEditing(true)
   }
 
   func removeSelf() {
+    if let parent = parent as? ChatViewController {
+      parent.isCurrentPage = true
+    }
     view.removeFromSuperview()
     removeFromParent()
   }
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             numberOfItemsInSection section: Int) -> Int {
+  open func collectionView(_ collectionView: UICollectionView,
+                           numberOfItemsInSection section: Int) -> Int {
     datas.count
   }
 
   open func setCellModel(cell: NEBaseForwardUserCell, indexPath: IndexPath) -> UICollectionViewCell {
     let item = datas[indexPath.row]
-    if let url = item.avatar {
+    if let url = item.avatar, !url.isEmpty {
       cell.userHeader.sd_setImage(with: URL(string: url), completed: nil)
       cell.userHeader.titleLabel.text = ""
       cell.userHeader.backgroundColor = .clear
@@ -308,14 +375,14 @@ public class NEBaseForwardAlertViewController: UIViewController, UICollectionVie
     return cell
   }
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  open func collectionView(_ collectionView: UICollectionView,
+                           cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     UICollectionViewCell()
   }
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             layout collectionViewLayout: UICollectionViewLayout,
-                             sizeForItemAt indexPath: IndexPath) -> CGSize {
+  open func collectionView(_ collectionView: UICollectionView,
+                           layout collectionViewLayout: UICollectionViewLayout,
+                           sizeForItemAt indexPath: IndexPath) -> CGSize {
     CGSize(width: 32.0, height: 32)
   }
 }

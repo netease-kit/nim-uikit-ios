@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class ChatTextCell: ChatStateCell {
+open class ChatTextCell: ChatStateCell {
   public var titleLabel: UILabel = .init()
   public var detailLabel: UILabel = .init()
   public var line = UIView()
@@ -63,7 +63,7 @@ public class ChatTextCell: ChatStateCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }

@@ -35,7 +35,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     NSLayoutConstraint.activate([
       revokeLabelLeft.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
       revokeLabelLeft.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
-      revokeLabelLeft.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      revokeLabelLeft.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 6),
       revokeLabelLeft.heightAnchor.constraint(equalToConstant: 16),
     ])
   }
@@ -50,7 +50,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     revokeLabelRightXAnchor?.isActive = true
     NSLayoutConstraint.activate([
       revokeLabelRight.widthAnchor.constraint(equalToConstant: 120),
-      revokeLabelRight.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      revokeLabelRight.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 6),
       revokeLabelRight.heightAnchor.constraint(equalToConstant: 16),
     ])
 
@@ -69,22 +69,27 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
   }
 
   override open func showLeftOrRight(showRight: Bool) {
-    super.showLeftOrRight(showRight: showRight)
-    revokeLabelLeft.isHidden = showRight
-    reeditButton.isHidden = !showRight
-    revokeLabelRight.isHidden = !showRight
     avatarImageLeft.isHidden = true
+    nameLabelLeft.isHidden = true
     bubbleImageLeft.isHidden = true
-    avatarImageRight.isHidden = true
-    bubbleImageRight.isHidden = true
-    seletedBtn.isHidden = true
-    pinLabelLeft.isHidden = true
     pinImageLeft.isHidden = true
-    pinLabelRight.isHidden = true
+    pinLabelLeft.isHidden = true
+    fullNameLabel.isHidden = true
+
+    avatarImageRight.isHidden = true
+    nameLabelRight.isHidden = true
+    bubbleImageRight.isHidden = true
     pinImageRight.isHidden = true
+    pinLabelRight.isHidden = true
+    activityView.isHidden = true
+    readView.isHidden = true
+    seletedBtn.isHidden = true
+
+    revokeLabelLeft.isHidden = showRight
+    revokeLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     if let time = model.message?.timestamp {
       let date = Date()
       let currentTime = date.timeIntervalSince1970
@@ -93,14 +98,11 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
       }
     }
 
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
     let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
 
     model.contentSize = CGSize(width: kScreenWidth, height: 0)
-    super.setModel(model)
-    fullNameLabel.isHidden = true
+    super.setModel(model, isSend)
+    showLeftOrRight(showRight: isSend)
 
     revokeLabel.textColor = .funChatInputViewPlaceholderTextColor
     if isSend {
@@ -108,7 +110,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     } else {
       revokeLabel.text = (model.fullName ?? "") + " " + chatLocalizable("withdrew_message")
     }
-    reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
 
     if isSend, model.isRevokedText == true {
       if model.timeOut == true {
@@ -116,10 +117,12 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
         revokeLabelRightXAnchor?.constant = 0
       } else {
         reeditButton.isHidden = false
+        reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
         revokeLabelRightXAnchor?.constant = -32
       }
     } else {
       reeditButton.isHidden = true
+      revokeLabelRightXAnchor?.constant = 0
     }
   }
 

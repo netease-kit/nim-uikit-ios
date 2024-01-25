@@ -63,9 +63,14 @@ open class NEBaseConversationListCell: UITableViewCell {
   open func configData(sessionModel: ConversationListModel?) {
     guard let conversationModel = sessionModel else { return }
 
+    if let userId = conversationModel.userInfo?.userId,
+       let user = ChatUserCache.getUserInfo(userId) {
+      conversationModel.userInfo = user
+    }
+
     if conversationModel.recentSession?.session?.sessionType == .P2P {
       // p2p head image
-      if let imageName = conversationModel.userInfo?.userInfo?.avatarUrl {
+      if let imageName = conversationModel.userInfo?.userInfo?.avatarUrl, !imageName.isEmpty {
         headImge.setTitle("")
         headImge.sd_setImage(with: URL(string: imageName), completed: nil)
         headImge.backgroundColor = .clear
@@ -86,7 +91,7 @@ open class NEBaseConversationListCell: UITableViewCell {
 
     } else if conversationModel.recentSession?.session?.sessionType == .team {
       // team head image
-      if let imageName = conversationModel.teamInfo?.avatarUrl {
+      if let imageName = conversationModel.teamInfo?.avatarUrl, !imageName.isEmpty {
         headImge.setTitle("")
         headImge.sd_setImage(with: URL(string: imageName), completed: nil)
         headImge.backgroundColor = .clear
@@ -119,6 +124,8 @@ open class NEBaseConversationListCell: UITableViewCell {
         }
       }
       subTitle.attributedText = mutaAttri // contentForRecentSession(message: lastMessage)
+    } else {
+      subTitle.attributedText = nil
     }
 
     // unRead message count
@@ -153,11 +160,15 @@ open class NEBaseConversationListCell: UITableViewCell {
     if let lastMessage = recentSession.lastMessage {
       return lastMessage.timestamp
     }
-    // 服务端时间戳以毫秒为单位,需要转化
-    return recentSession.updateTime / 1000
+
+    return 0
   }
 
   func dealTime(time: TimeInterval) -> String {
+    if time <= 0 {
+      return ""
+    }
+
     let targetDate = Date(timeIntervalSince1970: time)
     let fmt = DateFormatter()
 

@@ -8,7 +8,7 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open class FunPopListViewController: NEBasePopListViewController {
+open class FunPopListView: NEBasePopListView {
   public var triangleView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -20,17 +20,17 @@ open class FunPopListViewController: NEBasePopListViewController {
   override func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
-      shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-      shadowView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
+      shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
+      shadowView.rightAnchor.constraint(equalTo: rightAnchor, constant: -8),
     ])
 
     popView.backgroundColor = UIColor.funConversationPopViewBg
 
-    view.insertSubview(triangleView, aboveSubview: shadowView)
+    insertSubview(triangleView, aboveSubview: shadowView)
     NSLayoutConstraint.activate([
       triangleView.widthAnchor.constraint(equalToConstant: 11),
       triangleView.heightAnchor.constraint(equalToConstant: 11),
-      triangleView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -25),
+      triangleView.rightAnchor.constraint(equalTo: rightAnchor, constant: -25),
       triangleView.topAnchor.constraint(equalTo: popView.topAnchor, constant: -5),
     ])
   }

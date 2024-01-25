@@ -36,7 +36,7 @@ class CustomChatCell: NEChatBaseCell {
     testLabel.textColor = UIColor.black
   }
 
-  override func setModel(_ model: MessageContentModel) {
+  override func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     print("this is custom message")
     testLabel.text = "this is custom message"
   }

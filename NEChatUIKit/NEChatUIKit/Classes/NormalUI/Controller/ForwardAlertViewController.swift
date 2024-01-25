@@ -8,7 +8,7 @@ import NECommonUIKit
 import UIKit
 
 @objcMembers
-public class ForwardUserCell: NEBaseForwardUserCell {
+open class ForwardUserCell: NEBaseForwardUserCell {
   override func setupUI() {
     super.setupUI()
     userHeader.layer.cornerRadius = 16
@@ -16,8 +16,8 @@ public class ForwardUserCell: NEBaseForwardUserCell {
 }
 
 @objcMembers
-public class ForwardAlertViewController: NEBaseForwardAlertViewController {
-  override public func setupUI() {
+open class ForwardAlertViewController: NEBaseForwardAlertViewController {
+  override open func setupUI() {
     super.setupUI()
     oneUserHead.layer.cornerRadius = 16.0
     userCollection.register(
@@ -26,7 +26,7 @@ public class ForwardAlertViewController: NEBaseForwardAlertViewController {
     )
   }
 
-  override public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  override open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     if let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: "\(ForwardUserCell.self)",
       for: indexPath

@@ -11,7 +11,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseSystemNotificationCell: NEBaseValidationCell {
-  private var notifModel: XNotification?
+  private var notifModel: NENotification?
   public weak var delegate: SystemNotificationCellDelegate?
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -58,7 +58,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
     ])
   }
 
-  override open func confige(_ model: XNotification) {
+  override open func confige(_ model: NENotification) {
     super.confige(model)
     notifModel = model
     let hideActionButton = shouldHideActionButton()

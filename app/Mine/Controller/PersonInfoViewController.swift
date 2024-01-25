@@ -110,7 +110,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
       if let t = time {
         weakSelf?.viewModel.updateBirthday(birthDay: t) { error in
           if error != nil {
-            if error?.code == 408 {
+            if error?.code == noNetworkCode {
               weakSelf?.showToast(commonLocalizable("network_error"))
             } else {
               weakSelf?.showToast(NSLocalizedString("setting_birthday_failure", comment: ""))
@@ -240,7 +240,7 @@ class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
       sex = value == 0 ? .male : .female
       weakSelf?.viewModel.updateSex(sex: sex) { error in
         if error != nil {
-          if error?.code == 408 {
+          if error?.code == noNetworkCode {
             weakSelf?.showToast(commonLocalizable("network_error"))
           } else {
             weakSelf?.showToast(NSLocalizedString("change_gender_failure", comment: ""))

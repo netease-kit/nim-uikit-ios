@@ -29,7 +29,7 @@ open class NEBasePinMessageDefaultCell: NEBasePinMessageTextCell {
     super.setupUI()
   }
 
-  override public func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: PinMessageModel) {
     super.configure(item)
     contentLabel.text = chatLocalizable("unkonw_pin_message")
   }

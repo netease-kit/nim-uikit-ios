@@ -42,11 +42,11 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     } else {
       title = localizable("group_info")
     }
-    viewmodel.getData(team)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    viewmodel.getData(team)
     setupUI()
   }
 

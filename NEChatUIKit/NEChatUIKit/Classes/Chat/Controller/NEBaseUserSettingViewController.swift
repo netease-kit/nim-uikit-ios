@@ -70,7 +70,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     fatalError("init(coder:) has not been implemented")
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     viewmodel.delegate = self
     if let uid = userId {
@@ -124,7 +124,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     tap.numberOfTapsRequired = 1
     tap.numberOfTouchesRequired = 1
 
-    if let url = viewmodel.userInfo?.userInfo?.avatarUrl {
+    if let url = viewmodel.userInfo?.userInfo?.avatarUrl, !url.isEmpty {
       userHeader.sd_setImage(with: URL(string: url), completed: nil)
       userHeader.setTitle("")
       userHeader.backgroundColor = .clear
@@ -265,7 +265,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
 
   // MARK: UITableViewDataSource, UITableViewDelegate
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewmodel.cellDatas.count
   }
 

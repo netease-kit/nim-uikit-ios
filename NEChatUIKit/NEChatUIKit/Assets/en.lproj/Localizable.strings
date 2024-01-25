@@ -24,7 +24,6 @@
 "downloading"="downloading...";
 "read"="read";
 "unread"="unread";
-"network_unavailable"="No internet, Please check your setting";
 
 
 //MARK: tips
@@ -42,7 +41,7 @@
 "out"="remove";
 "has_updated" = "update";
 "to" = "to ";
-"only_team_owner" = "Only the group owner";
+"only_team_owner" = "Group owners and administrators";
 "everyone" = "Everyone";
 
 "team_name" = "Group Name";
@@ -60,6 +59,7 @@
 "not_mute" = "unmute";
 "mute" = "mute";
 "team_has_been_removed" = "This group is disbanded";
+"team_has_been_quit" = "You have been removed";
 "team_has_quit" = "Group chat has exited";
 "join"="joined";
 "pass"="Passed";
@@ -92,7 +92,6 @@
 "operation_delete"="delete";
 "operation_recall"="recall";
 "withdrew_message" = "withdrew this message";
-"message_has_be_withdrawn" = "message recalled";
 "message_reedit" = "reedit";
 "message_revoke_confirm" = "Wether to recall this message";
 "message_delete_confirm"="Wether to delete this message";
@@ -108,6 +107,9 @@
 "msg_video"="video message";
 "msg_file"="file message";
 "msg_location"="location message";
+"msg_rtc_audio"="audio call message";
+"msg_rtc_video"="video call message";
+"msg_rtc_call"="RTC call message";
 "msg_custom"="custom message";
 "msg_unknown"="Unknown message type";
 "message_read"="Reading Status";
@@ -181,4 +183,21 @@
 
 "no_location"="Please select the location you want to send";
 
-"delete_failed"="Delete failed";
+// 多选
+"select_multi"="select_multi";
+"select_per_item"="select_per_item";
+"chat_history"="chat history";
+"chat_history_by"="`s messages";
+"leave_message"="leave message";
+"exist_invalid"="There are messages cannot be forwarded. Can it be removed and sent?";
+"forward_failed"="Eror, forwarding failed";
+"multiForward_open_failed"="Failed to obtain information";
+"file_check_failed"="File verification failed";
+"per_item_forward_limit"="Forward one by one to limit %d messages";
+"multiForward_forward_limit"="Combined forwarding limits %d messages";
+"exception_description"="Exception description";
+
+"multiple_line_placleholder"="Please enter title";
+"null_message_not_support"="Empty messages are not allowed to be sent";
+
+"black_list_tip"="Opposite has blocked you and the message cannot be sent.";

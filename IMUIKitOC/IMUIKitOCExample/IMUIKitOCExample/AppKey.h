@@ -7,6 +7,6 @@
 #define AppKey_h
 
 /// IM key
-static NSString *const AppKey = @"";
+static NSString *const AppKey = @"<#appKey#>";
 
 #endif /* AppKey_h */

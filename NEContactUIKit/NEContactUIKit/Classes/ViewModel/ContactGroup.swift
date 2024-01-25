@@ -6,4 +6,4 @@
 import Foundation
 
 @objcMembers
-public class ContactGroup {}
+open class ContactGroup {}

@@ -20,7 +20,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor
     viewmodel.cellDatas.forEach { cellModel in
@@ -38,7 +38,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     contentTable.rowHeight = 56
   }
 
-  override public func headerView() -> UIView {
+  override open func headerView() -> UIView {
     let header = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 117))
     header.backgroundColor = .clear
     let cornerBack = UIView()
@@ -59,7 +59,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     tap.numberOfTapsRequired = 1
     tap.numberOfTouchesRequired = 1
 
-    if let url = viewmodel.userInfo?.userInfo?.avatarUrl {
+    if let url = viewmodel.userInfo?.userInfo?.avatarUrl, !url.isEmpty {
       userHeader.sd_setImage(with: URL(string: url), completed: nil)
       userHeader.setTitle("")
       userHeader.backgroundColor = .clear
@@ -116,7 +116,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     return header
   }
 
-  override public func filterStackViewController() -> [UIViewController]? {
+  override open func filterStackViewController() -> [UIViewController]? {
     navigationController?.viewControllers.filter {
       if $0.isKind(of: FunP2PChatViewController.self) || $0
         .isKind(of: FunUserSettingViewController.self) {

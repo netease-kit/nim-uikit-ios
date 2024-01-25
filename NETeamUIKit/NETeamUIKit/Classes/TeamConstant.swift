@@ -21,4 +21,5 @@ public var inviteNumberLimit: Int = 200
 
 enum NotificationName {
   static let leaveTeamBySelf = Notification.Name(rawValue: "team.leaveTeamBySelf")
+  static let popGroupChatVC = Notification.Name(rawValue: "team.popGroupChatVC")
 }

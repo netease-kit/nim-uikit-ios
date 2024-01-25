@@ -13,7 +13,7 @@ public enum ChatSendMessageStatus: Int {
 }
 
 @objcMembers
-public class ChatActivityIndicatorView: UIView {
+open class ChatActivityIndicatorView: UIView {
   public var messageStatus: ChatSendMessageStatus? {
     didSet {
       failBtn.isHidden = true
@@ -44,7 +44,7 @@ public class ChatActivityIndicatorView: UIView {
     commonUI()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 

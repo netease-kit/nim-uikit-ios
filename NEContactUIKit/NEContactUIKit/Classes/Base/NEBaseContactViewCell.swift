@@ -35,6 +35,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     label.layer.cornerRadius = 9
     label.clipsToBounds = true
     label.isHidden = true
+    label.accessibilityIdentifier = "id.unread"
     return label
   }()
 
@@ -45,7 +46,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     name.textAlignment = .center
     name.font = UIFont.systemFont(ofSize: 14.0)
     name.adjustsFontSizeToFitWidth = true
-    name.accessibilityIdentifier = "id.avatar"
+    name.accessibilityIdentifier = "id.noAvatar"
     return name
   }()
 
@@ -70,17 +71,6 @@ open class NEBaseContactViewCell: UITableViewCell {
   }()
 
   var leftConstraint: NSLayoutConstraint?
-
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

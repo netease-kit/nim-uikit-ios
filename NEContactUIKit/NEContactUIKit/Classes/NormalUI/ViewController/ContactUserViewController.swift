@@ -15,7 +15,7 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     headerView = UserInfoHeaderView()
   }
 
-  override public init(user: User?) {
+  override public init(user: NEKitUser?) {
     super.init(user: user)
     initNormal()
   }
@@ -34,7 +34,7 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     tableView.rowHeight = 62
   }
 
-  override public func getContactRemakNameViewController() -> NEBaseContactRemakNameViewController {
+  override open func getContactRemakNameViewController() -> NEBaseContactRemakNameViewController {
     ContactRemakNameViewController()
   }
 }

@@ -15,6 +15,7 @@ open class UserBaseTableViewCell: UITableViewCell {
     avatarImage.clipsToBounds = true
     avatarImage.isUserInteractionEnabled = true
     avatarImage.contentMode = .scaleAspectFill
+    avatarImage.accessibilityIdentifier = "id.avatar"
     return avatarImage
   }()
 
@@ -25,6 +26,7 @@ open class UserBaseTableViewCell: UITableViewCell {
     nameLabel.font = UIFont.systemFont(ofSize: 12)
     nameLabel.textColor = .white
     nameLabel.text = "placeholder"
+    nameLabel.accessibilityIdentifier = "id.avatar"
     return nameLabel
   }()
 
@@ -32,10 +34,11 @@ open class UserBaseTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.text = "placeholder"
+    titleLabel.accessibilityIdentifier = "id.nickname"
     return titleLabel
   }()
 
-  public var userModel: User?
+  public var userModel: NEKitUser?
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -67,12 +70,12 @@ open class UserBaseTableViewCell: UITableViewCell {
     titleLabel.text = "placeholder"
   }
 
-  open func setModel(_ model: User) {
+  open func setModel(_ model: NEKitUser) {
     userModel = model
     nameLabel.text = model.shortName(showAlias: false, count: 2)
     titleLabel.text = model.showName()
 
-    if let avatarURL = model.userInfo?.avatarUrl {
+    if let avatarURL = model.userInfo?.avatarUrl, !avatarURL.isEmpty {
       avatarImage
         .sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
           if image != nil {

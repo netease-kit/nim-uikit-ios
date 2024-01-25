@@ -33,11 +33,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
     func setupInit(){
         
-        // init
+        // 初始化NIMSDK
         let option = NIMSDKOption()
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupCoreKitIM(option)
+        
+        // 登录IM之前先初始化 @ 消息监听mananger
+        NEAtMessageManager.setupInstance()
         
         let account = "<#account#>"
         let token = "<#token#>"
@@ -173,7 +176,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 return
               }
               let anchor = param["anchor"] as? NIMMessage
-              var p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+              let p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+                
               for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
                 if vc.isKind(of: ChatViewController.self) {
                   nav?.viewControllers[i] = p2pChatVC
@@ -181,6 +185,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                   return
                 }
               }
+                
+                if let remove = param["removeUserVC"] as? Bool, remove {
+                    nav?.viewControllers.removeLast()
+                }
+                
               nav?.pushViewController(p2pChatVC, animated: true)
             }
         } else {
@@ -191,7 +200,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 return
               }
               let anchor = param["anchor"] as? NIMMessage
-              var p2pChatVC = FunP2PChatViewController(session: session, anchor: anchor)
+              let p2pChatVC = FunP2PChatViewController(session: session, anchor: anchor)
+                
               for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
                 if vc.isKind(of: ChatViewController.self) {
                   nav?.viewControllers[i] = p2pChatVC
@@ -199,6 +209,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                   return
                 }
               }
+                
+                if let remove = param["removeUserVC"] as? Bool, remove {
+                    nav?.viewControllers.removeLast()
+                }
+                
               nav?.pushViewController(p2pChatVC, animated: true)
             }
         }

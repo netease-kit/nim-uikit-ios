@@ -146,7 +146,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     updateConstraintsIfNeeded()
   }
 
-  open func setData(user: User?) {
+  open func setData(user: NEKitUser?) {
     guard let user = user else {
       return
     }

@@ -5,7 +5,8 @@
 
 import UIKit
 
-public enum NEMoreActionType: Int {
+@objc
+public enum NEMoreActionType: NSInteger {
   case takePicture = 1
   case location
   case rtc
@@ -18,7 +19,7 @@ public enum NEMoreActionType: Int {
 
 @objc
 @objcMembers
-public class NEMoreItemModel: NSObject {
+open class NEMoreItemModel: NSObject {
   // 单元图标
   public var image: UIImage?
 

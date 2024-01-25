@@ -10,14 +10,14 @@
 "team_no_speak"="Mute";
 "invite_permission"="Invite Permission";
 "modify_team_info_permission"="Group info Permission";
-"agree"="是否需要被邀请者同意";//后期能力删除
+"agree"="Does the invitee need to consent?";//后期能力删除
 "setting"="Setting";
 "group_memmber"="Group Member";
 "discuss_mebmer"="Temp Group Member";
 "dismiss_team"="Disband Group";
 "leave_team"="Leave Group";
 "leave_discuss"="Leave Temp Group";
-"team_header"=" Group Avator";
+"team_header"=" Group Avatar";
 "team_name"="Group Name";
 "team_intr"="Group Info";
 "default_icon"="Select Default icon";
@@ -44,7 +44,7 @@
 "quit_discuss_chat"="Wether to leave Temp Group";
 "cancel"="cancel";
 "remind"="tip";
-"discuss_avatar"="Temp Group Avator";
+"discuss_avatar"="Temp Group Avatar";
 "discuss_name"="Temp Group Name";
 "discuss_intro"="Temp Group Introduce";
 "invite_has_send"="Invitation sent";
@@ -52,3 +52,36 @@
 // error toast
 "space_not_support"="All Spaces are not supported";
 "team_not_exist"="team not exist";
+
+"manage_team"="Manage Group";
+"confirm_delete_text"="Sure to Remove '%@'";
+"question_mark"="?";
+
+"who_edit_team_info"="Edit group info permission";
+"who_edit_user_info"="Add member permission";
+"who_at_all"="@all permission";
+"who_mark"="Pin permission";
+"who_user_join_noti"="Group notification recipients";
+"manage_manger"="Manager management";
+"team_manager"="Manager";
+"transfer_owner"="Transfer group admin";
+"add_manager"="Add manager";
+"group_manager"="Group manager";
+"team_member_select"="Select member";
+"search_member"="Search member";
+"member_select_sure"="Sure";
+"member_empty_tip"="Select member";
+"team_tip_noti_at_manager"="Only admin and manager can @all";
+"team_tip_noti_at_all"="Everyone can @all";
+"team_owner_and_manager"="Admin and manager";
+"select_limit_tip"="Exceeding the %d person limit";
+"remove_manager_title"="Whether to remove";
+"remove_manager_tip"="No permission after remove";
+"max_managers_tip"="10 limit manager";
+"network_error"="Network is not available, please check";
+"no_permission_tip"="No permission";
+"no_manager_member"="No manager";
+"remove_member_tip"="This member will leave group after remove";
+"member_select_no_member"="No member";
+"remove_failed"="remove failed";
+"failed_operation"="操作失败";

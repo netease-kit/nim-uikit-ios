@@ -9,8 +9,8 @@ import UIKit
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }
 
-public class InputEmoticonTabView: UIControl {
-  public weak var delegate: InputEmoticonTabViewDelegate?
+open class InputEmoticonTabView: UIControl {
+  open weak var delegate: InputEmoticonTabViewDelegate?
   private var tabs = [UIButton]()
   private var seps = [UIView]()
   private var className = "InputEmoticonTabView"
@@ -20,7 +20,7 @@ public class InputEmoticonTabView: UIControl {
     setUpSubViews()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -35,14 +35,14 @@ public class InputEmoticonTabView: UIControl {
     ])
   }
 
-  public func selectTabIndex(_ index: Int) {
+  open func selectTabIndex(_ index: Int) {
     for i in 0 ..< tabs.count {
       let btn = tabs[i]
       btn.isSelected = i == index
     }
   }
 
-  public func loadCatalogs(_ emoticonCatalogs: [NIMInputEmoticonCatalog]?) {
+  open func loadCatalogs(_ emoticonCatalogs: [NIMInputEmoticonCatalog]?) {
     tabs.forEach { btn in
       btn.removeFromSuperview()
     }
@@ -86,6 +86,7 @@ public class InputEmoticonTabView: UIControl {
     button.titleLabel?.textColor = .white
     button.backgroundColor = UIColor.ne_blueText
     button.titleLabel?.font = DefaultTextFont(14)
+    button.accessibilityIdentifier = "id.emojiSend"
     return button
   }()
 }

@@ -19,7 +19,7 @@ public enum OperationType: Int {
 }
 
 @objcMembers
-public class OperationItem: NSObject {
+open class OperationItem: NSObject {
   public var text: String = ""
   public var imageName: String = ""
   public var type: OperationType?
@@ -64,15 +64,15 @@ public class OperationItem: NSObject {
     return item
   }
 
-//  static public func selectItem() -> OperationItem {
-//    OperationItem(
-//      text: chatLocalizable("operation_select"),
-//      imageName: "op_select",
-//      type: .multiSelect
-//    )
-//  }
+  public static func selectItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_select")
+    item.imageName = "op_select"
+    item.type = .multiSelect
+    return item
+  }
 
-//  static public func collectionItem() -> OperationItem {
+//  static open func collectionItem() -> OperationItem {
 //    OperationItem(
 //      text: chatLocalizable("operation_collection"),
 //      imageName: "op_collection",

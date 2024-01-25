@@ -13,10 +13,10 @@ protocol UserSettingViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class UserSettingViewModel: NSObject {
+open class UserSettingViewModel: NSObject {
   var repo = ChatRepo.shared
 
-  var userInfo: User?
+  var userInfo: NEKitUser?
 
   var cellDatas = [UserSettingCellModel]()
 
@@ -69,6 +69,9 @@ public class UserSettingViewModel: NSObject {
       if let uid = weakSelf?.userInfo?.userId {
         let session = NIMSession(uid, type: .P2P)
         if isOpen {
+          if weakSelf?.getRecenterSession() == nil {
+            weakSelf?.addRecentetSession()
+          }
           let params = NIMAddStickTopSessionParams(session: session)
           weakSelf?.repo.chatExtendProvider
             .addStickTopSession(params: params) { error, info in
@@ -96,28 +99,21 @@ public class UserSettingViewModel: NSObject {
         }
       }
     }
-
-    /*
-     let blackList = UserSettingCellModel()
-     blackList.cornerType = .bottomRight.union(.bottomLeft)
-     blackList.cellName = "加入黑名单"
-     if let isBlack = user.imUser?.isInMyBlackList() {
-         blackList.switchOpen = isBlack
-     }
-     blackList.swichChange = { isOpen in
-         if let uid = weakSelf?.userInfo?.userId {
-             if isOpen {
-                 weakSelf?.repo.addBlackList(account: uid, { error in
-                     print("add black list : ", error as Any)
-                 })
-             }else {
-                 weakSelf?.repo.removeFromBlackList(account: uid, { error in
-                     print("remo black list : ", error as Any)
-                 })
-             }
-         }
-     }
-     */
     cellDatas.append(contentsOf: [mark, remind, setTop])
+  }
+
+  public func addRecentetSession() {
+    if let uid = userInfo?.userId {
+      let currentSession = NIMSession(uid, type: .P2P)
+      repo.addRecentSession(currentSession)
+    }
+  }
+
+  public func getRecenterSession() -> NIMRecentSession? {
+    if let uid = userInfo?.userId {
+      let currentSession = NIMSession(uid, type: .P2P)
+      return repo.getRecentSession(currentSession)
+    }
+    return nil
   }
 }

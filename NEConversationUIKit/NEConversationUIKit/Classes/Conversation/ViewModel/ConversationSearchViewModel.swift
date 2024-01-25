@@ -6,7 +6,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-public class ConversationSearchViewModel: NSObject {
+open class ConversationSearchViewModel: NSObject {
   let repo = ConversationRepo.shared
   public var searchResult: (
     friend: [ConversationSearchListModel],
@@ -23,12 +23,12 @@ public class ConversationSearchViewModel: NSObject {
   /// - Parameters:
   ///   - searchStr: 搜索的内容
   ///   - completion: 回调结果
-  public func doSearch(searchStr: String,
-                       _ completion: @escaping (NSError?, (
-                         friend: [ConversationSearchListModel],
-                         contactGroup: [ConversationSearchListModel],
-                         seniorGroup: [ConversationSearchListModel]
-                       )?) -> Void) {
+  open func doSearch(searchStr: String,
+                     _ completion: @escaping (NSError?, (
+                       friend: [ConversationSearchListModel],
+                       contactGroup: [ConversationSearchListModel],
+                       seniorGroup: [ConversationSearchListModel]
+                     )?) -> Void) {
     NELog.infoLog(
       ModuleName + " " + className,
       desc: #function + ", searchStr.count:\(searchStr.count)"

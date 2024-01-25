@@ -9,17 +9,6 @@ import UIKit
 open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
   public var titleWidthAnchor: NSLayoutConstraint?
 
-  override public func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override public func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
@@ -56,7 +45,7 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
     ])
   }
 
-  override public func configure(_ anyModel: Any) {
+  override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
     if let m = anyModel as? SettingCellModel {
       titleWidthAnchor?.constant = m.titleWidth

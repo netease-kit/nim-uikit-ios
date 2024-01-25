@@ -9,7 +9,7 @@ import UIKit
 open class FunChatMessageTipCell: NEBaseChatMessageTipCell {
   override open func commonUI() {
     super.commonUI()
-    timeLabel.font = .systemFont(ofSize: 14)
-    timeLabel.textColor = .funRecordAudioTextColor
+    contentLabel.font = .systemFont(ofSize: 14)
+    contentLabel.textColor = .funRecordAudioTextColor
   }
 }

@@ -22,6 +22,8 @@ open class FunContactTableViewCell: NEBaseContactTableViewCell {
   override open func commonUI() {
     super.commonUI()
     bottomLine.backgroundColor = .funContactLineBorderColor
+    contentView.removeLayoutConstraint(firstItem: redAngleView, seconedItem: arrow, attribute: .right)
+    redAngleView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10).isActive = true
   }
 
   override open func initSubviewsLayout() {

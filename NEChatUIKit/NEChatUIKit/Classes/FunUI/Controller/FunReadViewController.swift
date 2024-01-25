@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class FunReadViewController: NEBaseReadViewController {
-  override public func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     navigationController?.navigationBar.backgroundColor = .white
     navigationView.backgroundColor = .white
@@ -26,13 +26,13 @@ open class FunReadViewController: NEBaseReadViewController {
     emptyView.setEmptyImage(name: "fun_emptyView")
   }
 
-  override public func readButtonEvent(button: UIButton) {
+  override open func readButtonEvent(button: UIButton) {
     super.readButtonEvent(button: button)
     readButton.setTitleColor(UIColor.funChatThemeColor, for: .normal)
     unreadButton.setTitleColor(UIColor.ne_darkText, for: .normal)
   }
 
-  override public func unreadButtonEvent(button: UIButton) {
+  override open func unreadButtonEvent(button: UIButton) {
     super.unreadButtonEvent(button: button)
     readButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     unreadButton.setTitleColor(UIColor.funChatThemeColor, for: .normal)

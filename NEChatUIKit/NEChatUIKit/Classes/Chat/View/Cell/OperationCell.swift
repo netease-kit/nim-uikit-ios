@@ -23,6 +23,8 @@ open class OperationCell: UICollectionViewCell {
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
+    contentView.accessibilityIdentifier = "id.menuCell"
+
     imageView.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(imageView)
     imageView.contentMode = .center

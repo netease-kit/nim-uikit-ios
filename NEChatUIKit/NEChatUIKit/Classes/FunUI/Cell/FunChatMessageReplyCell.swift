@@ -9,10 +9,9 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
   public lazy var replyLabelLeft: UILabel = {
     let replyLabelLeft = UILabel()
     replyLabelLeft.numberOfLines = 2
-    replyLabelLeft.textColor = UIColor(hexString: "#666666") // 换肤颜色提取
+    replyLabelLeft.textColor = .ne_greyText
     replyLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     replyLabelLeft.font = UIFont.systemFont(ofSize: 13)
-    replyLabelLeft.textAlignment = .justified
     return replyLabelLeft
   }()
 
@@ -21,6 +20,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     replyTextView.translatesAutoresizingMaskIntoConstraints = false
     replyTextView.backgroundColor = .funChatInputReplyBg
     replyTextView.layer.cornerRadius = 4
+    replyTextView.accessibilityIdentifier = "id.replyTextView"
     return replyTextView
   }()
 
@@ -32,7 +32,6 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     replyLabelRight.textColor = .ne_greyText
     replyLabelRight.translatesAutoresizingMaskIntoConstraints = false
     replyLabelRight.font = UIFont.systemFont(ofSize: 13)
-    replyLabelRight.textAlignment = .justified
     return replyLabelRight
   }()
 
@@ -41,8 +40,12 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     replyTextView.translatesAutoresizingMaskIntoConstraints = false
     replyTextView.backgroundColor = .funChatInputReplyBg
     replyTextView.layer.cornerRadius = 4
+    replyTextView.accessibilityIdentifier = "id.replyTextView"
     return replyTextView
   }()
+
+  public var funPinLabelLeftTopAnchor: NSLayoutConstraint? // 左侧标记文案顶部布局约束
+  public var funPinLabelRightTopAnchor: NSLayoutConstraint? // 右侧标记文案顶部布局约束
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -69,9 +72,10 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
       replyTextViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
 
-    contentView.removeLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .top)
     contentView.updateLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .left, constant: 14 + funMargin)
-    pinLabelLeft.topAnchor.constraint(equalTo: replyTextViewLeft.bottomAnchor, constant: 4).isActive = true
+    pinLabelLeftTopAnchor?.isActive = false
+    funPinLabelLeftTopAnchor = pinLabelLeft.topAnchor.constraint(equalTo: replyTextViewLeft.bottomAnchor, constant: 4)
+    funPinLabelLeftTopAnchor?.isActive = true
 
     replyTextViewLeft.addSubview(replyLabelLeft)
     NSLayoutConstraint.activate([
@@ -91,9 +95,10 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
       replyTextViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
 
-    contentView.removeLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .top)
     contentView.updateLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .right, constant: -funMargin)
-    pinLabelRight.topAnchor.constraint(equalTo: replyTextViewRight.bottomAnchor, constant: 4).isActive = true
+    pinLabelRightTopAnchor?.isActive = false
+    funPinLabelRightTopAnchor = pinLabelRight.topAnchor.constraint(equalTo: replyTextViewRight.bottomAnchor, constant: 4)
+    funPinLabelRightTopAnchor?.isActive = true
 
     replyTextViewRight.addSubview(replyLabelRight)
     NSLayoutConstraint.activate([
@@ -112,8 +117,11 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
 
   open func addReplyGesture() {
     let replyViewTapLeft = UITapGestureRecognizer(target: self, action: #selector(tapReplyView(tap:)))
+    replyViewTapLeft.cancelsTouchesInView = false
     replyTextViewLeft.addGestureRecognizer(replyViewTapLeft)
+
     let replyViewTapRight = UITapGestureRecognizer(target: self, action: #selector(tapReplyView(tap:)))
+    replyViewTapRight.cancelsTouchesInView = false
     replyTextViewRight.addGestureRecognizer(replyViewTapRight)
   }
 
@@ -122,19 +130,15 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     delegate?.didTapMessageView(self, contentModel)
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let replyLabel = isSend ? replyLabelRight : replyLabelLeft
 
     if let text = model.replyText,
        let font = replyLabel.font {
-      let normalReplyText = NEEmotionTool.getAttWithStr(str: text,
-                                                        font: font,
-                                                        color: replyLabel.textColor)
-      replyLabel.attributedText = normalReplyText.attributedSubstring(from: NSRange(location: 1, length: normalReplyText.length - 1))
+      replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
+                                                              font: font,
+                                                              color: replyLabel.textColor)
     }
   }
 }

@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-public class ChatCenterTextCell: ChatCornerCell {
+open class ChatCenterTextCell: ChatCornerCell {
   public var titleLabel: UILabel = .init()
   public var line = UIView()
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -35,7 +35,7 @@ public class ChatCenterTextCell: ChatCornerCell {
     ])
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }

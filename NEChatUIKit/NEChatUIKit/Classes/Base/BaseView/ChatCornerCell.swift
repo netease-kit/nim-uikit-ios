@@ -8,4 +8,4 @@ import NECommonUIKit
 import UIKit
 
 @objcMembers
-public class ChatCornerCell: CornerCell {}
+open class ChatCornerCell: CornerCell {}

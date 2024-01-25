@@ -8,8 +8,8 @@ import UIKit
 
 @objcMembers
 open class FunContactsSelectedViewController: NEBaseContactsSelectedViewController {
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+  override init(filterUsers: Set<String>? = nil) {
+    super.init(filterUsers: filterUsers)
     customCells = [ContactCellType.ContactPerson.rawValue: FunContactSelectedCell.self]
     view.backgroundColor = .funContactBackgroundColor
   }

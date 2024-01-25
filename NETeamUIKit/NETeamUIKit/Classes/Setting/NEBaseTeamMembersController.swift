@@ -3,15 +3,22 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
+import NECommonUIKit
+import NECoreIMKit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegate,
-  UITableViewDataSource {
+  UITableViewDataSource, TeamMemberCellDelegate, TeamMembersViewModelDelegate {
   public var teamId: String?
 
-  public var datas: [TeamMemberInfoModel]?
+  public var memberDatas: [TeamMemberInfoModel]? {
+    didSet {
+      viewmodel.setShowDatas(memberDatas)
+    }
+  }
 
   public var ownerId: String?
 
@@ -20,6 +27,8 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   public var searchDatas = [TeamMemberInfoModel]()
 
   public let back = UIView()
+
+  let viewmodel = TeamMembersViewModel()
 
   public lazy var searchTextField: UITextField = {
     let field = UITextField()
@@ -71,31 +80,30 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     fatalError("init(coder:) has not been implemented")
   }
 
-  override open func viewWillAppear(_ animated: Bool) {
-    TeamRepo.shared.fetchTeamInfo(teamId ?? "") { [weak self] error, teamModel in
-      if let err = error as? NSError {
-        if err.code == 803 || err.code == 1 {
-          self?.showToast(localizable("team_not_exist"))
-        } else {
-          self?.showToast(err.localizedDescription)
-        }
-      } else {
-        self?.datas = teamModel?.users
-        self?.contentTable.reloadData()
-      }
-    }
-  }
-
   override open func viewDidLoad() {
     super.viewDidLoad()
+    addObserver()
 
+    viewmodel.delegate = self
     let team = TeamProvider.shared.getTeam(teamId: teamId ?? "")
     ownerId = team?.owner
     if team?.isDisscuss() == false {
       isSenior = true
     }
+    if let tid = team?.teamId {
+      viewmodel.getMemberInfo(tid)
+    }
 
     setupUI()
+
+    TeamRepo.shared.fetchTeamInfo(teamId ?? "") { [weak self] error, teamModel in
+      if error != nil {
+        self?.emptyView.isHidden = false
+      } else {
+        self?.viewmodel.setShowDatas(teamModel?.users)
+        self?.didNeedRefreshUI()
+      }
+    }
   }
 
   open func setupUI() {
@@ -149,27 +157,20 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     NSLayoutConstraint.activate([
       emptyView.leftAnchor.constraint(equalTo: contentTable.leftAnchor),
       emptyView.rightAnchor.constraint(equalTo: contentTable.rightAnchor),
-      emptyView.topAnchor.constraint(equalTo: contentTable.topAnchor),
+      emptyView.topAnchor.constraint(equalTo: contentTable.topAnchor, constant: 50),
       emptyView.bottomAnchor.constraint(equalTo: contentTable.bottomAnchor),
     ])
+  }
 
+  func addObserver() {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(textChange),
       name: UITextField.textDidChangeNotification,
       object: nil
     )
+    NotificationCenter.default.addObserver(self, selector: #selector(didNeedRefreshUI), name: NENotificationName.updateFriendInfo, object: nil)
   }
-
-  /*
-   // MARK: - Navigation
-
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       // Get the new view controller using segue.destination.
-       // Pass the selected object to the new view controller.
-   }
-   */
 
   func isOwner(_ userId: String?) -> Bool {
     if isSenior == false {
@@ -184,7 +185,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   func textChange() {
     searchDatas.removeAll()
     if let text = searchTextField.text, text.count > 0 {
-      datas?.forEach { model in
+      viewmodel.datas.forEach { model in
         if let uid = model.nimUser?.userId, uid.contains(text) {
           searchDatas.append(model)
         } else if let nick = model.nimUser?.userInfo?.nickName, nick.contains(text) {
@@ -199,14 +200,14 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     } else {
       emptyView.isHidden = true
     }
-    contentTable.reloadData()
+    didNeedRefreshUI()
   }
 
   func getRealModel(_ index: Int) -> TeamMemberInfoModel? {
     if let text = searchTextField.text, text.count > 0 {
       return searchDatas[index]
     }
-    return datas?[index]
+    return viewmodel.datas[index]
   }
 
   deinit {
@@ -219,7 +220,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     if let text = searchTextField.text, text.count > 0 {
       return searchDatas.count
     }
-    return datas?.count ?? 0
+    return viewmodel.datas.count
   }
 
   open func tableView(_ tableView: UITableView,
@@ -260,5 +261,46 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
         }
       }
     }
+  }
+
+  func didClickRemoveButton(_ model: TeamMemberInfoModel?, _ index: Int) {
+    print("did click remove button")
+    weak var weakSelf = self
+
+    // 注释掉的暂时留存，后续可能更改提示语 let content = String(format: localizable("confirm_delete_text"), model?.atNameInTeam() ?? "") + localizable("question_mark")
+
+    showAlert(title: localizable("remove_manager_title"), message: localizable("remove_member_tip")) {
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.view.makeToast(commonLocalizable("network_error"))
+        return
+      }
+
+      if let tid = weakSelf?.teamId, let uid = model?.nimUser?.userId {
+        weakSelf?.viewmodel.removeTeamMember(tid, [uid]) { error in
+          if let err = error {
+            if err.code == noPermissionCode {
+              weakSelf?.view.makeToast(localizable("no_permission_tip"))
+            } else {
+              weakSelf?.view.makeToast(localizable("remove_failed"))
+            }
+          } else {
+            if let text = weakSelf?.searchTextField.text, text.count > 0 {
+              weakSelf?.searchDatas.remove(at: index)
+              weakSelf?.viewmodel.removeModel(model)
+              weakSelf?.didNeedRefreshUI()
+            } else {
+              weakSelf?.viewmodel.removeModel(model)
+              weakSelf?.didNeedRefreshUI()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 查找移除数据在 data 中的位置
+
+  func didNeedRefreshUI() {
+    contentTable.reloadData()
   }
 }

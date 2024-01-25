@@ -93,6 +93,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     backgroundViewLeft.layer.cornerRadius = 4
     backgroundViewLeft.layer.borderWidth = 1
     backgroundViewLeft.layer.borderColor = UIColor.ne_outlineColor.cgColor
+    backgroundViewLeft.accessibilityIdentifier = "id.mapView"
 
     let messageLongPress = UILongPressGestureRecognizer(
       target: self,
@@ -108,6 +109,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     ])
 
     let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
+    messageTap.cancelsTouchesInView = false
     backgroundViewLeft.addGestureRecognizer(messageTap)
 
     backgroundViewLeft.addSubview(titleLabelLeft)
@@ -162,6 +164,8 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     backgroundViewRight.layer.cornerRadius = 4
     backgroundViewRight.layer.borderWidth = 1
     backgroundViewRight.layer.borderColor = UIColor.ne_outlineColor.cgColor
+    backgroundViewRight.accessibilityIdentifier = "id.mapView"
+
     let messageLongPress = UILongPressGestureRecognizer(
       target: self,
       action: #selector(longPress)
@@ -175,6 +179,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
       backgroundViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor),
     ])
     let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
+    messageTap.cancelsTouchesInView = false
     backgroundViewRight.addGestureRecognizer(messageTap)
 
     backgroundViewRight.addSubview(titleLabelRight)
@@ -226,11 +231,8 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     backgroundViewRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
-    guard let isSend = model.message?.isOutgoingMsg else {
-      return
-    }
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let subTitleLabel = isSend ? subTitleLabelRight : subTitleLabelLeft
     let mapView = isSend ? mapViewRight : mapViewLeft

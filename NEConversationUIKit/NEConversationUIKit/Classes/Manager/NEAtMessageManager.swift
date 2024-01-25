@@ -10,20 +10,20 @@ public let yxAitMsg = "yxAitMsg"
 public let AtMessageChangeNoti = "at_message_change_noti"
 
 @objcMembers
-public class AtMessageModel: NSObject {
+open class AtMessageModel: NSObject {
   public var messageId: String?
   public var messageTime: NSNumber?
 }
 
 @objcMembers
-public class AtMEMessageRecord: NSObject {
+open class AtMEMessageRecord: NSObject {
   public var atMessages = [String: NSNumber]()
   public var lastTime: NSNumber?
   public var isRead = false
 }
 
 @objcMembers
-public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManagerDelegate {
+open class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManagerDelegate {
   public static var instance: NEAtMessageManager?
   private let workQueue = DispatchQueue(label: "AtMessageWorkQueue")
   private let lock = NSLock()
@@ -45,7 +45,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     NEAtMessageManager.instance = NEAtMessageManager()
   }
 
-  public func onLogin(_ step: NIMLoginStep) {
+  open func onLogin(_ step: NIMLoginStep) {
     if step == .loginOK {
       NELog.infoLog(className(), desc: "login ok")
       currentAccid = NIMSDK.shared().loginManager.currentAccount()
@@ -66,7 +66,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     }
   }
 
-  public func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
+  open func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
     guard let msg = notification.message else {
       return
     }
@@ -86,7 +86,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     lock.unlock()
   }
 
-  public func isAtCurrentUser(sessionId: String) -> Bool {
+  open func isAtCurrentUser(sessionId: String) -> Bool {
     let dic = getMessageDic()
     NELog.infoLog(className(), desc: "session id : \(sessionId)")
     NELog.infoLog(className(), desc: "dic : \(dic)")
@@ -96,7 +96,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     return false
   }
 
-  public func clearAtRecord(_ sessionId: String) {
+  open func clearAtRecord(_ sessionId: String) {
     weak var weakSelf = self
     workQueue.async {
       guard let dic = weakSelf?.getMessageDic() else {
@@ -111,7 +111,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     }
   }
 
-  public func filterAtMessage(messages: [NIMMessage]) {
+  open func filterAtMessage(messages: [NIMMessage]) {
     NELog.infoLog(className(), desc: "at manager filterAtMessage : \(messages.count)")
     weak var weakSelf = self
     workQueue.async {
@@ -124,14 +124,14 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     }
   }
 
-  public func removeRevokeAtMessage(messages: [NIMMessage]) {
+  open func removeRevokeAtMessage(messages: [NIMMessage]) {
     weak var weakSelf = self
     workQueue.async {
       weakSelf?.removeRevokeAtMessageInWorkqueue(messages: messages)
     }
   }
 
-  public func startFilterRoamingMessagesTask() {
+  open func startFilterRoamingMessagesTask() {
     weak var weakSelf = self
     workQueue.async {
       weakSelf?.startFilterRoamingMessagesTaskInWorkqueue()
@@ -347,7 +347,7 @@ public class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManag
     }
   }
 
-  public func onRecvMessages(_ messages: [NIMMessage]) {
+  open func onRecvMessages(_ messages: [NIMMessage]) {
     filterAtMessage(messages: messages)
   }
 }

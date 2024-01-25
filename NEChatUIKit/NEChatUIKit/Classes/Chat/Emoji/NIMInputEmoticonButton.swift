@@ -9,14 +9,14 @@ public protocol NIMInputEmoticonButtonDelegate: NSObjectProtocol {
   func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String)
 }
 
-public class NIMInputEmoticonButton: UIButton {
+open class NIMInputEmoticonButton: UIButton {
   public var emotionData: NIMInputEmoticon?
   public var catalogID: String?
   public weak var delegate: NIMInputEmoticonButtonDelegate?
   private let classsTag = "NIMInputEmoticonButton"
 
-  public class func iconButtonWithData(data: NIMInputEmoticon, catalogID: String,
-                                       delegate: NIMInputEmoticonButtonDelegate)
+  open class func iconButtonWithData(data: NIMInputEmoticon, catalogID: String,
+                                     delegate: NIMInputEmoticonButtonDelegate)
     -> NIMInputEmoticonButton {
     let icon = NIMInputEmoticonButton()
     icon.addTarget(icon, action: #selector(onIconSelected), for: .touchUpInside)
@@ -26,6 +26,8 @@ public class NIMInputEmoticonButton: UIButton {
     icon.isExclusiveTouch = true
     icon.contentMode = .scaleToFill
     icon.delegate = delegate
+    icon.accessibilityIdentifier = "id.emoji"
+    icon.accessibilityValue = data.tag
     switch data.type {
     case .unicode:
       icon.setTitle(data.unicode, for: .normal)

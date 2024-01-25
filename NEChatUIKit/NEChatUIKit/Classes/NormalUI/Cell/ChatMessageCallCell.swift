@@ -66,14 +66,11 @@ open class ChatMessageCallCell: NormalChatMessageBaseCell {
     contentLabelRight.isHidden = !showRight
   }
 
-  override open func setModel(_ model: MessageContentModel) {
-    super.setModel(model)
+  override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    super.setModel(model, isSend)
     if let m = model as? MessageCallRecordModel {
-      if let isSend = model.message?.isOutgoingMsg, isSend {
-        contentLabelRight.attributedText = m.attributeStr
-        return
-      }
-      contentLabelLeft.attributedText = m.attributeStr
+      let contentLabel = isSend ? contentLabelRight : contentLabelLeft
+      contentLabel.attributedText = m.attributeStr
     }
   }
 }

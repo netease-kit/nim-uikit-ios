@@ -12,7 +12,7 @@ public protocol PinMessageViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatManagerDelegate, NIMConversationManagerDelegate {
+open class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatManagerDelegate, NIMConversationManagerDelegate {
   public let chatRepo = ChatRepo.shared
   public var items = [PinMessageModel]()
   public var delegate: PinMessageViewModelDelegate?
@@ -25,7 +25,7 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
     NIMSDK.shared().conversationManager.add(self)
   }
 
-  public func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String: String]?) {
+  open func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String: String]?) {
     for message in messages {
       if message.session?.sessionId == session?.sessionId {
         delegate?.didNeedRefreshUI()
@@ -34,7 +34,7 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
     }
   }
 
-  public func getPinitems(session: NIMSession, _ completion: @escaping (Error?) -> Void) {
+  open func getPinitems(session: NIMSession, _ completion: @escaping (Error?) -> Void) {
     weak var weakSelf = self
     self.session = session
     chatRepo.fetchPinMessage(session.sessionId, session.sessionType) { error, pinItems in
@@ -92,9 +92,9 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
     }
   }
 
-  public func removePinMessage(_ message: NIMMessage,
-                               _ completion: @escaping (Error?, NIMMessagePinItem?)
-                                 -> Void) {
+  open func removePinMessage(_ message: NIMMessage,
+                             _ completion: @escaping (Error?, NIMMessagePinItem?)
+                               -> Void) {
     NELog.infoLog("PinMessageViewModel", desc: #function + ", messageId: " + message.messageId)
     let item = NIMMessagePinItem(message: message)
     chatRepo.removeMessagePin(item) { error, pinItem in
@@ -102,54 +102,83 @@ public class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatM
     }
   }
 
-  public func forwardUserMessage(_ message: NIMMessage, _ users: [NIMUser]) {
+  open func sendTextMessage(text: String, session: NIMSession, _ completion: @escaping (Error?) -> Void) {
+    NELog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
+    if text.count <= 0 {
+      return
+    }
+    chatRepo.sendMessage(
+      message: MessageUtils.textMessage(text: text),
+      session: session,
+      completion
+    )
+  }
+
+  open func forwardUserMessage(_ message: NIMMessage,
+                               _ users: [NIMUser],
+                               _ comment: String?,
+                               _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + message.messageId)
     users.forEach { user in
       if let uid = user.userId {
         let session = NIMSession(uid, type: .P2P)
         if let forwardMessage = chatRepo.makeForwardMessage(message) {
-          clearForwardAtMark(forwardMessage)
+          ChatMessageHelper.clearForwardAtMark(forwardMessage)
           chatRepo.sendForwardMessage(forwardMessage, session)
+        }
+        if let text = comment {
+          sendTextMessage(text: text, session: session) { error in
+            print("sendTextMessage error: \(String(describing: error))")
+          }
         }
       }
     }
   }
 
-  public func forwardTeamMessage(_ message: NIMMessage, _ team: NIMTeam) {
+  open func forwardTeamMessage(_ message: NIMMessage,
+                               _ team: NIMTeam,
+                               _ comment: String?,
+                               _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + message.messageId)
     if let tid = team.teamId {
       let session = NIMSession(tid, type: .team)
       if let forwardMessage = chatRepo.makeForwardMessage(message) {
-        clearForwardAtMark(forwardMessage)
+        ChatMessageHelper.clearForwardAtMark(forwardMessage)
         chatRepo.sendForwardMessage(forwardMessage, session)
+      }
+      if let text = comment {
+        sendTextMessage(text: text, session: session, completion)
       }
     }
   }
 
   // MARK: NIMChatManagerDelegate
 
-  public func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
+  open func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
 //    items = [PinMessageModel]()
     delegate?.didNeedRefreshUI()
   }
 
   // MARK: ChatExtendProviderDelegate
 
-  public func onNotifyAddMessagePin(pinItem: NIMMessagePinItem) {
+  open func onNotifyAddMessagePin(pinItem: NIMMessagePinItem) {
 //    items = [PinMessageModel]()
     delegate?.didNeedRefreshUI()
   }
 
-  public func onNotifyRemoveMessagePin(pinItem: NIMMessagePinItem) {
+  open func onNotifyRemoveMessagePin(pinItem: NIMMessagePinItem) {
 //    items = [PinMessageModel]()
     delegate?.didNeedRefreshUI()
   }
 
-  private func clearForwardAtMark(_ forwardMessage: NIMMessage) {
-    forwardMessage.remoteExt?.removeValue(forKey: yxAtMsg)
-    forwardMessage.remoteExt?.removeValue(forKey: keyReplyMsgKey)
-    if forwardMessage.remoteExt?.count ?? 0 <= 0 {
-      forwardMessage.remoteExt = nil
-    }
+  open func downLoad(_ urlString: String, _ filePath: String, _ progress: NIMHttpProgressBlock?,
+                     _ completion: NIMDownloadCompleteBlock?) {
+    NELog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
+    chatRepo.downloadSource(urlString, filePath, progress, completion)
+  }
+
+  open func getHandSetEnable() -> Bool {
+    NELog.infoLog(ModuleName + " " + className(), desc: #function)
+    return chatRepo.getHandsetMode()
   }
 }

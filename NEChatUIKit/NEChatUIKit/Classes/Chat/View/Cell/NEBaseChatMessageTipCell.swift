@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseChatMessageTipCell: UITableViewCell {
-  var timeLabelWidthAnchor: NSLayoutConstraint?
+  var timeLabelHeightAnchor: NSLayoutConstraint? // 消息时间高度约束
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -21,19 +21,36 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
   }
 
   open func commonUI() {
-    timeLabel.numberOfLines = 0
     contentView.addSubview(timeLabel)
+    timeLabelHeightAnchor = timeLabel.heightAnchor.constraint(equalToConstant: 22)
     NSLayoutConstraint.activate([
-      timeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      timeLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+      timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
+      timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      timeLabelHeightAnchor!,
     ])
-    timeLabelWidthAnchor = timeLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW)
-    timeLabelWidthAnchor?.isActive = true
+
+    contentView.addSubview(contentLabel)
+    NSLayoutConstraint.activate([
+      contentLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
+      contentLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+      contentLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW),
+    ])
   }
 
   func setModel(_ model: MessageTipsModel) {
-    timeLabel.text = model.text
-    timeLabelWidthAnchor?.constant = model.contentSize.width
+    // time
+    if let time = model.timeContent, !time.isEmpty {
+      timeLabelHeightAnchor?.constant = chat_timeCellH
+      timeLabel.text = time
+      timeLabel.isHidden = false
+    } else {
+      timeLabelHeightAnchor?.constant = 0
+      timeLabel.text = ""
+      timeLabel.isHidden = true
+    }
+
+    contentLabel.text = model.text
   }
 
   public lazy var timeLabel: UILabel = {
@@ -41,6 +58,17 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
     label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
     label.textAlignment = .center
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.messageTipText"
+    return label
+  }()
+
+  public lazy var contentLabel: UILabel = {
+    let label = UILabel()
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    label.textAlignment = .center
+    label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.messageTipText"
     return label

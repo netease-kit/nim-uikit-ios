@@ -9,7 +9,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
+open class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
   typealias RefreshBlock = () -> Void
   public var contacts: [ContactSection] = []
   public var indexs: [String]?
@@ -32,7 +32,7 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     self.contactHeaders = contactHeaders
   }
 
-  public func onNotificationUnreadCountChanged(_ count: Int) {
+  open func onNotificationUnreadCountChanged(_ count: Int) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", count: \(count)")
     print("onNotificationUnreadCountChanged : ", count)
     unreadCount = count
@@ -41,14 +41,14 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     }
   }
 
-  public func onRecieveNotification(_ notification: XNotification) {}
+  open func onRecieveNotification(_ notification: NENotification) {}
 
   func loadData(fetch: Bool = false, _ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
     getContactList(fetch, filters) { contacts, error in
       if let users = contacts {
-        NELog.infoLog("contact loadData", desc: "contact data:\(contacts)")
+        NELog.infoLog("contact loadData", desc: "contact data:\(users)")
         weakSelf?.contacts = users
         weakSelf?.indexs = self.getIndexs(contactSections: users)
         if let headSection = weakSelf?.headerSection(headerItem: weakSelf?.contactHeaders) {
@@ -57,10 +57,6 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
         completion(nil, users.count)
       }
     }
-  }
-
-  func reLoadData(completion: @escaping (NSError?, Int) -> Void) {
-    loadData(fetch: true, completion: completion)
   }
 
   func getContactList(_ fetch: Bool = false, _ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
@@ -73,7 +69,7 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     }
     contactRepo.getFriendList(fetch, local: local) { friends, error in
       if var users = friends {
-        NELog.infoLog("contact bar getFriendList", desc: "friend count:\(friends?.count)")
+        NELog.infoLog("contact bar getFriendList", desc: "friend count:\(users.count)")
         weakSelf?.initalDict = [String: [ContactInfo]]()
         if let filterUsers = filters {
           users = users.filter { user in
@@ -87,16 +83,15 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
         if users.isEmpty {
           completion(contactList, nil)
           return
-//                return contactList
         }
 
         let digitRegular = NSPredicate(format: "SELF MATCHES %@", "[0-9]")
         let azRegular = NSPredicate(format: "SELF MATCHES %@", "[A-Z]")
         var digitList = [ContactInfo]()
         var specialCharList = [ContactInfo]()
-        for contact: User in users {
+        for contact: NEKitUser in users {
           // get inital of name
-          var name = contact.alias != nil ? contact.alias : contact.userInfo?.nickName
+          var name = contact.alias?.isEmpty == false ? contact.alias : contact.userInfo?.nickName
           if name == nil {
             name = contact.userId
           }
@@ -158,9 +153,9 @@ public class ContactViewModel: NSObject, ContactRepoSystemNotiDelegate {
     }
     var infos: [ContactInfo] = []
     for item in header {
-      let user = User()
+      let user = NEKitUser()
       user.alias = item.name
-      let userInfo = UserInfo(nickName: "", avatar: item.imageName)
+      let userInfo = NEKitUserInfo(nickName: "", avatar: item.imageName)
       user.userInfo = userInfo
 
       let info = ContactInfo()

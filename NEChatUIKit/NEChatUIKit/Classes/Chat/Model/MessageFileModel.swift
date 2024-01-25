@@ -7,7 +7,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-class MessageFileModel: MessageContentModel {
+open class MessageFileModel: MessageContentModel {
   public var displayName: String?
   public var path: String?
   public var url: String?
@@ -18,7 +18,7 @@ class MessageFileModel: MessageContentModel {
   public var state = DownloadState.Success
   public weak var cell: NEChatBaseCell?
 
-  required init(message: NIMMessage?) {
+  public required init(message: NIMMessage?) {
     super.init(message: message)
     type = .file
     if let fileObject = message?.messageObject as? NIMFileObject {
@@ -28,6 +28,6 @@ class MessageFileModel: MessageContentModel {
       fileLength = fileObject.fileLength
     }
     contentSize = chat_file_size
-    height = Float(contentSize.height + chat_content_margin) + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
   }
 }

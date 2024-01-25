@@ -6,12 +6,14 @@
 #import "NETabbarController.h"
 #import "NENavigationController.h"
 
+#import <NEChatKit/NEChatKit-Swift.h>
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
+#import <NECommonUIKit/NECommonUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
 #import <NECoreIMKit/NECoreIMKit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
-//#import <NEQChatUIKit/NEQChatUIKit-Swift.h>
+// #import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 
 @interface NETabbarController ()
 
@@ -26,8 +28,14 @@
 }
 
 - (void)setUpControllers {
+  //  ChatViewController *chat = [[ChatViewController alloc] init];
+  //  NENavigationView *nenav = [[NENavigationView alloc] init];
+
+  [ChatRouter registerFun];
+
   // 会话列表页
   ConversationController *sessionCtrl = [[ConversationController alloc] init];
+
   sessionCtrl.view.backgroundColor = [UIColor whiteColor];
   sessionCtrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"message", @"")
                                                          image:[UIImage imageNamed:@"chat"]
@@ -46,13 +54,13 @@
 
   // 圈组
 
-//  QChatHomeViewController *qchatCtrl = [[QChatHomeViewController alloc] init];
-//  qchatCtrl.tabBarItem =
-//      [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"qchat", @"")
-//                                    image:[UIImage imageNamed:@"qchat_tabbar_icon"]
-//                            selectedImage:[UIImage imageNamed:@"qchat_tabbar_icon"]];
-//  NENavigationController *qchatNav =
-//      [[NENavigationController alloc] initWithRootViewController:qchatCtrl];
+  //  QChatHomeViewController *qchatCtrl = [[QChatHomeViewController alloc] init];
+  //  qchatCtrl.tabBarItem =
+  //      [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"qchat", @"")
+  //                                    image:[UIImage imageNamed:@"qchat_tabbar_icon"]
+  //                            selectedImage:[UIImage imageNamed:@"qchat_tabbar_icon"]];
+  //  NENavigationController *qchatNav =
+  //      [[NENavigationController alloc] initWithRootViewController:qchatCtrl];
 
   self.tabBar.backgroundColor = [UIColor whiteColor];
   self.viewControllers = @[ sessionNav, contactNav ];

@@ -13,7 +13,7 @@ open class ChatTableViewController: NEBaseViewController, UITableViewDelegate,
   public var topConstraint: NSLayoutConstraint?
   public var bottomConstraint: NSLayoutConstraint?
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     tableView.separatorStyle = .none
     tableView.delegate = self
@@ -47,12 +47,12 @@ open class ChatTableViewController: NEBaseViewController, UITableViewDelegate,
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     tableView.dequeueReusableCell(withIdentifier: "UITableViewCell", for: indexPath)
   }
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     0
   }
 

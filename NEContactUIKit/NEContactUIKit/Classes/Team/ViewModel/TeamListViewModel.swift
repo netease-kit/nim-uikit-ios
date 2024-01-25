@@ -8,10 +8,10 @@ import NECoreIMKit
 import NECoreKit
 
 @objcMembers
-public class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
+open class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
   var contactRepo = ContactRepo.shared
   var refresh: () -> Void = {}
-  public var teamList = [Team]()
+  public var teamList = [NETeam]()
   private let className = "TeamListViewModel"
 
   override public init() {
@@ -23,7 +23,7 @@ public class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
     contactRepo.removeTeamDelegate(delegate: self)
   }
 
-  func getTeamList() -> [Team]? {
+  func getTeamList() -> [NETeam]? {
     NELog.infoLog(ModuleName + " " + className, desc: #function)
     teamList = contactRepo.getTeamList()
     teamList.sort(by: { team1, team2 in
@@ -35,14 +35,14 @@ public class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
   // MARK: NIMTeamManagerDelegate
 
   public func onTeamAdded(_ team: NIMTeam) {
-    teamList.insert(Team(teamInfo: team), at: 0)
+    teamList.insert(NETeam(teamInfo: team), at: 0)
     refresh()
   }
 
   public func onTeamUpdated(_ team: NIMTeam) {
     for (i, t) in teamList.enumerated() {
       if t.teamId == team.teamId {
-        teamList[i] = Team(teamInfo: team)
+        teamList[i] = NETeam(teamInfo: team)
         refresh()
         break
       }

@@ -11,7 +11,7 @@ import SDWebImageSVGKitPlugin
 import SDWebImageWebPCoder
 
 @objcMembers
-public class ChatRouter: NSObject {
+open class ChatRouter: NSObject {
   public static func setupInit() {
     NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
     NIMKitFileLocationHelper.setStaticUserId(NIMSDK.shared().loginManager.currentAccount())

@@ -8,12 +8,12 @@ import NECoreIMKit
 import NIMSDK
 
 @objcMembers
-public class TeamMemberSelectVM: NSObject {
+open class TeamMemberSelectVM: NSObject {
   public var chatRepo = ChatRepo.shared
   private let className = "TeamMemberSelectVM"
 
-  public func fetchTeamMembers(sessionId: String,
-                               _ completion: @escaping (Error?, ChatTeamInfoModel?) -> Void) {
+  open func fetchTeamMembers(sessionId: String,
+                             _ completion: @escaping (Error?, ChatTeamInfoModel?) -> Void) {
     NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId: " + sessionId)
     chatRepo.getTeamInfo(sessionId, completion)
   }
