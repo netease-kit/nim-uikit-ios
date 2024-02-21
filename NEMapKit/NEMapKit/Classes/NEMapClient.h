@@ -12,6 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setupMapClientWithAppkey:(NSString *)appkey;
 
+/// 设置插件初始化
+/// @param appkey appkey
+/// @param serverKey serverKey
+- (void)setupMapClientWithAppkey:(NSString *)appkey withServerKey:(NSString *)serverKey;
+
 @end
 
 NS_ASSUME_NONNULL_END

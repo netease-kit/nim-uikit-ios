@@ -23,7 +23,7 @@ public class ConversationDeduplicationHelper: NSObject, NIMLoginManagerDelegate 
   }
 
   public func onLogin(_ step: NIMLoginStep) {
-    if step == .logout {
+    if step == .logining {
       clearCache()
     }
   }

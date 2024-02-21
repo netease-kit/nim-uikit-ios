@@ -39,6 +39,8 @@ typedef void (^MapMoveCompletion)(void);
 
 @property(nonatomic, assign) BOOL needSearchRound;
 
+@property(nonatomic, strong) NSString *serverKey;
+
 @end
 
 @implementation NEMapClient
@@ -57,6 +59,11 @@ typedef void (^MapMoveCompletion)(void);
     instance = [[[self class] alloc] init];
   });
   return instance;
+}
+
+- (void)setupMapClientWithAppkey:(NSString *)appkey withServerKey:(NSString *)serverKey {
+  self.serverKey = serverKey;
+  [self setupMapClientWithAppkey:appkey];
 }
 
 - (void)setupMapClientWithAppkey:(NSString *)appkey {
@@ -297,6 +304,14 @@ typedef void (^MapMoveCompletion)(void);
     return annotationView;
   }
   return nil;
+}
+
+- (NSString *)getMapImageUrlWithLat:(double)lat lng:(double)lng {
+  NSString *url =
+      [NSString stringWithFormat:@"https://restapi.amap.com/v3/"
+                                 @"staticmap?location=%f,%f&zoom=15&size=500*200&key=%@",
+                                 lng, lat, self.serverKey];
+  return url;
 }
 
 @end
