@@ -13,6 +13,7 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true
     label.numberOfLines = 3
+    label.accessibilityIdentifier = "id.message"
     return label
   }()
 

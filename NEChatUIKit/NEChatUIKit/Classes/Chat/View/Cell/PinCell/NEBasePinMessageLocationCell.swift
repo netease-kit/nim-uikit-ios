@@ -31,7 +31,16 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
     label.text = chatLocalizable("no_map_plugin")
     label.textAlignment = .center
     label.textColor = UIColor.ne_greyText
+    label.isHidden = true
     return label
+  }()
+
+  let pointImage = UIImageView()
+
+  public lazy var mapImageView: UIImageView = {
+    let image = UIImageView()
+    image.translatesAutoresizingMaskIntoConstraints = false
+    return image
   }()
 
   var mapView: UIView?
@@ -91,34 +100,29 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
       subTitleLabel.topAnchor.constraint(equalTo: locationTitleLabel.bottomAnchor, constant: 4),
     ])
 
-    if let map = NEChatKitClient.instance.delegate?.getCellMapView?() as? UIView {
-      mapView = map
-      back.addSubview(map)
-      map.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        map.leftAnchor.constraint(equalTo: back.leftAnchor),
-        map.bottomAnchor.constraint(equalTo: back.bottomAnchor),
-        map.rightAnchor.constraint(equalTo: back.rightAnchor),
-        map.topAnchor.constraint(equalTo: subTitleLabel.bottomAnchor, constant: 4),
-      ])
+    back.addSubview(mapImageView)
+    NSLayoutConstraint.activate([
+      mapImageView.leftAnchor.constraint(equalTo: back.leftAnchor),
+      mapImageView.bottomAnchor.constraint(equalTo: back.bottomAnchor),
+      mapImageView.rightAnchor.constraint(equalTo: back.rightAnchor),
+      mapImageView.topAnchor.constraint(equalTo: subTitleLabel.bottomAnchor, constant: 4),
+    ])
 
-      let pointImage = UIImageView()
-      pointImage.translatesAutoresizingMaskIntoConstraints = false
-      pointImage.image = coreLoader.loadImage("location_point")
-      map.addSubview(pointImage)
-      NSLayoutConstraint.activate([
-        pointImage.centerXAnchor.constraint(equalTo: map.centerXAnchor),
-        pointImage.bottomAnchor.constraint(equalTo: map.bottomAnchor, constant: -30),
-      ])
-    } else {
-      back.addSubview(emptyLabel)
-      NSLayoutConstraint.activate([
-        emptyLabel.leftAnchor.constraint(equalTo: back.leftAnchor),
-        emptyLabel.rightAnchor.constraint(equalTo: back.rightAnchor),
-        emptyLabel.bottomAnchor.constraint(equalTo: back.bottomAnchor, constant: -40),
-      ])
-    }
-    mapView?.isUserInteractionEnabled = false
+    pointImage.translatesAutoresizingMaskIntoConstraints = false
+    pointImage.image = coreLoader.loadImage("location_point")
+    mapImageView.addSubview(pointImage)
+    NSLayoutConstraint.activate([
+      pointImage.centerXAnchor.constraint(equalTo: mapImageView.centerXAnchor),
+      pointImage.bottomAnchor.constraint(equalTo: mapImageView.bottomAnchor, constant: -30),
+    ])
+
+    back.addSubview(emptyLabel)
+    NSLayoutConstraint.activate([
+      emptyLabel.leftAnchor.constraint(equalTo: back.leftAnchor),
+      emptyLabel.rightAnchor.constraint(equalTo: back.rightAnchor),
+      emptyLabel.bottomAnchor.constraint(equalTo: back.bottomAnchor, constant: -40),
+    ])
+
     if let gesture = contentGesture {
       back.addGestureRecognizer(gesture)
     }
@@ -129,8 +133,16 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
     if let m = item.chatmodel as? MessageLocationModel {
       locationTitleLabel.text = m.title
       subTitleLabel.text = m.subTitle
-      if let lat = m.lat, let lng = m.lng, let map = mapView {
-        NEChatKitClient.instance.delegate?.setMapviewLocation?(lat: lat, lng: lng, mapview: map)
+      if let lat = m.lat, let lng = m.lng {
+        if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
+          NELog.infoLog(className(), desc: #function + "location image url = \(url)")
+          mapImageView.sd_setImage(with: URL(string: url))
+          emptyLabel.isHidden = true
+          pointImage.isHidden = false
+        } else {
+          emptyLabel.isHidden = false
+          pointImage.isHidden = true
+        }
       }
     }
   }

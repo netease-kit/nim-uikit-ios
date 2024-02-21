@@ -10,29 +10,22 @@ target 'app' do
   pod 'YXLogin', '1.0.0'
   
   #可选UI库
-  pod 'NEContactUIKit', '9.7.0'
-  pod 'NEConversationUIKit', '9.7.0'
-  pod 'NEChatUIKit', '9.7.0'
-  pod 'NETeamUIKit', '9.7.0'
+  pod 'NEContactUIKit', '8.9.0'
+  pod 'NEConversationUIKit', '8.9.0'
+  pod 'NEChatUIKit', '8.9.0'
+  pod 'NETeamUIKit', '8.9.0'
 
   #可选Kit库（和UIKit对应）
-  pod 'NEChatKit', '9.7.0'
+  pod 'NEChatKit', '8.9.0'
 
   #基础kit库
   pod 'NECommonUIKit', '9.6.6'
   pod 'NECommonKit', '9.6.6'
-  pod 'NECoreIMKit', '9.6.7'
-  pod 'NECoreKit', '9.6.6'
+  pod 'NECoreIMKit', '8.9.0'
+  pod 'NECoreKit', '8.9.0'
 
   #扩展库
-#  pod 'NEMapKit', '9.7.0'
-  
-  #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
-  pod 'NIMSDK_LITE','9.14.2'
-  pod 'NERtcCallKit/NOS_Special', '2.2.0'
-  pod 'NERtcCallUIKit/NOS_Special', '2.2.0'
-  pod 'NERtcSDK', '5.5.2'
-
+  pod 'NEMapKit', '8.9.0'
 
   # # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
 #   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
@@ -40,7 +33,6 @@ target 'app' do
 #   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
 #   pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
 #   pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
-#   pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
 
 
 end

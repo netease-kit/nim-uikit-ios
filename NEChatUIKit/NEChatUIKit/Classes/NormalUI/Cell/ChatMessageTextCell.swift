@@ -69,6 +69,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     if let m = model as? MessageTextModel {
       contentLabel.attributedText = m.attributeStr
+      contentLabel.accessibilityValue = m.message?.text
     }
   }
 }

@@ -13,8 +13,6 @@ import NEConversationUIKit
 import NETeamUIKit
 import NEChatUIKit
 import NEMapKit
-import NERtcCallKit
-import NERtcCallUIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -121,8 +119,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // 自定义示例
         customVerification()
         
-        //地图map初始化
-        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
+        // 地图map初始化
+        // 位置消息展示方案，参考高德静态地图文档，https://lbs.amap.com/api/webservice/guide/api/staticmaps/#limit
+        // 高德地图web API KEY，用于位置消息生成图片（高德提供服务，需要用户自己创建web服务，https://lbs.amap.com/api/webservice/create-project-and-key）
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
+
         
         /* 聊天面板外部扩展示例
          // 新增未知类型
@@ -143,17 +144,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
          // 遍历 NEChatUIKitClient.instance.moreAction， 根据type 移除已有类型
          */
         
-        //呼叫组件初始化
-        let option = NERtcCallOptions()
-        option.apnsCerName = AppKey.pushCerName
-        option.isDisableLog = true
-        option.supportAutoJoinWhenCalled = false
-        NERtcCallKit.sharedInstance().setupAppKey(AppKey.appKey, options: option)
-        let uiConfig = NECallUIKitConfig()
-        uiConfig.appKey = AppKey.appKey
-        uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
-        NERtcCallKit.sharedInstance().timeOutSeconds = 30
-        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
         
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {

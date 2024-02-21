@@ -89,6 +89,8 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
       replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: "| " + text,
                                                               font: font,
                                                               color: replyLabel.textColor)
+      replyLabel.accessibilityValue = model.replyText
+
       if let attriText = replyLabel.attributedText {
         let textSize = attriText.finalSize(font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
         model.contentSize.width = max(textSize.width + chat_content_margin * 2, model.contentSize.width)

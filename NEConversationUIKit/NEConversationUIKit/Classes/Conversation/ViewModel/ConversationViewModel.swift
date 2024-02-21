@@ -546,7 +546,9 @@ open class ConversationViewModel: NSObject, ConversationRepoDelegate,
       for (i, listModel) in listArr.enumerated() {
         if listModel.recentSession?.session?.sessionType == .P2P {
           if listModel.userInfo?.userId == user.userId {
-            listModel.userInfo = NEKitUser(user: user)
+            let u = NEKitUser(user: user)
+            listModel.userInfo = u
+            ChatUserCache.updateUserInfo(u)
             delegate?.didUpdateRecentSession(index: i)
             break
           }

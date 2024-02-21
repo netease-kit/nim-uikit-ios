@@ -267,6 +267,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
       mutaString.replaceCharacters(in: range, with: addString)
       textView.attributedText = mutaString
+      textView.accessibilityValue = text
       DispatchQueue.main.async {
         textView.selectedRange = NSMakeRange(range.location + addString.length, 0)
       }
@@ -305,6 +306,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     if let findRange = findShowPosition(range: range, attribute: textView.attributedText) {
       textView.selectedRange = NSMakeRange(findRange.location + findRange.length, 0)
     }
+
+    textView.scrollRangeToVisible(NSMakeRange(textView.selectedRange.location, 1))
+    textView.accessibilityValue = getRealSendText(textView.attributedText)
   }
 
   @available(iOS 10.0, *)
@@ -349,34 +353,12 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       textView.deleteBackward()
       print("delete ward")
     } else {
-      if let font = textView.font {
-        let attribute = NEEmotionTool.getAttWithStr(
-          str: description,
-          font: font,
-          CGPoint(x: 0, y: -4)
-        )
-        print("attribute : ", attribute)
-        let mutaAttribute = NSMutableAttributedString()
-        if let origin = textView.attributedText {
-          mutaAttribute.append(origin)
-        }
-        attribute.enumerateAttribute(
-          NSAttributedString.Key.attachment,
-          in: NSMakeRange(0, attribute.length)
-        ) { value, range, stop in
-          if let neAttachment = value as? NEEmotionAttachment {
-            print("ne attachment bounds ", neAttachment.bounds)
-          }
-        }
-        mutaAttribute.append(attribute)
-        mutaAttribute.addAttribute(
-          NSAttributedString.Key.font,
-          value: font,
-          range: NSMakeRange(0, mutaAttribute.length)
-        )
-        textView.attributedText = mutaAttribute
-        textView.scrollRangeToVisible(NSMakeRange(textView.attributedText.length, 1))
-      }
+      let range = textView.selectedRange
+      let attribute = NEEmotionTool.getAttWithStr(str: description, font: .systemFont(ofSize: 16))
+      let mutaAttribute = NSMutableAttributedString(attributedString: textView.attributedText)
+      mutaAttribute.insert(attribute, at: range.location)
+      textView.attributedText = mutaAttribute
+      textView.selectedRange = NSMakeRange(range.location + attribute.length, 0)
     }
   }
 
