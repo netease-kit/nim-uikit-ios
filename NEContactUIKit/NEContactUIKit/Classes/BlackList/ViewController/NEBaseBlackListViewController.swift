@@ -4,18 +4,32 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
-  BlackListCellDelegate, UIGestureRecognizerDelegate {
+  BlackListCellDelegate, UIGestureRecognizerDelegate, BlackListViewModelDelegate {
   public let navigationView = NENavigationView()
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = BlackListViewModel()
-  public var blackList: [NEKitUser]?
-  var className = "BlackListBaseViewController"
+
+  public lazy var headView: UIView = {
+    let headView =
+      UIView(frame: CGRect(x: 0, y: 0, width: Int(NEConstant.screenWidth), height: 40))
+    return headView
+  }()
+
+  public lazy var contentLabel: UILabel = {
+    let contentLabel =
+      UILabel(frame: CGRect(x: 20, y: 0, width: Int(NEConstant.screenWidth) - 20, height: 40))
+    contentLabel.text = localizable("black_tip")
+    contentLabel.textColor = UIColor.ne_emptyTitleColor
+    contentLabel.font = UIFont.systemFont(ofSize: 14)
+    contentLabel.accessibilityIdentifier = "id.tips"
+    return contentLabel
+  }()
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -32,6 +46,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     loadData()
   }
 
+  /// UI 初始化
   func commonUI() {
     title = localizable("blacklist")
     navigationView.navTitle.text = title
@@ -79,25 +94,17 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    let headView =
-      UIView(frame: CGRect(x: 0, y: 0, width: Int(NEConstant.screenWidth), height: 40))
-    let contentLabel =
-      UILabel(frame: CGRect(x: 20, y: 0, width: Int(NEConstant.screenWidth) - 20, height: 40))
-    contentLabel.text = localizable("black_tip")
-    contentLabel.textColor = UIColor.ne_emptyTitleColor
-    contentLabel.font = UIFont.systemFont(ofSize: 14)
-    contentLabel.accessibilityIdentifier = "id.tips"
     headView.addSubview(contentLabel)
     tableView.tableHeaderView = headView
   }
 
   func loadData() {
-    blackList = viewModel.getBlackList()
+    viewModel.getBlackList()
     tableView.reloadData()
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    blackList?.count ?? 0
+    viewModel.blockList.count
   }
 
   open func tableView(_ tableView: UITableView,
@@ -117,33 +124,20 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     let contactSelectVC = getContactSelectVC()
     navigationController?.pushViewController(contactSelectVC, animated: true)
     contactSelectVC.callBack = { [weak self] selectMemberarray in
-      var users = [NEKitUser]()
-      selectMemberarray.forEach { memberInfo in
+      var users = [NEUserWithFriend]()
+      for memberInfo in selectMemberarray {
         if let u = memberInfo.user {
           users.append(u)
         }
       }
-      return self?.addBlackUsers(users: users)
+      self?.addBlackUsers(users: users)
     }
   }
 
-  func addBlackUsers(users: [NEKitUser]) {
-    var num = users.count
-    var suc = [NEKitUser]()
-    for user in users {
-      viewModel.addBlackList(account: user.userId ?? "") { [weak self] error in
-        NELog.infoLog(
-          ModuleName + " " + (self?.className ?? "BlackListViewController"),
-          desc: "CALLBACK addBlackList " + (error?.localizedDescription ?? "no error")
-        )
-        if error == nil {
-          suc.append(user)
-        }
-        num -= 1
-        if num == 0 {
-          print("add black finished")
-          self?.loadData()
-        }
+  func addBlackUsers(users: [NEUserWithFriend]) {
+    viewModel.addBlackList(users: users) { [weak self] error in
+      if let err = error {
+        self?.showToast(err.localizedDescription)
       }
     }
   }
@@ -160,30 +154,36 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     guard let acc = account else {
       return
     }
-    viewModel.removeFromBlackList(account: acc) { error in
-      NELog.infoLog(
-        ModuleName + " " + self.className,
-        desc: "CALLBACK removeFromBlackList " + (error?.localizedDescription ?? "no error")
-      )
-      // 1.当前页面刷新
-      if error == nil {
-        self.blackList?.remove(at: index)
-        self.tableView.reloadData()
-      } else {
-        print("removeFromBlackList error:\(error!)")
+
+    viewModel.removeFromBlackList(account: acc) { [weak self] error in
+      if let err = error {
+        self?.showToast(err.localizedDescription)
       }
     }
   }
-}
 
-// MARK: FriendProviderDelegate
+  // MARK: BlackListViewModelDelegate
 
-extension NEBaseBlackListViewController: FriendProviderDelegate {
-  public func onFriendChanged(user: NECoreIMKit.NEKitUser) {}
+  /// 重新加载表格
+  public func tableViewReload() {
+    tableView.reloadData()
+  }
 
-  public func onUserInfoChanged(user: NECoreIMKit.NEKitUser) {}
+  /// 重新加载单元格
+  /// - Parameter indexs: 单元格位置
+  public func tableViewReload(_ indexs: [IndexPath]) {
+    tableView.reloadData(indexs)
+  }
 
-  public func onBlackListChanged() {
-    loadData()
+  /// 删除单元格
+  /// - Parameter indexs: 单元格位置
+  public func tableViewDelete(_ indexs: [IndexPath]) {
+    tableView.deleteData(indexs)
+  }
+
+  /// 插入单元格
+  /// - Parameter indexs: 单元格位置
+  public func tableViewInsert(_ indexs: [IndexPath]) {
+    tableView.insertData(indexs)
   }
 }

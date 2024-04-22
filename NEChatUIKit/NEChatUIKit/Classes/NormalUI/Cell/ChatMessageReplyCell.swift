@@ -31,7 +31,7 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func commonUI() {
@@ -84,14 +84,21 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     let replyLabel = isSend ? replyLabelRight : replyLabelLeft
 
-    if let text = model.replyText,
+    if var text = model.replyText,
        let font = replyLabel.font {
-      replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: "| " + text,
+      // 如果有回复的消息，需要在回复的消息前加上“| ”
+      if text != chatLocalizable("message_not_found") {
+        text = "| " + text
+      }
+
+      replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
                                                               font: font,
                                                               color: replyLabel.textColor)
-      if let attriText = replyLabel.attributedText {
-        let textSize = attriText.finalSize(font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
-        model.contentSize.width = max(textSize.width + chat_content_margin * 2, model.contentSize.width)
+      replyLabel.accessibilityValue = text
+
+      if let attriText = replyLabel.attributedText, let model = model as? MessageTextModel {
+        let textSize = NSAttributedString.getRealSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
+        model.contentSize.width = max(textSize.width, model.textWidght) + chat_content_margin * 2
       }
     }
 

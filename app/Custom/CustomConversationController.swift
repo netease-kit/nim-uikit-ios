@@ -15,7 +15,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override public func viewDidLoad() {
@@ -117,9 +117,9 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     }
 
     /// 会话列表点击事件
-//    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
-//      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
-//    }
+    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
+      // self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
+    }
 
     /*
      布局自定义
@@ -130,13 +130,13 @@ open class CustomConversationController: ConversationController, NEBaseConversat
       viewController.navigationView.backgroundColor = .gray
 
       // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-      self.customTopView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customTopView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyTopView.backgroundColor = .purple
       viewController.bodyTopView.addSubview(self.customTopView)
       viewController.bodyTopViewHeight = 80
 
       // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-      self.customBottomView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customBottomView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyBottomView.backgroundColor = .purple
       viewController.bodyBottomView.addSubview(self.customBottomView)
       viewController.bodyBottomViewHeight = 60
@@ -157,12 +157,12 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     navigationView.addBtn.setImage(UIImage.ne_imageNamed(name: "noNeed_notify"), for: .normal)
 
     // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-    customTopView.btn.setTitle("通过重写方式添加", for: .normal)
+    customTopView.button.setTitle("通过重写方式添加", for: .normal)
     bodyTopView.addSubview(customTopView)
     bodyTopViewHeight = 80
 
     // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-    customBottomView.btn.setTitle("通过重写方式添加", for: .normal)
+    customBottomView.button.setTitle("通过重写方式添加", for: .normal)
     bodyBottomView.addSubview(customBottomView)
     bodyBottomViewHeight = 60
 
@@ -195,9 +195,10 @@ open class CustomConversationController: ConversationController, NEBaseConversat
 
   //  可自行处理数据
   public func onDataLoaded() {
-    guard let conversationList = viewModel.conversationListArray else { return
+    for model in viewModel.conversationListData {
+      model.customType = 1
     }
-    conversationList.forEach { model in
+    for model in viewModel.stickTopConversations {
       model.customType = 1
     }
     tableView.reloadData()

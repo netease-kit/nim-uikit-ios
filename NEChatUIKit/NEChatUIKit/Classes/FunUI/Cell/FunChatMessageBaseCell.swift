@@ -22,7 +22,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     bubbleImageRight.image = image?
       .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
 
-    seletedBtn.setImage(.ne_imageNamed(name: "fun_select"), for: .selected)
+    selectedButton.setImage(.ne_imageNamed(name: "fun_select"), for: .selected)
   }
 
   override open func baseCommonUI() {
@@ -31,6 +31,9 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
 
     contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .left, constant: 8 + funMargin)
     contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .top, constant: -4)
+
+    contentView.updateLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .left, constant: 14 + funMargin)
+    contentView.updateLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .right, constant: -funMargin)
   }
 
   override open func initSubviewsLayout() {

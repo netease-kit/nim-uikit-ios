@@ -7,6 +7,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// 国际化类型
+typedef NS_ENUM(NSInteger, NECallUILanguage) {
+  /// 根据系统设置切换
+  NECallUILanguageAuto = 0,
+  /// 简体中文
+  NECallUILanguageZhHans,
+  /// 英文
+  NECallUILanguageEn,
+};
+
 @interface NECallUIConfig : NSObject
 
 /// 是否禁止音频通话转视频通话，默认YES，支持转换
@@ -41,6 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 是否开启被叫预览，默认NO，不开启
 @property(nonatomic, assign) BOOL enableCalleePreview;
+
+/// 国际化配置
+@property(nonatomic, assign) NECallUILanguage language;
 
 @end
 

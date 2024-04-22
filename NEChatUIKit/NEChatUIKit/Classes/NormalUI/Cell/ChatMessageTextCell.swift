@@ -13,7 +13,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    label.font = messageTextFont
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
     return label
@@ -25,7 +25,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    label.font = messageTextFont
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
     return label
@@ -37,7 +37,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -69,6 +69,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     if let m = model as? MessageTextModel {
       contentLabel.attributedText = m.attributeStr
+      contentLabel.accessibilityValue = m.message?.text
     }
   }
 }

@@ -21,6 +21,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
     initialConfig()
   }
 
+  /// 导航栏配置
   func initialConfig() {
     title = NSLocalizedString("message_remind", comment: "")
     if NEStyleManager.instance.isNormalStyle() {
@@ -32,6 +33,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
     }
   }
 
+  /// 页面主题元素初始化以及布局
   func setupSubviews() {
     view.addSubview(tableView)
     if NEStyleManager.instance.isNormalStyle() {
@@ -44,24 +46,24 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
 
   lazy var tableView: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
   // MARK: UITableViewDelegate, UITableViewDataSource
@@ -93,6 +95,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     //        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     //        if let block = model.cellClick {
+
     //            block()
     //        }
   }
@@ -116,8 +119,8 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = .ne_lightBackgroundColor
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = .ne_lightBackgroundColor
+    return headerView
   }
 }

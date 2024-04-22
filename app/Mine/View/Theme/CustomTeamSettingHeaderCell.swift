@@ -28,15 +28,15 @@ class CustomTeamSettingHeaderCell: TeamSettingHeaderCell {
         titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -68),
       ])
 
-      contentView.addSubview(arrow)
+      contentView.addSubview(arrowView)
       NSLayoutConstraint.activate([
-        arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-        arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+        arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+        arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
       ])
 
       contentView.addSubview(headerView)
       NSLayoutConstraint.activate([
-        headerView.centerYAnchor.constraint(equalTo: arrow.centerYAnchor),
+        headerView.centerYAnchor.constraint(equalTo: arrowView.centerYAnchor),
         headerView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -48.0),
         headerView.widthAnchor.constraint(equalToConstant: 42.0),
         headerView.heightAnchor.constraint(equalToConstant: 42.0),

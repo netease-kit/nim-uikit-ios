@@ -12,14 +12,14 @@ open class TextViewController: ChatBaseViewController {
   let titleFont = UIFont.systemFont(ofSize: 24, weight: .semibold)
   let bodyFont = UIFont.systemFont(ofSize: 24)
 
-  lazy var scrollView: UIScrollView = {
+  public lazy var scrollView: UIScrollView = {
     let scrollView = UIScrollView()
     scrollView.isScrollEnabled = true
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     return scrollView
   }()
 
-  lazy var textView: UIView = {
+  public lazy var textView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
@@ -42,7 +42,7 @@ open class TextViewController: ChatBaseViewController {
     return view
   }()
 
-  lazy var titleLabel: CopyableLabel = {
+  public lazy var titleLabel: CopyableLabel = {
     let label = CopyableLabel()
     label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ open class TextViewController: ChatBaseViewController {
     return label
   }()
 
-  lazy var bodyLabel: CopyableLabel = {
+  public lazy var bodyLabel: CopyableLabel = {
     let label = CopyableLabel()
     label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -69,20 +69,20 @@ open class TextViewController: ChatBaseViewController {
     super.init(nibName: nil, bundle: nil)
     contentMaxWidth = kScreenWidth - leftRightMargin * 2
     if let title = title {
+      titleLabel.copyString = title
       let titleAtt = NEEmotionTool.getAttWithStr(str: title, font: titleFont, CGPoint(x: 0, y: -3))
-      titleLabel.copyString = titleAtt.string
       titleLabel.attributedText = titleAtt
     }
 
     if let body = body {
+      bodyLabel.copyString = body
       let bodyAtt = NEEmotionTool.getAttWithStr(str: body, font: bodyFont, CGPoint(x: 0, y: -3))
-      bodyLabel.copyString = bodyAtt.string
       bodyLabel.attributedText = bodyAtt
     }
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -122,11 +122,11 @@ open class TextViewController: ChatBaseViewController {
     bodyLabel.preferredMaxLayoutWidth = contentMaxWidth
     scrollView.addSubview(textView)
     contentLabelTopAnchor = textView.topAnchor.constraint(equalTo: scrollView.topAnchor)
+    contentLabelTopAnchor?.isActive = true
     contentLabelLeftAnchor = textView.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: leftRightMargin)
+    contentLabelLeftAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      contentLabelTopAnchor!,
       textView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-      contentLabelLeftAnchor!,
       textView.rightAnchor.constraint(equalTo: scrollView.rightAnchor, constant: -leftRightMargin),
     ])
   }
@@ -142,7 +142,7 @@ open class TextViewController: ChatBaseViewController {
       }
     }
 
-    let textSize = label.attributedText?.finalSize(bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
+    let textSize = NSAttributedString.getRealSize(label.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
     let textViewHeight = kScreenHeight - kNavigationHeight - KStatusBarHeight
     if textSize.height <= textViewHeight {
       let offsetY = (textViewHeight - textSize.height) / 2

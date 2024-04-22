@@ -7,27 +7,21 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class MessageFileModel: MessageContentModel {
+open class MessageFileModel: MessageVideoModel {
   public var displayName: String?
   public var path: String?
-  public var url: String?
   public var fileLength: Int64?
-
-  public var progress: Float = 0
   public var size: Float = 0
-  public var state = DownloadState.Success
-  public weak var cell: NEChatBaseCell?
 
-  public required init(message: NIMMessage?) {
+  public required init(message: V2NIMMessage?) {
     super.init(message: message)
     type = .file
-    if let fileObject = message?.messageObject as? NIMFileObject {
-      displayName = fileObject.displayName
+    if let fileObject = message?.attachment as? V2NIMMessageFileAttachment {
+      displayName = fileObject.name
       path = fileObject.path
-      url = fileObject.url
-      fileLength = fileObject.fileLength
+      fileLength = Int64(fileObject.size)
     }
     contentSize = chat_file_size
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

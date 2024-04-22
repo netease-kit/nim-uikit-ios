@@ -17,7 +17,6 @@
 "record_too_short"="Time is too short";
 "no_microphone_permission"="no micro permission";
 "choose"="select";
-"take_photo"="camera";
 "select_from_album"="album";
 "select_from_icloud"="icloud";
 "editing"="typing";
@@ -51,9 +50,10 @@
 "team_join_mode" = "join mode";
 "team_be_invited_mode" = "invite mode";
 "team_be_invited_permission" = "Invite Permission";
-"team_be_invited_author" = "是否需要被邀请者同意权限";
-"team_update_info_permission" = "update info permission";
+"team_be_invited_author" = "BeInvite Permission";
+"team_update_info_permission" = "Update info permission";
 "team_update_client_custom"="Update Permission";
+"team_at_permission"="@All Permission update to ";
 
 "team_custom_info" = "custom info";
 "not_mute" = "unmute";
@@ -169,6 +169,7 @@
 "failed_operation"="Failed Operation";
 "team_not_exist"="team not exist";
 "unpin_failed"="Unpin failed";
+"pin_limit_exceeded"="The number of pin has reached the upper limit";
 
 "fun_hold_to_talk"="Hold to talk";
 
@@ -194,6 +195,7 @@
 "multiForward_open_failed"="Failed to obtain information";
 "file_check_failed"="File verification failed";
 "per_item_forward_limit"="Forward one by one to limit %d messages";
+"selete_messages_limit"="Delete limits %d messages";
 "multiForward_forward_limit"="Combined forwarding limits %d messages";
 "exception_description"="Exception description";
 

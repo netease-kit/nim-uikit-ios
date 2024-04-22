@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class PinMessageFileModel: NSObject {
-  public var progress: Float = 0
+  public var progress: UInt = 0
   public var size: Float = 0
 
   public var state = DownloadState.Success

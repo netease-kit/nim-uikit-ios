@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -13,12 +13,12 @@ import UIKit
 open class TeamUserCell: NEBaseTeamUserCell {
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = 16.0
+    userHeaderView.layer.cornerRadius = 16.0
     NSLayoutConstraint.activate([
-      userHeader.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      userHeader.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      userHeader.widthAnchor.constraint(equalToConstant: 32.0),
-      userHeader.heightAnchor.constraint(equalToConstant: 32.0),
+      userHeaderView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 32.0),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 32.0),
     ])
   }
 }

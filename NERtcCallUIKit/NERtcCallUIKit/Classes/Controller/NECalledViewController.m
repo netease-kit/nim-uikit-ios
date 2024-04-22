@@ -4,6 +4,7 @@
 
 #import "NECalledViewController.h"
 #import <AVKit/AVKit.h>
+#import "NECallKitUtil.h"
 
 @interface NECalledViewController ()
 
@@ -54,7 +55,7 @@
 
   self.connectingLabel = [[UILabel alloc] init];
   self.connectingLabel.translatesAutoresizingMaskIntoConstraints = NO;
-  self.connectingLabel.text = [self localizableWithKey:@"connecting"];
+  self.connectingLabel.text = [NECallKitUtil localizableWithKey:@"connecting"];
   self.connectingLabel.textColor = [UIColor whiteColor];
   self.connectingLabel.font = [UIFont systemFontOfSize:14];
   self.connectingLabel.hidden = YES;

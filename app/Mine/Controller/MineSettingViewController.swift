@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECoreIM2Kit
 import NECoreKit
 import NETeamUIKit
 import NIMSDK
@@ -50,30 +51,30 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
 
   lazy var tableView: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.tableFooterView = getFooterView()
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.tableFooterView = getFooterView()
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
   func getFooterView() -> UIView? {
-    let footer = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 64.0))
+    let footerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 64.0))
     let button = UIButton()
-    footer.addSubview(button)
+    footerView.addSubview(button)
     button.backgroundColor = .white
     button.clipsToBounds = true
     button.setTitleColor(UIColor(hexString: "0xE6605C"), for: .normal)
@@ -88,14 +89,14 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     } else {
       button.translatesAutoresizingMaskIntoConstraints = false
       NSLayoutConstraint.activate([
-        button.leftAnchor.constraint(equalTo: footer.leftAnchor, constant: 0),
-        button.rightAnchor.constraint(equalTo: footer.rightAnchor, constant: 0),
-        button.topAnchor.constraint(equalTo: footer.topAnchor, constant: 12),
+        button.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
+        button.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
+        button.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
         button.heightAnchor.constraint(equalToConstant: 40),
       ])
     }
 
-    return footer
+    return footerView
   }
 
   @objc func loginOutAction() {
@@ -104,28 +105,32 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
         withConfirm: NSLocalizedString("want_to_logout", comment: ""),
         withCompletion: { [weak self] user, error in
           if error != nil {
+            NEALog.infoLog(self?.className() ?? "", desc: "logout author manager error : \(error?.localizedDescription ?? "")")
             self?.view.makeToast(error?.localizedDescription)
-            NELog.errorLog(
+            NEALog.errorLog(
               self?.tag ?? "",
               desc: "CALLBACK logout failed,error = \(error!)"
             )
           } else {
-            IMKitClient.instance.logout { error in
+            IMKitClient.instance.logoutIM { error in
               if error != nil {
+                NEALog.infoLog(self?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
                 self?.view.makeToast(error?.localizedDescription)
-                NELog.errorLog(
+                NEALog.errorLog(
                   self?.tag ?? "",
-                  desc: "CALLBACK logout failed,error = \(error!)"
+                  desc: "CALLBACK logout SUCCESS = \(error!)"
                 )
               } else {
+                NEALog.infoLog(self?.className() ?? "", desc: "logout im  success ")
                 NotificationCenter.default.post(
                   name: Notification.Name("logout"),
                   object: nil
                 )
-                NELog.infoLog(
+                NEALog.infoLog(
                   self?.tag ?? "",
                   desc: "CALLBACK logout SUCCESS"
                 )
+                NEFriendUserCache.shared.removeAllFriendInfo()
               }
             }
           }
@@ -185,9 +190,9 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = .clear
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = .clear
+    return headerView
   }
 
   func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {

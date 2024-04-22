@@ -6,7 +6,7 @@ import UIKit
 
 @objcMembers
 open class NEBasePinMessageRichTextCell: NEBasePinMessageTextCell {
-  lazy var titleLabel: UILabel = {
+  public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
@@ -48,7 +48,7 @@ open class NEBasePinMessageRichTextCell: NEBasePinMessageTextCell {
     titleLabel.addGestureRecognizer(titleGesture)
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
     if let model = item.chatmodel as? MessageRichTextModel {
       titleLabel.attributedText = model.titleAttributeStr

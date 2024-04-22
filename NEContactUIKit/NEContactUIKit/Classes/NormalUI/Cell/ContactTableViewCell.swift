@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -23,9 +23,9 @@ open class ContactTableViewCell: NEBaseContactTableViewCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImage.widthAnchor.constraint(equalToConstant: 36),
-      avatarImage.heightAnchor.constraint(equalToConstant: 36),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 

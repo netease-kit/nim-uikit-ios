@@ -23,7 +23,7 @@ class CustomTeamSettingRightCustomCell: TeamSettingRightCustomCell {
 
       contentView.addSubview(titleLabel)
       contentView.addSubview(subTitleLabel)
-      contentView.addSubview(arrow)
+      contentView.addSubview(arrowView)
 
       NSLayoutConstraint.activate([
         titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
@@ -34,14 +34,14 @@ class CustomTeamSettingRightCustomCell: TeamSettingRightCustomCell {
       titleWidthAnchor?.isActive = true
 
       NSLayoutConstraint.activate([
-        arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-        arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-        arrow.widthAnchor.constraint(equalToConstant: 7),
+        arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+        arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+        arrowView.widthAnchor.constraint(equalToConstant: 7),
       ])
 
       NSLayoutConstraint.activate([
         subTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 10),
-        subTitleLabel.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -10),
+        subTitleLabel.rightAnchor.constraint(equalTo: arrowView.leftAnchor, constant: -10),
         subTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ])
 

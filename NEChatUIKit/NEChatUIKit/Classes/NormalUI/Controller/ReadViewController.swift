@@ -4,20 +4,20 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class ReadViewController: NEBaseReadViewController {
-  override init(message: NIMMessage) {
-    super.init(message: message)
+  override init(message: V2NIMMessage, teamId: String) {
+    super.init(message: message, teamId: teamId)
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func commonUI() {

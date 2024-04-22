@@ -3,20 +3,22 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NEChatKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class UserBaseTableViewCell: UITableViewCell {
-  public lazy var avatarImage: UIImageView = {
-    let avatarImage = UIImageView()
-    avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
-    avatarImage.translatesAutoresizingMaskIntoConstraints = false
-    avatarImage.clipsToBounds = true
-    avatarImage.isUserInteractionEnabled = true
-    avatarImage.contentMode = .scaleAspectFill
-    avatarImage.accessibilityIdentifier = "id.avatar"
-    return avatarImage
+  /// 用户头像
+  public lazy var avatarImageView: UIImageView = {
+    let avatarImageView = UIImageView()
+    avatarImageView.backgroundColor = UIColor(hexString: "#537FF4")
+    avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+    avatarImageView.clipsToBounds = true
+    avatarImageView.isUserInteractionEnabled = true
+    avatarImageView.contentMode = .scaleAspectFill
+    avatarImageView.accessibilityIdentifier = "id.avatar"
+    return avatarImageView
   }()
 
   public lazy var nameLabel: UILabel = {
@@ -38,7 +40,7 @@ open class UserBaseTableViewCell: UITableViewCell {
     return titleLabel
   }()
 
-  public var userModel: NEKitUser?
+  public var userModel: NETeamMemberInfoModel?
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -48,50 +50,50 @@ open class UserBaseTableViewCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func baseCommonUI() {
     selectionStyle = .none
     backgroundColor = .white
-    contentView.addSubview(avatarImage)
+    contentView.addSubview(avatarImageView)
     contentView.addSubview(nameLabel)
     contentView.addSubview(titleLabel)
 
     // name
     NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: avatarImage.rightAnchor),
-      nameLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor),
-      nameLabel.bottomAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+      nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
+      nameLabel.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
+      nameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
+      nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
     ])
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.text = "placeholder"
   }
 
-  open func setModel(_ model: NEKitUser) {
+  open func setModel(_ model: NETeamMemberInfoModel) {
     userModel = model
-    nameLabel.text = model.shortName(showAlias: false, count: 2)
-    titleLabel.text = model.showName()
+    nameLabel.text = ChatMessageHelper.getShortName(model.showNickInTeam() ?? "")
+    titleLabel.text = model.atNameInTeam()
 
-    if let avatarURL = model.userInfo?.avatarUrl, !avatarURL.isEmpty {
-      avatarImage
+    if let avatarURL = model.nimUser?.user?.avatar, !avatarURL.isEmpty {
+      avatarImageView
         .sd_setImage(with: URL(string: avatarURL)) { [weak self] image, error, type, url in
           if image != nil {
-            self?.avatarImage.image = image
+            self?.avatarImageView.image = image
             self?.nameLabel.isHidden = true
-            self?.avatarImage.backgroundColor = .clear
+            self?.avatarImageView.backgroundColor = .clear
           } else {
-            self?.avatarImage.image = nil
+            self?.avatarImageView.image = nil
             self?.nameLabel.isHidden = false
-            self?.avatarImage.backgroundColor = UIColor.colorWithString(string: model.userId)
+            self?.avatarImageView.backgroundColor = UIColor.colorWithString(string: model.teamMember?.accountId)
           }
         }
     } else {
-      avatarImage.image = nil
+      avatarImageView.image = nil
       nameLabel.isHidden = false
-      avatarImage.backgroundColor = UIColor.colorWithString(string: model.userId)
+      avatarImageView.backgroundColor = UIColor.colorWithString(string: model.teamMember?.accountId)
     }
   }
 }

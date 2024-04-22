@@ -8,22 +8,22 @@ import UIKit
 @objcMembers
 open class NEBasePinMessageFileCell: NEBasePinMessageCell {
   public lazy var stateView: FileStateView = {
-    let state = FileStateView()
-    state.translatesAutoresizingMaskIntoConstraints = false
-    state.backgroundColor = .clear
-    return state
+    let stateView = FileStateView()
+    stateView.translatesAutoresizingMaskIntoConstraints = false
+    stateView.backgroundColor = .clear
+    return stateView
   }()
 
   public var bubbleImage = UIImageView()
 
-  lazy var imgView: UIImageView = {
-    let view_img = UIImageView()
-    view_img.translatesAutoresizingMaskIntoConstraints = false
-    view_img.backgroundColor = .clear
-    return view_img
+  public lazy var imgView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.backgroundColor = .clear
+    return imageView
   }()
 
-  lazy var titleLabel: UILabel = {
+  public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = false
@@ -34,7 +34,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
     return label
   }()
 
-  lazy var sizeLabel: UILabel = {
+  public lazy var sizeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor(hexString: "#999999")
@@ -43,7 +43,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
     return label
   }()
 
-  lazy var labelView: UIView = {
+  public lazy var labelView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isUserInteractionEnabled = false
@@ -131,56 +131,55 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
-    if let fileObject = item.message.messageObject as? NIMFileObject {
+    if let fileObject = item.message.attachment as? V2NIMMessageFileAttachment {
       if let fileModel = item.pinFileModel {
         fileModel.cell = self
         if fileModel.state == .Success {
           stateView.state = .FileOpen
         } else {
           stateView.state = .FileDownload
-          stateView.setProgress(fileModel.progress)
-          if fileModel.progress >= 1 {
+          stateView.setProgress(Float(fileModel.progress))
+          if fileModel.progress >= 100 {
             fileModel.state = .Success
           }
         }
       }
 
       var imageName = "file_unknown"
-      var displayName = "未知文件"
-      if let filePath = fileObject.path as? NSString {
-        displayName = filePath.lastPathComponent
-        switch filePath.pathExtension.lowercased() {
-        case file_doc_support:
-          imageName = "file_doc"
-        case file_xls_support:
-          imageName = "file_xls"
-        case file_img_support:
-          imageName = "file_img"
-        case file_ppt_support:
-          imageName = "file_ppt"
-        case file_txt_support:
-          imageName = "file_txt"
-        case file_audio_support:
-          imageName = "file_audio"
-        case file_vedio_support:
-          imageName = "file_vedio"
-        case file_zip_support:
-          imageName = "file_zip"
-        case file_pdf_support:
-          imageName = "file_pdf"
-        case file_html_support:
-          imageName = "file_html"
-        case "key", "keynote":
-          imageName = "file_keynote"
-        default:
-          imageName = "file_unknown"
-        }
+      let suffix = (fileObject.name as NSString).pathExtension.lowercased()
+      switch suffix {
+      case file_doc_support:
+        imageName = "file_doc"
+      case file_xls_support:
+        imageName = "file_xls"
+      case file_img_support:
+        imageName = "file_img"
+      case file_ppt_support:
+        imageName = "file_ppt"
+      case file_txt_support:
+        imageName = "file_txt"
+      case file_audio_support:
+        imageName = "file_audio"
+      case file_vedio_support:
+        imageName = "file_vedio"
+      case file_zip_support:
+        imageName = "file_zip"
+      case file_pdf_support:
+        imageName = "file_pdf"
+      case file_html_support:
+        imageName = "file_html"
+      case "key", "keynote":
+        imageName = "file_keynote"
+      default:
+        imageName = "file_unknown"
       }
+
       imgView.image = UIImage.ne_imageNamed(name: imageName)
-      titleLabel.text = fileObject.displayName ?? displayName
-      let size_B = Double(fileObject.fileLength)
+      titleLabel.text = fileObject.name
+
+      let size_B = Double(fileObject.size)
       var size_str = String(format: "%.1f B", size_B)
       if size_B > 1e3 {
         let size_KB = size_B / 1e3
@@ -198,7 +197,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
     }
   }
 
-  open func uploadProgress(progress: Float) {
-    stateView.setProgress(progress)
+  open func uploadProgress(progress: UInt) {
+    stateView.setProgress(Float(progress))
   }
 }

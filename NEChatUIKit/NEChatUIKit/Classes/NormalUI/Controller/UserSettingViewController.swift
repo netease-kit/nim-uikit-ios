@@ -20,15 +20,15 @@ open class UserSettingViewController: NEBaseUserSettingViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = IMKitClient.instance.getConfigCenter().teamEnable ? 21.0 : 30.0
+    userHeaderView.layer.cornerRadius = IMKitClient.instance.getConfigCenter().teamEnable ? 21.0 : 30.0
   }
 
-  override func getPinMessageViewController(session: NIMSession) -> NEBasePinMessageViewController {
-    PinMessageViewController(session: session)
+  override func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {
+    PinMessageViewController(conversationId: conversationId)
   }
 }

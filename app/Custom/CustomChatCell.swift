@@ -4,6 +4,7 @@
 
 import NEChatUIKit
 import UIKit
+
 class CustomChatCell: NEChatBaseCell {
   public var testLabel = UILabel()
 
@@ -19,7 +20,7 @@ class CustomChatCell: NEChatBaseCell {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

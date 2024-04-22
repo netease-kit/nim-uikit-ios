@@ -11,13 +11,13 @@ open class SearchSessionHeaderView: SearchSessionBaseView {
   override open func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
-      title.topAnchor.constraint(equalTo: contentView.topAnchor),
-      title.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
     ])
 
     NSLayoutConstraint.activate([
       bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      bottomLine.leftAnchor.constraint(equalTo: title.leftAnchor),
+      bottomLine.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),
       bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
     ])
@@ -34,7 +34,7 @@ open class ConversationSearchController: NEBaseConversationSearchController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupSubviews() {

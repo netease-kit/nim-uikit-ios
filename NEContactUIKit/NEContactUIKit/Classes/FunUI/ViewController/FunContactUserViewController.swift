@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -14,7 +14,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     headerView = FunUserInfoHeaderView()
   }
 
-  override public init(user: NEKitUser?) {
+  override public init(user: NEUserWithFriend?) {
     super.init(user: user)
     initFun()
   }
@@ -25,7 +25,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func commonUI() {
@@ -60,7 +60,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     FunContactRemakNameViewController()
   }
 
-  override open func deleteFriend(user: NEKitUser?) {
+  override open func deleteFriend(user: NEUserWithFriend?) {
     let titleAction = NECustomAlertAction(title: String(format: localizable("delete_title"), user?.showName(true) ?? "")) {}
     titleAction.contentText.font = .systemFont(ofSize: 13)
     titleAction.contentText.textColor = UIColor(hexString: "#8F8F8F")

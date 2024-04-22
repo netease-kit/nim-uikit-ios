@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 

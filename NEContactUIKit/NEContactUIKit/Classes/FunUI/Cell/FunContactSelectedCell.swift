@@ -10,18 +10,18 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImage.widthAnchor.constraint(equalToConstant: 40),
-      avatarImage.heightAnchor.constraint(equalToConstant: 40),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 
   override open func commonUI() {
     super.commonUI()
-    sImage.highlightedImage = UIImage.ne_imageNamed(name: "fun_select")
+    sImageView.highlightedImage = UIImage.ne_imageNamed(name: "fun_select")
     NSLayoutConstraint.activate([
-      sImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      sImage.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      sImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      sImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
     ])
 
     bottomLine.backgroundColor = .funContactLineBorderColor
@@ -29,11 +29,11 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
 
   override open func initSubviewsLayout() {
     if NEKitContactConfig.shared.ui.contactProperties.avatarType == .rectangle {
-      avatarImage.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
+      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
     } else if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
-      avatarImage.layer.cornerRadius = 20.0
+      avatarImageView.layer.cornerRadius = 20.0
     } else {
-      avatarImage.layer.cornerRadius = 4.0 // Fun UI
+      avatarImageView.layer.cornerRadius = 4.0 // Fun UI
     }
   }
 
@@ -44,6 +44,6 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
 
   override open func setModel(_ model: ContactInfo) {
     super.setModel(model)
-    arrow.isHidden = true
+    arrowImageView.isHidden = true
   }
 }

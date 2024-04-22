@@ -10,10 +10,10 @@ public extension ChatRouter {
     // pin
     Router.shared.register(PushPinMessageVCRouter) { param in
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let pin = FunPinMessageViewController(session: session)
+      let pin = FunPinMessageViewController(conversationId: conversationId)
       nav?.pushViewController(pin, animated: true)
     }
 
@@ -21,11 +21,11 @@ public extension ChatRouter {
     Router.shared.register(PushP2pChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let anchor = param["anchor"] as? NIMMessage
-      let p2pChatVC = FunP2PChatViewController(session: session, anchor: anchor)
+      let anchor = param["anchor"] as? V2NIMMessage
+      let p2pChatVC = FunP2PChatViewController(conversationId: conversationId, anchor: anchor)
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
@@ -46,12 +46,12 @@ public extension ChatRouter {
     Router.shared.register(PushTeamChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
 
-      let anchor = param["anchor"] as? NIMMessage
-      let groupVC = FunGroupChatViewController(session: session, anchor: anchor)
+      let anchor = param["anchor"] as? V2NIMMessage
+      let groupVC = FunTeamChatViewController(conversationId: conversationId, anchor: anchor)
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
           nav?.viewControllers[i] = groupVC

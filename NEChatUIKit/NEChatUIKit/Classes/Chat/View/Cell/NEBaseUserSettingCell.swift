@@ -15,7 +15,7 @@ open class NEBaseUserSettingCell: CornerCell {
     return label
   }()
 
-  public lazy var arrow: UIImageView = {
+  public lazy var arrowImageView: UIImageView = {
     let imageView = UIImageView(image: coreLoader.loadImage("arrowRight"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView

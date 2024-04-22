@@ -19,12 +19,12 @@ open class TeamSettingHeaderCell: NEBaseTeamSettingHeaderCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
     ])
 
     NSLayoutConstraint.activate([
-      headerView.centerYAnchor.constraint(equalTo: arrow.centerYAnchor),
+      headerView.centerYAnchor.constraint(equalTo: arrowView.centerYAnchor),
       headerView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -64.0),
       headerView.widthAnchor.constraint(equalToConstant: 42.0),
       headerView.heightAnchor.constraint(equalToConstant: 42.0),

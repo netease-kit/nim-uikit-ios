@@ -26,7 +26,7 @@ open class NEBaseUserSettingSelectCell: NEBaseUserSettingCell {
 
   open func setupUI() {
     contentView.addSubview(titleLabel)
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowImageView)
     contentView.addSubview(subTitleLabel)
 
     NSLayoutConstraint.activate([

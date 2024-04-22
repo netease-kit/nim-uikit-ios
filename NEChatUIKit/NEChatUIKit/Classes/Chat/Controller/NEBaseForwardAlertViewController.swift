@@ -17,13 +17,13 @@ open class ForwardItem: NSObject {
 
 @objcMembers
 open class NEBaseForwardUserCell: UICollectionViewCell {
-  lazy var userHeader: NEUserHeaderView = {
-    let header = NEUserHeaderView(frame: .zero)
-    header.translatesAutoresizingMaskIntoConstraints = false
-    header.titleLabel.font = NEConstant.defaultTextFont(11.0)
-    header.clipsToBounds = true
-    header.accessibilityIdentifier = "id.forwardHeaderView"
-    return header
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let headerView = NEUserHeaderView(frame: .zero)
+    headerView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.titleLabel.font = NEConstant.defaultTextFont(11.0)
+    headerView.clipsToBounds = true
+    headerView.accessibilityIdentifier = "id.forwardHeaderView"
+    return headerView
   }()
 
   override public init(frame: CGRect) {
@@ -36,12 +36,12 @@ open class NEBaseForwardUserCell: UICollectionViewCell {
   }
 
   func setupUI() {
-    contentView.addSubview(userHeader)
+    contentView.addSubview(userHeaderView)
     NSLayoutConstraint.activate([
-      userHeader.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      userHeader.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      userHeader.widthAnchor.constraint(equalToConstant: 32.0),
-      userHeader.heightAnchor.constraint(equalToConstant: 32.0),
+      userHeaderView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 32.0),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 32.0),
     ])
   }
 }
@@ -57,50 +57,50 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   var type = chatLocalizable("operation_forward") // 合并转发/逐条转发/转发
   var context = ""
 
-  public let sureBtn = UIButton()
-  public let tip = UILabel()
+  public let sureButton = UIButton()
+  public let tipLabel = UILabel()
   public var contentViewCenterYAnchor: NSLayoutConstraint?
 
-  lazy var userCollection: UICollectionView = {
-    let flow = UICollectionViewFlowLayout()
-    flow.scrollDirection = .horizontal
-    flow.minimumLineSpacing = 9.5
-    flow.minimumInteritemSpacing = 9.5
-    let collection = UICollectionView(frame: .zero, collectionViewLayout: flow)
-    collection.translatesAutoresizingMaskIntoConstraints = false
-    collection.delegate = self
-    collection.dataSource = self
-    collection.backgroundColor = .clear
-    collection.showsHorizontalScrollIndicator = false
-    return collection
+  public lazy var userCollectionView: UICollectionView = {
+    let flowLayout = UICollectionViewFlowLayout()
+    flowLayout.scrollDirection = .horizontal
+    flowLayout.minimumLineSpacing = 9.5
+    flowLayout.minimumInteritemSpacing = 9.5
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+    collectionView.translatesAutoresizingMaskIntoConstraints = false
+    collectionView.delegate = self
+    collectionView.dataSource = self
+    collectionView.backgroundColor = .clear
+    collectionView.showsHorizontalScrollIndicator = false
+    return collectionView
   }()
 
-  lazy var contentView: UIView = {
-    let back = UIView()
-    back.backgroundColor = .white
-    back.translatesAutoresizingMaskIntoConstraints = false
-    back.clipsToBounds = true
-    back.layer.cornerRadius = 8.0
-    return back
+  public lazy var contentView: UIView = {
+    let backView = UIView()
+    backView.backgroundColor = .white
+    backView.translatesAutoresizingMaskIntoConstraints = false
+    backView.clipsToBounds = true
+    backView.layer.cornerRadius = 8.0
+    return backView
   }()
 
-  lazy var oneUserHead: NEUserHeaderView = {
-    let header = NEUserHeaderView(frame: .zero)
-    header.clipsToBounds = true
-    header.translatesAutoresizingMaskIntoConstraints = false
-    header.accessibilityIdentifier = "id.forwardHeaderView"
-    return header
+  public lazy var oneUserHeadView: NEUserHeaderView = {
+    let headerView = NEUserHeaderView(frame: .zero)
+    headerView.clipsToBounds = true
+    headerView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.accessibilityIdentifier = "id.forwardHeaderView"
+    return headerView
   }()
 
-  lazy var oneUserName: UILabel = {
-    let name = UILabel()
-    name.textColor = .ne_darkText
-    name.font = NEConstant.defaultTextFont(14.0)
-    name.translatesAutoresizingMaskIntoConstraints = false
-    return name
+  public lazy var oneUserNameLabel: UILabel = {
+    let nameLabel = UILabel()
+    nameLabel.textColor = .ne_darkText
+    nameLabel.font = NEConstant.defaultTextFont(14.0)
+    nameLabel.translatesAutoresizingMaskIntoConstraints = false
+    return nameLabel
   }()
 
-  lazy var contentText: UILabel = {
+  public lazy var contentLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(14.0)
@@ -112,7 +112,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   }()
 
   // 留言
-  lazy var commentTextFeild: UITextField = {
+  public lazy var commentTextFeild: UITextField = {
     let textFeild = UITextField()
     textFeild.translatesAutoresizingMaskIntoConstraints = false
     textFeild.placeholder = chatLocalizable("leave_message")
@@ -155,78 +155,78 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     view.backgroundColor = NEConstant.hexRGB(0x000000).withAlphaComponent(0.4)
     view.addSubview(contentView)
     contentViewCenterYAnchor = contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+    contentViewCenterYAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      contentViewCenterYAnchor!,
       contentView.widthAnchor.constraint(equalToConstant: 276),
       contentView.heightAnchor.constraint(equalToConstant: 250),
     ])
 
-    tip.translatesAutoresizingMaskIntoConstraints = false
-    tip.font = NEConstant.defaultTextFont(16.0)
-    tip.textColor = .ne_darkText
-    tip.text = chatLocalizable("send_to")
-    tip.accessibilityIdentifier = "id.forwardTitle"
-    contentView.addSubview(tip)
+    tipLabel.translatesAutoresizingMaskIntoConstraints = false
+    tipLabel.font = NEConstant.defaultTextFont(16.0)
+    tipLabel.textColor = .ne_darkText
+    tipLabel.text = chatLocalizable("send_to")
+    tipLabel.accessibilityIdentifier = "id.forwardTitle"
+    contentView.addSubview(tipLabel)
     NSLayoutConstraint.activate([
-      tip.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
-      tip.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-      tip.heightAnchor.constraint(equalToConstant: 18.0),
+      tipLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
+      tipLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+      tipLabel.heightAnchor.constraint(equalToConstant: 18.0),
     ])
 
-    contentView.addSubview(oneUserHead)
+    contentView.addSubview(oneUserHeadView)
     NSLayoutConstraint.activate([
-      oneUserHead.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
-      oneUserHead.topAnchor.constraint(equalTo: tip.bottomAnchor, constant: 16),
-      oneUserHead.widthAnchor.constraint(equalToConstant: 32.0),
-      oneUserHead.heightAnchor.constraint(equalToConstant: 32.0),
+      oneUserHeadView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      oneUserHeadView.topAnchor.constraint(equalTo: tipLabel.bottomAnchor, constant: 16),
+      oneUserHeadView.widthAnchor.constraint(equalToConstant: 32.0),
+      oneUserHeadView.heightAnchor.constraint(equalToConstant: 32.0),
     ])
 
-    contentView.addSubview(oneUserName)
+    contentView.addSubview(oneUserNameLabel)
     NSLayoutConstraint.activate([
-      oneUserName.leftAnchor.constraint(equalTo: oneUserHead.rightAnchor, constant: 8.0),
-      oneUserName.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
-      oneUserName.centerYAnchor.constraint(equalTo: oneUserHead.centerYAnchor),
+      oneUserNameLabel.leftAnchor.constraint(equalTo: oneUserHeadView.rightAnchor, constant: 8.0),
+      oneUserNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
+      oneUserNameLabel.centerYAnchor.constraint(equalTo: oneUserHeadView.centerYAnchor),
     ])
 
-    contentView.addSubview(userCollection)
+    contentView.addSubview(userCollectionView)
     NSLayoutConstraint.activate([
-      userCollection.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
-      userCollection.rightAnchor.constraint(
+      userCollectionView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
+      userCollectionView.rightAnchor.constraint(
         equalTo: contentView.rightAnchor,
         constant: -16.0
       ),
-      userCollection.heightAnchor.constraint(equalToConstant: 32.0),
-      userCollection.topAnchor.constraint(equalTo: oneUserHead.topAnchor),
+      userCollectionView.heightAnchor.constraint(equalToConstant: 32.0),
+      userCollectionView.topAnchor.constraint(equalTo: oneUserHeadView.topAnchor),
     ])
 
-    let textBack = UIView()
-    textBack.translatesAutoresizingMaskIntoConstraints = false
-    textBack.backgroundColor = NEConstant.hexRGB(0xF2F4F5)
-    textBack.clipsToBounds = true
-    textBack.layer.cornerRadius = 4.0
-    contentView.addSubview(textBack)
+    let textBackView = UIView()
+    textBackView.translatesAutoresizingMaskIntoConstraints = false
+    textBackView.backgroundColor = NEConstant.hexRGB(0xF2F4F5)
+    textBackView.clipsToBounds = true
+    textBackView.layer.cornerRadius = 4.0
+    contentView.addSubview(textBackView)
     NSLayoutConstraint.activate([
-      textBack.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
-      textBack.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
-      textBack.topAnchor.constraint(equalTo: oneUserHead.bottomAnchor, constant: 12.0),
+      textBackView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
+      textBackView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
+      textBackView.topAnchor.constraint(equalTo: oneUserHeadView.bottomAnchor, constant: 12.0),
     ])
 
-    textBack.addSubview(contentText)
+    textBackView.addSubview(contentLabel)
     NSLayoutConstraint.activate([
-      contentText.leftAnchor.constraint(equalTo: textBack.leftAnchor, constant: 12),
-      contentText.rightAnchor.constraint(equalTo: textBack.rightAnchor, constant: -12),
-      contentText.topAnchor.constraint(equalTo: textBack.topAnchor, constant: 7),
-      contentText.bottomAnchor.constraint(equalTo: textBack.bottomAnchor, constant: -7),
+      contentLabel.leftAnchor.constraint(equalTo: textBackView.leftAnchor, constant: 12),
+      contentLabel.rightAnchor.constraint(equalTo: textBackView.rightAnchor, constant: -12),
+      contentLabel.topAnchor.constraint(equalTo: textBackView.topAnchor, constant: 7),
+      contentLabel.bottomAnchor.constraint(equalTo: textBackView.bottomAnchor, constant: -7),
     ])
-    contentText.text = "[\(type)]\(context)的会话记录"
+    contentLabel.text = "[\(type)]\(context)的会话记录"
 
     // 留言
     contentView.addSubview(commentTextFeild)
     NSLayoutConstraint.activate([
-      commentTextFeild.leftAnchor.constraint(equalTo: textBack.leftAnchor),
-      commentTextFeild.rightAnchor.constraint(equalTo: textBack.rightAnchor),
-      commentTextFeild.topAnchor.constraint(equalTo: textBack.bottomAnchor, constant: 16),
+      commentTextFeild.leftAnchor.constraint(equalTo: textBackView.leftAnchor),
+      commentTextFeild.rightAnchor.constraint(equalTo: textBackView.rightAnchor),
+      commentTextFeild.topAnchor.constraint(equalTo: textBackView.bottomAnchor, constant: 16),
       commentTextFeild.heightAnchor.constraint(equalToConstant: 32),
     ])
 
@@ -252,33 +252,33 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       horizontalLine.bottomAnchor.constraint(equalTo: verticalLine.topAnchor),
     ])
 
-    let canceBtn = UIButton()
-    canceBtn.translatesAutoresizingMaskIntoConstraints = false
-    canceBtn.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
-    canceBtn.setTitle(chatLocalizable("cancel"), for: .normal)
-    canceBtn.setTitleColor(.ne_greyText, for: .normal)
-    canceBtn.accessibilityIdentifier = "id.forwardCancelBtn"
+    let canceButton = UIButton()
+    canceButton.translatesAutoresizingMaskIntoConstraints = false
+    canceButton.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
+    canceButton.setTitle(chatLocalizable("cancel"), for: .normal)
+    canceButton.setTitleColor(.ne_greyText, for: .normal)
+    canceButton.accessibilityIdentifier = "id.forwardCancelBtn"
 
-    sureBtn.translatesAutoresizingMaskIntoConstraints = false
-    sureBtn.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
-    sureBtn.setTitle(chatLocalizable("send"), for: .normal)
-    sureBtn.setTitleColor(.ne_blueText, for: .normal)
-    sureBtn.accessibilityIdentifier = "id.forwardSendBtn"
+    sureButton.translatesAutoresizingMaskIntoConstraints = false
+    sureButton.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
+    sureButton.setTitle(chatLocalizable("send"), for: .normal)
+    sureButton.setTitleColor(.ne_blueText, for: .normal)
+    sureButton.accessibilityIdentifier = "id.forwardSendBtn"
 
-    contentView.addSubview(canceBtn)
+    contentView.addSubview(canceButton)
     NSLayoutConstraint.activate([
-      canceBtn.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      canceBtn.bottomAnchor.constraint(equalTo: verticalLine.bottomAnchor),
-      canceBtn.topAnchor.constraint(equalTo: horizontalLine.bottomAnchor),
-      canceBtn.rightAnchor.constraint(equalTo: verticalLine.leftAnchor),
+      canceButton.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      canceButton.bottomAnchor.constraint(equalTo: verticalLine.bottomAnchor),
+      canceButton.topAnchor.constraint(equalTo: horizontalLine.bottomAnchor),
+      canceButton.rightAnchor.constraint(equalTo: verticalLine.leftAnchor),
     ])
 
-    contentView.addSubview(sureBtn)
+    contentView.addSubview(sureButton)
     NSLayoutConstraint.activate([
-      sureBtn.bottomAnchor.constraint(equalTo: verticalLine.bottomAnchor),
-      sureBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      sureBtn.topAnchor.constraint(equalTo: horizontalLine.bottomAnchor),
-      sureBtn.leftAnchor.constraint(equalTo: verticalLine.rightAnchor),
+      sureButton.bottomAnchor.constraint(equalTo: verticalLine.bottomAnchor),
+      sureButton.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      sureButton.topAnchor.constraint(equalTo: horizontalLine.bottomAnchor),
+      sureButton.leftAnchor.constraint(equalTo: verticalLine.rightAnchor),
     ])
   }
 
@@ -305,24 +305,24 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     if datas.count == 1 {
       let item = datas[0]
       if let name = item.name {
-        oneUserHead.setTitle(name)
-        oneUserName.text = name
+        oneUserHeadView.setTitle(name)
+        oneUserNameLabel.text = name
       } else if let uid = item.uid {
-        oneUserHead.setTitle(uid)
-        oneUserName.text = uid
+        oneUserHeadView.setTitle(uid)
+        oneUserNameLabel.text = uid
       }
       if let url = item.avatar, !url.isEmpty {
-        oneUserHead.sd_setImage(with: URL(string: url), completed: nil)
-        oneUserHead.titleLabel.text = ""
-        oneUserHead.backgroundColor = .clear
+        oneUserHeadView.sd_setImage(with: URL(string: url), completed: nil)
+        oneUserHeadView.titleLabel.text = ""
+        oneUserHeadView.backgroundColor = .clear
       } else {
-        oneUserHead.backgroundColor = UIColor.colorWithString(string: item.uid)
-        oneUserHead.image = nil
+        oneUserHeadView.backgroundColor = UIColor.colorWithString(string: item.uid)
+        oneUserHeadView.image = nil
       }
-      userCollection.isHidden = true
+      userCollectionView.isHidden = true
     } else {
-      oneUserHead.isHidden = true
-      oneUserName.isHidden = true
+      oneUserHeadView.isHidden = true
+      oneUserNameLabel.isHidden = true
     }
   }
 
@@ -360,16 +360,16 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   open func setCellModel(cell: NEBaseForwardUserCell, indexPath: IndexPath) -> UICollectionViewCell {
     let item = datas[indexPath.row]
     if let url = item.avatar, !url.isEmpty {
-      cell.userHeader.sd_setImage(with: URL(string: url), completed: nil)
-      cell.userHeader.titleLabel.text = ""
-      cell.userHeader.backgroundColor = .clear
+      cell.userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+      cell.userHeaderView.titleLabel.text = ""
+      cell.userHeaderView.backgroundColor = .clear
     } else {
-      cell.userHeader.backgroundColor = UIColor.colorWithString(string: item.uid)
-      cell.userHeader.image = nil
+      cell.userHeaderView.backgroundColor = UIColor.colorWithString(string: item.uid)
+      cell.userHeaderView.image = nil
       if let name = item.name {
-        cell.userHeader.setTitle(name)
+        cell.userHeaderView.setTitle(name)
       } else if let uid = item.uid {
-        cell.userHeader.setTitle(uid)
+        cell.userHeaderView.setTitle(uid)
       }
     }
     return cell

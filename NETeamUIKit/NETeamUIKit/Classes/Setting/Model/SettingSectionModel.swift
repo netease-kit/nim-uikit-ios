@@ -12,7 +12,7 @@ open class SettingSectionModel: NSObject {
 
   // 设置圆角
   open func setCornerType() {
-    cellModels.forEach { model in
+    for model in cellModels {
       if model == cellModels.first {
         model.cornerType = .topLeft.union(.topRight)
         if model == cellModels.last {

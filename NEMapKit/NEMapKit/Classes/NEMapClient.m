@@ -12,14 +12,14 @@
 #import <NEChatKit/NEChatKit-Swift.h>
 #import <NECommonKit/NECommonKit-Swift.h>
 
-typedef void (^SearchCompletion)(NSArray<ChatLocaitonModel *> *, NSError *);
+#import <NECoreKit/NECoreKit-Swift.h>
+#import <NEMapKit/NEMapKit-Swift.h>
+
+typedef void (^SearchCompletion)(NSArray<NELocaitonModel *> *, NSError *);
 
 typedef void (^MapMoveCompletion)(void);
 
-@interface NEMapClient () <NEChatMapProtocol,
-                           AMapSearchDelegate,
-                           NEMapServiceDelegate,
-                           MAMapViewDelegate>
+@interface NEMapClient () <NEChatMapProtocol, AMapSearchDelegate, MAMapViewDelegate>
 
 @property(nonatomic, strong) MAMapView *mapView;
 
@@ -39,6 +39,8 @@ typedef void (^MapMoveCompletion)(void);
 
 @property(nonatomic, assign) BOOL needSearchRound;
 
+@property(nonatomic, strong) NSString *serverKey;
+
 @end
 
 @implementation NEMapClient
@@ -57,6 +59,44 @@ typedef void (^MapMoveCompletion)(void);
     instance = [[[self class] alloc] init];
   });
   return instance;
+}
+
+- (void)setupMapClientWithAppkey:(NSString *)appkey withServerKey:(NSString *)serverKey {
+  self.serverKey = serverKey;
+  [self setupMapClientWithAppkey:appkey];
+  [[Router shared] register:NERouterUrl.LocationVCRouter
+                    closure:^(NSDictionary<NSString *, id> *_Nonnull param) {
+                      NSObject *param1 = [param objectForKey:@"nav"];
+                      NSInteger type = NEMapTypeDetail;
+                      NSNumber *typeValue = [param objectForKey:@"type"];
+                      if (typeValue != nil && ![typeValue isKindOfClass:[NSNull class]]) {
+                        type = typeValue.integerValue;
+                      }
+                      if ([param1 isKindOfClass:[UINavigationController class]]) {
+                        UINavigationController *nav = (UINavigationController *)param1;
+                        NELocationViewController *controller =
+                            [[NELocationViewController alloc] initWithType:type];
+                        if (type == NEMapTypeDetail) {
+                          double lat = 0;
+                          double lng = 0;
+                          NSNumber *latValue = param[@"lat"];
+                          if (latValue != nil && ![latValue isKindOfClass:NSNull.class]) {
+                            lat = latValue.doubleValue;
+                          }
+                          NSNumber *lngValue = param[@"lng"];
+                          if (lngValue != nil && ![lngValue isKindOfClass:NSNull.class]) {
+                            lng = lngValue.doubleValue;
+                          }
+                          NSString *title = param[@"locationTitle"];
+                          NSString *subTitle = param[@"subTitle"];
+                          controller.currentPoint = CGPointMake(lat, lng);
+                          controller.locationTitle = title;
+                          controller.subTitle = subTitle;
+                        }
+
+                        [nav pushViewController:controller animated:YES];
+                      }
+                    }];
 }
 
 - (void)setupMapClientWithAppkey:(NSString *)appkey {
@@ -98,7 +138,7 @@ typedef void (^MapMoveCompletion)(void);
 }
 
 - (void)searchPositionWithKey:(NSString *)key
-                   completion:(void (^)(NSArray<ChatLocaitonModel *> *_Nonnull,
+                   completion:(void (^)(NSArray<NELocaitonModel *> *_Nonnull,
                                         NSError *_Nullable))completion {
   if (key.length <= 0) {
     return;
@@ -154,8 +194,6 @@ typedef void (^MapMoveCompletion)(void);
   mapView.showsCompass = NO;
   // 隐藏比例尺
   mapView.showsScale = NO;
-  //  mapView.maxZoomLevel = 5;
-  //  mapView.showsUserLocation = YES;
   mapView.userTrackingMode = MAUserTrackingModeNone;
   mapView.zoomEnabled = NO;
 
@@ -177,7 +215,7 @@ typedef void (^MapMoveCompletion)(void);
   }
 }
 
-- (void)searchRoundPositionWithCompletion:(void (^)(NSArray<ChatLocaitonModel *> *_Nonnull,
+- (void)searchRoundPositionWithCompletion:(void (^)(NSArray<NELocaitonModel *> *_Nonnull,
                                                     NSError *_Nullable))completion {
   self.searchRoundBlock = completion;
   self.needSearchRound = YES;
@@ -193,7 +231,7 @@ typedef void (^MapMoveCompletion)(void);
 }
 
 - (void)searchMapCenterWithMapview:(id)mapview
-                        completion:(void (^)(NSArray<ChatLocaitonModel *> *_Nonnull,
+                        completion:(void (^)(NSArray<NELocaitonModel *> *_Nonnull,
                                              NSError *_Nullable))completion {
   if ([mapview isKindOfClass:[MAMapView class]]) {
     self.searchRoundBlock = completion;
@@ -228,9 +266,9 @@ typedef void (^MapMoveCompletion)(void);
 }
 
 - (void)parseAndPassWithData:(NSArray<AMapPOI *> *)datas {
-  NSMutableArray<ChatLocaitonModel *> *mutaData = [[NSMutableArray alloc] init];
+  NSMutableArray<NELocaitonModel *> *mutaData = [[NSMutableArray alloc] init];
   for (AMapPOI *poi in datas) {
-    ChatLocaitonModel *model = [[ChatLocaitonModel alloc] init];
+    NELocaitonModel *model = [[NELocaitonModel alloc] init];
     [mutaData addObject:model];
     model.title = poi.name;
     model.address = poi.address;
@@ -252,7 +290,6 @@ typedef void (^MapMoveCompletion)(void);
 - (void)mapView:(MAMapView *)mapView
     didUpdateUserLocation:(MAUserLocation *)userLocation
          updatingLocation:(BOOL)updatingLocation {
-  //  NSLog(@"didUpdateUserLocation : %d", updatingLocation);
   if (updatingLocation && self.needSearchRound) {
     AMapReGeocodeSearchRequest *regeoRequest = [[AMapReGeocodeSearchRequest alloc] init];
     regeoRequest.location = [AMapGeoPoint locationWithLatitude:userLocation.coordinate.latitude
@@ -297,6 +334,14 @@ typedef void (^MapMoveCompletion)(void);
     return annotationView;
   }
   return nil;
+}
+
+- (NSString *)getMapImageUrlWithLat:(double)lat lng:(double)lng {
+  NSString *url =
+      [NSString stringWithFormat:@"https://restapi.amap.com/v3/"
+                                 @"staticmap?location=%f,%f&zoom=15&size=500*200&key=%@",
+                                 lng, lat, self.serverKey];
+  return url;
 }
 
 @end

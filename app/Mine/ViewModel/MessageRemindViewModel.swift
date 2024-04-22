@@ -5,16 +5,16 @@
 
 import Foundation
 import NETeamUIKit
+import NIMSDK
 
 @objcMembers
 public class MessageRemindViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
 
-  let repo = SettingRepo.shared
+  let settingRepo = SettingRepo.shared
 
   func getData() {
     sectionData.append(getFirstSection())
-//        sectionData.append(getSecondSection())
     sectionData.append(getThirdSection())
   }
 
@@ -26,9 +26,13 @@ public class MessageRemindViewModel: NSObject {
     let messageNotify = SettingCellModel()
     messageNotify.cellName = NSLocalizedString("new_message_remind", comment: "")
     messageNotify.type = SettingCellType.SettingSwitchCell.rawValue
-    messageNotify.switchOpen = repo.getPushEnable()
+    // TODO: 换V2
+    messageNotify.switchOpen = settingRepo.getPushEnable()
     messageNotify.swichChange = { isOpen in
-      weakSelf?.repo.setPushEnable(isOpen)
+//      let config = V2NIMDndConfig()
+//      config.dndOn = isOpen
+//      weakSelf?.repo.setDndConfig(config: config)
+      weakSelf?.settingRepo.setPushEnable(isOpen)
     }
     model.cellModels.append(contentsOf: [
       messageNotify, // 新消息通知
@@ -37,49 +41,22 @@ public class MessageRemindViewModel: NSObject {
     return model
   }
 
-  private func getSecondSection() -> SettingSectionModel {
-    let model = SettingSectionModel()
-    weak var weakSelf = self
-    let ringBellItem = SettingCellModel()
-    ringBellItem.cellName = NSLocalizedString("ring_mode", comment: "")
-    ringBellItem.type = SettingCellType.SettingSwitchCell.rawValue
-    ringBellItem.switchOpen = repo.getRingMode()
-    ringBellItem.swichChange = { isOpen in
-      weakSelf?.repo.setRingMode(isOpen)
-    }
-
-    let vibrationItem = SettingCellModel()
-    vibrationItem.cellName = NSLocalizedString("vibration_mode", comment: "")
-    vibrationItem.type = SettingCellType.SettingSwitchCell.rawValue
-    vibrationItem.switchOpen = repo.getVibrateMode()
-    vibrationItem.swichChange = { isOpen in
-      weakSelf?.repo.setVibrateMode(isOpen)
-    }
-    model.cellModels.append(contentsOf: [
-      ringBellItem,
-      vibrationItem,
-    ])
-    model.setCornerType()
-    return model
-  }
-
   private func getThirdSection() -> SettingSectionModel {
     let model = SettingSectionModel()
     weak var weakSelf = self
-//    let receiveItem = SettingCellModel()
-//    receiveItem.cellName = NSLocalizedString("syn_receive_push", comment: "")
-//    receiveItem.type = SettingCellType.SettingSwitchCell.rawValue
-//    receiveItem.switchOpen = repo.getPcWebPushEnable()
-//    receiveItem.swichChange = { isOpen in
-//      weakSelf?.repo.updatePcWebPushEnable(isOpen)
-//    }
 
     let messageDetailItem = SettingCellModel()
     messageDetailItem.cellName = NSLocalizedString("display_message_detail", comment: "")
     messageDetailItem.type = SettingCellType.SettingSwitchCell.rawValue
-    messageDetailItem.switchOpen = repo.getPushShowDetail()
+    // TODO: 换V2
+    messageDetailItem.switchOpen = settingRepo.getPushDetailEnable()
     messageDetailItem.swichChange = { isOpen in
-      weakSelf?.repo.setPushShowDetail(isOpen)
+      weakSelf?.settingRepo.setPushShowDetail(isOpen) { error in
+        if let err = error {
+          print("设置失败: \(err)")
+          messageDetailItem.switchOpen = !isOpen
+        }
+      }
     }
 
     model.cellModels.append(contentsOf: [messageDetailItem])

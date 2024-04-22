@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 
@@ -32,10 +32,10 @@ public extension ContactRouter {
 
     Router.shared.register(ContactUserInfoPageRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
-        if let user = param["user"] as? NEKitUser {
+        if let user = param["user"] as? NEUserWithFriend {
           let userInfoVC = ContactUserViewController(user: user)
           nav.pushViewController(userInfoVC, animated: true)
-        } else if let nimUser = param["nim_user"] as? NEKitUser {
+        } else if let nimUser = param["nim_user"] as? NEUserWithFriend {
           let userInfoVC = ContactUserViewController(user: nimUser)
           nav.pushViewController(userInfoVC, animated: true)
         } else if let uid = param["uid"] as? String {

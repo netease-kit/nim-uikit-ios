@@ -7,12 +7,12 @@ import NECommonUIKit
 import UIKit
 
 protocol TeamMemberCellDelegate: NSObject {
-  func didClickRemoveButton(_ model: TeamMemberInfoModel?, _ index: Int)
+  func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int)
 }
 
 @objcMembers
 open class NEBaseTeamMemberCell: UITableViewCell {
-  var currentModel: TeamMemberInfoModel?
+  var currentModel: NETeamMemberInfoModel?
 
   weak var delegate: TeamMemberCellDelegate?
 
@@ -22,7 +22,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
 
   var index = 0
 
-  lazy var headerView: NEUserHeaderView = {
+  public lazy var headerView: NEUserHeaderView = {
     let header = NEUserHeaderView(frame: .zero)
     header.titleLabel.font = NEConstant.defaultTextFont(14)
     header.titleLabel.textColor = UIColor.white
@@ -32,7 +32,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     return header
   }()
 
-  lazy var ownerLabel: UILabel = {
+  public lazy var ownerLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(12.0)
@@ -48,7 +48,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     return label
   }()
 
-  lazy var nameLabel: UILabel = {
+  public lazy var nameLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
@@ -57,7 +57,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     return label
   }()
 
-  lazy var removeLabel: UILabel = {
+  public lazy var removeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.text = localizable("team_member_remove")
@@ -66,7 +66,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     return label
   }()
 
-  lazy var removeBtn: UIButton = {
+  public lazy var removeButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     return button
@@ -109,31 +109,32 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     ])
   }
 
-  func configure(_ model: TeamMemberInfoModel) {
-    if let userId = model.nimUser?.userId, let user = ChatUserCache.getUserInfo(userId) {
-      model.nimUser = user
+  func configure(_ model: NETeamMemberInfoModel) {
+    // 更新用户信息
+    if let userId = model.nimUser?.user?.accountId, let user = NEFriendUserCache.shared.getFriendInfo(userId) {
+//      model.nimUser = user
     }
     currentModel = model
-    if let url = model.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
+    if let url = model.nimUser?.user?.avatar, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {
       headerView.image = nil
-      headerView.setTitle(model.showNickInTeam())
-      headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.userId)
+      headerView.setTitle(model.showNickInTeam() ?? "")
+      headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.user?.accountId)
     }
     nameLabel.text = model.atNameInTeam()
   }
 
   func setupRemoveButton() {
-    contentView.addSubview(removeBtn)
+    contentView.addSubview(removeButton)
     NSLayoutConstraint.activate([
-      removeBtn.topAnchor.constraint(equalTo: contentView.topAnchor),
-      removeBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      removeBtn.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      removeBtn.widthAnchor.constraint(equalToConstant: 100),
+      removeButton.topAnchor.constraint(equalTo: contentView.topAnchor),
+      removeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      removeButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      removeButton.widthAnchor.constraint(equalToConstant: 100),
     ])
-    removeBtn.addTarget(self, action: #selector(didClickRemove), for: .touchUpInside)
+    removeButton.addTarget(self, action: #selector(didClickRemove), for: .touchUpInside)
   }
 
   func didClickRemove() {

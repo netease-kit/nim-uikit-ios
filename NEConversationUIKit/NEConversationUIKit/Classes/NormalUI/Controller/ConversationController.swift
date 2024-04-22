@@ -10,6 +10,24 @@ import UIKit
 
 @objcMembers
 open class ConversationController: NEBaseConversationController {
+  /// 搜索按钮
+  public lazy var searchBarButton: UIButton = {
+    let searchBarButton = UIButton()
+    searchBarButton.accessibilityIdentifier = "id.titleBarSearchImg"
+    searchBarButton.setImage(UIImage.ne_imageNamed(name: "chat_search"), for: .normal)
+    searchBarButton.addTarget(self, action: #selector(searchAction), for: .touchUpInside)
+    return searchBarButton
+  }()
+
+  /// 添加按钮
+  public lazy var addBarButton: UIButton = {
+    let addBarButton = UIButton()
+    addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
+    addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
+    addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
+    return addBarButton
+  }()
+
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
     className = "ConversationController"
@@ -17,7 +35,7 @@ open class ConversationController: NEBaseConversationController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -27,18 +45,9 @@ open class ConversationController: NEBaseConversationController {
 
   override func initSystemNav() {
     super.initSystemNav()
-    let searchBarButton = UIButton()
-    searchBarButton.accessibilityIdentifier = "id.titleBarSearchImg"
-    searchBarButton.setImage(UIImage.ne_imageNamed(name: "chat_search"), for: .normal)
-    searchBarButton.addTarget(self, action: #selector(searchAction), for: .touchUpInside)
+
     let searchBarItem = UIBarButtonItem(customView: searchBarButton)
-
-    let addBarButton = UIButton()
-    addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
-    addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
-    addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
     let addBarItem = UIBarButtonItem(customView: addBarButton)
-
     let spaceBarItem = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
     spaceBarItem.width = NEConstant.screenInterval
 

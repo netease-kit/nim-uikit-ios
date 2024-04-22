@@ -15,7 +15,7 @@ open class FunTeamSettingSelectCell: NEBaseTeamSettingSelectCell {
     super.init(coder: coder)
   }
 
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .left, constant: 16)
     contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .right, constant: 0)
@@ -33,8 +33,8 @@ open class FunTeamSettingSelectCell: NEBaseTeamSettingSelectCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
     ])
   }
 }

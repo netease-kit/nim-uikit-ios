@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECommonUIKit
-import NECoreKit
+import MJRefresh
+import NECommonKit
+import NECoreIM2Kit
 import NIMSDK
-import UIKit
 
 @objc
 public protocol NEBaseConversationControllerDelegate {
@@ -14,7 +14,7 @@ public protocol NEBaseConversationControllerDelegate {
 }
 
 @objcMembers
-open class NEBaseConversationController: UIViewController, NIMChatManagerDelegate, UIGestureRecognizerDelegate {
+open class NEBaseConversationController: UIViewController, UIGestureRecognizerDelegate {
   var className = "NEBaseConversationController"
   public var deleteBottonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
 
@@ -26,6 +26,9 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
   public var popListView = NEBasePopListView()
 
   public var delegate: NEBaseConversationControllerDelegate?
+
+  /// 是否取过数据
+  public var isRequestedData = false
 
   public var bodyTopViewHeight: CGFloat = 0 {
     didSet {
@@ -43,200 +46,6 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
 
   public var cellRegisterDic = [0: NEBaseConversationListCell.self]
   public let viewModel = ConversationViewModel()
-
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nil, bundle: nil)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  override open func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    showTitleBar()
-    viewModel.loadStickTopSessionInfos { [weak self] error, sessionInfos in
-      NELog.infoLog(
-        ModuleName + " " + (self?.className ?? "NEBaseConversationController"),
-        desc: "CALLBACK loadStickTopSessionInfos " + (error?.localizedDescription ?? "no error")
-      )
-      if let infos = sessionInfos {
-        self?.viewModel.stickTopInfos = infos
-        self?.reloadTableView()
-        self?.delegate?.onDataLoaded()
-      }
-    }
-
-    NEChatDetectNetworkTool.shareInstance.netWorkReachability { [weak self] status in
-      if status == .notReachable {
-        self?.brokenNetworkView.isHidden = false
-        self?.contentViewTopAnchor?.constant = self?.brokenNetworkViewHeight ?? 36
-      } else {
-        self?.brokenNetworkView.isHidden = true
-        self?.contentViewTopAnchor?.constant = 0
-      }
-    }
-
-    if navigationController?.viewControllers.count ?? 0 > 0 {
-      if let root = navigationController?.viewControllers[0] as? UIViewController {
-        if root.isKind(of: NEBaseConversationController.self) {
-          navigationController?.interactivePopGestureRecognizer?.delegate = self
-        }
-      }
-    }
-  }
-
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    showTitleBar()
-    setupSubviews()
-    requestData()
-    initialConfig()
-    NIMSDK.shared().chatManager.add(self)
-    NotificationCenter.default.addObserver(self, selector: #selector(didRefreshTable), name: NENotificationName.updateFriendInfo, object: nil)
-  }
-
-  override open func viewWillDisappear(_ animated: Bool) {
-    popListView.removeSelf()
-  }
-
-  deinit {
-    NIMSDK.shared().chatManager.remove(self)
-  }
-
-  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    if let navigationController = navigationController,
-       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
-       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
-       navigationController.visibleViewController == navigationController.viewControllers.first {
-      return false
-    }
-    return true
-  }
-
-  open func showTitleBar() {
-    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationView.isHidden = true
-      topConstant = 0
-      if NEKitConversationConfig.shared.ui.showTitleBar {
-        navigationController?.isNavigationBarHidden = false
-      } else {
-        navigationController?.isNavigationBarHidden = true
-        if #available(iOS 10, *) {
-          topConstant += NEConstant.statusBarHeight
-        }
-      }
-    } else {
-      navigationController?.isNavigationBarHidden = true
-      if NEKitConversationConfig.shared.ui.showTitleBar {
-        navigationView.isHidden = false
-        topConstant = NEConstant.navigationHeight
-      } else {
-        navigationView.isHidden = true
-        topConstant = 0
-      }
-      if #available(iOS 10, *) {
-        topConstant += NEConstant.statusBarHeight
-      }
-    }
-  }
-
-  func initSystemNav() {
-    edgesForExtendedLayout = []
-
-    let brandBarBtn = UIButton()
-    brandBarBtn.accessibilityIdentifier = "id.titleBarTitle"
-    brandBarBtn.setTitle(localizable("appName"), for: .normal)
-    brandBarBtn.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
-    brandBarBtn.layoutButtonImage(style: .left, space: 12)
-    brandBarBtn.setTitleColor(UIColor.black, for: .normal)
-    brandBarBtn.titleLabel?.font = NEConstant.textFont("PingFangSC-Medium", 20)
-    let brandBtn = UIBarButtonItem(customView: brandBarBtn)
-    navigationItem.leftBarButtonItem = brandBtn
-  }
-
-  open func setupSubviews() {
-    initSystemNav()
-    view.addSubview(navigationView)
-    view.addSubview(bodyTopView)
-    view.addSubview(bodyView)
-    view.addSubview(bodyBottomView)
-
-    NSLayoutConstraint.activate([
-      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      navigationView.heightAnchor
-        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
-    ])
-
-    NSLayoutConstraint.activate([
-      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
-    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
-    bodyTopViewHeightAnchor?.isActive = true
-
-    NSLayoutConstraint.activate([
-      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
-      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
-    ])
-
-    NSLayoutConstraint.activate([
-      bodyBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
-    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
-    bodyBottomViewHeightAnchor?.isActive = true
-
-    cellRegisterDic.forEach { (key: Int, value: NEBaseConversationListCell.Type) in
-      tableView.register(value, forCellReuseIdentifier: "\(key)")
-    }
-
-    if let customController = NEKitConversationConfig.shared.ui.customController {
-      customController(self)
-    }
-  }
-
-  open func initialConfig() {
-    viewModel.delegate = self
-  }
-
-  func requestData() {
-    let params = NIMFetchServerSessionOption()
-    params.minTimestamp = 0
-    params.maxTimestamp = Date().timeIntervalSince1970 * 1000
-    params.limit = 50
-    weak var weakSelf = self
-    viewModel.fetchServerSessions(option: params) { error, recentSessions in
-      if error == nil {
-        NELog.infoLog(ModuleName + " " + self.className, desc: "✅CALLBACK fetchServerSessions SUCCESS")
-        if let recentList = recentSessions {
-          NELog.infoLog(ModuleName + " " + self.className, desc: "✅CALLBACK fetchServerSessions SUCCESS count : \(recentList.count)")
-          if recentList.count > 0 {
-            weakSelf?.emptyView.isHidden = true
-            weakSelf?.reloadTableView()
-            weakSelf?.delegate?.onDataLoaded()
-          } else {
-            weakSelf?.emptyView.isHidden = false
-          }
-        }
-
-      } else {
-        NELog.errorLog(
-          ModuleName + " " + self.className,
-          desc: "❌CALLBACK fetchServerSessions failed，error = \(error!)"
-        )
-        weakSelf?.emptyView.isHidden = false
-      }
-    }
-  }
-
-  // MARK: lazyMethod
 
   public lazy var navigationView: TabNavigationView = {
     let nav = TabNavigationView(frame: CGRect.zero)
@@ -355,6 +164,10 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
     tableView.delegate = self
     tableView.dataSource = self
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+    tableView.mj_footer = MJRefreshBackNormalFooter(
+      refreshingTarget: self,
+      refreshingAction: #selector(loadMoreData)
+    )
     return tableView
   }()
 
@@ -364,6 +177,209 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
     view.backgroundColor = .clear
     return view
   }()
+
+  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    showTitleBar()
+
+    // 是否取过数据，如果取过数据再刷新页面
+    if isRequestedData == true {
+      reloadTableView()
+    }
+
+    NEChatDetectNetworkTool.shareInstance.netWorkReachability { [weak self] status in
+      if status == .notReachable {
+        self?.brokenNetworkView.isHidden = false
+        self?.contentViewTopAnchor?.constant = self?.brokenNetworkViewHeight ?? 36
+      } else {
+        self?.brokenNetworkView.isHidden = true
+        self?.contentViewTopAnchor?.constant = 0
+      }
+    }
+
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: NEBaseConversationController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
+      }
+    }
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    showTitleBar()
+    setupSubviews()
+    requestData()
+    initialConfig()
+
+    // 拉取好友信息
+    DispatchQueue.global().async {
+      ContactRepo.shared.getMyUserInfo(nil)
+      ContactRepo.shared.getContactList { _, _ in }
+    }
+  }
+
+  override open func viewWillDisappear(_ animated: Bool) {
+    popListView.removeSelf()
+  }
+
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
+  }
+
+  open func showTitleBar() {
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationView.isHidden = true
+      topConstant = 0
+      if NEKitConversationConfig.shared.ui.showTitleBar {
+        navigationController?.isNavigationBarHidden = false
+      } else {
+        navigationController?.isNavigationBarHidden = true
+        if #available(iOS 10, *) {
+          topConstant += NEConstant.statusBarHeight
+        }
+      }
+    } else {
+      navigationController?.isNavigationBarHidden = true
+      if NEKitConversationConfig.shared.ui.showTitleBar {
+        navigationView.isHidden = false
+        topConstant = NEConstant.navigationHeight
+      } else {
+        navigationView.isHidden = true
+        topConstant = 0
+      }
+      if #available(iOS 10, *) {
+        topConstant += NEConstant.statusBarHeight
+      }
+    }
+  }
+
+  func initSystemNav() {
+    edgesForExtendedLayout = []
+
+    let brandBarBtn = UIButton()
+    brandBarBtn.accessibilityIdentifier = "id.titleBarTitle"
+    brandBarBtn.setTitle(localizable("appName"), for: .normal)
+    brandBarBtn.setImage(UIImage.ne_imageNamed(name: "brand_yunxin"), for: .normal)
+    brandBarBtn.layoutButtonImage(style: .left, space: 12)
+    brandBarBtn.setTitleColor(UIColor.black, for: .normal)
+    brandBarBtn.titleLabel?.font = NEConstant.textFont("PingFangSC-Medium", 20)
+    let brandBtn = UIBarButtonItem(customView: brandBarBtn)
+    navigationItem.leftBarButtonItem = brandBtn
+  }
+
+  open func setupSubviews() {
+    initSystemNav()
+    view.addSubview(navigationView)
+    view.addSubview(bodyTopView)
+    view.addSubview(bodyView)
+    view.addSubview(bodyBottomView)
+
+    NSLayoutConstraint.activate([
+      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navigationView.heightAnchor
+        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
+    bodyTopViewHeightAnchor?.isActive = true
+
+    NSLayoutConstraint.activate([
+      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
+      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
+    bodyBottomViewHeightAnchor?.isActive = true
+
+    for (key, value) in cellRegisterDic {
+      tableView.register(value, forCellReuseIdentifier: "\(key)")
+    }
+
+    if let customController = NEKitConversationConfig.shared.ui.customController {
+      customController(self)
+    }
+  }
+
+  open func initialConfig() {
+    viewModel.delegate = self
+  }
+
+  func loadMoreData() {
+    viewModel.getConversationListByPage { [weak self] error, finishied in
+      self?.isRequestedData = true
+      if let end = finishied, end == true {
+        self?.tableView.mj_footer?.endRefreshingWithNoMoreData()
+        DispatchQueue.main.async {
+          self?.tableView.mj_footer = nil
+        }
+      } else {
+        self?.tableView.mj_footer?.endRefreshing()
+      }
+      self?.delegate?.onDataLoaded()
+      self?.reloadTableView()
+    }
+  }
+
+  func requestData() {
+    viewModel.getConversationListByPage { [weak self] error, finished in
+
+      if let err = error {
+        self?.view.ne_makeToast(err.localizedDescription)
+        self?.emptyView.isHidden = false
+        NEALog.errorLog(
+          ModuleName + " " + (self?.className ?? ""),
+          desc: "❌CALLBACK requestData failed，error = \(error!)"
+        )
+      } else {
+        if let end = finished, end == true {
+          DispatchQueue.main.async {
+            self?.tableView.mj_footer = nil
+          }
+        }
+        if let topDats = self?.viewModel.stickTopConversations, let normalDatas = self?.viewModel.conversationListData {
+          if topDats.count <= 0, normalDatas.count <= 0 {
+            self?.emptyView.isHidden = false
+          } else {
+            self?.emptyView.isHidden = true
+            self?.reloadTableView()
+            self?.delegate?.onDataLoaded()
+          }
+        }
+      }
+    }
+  }
+
+  // MARK: lazyMethod
 }
 
 extension NEBaseConversationController: TabNavigationViewDelegate {
@@ -372,6 +388,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     NEKitConversationConfig.shared.ui.titleBarLeftClick?()
   }
 
+  /// 点击搜索会话
   open func searchAction() {
     if let searchBlock = NEKitConversationConfig.shared.ui.titleBarRight2Click {
       searchBlock()
@@ -443,14 +460,22 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     }
   }
 
+  /// 创建讨论组
   open func createDiscussGroup() {
     Router.shared.register(ContactSelectedUsersRouter) { param in
       print("user setting accids : ", param)
       Router.shared.use(TeamCreateDisuss, parameters: param, closure: nil)
     }
+
+    // 创建讨论组-人员选择页面不包含自己
+    var filters = Set<String>()
+    filters.insert(IMKitClient.instance.account())
+
     Router.shared.use(
       ContactUserSelectRouter,
-      parameters: ["nav": navigationController as Any, "limit": inviteNumberLimit],
+      parameters: ["nav": navigationController as Any,
+                   "limit": inviteNumberLimit,
+                   "filters": filters],
       closure: nil
     )
     weak var weakSelf = self
@@ -458,26 +483,34 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       print("create discuss ", param)
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        let session = weakSelf?.viewModel.repo.createTeamSession(teamid)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": weakSelf?.navigationController as Any,
-                       "session": session as Any],
-          closure: nil
-        )
+        if let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid) {
+          var params = [String: Any]()
+          params["nav"] = weakSelf?.navigationController as Any
+          params["conversationId"] = conversationId as Any
+
+          Router.shared.use(PushTeamChatVCRouter, parameters: params, closure: nil)
+        }
       } else if let msg = param["msg"] as? String {
         weakSelf?.showToast(msg)
       }
     }
   }
 
+  /// 创建高级群
   open func createSeniorGroup() {
     Router.shared.register(ContactSelectedUsersRouter) { param in
       Router.shared.use(TeamCreateSenior, parameters: param, closure: nil)
     }
+
+    // 创建高级群-人员选择页面不包含自己
+    var filters = Set<String>()
+    filters.insert(IMKitClient.instance.account())
+
     Router.shared.use(
       ContactUserSelectRouter,
-      parameters: ["nav": navigationController as Any, "limit": 200],
+      parameters: ["nav": navigationController as Any,
+                   "limit": 200,
+                   "filters": filters],
       closure: nil
     )
     weak var weakSelf = self
@@ -485,109 +518,88 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       print("create senior : ", param)
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        let session = weakSelf?.viewModel.repo.createTeamSession(teamid)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": weakSelf?.navigationController as Any,
-                       "session": session as Any],
-          closure: nil
-        )
+        if let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid) {
+          var params = [String: Any]()
+          params["nav"] = weakSelf?.navigationController as Any
+          params["conversationId"] = conversationId as Any
+
+          Router.shared.use(PushTeamChatVCRouter, parameters: params, closure: nil)
+        }
       } else if let msg = param["msg"] as? String {
         weakSelf?.showToast(msg)
       }
     }
   }
-
-  // MARK: =========================NIMChatManagerDelegate========================
-
-  open func onRecvRevokeMessageNotification(_ notification: NIMRevokeMessageNotification) {
-    guard let msg = notification.message else {
-      return
-    }
-
-    if ConversationDeduplicationHelper.instance.isRevokeMessageSaved(messageId: msg.messageId) {
-      return
-    }
-    saveRevokeMessage(msg) { [weak self] error in
-    }
-  }
-
-  open func saveRevokeMessage(_ message: NIMMessage, _ completion: @escaping (Error?) -> Void) {
-    let messageNew = NIMMessage()
-    messageNew.text = localizable("message_recalled")
-    var muta = [String: Any]()
-    muta[revokeLocalMessage] = true
-//    if message.messageType == .text {
-//      muta[revokeLocalMessageContent] = message.text
-//    }
-    messageNew.timestamp = message.timestamp
-    messageNew.from = message.from
-    messageNew.localExt = muta
-    let setting = NIMMessageSetting()
-    setting.shouldBeCounted = false
-    setting.isSessionUpdate = false
-    messageNew.setting = setting
-    if let session = message.session {
-      viewModel.repo.saveMessageToDB(messageNew, session, completion)
-    }
-  }
 }
 
-// MARK: - UITableViewDelegate, UITableViewDataSource
-
 extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSource {
+  public func numberOfSections(in tableView: UITableView) -> Int {
+    2
+  }
+
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    let count = viewModel.conversationListArray?.count ?? 0
-    NELog.infoLog(ModuleName + " " + "ConversationController",
-                  desc: "numberOfRowsInSection count : \(count)")
-    return count
+    if section == 0 {
+      return viewModel.stickTopConversations.count
+    }
+
+    if section == 1 {
+      let conversationCount = viewModel.conversationListData.count
+      return conversationCount
+    }
+
+    return 0
   }
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewModel.conversationListArray?[indexPath.row]
+    var model: NEConversationListModel?
+
+    if indexPath.section == 0 {
+      model = viewModel.stickTopConversations[indexPath.row]
+    } else if indexPath.section == 1 {
+      model = viewModel.conversationListData[indexPath.row]
+    }
+
     let reusedId = "\(model?.customType ?? 0)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
 
-    if let c = cell as? NEBaseConversationListCell {
-      c.topStickInfos = viewModel.stickTopInfos
-      c.configData(sessionModel: model)
+    if let c = cell as? NEBaseConversationListCell, let m = model {
+      c.configureData(m)
     }
 
     return cell
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let conversationModel = viewModel.conversationListArray?[indexPath.row]
+    var conversationModel: NEConversationListModel?
+    if indexPath.section == 0 {
+      conversationModel = viewModel.stickTopConversations[indexPath.row]
+    } else if indexPath.section == 1 {
+      conversationModel = viewModel.conversationListData[indexPath.row]
+    }
 
-    if let didClick = NEKitConversationConfig.shared.ui.itemClick {
-      didClick(conversationModel, indexPath)
+    if let didClick = NEKitConversationConfig.shared.ui.itemClick, let model = conversationModel {
+      didClick(model, indexPath)
       return
     }
 
-    let sid = conversationModel?.recentSession?.session?.sessionId ?? ""
-    let sessionType = conversationModel?.recentSession?.session?.sessionType ?? .P2P
-    onselectedTableRow(sessionType: sessionType, sessionId: sid, indexPath: indexPath)
+    if let conversation = conversationModel?.conversation {
+      onselectedTableRow(conversation: conversation)
+    }
   }
 
   open func tableView(_ tableView: UITableView,
                       editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     weak var weakSelf = self
+
     var rowActions = [UITableViewRowAction]()
-
-    let conversationModel = weakSelf?.viewModel.conversationListArray?[indexPath.row]
-    guard let recentSession = conversationModel?.recentSession,
-          let session = recentSession.session else {
-      return rowActions
-    }
-
     let deleteAction = UITableViewRowAction(style: .destructive,
                                             title: NEKitConversationConfig.shared.ui.deleteBottonTitle) { action, indexPath in
       weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
 
     // 置顶和取消置顶
-    let isTop = viewModel.stickTopInfos[session] != nil
+    let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
                                          title: isTop ? NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle :
                                            NEKitConversationConfig.shared.ui.stickTopBottonTitle) { action, indexPath in
@@ -601,83 +613,71 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     return rowActions
   }
 
-  /*
-   @available(iOS 11.0, *)
-   open func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-
-   var rowActions = [UIContextualAction]()
-
-   let deleteAction = UIContextualAction(style: .normal, title: "删除") { (action, sourceView, completionHandler) in
-
-   //            self.dataSource.remove(at: indexPath.row)
-   //            tableView.deleteRows(at: [indexPath], with: .automatic)
-   // 需要返回true，否则没有反应
-   completionHandler(true)
-   }
-   deleteAction.backgroundColor = NEConstant.hexRGB(0xA8ABB6)
-   rowActions.append(deleteAction)
-
-   let topAction = UIContextualAction(style: .normal, title: "置顶") { (action, sourceView, completionHandler) in
-
-   //            self.dataSource.remove(at: indexPath.row)
-   //            tableView.deleteRows(at: [indexPath], with: .automatic)
-   // 需要返回true，否则没有反应
-   completionHandler(true)
-   }
-   topAction.backgroundColor = NEConstant.hexRGB(0x337EFF)
-   rowActions.append(topAction)
-
-   let actionConfig = UISwipeActionsConfiguration.init(actions: rowActions)
-   actionConfig.performsFirstActionWithFullSwipe = false
-
-   return actionConfig
-   }
-   */
-
+  /// 删除会话
   open func deleteActionHandler(action: UITableViewRowAction?, indexPath: IndexPath) {
-    let conversationModel = viewModel.conversationListArray?[indexPath.row]
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+
+    var conversationModel: NEConversationListModel?
+
+    if indexPath.section == 0 {
+      conversationModel = viewModel.stickTopConversations[indexPath.row]
+
+    } else if indexPath.section == 1 {
+      conversationModel = viewModel.conversationListData[indexPath.row]
+    }
 
     if let deleteBottonClick = NEKitConversationConfig.shared.ui.deleteBottonClick {
       deleteBottonClick(conversationModel, indexPath)
       return
     }
 
-    if let recentSession = conversationModel?.recentSession {
-      viewModel.deleteRecentSession(recentSession: recentSession)
-      didDeleteConversationCell(
-        model: conversationModel ?? ConversationListModel(),
-        indexPath: indexPath
-      )
+    if let conversation = conversationModel?.conversation {
+      viewModel.deleteConversation(conversation) { [weak self] error in
+        if let err = error {
+          self?.view.ne_makeToast(err.localizedDescription)
+        }
+        self?.reloadTableView()
+      }
     }
   }
 
+  /// 点击会话
   open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
     if !NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
       showToast(localizable("network_error"))
       return
     }
-    let conversationModel = viewModel.conversationListArray?[indexPath.row]
+    var conversationModel: NEConversationListModel?
+    if indexPath.section == 0 {
+      conversationModel = viewModel.stickTopConversations[indexPath.row]
+    } else {
+      conversationModel = viewModel.conversationListData[indexPath.row]
+    }
 
     if let stickTopBottonClick = NEKitConversationConfig.shared.ui.stickTopBottonClick {
       stickTopBottonClick(conversationModel, indexPath)
       return
     }
 
-    if let recentSession = conversationModel?.recentSession {
-      onTopRecentAtIndexPath(
-        rencent: recentSession,
-        indexPath: indexPath,
-        isTop: isTop
-      ) { [weak self] error, sessionInfo in
-        if error == nil {
+    if let conversation = conversationModel?.conversation {
+      onTopRecentAtIndexPath(conversation: conversation,
+                             indexPath: indexPath,
+                             isTop: isTop) { [weak self] error in
+
+        if let err = error {
+          self?.view.ne_makeToast(err.localizedDescription)
+        } else {
           if isTop {
             self?.didRemoveStickTopSession(
-              model: conversationModel ?? ConversationListModel(),
+              model: conversationModel ?? NEConversationListModel(),
               indexPath: indexPath
             )
           } else {
             self?.didAddStickTopSession(
-              model: conversationModel ?? ConversationListModel(),
+              model: conversationModel ?? NEConversationListModel(),
               indexPath: indexPath
             )
           }
@@ -686,55 +686,81 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     }
   }
 
-  private func onTopRecentAtIndexPath(rencent: NIMRecentSession, indexPath: IndexPath,
-                                      isTop: Bool,
-                                      _ completion: @escaping (NSError?, NIMStickTopSessionInfo?)
-                                        -> Void) {
-    guard let session = rencent.session else {
-      NELog.errorLog(ModuleName + " " + className, desc: "❌session is nil")
-      return
-    }
-    weak var weakSelf = self
-    if isTop {
-      guard let params = viewModel.stickTopInfos[session] else {
-        return
+  /// 非置顶变为置顶
+  ///  - Parameter conversation: 会话
+  private func moveNormalConversationToTop(conversation: V2NIMConversation) {
+    var addModel: NEConversationListModel?
+    viewModel.conversationListData.removeAll(where: { model in
+      if model.conversation?.conversationId == conversation.conversationId {
+        addModel = model
+        return true
       }
+      return false
+    })
+    if let model = addModel {
+      viewModel.stickTopConversations.append(model)
+    }
+  }
 
-      viewModel.removeStickTopSession(params: params) { error, topSessionInfo in
+  /// 置顶变为非置顶
+  ///  - Parameter conversation: 会话
+  private func moveTopToNormalConversation(conversation: V2NIMConversation) {
+    var addModel: NEConversationListModel?
+    viewModel.stickTopConversations.removeAll(where: { model in
+      if model.conversation?.conversationId == conversation.conversationId {
+        addModel = model
+        return true
+      }
+      return false
+    })
+    if let model = addModel {
+      viewModel.conversationListData.append(model)
+    }
+  }
+
+  /// 点击回调
+  /// - Parameter conversation: 会话
+  /// - Parameter indexPath: 索引
+  /// - Parameter isTop: 置顶
+  /// - Parameter completion: 完成回调
+  func onTopRecentAtIndexPath(conversation: V2NIMConversation, indexPath: IndexPath,
+                              isTop: Bool,
+                              _ completion: @escaping (NSError?)
+                                -> Void) {
+    weak var weakSelf = self
+    if indexPath.section == 0 {
+      viewModel.removeStickTop(conversation: conversation) { error in
         if let err = error {
-          NELog.errorLog(
-            ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
-            desc: "❌CALLBACK removeStickTopSession failed，error = \(err)"
-          )
-          completion(error as NSError?, nil)
+          NEALog.errorLog(ModuleName + " " + (weakSelf?.className ?? "ConversationController"), desc: "❌CALLBACK removeStickTopSession failed，error = \(err)")
+          completion(error)
 
           return
         } else {
-          NELog.infoLog(
-            ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
-            desc: "✅CALLBACK removeStickTopSession SUCCESS"
+          NEALog.infoLog(
+            ModuleName + " " + (weakSelf?.className ?? "ConversationController"), desc: "✅CALLBACK removeStickTopSession SUCCESS"
           )
-          weakSelf?.viewModel.stickTopInfos[session] = nil
+          weakSelf?.moveTopToNormalConversation(conversation: conversation)
+
           weakSelf?.reloadTableView()
-          completion(nil, topSessionInfo)
+          completion(nil)
         }
       }
 
     } else {
-      viewModel.addStickTopSession(session: session) { error, newInfo in
+      viewModel.addStickTop(conversation: conversation) { error in
         if let err = error {
-          NELog.errorLog(
+          NEALog.errorLog(
             ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
             desc: "❌CALLBACK addStickTopSession failed，error = \(err)"
           )
-          completion(error as NSError?, nil)
+          completion(error)
           return
         } else {
-          NELog.infoLog(ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
-                        desc: "✅CALLBACK addStickTopSession callback SUCCESS")
-          weakSelf?.viewModel.stickTopInfos[session] = newInfo
+          NEALog.infoLog(ModuleName + " " + (weakSelf?.className ?? "ConversationController"),
+                         desc: "✅CALLBACK addStickTopSession callback SUCCESS")
+          weakSelf?.moveNormalConversationToTop(conversation: conversation)
           weakSelf?.reloadTableView()
-          completion(nil, newInfo)
+          completion(nil)
         }
       }
     }
@@ -745,53 +771,46 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
 extension NEBaseConversationController {
   /// cell点击事件,可重写该事件处理自己的逻辑业务，例如跳转到指定的会话页面
-  /// - Parameters:
-  ///   - sessionType: 会话类型
-  ///   - sessionId: 会话id
-  ///   - indexPath: indexpath
-  open func onselectedTableRow(sessionType: NIMSessionType, sessionId: String,
-                               indexPath: IndexPath) {
-    if sessionType == .P2P {
-      let session = NIMSession(sessionId, type: .P2P)
+  /// - Parameter conversation: 会话
+  open func onselectedTableRow(conversation: V2NIMConversation) {
+    if conversation.type == .CONVERSATION_TYPE_P2P {
+      let conversationId = V2NIMConversationIdUtil.p2pConversationId(conversation.getUid())
       Router.shared.use(
         PushP2pChatVCRouter,
-        parameters: ["nav": navigationController as Any, "session": session as Any],
+        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
         closure: nil
       )
-    } else if sessionType == .team {
-      let session = NIMSession(sessionId, type: .team)
+    } else if conversation.type == .CONVERSATION_TYPE_TEAM {
+      let conversationId = V2NIMConversationIdUtil.teamConversationId(conversation.getTeamId())
       Router.shared.use(
         PushTeamChatVCRouter,
-        parameters: ["nav": navigationController as Any, "session": session as Any],
+        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
         closure: nil
       )
     }
   }
 
   /// 删除会话
-  /// - Parameters:
-  ///   - model: 会话模型
-  ///   - indexPath: indexpath
-  open func didDeleteConversationCell(model: ConversationListModel, indexPath: IndexPath) {}
+  ///   - parameter model: 会话模型
+  ///   - parameter indexpath: 索引
+  open func didDeleteConversationCell(model: NEConversationListModel, indexPath: IndexPath) {}
 
   /// 删除一条置顶记录
-  /// - Parameters:
-  ///   - model: 会话模型
-  ///   - indexPath: indexpath
-  open func didRemoveStickTopSession(model: ConversationListModel, indexPath: IndexPath) {}
+  ///   - parameter model: 会话模型
+  ///   - parameter indexpath
+  open func didRemoveStickTopSession(model: NEConversationListModel, indexPath: IndexPath) {}
 
   /// 添加一条置顶记录
-  /// - Parameters:
-  ///   - model: 会话模型
-  ///   - indexPath: indexpath
-  open func didAddStickTopSession(model: ConversationListModel, indexPath: IndexPath) {}
+  ///   - Parameter model: 会话模型
+  ///   - Parameter indexpath: 索引
+  open func didAddStickTopSession(model: NEConversationListModel, indexPath: IndexPath) {}
 }
 
 // MARK: ================= ConversationViewModelDelegate===================
 
 extension NEBaseConversationController: ConversationViewModelDelegate {
   open func didAddRecentSession() {
-    NELog.infoLog("ConversationController", desc: "didAddRecentSession")
+    NEALog.infoLog("ConversationController", desc: "didAddRecentSession")
     reloadTableView()
   }
 
@@ -805,12 +824,18 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
   }
 
   open func didRefreshTable() {
-    tableView.reloadData()
+    reloadTableView()
   }
 
+  /// 带排序的刷新
   open func reloadTableView() {
-    emptyView.isHidden = (viewModel.conversationListArray?.count ?? 0) > 0
-    viewModel.sortRecentSession()
-    didRefreshTable()
+    if viewModel.stickTopConversations.count <= 0, viewModel.conversationListData.count <= 0 {
+      emptyView.isHidden = false
+    } else {
+      emptyView.isHidden = true
+    }
+    viewModel.conversationListData.sort()
+    viewModel.stickTopConversations.sort()
+    tableView.reloadData()
   }
 }

@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -15,7 +15,7 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     headerView = UserInfoHeaderView()
   }
 
-  override public init(user: NEKitUser?) {
+  override public init(user: NEUserWithFriend?) {
     super.init(user: user)
     initNormal()
   }
@@ -26,7 +26,7 @@ open class ContactUserViewController: NEBaseContactUserViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func commonUI() {

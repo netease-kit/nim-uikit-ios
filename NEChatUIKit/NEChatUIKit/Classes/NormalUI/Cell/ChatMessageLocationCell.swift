@@ -32,11 +32,19 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.text = chatLocalizable("no_map_plugin")
     label.textAlignment = .center
     label.textColor = UIColor.ne_greyText
+    label.isHidden = true
     return label
   }()
 
   public var mapViewLeft: UIView?
   let backgroundViewLeft = UIView()
+
+  public var mapImageViewLeft: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    return imageView
+  }()
 
   // Right
   public lazy var titleLabelRight: UILabel = {
@@ -64,11 +72,33 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     label.text = chatLocalizable("no_map_plugin")
     label.textAlignment = .center
     label.textColor = UIColor.ne_greyText
+    label.isHidden = true
     return label
+  }()
+
+  lazy var pointImageLeft: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = coreLoader.loadImage("location_point")
+    return imageView
+  }()
+
+  lazy var pointImageRight: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = coreLoader.loadImage("location_point")
+    return imageView
   }()
 
   public var mapViewRight: UIView?
   let backgroundViewRight = UIView()
+
+  public var mapImageViewRight: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    return imageView
+  }()
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -76,7 +106,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -126,33 +156,26 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
       subTitleLabelLeft.topAnchor.constraint(equalTo: titleLabelLeft.bottomAnchor, constant: 4),
     ])
 
-    if let map = NEChatKitClient.instance.delegate?.getCellMapView?() as? UIView {
-      mapViewLeft = map
-      backgroundViewLeft.addSubview(map)
-      map.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        map.leftAnchor.constraint(equalTo: backgroundViewLeft.leftAnchor),
-        map.bottomAnchor.constraint(equalTo: backgroundViewLeft.bottomAnchor),
-        map.rightAnchor.constraint(equalTo: backgroundViewLeft.rightAnchor),
-        map.topAnchor.constraint(equalTo: subTitleLabelLeft.bottomAnchor, constant: 4),
-      ])
+    backgroundViewLeft.addSubview(mapImageViewLeft)
+    NSLayoutConstraint.activate([
+      mapImageViewLeft.leftAnchor.constraint(equalTo: backgroundViewLeft.leftAnchor),
+      mapImageViewLeft.bottomAnchor.constraint(equalTo: backgroundViewLeft.bottomAnchor),
+      mapImageViewLeft.rightAnchor.constraint(equalTo: backgroundViewLeft.rightAnchor),
+      mapImageViewLeft.heightAnchor.constraint(equalToConstant: 86),
+    ])
 
-      let pointImage = UIImageView()
-      pointImage.translatesAutoresizingMaskIntoConstraints = false
-      pointImage.image = coreLoader.loadImage("location_point")
-      map.addSubview(pointImage)
-      NSLayoutConstraint.activate([
-        pointImage.centerXAnchor.constraint(equalTo: map.centerXAnchor),
-        pointImage.bottomAnchor.constraint(equalTo: map.bottomAnchor, constant: -30),
-      ])
-    } else {
-      backgroundViewLeft.addSubview(emptyLabelLeft)
-      NSLayoutConstraint.activate([
-        emptyLabelLeft.leftAnchor.constraint(equalTo: backgroundViewLeft.leftAnchor),
-        emptyLabelLeft.rightAnchor.constraint(equalTo: backgroundViewLeft.rightAnchor),
-        emptyLabelLeft.bottomAnchor.constraint(equalTo: backgroundViewLeft.bottomAnchor, constant: -40),
-      ])
-    }
+    mapImageViewLeft.addSubview(pointImageLeft)
+    NSLayoutConstraint.activate([
+      pointImageLeft.centerXAnchor.constraint(equalTo: mapImageViewLeft.centerXAnchor),
+      pointImageLeft.bottomAnchor.constraint(equalTo: mapImageViewLeft.bottomAnchor, constant: -30),
+    ])
+
+    backgroundViewLeft.addSubview(emptyLabelLeft)
+    NSLayoutConstraint.activate([
+      emptyLabelLeft.leftAnchor.constraint(equalTo: backgroundViewLeft.leftAnchor),
+      emptyLabelLeft.rightAnchor.constraint(equalTo: backgroundViewLeft.rightAnchor),
+      emptyLabelLeft.bottomAnchor.constraint(equalTo: backgroundViewLeft.bottomAnchor, constant: -40),
+    ])
   }
 
   open func commonUIRight() {
@@ -196,33 +219,26 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
       subTitleLabelRight.topAnchor.constraint(equalTo: titleLabelRight.bottomAnchor, constant: 4),
     ])
 
-    if let map = NEChatKitClient.instance.delegate?.getCellMapView?() as? UIView {
-      mapViewRight = map
-      backgroundViewRight.addSubview(map)
-      map.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        map.leftAnchor.constraint(equalTo: backgroundViewRight.leftAnchor),
-        map.bottomAnchor.constraint(equalTo: backgroundViewRight.bottomAnchor),
-        map.rightAnchor.constraint(equalTo: backgroundViewRight.rightAnchor),
-        map.topAnchor.constraint(equalTo: subTitleLabelRight.bottomAnchor, constant: 4),
-      ])
+    backgroundViewRight.addSubview(mapImageViewRight)
+    NSLayoutConstraint.activate([
+      mapImageViewRight.leftAnchor.constraint(equalTo: backgroundViewRight.leftAnchor),
+      mapImageViewRight.bottomAnchor.constraint(equalTo: backgroundViewRight.bottomAnchor),
+      mapImageViewRight.rightAnchor.constraint(equalTo: backgroundViewRight.rightAnchor),
+      mapImageViewRight.heightAnchor.constraint(equalToConstant: 86),
+    ])
 
-      let pointImage = UIImageView()
-      pointImage.translatesAutoresizingMaskIntoConstraints = false
-      pointImage.image = coreLoader.loadImage("location_point")
-      map.addSubview(pointImage)
-      NSLayoutConstraint.activate([
-        pointImage.centerXAnchor.constraint(equalTo: map.centerXAnchor),
-        pointImage.bottomAnchor.constraint(equalTo: map.bottomAnchor, constant: -30),
-      ])
-    } else {
-      backgroundViewRight.addSubview(emptyLabelRight)
-      NSLayoutConstraint.activate([
-        emptyLabelRight.leftAnchor.constraint(equalTo: backgroundViewRight.leftAnchor),
-        emptyLabelRight.rightAnchor.constraint(equalTo: backgroundViewRight.rightAnchor),
-        emptyLabelRight.bottomAnchor.constraint(equalTo: backgroundViewRight.bottomAnchor, constant: -40),
-      ])
-    }
+    mapImageViewRight.addSubview(pointImageRight)
+    NSLayoutConstraint.activate([
+      pointImageRight.centerXAnchor.constraint(equalTo: mapImageViewRight.centerXAnchor),
+      pointImageRight.bottomAnchor.constraint(equalTo: mapImageViewRight.bottomAnchor, constant: -30),
+    ])
+
+    backgroundViewRight.addSubview(emptyLabelRight)
+    NSLayoutConstraint.activate([
+      emptyLabelRight.leftAnchor.constraint(equalTo: backgroundViewRight.leftAnchor),
+      emptyLabelRight.rightAnchor.constraint(equalTo: backgroundViewRight.rightAnchor),
+      emptyLabelRight.bottomAnchor.constraint(equalTo: backgroundViewRight.bottomAnchor, constant: -40),
+    ])
   }
 
   override open func showLeftOrRight(showRight: Bool) {
@@ -235,16 +251,25 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     super.setModel(model, isSend)
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let subTitleLabel = isSend ? subTitleLabelRight : subTitleLabelLeft
-    let mapView = isSend ? mapViewRight : mapViewLeft
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
-
-    bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
+    let mapImageView = isSend ? mapImageViewRight : mapImageViewLeft
+    let emptyLabel = isSend ? emptyLabelRight : emptyLabelLeft
+    let pointImage = isSend ? pointImageRight : pointImageLeft
 
     if let m = model as? MessageLocationModel {
       titleLabel.text = m.title
       subTitleLabel.text = m.subTitle
-      if let lat = m.lat, let lng = m.lng, let map = mapView {
-        NEChatKitClient.instance.delegate?.setMapviewLocation?(lat: lat, lng: lng, mapview: map)
+      if let lat = m.lat, let lng = m.lng {
+        if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
+          NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
+          mapImageView.sd_setImage(with: URL(string: url))
+          emptyLabel.isHidden = true
+          pointImage.isHidden = false
+        } else {
+          mapImageView.image = UIImage.ne_imageNamed(name: "map_placeholder_image")
+          emptyLabel.isHidden = false
+          pointImage.isHidden = true
+        }
       }
     }
   }

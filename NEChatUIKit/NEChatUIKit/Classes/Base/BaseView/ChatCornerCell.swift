@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
+
 // this cell has rounding corner style
 import UIKit
 

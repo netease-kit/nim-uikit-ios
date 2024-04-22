@@ -5,7 +5,7 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 
 /*
      通讯录 section 数据模型

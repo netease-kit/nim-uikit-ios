@@ -12,14 +12,49 @@ enum IntroduceCellType: Int {
 }
 
 class VersionCell: UITableViewCell {
+  /// 标题
+  lazy var titleLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textColor = UIColor(hexString: "0x333333")
+    label.font = UIFont.systemFont(ofSize: 14)
+    return label
+  }()
+
+  /// 子标题
+  lazy var subTitleLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textColor = UIColor(hexString: "0x333333")
+    label.font = UIFont.systemFont(ofSize: 14)
+    label.isHidden = true
+    label.accessibilityIdentifier = "id.version"
+    return label
+  }()
+
+  /// 箭头图片
+  public lazy var arrowImageView: UIImageView = {
+    let imageView = UIImageView(image: UIImage(named: "arrow_right"))
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.isHidden = true
+    return imageView
+  }()
+
+  private lazy var bottomLine: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor(hexString: "0xDBE0E8")
+    return view
+  }()
+
   public var cellType: IntroduceCellType? {
     didSet {
       if cellType == .version {
-        subTitle.isHidden = false
-        arrow.isHidden = true
+        subTitleLabel.isHidden = false
+        arrowImageView.isHidden = true
       } else {
-        subTitle.isHidden = true
-        arrow.isHidden = false
+        subTitleLabel.isHidden = true
+        arrowImageView.isHidden = false
       }
     }
   }
@@ -43,8 +78,8 @@ class VersionCell: UITableViewCell {
 
   func setupSubviews() {
     contentView.addSubview(titleLabel)
-    contentView.addSubview(subTitle)
-    contentView.addSubview(arrow)
+    contentView.addSubview(subTitleLabel)
+    contentView.addSubview(arrowImageView)
     contentView.addSubview(bottomLine)
 
     NSLayoutConstraint.activate([
@@ -53,13 +88,13 @@ class VersionCell: UITableViewCell {
     ])
 
     NSLayoutConstraint.activate([
-      subTitle.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      subTitle.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      subTitleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      subTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
 
     NSLayoutConstraint.activate([
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
 
     NSLayoutConstraint.activate([
@@ -71,43 +106,11 @@ class VersionCell: UITableViewCell {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func configData(model: SettingCellModel) {
     titleLabel.text = model.cellName
-    subTitle.text = model.subTitle
+    subTitleLabel.text = model.subTitle
   }
-
-  lazy var titleLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = UIColor(hexString: "0x333333")
-    label.font = UIFont.systemFont(ofSize: 14)
-    return label
-  }()
-
-  lazy var subTitle: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = UIColor(hexString: "0x333333")
-    label.font = UIFont.systemFont(ofSize: 14)
-    label.isHidden = true
-    label.accessibilityIdentifier = "id.version"
-    return label
-  }()
-
-  public lazy var arrow: UIImageView = {
-    let imageView = UIImageView(image: UIImage(named: "arrow_right"))
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.isHidden = true
-    return imageView
-  }()
-
-  private lazy var bottomLine: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor(hexString: "0xDBE0E8")
-    return view
-  }()
 }

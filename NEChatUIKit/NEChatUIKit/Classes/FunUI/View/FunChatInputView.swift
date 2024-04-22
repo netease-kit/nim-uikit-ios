@@ -18,14 +18,6 @@ public protocol FunChatInputViewDelegate: NSObjectProtocol {
 
 @objcMembers
 open class FunChatInputView: NEBaseChatInputView {
-  /*
-   // Only override draw() if you perform custom drawing.
-   // An empty implementation adversely affects performance during animation.
-   override func draw(_ rect: CGRect) {
-       // Drawing code
-   }
-   */
-
   var replyViewTopConstraint: NSLayoutConstraint?
 
   weak var funDelegate: FunChatInputViewDelegate?
@@ -41,12 +33,12 @@ open class FunChatInputView: NEBaseChatInputView {
 //    public var textViewHeight: NSLayoutConstraint?
 
   public var replyBackView: UIView = {
-    let back = UIView()
-    back.translatesAutoresizingMaskIntoConstraints = false
-    back.layer.cornerRadius = 8.0
-    back.clipsToBounds = true
-    back.backgroundColor = UIColor.funChatInputReplyBg
-    return back
+    let backView = UIView()
+    backView.translatesAutoresizingMaskIntoConstraints = false
+    backView.layer.cornerRadius = 8.0
+    backView.clipsToBounds = true
+    backView.backgroundColor = UIColor.funChatInputReplyBg
+    return backView
   }()
 
   public lazy var replyLabel: UILabel = {
@@ -54,6 +46,7 @@ open class FunChatInputView: NEBaseChatInputView {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.backgroundColor = UIColor.clear
     label.numberOfLines = 2
+    label.accessibilityIdentifier = "id.messageReplyInput"
     return label
   }()
 
@@ -62,6 +55,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
     button.setImage(coreLoader.loadImage("fun_chat_input_reply_clear"), for: .normal)
+    button.accessibilityIdentifier = "id.clear"
     return button
   }()
 
@@ -71,6 +65,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.backgroundColor = UIColor.clear
     button.setImage(coreLoader.loadImage("fun_chat_input_change_record"), for: .normal)
     button.setImage(coreLoader.loadImage("fun_chat_input_keyboard"), for: .selected)
+    button.accessibilityIdentifier = "id.changeRecordMode"
     return button
   }()
 
@@ -80,6 +75,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.backgroundColor = UIColor.clear
     button.tag = addMoreBtnTag
     button.setImage(coreLoader.loadImage("fun_chat_input_show_more"), for: .normal)
+    button.accessibilityIdentifier = "id.inputMore"
     return button
   }()
 
@@ -89,6 +85,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.backgroundColor = UIColor.clear
     button.tag = addEmojBtnTag
     button.setImage(coreLoader.loadImage("fun_chat_input_show_emoj"), for: .normal)
+    button.accessibilityIdentifier = "id.inputEmoji"
     return button
   }()
 

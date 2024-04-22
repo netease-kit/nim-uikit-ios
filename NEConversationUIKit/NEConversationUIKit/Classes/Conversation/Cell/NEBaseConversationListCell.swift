@@ -8,9 +8,8 @@ import UIKit
 
 @objcMembers
 open class NEBaseConversationListCell: UITableViewCell {
-//  private var viewModel = ConversationViewModel()
   public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
-  private let repo = ConversationRepo.shared
+
   private var timeWidth: NSLayoutConstraint?
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -20,7 +19,7 @@ open class NEBaseConversationListCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func setupSubviews() {
@@ -29,16 +28,16 @@ open class NEBaseConversationListCell: UITableViewCell {
       backgroundColor = bgColor
     }
 
-    contentView.addSubview(headImge)
+    contentView.addSubview(headImageView)
     contentView.addSubview(redAngleView)
-    contentView.addSubview(title)
-    contentView.addSubview(subTitle)
+    contentView.addSubview(titleLabel)
+    contentView.addSubview(subTitleLabel)
     contentView.addSubview(timeLabel)
-    contentView.addSubview(notifyMsg)
+    contentView.addSubview(notifyMsgView)
 
     NSLayoutConstraint.activate([
-      redAngleView.centerXAnchor.constraint(equalTo: headImge.rightAnchor, constant: -8),
-      redAngleView.centerYAnchor.constraint(equalTo: headImge.topAnchor, constant: 8),
+      redAngleView.centerXAnchor.constraint(equalTo: headImageView.rightAnchor, constant: -8),
+      redAngleView.centerYAnchor.constraint(equalTo: headImageView.topAnchor, constant: 8),
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
     timeWidth = timeLabel.widthAnchor.constraint(equalToConstant: 0)
@@ -52,69 +51,89 @@ open class NEBaseConversationListCell: UITableViewCell {
     ])
 
     NSLayoutConstraint.activate([
-      subTitle.leftAnchor.constraint(equalTo: headImge.rightAnchor, constant: 12),
-      subTitle.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -50),
-      subTitle.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 6),
+      subTitleLabel.leftAnchor.constraint(equalTo: headImageView.rightAnchor, constant: 12),
+      subTitleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -50),
+      subTitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
     ])
   }
 
   func initSubviewsLayout() {}
 
-  open func configData(sessionModel: ConversationListModel?) {
+  /// 数据绑定UI
+  /// - Parameter sessionModel: 会话数据
+  open func configureData(_ sessionModel: NEConversationListModel?) {
     guard let conversationModel = sessionModel else { return }
-
-    if let userId = conversationModel.userInfo?.userId,
-       let user = ChatUserCache.getUserInfo(userId) {
-      conversationModel.userInfo = user
-    }
-
-    if conversationModel.recentSession?.session?.sessionType == .P2P {
+    if conversationModel.conversation?.type == .CONVERSATION_TYPE_P2P {
       // p2p head image
-      if let imageName = conversationModel.userInfo?.userInfo?.avatarUrl, !imageName.isEmpty {
-        headImge.setTitle("")
-        headImge.sd_setImage(with: URL(string: imageName), completed: nil)
-        headImge.backgroundColor = .clear
+      if let imageName = conversationModel.conversation?.avatar, !imageName.isEmpty {
+        headImageView.setTitle("")
+        headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
+        headImageView.backgroundColor = .clear
       } else {
-        headImge.setTitle(conversationModel.userInfo?.shortName(showAlias: false, count: 2) ?? "")
-        headImge.sd_setImage(with: nil, completed: nil)
-        headImge.backgroundColor = UIColor
-          .colorWithString(string: conversationModel.userInfo?.userId)
+        if let name = conversationModel.conversation?.shortName(count: 2) {
+          headImageView.setTitle(name)
+        } else if let conversationId = conversationModel.conversation?.conversationId {
+          // 截断长度
+          let count = 2
+          let showId = conversationId
+            .count > count ? String(conversationId[conversationId.index(conversationId.endIndex, offsetBy: -count)...]) : conversationId
+          headImageView.setTitle(showId)
+        }
+        headImageView.sd_setImage(with: nil, completed: nil)
+        if let cid = conversationModel.conversation?.conversationId, let uid = V2NIMConversationIdUtil.conversationTargetId(cid) {
+          headImageView.backgroundColor = UIColor
+            .colorWithString(string: uid)
+        }
       }
 
       // p2p nickName
-      title.text = conversationModel.userInfo?.showName()
-
-      // notifyForNewMsg
-//      notifyMsg.isHidden = viewModel
-//        .notifyForNewMsg(userId: conversationModel.userInfo?.userId)
-      notifyMsg.isHidden = repo.isNeedNotify(userId: conversationModel.userInfo?.userId)
-
-    } else if conversationModel.recentSession?.session?.sessionType == .team {
-      // team head image
-      if let imageName = conversationModel.teamInfo?.avatarUrl, !imageName.isEmpty {
-        headImge.setTitle("")
-        headImge.sd_setImage(with: URL(string: imageName), completed: nil)
-        headImge.backgroundColor = .clear
-      } else {
-        headImge.setTitle(conversationModel.teamInfo?.getShowName() ?? "")
-        headImge.sd_setImage(with: nil, completed: nil)
-        headImge.backgroundColor = UIColor
-          .colorWithString(string: conversationModel.teamInfo?.teamId)
+      if let name = conversationModel.conversation?.name, name.count > 0 {
+        titleLabel.text = conversationModel.conversation?.name
+      } else if let conversationId = conversationModel.conversation?.conversationId, let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
+        titleLabel.text = accountId
       }
-      title.text = conversationModel.teamInfo?.getShowName()
 
-      // notifyForNewMsg
-//      let teamNotifyState = viewModel
-//        .notifyStateForNewMsg(teamId: conversationModel.teamInfo?.teamId)
-      let teamNotifyState = repo.isNeedNotifyForTeam(teamId: conversationModel.teamInfo?.teamId)
-      notifyMsg.isHidden = teamNotifyState == .none ? false : true
+    } else if conversationModel.conversation?.type == .CONVERSATION_TYPE_TEAM {
+      // team head image
+      if let imageName = conversationModel.conversation?.avatar, !imageName.isEmpty {
+        headImageView.setTitle("")
+        headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
+        headImageView.backgroundColor = .clear
+      } else {
+        headImageView.setTitle(conversationModel.conversation?.name ?? "")
+        headImageView.sd_setImage(with: nil, completed: nil)
+        if let name = conversationModel.conversation?.shortName(count: 2) {
+          headImageView.setTitle(name)
+        } else if let conversationId = conversationModel.conversation?.conversationId {
+          // 截断长度
+          let count = 2
+          let showId = conversationId
+            .count > count ? String(conversationId[conversationId.index(conversationId.endIndex, offsetBy: -count)...]) : conversationId
+          headImageView.setTitle(showId)
+        }
+        if let cid = conversationModel.conversation?.conversationId, let uid = V2NIMConversationIdUtil.conversationTargetId(cid) {
+          headImageView.backgroundColor = UIColor
+            .colorWithString(string: uid)
+        }
+      }
+      titleLabel.text = conversationModel.conversation?.name
+      if let name = conversationModel.conversation?.name {
+        titleLabel.text = name
+      } else if let conversationId = conversationModel.conversation?.conversationId, let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
+        titleLabel.text = teamId
+      }
+    }
+
+    // notifyForNewMsg
+    if let mute = conversationModel.conversation?.mute {
+      notifyMsgView.isHidden = !mute
     }
 
     // last message
-    if let lastMessage = conversationModel.recentSession?.lastMessage {
-      let text = contentForRecentSession(message: lastMessage)
+    if let lastMessage = conversationModel.conversation?.lastMessage {
+      let text = contentForConversation(lastMessage: lastMessage)
       let mutaAttri = NSMutableAttributedString(string: text)
-      if let sessionId = sessionModel?.recentSession?.session?.sessionId {
+      if let sessionId = conversationModel.conversation?.conversationId {
         let isAtMessage = NEAtMessageManager.instance?.isAtCurrentUser(sessionId: sessionId)
         if isAtMessage == true {
           let atStr = localizable("you_were_mentioned")
@@ -123,17 +142,17 @@ open class NEBaseConversationListCell: UITableViewCell {
           mutaAttri.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemContentSize : 13), range: NSMakeRange(0, mutaAttri.length))
         }
       }
-      subTitle.attributedText = mutaAttri // contentForRecentSession(message: lastMessage)
+      subTitleLabel.attributedText = mutaAttri
     } else {
-      subTitle.attributedText = nil
+      subTitleLabel.attributedText = nil
     }
 
     // unRead message count
-    if let unReadCount = conversationModel.recentSession?.unreadCount {
+    if let unReadCount = conversationModel.conversation?.unreadCount {
       if unReadCount <= 0 {
         redAngleView.isHidden = true
       } else {
-        redAngleView.isHidden = notifyMsg.isHidden ? false : true
+        redAngleView.isHidden = notifyMsgView.isHidden ? false : true
         if unReadCount <= 99 {
           redAngleView.text = "\(unReadCount)"
         } else {
@@ -143,10 +162,10 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
 
     // time
-    if let rencentSession = conversationModel.recentSession {
+    if let time = conversationModel.conversation?.lastMessage?.messageRefer.createTime {
       timeLabel
         .text =
-        dealTime(time: timestampDescriptionForRecentSession(recentSession: rencentSession))
+        dealTime(time: time)
       if let text = timeLabel.text {
         let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
         let attibutes = [NSAttributedString.Key.font: timeLabel.font]
@@ -188,14 +207,14 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
   }
 
-  open func contentForRecentSession(message: NIMMessage) -> String {
-    let text = NEMessageUtil.messageContent(message: message)
+  open func contentForConversation(lastMessage: V2NIMLastMessage) -> String {
+    let text = NEMessageUtil.messageContent(lastMessage.messageType, lastMessage.text, lastMessage.attachment)
     return text
   }
 
   // MARK: lazy Method
 
-  public lazy var headImge: NEUserHeaderView = {
+  public lazy var headImageView: NEUserHeaderView = {
     let headView = NEUserHeaderView(frame: .zero)
     headView.titleLabel.textColor = .white
     headView.titleLabel.font = NEConstant.defaultTextFont(14)
@@ -221,7 +240,7 @@ open class NEBaseConversationListCell: UITableViewCell {
   }()
 
   // 会话列表会话名称
-  public lazy var title: UILabel = {
+  public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.conversationProperties.itemTitleColor
@@ -232,7 +251,7 @@ open class NEBaseConversationListCell: UITableViewCell {
   }()
 
   // 会话列表外露消息
-  public lazy var subTitle: UILabel = {
+  public lazy var subTitleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEKitConversationConfig.shared.ui.conversationProperties.itemContentColor
@@ -253,12 +272,12 @@ open class NEBaseConversationListCell: UITableViewCell {
   }()
 
   // 免打扰icon
-  public lazy var notifyMsg: UIImageView = {
-    let notify = UIImageView()
-    notify.translatesAutoresizingMaskIntoConstraints = false
-    notify.image = UIImage.ne_imageNamed(name: "noNeed_notify")
-    notify.isHidden = true
-    notify.accessibilityIdentifier = "id.mute"
-    return notify
+  public lazy var notifyMsgView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = UIImage.ne_imageNamed(name: "noNeed_notify")
+    imageView.isHidden = true
+    imageView.accessibilityIdentifier = "id.mute"
+    return imageView
   }()
 }

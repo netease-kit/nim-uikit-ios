@@ -17,13 +17,13 @@ open class ContactsSelectedViewController: NEBaseContactsSelectedViewController 
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupUI() {
     super.setupUI()
 
-    collection.register(
+    collectionView.register(
       ContactUnCheckCell.self,
       forCellWithReuseIdentifier: "\(NSStringFromClass(ContactUnCheckCell.self))"
     )
@@ -34,8 +34,8 @@ open class ContactsSelectedViewController: NEBaseContactsSelectedViewController 
     super.setupNavRightItem()
     navigationView.moreButton.backgroundColor = .white
     navigationView.moreButton.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
-    sureBtn.backgroundColor = .white
-    sureBtn.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
+    sureButton.backgroundColor = .white
+    sureButton.setTitleColor(UIColor(hexString: "337EFF"), for: .normal)
   }
 
   override open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

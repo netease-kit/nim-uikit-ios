@@ -26,7 +26,7 @@ open class ChatRecordView: UIView, UIGestureRecognizerDelegate {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func commonUI() {
@@ -35,6 +35,7 @@ open class ChatRecordView: UIView, UIGestureRecognizerDelegate {
     topTipLabel.font = UIFont.systemFont(ofSize: 12)
     topTipLabel.textColor = .ne_lightText
     topTipLabel.textAlignment = .center
+    topTipLabel.isHidden = true // 不展示
     addSubview(topTipLabel)
     NSLayoutConstraint.activate([
       topTipLabel.topAnchor.constraint(equalTo: topAnchor, constant: 0),

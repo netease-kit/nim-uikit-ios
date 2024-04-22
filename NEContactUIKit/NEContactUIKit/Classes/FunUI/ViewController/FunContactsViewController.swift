@@ -2,7 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECommonUIKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -12,7 +13,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.searchBotton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
-    view.searchBotton.setTitle(localizable("search"), for: .normal)
+    view.searchBotton.setTitle(commonLocalizable("search"), for: .normal)
     return view
   }()
 
@@ -61,7 +62,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
 
   deinit {
     if let searchViewGestures = searchView.gestureRecognizers {
-      searchViewGestures.forEach { gesture in
+      for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
       }
     }
@@ -90,7 +91,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    cellRegisterDic.forEach { (key: Int, value: NEBaseContactTableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
 
@@ -100,7 +101,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    var reusedId = "\(info.contactCellType)"
+    let reusedId = "\(info.contactCellType)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
 
     if let c = cell as? FunContactTableViewCell {

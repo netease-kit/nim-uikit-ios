@@ -51,14 +51,14 @@ public class ConversationUIConfig: NSObject {
   /// 会话列表 cell 左划置顶按钮背景颜色
   public var stickTopBottonBackgroundColor: UIColor?
   /// 会话列表 cell 左划置顶按钮点击事件
-  public var stickTopBottonClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var stickTopBottonClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表 cell 左划删除按钮文案内容
   public var deleteBottonTitle = localizable("delete")
   /// 会话列表 cell 左划删除按钮背景颜色
   public var deleteBottonBackgroundColor: UIColor?
   /// 会话列表 cell 左划删除按钮点击事件
-  public var deleteBottonClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var deleteBottonClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 标题栏左侧按钮点击事件
   public var titleBarLeftClick: (() -> Void)?
@@ -70,7 +70,7 @@ public class ConversationUIConfig: NSObject {
   public var titleBarRight2Click: (() -> Void)?
 
   /// 会话列表点击事件
-  public var itemClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var itemClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表的视图控制器回调，回调中会返回会话列表的视图控制器
   public var customController: ((NEBaseConversationController) -> Void)?

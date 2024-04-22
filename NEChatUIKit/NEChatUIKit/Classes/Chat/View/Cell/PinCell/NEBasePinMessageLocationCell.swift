@@ -31,7 +31,16 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
     label.text = chatLocalizable("no_map_plugin")
     label.textAlignment = .center
     label.textColor = UIColor.ne_greyText
+    label.isHidden = true
     return label
+  }()
+
+  let pointImageView = UIImageView()
+
+  public lazy var mapImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    return imageView
   }()
 
   var mapView: UIView?
@@ -58,79 +67,82 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
   override open func setupUI() {
     super.setupUI()
 
-    let back = UIView()
-    back.backgroundColor = UIColor.white
-    contentView.addSubview(back)
-    back.translatesAutoresizingMaskIntoConstraints = false
-    back.clipsToBounds = true
-    back.layer.cornerRadius = 4
-    back.layer.borderWidth = 1
-    back.layer.borderColor = UIColor.ne_outlineColor.cgColor
+    let contentBackView = UIView()
+    contentBackView.backgroundColor = UIColor.white
+    contentView.addSubview(contentBackView)
+    contentBackView.translatesAutoresizingMaskIntoConstraints = false
+    contentBackView.clipsToBounds = true
+    contentBackView.layer.cornerRadius = 4
+    contentBackView.layer.borderWidth = 1
+    contentBackView.layer.borderColor = UIColor.ne_outlineColor.cgColor
 
-    backView.addSubview(back)
-    contentWidth = back.widthAnchor.constraint(equalToConstant: chat_content_maxW)
-    contentHeight = back.heightAnchor.constraint(equalToConstant: chat_content_maxW)
+    backView.addSubview(contentBackView)
+    contentWidth = contentBackView.widthAnchor.constraint(equalToConstant: chat_content_maxW)
+    contentHeight = contentBackView.heightAnchor.constraint(equalToConstant: chat_content_maxW)
     NSLayoutConstraint.activate([
       contentWidth!,
       contentHeight!,
-      back.leftAnchor.constraint(equalTo: headerView.leftAnchor),
-      back.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 12),
+      contentBackView.leftAnchor.constraint(equalTo: headerView.leftAnchor),
+      contentBackView.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 12),
     ])
 
-    back.addSubview(locationTitleLabel)
+    contentBackView.addSubview(locationTitleLabel)
     NSLayoutConstraint.activate([
-      locationTitleLabel.leftAnchor.constraint(equalTo: back.leftAnchor, constant: 16),
-      locationTitleLabel.rightAnchor.constraint(equalTo: back.rightAnchor, constant: -16),
-      locationTitleLabel.topAnchor.constraint(equalTo: back.topAnchor, constant: 10),
+      locationTitleLabel.leftAnchor.constraint(equalTo: contentBackView.leftAnchor, constant: 16),
+      locationTitleLabel.rightAnchor.constraint(equalTo: contentBackView.rightAnchor, constant: -16),
+      locationTitleLabel.topAnchor.constraint(equalTo: contentBackView.topAnchor, constant: 10),
     ])
 
-    back.addSubview(subTitleLabel)
+    contentBackView.addSubview(subTitleLabel)
     NSLayoutConstraint.activate([
       subTitleLabel.leftAnchor.constraint(equalTo: locationTitleLabel.leftAnchor),
       subTitleLabel.rightAnchor.constraint(equalTo: locationTitleLabel.rightAnchor),
       subTitleLabel.topAnchor.constraint(equalTo: locationTitleLabel.bottomAnchor, constant: 4),
     ])
 
-    if let map = NEChatKitClient.instance.delegate?.getCellMapView?() as? UIView {
-      mapView = map
-      back.addSubview(map)
-      map.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        map.leftAnchor.constraint(equalTo: back.leftAnchor),
-        map.bottomAnchor.constraint(equalTo: back.bottomAnchor),
-        map.rightAnchor.constraint(equalTo: back.rightAnchor),
-        map.topAnchor.constraint(equalTo: subTitleLabel.bottomAnchor, constant: 4),
-      ])
+    contentBackView.addSubview(mapImageView)
+    NSLayoutConstraint.activate([
+      mapImageView.leftAnchor.constraint(equalTo: contentBackView.leftAnchor),
+      mapImageView.bottomAnchor.constraint(equalTo: contentBackView.bottomAnchor),
+      mapImageView.rightAnchor.constraint(equalTo: contentBackView.rightAnchor),
+      mapImageView.topAnchor.constraint(equalTo: subTitleLabel.bottomAnchor, constant: 4),
+    ])
 
-      let pointImage = UIImageView()
-      pointImage.translatesAutoresizingMaskIntoConstraints = false
-      pointImage.image = coreLoader.loadImage("location_point")
-      map.addSubview(pointImage)
-      NSLayoutConstraint.activate([
-        pointImage.centerXAnchor.constraint(equalTo: map.centerXAnchor),
-        pointImage.bottomAnchor.constraint(equalTo: map.bottomAnchor, constant: -30),
-      ])
-    } else {
-      back.addSubview(emptyLabel)
-      NSLayoutConstraint.activate([
-        emptyLabel.leftAnchor.constraint(equalTo: back.leftAnchor),
-        emptyLabel.rightAnchor.constraint(equalTo: back.rightAnchor),
-        emptyLabel.bottomAnchor.constraint(equalTo: back.bottomAnchor, constant: -40),
-      ])
-    }
-    mapView?.isUserInteractionEnabled = false
+    pointImageView.translatesAutoresizingMaskIntoConstraints = false
+    pointImageView.image = coreLoader.loadImage("location_point")
+    mapImageView.addSubview(pointImageView)
+    NSLayoutConstraint.activate([
+      pointImageView.centerXAnchor.constraint(equalTo: mapImageView.centerXAnchor),
+      pointImageView.bottomAnchor.constraint(equalTo: mapImageView.bottomAnchor, constant: -30),
+    ])
+
+    contentBackView.addSubview(emptyLabel)
+    NSLayoutConstraint.activate([
+      emptyLabel.leftAnchor.constraint(equalTo: contentBackView.leftAnchor),
+      emptyLabel.rightAnchor.constraint(equalTo: contentBackView.rightAnchor),
+      emptyLabel.bottomAnchor.constraint(equalTo: contentBackView.bottomAnchor, constant: -40),
+    ])
+
     if let gesture = contentGesture {
-      back.addGestureRecognizer(gesture)
+      contentBackView.addGestureRecognizer(gesture)
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
     if let m = item.chatmodel as? MessageLocationModel {
       locationTitleLabel.text = m.title
       subTitleLabel.text = m.subTitle
-      if let lat = m.lat, let lng = m.lng, let map = mapView {
-        NEChatKitClient.instance.delegate?.setMapviewLocation?(lat: lat, lng: lng, mapview: map)
+      if let lat = m.lat, let lng = m.lng {
+        if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
+          NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
+          mapImageView.sd_setImage(with: URL(string: url))
+          emptyLabel.isHidden = true
+          pointImageView.isHidden = false
+        } else {
+          emptyLabel.isHidden = false
+          pointImageView.isHidden = true
+        }
       }
     }
   }

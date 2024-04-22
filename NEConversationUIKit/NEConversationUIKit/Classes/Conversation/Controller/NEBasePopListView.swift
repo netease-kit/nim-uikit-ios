@@ -21,10 +21,11 @@ open class PopListItem: NSObject {
 @objcMembers
 open class NEBasePopListView: UIView {
   public let shadowView = UIView()
+  public let popView = UIView()
+
   public var buttonHeight: CGFloat = 32.0
-  let popView = UIView()
   public var popViewWidth: CGFloat = 122.0
-  var popViewHeight: CGFloat = 0
+  public var popViewHeight: CGFloat = 0
   public var popViewRadius: CGFloat = 8.0
   public var topConstant: CGFloat = 0
 
@@ -45,7 +46,7 @@ open class NEBasePopListView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func setupUI() {

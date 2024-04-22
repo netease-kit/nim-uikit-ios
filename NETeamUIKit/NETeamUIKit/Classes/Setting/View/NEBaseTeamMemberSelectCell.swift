@@ -16,17 +16,17 @@ open class NEBaseTeamMemberSelectCell: UITableViewCell {
     return imageView
   }()
 
-  lazy var headerView: NEUserHeaderView = {
-    let header = NEUserHeaderView(frame: .zero)
-    header.titleLabel.font = NEConstant.defaultTextFont(14)
-    header.titleLabel.textColor = UIColor.white
-    header.clipsToBounds = true
-    header.translatesAutoresizingMaskIntoConstraints = false
-    header.accessibilityIdentifier = "id.avatar"
-    return header
+  public lazy var headerView: NEUserHeaderView = {
+    let headerView = NEUserHeaderView(frame: .zero)
+    headerView.titleLabel.font = NEConstant.defaultTextFont(14)
+    headerView.titleLabel.textColor = UIColor.white
+    headerView.clipsToBounds = true
+    headerView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.accessibilityIdentifier = "id.avatar"
+    return headerView
   }()
 
-  lazy var nameLabel: UILabel = {
+  public lazy var nameLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
@@ -53,13 +53,13 @@ open class NEBaseTeamMemberSelectCell: UITableViewCell {
 
   open func configureMember(_ model: NESelectTeamMember?) {
     checkImageView.isHighlighted = model?.isSelected ?? false
-    if let url = model?.member?.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
+    if let url = model?.member?.nimUser?.user?.avatar, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {
       headerView.image = nil
       headerView.setTitle(model?.member?.showNickInTeam() ?? "")
-      headerView.backgroundColor = UIColor.colorWithString(string: model?.member?.nimUser?.userId)
+      headerView.backgroundColor = UIColor.colorWithString(string: model?.member?.nimUser?.user?.accountId)
     }
     nameLabel.text = model?.member?.atNameInTeam()
   }

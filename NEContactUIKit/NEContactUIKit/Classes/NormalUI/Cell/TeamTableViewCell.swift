@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class TeamTableViewCell: NEBaseTeamTableViewCell {
   override func commonUI() {
     super.commonUI()
-    avatarImage.layer.cornerRadius = 21
+    avatarImageView.layer.cornerRadius = 21
 
     titleLabel.font = UIFont.systemFont(ofSize: 16)
     titleLabel.textColor = UIColor(

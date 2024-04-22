@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 /// 头像枚举类型
 @objc public enum NEContactAvatarType: Int {
   case rectangle = 1 // 矩形

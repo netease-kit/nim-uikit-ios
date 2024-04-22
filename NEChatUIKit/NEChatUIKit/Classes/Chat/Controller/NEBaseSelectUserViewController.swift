@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
-public typealias DidSelectedAtRow = (_ index: Int, _ model: ChatTeamMemberInfoModel?) -> Void
+public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoModel?) -> Void
 
 @objcMembers
 open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDelegate,
@@ -16,8 +16,9 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
   public var sessionId: String
   public var viewModel = TeamMemberSelectVM()
   public var selectedBlock: DidSelectedAtRow?
-  var teamInfo: ChatTeamInfoModel?
-  private var showSelf = true // 是否展示自己
+  var teamInfo: NETeamInfoModel?
+  //// 是否展示自己
+  private var showSelf = true
   var className = "SelectUserViewController"
   var isShowAtAll = true
 
@@ -28,7 +29,9 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    sessionId = ""
+    showSelf = true
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -39,28 +42,29 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
     loadData()
   }
 
+  /// UI 内容初始化以及布局
   func commonUI() {
-    let btn = UIButton(type: .custom)
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.accessibilityIdentifier = "id.arrowDown"
-    btn.setImage(UIImage.ne_imageNamed(name: "arrowDown"), for: .normal)
-    btn.addTarget(self, action: #selector(btnEvent), for: .touchUpInside)
-    view.addSubview(btn)
+    let button = UIButton(type: .custom)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.accessibilityIdentifier = "id.arrowDown"
+    button.setImage(UIImage.ne_imageNamed(name: "arrowDown"), for: .normal)
+    button.addTarget(self, action: #selector(btnEvent), for: .touchUpInside)
+    view.addSubview(button)
 
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        btn.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
-        btn.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-        btn.widthAnchor.constraint(equalToConstant: 50),
-        btn.heightAnchor.constraint(equalToConstant: 50),
+        button.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
+        button.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+        button.widthAnchor.constraint(equalToConstant: 50),
+        button.heightAnchor.constraint(equalToConstant: 50),
       ])
     } else {
       // Fallback on earlier versions
       NSLayoutConstraint.activate([
-        btn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-        btn.topAnchor.constraint(equalTo: view.topAnchor),
-        btn.widthAnchor.constraint(equalToConstant: 50),
-        btn.heightAnchor.constraint(equalToConstant: 50),
+        button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+        button.topAnchor.constraint(equalTo: view.topAnchor),
+        button.widthAnchor.constraint(equalToConstant: 50),
+        button.heightAnchor.constraint(equalToConstant: 50),
       ])
     }
 
@@ -78,6 +82,7 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
       label.heightAnchor.constraint(equalToConstant: 50),
     ])
 
+    /// 内容列表
     tableView.delegate = self
     tableView.dataSource = self
     tableView.sectionHeaderHeight = 0
@@ -108,7 +113,7 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
 
   func loadData() {
     viewModel.fetchTeamMembers(sessionId: sessionId) { [weak self] error, team in
-      NELog.infoLog(
+      NEALog.infoLog(
         ModuleName + " " + (self?.className ?? "SelectUserViewController"),
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")
       )
@@ -119,32 +124,33 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
 
       // 人员选择页面移除自己
       var selfIndex = -1
-      if !(self?.showSelf ?? true),
-         let users = team?.users {
+      if !(self?.showSelf ?? true), let users = team?.users {
         for (index, user) in users.enumerated() {
-          if let u = team?.users[index].nimUser {
-            ChatUserCache.updateUserInfo(u)
-          }
-          if user.nimUser?.userId == IMKitLoginManager.instance.currentAccount() {
-            if user.teamMember?.type != .manager, let custom = team?.team?.clientCustomInfo, custom.count > 0, let json = getDictionaryFromJSONString(custom), let atValue = json[keyAllowAtAll] as? String, atValue == allowAtManagerValue {
+          if user.nimUser?.user?.accountId == IMKitClient.instance.account() {
+            if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
+               let custom = team?.team?.serverExtension, custom.count > 0,
+               let json = getDictionaryFromJSONString(custom),
+               let atValue = json[keyAllowAtAll] as? String, atValue == allowAtManagerValue {
               self?.isShowAtAll = false
             }
             selfIndex = index
           }
         }
-        team?.users.remove(at: selfIndex)
+        if selfIndex >= 0 {
+          team?.users.remove(at: selfIndex)
+        }
       }
 
       // 根据身份+进群时间正序排序
       if let users = team?.users {
-        var owner: ChatTeamMemberInfoModel? // 群主
-        var managers = [ChatTeamMemberInfoModel]() // 管理员
-        var normals = [ChatTeamMemberInfoModel]() // 普通成员
+        var owner: NETeamMemberInfoModel? // 群主
+        var managers = [NETeamMemberInfoModel]() // 管理员
+        var normals = [NETeamMemberInfoModel]() // 普通成员
 
         for user in users {
-          if user.teamMember?.type == .owner {
+          if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_OWNER {
             owner = user
-          } else if user.teamMember?.type == .manager {
+          } else if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
             managers.append(user)
           } else {
             normals.append(user)
@@ -152,11 +158,11 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
         }
 
         managers.sort(by: { m1, m2 in
-          (m1.teamMember?.createTime ?? 0) < (m2.teamMember?.createTime ?? 0)
+          (m1.teamMember?.joinTime ?? 0) < (m2.teamMember?.joinTime ?? 0)
         })
 
         normals.sort(by: { m1, m2 in
-          (m1.teamMember?.createTime ?? 0) < (m2.teamMember?.createTime ?? 0)
+          (m1.teamMember?.joinTime ?? 0) < (m2.teamMember?.joinTime ?? 0)
         })
 
         if let owner = owner {

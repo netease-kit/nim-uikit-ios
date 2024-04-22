@@ -4,25 +4,26 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class TextWithRightArrowCell: ContactBaseTextCell {
-  public var arrowImage = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
+  public var arrowImageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    arrowImage.translatesAutoresizingMaskIntoConstraints = false
-    arrowImage.contentMode = .center
-    contentView.addSubview(arrowImage)
+    arrowImageView.translatesAutoresizingMaskIntoConstraints = false
+    arrowImageView.contentMode = .center
+    contentView.addSubview(arrowImageView)
     NSLayoutConstraint.activate([
-      arrowImage.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      arrowImage.widthAnchor.constraint(equalToConstant: 20),
-      arrowImage.heightAnchor.constraint(equalToConstant: 20),
-      arrowImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      arrowImageView.widthAnchor.constraint(equalToConstant: 20),
+      arrowImageView.heightAnchor.constraint(equalToConstant: 20),
+      arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func setModel(model: UserItem) {

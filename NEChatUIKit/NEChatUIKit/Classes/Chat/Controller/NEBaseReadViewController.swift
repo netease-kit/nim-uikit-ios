@@ -3,8 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
@@ -15,18 +16,24 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
   public var line: UIView = .init()
   public var lineLeftCons: NSLayoutConstraint?
   public var readTableView = UITableView(frame: .zero, style: .plain)
-  public var readUsers = [NEKitUser]()
-  public var unReadUsers = [NEKitUser]()
+  public var readUsers = [NETeamMemberInfoModel]()
+  public var unReadUsers = [NETeamMemberInfoModel]()
   public let readButton = UIButton(type: .custom)
   public let unreadButton = UIButton(type: .custom)
-  private var message: NIMMessage
-  init(message: NIMMessage) {
+  private var message: V2NIMMessage
+  private var teamId: String
+  private let chatRepo = ChatRepo.shared
+  private let contactRepo = ContactRepo.shared
+  init(message: V2NIMMessage, teamId: String) {
     self.message = message
+    self.teamId = teamId
     super.init(nibName: nil, bundle: nil)
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    message = V2NIMMessage()
+    teamId = ""
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -51,7 +58,7 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
     unreadButton.setTitleColor(UIColor.ne_darkText, for: .normal)
     unreadButton.translatesAutoresizingMaskIntoConstraints = false
     unreadButton.addTarget(self, action: #selector(unreadButtonEvent), for: .touchUpInside)
-    readButton.accessibilityIdentifier = "id.tabUnRead"
+    unreadButton.accessibilityIdentifier = "id.tabUnRead"
 
     view.addSubview(readButton)
     NSLayoutConstraint.activate([
@@ -164,11 +171,12 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
     }
   }
 
-  func loadData(message: NIMMessage) {
-    NIMSDK.shared().chatManager.queryMessageReceiptDetail(message) { anError, receiptInfo in
-      print("anError:\(anError) receiptInfo:\(receiptInfo)")
-      if let error = anError as? NSError {
-        if error.code == noNetworkCode {
+  func loadData(message: V2NIMMessage) {
+    chatRepo.getTeamMessageReceiptDetail(message: message, memberAccountIds: []) { readReceiptDetail, error in
+      guard let readReceiptDetail = readReceiptDetail else { return }
+      let group = DispatchGroup()
+      if let error = error as? NSError {
+        if error.code == protocolSendFailed {
           self.showToast(commonLocalizable("network_error"))
         } else {
           self.showToast(error.localizedDescription)
@@ -176,29 +184,39 @@ open class NEBaseReadViewController: ChatBaseViewController, UIScrollViewDelegat
         return
       }
 
-      for userId in receiptInfo?.readUserIds ?? [] {
-        if let uId = userId as? String,
-           let user = UserInfoProvider.shared.getUserInfo(userId: uId) {
-          self.readUsers.append(user)
+      self.readButton.setTitle("已读 (" + "\(readReceiptDetail.readAccountList.count)" + ")", for: .normal)
+      self.unreadButton.setTitle("未读 (" + "\(readReceiptDetail.unreadAccountList.count)" + ")", for: .normal)
+
+      // 加载用户信息
+      let loadUserIds = readReceiptDetail.readAccountList + readReceiptDetail.unreadAccountList
+      group.enter()
+      ChatTeamCache.shared.loadShowName(userIds: loadUserIds, teamId: self.teamId) {
+        // 已读用户
+        for userId in readReceiptDetail.readAccountList {
+          if let memberInfo = ChatTeamCache.shared.getTeamMemberInfo(accountId: userId) {
+            self.readUsers.append(memberInfo)
+          }
         }
+
+        // 未读用户
+        for userId in readReceiptDetail.unreadAccountList {
+          if let memberInfo = ChatTeamCache.shared.getTeamMemberInfo(accountId: userId) {
+            self.unReadUsers.append(memberInfo)
+          }
+        }
+
+        group.leave()
       }
 
-      for userId in receiptInfo?.unreadUserIds ?? [] {
-        if let uId = userId as? String,
-           let user = UserInfoProvider.shared.getUserInfo(userId: uId) {
-          self.unReadUsers.append(user)
+      group.notify(queue: .main) {
+        self.readTableView.reloadData()
+        if self.read, self.readUsers.count == 0 {
+          self.readTableView.isHidden = true
+          self.emptyView.isHidden = false
+        } else {
+          self.readTableView.isHidden = false
+          self.emptyView.isHidden = true
         }
-      }
-      self.readButton.setTitle("已读 (" + "\(self.readUsers.count)" + ")", for: .normal)
-      self.unreadButton.setTitle("未读 (" + "\(self.unReadUsers.count)" + ")", for: .normal)
-      self.readTableView.reloadData()
-
-      if self.read, self.readUsers.count == 0 {
-        self.readTableView.isHidden = true
-        self.emptyView.isHidden = false
-      } else {
-        self.readTableView.isHidden = false
-        self.emptyView.isHidden = true
       }
     }
   }

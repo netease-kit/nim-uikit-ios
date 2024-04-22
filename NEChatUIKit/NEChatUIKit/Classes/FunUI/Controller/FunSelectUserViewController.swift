@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
@@ -15,7 +15,7 @@ open class FunSelectUserViewController: NEBaseSelectUserViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func commonUI() {

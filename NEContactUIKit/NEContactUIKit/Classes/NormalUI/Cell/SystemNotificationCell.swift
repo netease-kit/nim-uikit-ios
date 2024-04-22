@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -13,11 +13,11 @@ import UIKit
 open class SystemNotificationCell: NEBaseSystemNotificationCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImage.layer.cornerRadius = 18
+    avatarImageView.layer.cornerRadius = 18
     NSLayoutConstraint.activate([
-      avatarImage.widthAnchor.constraint(equalToConstant: 36),
-      avatarImage.heightAnchor.constraint(equalToConstant: 36),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 }

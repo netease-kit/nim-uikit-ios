@@ -14,7 +14,7 @@ import SDWebImageWebPCoder
 open class ChatRouter: NSObject {
   public static func setupInit() {
     NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
-    NIMKitFileLocationHelper.setStaticUserId(NIMSDK.shared().loginManager.currentAccount())
+    NIMKitFileLocationHelper.setStaticUserId(IMKitClient.instance.account())
     let webpCoder = SDImageWebPCoder()
     SDImageCodersManager.shared.addCoder(webpCoder)
     let svgCoder = SDImageSVGKCoder.shared

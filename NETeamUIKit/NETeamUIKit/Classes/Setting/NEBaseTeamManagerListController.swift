@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NECommonKit
 import NECommonUIKit
 import UIKit
 
@@ -12,23 +13,24 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
 
   let viewmodel = TeamManagerListViewModel()
 
-  public lazy var contentTable: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.keyboardDismissMode = .onDrag
-    table.sectionHeaderHeight = 12.0
-    table
+  /// 内容视图
+  public lazy var contentTableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
+    tableView.sectionHeaderHeight = 12.0
+    tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
   public var cellClassDic = [Int: UITableViewCell.Type]() // key 值为 table section 值
@@ -52,16 +54,16 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
         }
       }
     }
-    view.addSubview(contentTable)
+    view.addSubview(contentTableView)
     NSLayoutConstraint.activate([
-      contentTable.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-      contentTable.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-      contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-      contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+      contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+      contentTableView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+      contentTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      contentTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
     ])
 
-    cellClassDic.forEach { (key: Int, value: UITableViewCell.Type) in
-      contentTable.register(value, forCellReuseIdentifier: "\(key)")
+    for (key, value) in cellClassDic {
+      contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
 
@@ -88,14 +90,14 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
     if indexPath.section == 1 {
       let model = viewmodel.managers[indexPath.row]
       if let user = model.nimUser {
-        if IMKitClient.instance.isMySelf(user.userId) {
+        if IMKitClient.instance.isMe(user.user?.accountId) {
           Router.shared.use(
             MeSettingRouter,
             parameters: ["nav": navigationController as Any],
             closure: nil
           )
         } else {
-          if let uid = user.userId {
+          if let uid = user.user?.accountId {
             Router.shared.use(
               ContactUserInfoPageRouter,
               parameters: ["nav": navigationController as Any, "uid": uid],
@@ -107,17 +109,17 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
     }
   }
 
-  open func didAddManagers(_ managers: [TeamMemberInfoModel]) {
+  open func didAddManagers(_ managers: [NETeamMemberInfoModel]) {
     if let tid = teamId {
       var uids = [String]()
-      managers.forEach { member in
-        if let uid = member.nimUser?.userId {
+      for member in managers {
+        if let uid = member.nimUser?.user?.accountId {
           uids.append(uid)
         }
       }
       viewmodel.addTeamManager(tid, uids) { [weak self] error in
-        if let err = error {
-          self?.view.makeToast(err.localizedDescription)
+        if error != nil {
+          self?.view.makeToast(localizable("failed_operation"))
         } else {
           self?.viewmodel.managers.insert(contentsOf: managers, at: 0)
           self?.sortAndReloadData()
@@ -126,12 +128,20 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
     }
   }
 
-  func didClickRemoveButton(_ model: TeamMemberInfoModel?, _ index: Int) {
+  func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
     print("did click remove button")
     weak var weakSelf = self
     // let content = String(format: localizable("confirm_delete_text"), model?.atNameInTeam() ?? "") + localizable("question_mark")
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
     showAlert(title: localizable("remove_manager_title"), message: localizable("remove_manager_tip")) {
-      if let tid = weakSelf?.teamId, let uid = model?.nimUser?.userId {
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.showToast(commonLocalizable("network_error"))
+        return
+      }
+      if let tid = weakSelf?.teamId, let uid = model?.nimUser?.user?.accountId {
         weakSelf?.viewmodel.removeTeamManager(tid, [uid]) { error in
           if let err = error {
             weakSelf?.view.makeToast(err.localizedDescription)
@@ -148,8 +158,8 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
 
   open func getFilters() -> Set<String> {
     var filters = Set<String>()
-    viewmodel.managers.forEach { model in
-      if let uid = model.nimUser?.userId {
+    for model in viewmodel.managers {
+      if let uid = model.nimUser?.user?.accountId {
         filters.insert(uid)
       }
     }
@@ -159,12 +169,12 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
   open func sortAndReloadData() {
     // 数据源根据时间排序
     viewmodel.managers.sort { model1, model2 -> Bool in
-      if let time1 = model1.teamMember?.createTime, let time2 = model2.teamMember?.createTime {
+      if let time1 = model1.teamMember?.joinTime, let time2 = model2.teamMember?.joinTime {
         return time2 > time1
       }
       return false
     }
-    contentTable.reloadData()
+    contentTableView.reloadData()
   }
 
   open func didNeedReloadData() {

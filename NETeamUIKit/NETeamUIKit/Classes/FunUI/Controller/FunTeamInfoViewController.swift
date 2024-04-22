@@ -7,9 +7,9 @@ import UIKit
 
 @objcMembers
 open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
-  override init(team: NIMTeam?) {
+  override init(team: V2NIMTeam?) {
     super.init(team: team)
-    cellClassDic = [
+    registerCellDic = [
       SettingCellType.SettingArrowCell.rawValue: FunTeamArrowSettingCell.self,
       SettingCellType.SettingHeaderCell.rawValue: FunTeamSettingHeaderCell.self,
     ]
@@ -17,12 +17,12 @@ open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    viewmodel.cellDatas.forEach { cellModel in
+    for cellModel in viewModel.cellDatas {
       cellModel.cornerType = .none
       if cellModel.type == SettingCellType.SettingArrowCell.rawValue {
         cellModel.rowHeight = 56
@@ -42,7 +42,7 @@ open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
 
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
@@ -54,15 +54,15 @@ open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
   }
 
   override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     if indexPath.row == 0 {
       let avatar = FunTeamAvatarViewController()
       avatar.team = team
       weak var weakSelf = self
       avatar.block = {
         if let t = weakSelf?.team {
-          weakSelf?.viewmodel.getData(t)
-          weakSelf?.contentTable.reloadData()
+          weakSelf?.viewModel.getData(t)
+          weakSelf?.contentTableView.reloadData()
         }
       }
       navigationController?.pushViewController(avatar, animated: true)

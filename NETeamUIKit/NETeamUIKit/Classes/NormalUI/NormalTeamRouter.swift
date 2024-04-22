@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 
@@ -22,9 +22,11 @@ public extension TeamRouter {
     Router.shared.register(SearchMessageRouter) { param in
 
       let nav = param["nav"] as? UINavigationController
-      if let tid = param["teamId"] as? String {
-        let session = NIMSession(tid, type: .team)
-        let searchMsgCtrl = TeamHistoryMessageController(session: session)
+      if let teamId = param["teamId"] as? String {
+        let searchMsgCtrl = TeamHistoryMessageController(teamId: teamId)
+        if let info = param["teamInfo"] as? NETeamInfoModel {
+          searchMsgCtrl.viewModel.teamInfoModel = info
+        }
         nav?.pushViewController(searchMsgCtrl, animated: true)
       }
     }

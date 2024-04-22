@@ -9,29 +9,31 @@ import UIKit
 
 @objcMembers
 open class FunConversationController: NEBaseConversationController {
+  /// 搜索视图
+  public lazy var searchView: FunSearchView = {
+    let view = FunSearchView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.searchBotton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchBotton.setTitle(commonLocalizable("search"), for: .normal)
+    view.searchBotton.accessibilityIdentifier = "id.titleBarSearchImg"
+    return view
+  }()
+
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     className = "FunConversationController"
     deleteBottonBackgroundColor = .funConversationdeleteActionColor
     cellRegisterDic = [0: FunConversationListCell.self]
     brokenNetworkViewHeight = 48
-    brokenNetworkView.errorIcon.isHidden = false
+    brokenNetworkView.errorIconView.isHidden = false
     brokenNetworkView.backgroundColor = .funConversationNetworkBrokenBackgroundColor
-    brokenNetworkView.content.textColor = .funConversationNetworkBrokenTitleColor
+    brokenNetworkView.contentLabel.textColor = .funConversationNetworkBrokenTitleColor
     emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
-
-  public lazy var searchView: FunSearchView = {
-    let view = FunSearchView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchBotton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
-    view.searchBotton.setTitle(localizable("search"), for: .normal)
-    return view
-  }()
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -42,7 +44,7 @@ open class FunConversationController: NEBaseConversationController {
 
   deinit {
     if let searchViewGestures = searchView.gestureRecognizers {
-      searchViewGestures.forEach { gesture in
+      for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
       }
     }
@@ -51,6 +53,7 @@ open class FunConversationController: NEBaseConversationController {
   override func initSystemNav() {
     super.initSystemNav()
     let addBarButton = UIButton()
+    addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
     addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
     addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
     let addBarItem = UIBarButtonItem(customView: addBarButton)

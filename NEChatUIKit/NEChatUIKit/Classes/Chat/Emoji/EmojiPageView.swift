@@ -32,7 +32,7 @@ open class EmojiPageView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override public var frame: CGRect {
@@ -78,7 +78,7 @@ open class EmojiPageView: UIView {
   func reloadPage() {
     // reload时候记录上次位置
 //        guard let cPage = currentPage else {
-//            NELog.errorLog(className, desc: "❌currentPage is nil")
+//            NEALog.errorLog(className, desc: "❌currentPage is nil")
 //            return
 //        }
     if currentPage >= pages.count {

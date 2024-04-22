@@ -14,10 +14,10 @@ open class NEChatBaseCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
-  open func uploadProgress(byRight: Bool, _ progress: Float) {
+  open func uploadProgress(byRight: Bool, _ progress: UInt) {
     fatalError("override in sub class")
   }
 

@@ -7,21 +7,21 @@ import UIKit
 
 @objcMembers
 open class NEBaseContactViewCell: UITableViewCell {
-  public lazy var avatarImage: UIImageView = {
-    let avatar = UIImageView()
-    avatar.translatesAutoresizingMaskIntoConstraints = false
-    avatar.addSubview(nameLabel)
-    avatar.clipsToBounds = true
-    avatar.contentMode = .scaleAspectFill
-    avatar.backgroundColor = UIColor.colorWithNumber(number: 0)
-    avatar.accessibilityIdentifier = "id.avatar"
+  public lazy var avatarImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.addSubview(nameLabel)
+    imageView.clipsToBounds = true
+    imageView.contentMode = .scaleAspectFill
+    imageView.backgroundColor = UIColor.colorWithNumber(number: 0)
+    imageView.accessibilityIdentifier = "id.avatar"
     NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatar.leftAnchor, constant: 1),
-      nameLabel.rightAnchor.constraint(equalTo: avatar.rightAnchor, constant: -1),
-      nameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
-      nameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+      nameLabel.leftAnchor.constraint(equalTo: imageView.leftAnchor, constant: 1),
+      nameLabel.rightAnchor.constraint(equalTo: imageView.rightAnchor, constant: -1),
+      nameLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
+      nameLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor),
     ])
-    return avatar
+    return imageView
   }()
 
   public lazy var redAngleView: RedAngleLabel = {
@@ -40,14 +40,14 @@ open class NEBaseContactViewCell: UITableViewCell {
   }()
 
   public lazy var nameLabel: UILabel = {
-    let name = UILabel()
-    name.translatesAutoresizingMaskIntoConstraints = false
-    name.textColor = .white
-    name.textAlignment = .center
-    name.font = UIFont.systemFont(ofSize: 14.0)
-    name.adjustsFontSizeToFitWidth = true
-    name.accessibilityIdentifier = "id.noAvatar"
-    return name
+    let nameLabel = UILabel()
+    nameLabel.translatesAutoresizingMaskIntoConstraints = false
+    nameLabel.textColor = .white
+    nameLabel.textAlignment = .center
+    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
+    nameLabel.adjustsFontSizeToFitWidth = true
+    nameLabel.accessibilityIdentifier = "id.noAvatar"
+    return nameLabel
   }()
 
   public lazy var titleLabel: UILabel = {
@@ -82,8 +82,8 @@ open class NEBaseContactViewCell: UITableViewCell {
   }
 
   open func setupCommonCircleHeader() {
-    contentView.addSubview(avatarImage)
-    leftConstraint = avatarImage.leftAnchor.constraint(
+    contentView.addSubview(avatarImageView)
+    leftConstraint = avatarImageView.leftAnchor.constraint(
       equalTo: contentView.leftAnchor,
       constant: 20
     )

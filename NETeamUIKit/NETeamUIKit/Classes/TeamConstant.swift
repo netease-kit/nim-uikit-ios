@@ -7,8 +7,9 @@ import Foundation
 @_exported import NEChatKit
 @_exported import NECommonKit
 @_exported import NECommonUIKit
-@_exported import NECoreIMKit
+@_exported import NECoreIM2Kit
 @_exported import NECoreKit
+
 let coreLoader = CoreLoader<NEBaseTeamSettingViewController>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)

@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 "contact"="通讯录";
-"search"="搜索";
 "alert_tip"="提示";
 "alert_sure"="确定";
 "alert_cancel"="取消";
@@ -30,6 +29,9 @@
 "send_friend_apply"="好友申请已发送";
 "validation_message"="验证消息";
 "no_validation_message"="暂无验证消息";
+"add_request"="添加您为好友";
+"agreed_request"="同意了你的好友请求";
+"refused_request"="拒绝了你的好友请求";
 "clear"="清空";
 "agreed"="已同意";
 "refused"="已拒绝";

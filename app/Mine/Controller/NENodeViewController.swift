@@ -20,11 +20,13 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
 
   func setupUI() {
     title = NSLocalizedString("node_select", comment: "")
+    navigationView.backgroundColor = .ne_lightBackgroundColor
+
     view.addSubview(tableView)
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      tableView.topAnchor.constraint(equalTo: view.topAnchor),
+      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
@@ -46,7 +48,8 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
     alertController.addAction(cancelAction)
     let sureAction = UIAlertAction(title: NSLocalizedString("restart", comment: ""), style: .default) { action in
       // 设置节点
-      IMKitClient.instance.getSettingRepo().setNodeValue(isDomestic)
+      // TODO: - 未实现
+//      SettingRepo.shared.setNodeValue(isDomestic)
       exit(0)
     }
     alertController.addAction(sureAction)
@@ -54,18 +57,18 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
   }
 
   lazy var tableView: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .ne_lightBackgroundColor
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .ne_lightBackgroundColor
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
   // MARK: UITableViewDataSource, UITableViewDelegate
@@ -116,8 +119,8 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = .ne_lightBackgroundColor
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = .ne_lightBackgroundColor
+    return headerView
   }
 }

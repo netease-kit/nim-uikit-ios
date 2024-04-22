@@ -5,7 +5,7 @@
 import CoreMedia
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 
 @objcMembers
@@ -13,51 +13,38 @@ open class ContactUserViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "ContactUserViewModel"
 
-  func addFriend(_ account: String, _ completion: @escaping (NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    let request = NEAddFriendRequest()
-    request.account = account
-    request.operationType = .addRequest
-    contactRepo.addFriend(request: request, completion)
+  func addFriend(_ account: String, _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    contactRepo.addFriend(accountId: account, completion)
   }
 
-  open func deleteFriend(account: String, _ completion: @escaping (NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+  open func deleteFriend(account: String, _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
     contactRepo.deleteFriend(account: account, completion)
   }
 
-  open func isFriend(account: String) -> Bool {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    return contactRepo.isFriend(account: account)
+  open func isFriend(account: String, _ completion: @escaping (Bool) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    contactRepo.isFriend(accountId: account, completion)
   }
 
-  open func isBlack(account: String) -> Bool {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    return contactRepo.isBlackList(account: account)
+  open func isBlack(account: String, _ completion: @escaping (Bool) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    contactRepo.isBlockList(accountId: account, completion)
   }
 
-  open func removeBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    return contactRepo.removeBlackList(account: account, completion)
+  open func removeBlackList(account: String, _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    contactRepo.removeBlockList(accountId: account, completion)
   }
 
-  open func update(_ user: NEKitUser, _ completion: @escaping (Error?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + (user.userId ?? "nil"))
+  open func update(_ user: NEUserWithFriend, _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + (user.user?.accountId ?? "nil"))
     contactRepo.updateUser(user, completion)
   }
 
-  open func getUserInfo(_ uid: String, _ completion: @escaping (Error?, NEKitUser?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
-    contactRepo.getUserInfo(uid) { error, users in
-      completion(error, users?.first)
-    }
-  }
-
-  open func fetchUserInfo(accountList: [String],
-                          _ completion: @escaping ([NEKitUser]?, NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", uid: \(accountList)")
-    contactRepo.fetchUserInfo(accountList: accountList) { users, error in
-      completion(users, error)
-    }
+  open func getUserInfo(_ uid: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
+    contactRepo.getFriendInfo(uid, completion)
   }
 }

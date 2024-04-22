@@ -14,9 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 被叫accid
 @property(nonatomic, strong) NSString *remoteUserAccid;
 
-/// 主叫accid
-@property(nonatomic, strong) NSString *currentUserAccid;
-
 /// 通话页面被叫显示名称
 @property(nonatomic, strong) NSString *remoteShowName;
 

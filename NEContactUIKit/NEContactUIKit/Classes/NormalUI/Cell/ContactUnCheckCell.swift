@@ -9,12 +9,12 @@ import UIKit
 open class ContactUnCheckCell: NEBaseContactUnCheckCell {
   override func setupUI() {
     super.setupUI()
-    avatarImage.layer.cornerRadius = 18
+    avatarImageView.layer.cornerRadius = 18
     NSLayoutConstraint.activate([
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      avatarImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      avatarImage.widthAnchor.constraint(equalToConstant: 36),
-      avatarImage.heightAnchor.constraint(equalToConstant: 36),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      avatarImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
     ])
   }
 }

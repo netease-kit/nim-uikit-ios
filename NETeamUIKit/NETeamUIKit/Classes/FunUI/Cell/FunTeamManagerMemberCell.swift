@@ -5,15 +5,6 @@
 import UIKit
 
 class FunTeamManagerMemberCell: FunTeamMemberCell {
-//    lazy var removeLabel: UILabel = {
-//        let label = UILabel()
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.text = localizable("team_member_remove")
-//        label.textColor = .funTeamRemoveLabelColor
-//        label.font = UIFont.systemFont(ofSize: 14.0)
-//        return label
-//    }()
-
   override func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code

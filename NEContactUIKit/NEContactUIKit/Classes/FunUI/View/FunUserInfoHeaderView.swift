@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class FunUserInfoHeaderView: NEBaseUserInfoHeaderView {
   override open func commonUI() {
     super.commonUI()
-    avatarImage.layer.cornerRadius = 4
+    avatarImageView.layer.cornerRadius = 4
 
     NSLayoutConstraint.activate([
       lineView.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),
@@ -19,24 +19,24 @@ open class FunUserInfoHeaderView: NEBaseUserInfoHeaderView {
     ])
   }
 
-  override open func setData(user: NEKitUser?) {
+  override open func setData(user: NEUserWithFriend?) {
     super.setData(user: user)
-    guard let u = user else {
+    guard let friendUser = user else {
       return
     }
 
     // title
 
-    if let alias = u.alias, !alias.isEmpty {
+    if let alias = friendUser.friend?.alias, !alias.isEmpty {
       commonUI(showDetail: true)
       titleLabel.text = alias
-      let uid = u.userId ?? ""
-      detailLabel.text = "\(localizable("nick")):\(u.userInfo?.nickName ?? uid)"
+      let uid = friendUser.user?.accountId ?? ""
+      detailLabel.text = "\(localizable("nick")):\(friendUser.user?.name ?? uid)"
       detailLabel2.text = "\(localizable("account")):\(uid)"
     } else {
       commonUI(showDetail: false)
-      titleLabel.text = u.showName()
-      detailLabel.text = "\(localizable("account")):\(u.userId ?? "")"
+      titleLabel.text = friendUser.showName()
+      detailLabel.text = "\(localizable("account")):\(friendUser.user?.accountId ?? "")"
     }
   }
 }

@@ -24,7 +24,7 @@ open class FunTeamMemberSelectController: NEBaseTeamMemberSelectController {
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "\(indexPath.section)", for: indexPath) as! FunTeamMemberSelectCell
-    let member = viewmodel.showDatas[indexPath.row]
+    let member = viewModel.showDatas[indexPath.row]
     cell.configureMember(member)
     return cell
   }

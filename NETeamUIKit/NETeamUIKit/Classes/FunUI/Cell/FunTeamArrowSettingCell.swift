@@ -27,8 +27,8 @@ open class FunTeamArrowSettingCell: NEBaseTeamArrowSettingCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
     ])
   }
 }

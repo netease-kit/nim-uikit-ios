@@ -14,7 +14,7 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupUI() {
@@ -29,53 +29,53 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
     view.backgroundColor = .funTeamBackgroundColor
 
     NSLayoutConstraint.activate([
-      headerBack.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
-      headerBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-      headerBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-      headerBack.heightAnchor.constraint(equalToConstant: 128.0),
+      headerBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
+      headerBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+      headerBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+      headerBackView.heightAnchor.constraint(equalToConstant: 128.0),
     ])
 
     NSLayoutConstraint.activate([
-      photoImage.centerXAnchor.constraint(equalTo: headerView.rightAnchor),
-      photoImage.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
+      photoImageView.rightAnchor.constraint(equalTo: headerView.rightAnchor),
+      photoImageView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
     ])
 
     NSLayoutConstraint.activate([
-      defaultHeaderBack.leftAnchor.constraint(equalTo: headerBack.leftAnchor),
-      defaultHeaderBack.rightAnchor.constraint(equalTo: headerBack.rightAnchor),
-      defaultHeaderBack.topAnchor.constraint(
-        equalTo: headerBack.bottomAnchor,
+      defaultHeaderBackView.leftAnchor.constraint(equalTo: headerBackView.leftAnchor),
+      defaultHeaderBackView.rightAnchor.constraint(equalTo: headerBackView.rightAnchor),
+      defaultHeaderBackView.topAnchor.constraint(
+        equalTo: headerBackView.bottomAnchor,
         constant: 8.0
       ),
-      defaultHeaderBack.heightAnchor.constraint(equalToConstant: 124.0),
+      defaultHeaderBackView.heightAnchor.constraint(equalToConstant: 124.0),
     ])
 
     NSLayoutConstraint.activate([
-      tag.leftAnchor.constraint(equalTo: defaultHeaderBack.leftAnchor, constant: 16.0),
-      tag.topAnchor.constraint(equalTo: defaultHeaderBack.topAnchor, constant: 16.0),
-      tag.heightAnchor.constraint(equalToConstant: 18),
+      tagLabel.leftAnchor.constraint(equalTo: defaultHeaderBackView.leftAnchor, constant: 16.0),
+      tagLabel.topAnchor.constraint(equalTo: defaultHeaderBackView.topAnchor, constant: 16.0),
+      tagLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
 
-    iconCollection.register(
+    iconsCollectionView.register(
       FunTeamDefaultIconCell.self,
       forCellWithReuseIdentifier: "\(FunTeamDefaultIconCell.self)"
     )
     NSLayoutConstraint.activate([
-      iconCollection.topAnchor.constraint(equalTo: tag.bottomAnchor, constant: 0),
-      iconCollection.leftAnchor.constraint(
-        equalTo: defaultHeaderBack.leftAnchor,
+      iconsCollectionView.topAnchor.constraint(equalTo: tagLabel.bottomAnchor, constant: 0),
+      iconsCollectionView.leftAnchor.constraint(
+        equalTo: defaultHeaderBackView.leftAnchor,
         constant: 16
       ),
-      iconCollection.rightAnchor.constraint(
-        equalTo: defaultHeaderBack.rightAnchor,
+      iconsCollectionView.rightAnchor.constraint(
+        equalTo: defaultHeaderBackView.rightAnchor,
         constant: -16
       ),
-      iconCollection.heightAnchor.constraint(equalToConstant: 90.0),
+      iconsCollectionView.heightAnchor.constraint(equalToConstant: 90.0),
     ])
   }
 
   override open func uploadPhoto() {
-    if changePermission() {
+    if getChangePermission() {
       showCustomBottomAlert(self)
     }
   }
@@ -86,7 +86,8 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
       withReuseIdentifier: "\(FunTeamDefaultIconCell.self)",
       for: indexPath
     ) as? FunTeamDefaultIconCell {
-      cell.iconImage.image = coreLoader.loadImage("fun_icon_\(indexPath.row)")
+      cell.iconImageView.image = coreLoader.loadImage("fun_icon_\(indexPath.row)")
+      cell.iconImageView.accessibilityIdentifier = "id.default\(indexPath.row + 1)"
 
       return cell
     }

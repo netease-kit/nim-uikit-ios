@@ -17,10 +17,10 @@ open class NEBaseContactUnCheckCell: UICollectionViewCell {
   }
 
   func setupUI() {
-    contentView.addSubview(avatarImage)
+    contentView.addSubview(avatarImageView)
   }
 
-  lazy var avatarImage: NEUserHeaderView = {
+  lazy var avatarImageView: NEUserHeaderView = {
     let view = NEUserHeaderView(frame: .zero)
     view.titleLabel.font = UIFont.systemFont(ofSize: 16.0)
     view.clipsToBounds = true
@@ -29,10 +29,10 @@ open class NEBaseContactUnCheckCell: UICollectionViewCell {
   }()
 
   func configure(_ model: ContactInfo) {
-    avatarImage.configHeadData(
-      headUrl: model.user?.userInfo?.avatarUrl,
+    avatarImageView.configHeadData(
+      headUrl: model.user?.user?.avatar,
       name: model.user?.showName() ?? "",
-      uid: model.user?.userId ?? ""
+      uid: model.user?.user?.accountId ?? ""
     )
   }
 }

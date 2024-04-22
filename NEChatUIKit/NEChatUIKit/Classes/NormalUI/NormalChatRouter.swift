@@ -10,24 +10,30 @@ public extension ChatRouter {
     // pin
     Router.shared.register(PushPinMessageVCRouter) { param in
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let pin = PinMessageViewController(session: session)
+      let pin = PinMessageViewController(conversationId: conversationId)
       nav?.pushViewController(pin, animated: true)
     }
     // sendMessage
     Router.shared.register(ChatAddFriendRouter) { param in
       if let text = param["text"] as? String,
-         let sessionId = param["sessionId"] as? String,
-         let sessionType = param["sessionType"] as? NIMSessionType {
-        let msg = NIMMessage()
+         let sessionId = param["conversationId"] as? String {
+        let msg = V2NIMMessage()
         msg.text = text
-        let session = NIMSession(sessionId, type: sessionType)
-        NIMSDK.shared().chatManager.send(msg, to: session) { error in
-          if let err = error {
-            NELog.errorLog("ChatAddFriendRouter", desc: "send P2P message error:\(err.localizedDescription)")
-          }
+
+        let config = V2NIMMessageConfig()
+        config.lastMessageUpdateEnabled = true
+        config.onlineSyncEnabled = true
+        config.unreadEnabled = true
+        let param = V2NIMSendMessageParams()
+        param.messageConfig = MessageUtils.messageConfig()
+        NIMSDK.shared().v2MessageService.send(msg, conversationId: sessionId, params: param) { result in
+
+        } failure: { error in
+          NEALog.errorLog("ChatAddFriendRouter", desc: "send P2P message error:\(error.nserror.localizedDescription)")
+        } progress: { _ in
         }
       }
     }
@@ -36,11 +42,11 @@ public extension ChatRouter {
     Router.shared.register(PushP2pChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let anchor = param["anchor"] as? NIMMessage
-      let p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+      let anchor = param["anchor"] as? V2NIMMessage
+      let p2pChatVC = P2PChatViewController(conversationId: conversationId, anchor: anchor)
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
@@ -61,12 +67,12 @@ public extension ChatRouter {
     Router.shared.register(PushTeamChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
-      guard let session = param["session"] as? NIMSession else {
+      guard let conversationId = param["conversationId"] as? String else {
         return
       }
 
-      let anchor = param["anchor"] as? NIMMessage
-      let groupVC = GroupChatViewController(session: session, anchor: anchor)
+      let anchor = param["anchor"] as? V2NIMMessage
+      let groupVC = TeamChatViewController(conversationId: conversationId, anchor: anchor)
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
           nav?.viewControllers[i] = groupVC

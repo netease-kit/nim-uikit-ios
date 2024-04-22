@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -19,7 +19,7 @@ open class ContactInfo: NSObject {
     nil
   }
 
-  public var user: NEKitUser?
+  public var user: NEUserWithFriend?
   public var contactCellType = ContactCellType.ContactPerson.rawValue
   public var router = ContactPersonRouter
   public var isSelected = false

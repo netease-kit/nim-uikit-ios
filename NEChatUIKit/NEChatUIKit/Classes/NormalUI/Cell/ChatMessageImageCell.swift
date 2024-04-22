@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NIMSDK
+import SDWebImage
 import UIKit
 
 @objcMembers
@@ -16,7 +17,7 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -79,12 +80,17 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
-    if let m = model as? MessageImageModel, let imageUrl = m.imageUrl {
+    if let m = model as? MessageImageModel, let imageUrl = m.urlString {
+      var options: SDWebImageOptions = [.retryFailed]
+      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment, imageObject.ext?.lowercased() != ".gif" {
+        options = [.retryFailed, .progressiveLoad]
+      }
+
       if imageUrl.hasPrefix("http") {
         contentImageView.sd_setImage(
           with: URL(string: imageUrl),
           placeholderImage: nil,
-          options: .retryFailed,
+          options: options,
           progress: nil,
           completed: nil
         )

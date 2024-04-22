@@ -30,12 +30,12 @@ open class FunTeamSettingHeaderCell: NEBaseTeamSettingHeaderCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
     ])
 
     NSLayoutConstraint.activate([
-      headerView.centerYAnchor.constraint(equalTo: arrow.centerYAnchor),
+      headerView.centerYAnchor.constraint(equalTo: arrowView.centerYAnchor),
       headerView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -44.0),
       headerView.widthAnchor.constraint(equalToConstant: 42.0),
       headerView.heightAnchor.constraint(equalToConstant: 42.0),

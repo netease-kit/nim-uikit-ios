@@ -4,7 +4,7 @@
 
 import Foundation
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 
@@ -34,31 +34,31 @@ open class TeamRouter: NSObject {
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
 
-        let option = NIMCreateTeamOption()
-        option.type = .advanced
-        option.avatarUrl = iconUrl
-        option.name = name
-        option.joinMode = .noAuth
-        option.inviteMode = .all
-        option.beInviteMode = .noAuth
-        option.updateInfoMode = .all
-        option.updateClientCustomMode = .all
+        let param = V2NIMCreateTeamParams()
+        param.name = name
+        param.teamType = .TEAM_TYPE_NORMAL
+        param.avatar = iconUrl
+        param.joinMode = .TEAM_JOIN_MODE_FREE
+        param.inviteMode = .TEAM_INVITE_MODE_ALL
+        param.agreeMode = .TEAM_AGREE_MODE_NO_AUTH
+        param.updateInfoMode = .TEAM_UPDATE_INFO_MODE_ALL
+        param.updateExtensionMode = .TEAM_UPDATE_EXTENSION_MODE_ALL
         var disucssFlag = [String: Any]()
         disucssFlag[discussTeamKey] = true
         let jsonString = NECommonUtil.getJSONStringFromDictionary(disucssFlag)
         if jsonString.count > 0 {
-          option.clientCustomInfo = jsonString
+          param.serverExtension = jsonString
         }
 
-        repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
+        repo.createTeam(accids, param, nil, nil) { createResult, error in
           var result = [String: Any]()
-          if let err = error {
+          if let err = error as? NSError {
             result["code"] = err.code
             result["msg"] = err.localizedDescription
           } else {
             result["code"] = 0
             result["msg"] = "ok"
-            result["teamId"] = teamid
+            result["teamId"] = createResult?.team?.teamId
           }
           Router.shared.use(TeamCreateDiscussResult, parameters: result, closure: nil)
         }
@@ -76,26 +76,23 @@ open class TeamRouter: NSObject {
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
 
-        let option = NIMCreateTeamOption()
-        option.type = .advanced
-        option.avatarUrl = iconUrl
-        option.name = name
-        option.beInviteMode = .noAuth
-
-        repo.createAdvanceTeam(accids, option) { error, teamid, failedIds in
+        let param = V2NIMCreateTeamParams()
+        param.name = name
+        param.avatar = iconUrl
+        param.teamType = .TEAM_TYPE_NORMAL
+        param.agreeMode = .TEAM_AGREE_MODE_NO_AUTH
+        // TODO: 拆分步骤
+        repo.createTeam(accids, param, nil, nil) { creatResult, error in
           var result = [String: Any]()
-          if let err = error {
+          if let err = error as? NSError {
             result["code"] = err.code
             result["msg"] = err.localizedDescription
           } else {
             result["code"] = 0
             result["msg"] = "ok"
-            result["teamId"] = teamid
+            result["teamId"] = creatResult?.team?.teamId
 
-            repo.sendCreateAdavanceNoti(
-              teamid ?? "",
-              localizable("create_senior_team_noti")
-            ) { error in
+            repo.sendCreateAdavanceNoti(creatResult?.team?.teamId ?? "", localizable("create_senior_team_noti")) { error in
               print("send noti message  : ", error as Any)
             }
           }

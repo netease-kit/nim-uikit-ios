@@ -15,7 +15,7 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupUI() {
@@ -23,7 +23,7 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
     super.setupUI()
     emptyView.setEmptyImage(name: "fun_user_empty")
     collectionBackView.backgroundColor = .white
-    collection.register(
+    collectionView.register(
       FunContactUnCheckCell.self,
       forCellWithReuseIdentifier: "\(NSStringFromClass(FunContactUnCheckCell.self))"
     )
@@ -32,8 +32,10 @@ open class FunContactsSelectedViewController: NEBaseContactsSelectedViewControll
 
   override open func setupNavRightItem() {
     super.setupNavRightItem()
+    navigationView.setBackButtonTitle(localizable("close"))
+    navigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.moreButton.backgroundColor = .funContactThemeColor
-    sureBtn.backgroundColor = .funContactThemeColor
+    sureButton.backgroundColor = .funContactThemeColor
   }
 
   override open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

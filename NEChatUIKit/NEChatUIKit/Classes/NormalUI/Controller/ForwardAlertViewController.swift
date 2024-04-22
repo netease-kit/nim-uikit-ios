@@ -11,7 +11,7 @@ import UIKit
 open class ForwardUserCell: NEBaseForwardUserCell {
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = 16
+    userHeaderView.layer.cornerRadius = 16
   }
 }
 
@@ -19,8 +19,8 @@ open class ForwardUserCell: NEBaseForwardUserCell {
 open class ForwardAlertViewController: NEBaseForwardAlertViewController {
   override open func setupUI() {
     super.setupUI()
-    oneUserHead.layer.cornerRadius = 16.0
-    userCollection.register(
+    oneUserHeadView.layer.cornerRadius = 16.0
+    userCollectionView.register(
       ForwardUserCell.self,
       forCellWithReuseIdentifier: "\(ForwardUserCell.self)"
     )

@@ -8,7 +8,7 @@ import NEContactUIKit
 import YXLogin
 import NECoreKit
 import NIMSDK
-import NECoreIMKit
+import NECoreIM2Kit
 import NEConversationUIKit
 import NETeamUIKit
 import NEChatUIKit
@@ -35,9 +35,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         // 初始化NIMSDK
         let option = NIMSDKOption()
+        option.v2 = true
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.pushCerName
-        IMKitClient.instance.setupCoreKitIM(option)
+        IMKitClient.instance.setupIM(option)
         
         // 登录IM之前先初始化 @ 消息监听mananger
         NEAtMessageManager.setupInstance()
@@ -46,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let token = "<#token#>"
         
         weak var weakSelf = self
-        IMKitClient.instance.loginIM(account, token) { error in
+        IMKitClient.instance.login(account, token, nil) { error in
             if let err = error {
                 print("login error in app : ", err.localizedDescription)
             }else {
@@ -96,11 +97,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        NELog.infoLog("app delegate : ", desc: error.localizedDescription)
+        NEALog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
     func initializePage() {
-        self.window?.rootViewController = NETabBarController()
+        self.window?.rootViewController = NETabBarController(true)
         loadService()
     }
     
@@ -122,7 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         customVerification()
         
         //地图map初始化
-        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey)
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
         
         /* 聊天面板外部扩展示例
          // 新增未知类型
@@ -172,11 +173,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             Router.shared.register(PushP2pChatVCRouter) { param in
               print("param:\(param)")
               let nav = param["nav"] as? UINavigationController
-              guard let session = param["session"] as? NIMSession else {
+              guard let conversationId = param["conversationId"] as? String else {
                 return
               }
-              let anchor = param["anchor"] as? NIMMessage
-              let p2pChatVC = P2PChatViewController(session: session, anchor: anchor)
+              let anchor = param["anchor"] as? V2NIMMessage
+              let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
                 
               for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
                 if vc.isKind(of: ChatViewController.self) {
@@ -185,7 +186,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                   return
                 }
               }
-                
                 if let remove = param["removeUserVC"] as? Bool, remove {
                     nav?.viewControllers.removeLast()
                 }
@@ -196,11 +196,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             Router.shared.register(PushP2pChatVCRouter) { param in
               print("param:\(param)")
               let nav = param["nav"] as? UINavigationController
-              guard let session = param["session"] as? NIMSession else {
+              guard let conversationId = param["conversationId"] as? String else {
                 return
               }
-              let anchor = param["anchor"] as? NIMMessage
-              let p2pChatVC = FunP2PChatViewController(session: session, anchor: anchor)
+              let anchor = param["anchor"] as? V2NIMMessage
+              let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
                 
               for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
                 if vc.isKind(of: ChatViewController.self) {

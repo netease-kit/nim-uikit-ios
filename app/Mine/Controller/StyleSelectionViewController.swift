@@ -39,16 +39,16 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
     layout.minimumLineSpacing = 0
     layout.minimumInteritemSpacing = 0
     layout.sectionInset = UIEdgeInsets(top: topMargin, left: 0, bottom: topMargin, right: 0)
-    let collect = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collect.translatesAutoresizingMaskIntoConstraints = false
-    collect.dataSource = self
-    collect.delegate = self
-    collect.isUserInteractionEnabled = true
-    collect.backgroundColor = .white
-    collect.contentMode = .center
-    collect.register(StyleSelectionCell.self, forCellWithReuseIdentifier: "\(StyleSelectionCell.self)")
+    let collectView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectView.translatesAutoresizingMaskIntoConstraints = false
+    collectView.dataSource = self
+    collectView.delegate = self
+    collectView.isUserInteractionEnabled = true
+    collectView.backgroundColor = .white
+    collectView.contentMode = .center
+    collectView.register(StyleSelectionCell.self, forCellWithReuseIdentifier: "\(StyleSelectionCell.self)")
 
-    return collect
+    return collectView
   }()
 
   override open func viewDidLoad() {
@@ -119,7 +119,6 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
   public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     if indexPath.row == 0 {
       if NEStyleManager.instance.isNormalStyle() == false {
-        removeConversationDelegate()
         NEStyleManager.instance.setNormalStyle()
         NotificationCenter.default.post(
           name: Notification.Name(CHANGE_UI),
@@ -128,22 +127,11 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
       }
     } else if indexPath.row == 1 {
       if NEStyleManager.instance.isNormalStyle() == true {
-        removeConversationDelegate()
         NEStyleManager.instance.setFunStyle()
         NotificationCenter.default.post(
           name: Notification.Name(CHANGE_UI),
           object: nil
         )
-      }
-    }
-  }
-
-  public func removeConversationDelegate() {
-    if let tabcontroller = UIApplication.shared.keyWindow?.rootViewController as? NETabBarController {
-      tabcontroller.viewControllers?.forEach { controller in
-        if let nav = controller as? NENavigationController, let conversationController = nav.topViewController as? NEBaseConversationController {
-          NIMSDK.shared().chatManager.remove(conversationController)
-        }
       }
     }
   }

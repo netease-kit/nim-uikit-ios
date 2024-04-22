@@ -59,8 +59,8 @@ open class TeamManagerListController: NEBaseTeamManagerListController {
     cell.delegate = self
     cell.index = indexPath.row
     cell.configure(viewmodel.managers[indexPath.row])
-    if let type = viewmodel.currentMember?.type, type == .manager {
-      cell.removeBtn.isHidden = true
+    if let type = viewmodel.currentMember?.memberRole, type == .TEAM_MEMBER_ROLE_MANAGER {
+      cell.removeButton.isHidden = true
       cell.removeLabel.isHidden = true
     }
     return cell
