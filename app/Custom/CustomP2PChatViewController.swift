@@ -5,6 +5,7 @@
 import NEChatUIKit
 import NIMSDK
 import UIKit
+
 class CustomP2PChatViewController: P2PChatViewController {
   let customMessageType = 20
   override func viewDidLoad() {
@@ -131,13 +132,13 @@ class CustomP2PChatViewController: P2PChatViewController {
       viewController.navigationView.backgroundColor = .gray
 
       // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-      self.customTopView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customTopView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyTopView.backgroundColor = .purple
       viewController.bodyTopView.addSubview(self.customTopView)
       viewController.bodyTopViewHeight = 80
 
       // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-      self.customBottomView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customBottomView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyBottomView.backgroundColor = .purple
       viewController.bodyBottomView.addSubview(self.customBottomView)
       viewController.bodyBottomViewHeight = 60
@@ -147,13 +148,13 @@ class CustomP2PChatViewController: P2PChatViewController {
   /// 通过重写实现自定义
   func customByOverread() {
     // 聊天页顶部导航栏下方扩展视图示例
-    customTopView.btn.setTitle("通过重写方式添加", for: .normal)
+    customTopView.button.setTitle("通过重写方式添加", for: .normal)
     bodyTopView.addSubview(customTopView)
     bodyTopView.backgroundColor = .yellow
     bodyTopViewHeight = 80
 
     // 输入框上区域扩展视图示例
-    customBottomView.btn.setTitle("通过重写方式添加", for: .normal)
+    customBottomView.button.setTitle("通过重写方式添加", for: .normal)
     bodyBottomView.addSubview(customBottomView)
     bodyBottomView.backgroundColor = .yellow
     bodyBottomViewHeight = 60
@@ -206,31 +207,32 @@ class CustomP2PChatViewController: P2PChatViewController {
     NIMCustomObject.registerCustomDecoder(CustomAttachmentDecoder())
 
     // 测试自定义消息发送按钮
-    let testBtn = UIButton()
-    testBtn.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(testBtn)
+    let testButton = UIButton()
+    testButton.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(testButton)
     NSLayoutConstraint.activate([
-      testBtn.widthAnchor.constraint(equalToConstant: 100),
-      testBtn.heightAnchor.constraint(equalToConstant: 40),
-      testBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      testBtn.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      testButton.widthAnchor.constraint(equalToConstant: 100),
+      testButton.heightAnchor.constraint(equalToConstant: 40),
+      testButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      testButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
     ])
-    testBtn.backgroundColor = UIColor.red
-    testBtn.addTarget(self, action: #selector(sendCustomButton), for: .touchUpInside)
+    testButton.backgroundColor = UIColor.red
+    testButton.addTarget(self, action: #selector(sendCustomButton), for: .touchUpInside)
   }
 
   // 自定义标题
-  //    override func getSessionInfo(session: NIMSession) {
-  //        super.getSessionInfo(session: session)
-  //        title = "小易助手"
-  //    }
+//  override func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
+//    super.getSessionInfo(sessionId: sessionId) {
+//      self.title = "小易助手"
+//    }
+//  }
 
   // 长按消息功能弹窗列表自定义（可针对不同 type 消息自定义长按功能项）
-  //    override func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {
-  //        if model?.type == .rtcCallRecord {
-  //            items.append(OperationItem.deleteItem())
-  //        }
-  //    }
+//  override func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {
+//    if model?.type == .rtcCallRecord {
+//      items.append(OperationItem.deleteItem())
+//    }
+//  }
 
   @objc func customClick() {
     showToast("自定义点击事件")
@@ -238,7 +240,7 @@ class CustomP2PChatViewController: P2PChatViewController {
 
   func customBottomBar() {
     let subviews = chatInputView.stackView.subviews
-    subviews.forEach { view in
+    for view in subviews {
       view.removeFromSuperview()
       chatInputView.stackView.removeArrangedSubview(view)
     }
@@ -258,15 +260,15 @@ class CustomP2PChatViewController: P2PChatViewController {
 
   @objc func buttonEvent(_ btn: UIButton) {
     if btn.tag == 0 { // 表情
-      layoutInputView(offset: bottomExanpndHeight)
+      layoutInputView(offset: bottomExanpndHeight, true)
       chatInputView.addEmojiView()
     } else if btn.tag == 1 { // 语音
-      layoutInputView(offset: bottomExanpndHeight)
+      layoutInputView(offset: bottomExanpndHeight, true)
       chatInputView.addRecordView()
     } else if btn.tag == 2 { // 照片
       goPhotoAlbumWithVideo(self)
     } else if btn.tag == 3 { // 更多
-      layoutInputView(offset: bottomExanpndHeight)
+      layoutInputView(offset: bottomExanpndHeight, true)
       chatInputView.addMoreActionView()
     }
   }
@@ -274,13 +276,15 @@ class CustomP2PChatViewController: P2PChatViewController {
   @objc func sendCustomButton() {
     let data = ["type": customMessageType]
     let attachment = CustomAttachment(customType: customMessageType, cellHeight: 50, data: data)
-    let message = NIMMessage()
-    let object = NIMCustomObject()
-    object.attachment = attachment
-    message.messageObject = object
+    let message = V2NIMMessage()
+    let object = V2NIMMessageAttachment()
+    message.attachment = object
 
-    NIMSDK.shared().chatManager.send(message, to: viewmodel.session) { error in
-      print("send custom message error : ", error?.localizedDescription as Any)
+    NIMSDK.shared().v2MessageService.send(message, conversationId: V2NIMConversationIdUtil.conversationTargetId(viewModel.conversationId) ?? "", params: nil) { _ in
+
+    } failure: { error in
+      print("send custom message error : ", error.nserror.localizedDescription)
+    } progress: { _ in
     }
   }
 

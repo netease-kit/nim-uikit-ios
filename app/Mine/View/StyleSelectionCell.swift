@@ -7,7 +7,7 @@ import UIKit
 open class StyleSelectionCell: UICollectionViewCell {
   var styleName = "default"
   var stylePreview = UIImageView()
-  var styleTitle = UILabel()
+  var styleTitleLabel = UILabel()
   var selectButton = UIButton()
 
   override public init(frame: CGRect) {
@@ -17,7 +17,7 @@ open class StyleSelectionCell: UICollectionViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func setupSubviews() {
@@ -25,8 +25,9 @@ open class StyleSelectionCell: UICollectionViewCell {
     stylePreview.layer.cornerRadius = 8
     addSubview(stylePreview)
 
-    styleTitle.translatesAutoresizingMaskIntoConstraints = false
-    addSubview(styleTitle)
+    styleTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+    styleTitleLabel.accessibilityIdentifier = "id.styleTitle"
+    addSubview(styleTitleLabel)
 
     selectButton.translatesAutoresizingMaskIntoConstraints = false
     selectButton.setImage(UIImage(named: "unclicked"), for: .normal)
@@ -42,13 +43,13 @@ open class StyleSelectionCell: UICollectionViewCell {
     ])
 
     NSLayoutConstraint.activate([
-      styleTitle.topAnchor.constraint(equalTo: stylePreview.bottomAnchor, constant: 16),
-      styleTitle.centerXAnchor.constraint(equalTo: centerXAnchor),
-      styleTitle.heightAnchor.constraint(equalToConstant: 18),
+      styleTitleLabel.topAnchor.constraint(equalTo: stylePreview.bottomAnchor, constant: 16),
+      styleTitleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+      styleTitleLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
 
     NSLayoutConstraint.activate([
-      selectButton.topAnchor.constraint(equalTo: styleTitle.bottomAnchor, constant: 16),
+      selectButton.topAnchor.constraint(equalTo: styleTitleLabel.bottomAnchor, constant: 16),
       selectButton.centerXAnchor.constraint(equalTo: centerXAnchor),
       selectButton.widthAnchor.constraint(equalToConstant: 22),
       selectButton.heightAnchor.constraint(equalToConstant: 22),
@@ -58,7 +59,7 @@ open class StyleSelectionCell: UICollectionViewCell {
   func configData(model: StyleCellModel) {
     styleName = model.styleName
     stylePreview.image = UIImage(named: model.styleImageName)
-    styleTitle.text = model.styleTitle
+    styleTitleLabel.text = model.styleTitle
     selectButton.setImage(UIImage(named: model.selectedImageName), for: .selected)
     selectButton.isSelected = model.selected
   }

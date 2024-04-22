@@ -5,25 +5,25 @@
 import UIKit
 
 public class CustomView: UIView {
-  public let btn = UIButton()
+  public let button = UIButton()
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.addTarget(self, action: #selector(tapView), for: .touchUpInside)
-    btn.setTitle("按钮", for: .normal)
-    btn.backgroundColor = .red
-    addSubview(btn)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.addTarget(self, action: #selector(tapView), for: .touchUpInside)
+    button.setTitle("按钮", for: .normal)
+    button.backgroundColor = .red
+    addSubview(button)
     NSLayoutConstraint.activate([
-      btn.topAnchor.constraint(equalTo: topAnchor),
-      btn.bottomAnchor.constraint(equalTo: bottomAnchor),
-      btn.widthAnchor.constraint(equalToConstant: 200),
-      btn.centerXAnchor.constraint(equalTo: centerXAnchor),
+      button.topAnchor.constraint(equalTo: topAnchor),
+      button.bottomAnchor.constraint(equalTo: bottomAnchor),
+      button.widthAnchor.constraint(equalToConstant: 200),
+      button.centerXAnchor.constraint(equalTo: centerXAnchor),
     ])
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   @objc func tapView() {

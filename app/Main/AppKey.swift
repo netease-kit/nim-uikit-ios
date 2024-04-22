@@ -8,9 +8,11 @@ public struct AppKey {
     public static let pushCerName = "<#请输入推送证书#>"
     public static let appKey = "<#请输入appkey#>"
     public static let gaodeMapAppkey = "<#输入高德地图key#>"
+    public static let gaodeMapServerAppkey = "<#输入高德地图key#>"
     #else
     public static let pushCerName = "<#请输入推送证书#>"
     public static let appKey = "<#请输入appkey#>"
     public static let gaodeMapAppkey = "<#输入高德地图key#>"
+    public static let gaodeMapServerAppkey = "<#输入高德地图key#>"
     #endif
 }

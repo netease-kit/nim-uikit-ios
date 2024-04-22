@@ -41,6 +41,8 @@
 		181EE6012B234E540043817F /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E72B234E540043817F /* CustomTeamSettingSwitchCell.swift */; };
 		181EE6022B234E540043817F /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E82B234E540043817F /* NodeSelectCell.swift */; };
 		181EE6032B234E540043817F /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E92B234E540043817F /* VersionCell.swift */; };
+		18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */; };
+		18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */; };
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
 		4B3B9BE6277AFEE50091A74E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE4277AFEE50091A74E /* Main.storyboard */; };
 		4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */; };
@@ -108,6 +110,8 @@
 		181EE5E72B234E540043817F /* CustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
 		181EE5E82B234E540043817F /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
 		181EE5E92B234E540043817F /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
+		18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFunChatViewController.swift; sourceTree = "<group>"; };
+		18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNormalChatViewController.swift; sourceTree = "<group>"; };
 		39E9E27628D87E9800A11820 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		39E9E27828D87EA000A11820 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B3B9BDB277AFEE50091A74E /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,6 +145,8 @@
 		181EE57D2B234C510043817F /* Custom */ = {
 			isa = PBXGroup;
 			children = (
+				18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */,
+				18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */,
 				181EE57E2B234C510043817F /* CustomView.swift */,
 				181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */,
 				181EE5812B234C510043817F /* CustomContactsViewController.swift */,
@@ -457,10 +463,12 @@
 				DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */,
 				DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */,
 				181EE6012B234E540043817F /* CustomTeamSettingSwitchCell.swift in Sources */,
+				18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */,
 				181EE5F52B234E540043817F /* MessageRemindViewController.swift in Sources */,
 				181EE5FD2B234E540043817F /* CustomTeamSettingRightCustomCell.swift in Sources */,
 				181EE5FA2B234E540043817F /* MineTableViewCell.swift in Sources */,
 				181EE5EC2B234E540043817F /* PersonInfoViewModel.swift in Sources */,
+				18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

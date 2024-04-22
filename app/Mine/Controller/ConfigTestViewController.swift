@@ -87,24 +87,24 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
 
   lazy var tableView: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
   @objc func saveConfig() {
@@ -156,8 +156,8 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = .ne_lightBackgroundColor
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = .ne_lightBackgroundColor
+    return headerView
   }
 }

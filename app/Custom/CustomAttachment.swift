@@ -5,6 +5,7 @@
 import NEChatUIKit
 import NIMSDK
 import UIKit
+
 public class CustomAttachment: NECustomAttachment {
   public var goodsName = "name"
 
@@ -13,7 +14,7 @@ public class CustomAttachment: NECustomAttachment {
   override public func encode() -> String {
     // 自定义序列化方法之前必须调用父类的序列化方法
     let neContent = super.encode()
-    var info: [String: Any] = getDictionaryFromJSONString(neContent) as? [String: Any] ?? [:]
+    var info: [String: Any] = CustomAttachment.getDictionaryFromJSONString(neContent) ?? [:]
     info["goodsName"] = goodsName
     info["goodsURL"] = goodsURL
 

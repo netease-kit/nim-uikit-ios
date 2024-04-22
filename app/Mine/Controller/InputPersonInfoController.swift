@@ -34,10 +34,12 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     }))
   }
 
+  /// 初始化UI(内容区域)
   func setupSubviews() {
     view.addSubview(textfieldBgView)
     textfieldBgView.addSubview(textField)
 
+    /// 文本框白色背景
     if NEStyleManager.instance.isNormalStyle() {
       NSLayoutConstraint.activate([
         textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
@@ -55,6 +57,8 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
       ])
       textfieldBgView.layer.cornerRadius = 0
     }
+
+    /// 文本框
     NSLayoutConstraint.activate([
       textField.leftAnchor.constraint(equalTo: textfieldBgView.leftAnchor, constant: 16),
       textField.rightAnchor.constraint(equalTo: textfieldBgView.rightAnchor, constant: -12),
@@ -62,6 +66,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     ])
   }
 
+  /// 初始化UI(导航栏)
   func initialConfig() {
     addRightAction(NSLocalizedString("save", comment: ""), #selector(saveName), self)
 
@@ -81,19 +86,21 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
     }
   }
 
+  /// 保存昵称
   @objc func saveName() {
-    weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      weakSelf?.showToast(commonLocalizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       return
     }
 
     if let block = callBack {
       block(textField.text ?? "")
-//      weakSelf?.navigationController?.popViewController(animated: true)
+//      navigationController?.popViewController(animated: true)
     }
   }
 
+  /// 配置标题类型
+  /// - Parameter editType: 标题类型
   func configTitle(editType: EditType) {
     switch editType {
     case .nickName:
@@ -143,7 +150,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
   func textFieldChange() {
     guard let _ = textField.markedTextRange else {
       if let text = textField.text,
-         text.count > limitNumberCount {
+         text.utf16.count > limitNumberCount {
         textField.text = String(text.prefix(limitNumberCount))
         showToast(String(format: NSLocalizedString("text_count_limit", comment: ""), limitNumberCount))
       }

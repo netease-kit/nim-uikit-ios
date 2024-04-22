@@ -21,7 +21,7 @@ public class CustomContactsViewController: ContactsViewController, NEBaseContact
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override public func viewDidLoad() {
@@ -107,13 +107,13 @@ public class CustomContactsViewController: ContactsViewController, NEBaseContact
       viewController.navigationView.backgroundColor = .gray
 
       // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-      self.customTopView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customTopView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyTopView.backgroundColor = .purple
       viewController.bodyTopView.addSubview(self.customTopView)
       viewController.bodyTopViewHeight = 80
 
       // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-      self.customBottomView.btn.setTitle("通过配置项添加", for: .normal)
+      self.customBottomView.button.setTitle("通过配置项添加", for: .normal)
       viewController.bodyBottomView.backgroundColor = .purple
       viewController.bodyBottomView.addSubview(self.customBottomView)
       viewController.bodyBottomViewHeight = 60
@@ -122,12 +122,12 @@ public class CustomContactsViewController: ContactsViewController, NEBaseContact
 
   func customByOverread() {
     // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-    customTopView.btn.setTitle("通过重写方式添加", for: .normal)
+    customTopView.button.setTitle("通过重写方式添加", for: .normal)
     bodyTopView.addSubview(customTopView)
     bodyTopViewHeight = 80
 
     // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-    customBottomView.btn.setTitle("通过重写方式添加", for: .normal)
+    customBottomView.button.setTitle("通过重写方式添加", for: .normal)
     bodyBottomView.addSubview(customBottomView)
     bodyBottomViewHeight = 60
   }
@@ -146,7 +146,7 @@ public class CustomContactsViewController: ContactsViewController, NEBaseContact
 
   //  父类加载完数据后会调用此方法，可在此对数据进行二次处理
   public func onDataLoaded() {
-    viewModel.contacts[1].contacts.forEach { info in
+    for info in viewModel.contacts[1].contacts {
       info.contactCellType = ContactCellType.ContactCutom.rawValue
     }
   }
