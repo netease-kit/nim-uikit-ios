@@ -3,8 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
+
 @objc public protocol InputEmoticonContainerViewDelegate: NSObjectProtocol {
   func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String)
   func didPressSend(sender: UIButton)
@@ -46,7 +47,7 @@ open class InputEmoticonContainerView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func setUpSubViews() {
@@ -141,7 +142,7 @@ open class InputEmoticonContainerView: UIView {
         return emotionsCount / layoutCount + 1
       }
     } else {
-      NELog.errorLog(classTag, desc: "❌count maybe nil")
+      NEALog.errorLog(classTag, desc: "❌count maybe nil")
       return 0
     }
   }
@@ -183,12 +184,12 @@ extension InputEmoticonContainerView {
                      page: NSInteger) -> UIView {
     let subView = UIView()
     guard let layout = emoticon.layout else {
-      NELog.errorLog(classTag, desc: "layout is nil")
+      NEALog.errorLog(classTag, desc: "layout is nil")
       return UIView()
     }
 
     guard let emotions = emoticon.emoticons else {
-      NELog.errorLog(classTag, desc: "emoticon.emoticons is nil")
+      NEALog.errorLog(classTag, desc: "emoticon.emoticons is nil")
       return UIView()
     }
 
@@ -250,7 +251,7 @@ extension InputEmoticonContainerView {
                                  startX: CGFloat, startY: CGFloat, iconWidth: CGFloat,
                                  iconHeight: CGFloat, emotion: NIMInputEmoticonCatalog) {
     guard let layout = emotion.layout else {
-      NELog.errorLog(classTag, desc: "❌emotion is nill")
+      NEALog.errorLog(classTag, desc: "❌emotion is nill")
       return
     }
 
@@ -262,6 +263,7 @@ extension InputEmoticonContainerView {
     deleteIcon.setImage(UIImage.ne_imageNamed(name: "emoji_del_normal"), for: .normal)
     deleteIcon.setImage(UIImage.ne_imageNamed(name: "emoji_del_pressed"), for: .highlighted)
     deleteIcon.addTarget(self, action: #selector(onIconSelected), for: .touchUpInside)
+    deleteIcon.accessibilityIdentifier = "id.emojiDelete"
     let newX = CGFloat(coloumnIndex + 1) * layout.cellWidth + startX
     let newY = CGFloat(rowIndex) * layout.cellHeight + startY
     let deleteIconRect = CGRect(
@@ -296,7 +298,7 @@ extension InputEmoticonContainerView: EmojiPageViewDelegate, EmojiPageViewDataSo
     var resultEmotion = NIMInputEmoticonCatalog()
 
     guard let totalData = totalCatalogData, let targetView = pageView else {
-      NELog.errorLog(classTag, desc: "❌totalCatalogData is nil")
+      NEALog.errorLog(classTag, desc: "❌totalCatalogData is nil")
       return UIView()
     }
 
@@ -334,7 +336,7 @@ extension InputEmoticonContainerView: InputEmoticonTabViewDelegate {
 extension InputEmoticonContainerView: NIMInputEmoticonButtonDelegate {
   open func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String) {
     guard let emotionId = emotion.emoticonID else {
-      NELog.errorLog(classTag, desc: "❌emoticonID is nil")
+      NEALog.errorLog(classTag, desc: "❌emoticonID is nil")
       return
     }
     if emotion.type == .unicode {

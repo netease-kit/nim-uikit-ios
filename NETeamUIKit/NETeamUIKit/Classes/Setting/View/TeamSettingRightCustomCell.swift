@@ -12,10 +12,10 @@ open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
     if let icon = model?.rightCustomViewIcon, icon.count > 0 {
       customRightView.isHidden = false
       customRightView.setImage(coreLoader.loadImage(icon), for: .normal)
-      arrow.isHidden = true
+      arrowView.isHidden = true
     } else {
       customRightView.isHidden = true
-      arrow.isHidden = false
+      arrowView.isHidden = false
     }
   }
 
@@ -37,10 +37,10 @@ open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
   }
 
   public lazy var customRightView: UIButton = {
-    let btn = UIButton()
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.accessibilityIdentifier = "id.accountCopy"
-    return btn
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.accessibilityIdentifier = "id.accountCopy"
+    return button
   }()
 
   open func customRightViewClick() {

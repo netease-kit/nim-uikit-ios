@@ -3,8 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
+
 public protocol NIMInputEmoticonButtonDelegate: NSObjectProtocol {
   func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String)
 }
@@ -18,32 +19,32 @@ open class NIMInputEmoticonButton: UIButton {
   open class func iconButtonWithData(data: NIMInputEmoticon, catalogID: String,
                                      delegate: NIMInputEmoticonButtonDelegate)
     -> NIMInputEmoticonButton {
-    let icon = NIMInputEmoticonButton()
-    icon.addTarget(icon, action: #selector(onIconSelected), for: .touchUpInside)
-    icon.emotionData = data
-    icon.catalogID = catalogID
-    icon.isUserInteractionEnabled = true
-    icon.isExclusiveTouch = true
-    icon.contentMode = .scaleToFill
-    icon.delegate = delegate
-    icon.accessibilityIdentifier = "id.emoji"
-    icon.accessibilityValue = data.tag
+    let iconButton = NIMInputEmoticonButton()
+    iconButton.addTarget(iconButton, action: #selector(onIconSelected), for: .touchUpInside)
+    iconButton.emotionData = data
+    iconButton.catalogID = catalogID
+    iconButton.isUserInteractionEnabled = true
+    iconButton.isExclusiveTouch = true
+    iconButton.contentMode = .scaleToFill
+    iconButton.delegate = delegate
+    iconButton.accessibilityIdentifier = "id.emoji"
+    iconButton.accessibilityValue = data.tag
     switch data.type {
     case .unicode:
-      icon.setTitle(data.unicode, for: .normal)
-      icon.setTitle(data.unicode, for: .highlighted)
-      icon.titleLabel?.font = DefaultTextFont(32)
+      iconButton.setTitle(data.unicode, for: .normal)
+      iconButton.setTitle(data.unicode, for: .highlighted)
+      iconButton.titleLabel?.font = DefaultTextFont(32)
     default:
       let image = UIImage.ne_bundleImage(name: data.fileName ?? "")
-      icon.setImage(image, for: .normal)
-      icon.setImage(image, for: .highlighted)
+      iconButton.setImage(image, for: .normal)
+      iconButton.setImage(image, for: .highlighted)
     }
-    return icon
+    return iconButton
   }
 
   @objc func onIconSelected(sender: NIMInputEmoticonButton) {
     guard let data = emotionData, let id = catalogID else {
-      NELog.errorLog(classsTag, desc: "emotionData or catalogID maybe nil")
+      NEALog.errorLog(classsTag, desc: "emotionData or catalogID maybe nil")
       return
     }
     delegate?.selectedEmoticon(emotion: data, catalogID: id)

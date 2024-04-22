@@ -9,6 +9,17 @@ import UIKit
 open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
   public var titleWidthAnchor: NSLayoutConstraint?
 
+  /// 标题
+  public lazy var subTitleLabel: UILabel = {
+    let label = UILabel()
+    label.textColor = UIColor(hexString: "0xA6ADB6")
+    label.font = NEConstant.defaultTextFont(12.0)
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textAlignment = .right
+    label.accessibilityIdentifier = "id.subTitleLabel"
+    return label
+  }()
+
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
@@ -16,13 +27,13 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func setupUI() {
     contentView.addSubview(titleLabel)
     contentView.addSubview(subTitleLabel)
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowView)
 
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
@@ -33,14 +44,14 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
     titleWidthAnchor?.isActive = true
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-      arrow.widthAnchor.constraint(equalToConstant: 7),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      arrowView.widthAnchor.constraint(equalToConstant: 7),
     ])
 
     NSLayoutConstraint.activate([
       subTitleLabel.leftAnchor.constraint(equalTo: titleLabel.rightAnchor, constant: 10),
-      subTitleLabel.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -10),
+      subTitleLabel.rightAnchor.constraint(equalTo: arrowView.leftAnchor, constant: -10),
       subTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
   }
@@ -52,14 +63,4 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
       subTitleLabel.text = m.subTitle
     }
   }
-
-  public lazy var subTitleLabel: UILabel = {
-    let label = UILabel()
-    label.textColor = UIColor(hexString: "0xA6ADB6")
-    label.font = NEConstant.defaultTextFont(12.0)
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.textAlignment = .right
-    label.accessibilityIdentifier = "id.subTitleLabel"
-    return label
-  }()
 }

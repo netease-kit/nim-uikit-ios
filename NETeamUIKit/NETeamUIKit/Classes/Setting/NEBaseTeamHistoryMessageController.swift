@@ -3,28 +3,97 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECommonKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextFieldDelegate,
   UITableViewDelegate, UITableViewDataSource {
-  public let viewmodel = TeamSettingViewModel()
-  public var teamSession: NIMSession?
+  public let viewModel = TeamHistoryMessageViewModel()
+
+  /// 群id
+  public var teamId: String?
   public var searchStr = ""
   var tag = "TeamHistoryMessageController"
 
-  public init(session: NIMSession?) {
+  /// 历史消息列表
+  public lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.register(
+      NEBaseHistoryMessageCell.self,
+      forCellReuseIdentifier: "\(NSStringFromClass(NEBaseHistoryMessageCell.self))"
+    )
+    tableView.rowHeight = 65
+    tableView.backgroundColor = .white
+    tableView.sectionHeaderHeight = 30
+    tableView.sectionFooterHeight = 0
+    return tableView
+  }()
+
+  /// 搜索文本框
+  public lazy var searchTextField: SearchTextField = {
+    let textField = SearchTextField()
+    let leftImageView = UIImageView(image: coreLoader.loadImage("search_icon"))
+    textField.contentMode = .center
+    textField.leftView = leftImageView
+    textField.leftViewMode = .always
+    textField.placeholder = localizable("search")
+    textField.font = UIFont.systemFont(ofSize: 14)
+    textField.textColor = UIColor.ne_greyText
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    textField.layer.cornerRadius = 8
+    textField.backgroundColor = UIColor(hexString: "0xF2F4F5")
+    textField.clearButtonMode = .always
+    textField.returnKeyType = .search
+    textField.delegate = self
+    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    textField.accessibilityIdentifier = "id.search"
+    return textField
+
+  }()
+
+  /// 空占位图
+  public lazy var emptyView: NEEmptyDataView = {
+    let view = NEEmptyDataView(
+      imageName: "emptyView",
+      content: localizable("no_search_results"),
+      frame: CGRect.zero
+    )
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+
+  }()
+
+  /// 正在搜索标志，防止多次点击多次搜索
+  public var isSearching = false
+
+  public init(teamId: String?) {
     super.init(nibName: nil, bundle: nil)
-    teamSession = session
+    self.teamId = teamId
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    weak var weakSelf = self
+
+    viewModel.getTeamInfo(teamId) { team, error in
+      if team?.isValidTeam == false || team == nil {
+        weakSelf?.view.makeToast(localizable("team_not_exist"))
+      }
+    }
     setupSubviews()
     initialConfig()
   }
@@ -46,83 +115,29 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     title = localizable("historical_record")
   }
 
-  // MARK: lazy method
-
-  public lazy var tableView: UITableView = {
-    let tableView = UITableView(frame: .zero, style: .plain)
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.separatorStyle = .none
-    tableView.keyboardDismissMode = .onDrag
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.register(
-      NEBaseHistoryMessageCell.self,
-      forCellReuseIdentifier: "\(NSStringFromClass(NEBaseHistoryMessageCell.self))"
-    )
-    tableView.rowHeight = 65
-    tableView.backgroundColor = .white
-    tableView.sectionHeaderHeight = 30
-    tableView.sectionFooterHeight = 0
-    return tableView
-  }()
-
-  public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
-    let leftImageView = UIImageView(image: coreLoader.loadImage("search_icon"))
-    textField.contentMode = .center
-    textField.leftView = leftImageView
-    textField.leftViewMode = .always
-    textField.placeholder = localizable("search")
-    textField.font = UIFont.systemFont(ofSize: 14)
-    textField.textColor = UIColor.ne_greyText
-    textField.translatesAutoresizingMaskIntoConstraints = false
-    textField.layer.cornerRadius = 8
-    textField.backgroundColor = UIColor(hexString: "0xF2F4F5")
-    textField.clearButtonMode = .always
-    textField.returnKeyType = .search
-    textField.addTarget(self, action: #selector(searchTextFieldChange), for: .editingChanged)
-    textField.delegate = self
-    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
-      clearButton.accessibilityIdentifier = "id.clear"
-    }
-    textField.accessibilityIdentifier = "id.search"
-    return textField
-
-  }()
-
-  public lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(
-      imageName: "emptyView",
-      content: localizable("no_search_results"),
-      frame: CGRect.zero
-    )
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
-    return view
-
-  }()
-
-  // MARK: private method
-
-  func searchTextFieldChange(textfield: SearchTextField) {
-    guard let searchText = textfield.text else {
+  /// 搜索历史消息
+  func toSearchHistory() {
+    guard let searchText = searchTextField.text else {
       return
     }
     if searchText.count <= 0 {
-      viewmodel.searchResultInfos?.removeAll()
+      viewModel.searchResultInfos?.removeAll()
       emptyView.isHidden = true
       tableView.reloadData()
       return
     }
-    guard let session = teamSession else {
+    guard let teamId = teamId else {
+      return
+    }
+    if isSearching == true {
       return
     }
     weak var weakSelf = self
     searchStr = searchText
-    let option = NIMMessageSearchOption()
-    option.searchContent = searchText
-    weakSelf?.viewmodel.searchMessages(session, option: option) { error, messages in
-      NELog.infoLog(
+    isSearching = true
+    weakSelf?.viewModel.searchHistoryMessages(teamId, searchText) { error, messages in
+      weakSelf?.isSearching = false
+      NEALog.infoLog(
         ModuleName + " " + self.tag,
         desc: "CALLBACK searchMessages " + (error?.localizedDescription ?? "no error")
       )
@@ -134,7 +149,7 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
         }
         weakSelf?.tableView.reloadData()
       } else {
-        NELog.errorLog(
+        NEALog.errorLog(
           ModuleName + " " + (weakSelf?.tag ?? "TeamHistoryMessageController"),
           desc: "❌searchMessages failed, error = \(error!)"
         )
@@ -142,10 +157,20 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     }
   }
 
+  /// 监听键盘搜索按钮点击
+  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return false
+    }
+    toSearchHistory()
+    return true
+  }
+
   // MARK: UITableViewDelegate, UITableViewDataSource
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewmodel.searchResultInfos?.count ?? 0
+    viewModel.searchResultInfos?.count ?? 0
   }
 
   open func tableView(_ tableView: UITableView,
@@ -154,14 +179,13 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let cellModel = viewmodel.searchResultInfos?[indexPath.row]
-    if cellModel?.imMessage?.session?.sessionType == .team {
-      if let sid = cellModel?.imMessage?.session?.sessionId,
-         let message = cellModel?.imMessage {
-        let session = NIMSession(sid, type: .team)
+    let cellModel = viewModel.searchResultInfos?[indexPath.row]
+    if cellModel?.imMessage?.conversationType == .CONVERSATION_TYPE_TEAM {
+      if let message = cellModel?.imMessage, let conversationId = message.conversationId {
         Router.shared.use(
           PushTeamChatVCRouter,
-          parameters: ["nav": navigationController as Any, "session": session as Any,
+          parameters: ["nav": navigationController as Any,
+                       "conversationId": conversationId as Any,
                        "anchor": message],
           closure: nil
         )

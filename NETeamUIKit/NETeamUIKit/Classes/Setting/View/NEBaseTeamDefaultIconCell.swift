@@ -8,26 +8,16 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamDefaultIconCell: UICollectionViewCell {
-  override public init(frame: CGRect) {
-    super.init(frame: frame)
-    setupUI()
-  }
-
-  override public var isSelected: Bool {
-    didSet {
-      print("default icon select ", isSelected)
-      selectBack.isHidden = !isSelected
-    }
-  }
-
-  lazy var iconImage: UIImageView = {
-    let image = UIImageView()
-    image.translatesAutoresizingMaskIntoConstraints = false
-    image.contentMode = .scaleAspectFill
-    return image
+  /// icon 图片
+  public lazy var iconImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    return imageView
   }()
 
-  lazy var selectBack: UIView = {
+  /// 选中背景
+  public lazy var selectBackView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = NEConstant.hexRGB(0xF4F4F4)
@@ -37,12 +27,24 @@ open class NEBaseTeamDefaultIconCell: UICollectionViewCell {
     return view
   }()
 
+  override public init(frame: CGRect) {
+    super.init(frame: frame)
+    setupUI()
+  }
+
+  override public var isSelected: Bool {
+    didSet {
+      print("default icon select ", isSelected)
+      selectBackView.isHidden = !isSelected
+    }
+  }
+
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
   func setupUI() {
-    contentView.addSubview(selectBack)
-    contentView.addSubview(iconImage)
+    contentView.addSubview(selectBackView)
+    contentView.addSubview(iconImageView)
   }
 }

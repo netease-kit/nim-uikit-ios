@@ -3,6 +3,9 @@
 // found in the LICENSE file.
 
 #import "NECallKitUtil.h"
+#import "NERtcCallUIKit.h"
+
+static NECallUILanguage _language = NECallUILanguageAuto;
 
 @implementation NECallKitUtil
 
@@ -17,6 +20,33 @@
                                     blue:(hexValue & 0xFF) / 255.0
                                    alpha:1.0];
   return color;
+}
+
++ (void)setLanguage:(NECallUILanguage)language {
+  _language = language;
+}
+
++ (NSString *)localizableWithKey:(NSString *)key {
+  switch (_language) {
+    case NECallUILanguageZhHans: {
+      NSBundle *bundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[NERtcCallUIKit class]]
+                                                      pathForResource:@"zh-Hans"
+                                                               ofType:@"lproj"]];
+      return [bundle localizedStringForKey:key value:nil table:nil];
+    }
+    case NECallUILanguageEn: {
+      NSBundle *bundle = [NSBundle bundleWithPath:[[NSBundle bundleForClass:[NERtcCallUIKit class]]
+                                                      pathForResource:@"en"
+                                                               ofType:@"lproj"]];
+      return [bundle localizedStringForKey:key value:nil table:nil];
+    }
+    case NECallUILanguageAuto:
+    default:
+      break;
+  }
+  return [[NSBundle bundleForClass:NERtcCallUIKit.class] localizedStringForKey:key
+                                                                         value:nil
+                                                                         table:@"Localizable"];
 }
 
 @end

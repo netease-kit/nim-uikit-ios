@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 "contact"="Contact";
-"search"="Search";
 "alert_tip"="tip";
 "alert_sure"="ok";
 "alert_cancel"="cancel";
@@ -30,6 +29,9 @@
 "send_friend_apply"="Contact request sent";
 "validation_message"="Verify message";
 "no_validation_message"="No Validation Message";
+"add_request"="Friend request";
+"agreed_request"="Approved your apply";
+"refused_request"="Reject your apply";
 "clear"="Clear";
 "agreed"="Added";
 "refused"="Rejected";

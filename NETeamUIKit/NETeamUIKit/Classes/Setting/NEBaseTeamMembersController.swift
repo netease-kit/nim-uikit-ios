@@ -5,35 +5,36 @@
 
 import NEChatKit
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource, TeamMemberCellDelegate, TeamMembersViewModelDelegate {
+  /// 群id
   public var teamId: String?
-
-  public var memberDatas: [TeamMemberInfoModel]? {
+  /// 群成员数据
+  public var memberDatas: [NETeamMemberInfoModel]? {
     didSet {
-      viewmodel.setShowDatas(memberDatas)
+      viewModel.setShowDatas(memberDatas)
     }
   }
 
+  /// 创建者account id
   public var ownerId: String?
 
   public var isSenior = false
 
-  public var searchDatas = [TeamMemberInfoModel]()
+  public let backView = UIView()
 
-  public let back = UIView()
+  let viewModel = TeamMembersViewModel()
 
-  let viewmodel = TeamMembersViewModel()
-
+  /// 搜索输入控件
   public lazy var searchTextField: UITextField = {
     let field = UITextField()
     field.translatesAutoresizingMaskIntoConstraints = false
-    field.placeholder = localizable("search_friend")
+    field.placeholder = commonLocalizable("search")
     field.clearButtonMode = .always
     field.textColor = .ne_greyText
     field.font = UIFont.systemFont(ofSize: 14.0)
@@ -45,30 +46,41 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     return field
   }()
 
-  public lazy var contentTable: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
-    table
+  /// 群成员列表视图
+  public lazy var contentTableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
+    tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    table.keyboardDismissMode = .onDrag
-    return table
+    tableView.keyboardDismissMode = .onDrag
+    return tableView
   }()
 
-  lazy var emptyView: NEEmptyDataView = {
+  /// 空占位图
+  public lazy var emptyView: NEEmptyDataView = {
+    // member_select_no_member
     let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_result"), frame: .zero)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
     return view
+  }()
+
+  /// 搜索背景图
+  public lazy var searchIconImageView: UIImageView = {
+    let searchIconImageView = UIImageView()
+    searchIconImageView.image = coreLoader.loadImage("search_icon")
+    searchIconImageView.translatesAutoresizingMaskIntoConstraints = false
+    return searchIconImageView
   }()
 
   public init(teamId: String?) {
@@ -77,88 +89,83 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     addObserver()
+    viewModel.delegate = self
+    viewModel.teamId = teamId
 
-    viewmodel.delegate = self
-    let team = TeamProvider.shared.getTeam(teamId: teamId ?? "")
-    ownerId = team?.owner
-    if team?.isDisscuss() == false {
-      isSenior = true
-    }
-    if let tid = team?.teamId {
-      viewmodel.getMemberInfo(tid)
-    }
-
-    setupUI()
-
-    TeamRepo.shared.fetchTeamInfo(teamId ?? "") { [weak self] error, teamModel in
-      if error != nil {
-        self?.emptyView.isHidden = false
-      } else {
-        self?.viewmodel.setShowDatas(teamModel?.users)
-        self?.didNeedRefreshUI()
+    weak var weakSelf = self
+    if let tid = teamId {
+      weakSelf?.viewModel.getTeamInfo(tid) { teamInfo, error in
+        weakSelf?.ownerId = teamInfo?.team?.ownerAccountId
+        if error != nil {
+          weakSelf?.emptyView.isHidden = false
+          if let err = error {
+            weakSelf?.showToast(err.localizedDescription)
+          }
+        } else {
+          if teamInfo?.team?.isDisscuss() == false {
+            weakSelf?.isSenior = true
+            weakSelf?.title = localizable("group_memmber")
+          } else {
+            weakSelf?.title = localizable("discuss_mebmer")
+          }
+          weakSelf?.didNeedRefreshUI()
+        }
       }
     }
+    setupUI()
   }
 
+  /// UI 初始化
   open func setupUI() {
-    if isSenior {
-      title = localizable("group_memmber")
-    } else {
-      title = localizable("discuss_mebmer")
-    }
+    backView.backgroundColor = .clear
+    backView.translatesAutoresizingMaskIntoConstraints = false
+    backView.clipsToBounds = true
+    backView.layer.cornerRadius = 4.0
 
-    back.backgroundColor = .clear
-    back.translatesAutoresizingMaskIntoConstraints = false
-    back.clipsToBounds = true
-    back.layer.cornerRadius = 4.0
-
-    view.addSubview(back)
+    view.addSubview(backView)
     NSLayoutConstraint.activate([
-      back.topAnchor.constraint(equalTo: view.topAnchor, constant: 8.0 + topConstant),
-      back.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      back.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      back.heightAnchor.constraint(equalToConstant: 32),
+      backView.topAnchor.constraint(equalTo: view.topAnchor, constant: 8.0 + topConstant),
+      backView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      backView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      backView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    let searchIcon = UIImageView()
-    searchIcon.image = coreLoader.loadImage("search_icon")
-    searchIcon.translatesAutoresizingMaskIntoConstraints = false
-    back.addSubview(searchIcon)
+    backView.addSubview(searchIconImageView)
     NSLayoutConstraint.activate([
-      searchIcon.centerYAnchor.constraint(equalTo: back.centerYAnchor),
-      searchIcon.leftAnchor.constraint(equalTo: back.leftAnchor, constant: 16.0),
+      searchIconImageView.centerYAnchor.constraint(equalTo: backView.centerYAnchor),
+      searchIconImageView.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 16.0),
     ])
 
-    back.addSubview(searchTextField)
+    backView.addSubview(searchTextField)
     NSLayoutConstraint.activate([
-      searchTextField.leftAnchor.constraint(equalTo: back.leftAnchor, constant: 36.0),
-      searchTextField.rightAnchor.constraint(equalTo: back.rightAnchor, constant: -16.0),
-      searchTextField.topAnchor.constraint(equalTo: back.topAnchor),
-      searchTextField.bottomAnchor.constraint(equalTo: back.bottomAnchor),
+      searchTextField.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 36.0),
+      searchTextField.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: -16.0),
+      searchTextField.topAnchor.constraint(equalTo: backView.topAnchor),
+      searchTextField.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
     ])
 
-    view.addSubview(contentTable)
+    view.addSubview(contentTableView)
     NSLayoutConstraint.activate([
-      contentTable.leftAnchor.constraint(equalTo: view.leftAnchor),
-      contentTable.rightAnchor.constraint(equalTo: view.rightAnchor),
-      contentTable.topAnchor.constraint(equalTo: back.bottomAnchor, constant: 10),
-      contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      contentTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      contentTableView.topAnchor.constraint(equalTo: backView.bottomAnchor, constant: 10),
+      contentTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    contentTable.register(NEBaseTeamMemberCell.self, forCellReuseIdentifier: "\(NEBaseTeamMemberCell.self)")
+    contentTableView.register(NEBaseTeamMemberCell.self, forCellReuseIdentifier: "\(NEBaseTeamMemberCell.self)")
 
     view.addSubview(emptyView)
     NSLayoutConstraint.activate([
-      emptyView.leftAnchor.constraint(equalTo: contentTable.leftAnchor),
-      emptyView.rightAnchor.constraint(equalTo: contentTable.rightAnchor),
-      emptyView.topAnchor.constraint(equalTo: contentTable.topAnchor, constant: 50),
-      emptyView.bottomAnchor.constraint(equalTo: contentTable.bottomAnchor),
+      emptyView.leftAnchor.constraint(equalTo: contentTableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: contentTableView.rightAnchor),
+      emptyView.topAnchor.constraint(equalTo: contentTableView.topAnchor, constant: 50),
+      emptyView.bottomAnchor.constraint(equalTo: contentTableView.bottomAnchor),
     ])
   }
 
@@ -169,7 +176,6 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
       name: UITextField.textDidChangeNotification,
       object: nil
     )
-    NotificationCenter.default.addObserver(self, selector: #selector(didNeedRefreshUI), name: NENotificationName.updateFriendInfo, object: nil)
   }
 
   func isOwner(_ userId: String?) -> Bool {
@@ -183,31 +189,31 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   }
 
   func textChange() {
-    searchDatas.removeAll()
+    viewModel.searchDatas.removeAll()
     if let text = searchTextField.text, text.count > 0 {
-      viewmodel.datas.forEach { model in
-        if let uid = model.nimUser?.userId, uid.contains(text) {
-          searchDatas.append(model)
-        } else if let nick = model.nimUser?.userInfo?.nickName, nick.contains(text) {
-          searchDatas.append(model)
-        } else if let alias = model.nimUser?.alias, alias.contains(text) {
-          searchDatas.append(model)
-        } else if let tNick = model.teamMember?.nickname, tNick.contains(text) {
-          searchDatas.append(model)
+      for model in viewModel.datas {
+        if let uid = model.nimUser?.user?.accountId, uid.contains(text) {
+          viewModel.searchDatas.append(model)
+        } else if let nick = model.nimUser?.user?.name, nick.contains(text) {
+          viewModel.searchDatas.append(model)
+        } else if let alias = model.nimUser?.friend?.alias, alias.contains(text) {
+          viewModel.searchDatas.append(model)
+        } else if let tNick = model.teamMember?.teamNick, tNick.contains(text) {
+          viewModel.searchDatas.append(model)
         }
       }
-      emptyView.isHidden = searchDatas.count > 0
+
     } else {
       emptyView.isHidden = true
     }
     didNeedRefreshUI()
   }
 
-  func getRealModel(_ index: Int) -> TeamMemberInfoModel? {
+  func getRealModel(_ index: Int) -> NETeamMemberInfoModel? {
     if let text = searchTextField.text, text.count > 0 {
-      return searchDatas[index]
+      return viewModel.searchDatas[index]
     }
-    return viewmodel.datas[index]
+    return viewModel.datas[index]
   }
 
   deinit {
@@ -218,9 +224,9 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if let text = searchTextField.text, text.count > 0 {
-      return searchDatas.count
+      return viewModel.searchDatas.count
     }
-    return viewmodel.datas.count
+    return viewModel.datas.count
   }
 
   open func tableView(_ tableView: UITableView,
@@ -231,7 +237,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     ) as? NEBaseTeamMemberCell {
       if let model = getRealModel(indexPath.row) {
         cell.configure(model)
-        cell.ownerLabel.isHidden = !isOwner(model.nimUser?.userId)
+        cell.ownerLabel.isHidden = !isOwner(model.nimUser?.user?.accountId)
       }
       return cell
     }
@@ -245,14 +251,14 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if let model = getRealModel(indexPath.row), let user = model.nimUser {
-      if IMKitClient.instance.isMySelf(user.userId) {
+      if IMKitClient.instance.isMe(user.user?.accountId) {
         Router.shared.use(
           MeSettingRouter,
           parameters: ["nav": navigationController as Any],
           closure: nil
         )
       } else {
-        if let uid = user.userId {
+        if let uid = user.user?.accountId {
           Router.shared.use(
             ContactUserInfoPageRouter,
             parameters: ["nav": navigationController as Any, "uid": uid],
@@ -263,20 +269,20 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     }
   }
 
-  func didClickRemoveButton(_ model: TeamMemberInfoModel?, _ index: Int) {
+  /// 移除群成员
+  /// - Parameter model: 成员信息
+  /// - Parameter index: 成员索引
+  func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
     print("did click remove button")
     weak var weakSelf = self
-
-    // 注释掉的暂时留存，后续可能更改提示语 let content = String(format: localizable("confirm_delete_text"), model?.atNameInTeam() ?? "") + localizable("question_mark")
-
     showAlert(title: localizable("remove_manager_title"), message: localizable("remove_member_tip")) {
       if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
         weakSelf?.view.makeToast(commonLocalizable("network_error"))
         return
       }
 
-      if let tid = weakSelf?.teamId, let uid = model?.nimUser?.userId {
-        weakSelf?.viewmodel.removeTeamMember(tid, [uid]) { error in
+      if let tid = weakSelf?.teamId, let uid = model?.nimUser?.user?.accountId {
+        weakSelf?.viewModel.removeTeamMember(tid, [uid]) { error in
           if let err = error {
             if err.code == noPermissionCode {
               weakSelf?.view.makeToast(localizable("no_permission_tip"))
@@ -285,11 +291,17 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
             }
           } else {
             if let text = weakSelf?.searchTextField.text, text.count > 0 {
-              weakSelf?.searchDatas.remove(at: index)
-              weakSelf?.viewmodel.removeModel(model)
+              weakSelf?.viewModel.searchDatas.remove(at: index)
+              weakSelf?.viewModel.searchDatas.removeAll(where: { model in
+                if model.teamMember?.accountId == uid {
+                  return true
+                }
+                return false
+              })
+              weakSelf?.viewModel.removeModel(model)
               weakSelf?.didNeedRefreshUI()
             } else {
-              weakSelf?.viewmodel.removeModel(model)
+              weakSelf?.viewModel.removeModel(model)
               weakSelf?.didNeedRefreshUI()
             }
           }
@@ -298,9 +310,10 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     }
   }
 
-  // 查找移除数据在 data 中的位置
-
   func didNeedRefreshUI() {
-    contentTable.reloadData()
+    if let text = searchTextField.text, text.count > 0 {
+      emptyView.isHidden = viewModel.searchDatas.count > 0
+    }
+    contentTableView.reloadData()
   }
 }

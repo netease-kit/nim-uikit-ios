@@ -1,8 +1,9 @@
-//// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 #import <Foundation/Foundation.h>
+#import "NECallUIKitConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSString *noResponseFilePath;
 
 /// 初始化
-- (instancetype)initWithBundle:(NSBundle *)bundle;
+- (instancetype)initWithBundle:(NSBundle *)bundle language:(NECallUILanguage)language;
 
 @end
 

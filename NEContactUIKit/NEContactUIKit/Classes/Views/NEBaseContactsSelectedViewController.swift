@@ -2,6 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -19,6 +21,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
 
   public var selectArray = [ContactInfo]()
   public let selectDic = [String: ContactInfo]()
+  public var isCreating = false // 是否正在创建群组
 
   public lazy var collectionBackView: UIView = {
     let view = UIView()
@@ -29,18 +32,18 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
     return view
   }()
 
-  public lazy var collection: UICollectionView = {
+  public lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 0
     layout.minimumInteritemSpacing = 0
-    let collect = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-    collect.contentInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-    collect.accessibilityIdentifier = "id.selected"
-    return collect
+    let collectView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+    collectView.contentInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+    collectView.accessibilityIdentifier = "id.selected"
+    return collectView
   }()
 
-  public var sureBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 76, height: 32))
+  public var sureButton = UIButton(frame: CGRect(x: 0, y: 0, width: 76, height: 32))
 
   var collectionBackViewTopMargin: CGFloat = 0
   var collectionBackViewHeight: CGFloat = 52
@@ -50,19 +53,19 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
   public let viewModel = ContactViewModel(contactHeaders: nil)
 
   public lazy var tableView: UITableView = {
-    let table = UITableView(frame: .zero, style: .plain)
-    table.backgroundColor = .clear
-    table.sectionIndexColor = .ne_greyText
-    table.delegate = self
-    table.dataSource = self
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.separatorStyle = .none
-    table.contentInset = .init(top: -10, left: 0, bottom: 0, right: 0)
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.backgroundColor = .clear
+    tableView.sectionIndexColor = .ne_greyText
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.contentInset = .init(top: -10, left: 0, bottom: 0, right: 0)
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0
+      tableView.sectionHeaderTopPadding = 0
     }
 
-    return table
+    return tableView
   }()
 
   var tableViewTopAnchor: NSLayoutConstraint?
@@ -73,7 +76,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -100,27 +103,27 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       collectionBackView.heightAnchor.constraint(equalToConstant: collectionBackViewHeight),
     ])
 
-    collection.backgroundColor = .clear
-    collection.delegate = self
-    collection.dataSource = self
-    collection.allowsMultipleSelection = false
-    collection.translatesAutoresizingMaskIntoConstraints = false
-    collectionBackView.addSubview(collection)
+    collectionView.backgroundColor = .clear
+    collectionView.delegate = self
+    collectionView.dataSource = self
+    collectionView.allowsMultipleSelection = false
+    collectionView.translatesAutoresizingMaskIntoConstraints = false
+    collectionBackView.addSubview(collectionView)
     NSLayoutConstraint.activate([
-      collection.centerYAnchor.constraint(equalTo: collectionBackView.centerYAnchor),
-      collection.leftAnchor.constraint(equalTo: collectionBackView.leftAnchor),
-      collection.rightAnchor.constraint(equalTo: collectionBackView.rightAnchor),
-      collection.heightAnchor.constraint(equalToConstant: collectionBackViewHeight),
+      collectionView.centerYAnchor.constraint(equalTo: collectionBackView.centerYAnchor),
+      collectionView.leftAnchor.constraint(equalTo: collectionBackView.leftAnchor),
+      collectionView.rightAnchor.constraint(equalTo: collectionBackView.rightAnchor),
+      collectionView.heightAnchor.constraint(equalToConstant: collectionBackViewHeight),
     ])
 
     view.addSubview(tableView)
 
     tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      tableViewTopAnchor!,
     ])
 
     tableView.register(
@@ -128,9 +131,9 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    customCells.forEach { (key: Int, value: AnyClass) in
+    for (key, value) in customCells {
       if value is ContactCellDataProtrol.Type {
-        self.tableView.register(
+        tableView.register(
           value,
           forCellReuseIdentifier: "\(NSStringFromClass(value))"
         )
@@ -148,27 +151,30 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
 
   open func setupNavRightItem() {
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      let rightItem = UIBarButtonItem(customView: sureBtn)
+      let rightItem = UIBarButtonItem(customView: sureButton)
       navigationItem.rightBarButtonItem = rightItem
-      sureBtn.addTarget(self, action: #selector(sureClick(_:)), for: .touchUpInside)
-      sureBtn.setTitle(localizable("alert_sure"), for: .normal)
-      sureBtn.setTitleColor(.white, for: .normal)
-      sureBtn.layer.cornerRadius = 4
-      sureBtn.contentHorizontalAlignment = .center
-      sureBtn.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
+      sureButton.addTarget(self, action: #selector(sureClick(_:)), for: .touchUpInside)
+      sureButton.setTitle(localizable("alert_sure"), for: .normal)
+      sureButton.setTitleColor(.white, for: .normal)
+      sureButton.layer.cornerRadius = 4
+      sureButton.contentHorizontalAlignment = .center
+      sureButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     } else {
       navigationView.setMoreButtonTitle(localizable("alert_sure"))
       navigationView.moreButton.setTitleColor(.white, for: .normal)
       navigationView.moreButton.layer.cornerRadius = 4
       navigationView.moreButton.contentHorizontalAlignment = .center
       navigationView.addMoreButtonTarget(target: self, selector: #selector(sureClick(_:)))
-      navigationView.setBackButtonTitle(localizable("close"))
-      navigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
-      sureBtn = navigationView.moreButton
+      sureButton = navigationView.moreButton
     }
   }
 
   open func sureClick(_ sender: UIButton) {
+    // 防止多次点击确定按钮会多次创建群聊
+    if isCreating {
+      return
+    }
+
     if selectArray.count <= 0 {
       showToast(localizable("select_contact"))
       return
@@ -185,35 +191,51 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       return
     }
 
+    isCreating = true
     var accids = [String]()
     var names = [String]()
+    let group = DispatchGroup()
+    var mine: NEUserWithFriend?
 
-    names.append(viewModel.contactRepo.getUserName())
-
-    var users = [NIMUser]()
-    for c in selectArray {
-      accids.append(c.user?.userId ?? "")
-      if let name = c.user?.userInfo?.nickName {
-        names.append(name)
-      } else if let accid = c.user?.userId {
-        names.append(accid)
-      }
-      if let user = c.user?.imUser {
-        users.append(user)
+    if let mineInfo = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+      mine = mineInfo
+    } else {
+      group.enter()
+      ContactRepo.shared.getMyUserInfo { mineInfo in
+        mine = mineInfo
+        group.leave()
       }
     }
 
-    if let uid = userId {
-      accids.append(uid)
+    group.notify(queue: .main) { [weak self] in
+      let myName = mine?.showName() ?? IMKitClient.instance.account()
+      names.append(myName)
+      var users = [V2NIMUser]()
+      for c in self?.selectArray ?? [] {
+        accids.append(c.user?.user?.accountId ?? "")
+        if let name = c.user?.user?.name {
+          names.append(name)
+        } else if let accid = c.user?.user?.accountId {
+          names.append(accid)
+        }
+        if let user = c.user?.user {
+          users.append(user)
+        }
+      }
+
+      if let uid = self?.userId {
+        accids.append(uid)
+      }
+      let nameString = names.joined(separator: "、")
+      print("name string : ", nameString)
+      Router.shared.use(
+        ContactSelectedUsersRouter,
+        parameters: ["accids": accids, "names": nameString, "im_user": users],
+        closure: nil
+      )
+      self?.navigationController?.popViewController(animated: true)
+      self?.isCreating = false
     }
-    let nameString = names.joined(separator: "、")
-    print("name string : ", nameString)
-    Router.shared.use(
-      ContactSelectedUsersRouter,
-      parameters: ["accids": accids, "names": nameString, "im_user": users],
-      closure: nil
-    )
-    navigationController?.popViewController(animated: true)
   }
 
   // MARK: - Table View DataSource And Delegate
@@ -320,7 +342,7 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
         tableViewTopAnchor?.constant += collectionBackViewHeight + collectionBackViewTopMargin * 2
       }
     }
-    collection.reloadData()
+    collectionView.reloadData()
     tableView.reloadData()
     refreshSelectCount()
   }
@@ -334,16 +356,16 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       collectionBackView.isHidden = true
       tableViewTopAnchor?.constant -= collectionBackViewHeight + collectionBackViewTopMargin * 2
     }
-    collection.reloadData()
+    collectionView.reloadData()
     tableView.reloadData()
     refreshSelectCount()
   }
 
   func refreshSelectCount() {
     if selectArray.count > 0 {
-      sureBtn.setTitle("确定(\(selectArray.count))", for: .normal)
+      sureButton.setTitle("确定(\(selectArray.count))", for: .normal)
     } else {
-      sureBtn.setTitle(localizable("alert_sure"), for: .normal)
+      sureButton.setTitle(localizable("alert_sure"), for: .normal)
     }
   }
 }

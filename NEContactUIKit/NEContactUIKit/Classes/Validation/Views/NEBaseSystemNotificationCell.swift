@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -13,6 +13,52 @@ import UIKit
 open class NEBaseSystemNotificationCell: NEBaseValidationCell {
   private var notifModel: NENotification?
   public weak var delegate: SystemNotificationCellDelegate?
+
+  public var rejectButton: ExpandButton = {
+    let button = ExpandButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setTitle(localizable("refuse"), for: .normal)
+    button.setTitleColor(UIColor(hexString: "333333"), for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
+    button.clipsToBounds = false
+    button.layer.cornerRadius = 4
+    button.layer.borderColor = UIColor(hexString: "D9D9D9").cgColor
+    button.layer.borderWidth = 1
+    button.accessibilityIdentifier = "id.reject"
+    return button
+  }()
+
+  public var agreeButton: ExpandButton = {
+    let button = ExpandButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setTitle(localizable("agree"), for: .normal)
+    let blue = UIColor(hexString: "337EFF")
+    button.setTitleColor(blue, for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+    button.clipsToBounds = true
+    button.layer.cornerRadius = 4
+    button.layer.borderWidth = 1
+    button.layer.borderColor = blue.cgColor
+    button.accessibilityIdentifier = "id.accept"
+    return button
+  }()
+
+  public lazy var resultImage: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = UIImage.ne_imageNamed(name: "finishFlag")
+    return imageView
+  }()
+
+  public lazy var resultLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textColor = UIColor(hexString: "B3B7BC")
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.textAlignment = .right
+    label.accessibilityIdentifier = "id.verifyResult"
+    return label
+  }()
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,26 +70,26 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
 
   override open func setupUI() {
     super.setupUI()
-    contentView.addSubview(agreeBtn)
-    contentView.addSubview(rejectBtn)
+    contentView.addSubview(agreeButton)
+    contentView.addSubview(rejectButton)
     contentView.addSubview(resultImage)
     contentView.addSubview(resultLabel)
     resultLabel.text = ""
     NSLayoutConstraint.activate([
-      agreeBtn.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      agreeBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      agreeBtn.widthAnchor.constraint(equalToConstant: 60),
-      agreeBtn.heightAnchor.constraint(equalToConstant: 32),
+      agreeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      agreeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      agreeButton.widthAnchor.constraint(equalToConstant: 60),
+      agreeButton.heightAnchor.constraint(equalToConstant: 32),
     ])
-    agreeBtn.addTarget(self, action: #selector(agreeClick(_:)), for: .touchUpInside)
+    agreeButton.addTarget(self, action: #selector(agreeClick(_:)), for: .touchUpInside)
 
     NSLayoutConstraint.activate([
-      rejectBtn.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      rejectBtn.rightAnchor.constraint(equalTo: agreeBtn.leftAnchor, constant: -16),
-      rejectBtn.widthAnchor.constraint(equalToConstant: 60),
-      rejectBtn.heightAnchor.constraint(equalToConstant: 32),
+      rejectButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      rejectButton.rightAnchor.constraint(equalTo: agreeButton.leftAnchor, constant: -16),
+      rejectButton.widthAnchor.constraint(equalToConstant: 60),
+      rejectButton.heightAnchor.constraint(equalToConstant: 32),
     ])
-    rejectBtn.addTarget(self, action: #selector(rejectClick(_:)), for: .touchUpInside)
+    rejectButton.addTarget(self, action: #selector(rejectClick(_:)), for: .touchUpInside)
 
     NSLayoutConstraint.activate([
       resultLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
@@ -61,115 +107,42 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
   override open func confige(_ model: NENotification) {
     super.confige(model)
     notifModel = model
-    let hideActionButton = shouldHideActionButton()
-    agreeBtn.isHidden = hideActionButton
-    rejectBtn.isHidden = hideActionButton
 
-    if hideActionButton {
-      let hidden = shouldHideResultStatus()
+    if model.handleStatus != .HandleTypePending {
+      agreeButton.isHidden = true
+      rejectButton.isHidden = true
+      titleLabelRightMargin?.constant = -90
 
-      resultLabel.isHidden = hidden
-      resultImage.isHidden = hidden
+      if model.applicantAccid == IMKitClient.instance.account() {
+        // 自己申请的，不展示结果
+        resultLabel.isHidden = true
+        resultImage.isHidden = true
+      } else {
+        resultLabel.isHidden = false
+        resultImage.isHidden = false
 
-      switch notifModel?.handleStatus {
-      case .HandleTypeOk:
-        resultLabel.text = localizable("agreed")
-        resultImage.image = UIImage.ne_imageNamed(name: "finishFlag")
-      case .HandleTypeNo:
-        resultLabel.text = localizable("refused")
-        resultImage.image = UIImage.ne_imageNamed(name: "refused")
-      case .HandleTypeOutOfDate:
-        resultLabel.text = localizable("expired")
-        resultImage.image = UIImage.ne_imageNamed(name: "refused")
-      default:
-        resultLabel.text = ""
+        switch model.handleStatus {
+        case .HandleTypeOk:
+          resultLabel.text = localizable("agreed")
+          resultImage.image = UIImage.ne_imageNamed(name: "finishFlag")
+        case .HandleTypeNo:
+          resultLabel.text = localizable("refused")
+          resultImage.image = UIImage.ne_imageNamed(name: "refused")
+        case .HandleTypeOutOfDate:
+          resultLabel.text = localizable("expired")
+          resultImage.image = UIImage.ne_imageNamed(name: "refused")
+        default:
+          resultLabel.text = ""
+        }
       }
-      titleLabelRightMargin?.constant = hidden ? -20 : -90
     } else {
+      agreeButton.isHidden = false
+      rejectButton.isHidden = false
       resultLabel.isHidden = true
       resultImage.isHidden = true
       titleLabelRightMargin?.constant = -180
     }
   }
-
-  func shouldHideActionButton() -> Bool {
-    let type = notifModel?.type
-    let handled = notifModel?.handleStatus != .HandleTypePending
-    var needHandel = false
-    if type == .teamApply ||
-      type == .teamInvite ||
-      type == .superTeamInvite ||
-      type == .superTeamApply {
-      needHandel = true
-    }
-
-    if type == .addFriendRequest {
-      if let obj = notifModel?.attachment {
-        if obj.isKind(of: NIMUserAddAttachment.self) {
-          let operation = (obj as NIMUserAddAttachment).operationType
-          needHandel = operation == .request
-        }
-      }
-    }
-    return !(!handled && needHandel)
-  }
-
-  func shouldHideResultStatus() -> Bool {
-    let type = notifModel?.type
-    if type == .addFriendVerify ||
-      type == .addFriendReject ||
-      type == .teamInviteReject {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  public var rejectBtn: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(localizable("refuse"), for: .normal)
-    button.setTitleColor(UIColor(hexString: "333333"), for: .normal)
-    button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-    button.clipsToBounds = false
-    button.layer.cornerRadius = 4
-    button.layer.borderColor = UIColor(hexString: "D9D9D9").cgColor
-    button.layer.borderWidth = 1
-    button.accessibilityIdentifier = "id.reject"
-    return button
-  }()
-
-  public var agreeBtn: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(localizable("agree"), for: .normal)
-    let blue = UIColor(hexString: "337EFF")
-    button.setTitleColor(blue, for: .normal)
-    button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-    button.clipsToBounds = true
-    button.layer.cornerRadius = 4
-    button.layer.borderWidth = 1
-    button.layer.borderColor = blue.cgColor
-    button.accessibilityIdentifier = "id.accept"
-    return button
-  }()
-
-  public lazy var resultImage: UIImageView = {
-    let rightImage = UIImageView()
-    rightImage.translatesAutoresizingMaskIntoConstraints = false
-    rightImage.image = UIImage.ne_imageNamed(name: "finishFlag")
-    return rightImage
-  }()
-
-  public lazy var resultLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = UIColor(hexString: "B3B7BC")
-    label.font = UIFont.systemFont(ofSize: 14.0)
-    label.textAlignment = .right
-    label.accessibilityIdentifier = "id.verifyResult"
-    return label
-  }()
 
   open func rejectClick(_ sender: UIButton) {
     if let model = notifModel {

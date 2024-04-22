@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -59,7 +59,7 @@ open class ContactsViewController: NEBaseContactsViewController {
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    cellRegisterDic.forEach { (key: Int, value: NEBaseContactTableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -71,7 +71,7 @@ open class ContactsViewController: NEBaseContactsViewController {
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    var reusedId = "\(info.contactCellType)"
+    let reusedId = "\(info.contactCellType)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
 
     if let c = cell as? ContactTableViewCell {

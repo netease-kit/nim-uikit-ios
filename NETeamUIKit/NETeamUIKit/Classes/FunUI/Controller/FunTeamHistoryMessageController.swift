@@ -16,13 +16,13 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
     return view
   }()
 
-  override public init(session: NIMSession?) {
-    super.init(session: session)
+  override public init(teamId: String?) {
+    super.init(teamId: teamId)
     tag = "FunTeamHistoryMessageController"
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -85,7 +85,7 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
       withIdentifier: "\(NSStringFromClass(FunHistoryMessageCell.self))",
       for: indexPath
     ) as! NEBaseHistoryMessageCell
-    let cellModel = viewmodel.searchResultInfos?[indexPath.row]
+    let cellModel = viewModel.searchResultInfos?[indexPath.row]
     cell.searchText = searchStr
     cell.configData(message: cellModel)
     return cell

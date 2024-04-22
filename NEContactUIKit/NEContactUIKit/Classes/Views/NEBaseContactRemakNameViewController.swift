@@ -4,16 +4,16 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UITextFieldDelegate {
-  typealias ModifyBlock = (_ user: NEKitUser) -> Void
+  typealias ModifyBlock = (_ user: NEUserWithFriend) -> Void
 
   var completion: ModifyBlock?
-  var user: NEKitUser?
+  var user: NEUserWithFriend?
   let viewmodel = ContactUserViewModel()
   let textLimit = 15
   lazy var aliasInput: UITextField = {
@@ -59,7 +59,7 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
 
     view.addSubview(aliasInput)
     aliasInput.placeholder = localizable("input_noteName")
-    if let alias = user?.alias, !alias.isEmpty {
+    if let alias = user?.friend?.alias, !alias.isEmpty {
       aliasInput.text = alias
     }
   }
@@ -83,15 +83,12 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
       return
     }
 
-    if user?.alias != aliasInput.text {
-      user?.alias = aliasInput.text
-      NotificationCenter.default.post(name: NENotificationName.updateFriendInfo, object: user)
-    }
+    user?.friend?.alias = aliasInput.text
 
     if let u = user {
       view.makeToastActivity(.center)
       viewmodel.update(u) { error in
-        NELog.infoLog(
+        NEALog.infoLog(
           "ContactRemakNameViewController",
           desc: "CALLBACK update " + (error?.localizedDescription ?? "no error")
         )

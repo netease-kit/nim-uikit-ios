@@ -11,7 +11,7 @@ import UIKit
 open class FunForwardUserCell: NEBaseForwardUserCell {
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = 4
+    userHeaderView.layer.cornerRadius = 4
   }
 }
 
@@ -19,10 +19,10 @@ open class FunForwardUserCell: NEBaseForwardUserCell {
 open class FunForwardAlertViewController: NEBaseForwardAlertViewController {
   override open func setupUI() {
     super.setupUI()
-    tip.font = .systemFont(ofSize: 16, weight: .semibold)
-    oneUserHead.layer.cornerRadius = 4.0
-    sureBtn.setTitleColor(.funChatThemeColor, for: .normal)
-    userCollection.register(
+    tipLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+    oneUserHeadView.layer.cornerRadius = 4.0
+    sureButton.setTitleColor(.funChatThemeColor, for: .normal)
+    userCollectionView.register(
       FunForwardUserCell.self,
       forCellWithReuseIdentifier: "\(FunForwardUserCell.self)"
     )

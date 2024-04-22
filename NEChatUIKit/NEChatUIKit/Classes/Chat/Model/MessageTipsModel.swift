@@ -10,29 +10,23 @@ import NIMSDK
 open class MessageTipsModel: MessageContentModel {
   var text: String?
 
-  public required init(message: NIMMessage?) {
+  public required init(message: V2NIMMessage?) {
     super.init(message: message)
-    commonInit()
-  }
-
-  func setText() {
+    type = .tip
     if let msg = message {
-      if msg.messageType == .notification {
+      if msg.messageType == .MESSAGE_TYPE_NOTIFICATION {
         text = NotificationMessageUtils.textForNotification(message: msg)
         type = .notification
-      } else if msg.messageType == .tip {
+      } else if msg.messageType == .MESSAGE_TYPE_TIP {
         text = msg.text
         type = .tip
       }
     }
-  }
 
-  func commonInit() {
-    setText()
     let font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
 
-    contentSize = text?.finalSize(font, CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
-    height = ceil(contentSize.height)
+    contentSize = String.getRealSize(text, font, messageMaxSize)
+    height = contentSize.height + chat_content_margin * 3
 
     // time
     if let time = timeContent, !time.isEmpty {

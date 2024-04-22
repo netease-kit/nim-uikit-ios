@@ -23,6 +23,6 @@ open class NEBaseTeamArrowSettingCell: NEBaseTeamSettingCell {
 
   open func setupUI() {
     contentView.addSubview(titleLabel)
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowView)
   }
 }

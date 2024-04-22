@@ -17,7 +17,6 @@
 "record_too_short"="录音时间太短";
 "no_microphone_permission"="没有麦克风权限";
 "choose"="请选择";
-"take_photo"="拍照";
 "select_from_album"="从相册选择";
 "select_from_icloud"="从iCloud选择";
 "editing"="对方正在输入中...";
@@ -54,6 +53,7 @@
 "team_be_invited_author" = "是否需要被邀请者同意权限";
 "team_update_info_permission" = "群资料修改权限";
 "team_update_client_custom"="更新客户端自定义字段的权限";
+"team_at_permission"="@所有人权限更新为";
 
 "team_custom_info" = "自定义扩展字段";
 "not_mute" = "解除禁言";
@@ -167,6 +167,7 @@
 "failed_operation"="操作失败";
 "team_not_exist"="群组不存在";
 "unpin_failed"="取消标记失败";
+"pin_limit_exceeded"="已超出 pin 数量上限";
 
 "fun_hold_to_talk"="按住 说话";
 
@@ -192,6 +193,7 @@
 "multiForward_open_failed"="信息获取失败";
 "file_check_failed"="文件校验失败";
 "per_item_forward_limit"="逐条转发限制%d条消息";
+"selete_messages_limit"="批量删除限制%d条消息";
 "multiForward_forward_limit"="合并转发限制%d条消息";
 "exception_description"="异常说明";
 

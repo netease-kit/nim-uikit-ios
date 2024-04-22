@@ -6,6 +6,7 @@
 #import <NECommonKit/NECommonKit-Swift.h>
 #import <NERtcCallKit/NERtcCallKit.h>
 #import <SDWebImage/SDWebImage.h>
+#import "NECallKitUtil.h"
 #import "NECallViewController.h"
 
 @interface NECallUIStateController ()
@@ -127,7 +128,7 @@ navigation
     _subTitleLabel = [[UILabel alloc] init];
     _subTitleLabel.font = [UIFont boldSystemFontOfSize:self.subTitleFontSize];
     _subTitleLabel.textColor = [UIColor whiteColor];
-    _subTitleLabel.text = [self localizableWithKey:@"waitting_remote_response"];
+    _subTitleLabel.text = [NECallKitUtil localizableWithKey:@"waitting_remote_response"];
     _subTitleLabel.textAlignment = NSTextAlignmentRight;
     _subTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
   }
@@ -137,7 +138,7 @@ navigation
 - (NECustomButton *)cancelBtn {
   if (!_cancelBtn) {
     _cancelBtn = [[NECustomButton alloc] init];
-    _cancelBtn.titleLabel.text = [self localizableWithKey:@"call_cancel"];
+    _cancelBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"call_cancel"];
     _cancelBtn.imageView.image = [UIImage imageNamed:@"call_cancel"
                                             inBundle:self.bundle
                        compatibleWithTraitCollection:nil];
@@ -152,7 +153,7 @@ navigation
 - (NECustomButton *)rejectBtn {
   if (!_rejectBtn) {
     _rejectBtn = [[NECustomButton alloc] init];
-    _rejectBtn.titleLabel.text = [self localizableWithKey:@"call_reject"];
+    _rejectBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"call_reject"];
     _rejectBtn.imageView.image = [UIImage imageNamed:@"call_cancel"
                                             inBundle:self.bundle
                        compatibleWithTraitCollection:nil];
@@ -167,7 +168,7 @@ navigation
 - (NECustomButton *)acceptBtn {
   if (!_acceptBtn) {
     _acceptBtn = [[NECustomButton alloc] init];
-    _acceptBtn.titleLabel.text = [self localizableWithKey:@"call_accept"];
+    _acceptBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"call_accept"];
     _acceptBtn.imageView.image = [UIImage imageNamed:@"call_accept"
                                             inBundle:self.bundle
                        compatibleWithTraitCollection:nil];
@@ -183,7 +184,7 @@ navigation
 - (NECustomButton *)microphoneBtn {
   if (nil == _microphoneBtn) {
     _microphoneBtn = [[NECustomButton alloc] init];
-    _microphoneBtn.titleLabel.text = [self localizableWithKey:@"call_micro_phone"];
+    _microphoneBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"call_micro_phone"];
     _microphoneBtn.imageView.image = [UIImage imageNamed:@"micro_phone"
                                                 inBundle:self.bundle
                            compatibleWithTraitCollection:nil];
@@ -202,7 +203,7 @@ navigation
 - (NECustomButton *)speakerBtn {
   if (nil == _speakerBtn) {
     _speakerBtn = [[NECustomButton alloc] init];
-    _speakerBtn.titleLabel.text = [self localizableWithKey:@"call_speaker"];
+    _speakerBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"call_speaker"];
     _speakerBtn.imageView.image = [UIImage imageNamed:@"speaker_off"
                                              inBundle:self.bundle
                         compatibleWithTraitCollection:nil];
@@ -223,7 +224,7 @@ navigation
     _centerSubtitleLabel = [[UILabel alloc] init];
     _centerSubtitleLabel.textColor = [UIColor whiteColor];
     _centerSubtitleLabel.font = [UIFont systemFontOfSize:self.subTitleFontSize];
-    _centerSubtitleLabel.text = [self localizableWithKey:@"waitting_remote_accept"];
+    _centerSubtitleLabel.text = [NECallKitUtil localizableWithKey:@"waitting_remote_accept"];
     _centerSubtitleLabel.textAlignment = NSTextAlignmentCenter;
     _centerSubtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
   }
@@ -307,9 +308,10 @@ navigation
 }
 
 - (void)setupVideoCallingUI {
-  self.titleLabel.text = [NSString stringWithFormat:@"%@ %@", [self localizableWithKey:@"calling"],
-                                                    self.callParam.remoteShowName];
-  self.subTitleLabel.text = [self localizableWithKey:@"waitting_remote_accept"];
+  self.titleLabel.text =
+      [NSString stringWithFormat:@"%@ %@", [NECallKitUtil localizableWithKey:@"calling"],
+                                 self.callParam.remoteShowName];
+  self.subTitleLabel.text = [NECallKitUtil localizableWithKey:@"waitting_remote_accept"];
 
   if (self.callParam.remoteAvatar.length <= 0) {
     UIView *cover = [self getDefaultHeaderView:self.callParam.remoteUserAccid
@@ -332,9 +334,9 @@ navigation
 
 - (void)setupAudioCallingUI {
   self.centerTitleLabel.text =
-      [NSString stringWithFormat:@"%@ %@", [self localizableWithKey:@"calling"],
+      [NSString stringWithFormat:@"%@ %@", [NECallKitUtil localizableWithKey:@"calling"],
                                  self.callParam.remoteShowName];
-  self.centerSubtitleLabel.text = [self localizableWithKey:@"waitting_remote_accept"];
+  self.centerSubtitleLabel.text = [NECallKitUtil localizableWithKey:@"waitting_remote_accept"];
   if (self.callParam.remoteAvatar.length <= 0) {
     UIView *cover = [self getDefaultHeaderView:self.callParam.remoteUserAccid
                                           font:[UIFont systemFontOfSize:self.titleFontSize]
@@ -369,8 +371,8 @@ navigation
 
 - (NSString *)getInviteText {
   return (self.callParam.callType == NERtcCallTypeAudio
-              ? [self localizableWithKey:@"invite_audio_call"]
-              : [self localizableWithKey:@"invite_video_call"]);
+              ? [NECallKitUtil localizableWithKey:@"invite_audio_call"]
+              : [NECallKitUtil localizableWithKey:@"invite_video_call"]);
 }
 
 - (void)refreshVideoView {
@@ -383,7 +385,7 @@ navigation
     NSLog(@"show my big view");
     self.smallVideoView.maskView.hidden = !self.mainController.isRemoteMute;
     self.bigVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
-    self.bigVideoView.userID = self.callParam.currentUserAccid;
+    self.bigVideoView.userID = NIMSDK.sharedSDK.loginManager.currentAccount;
     self.smallVideoView.userID = self.callParam.remoteUserAccid;
   } else {
     [[NECallEngine sharedInstance] setupLocalView:self.smallVideoView.videoView];
@@ -392,7 +394,7 @@ navigation
     self.bigVideoView.maskView.hidden = !self.mainController.isRemoteMute;
     self.smallVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
     self.bigVideoView.userID = self.callParam.remoteUserAccid;
-    self.smallVideoView.userID = self.callParam.currentUserAccid;
+    self.smallVideoView.userID = NIMSDK.sharedSDK.loginManager.currentAccount;
   }
 }
 
@@ -416,11 +418,6 @@ navigation
     ]];
   }
   return headerView;
-}
-
-- (NSString *)localizableWithKey:(NSString *)key {
-  return [self.bundle localizedStringForKey:key value:nil table:@"Localizable"];
-  ;
 }
 
 @end

@@ -13,7 +13,7 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     cellClassDic = [0: FunTeamArrowSettingCell.self, 1: FunTeamManagerMemberCell.self]
   }
 
-  lazy var emptyView: NEEmptyDataView = {
+  public lazy var emptyView: NEEmptyDataView = {
     let view = NEEmptyDataView(imageName: "fun_user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
@@ -58,8 +58,8 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     cell.delegate = self
     cell.index = indexPath.row
     cell.configure(viewmodel.managers[indexPath.row])
-    if let type = viewmodel.currentMember?.type, type == .manager {
-      cell.removeBtn.isHidden = true
+    if let type = viewmodel.currentMember?.memberRole, type == .TEAM_MEMBER_ROLE_MANAGER {
+      cell.removeButton.isHidden = true
       cell.removeLabel.isHidden = true
     }
     return cell
@@ -78,6 +78,7 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     if indexPath.section == 0 {
       let selectController = FunTeamMemberSelectController()
       selectController.teamId = teamId
+
       selectController.selectMemberBlock = { [weak self] datas in
         self?.didAddManagers(datas)
       }

@@ -6,13 +6,14 @@ import UIKit
 
 @objcMembers
 open class NEBasePinMessageTextCell: NEBasePinMessageCell {
-  lazy var contentLabel: UILabel = {
+  public lazy var contentLabel: UILabel = {
     let label = UILabel()
     label.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true
     label.numberOfLines = 3
+    label.accessibilityIdentifier = "id.message"
     return label
   }()
 
@@ -64,7 +65,7 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
     if let model = item.chatmodel as? MessageTextModel {
       contentLabel.attributedText = model.attributeStr

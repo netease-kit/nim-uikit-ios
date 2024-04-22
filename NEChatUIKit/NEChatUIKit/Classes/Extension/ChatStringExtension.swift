@@ -5,28 +5,12 @@
 
 import Foundation
 
-// 缓存的用于计算高度的Label
-var tempLabelForCalc: UILabel = {
-  let label = UILabel()
-  label.numberOfLines = 0
-  return label
-}()
-
 extension String {
-  /// 计算 string 的 size
-  static func getTextRectSize(_ text: String, font: UIFont, size: CGSize) -> CGSize {
-    let attributes = [NSAttributedString.Key.font: font]
-    let option = NSStringDrawingOptions.usesLineFragmentOrigin
-    let rect: CGRect = text.boundingRect(with: size, options: option,
-                                         attributes: attributes, context: nil)
-    return CGSize(width: ceil(rect.width), height: ceil(rect.height))
-  }
-
   /// 计算 string 的行数，使用 font 的 lineHeight
   static func calculateMaxLines(width: CGFloat, string: String?, font: UIFont) -> Int {
     let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
     let charSize = font.lineHeight
-    let textSize = string?.finalSize(font, maxSize) ?? .zero
+    let textSize = String.getRealSize(string, font, maxSize)
     let lines = Int(textSize.height / charSize)
     return lines
   }
@@ -35,7 +19,7 @@ extension String {
   static func calculateMaxLines(width: CGFloat, attributeString: NSAttributedString?, font: UIFont) -> Int {
     let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
     let charSize = font.lineHeight
-    let textSize = attributeString?.finalSize(font, maxSize) ?? .zero
+    let textSize = NSAttributedString.getRealSize(attributeString, font, maxSize)
     let lines = Int(textSize.height / charSize)
     return lines
   }

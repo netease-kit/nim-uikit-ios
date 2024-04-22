@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class CenterTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()
@@ -36,6 +37,6 @@ open class CenterTextCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 }

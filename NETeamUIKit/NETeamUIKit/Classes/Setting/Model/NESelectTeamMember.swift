@@ -8,5 +8,5 @@ import UIKit
 @objcMembers
 open class NESelectTeamMember: NSObject {
   var isSelected: Bool = false
-  var member: TeamMemberInfoModel?
+  var member: NETeamMemberInfoModel?
 }

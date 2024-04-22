@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -12,7 +12,7 @@ import UIKit
 @objcMembers
 open class NEBaseContactUserViewController: NEBaseContactViewController, UITableViewDelegate,
   UITableViewDataSource {
-  var user: NEKitUser?
+  var user: NEUserWithFriend?
   var uid: String?
   public var isBlack: Bool = false
   var className = "ContactUserViewController"
@@ -22,10 +22,10 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   var data = [[UserItem]]()
   public var headerView = NEBaseUserInfoHeaderView()
 
-  public init(user: NEKitUser?) {
+  public init(user: NEUserWithFriend?) {
     super.init(nibName: nil, bundle: nil)
     self.user = user
-    uid = user?.userId
+    uid = user?.user?.accountId
   }
 
   public init(uid: String) {
@@ -34,7 +34,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -47,17 +47,16 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
         weakSelf?.showToast(commonLocalizable("network_error"), .bottom)
       }
       view.makeToastActivity(.center)
-      viewModel.fetchUserInfo(accountList: [userId]) { users, error in
+      viewModel.getUserInfo(userId) { user, error in
         weakSelf?.view.hideToastActivity()
-        NELog.infoLog(
+        NEALog.infoLog(
           weakSelf?.className ?? "ContactUserViewController",
           desc: "CALLBACK getUserInfo " + (error?.localizedDescription ?? "no error")
         )
         if let err = error {
           weakSelf?.showToast(err.localizedDescription)
-        } else if let u = users?.first {
+        } else if let u = user {
           weakSelf?.user = u
-          ChatUserCache.updateUserInfo(u)
           weakSelf?.loadData()
         }
       }
@@ -108,77 +107,80 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   func loadData() {
-    let isFriend = viewModel.contactRepo.isFriend(account: user?.userId ?? "")
-    isBlack = viewModel.contactRepo.isBlackList(account: user?.userId ?? "")
+    guard let uid = user?.user?.accountId else { return }
+    viewModel.contactRepo.isFriend(accountId: uid) { [weak self] isFriend in
+      self?.viewModel.contactRepo.isBlockList(accountId: uid) { isBlack in
+        self?.isBlack = isBlack
+        if isFriend {
+          self?.data = [
+            [
+              UserItem(title: localizable("noteName"),
+                       detailTitle: self?.user?.friend?.alias,
+                       value: false,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithRightArrowCell.self),
+            ],
+            [
+              UserItem(title: localizable("birthday"),
+                       detailTitle: self?.user?.user?.birthday,
+                       value: false,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithDetailTextCell.self),
+              UserItem(title: localizable("phone"),
+                       detailTitle: self?.user?.user?.mobile,
+                       value: false,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithDetailTextCell.self),
+              UserItem(title: localizable("email"),
+                       detailTitle: self?.user?.user?.email,
+                       value: false,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithDetailTextCell.self),
+              UserItem(title: localizable("sign"),
+                       detailTitle: self?.user?.user?.sign,
+                       value: false,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithDetailTextCell.self),
+            ],
 
-    if isFriend {
-      data = [
-        [
-          UserItem(title: localizable("noteName"),
-                   detailTitle: user?.alias,
-                   value: false,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithRightArrowCell.self),
-        ],
-        [
-          UserItem(title: localizable("birthday"),
-                   detailTitle: user?.userInfo?.birth,
-                   value: false,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithDetailTextCell.self),
-          UserItem(title: localizable("phone"),
-                   detailTitle: user?.userInfo?.mobile,
-                   value: false,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithDetailTextCell.self),
-          UserItem(title: localizable("email"),
-                   detailTitle: user?.userInfo?.email,
-                   value: false,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithDetailTextCell.self),
-          UserItem(title: localizable("sign"),
-                   detailTitle: user?.userInfo?.sign,
-                   value: false,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithDetailTextCell.self),
-        ],
+            [
+              UserItem(title: localizable("add_blackList"),
+                       detailTitle: "",
+                       value: isBlack,
+                       textColor: UIColor.darkText,
+                       cellClass: TextWithSwitchCell.self),
+            ],
+            [
+              UserItem(title: localizable("chat"),
+                       detailTitle: "",
+                       value: false,
+                       textColor: UIColor(hexString: "#337EFF"),
+                       cellClass: CenterTextCell.self),
+              UserItem(title: localizable("delete_friend"),
+                       detailTitle: "",
+                       value: false,
+                       textColor: UIColor.red,
+                       cellClass: CenterTextCell.self),
+            ],
+          ]
+        } else {
+          self?.data = [
+            [
+              UserItem(title: localizable("add_friend"),
+                       detailTitle: self?.user?.friend?.alias,
+                       value: false,
+                       textColor: UIColor(hexString: "#337EFF"),
+                       cellClass: CenterTextCell.self),
+            ],
+          ]
+        }
 
-        [
-          UserItem(title: localizable("add_blackList"),
-                   detailTitle: "",
-                   value: isBlack,
-                   textColor: UIColor.darkText,
-                   cellClass: TextWithSwitchCell.self),
-        ],
-        [
-          UserItem(title: localizable("chat"),
-                   detailTitle: "",
-                   value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
-                   cellClass: CenterTextCell.self),
-          UserItem(title: localizable("delete_friend"),
-                   detailTitle: "",
-                   value: false,
-                   textColor: UIColor.red,
-                   cellClass: CenterTextCell.self),
-        ],
-      ]
-    } else {
-      data = [
-        [
-          UserItem(title: localizable("add_friend"),
-                   detailTitle: user?.alias,
-                   value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
-                   cellClass: CenterTextCell.self),
-        ],
-      ]
+        self?.headerView.setData(user: self?.user)
+        self?.tableView.tableHeaderView = self?.tableView.tableHeaderView
+        self?.tableView.tableHeaderView?.layoutIfNeeded()
+        self?.tableView.reloadData()
+      }
     }
-
-    headerView.setData(user: user)
-    tableView.tableHeaderView = tableView.tableHeaderView
-    tableView.tableHeaderView?.layoutIfNeeded()
-    tableView.reloadData()
   }
 
   open func numberOfSections(in tableView: UITableView) -> Int {
@@ -242,9 +244,9 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = UIColor.clear
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = UIColor.clear
+    return headerView
   }
 
   open func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -273,11 +275,14 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       deleteFriend(user: user)
     }
     if item.title == localizable("add_friend") {
-      if let uId = user?.userId,
-         viewModel.isFriend(account: uId) {
-        loadData()
-      } else {
-        addFriend()
+      if let uId = user?.user?.accountId {
+        viewModel.isFriend(account: uId) { isFriend in
+          if isFriend {
+            self.loadData()
+          } else {
+            self.addFriend()
+          }
+        }
       }
     }
   }
@@ -292,7 +297,6 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     remark.completion = { [weak self] u in
       self?.user = u
       self?.headerView.setData(user: u)
-      ChatUserCache.updateUserInfo(u)
     }
     navigationController?.pushViewController(remark, animated: true)
 
@@ -311,12 +315,12 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       return
     }
 
-    guard let userId = user?.userId else {
+    guard let userId = user?.user?.accountId else {
       return
     }
     if isBlack {
       // add
-      viewModel.contactRepo.addBlackList(account: userId) { [weak self] error in
+      viewModel.contactRepo.addBlockList(accountId: userId) { [weak self] error in
         if error != nil {
           self?.view.makeToast(error?.localizedDescription)
         } else {
@@ -328,7 +332,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
 
     } else {
       // remove
-      viewModel.contactRepo.removeBlackList(account: userId) { [weak self] error in
+      viewModel.contactRepo.removeBlockList(accountId: userId) { [weak self] error in
         if error != nil {
           self?.view.makeToast(error?.localizedDescription)
         } else {
@@ -340,42 +344,42 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     }
   }
 
-  func chat(user: NEKitUser?) {
-    guard let accid = self.user?.userId else {
+  func chat(user: NEUserWithFriend?) {
+    guard let accid = self.user?.user?.accountId else {
       return
     }
 
-    let session = NIMSession(accid, type: .P2P)
+    let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid)
     Router.shared.use(
       PushP2pChatVCRouter,
-      parameters: ["nav": navigationController as Any, "session": session, "removeUserVC": true],
+      parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any, "removeUserVC": true],
       closure: nil
     )
   }
 
-  func deleteFriendAction(user: NEKitUser?) {
+  func deleteFriendAction(user: NEUserWithFriend?) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
       return
     }
-    if let userId = user?.userId {
+    if let userId = user?.user?.accountId {
       viewModel.deleteFriend(account: userId) { error in
-        NELog.infoLog(
+        NEALog.infoLog(
           self.className,
           desc: "CALLBACK deleteFriend " + (error?.localizedDescription ?? "no error")
         )
         if error != nil {
           self.showToast(error?.localizedDescription ?? "")
         } else {
-          ChatUserCache.removeUserInfo(userId)
+          NEFriendUserCache.shared.removeFriendInfo(userId)
           self.navigationController?.popViewController(animated: true)
         }
       }
     }
   }
 
-  open func deleteFriend(user: NEKitUser?) {
+  open func deleteFriend(user: NEUserWithFriend?) {
     let alertTitle = String(format: localizable("delete_title"), user?.showName(true) ?? "")
     let alertController = UIAlertController(
       title: alertTitle,
@@ -411,23 +415,26 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       weakSelf?.showToast(commonLocalizable("network_error"))
       return
     }
-    if let account = user?.userId {
+    if let account = user?.user?.accountId {
       viewModel.addFriend(account) { error in
-        NELog.infoLog(
+        NEALog.infoLog(
           self.className,
           desc: "CALLBACK addFriend " + (error?.localizedDescription ?? "no error")
         )
         if let err = error {
-          NELog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
+          NEALog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
         } else {
           weakSelf?.showToast(localizable("send_friend_apply"))
-          if let model = weakSelf?.viewModel,
-             model.isBlack(account: account) {
-            weakSelf?.viewModel.removeBlackList(account: account) { err in
-              NELog.infoLog(
-                self.className,
-                desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
-              )
+          if let model = weakSelf?.viewModel {
+            model.isBlack(account: account) { isBlack in
+              if isBlack {
+                weakSelf?.viewModel.removeBlackList(account: account) { err in
+                  NEALog.infoLog(
+                    self.className,
+                    desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
+                  )
+                }
+              }
             }
           }
         }

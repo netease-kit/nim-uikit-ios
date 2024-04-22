@@ -13,24 +13,23 @@ public enum DownloadState: Int {
 }
 
 @objcMembers
-open class MessageVideoModel: MessageContentModel {
-  public var imageUrl: String?
+open class MessageVideoModel: MessageImageModel {
   public var state = DownloadState.Success
-  public var progress: Float = 0
+  public var progress: UInt = 0
   public weak var cell: NEChatBaseCell?
-  public required init(message: NIMMessage?) {
+
+  public required init(message: V2NIMMessage?) {
     super.init(message: message)
     type = .video
-    if let videoObject = message?.messageObject as? NIMVideoObject {
-      imageUrl = videoObject.url
+    if let videoObject = message?.attachment as? V2NIMMessageVideoAttachment {
       contentSize = ChatMessageHelper.getSizeWithMaxSize(
         chat_pic_size,
-        size: videoObject.coverSize,
+        size: CGSize(width: videoObject.width, height: videoObject.height),
         miniWH: chat_min_h
       )
     } else {
       contentSize = chat_pic_size
     }
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

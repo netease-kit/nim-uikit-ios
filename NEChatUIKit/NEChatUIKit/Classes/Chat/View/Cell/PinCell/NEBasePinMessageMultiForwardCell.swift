@@ -19,7 +19,7 @@ open class NEBasePinMessageMultiForwardCell: NEBasePinMessageCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupUI() {
@@ -45,9 +45,9 @@ open class NEBasePinMessageMultiForwardCell: NEBasePinMessageCell {
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
-    guard let data = NECustomAttachment.dataOfCustomMessage(message: item.chatmodel.message) else {
+    guard let data = NECustomAttachment.dataOfCustomMessage(item.chatmodel.message?.attachment) else {
       return
     }
 

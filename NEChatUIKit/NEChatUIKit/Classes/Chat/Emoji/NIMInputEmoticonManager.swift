@@ -3,8 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
+
 public enum NIMEmoticonType: NSInteger {
   case file = 0
   case unicode
@@ -100,7 +101,7 @@ open class NIMInputEmoticonManager: NSObject {
     let cataLog = NIMInputEmoticonCatalog()
 
     guard let infoDict = info, let emotions = emoticonsArray else {
-      NELog.errorLog(classTag, desc: "❌info or emoticonsArray is nil")
+      NEALog.errorLog(classTag, desc: "❌info or emoticonsArray is nil")
       return cataLog
     }
     cataLog.catalogID = infoDict["id"] as? String
@@ -111,7 +112,7 @@ open class NIMInputEmoticonManager: NSObject {
     var id2Emoticons = [String: NIMInputEmoticon]()
     var resultEmotions = [NIMInputEmoticon]()
 
-    emotions.forEach { emoticonDict in
+    for emoticonDict in emotions {
       if let dict = (emoticonDict as? NSDictionary) {
         let emotion = NIMInputEmoticon()
         emotion.emoticonID = dict["id"] as? String
@@ -151,7 +152,7 @@ open class NIMInputEmoticonManager: NSObject {
     var emotion: NIMInputEmoticon?
 
     guard let clogs = catalogs else {
-      NELog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
       return emotion
     }
 
@@ -171,7 +172,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByID(emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NELog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
       return emotion
     }
 
@@ -191,7 +192,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByCatalogID(catalogID: String, emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NELog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
       return emotion
     }
 

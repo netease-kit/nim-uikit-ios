@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamSettingSelectCell: NEBaseTeamSettingCell {
-  lazy var subTitleLabel: UILabel = {
+  public lazy var subTitleLabel: UILabel = {
     let label = UILabel()
     label.textColor = NEConstant.hexRGB(0x999999)
     label.font = NEConstant.defaultTextFont(14.0)
@@ -31,9 +31,9 @@ open class NEBaseTeamSettingSelectCell: NEBaseTeamSettingCell {
     subTitleLabel.text = model?.subTitle
   }
 
-  func setupUI() {
+  open func setupUI() {
     contentView.addSubview(titleLabel)
     contentView.addSubview(subTitleLabel)
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowView)
   }
 }

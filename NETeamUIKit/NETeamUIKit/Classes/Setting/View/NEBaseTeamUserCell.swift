@@ -4,37 +4,47 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class NEBaseTeamUserCell: UICollectionViewCell {
-  var user: TeamMemberInfoModel? {
+  public var user: NETeamMemberInfoModel? {
     didSet {
       if let name = user?.showNickInTeam() {
-        userHeader.setTitle(name)
+        userHeaderView.setTitle(name)
       }
-      if let userId = user?.nimUser?.userId, let nimUser = ChatUserCache.getUserInfo(userId) {
-        user?.nimUser = nimUser
-      }
-      if let url = user?.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
-        userHeader.sd_setImage(with: URL(string: url), completed: nil)
-        userHeader.setTitle("")
-      } else if let id = user?.nimUser?.userId {
-        userHeader.image = nil
-        userHeader.backgroundColor = UIColor.colorWithString(string: "\(id)")
+
+      if let userId = user?.nimUser?.user?.accountId {
+        if let u = NEFriendUserCache.shared.getFriendInfo(userId) {
+          if let url = u.user?.avatar, !url.isEmpty {
+            userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+            userHeaderView.setTitle("")
+          } else if let id = u.user?.accountId {
+            userHeaderView.image = nil
+            userHeaderView.backgroundColor = UIColor.colorWithString(string: "\(id)")
+          }
+        } else {
+          if let url = user?.nimUser?.user?.avatar, !url.isEmpty {
+            userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+            userHeaderView.setTitle("")
+          } else if let id = user?.nimUser?.user?.accountId {
+            userHeaderView.image = nil
+            userHeaderView.backgroundColor = UIColor.colorWithString(string: "\(id)")
+          }
+        }
       }
     }
   }
 
-  lazy var userHeader: NEUserHeaderView = {
-    let header = NEUserHeaderView(frame: .zero)
-    header.translatesAutoresizingMaskIntoConstraints = false
-    header.titleLabel.font = NEConstant.defaultTextFont(11.0)
-    header.clipsToBounds = true
-    return header
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let headerView = NEUserHeaderView(frame: .zero)
+    headerView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.titleLabel.font = NEConstant.defaultTextFont(11.0)
+    headerView.clipsToBounds = true
+    return headerView
   }()
 
   override public init(frame: CGRect) {
@@ -47,6 +57,6 @@ open class NEBaseTeamUserCell: UICollectionViewCell {
   }
 
   func setupUI() {
-    contentView.addSubview(userHeader)
+    contentView.addSubview(userHeaderView)
   }
 }

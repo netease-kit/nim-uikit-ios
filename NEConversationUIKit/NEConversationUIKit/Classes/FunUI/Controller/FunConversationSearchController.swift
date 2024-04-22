@@ -7,13 +7,26 @@ import UIKit
 
 @objcMembers
 open class FunConversationSearchController: NEBaseConversationSearchController {
+  /// 取消按钮
+  lazy var cancelButton: UIButton = {
+    let cancelButton = UIButton()
+    cancelButton.translatesAutoresizingMaskIntoConstraints = false
+    cancelButton.setTitle(localizable("cancel"), for: .normal)
+    cancelButton.setTitleColor(.ne_greyText, for: .normal)
+    cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
+    cancelButton.titleLabel?.adjustsFontSizeToFitWidth = true
+    cancelButton.contentHorizontalAlignment = .center
+    cancelButton.accessibilityIdentifier = "id.cancelBtn"
+    return cancelButton
+  }()
+
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     tag = "FunConversationSearchController"
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -24,6 +37,7 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
     emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
+  /// 初始化子视图
   override open func setupSubviews() {
     super.setupSubviews()
     let leftImageView = UIImageView(image: UIImage
@@ -40,13 +54,6 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
       searchTextField.heightAnchor.constraint(equalToConstant: 36),
     ])
 
-    let cancelButton = UIButton()
-    cancelButton.translatesAutoresizingMaskIntoConstraints = false
-    cancelButton.setTitle(localizable("cancel"), for: .normal)
-    cancelButton.setTitleColor(.ne_greyText, for: .normal)
-    cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
-    cancelButton.titleLabel?.adjustsFontSizeToFitWidth = true
-    cancelButton.contentHorizontalAlignment = .center
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
       cancelButton.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
@@ -87,7 +94,7 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(SearchSessionBaseView.self))"
       ) as! FunSearchSessionHeaderView
-    sectionView.title.textColor = .funConversationSearchHeaderViewTitleColor
+    sectionView.titleLabel.textColor = .funConversationSearchHeaderViewTitleColor
     sectionView.bottomLine.backgroundColor = .funConversationLineBorderColor
     sectionView.setUpTitle(title: headTitleArr[section])
     return sectionView

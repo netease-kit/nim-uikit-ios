@@ -60,14 +60,14 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
     ])
   }
 
-  open func configure(_ model: ChatTeamMemberInfoModel) {
-    if let url = model.nimUser?.userInfo?.avatarUrl, !url.isEmpty {
+  open func configure(_ model: NETeamMemberInfoModel) {
+    if let url = model.nimUser?.user?.avatar, !url.isEmpty {
       headerView.sd_setImage(with: URL(string: url), completed: nil)
       headerView.setTitle("")
     } else {
       headerView.image = nil
-      headerView.setTitle(model.showNickInTeam())
-      headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.userId)
+      headerView.setTitle(model.showNickInTeam() ?? "")
+      headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.user?.accountId)
     }
     nameLabel.text = model.atNameInTeam()
   }

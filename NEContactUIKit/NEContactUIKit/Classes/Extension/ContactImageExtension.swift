@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+
 public extension UIImage {
   class func ne_imageNamed(name: String?) -> UIImage? {
     guard let imageName = name, !imageName.isEmpty else {

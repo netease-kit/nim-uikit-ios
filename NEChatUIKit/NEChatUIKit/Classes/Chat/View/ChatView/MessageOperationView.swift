@@ -57,7 +57,8 @@ open class MessageOperationView: UIView, UICollectionViewDataSource, UICollectio
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    collcetionView = UICollectionView(frame: .zero)
+    super.init(coder: coder)
   }
 
 //    MARK: UICollectionViewDataSource

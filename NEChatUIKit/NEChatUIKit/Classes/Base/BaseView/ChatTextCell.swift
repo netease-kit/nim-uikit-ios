@@ -17,7 +17,10 @@ open class ChatTextCell: ChatStateCell {
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
+  }
 
+  override open func setupUI() {
+    super.setupUI()
     titleLabel.font = UIFont.systemFont(ofSize: 16)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textColor = .ne_darkText
@@ -64,6 +67,6 @@ open class ChatTextCell: ChatStateCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 }

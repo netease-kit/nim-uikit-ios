@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -13,8 +13,7 @@ public protocol NEBaseContactsViewControllerDelegate {
 }
 
 @objcMembers
-open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
-  SystemMessageProviderDelegate, FriendProviderDelegate, TabNavigationViewDelegate, UIGestureRecognizerDelegate {
+open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TabNavigationViewDelegate, ContactViewModelDelegate {
   public var delegate: NEBaseContactsViewControllerDelegate?
 
   // custom ui cell
@@ -40,134 +39,6 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
   public var topConstant: CGFloat = 0
   private var bodyTopViewHeightAnchor: NSLayoutConstraint?
   private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
-
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    super.init(nibName: nil, bundle: nil)
-    viewModel.contactRepo.addNotificationDelegate(delegate: self)
-    viewModel.contactRepo.addContactDelegate(delegate: self)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  override open func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-
-    // 通讯录异步进行远端加载
-    if IMKitConfigCenter.shared.contactAsyncLoadEnable {
-      DispatchQueue.main.async {
-        self.loadData(fetch: true)
-      }
-    }
-    if navigationController?.viewControllers.count ?? 0 > 0 {
-      if let root = navigationController?.viewControllers[0] as? UIViewController {
-        if root.isKind(of: NEBaseContactsViewController.self) {
-          navigationController?.interactivePopGestureRecognizer?.delegate = self
-        }
-      }
-    }
-  }
-
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-    showTitleBar()
-    commonUI()
-    viewModel.refresh = { [weak self] in
-      self?.didRefreshTable()
-    }
-
-    loadData(fetch: true)
-
-    NotificationCenter.default.addObserver(self, selector: #selector(didRefreshTable), name: NENotificationName.updateFriendInfo, object: nil)
-  }
-
-  deinit {
-    viewModel.contactRepo.removeNotificationDelegate(delegate: self)
-    viewModel.contactRepo.removeContactDelegate(delegate: self)
-  }
-
-  open func showTitleBar() {
-    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationView.isHidden = true
-      topConstant = 0
-      if NEKitContactConfig.shared.ui.showTitleBar {
-        navigationController?.isNavigationBarHidden = false
-      } else {
-        navigationController?.isNavigationBarHidden = true
-        if #available(iOS 10, *) {
-          topConstant += NEConstant.statusBarHeight
-        }
-      }
-    } else {
-      navigationController?.isNavigationBarHidden = true
-      if NEKitContactConfig.shared.ui.showTitleBar {
-        navigationView.isHidden = false
-        topConstant = NEConstant.navigationHeight
-      } else {
-        navigationView.isHidden = true
-        topConstant = 0
-      }
-      if #available(iOS 10, *) {
-        topConstant += NEConstant.statusBarHeight
-      }
-    }
-  }
-
-  open func commonUI() {
-    initSystemNav()
-    view.addSubview(navigationView)
-    view.addSubview(bodyTopView)
-    view.addSubview(bodyView)
-    view.addSubview(bodyBottomView)
-
-    NSLayoutConstraint.activate([
-      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      navigationView.heightAnchor
-        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
-    ])
-
-    NSLayoutConstraint.activate([
-      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
-    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
-    bodyTopViewHeightAnchor?.isActive = true
-
-    NSLayoutConstraint.activate([
-      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
-      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
-    ])
-
-    NSLayoutConstraint.activate([
-      bodyBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
-    ])
-    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
-    bodyBottomViewHeightAnchor?.isActive = true
-
-    if let customController = NEKitContactConfig.shared.ui.customController {
-      customController(self)
-    }
-  }
-
-  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    if let navigationController = navigationController,
-       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
-       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
-       navigationController.visibleViewController == navigationController.viewControllers.first {
-      return false
-    }
-    return true
-  }
-
-  // MARK: lazy load
 
   public lazy var navigationView: TabNavigationView = {
     let nav = TabNavigationView(frame: CGRect.zero)
@@ -258,9 +129,129 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
     return view
   }()
 
-  open func loadData(fetch: Bool = false) {
-    viewModel.loadData(fetch: fetch) { [weak self] error, userSectionCount in
-      self?.emptyView.isHidden = userSectionCount > 0
+  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: NEBaseContactsViewController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
+      }
+    }
+    loadData()
+    viewModel.getAddApplicationUnreadCount(nil)
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    showTitleBar()
+    commonUI()
+
+    weak var weakSelf = self
+    viewModel.delegate = self
+    viewModel.refresh = {
+      weakSelf?.didRefreshTable()
+    }
+
+    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
+  }
+
+  func clearValidationUnreadCount() {
+    viewModel.unreadCount = 0
+  }
+
+  open func showTitleBar() {
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationView.isHidden = true
+      topConstant = 0
+      if NEKitContactConfig.shared.ui.showTitleBar {
+        navigationController?.isNavigationBarHidden = false
+      } else {
+        navigationController?.isNavigationBarHidden = true
+        if #available(iOS 10, *) {
+          topConstant += NEConstant.statusBarHeight
+        }
+      }
+    } else {
+      navigationController?.isNavigationBarHidden = true
+      if NEKitContactConfig.shared.ui.showTitleBar {
+        navigationView.isHidden = false
+        topConstant = NEConstant.navigationHeight
+      } else {
+        navigationView.isHidden = true
+        topConstant = 0
+      }
+      if #available(iOS 10, *) {
+        topConstant += NEConstant.statusBarHeight
+      }
+    }
+  }
+
+  open func commonUI() {
+    initSystemNav()
+    view.addSubview(navigationView)
+    view.addSubview(bodyTopView)
+    view.addSubview(bodyView)
+    view.addSubview(bodyBottomView)
+
+    NSLayoutConstraint.activate([
+      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
+      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      navigationView.heightAnchor
+        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyTopViewHeightAnchor = bodyTopView.heightAnchor.constraint(equalToConstant: bodyTopViewHeight)
+    bodyTopViewHeightAnchor?.isActive = true
+
+    NSLayoutConstraint.activate([
+      bodyView.topAnchor.constraint(equalTo: bodyTopView.bottomAnchor),
+      bodyView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      bodyView.bottomAnchor.constraint(equalTo: bodyBottomView.topAnchor),
+    ])
+
+    NSLayoutConstraint.activate([
+      bodyBottomView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      bodyBottomView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      bodyBottomView.rightAnchor.constraint(equalTo: view.rightAnchor),
+    ])
+    bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
+    bodyBottomViewHeightAnchor?.isActive = true
+
+    if let customController = NEKitContactConfig.shared.ui.customController {
+      customController(self)
+    }
+  }
+
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
+  }
+
+  open func loadData() {
+    viewModel.loadData { [weak self] error, userSectionCount in
       if error == nil {
         self?.delegate?.onDataLoaded()
         self?.didRefreshTable()
@@ -274,7 +265,7 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    NELog.infoLog(ModuleName + " " + className(), desc: "contact section: \(section), count:\(viewModel.contacts[section].contacts.count)")
+    NEALog.infoLog(ModuleName + " " + className(), desc: "contact section: \(section), count:\(viewModel.contacts[section].contacts.count)")
 
     return viewModel.contacts[section].contacts.count
   }
@@ -384,41 +375,16 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
 
   func didRefreshTable() {
     tableView.reloadData()
+    emptyView.isHidden = viewModel.getFriendSections().count > 0
   }
 
-//    MARK: SystemMessageProviderDelegate
-
-  open func onRecieveNotification(notification: NENotification) {
-    print("onRecieveNotification type:\(notification.type)")
-    if notification.type == .addFriendDirectly {
-      loadData()
-    }
-  }
-
-  open func onNotificationUnreadCountChanged(count: Int) {
-    print("unread count:\(count)")
-    viewModel.unreadCount = count
+  public func reloadTableView() {
     didRefreshTable()
   }
 
-//    MARK: FriendProviderDelegate
-
-  open func onFriendChanged(user: NEKitUser) {
-    print("onFriendChanged:\(user.userId)")
-    loadData()
+  public func reloadTableView(_ index: IndexPath) {
+    tableView.reloadData([index])
   }
-
-  open func onBlackListChanged() {
-    print("onBlackListChanged")
-    loadData()
-  }
-
-  open func onUserInfoChanged(user: NEKitUser) {
-    print("onUserInfoChanged:\(user.userId)")
-    loadData()
-  }
-
-  open func onReceive(_ notification: NIMCustomSystemNotification) {}
 }
 
 extension NEBaseContactsViewController {

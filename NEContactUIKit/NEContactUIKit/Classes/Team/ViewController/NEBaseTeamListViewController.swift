@@ -72,8 +72,13 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
   }
 
   func loadData() {
-    viewModel.getTeamList()
-    tableView.reloadData()
+    viewModel.getTeamList { [weak self] _, error in
+      if let err = error {
+        print("getTeamList error: \(err)")
+      } else {
+        self?.tableView.reloadData()
+      }
+    }
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -90,17 +95,17 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     if isClickCallBack == true {
       Router.shared.use(
         ContactTeamDataRouter,
-        parameters: ["team": model.nimTeam as Any],
+        parameters: ["team": model.v2Team as Any],
         closure: nil
       )
       navigationController?.popViewController(animated: true)
       return
     }
     if let teamid = model.teamId {
-      let session = NIMSession(teamid, type: .team)
+      let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
       Router.shared.use(
         PushTeamChatVCRouter,
-        parameters: ["nav": navigationController as Any, "session": session as Any],
+        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
         closure: nil
       )
     }

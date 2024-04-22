@@ -2,19 +2,20 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
-  lazy var stateView: VideoStateView = {
+  public lazy var stateView: VideoStateView = {
     let state = VideoStateView()
     state.translatesAutoresizingMaskIntoConstraints = false
     state.backgroundColor = .clear
     return state
   }()
 
-  lazy var videoTimeLabel: UILabel = {
+  public lazy var videoTimeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = .white
@@ -23,7 +24,7 @@ open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
     return label
   }()
 
-  lazy var timeView: UIView = {
+  public lazy var timeView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(videoTimeLabel)
@@ -67,27 +68,20 @@ open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
     stateView.isUserInteractionEnabled = false
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
 
-    if let videoObject = item.chatmodel.message?.messageObject as? NIMVideoObject {
-      if let path = videoObject.coverUrl {
-        contentImageView.sd_setImage(
-          with: URL(string: path),
-          placeholderImage: nil,
-          options: .retryFailed,
-          progress: nil,
-          completed: nil
-        )
-      } else {
-        contentImageView.sd_setImage(
-          with: URL(string: videoObject.coverUrl ?? ""),
-          placeholderImage: nil,
-          options: .retryFailed,
-          progress: nil,
-          completed: nil
-        )
-      }
+    if let videoObject = item.chatmodel.message?.attachment as? V2NIMMessageVideoAttachment {
+      // 获取首帧
+      let videoUrl = videoObject.url ?? ""
+      let thumbUrl = ResourceRepo.shared.videoThumbnailURL(videoUrl)
+      contentImageView.sd_setImage(
+        with: URL(string: thumbUrl),
+        placeholderImage: nil,
+        options: .retryFailed,
+        progress: nil,
+        completed: nil
+      )
 
       if videoObject.duration > 0 {
         timeView.isHidden = false

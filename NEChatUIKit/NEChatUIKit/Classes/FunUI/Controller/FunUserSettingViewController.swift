@@ -17,13 +17,13 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor
-    viewmodel.cellDatas.forEach { cellModel in
+    for cellModel in viewModel.cellDatas {
       cellModel.cornerType = .none
     }
   }
@@ -33,87 +33,87 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     navigationController?.navigationBar.backgroundColor = .white
     navigationView.backgroundColor = .white
     navigationView.titleBarBottomLine.isHidden = false
-    userHeader.layer.cornerRadius = 4.0
-    addBtn.setImage(coreLoader.loadImage("fun_setting_add"), for: .normal)
+    userHeaderView.layer.cornerRadius = 4.0
+    addButton.setImage(coreLoader.loadImage("fun_setting_add"), for: .normal)
     contentTable.rowHeight = 56
   }
 
   override open func headerView() -> UIView {
-    let header = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 117))
-    header.backgroundColor = .clear
-    let cornerBack = UIView()
-    cornerBack.backgroundColor = .white
-    cornerBack.translatesAutoresizingMaskIntoConstraints = false
-    header.addSubview(cornerBack)
+    let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 117))
+    headerView.backgroundColor = .clear
+    let cornerBackView = UIView()
+    cornerBackView.backgroundColor = .white
+    cornerBackView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.addSubview(cornerBackView)
     NSLayoutConstraint.activate([
-      cornerBack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -8),
-      cornerBack.leftAnchor.constraint(equalTo: header.leftAnchor),
-      cornerBack.rightAnchor.constraint(equalTo: header.rightAnchor),
-      cornerBack.heightAnchor.constraint(equalToConstant: 109.0),
+      cornerBackView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -8),
+      cornerBackView.leftAnchor.constraint(equalTo: headerView.leftAnchor),
+      cornerBackView.rightAnchor.constraint(equalTo: headerView.rightAnchor),
+      cornerBackView.heightAnchor.constraint(equalToConstant: 109.0),
     ])
 
-    cornerBack.addSubview(userHeader)
+    cornerBackView.addSubview(userHeaderView)
 
     let tap = UITapGestureRecognizer()
-    userHeader.addGestureRecognizer(tap)
+    userHeaderView.addGestureRecognizer(tap)
     tap.numberOfTapsRequired = 1
     tap.numberOfTouchesRequired = 1
 
-    if let url = viewmodel.userInfo?.userInfo?.avatarUrl, !url.isEmpty {
-      userHeader.sd_setImage(with: URL(string: url), completed: nil)
-      userHeader.setTitle("")
-      userHeader.backgroundColor = .clear
-    } else if let name = viewmodel.userInfo?.shortName(showAlias: false, count: 2) {
-      userHeader.sd_setImage(with: nil)
-      userHeader.setTitle(name)
-      userHeader.backgroundColor = UIColor.colorWithString(string: viewmodel.userInfo?.userId)
+    if let url = viewModel.userInfo?.user?.avatar, !url.isEmpty {
+      userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+      userHeaderView.setTitle("")
+      userHeaderView.backgroundColor = .clear
+    } else if let name = viewModel.userInfo?.shortName(showAlias: false, count: 2) {
+      userHeaderView.sd_setImage(with: nil)
+      userHeaderView.setTitle(name)
+      userHeaderView.backgroundColor = UIColor.colorWithString(string: viewModel.userInfo?.user?.accountId)
     }
 
-    nameLabel.text = viewmodel.userInfo?.showName()
-    cornerBack.addSubview(nameLabel)
+    nameLabel.text = viewModel.userInfo?.showName()
+    cornerBackView.addSubview(nameLabel)
 
     if IMKitClient.instance.getConfigCenter().teamEnable {
       NSLayoutConstraint.activate([
-        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 22),
-        userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 22),
-        userHeader.widthAnchor.constraint(equalToConstant: 50),
-        userHeader.heightAnchor.constraint(equalToConstant: 50),
+        userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 22),
+        userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 22),
+        userHeaderView.widthAnchor.constraint(equalToConstant: 50),
+        userHeaderView.heightAnchor.constraint(equalToConstant: 50),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(12)
       nameLabel.textAlignment = .center
       NSLayoutConstraint.activate([
-        nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 3.0),
-        nameLabel.centerXAnchor.constraint(equalTo: userHeader.centerXAnchor),
-        nameLabel.widthAnchor.constraint(equalTo: userHeader.widthAnchor),
+        nameLabel.topAnchor.constraint(equalTo: userHeaderView.bottomAnchor, constant: 3.0),
+        nameLabel.centerXAnchor.constraint(equalTo: userHeaderView.centerXAnchor),
+        nameLabel.widthAnchor.constraint(equalTo: userHeaderView.widthAnchor),
       ])
 
-      addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
-      cornerBack.addSubview(addBtn)
+      addButton.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
+      cornerBackView.addSubview(addButton)
       NSLayoutConstraint.activate([
-        addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
-        addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
-        addBtn.widthAnchor.constraint(equalToConstant: 50.0),
-        addBtn.heightAnchor.constraint(equalToConstant: 50.0),
+        addButton.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 20.0),
+        addButton.topAnchor.constraint(equalTo: userHeaderView.topAnchor),
+        addButton.widthAnchor.constraint(equalToConstant: 50.0),
+        addButton.heightAnchor.constraint(equalToConstant: 50.0),
       ])
     } else {
       NSLayoutConstraint.activate([
-        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
-        userHeader.centerYAnchor.constraint(equalTo: cornerBack.centerYAnchor),
-        userHeader.widthAnchor.constraint(equalToConstant: 60),
-        userHeader.heightAnchor.constraint(equalToConstant: 60),
+        userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
+        userHeaderView.centerYAnchor.constraint(equalTo: cornerBackView.centerYAnchor),
+        userHeaderView.widthAnchor.constraint(equalToConstant: 60),
+        userHeaderView.heightAnchor.constraint(equalToConstant: 60),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(16)
       nameLabel.textAlignment = .left
       NSLayoutConstraint.activate([
-        nameLabel.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 16.0),
-        nameLabel.rightAnchor.constraint(equalTo: cornerBack.rightAnchor),
-        nameLabel.centerYAnchor.constraint(equalTo: userHeader.centerYAnchor),
+        nameLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 16.0),
+        nameLabel.rightAnchor.constraint(equalTo: cornerBackView.rightAnchor),
+        nameLabel.centerYAnchor.constraint(equalTo: userHeaderView.centerYAnchor),
       ])
     }
 
-    return header
+    return headerView
   }
 
   override open func filterStackViewController() -> [UIViewController]? {
@@ -126,7 +126,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     }
   }
 
-  override func getPinMessageViewController(session: NIMSession) -> NEBasePinMessageViewController {
-    FunPinMessageViewController(session: session)
+  override func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {
+    FunPinMessageViewController(conversationId: conversationId)
   }
 }

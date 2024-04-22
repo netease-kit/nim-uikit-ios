@@ -33,13 +33,13 @@ open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
       headerView.setTitle("")
     } else {
       headerView.setTitle(model?.defaultHeadData ?? "")
-      headerView.backgroundColor = UIColor.colorWithString(string: model?.defaultHeadData)
+      headerView.backgroundColor = UIColor.colorWithString(string: model?.subTitle)
     }
   }
 
   open func setupUI() {
     contentView.addSubview(titleLabel)
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowView)
     contentView.addSubview(headerView)
   }
 }

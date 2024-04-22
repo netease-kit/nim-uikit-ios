@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -17,37 +17,37 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
   override open func setupUI() {
     view.backgroundColor = UIColor(hexString: "0xEDEDED")
 
-    let searchBack = UIView()
-    view.addSubview(searchBack)
-    searchBack.backgroundColor = UIColor.white
-    searchBack.translatesAutoresizingMaskIntoConstraints = false
-    searchBack.clipsToBounds = true
-    searchBack.layer.cornerRadius = 4.0
+    let searchBackView = UIView()
+    view.addSubview(searchBackView)
+    searchBackView.backgroundColor = UIColor.white
+    searchBackView.translatesAutoresizingMaskIntoConstraints = false
+    searchBackView.clipsToBounds = true
+    searchBackView.layer.cornerRadius = 4.0
     NSLayoutConstraint.activate([
-      searchBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      searchBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      searchBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 10 + topConstant),
-      searchBack.heightAnchor.constraint(equalToConstant: 36),
+      searchBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      searchBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10 + topConstant),
+      searchBackView.heightAnchor.constraint(equalToConstant: 36),
     ])
 
-    let searchImage = UIImageView()
-    searchBack.addSubview(searchImage)
-    searchImage.image = UIImage.ne_imageNamed(name: "search")
-    searchImage.translatesAutoresizingMaskIntoConstraints = false
+    let searchImageView = UIImageView()
+    searchBackView.addSubview(searchImageView)
+    searchImageView.image = UIImage.ne_imageNamed(name: "search")
+    searchImageView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      searchImage.centerYAnchor.constraint(equalTo: searchBack.centerYAnchor),
-      searchImage.leftAnchor.constraint(equalTo: searchBack.leftAnchor, constant: 18),
-      searchImage.widthAnchor.constraint(equalToConstant: 13),
-      searchImage.heightAnchor.constraint(equalToConstant: 13),
+      searchImageView.centerYAnchor.constraint(equalTo: searchBackView.centerYAnchor),
+      searchImageView.leftAnchor.constraint(equalTo: searchBackView.leftAnchor, constant: 18),
+      searchImageView.widthAnchor.constraint(equalToConstant: 13),
+      searchImageView.heightAnchor.constraint(equalToConstant: 13),
     ])
 
-    searchBack.addSubview(searchInput)
+    searchBackView.addSubview(searchInput)
     searchInput.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      searchInput.leftAnchor.constraint(equalTo: searchImage.rightAnchor, constant: 5),
-      searchInput.rightAnchor.constraint(equalTo: searchBack.rightAnchor, constant: -18),
-      searchInput.topAnchor.constraint(equalTo: searchBack.topAnchor),
-      searchInput.bottomAnchor.constraint(equalTo: searchBack.bottomAnchor),
+      searchInput.leftAnchor.constraint(equalTo: searchImageView.rightAnchor, constant: 5),
+      searchInput.rightAnchor.constraint(equalTo: searchBackView.rightAnchor, constant: -18),
+      searchInput.topAnchor.constraint(equalTo: searchBackView.topAnchor),
+      searchInput.bottomAnchor.constraint(equalTo: searchBackView.bottomAnchor),
     ])
     searchInput.textColor = UIColor(hexString: "0x333333")
     searchInput.placeholder = localizable("input_userId")
@@ -55,6 +55,10 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
     searchInput.returnKeyType = .search
     searchInput.delegate = self
     searchInput.clearButtonMode = .always
+    searchInput.accessibilityIdentifier = "id.addFriendAccount"
+    if let clearButton = searchInput.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
 
     NotificationCenter.default.addObserver(
       self,
@@ -67,6 +71,8 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
     NSLayoutConstraint.activate([
       emptyView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       emptyView.topAnchor.constraint(equalTo: searchInput.bottomAnchor, constant: 74),
+      emptyView.widthAnchor.constraint(equalToConstant: 200),
+      emptyView.heightAnchor.constraint(equalToConstant: 200),
     ])
 
     emptyView.setEmptyImage(name: "fun_user_empty")

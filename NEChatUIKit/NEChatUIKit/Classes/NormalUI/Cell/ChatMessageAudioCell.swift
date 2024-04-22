@@ -22,7 +22,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -95,13 +95,11 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   open func startAnimation(byRight: Bool) {
-    if byRight {
-      if !audioImageViewRight.isAnimating {
-        audioImageViewRight.startAnimating()
-      }
-    } else if !audioImageViewLeft.isAnimating {
-      audioImageViewLeft.startAnimating()
+    let audioImageView = byRight ? audioImageViewRight : audioImageViewLeft
+    if !audioImageView.isAnimating {
+      audioImageView.startAnimating()
     }
+
     if let m = contentModel as? MessageAudioModel {
       m.isPlaying = true
       isPlaying = true
@@ -109,13 +107,11 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   open func stopAnimation(byRight: Bool) {
-    if byRight {
-      if audioImageViewRight.isAnimating {
-        audioImageViewRight.stopAnimating()
-      }
-    } else if audioImageViewLeft.isAnimating {
-      audioImageViewLeft.stopAnimating()
+    let audioImageView = byRight ? audioImageViewRight : audioImageViewLeft
+    if audioImageView.isAnimating {
+      audioImageView.stopAnimating()
     }
+
     if let m = contentModel as? MessageAudioModel {
       m.isPlaying = false
       isPlaying = false
@@ -140,7 +136,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
         timeLabelLeft.text = "\(m.duration)" + "s"
       }
       m.isPlaying ? startAnimation(byRight: isSend) : stopAnimation(byRight: isSend)
-      messageId = m.message?.messageId
+      messageId = m.message?.messageClientId
     }
   }
 }

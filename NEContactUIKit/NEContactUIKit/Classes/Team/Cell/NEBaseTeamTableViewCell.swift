@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class NEBaseTeamTableViewCell: UITableViewCell {
-  public var avatarImage = UIImageView()
+  public var avatarImageView = UIImageView()
   public var nameLabel = UILabel()
   public var titleLabel = UILabel()
 //    public var arrow = UIImageView(image:UIImage.ne_imageNamed(name: "arrowRight"))
@@ -18,21 +18,21 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func commonUI() {
     selectionStyle = .none
-    avatarImage.translatesAutoresizingMaskIntoConstraints = false
-    avatarImage.clipsToBounds = true
-    avatarImage.contentMode = .scaleAspectFill
-    avatarImage.accessibilityIdentifier = "id.avatar"
-    contentView.addSubview(avatarImage)
+    avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+    avatarImageView.clipsToBounds = true
+    avatarImageView.contentMode = .scaleAspectFill
+    avatarImageView.accessibilityIdentifier = "id.avatar"
+    contentView.addSubview(avatarImageView)
     NSLayoutConstraint.activate([
-      avatarImage.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-      avatarImage.widthAnchor.constraint(equalToConstant: 42),
-      avatarImage.heightAnchor.constraint(equalToConstant: 42),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 42),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 42),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
 
     nameLabel.textAlignment = .center
@@ -41,17 +41,17 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     nameLabel.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: avatarImage.rightAnchor),
-      nameLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor),
-      nameLabel.bottomAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+      nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
+      nameLabel.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
+      nameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
+      nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
     ])
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.accessibilityIdentifier = "id.name"
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -35),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -78,13 +78,13 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     }
     titleLabel.text = name
 //        self.nameLabel.text = name.count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
-    if let url = team.thumbAvatarUrl, !url.isEmpty {
-      avatarImage.sd_setImage(with: URL(string: url), completed: nil)
-      avatarImage.backgroundColor = .clear
+    if let url = team.avatarUrl, !url.isEmpty {
+      avatarImageView.sd_setImage(with: URL(string: url), completed: nil)
+      avatarImageView.backgroundColor = .clear
     } else {
       // random avatar
 //      avatarImage.image = randomAvatar(teamId: team.teamId)
-      avatarImage.backgroundColor = UIColor.colorWithString(string: team.teamId)
+      avatarImageView.backgroundColor = UIColor.colorWithString(string: team.teamId)
     }
   }
 

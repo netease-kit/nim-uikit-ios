@@ -11,22 +11,23 @@ import NIMSDK
 open class MessageTextModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
   public var textHeight: CGFloat = 0
+  public var textWidght: CGFloat = 0
 
-  public required init(message: NIMMessage?) {
+  public required init(message: V2NIMMessage?) {
     super.init(message: message)
     type = .text
 
     attributeStr = NEEmotionTool.getAttWithStr(
       str: message?.text ?? "",
-      font: UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+      font: messageTextFont
     )
 
-    if let remoteExt = message?.remoteExt, let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
-      dic.forEach { (key: String, value: AnyObject) in
+    if let remoteExt = getDictionaryFromJSONString(message?.serverExtension ?? ""), let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
+      for (_, value) in dic {
         if let contentDic = value as? [String: AnyObject] {
           if let array = contentDic[atSegmentsKey] as? [AnyObject] {
             if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
-              models.forEach { model in
+              for model in models {
                 if attributeStr?.length ?? 0 > model.end {
                   attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_blueText, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
                 }
@@ -37,10 +38,10 @@ open class MessageTextModel: MessageContentModel {
       }
     }
 
-    let textSize = attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
-
+    let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
     textHeight = textSize.height
+    textWidght = textSize.width
     contentSize = CGSize(width: textSize.width + chat_content_margin * 2, height: textHeight + chat_content_margin * 2)
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

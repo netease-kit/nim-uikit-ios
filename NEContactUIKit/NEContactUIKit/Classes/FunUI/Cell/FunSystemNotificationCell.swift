@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
@@ -13,11 +13,11 @@ import UIKit
 open class FunSystemNotificationCell: NEBaseSystemNotificationCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImage.layer.cornerRadius = 4
+    avatarImageView.layer.cornerRadius = 4
     NSLayoutConstraint.activate([
-      avatarImage.widthAnchor.constraint(equalToConstant: 40),
-      avatarImage.heightAnchor.constraint(equalToConstant: 40),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 
@@ -26,8 +26,8 @@ open class FunSystemNotificationCell: NEBaseSystemNotificationCell {
 
     contentView.updateLayoutConstraint(firstItem: line, seconedItem: contentView, attribute: .right, constant: 0)
     line.backgroundColor = .funContactLineBorderColor
-    agreeBtn.backgroundColor = .funContactThemeColor
-    agreeBtn.setTitleColor(.white, for: .normal)
-    agreeBtn.layer.borderColor = UIColor.funContactThemeColor.cgColor
+    agreeButton.backgroundColor = .funContactThemeColor
+    agreeButton.setTitleColor(.white, for: .normal)
+    agreeButton.layer.borderColor = UIColor.funContactThemeColor.cgColor
   }
 }

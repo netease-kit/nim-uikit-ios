@@ -7,10 +7,44 @@ import UIKit
 
 @objcMembers
 open class ChatImageTextCell: ChatStateCell {
+  public lazy var avatarImageView: UIImageView = {
+    let avatarView = UIImageView()
+    avatarView.translatesAutoresizingMaskIntoConstraints = false
+    avatarView.clipsToBounds = true
+    avatarView.backgroundColor = .ne_defautAvatarColor
+    return avatarView
+  }()
+
+  public lazy var shortNameLabel: UILabel = {
+    let nameLabel = UILabel()
+    nameLabel.translatesAutoresizingMaskIntoConstraints = false
+    nameLabel.textColor = .white
+    nameLabel.textAlignment = .center
+    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
+    return nameLabel
+  }()
+
+  public lazy var nameLabel: UILabel = {
+    let label = UILabel()
+    label.textAlignment = .left
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.textColor = .ne_darkText
+    return label
+  }()
+
   var circleView = UIImageView()
+
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    // circle view
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func setupUI() {
+    super.setupUI()
     circleView.translatesAutoresizingMaskIntoConstraints = false
     circleView.layer.cornerRadius = 16
     circleView.clipsToBounds = true
@@ -22,7 +56,7 @@ open class ChatImageTextCell: ChatStateCell {
       circleView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 40),
       circleView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
-//        short name label
+    //        short name label
     contentView.addSubview(shortNameLabel)
     NSLayoutConstraint.activate([
       shortNameLabel.widthAnchor.constraint(equalTo: circleView.widthAnchor),
@@ -30,14 +64,14 @@ open class ChatImageTextCell: ChatStateCell {
       shortNameLabel.leftAnchor.constraint(equalTo: circleView.leftAnchor),
       shortNameLabel.topAnchor.constraint(equalTo: circleView.topAnchor),
     ])
-//        name label
+    //        name label
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: circleView.rightAnchor, constant: 12),
       nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
-//        line
+    //        line
     let line = UIView()
     line.backgroundColor = .ne_greyLine
     line.translatesAutoresizingMaskIntoConstraints = false
@@ -49,36 +83,6 @@ open class ChatImageTextCell: ChatStateCell {
       line.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -1),
     ])
   }
-
-  public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  public lazy var avatarImage: UIImageView = {
-    let avatar = UIImageView()
-    avatar.translatesAutoresizingMaskIntoConstraints = false
-    avatar.clipsToBounds = true
-    avatar.backgroundColor = .ne_defautAvatarColor
-    return avatar
-  }()
-
-  public lazy var shortNameLabel: UILabel = {
-    let name = UILabel()
-    name.translatesAutoresizingMaskIntoConstraints = false
-    name.textColor = .white
-    name.textAlignment = .center
-    name.font = UIFont.systemFont(ofSize: 14.0)
-    return name
-  }()
-
-  public lazy var nameLabel: UILabel = {
-    let label = UILabel()
-    label.textAlignment = .left
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.font = UIFont.systemFont(ofSize: 14.0)
-    label.textColor = .ne_darkText
-    return label
-  }()
 
   open func setup(accid: String?, nickName: String?) {
     let name = nickName?.count ?? 0 > 0 ? nickName : accid

@@ -4,7 +4,7 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 
 @objcMembers
@@ -12,8 +12,16 @@ open class FindFriendViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "FindFriendViewModel"
 
-  func searchFriend(_ text: String, _ completion: @escaping ([NEKitUser]?, NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
-    contactRepo.fetchUserInfo(accountList: [text], completion)
+  func searchFriend(_ text: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
+
+    // 优先去缓存中取
+    if let userFriend = NEFriendUserCache.shared.getFriendInfo(text) {
+      completion(userFriend, nil)
+      return
+    }
+
+    // 缓存中没有则去远端查询
+    contactRepo.getFriendInfo(text, completion)
   }
 }

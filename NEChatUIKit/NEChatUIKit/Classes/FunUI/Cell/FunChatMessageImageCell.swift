@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NIMSDK
+import SDWebImage
 import UIKit
 
 @objcMembers
@@ -15,7 +16,7 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -28,6 +29,7 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
     contentImageViewLeft.contentMode = .scaleAspectFill
     contentImageViewLeft.clipsToBounds = true
     contentImageViewLeft.layer.cornerRadius = 4
+    contentImageViewLeft.accessibilityIdentifier = "id.thumbnail"
     bubbleImageLeft.image = nil
     bubbleImageLeft.addSubview(contentImageViewLeft)
     NSLayoutConstraint.activate([
@@ -43,6 +45,7 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
     contentImageViewRight.contentMode = .scaleAspectFill
     contentImageViewRight.clipsToBounds = true
     contentImageViewRight.layer.cornerRadius = 4
+    contentImageViewRight.accessibilityIdentifier = "id.thumbnail"
     bubbleImageRight.image = nil
     bubbleImageRight.addSubview(contentImageViewRight)
     NSLayoutConstraint.activate([
@@ -63,12 +66,17 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
-    if let m = model as? MessageImageModel, let imageUrl = m.imageUrl {
+    if let m = model as? MessageImageModel, let imageUrl = m.urlString {
+      var options: SDWebImageOptions = [.retryFailed]
+      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment, imageObject.ext != ".gif" {
+        options = [.retryFailed, .progressiveLoad]
+      }
+
       if imageUrl.hasPrefix("http") {
         contentImageView.sd_setImage(
           with: URL(string: imageUrl),
           placeholderImage: nil,
-          options: .retryFailed,
+          options: options,
           progress: nil,
           completed: nil
         )

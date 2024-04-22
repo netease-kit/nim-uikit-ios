@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
@@ -19,15 +19,15 @@ class FunBlackListCell: NEBaseBlackListCell {
     button.layer.borderColor = UIColor(hexString: "#D9D9D9").cgColor
     button.setTitleColor(.ne_darkText, for: .normal)
 
-    avatarImage.layer.cornerRadius = 4
-    avatarImage.updateLayoutConstraint(firstItem: avatarImage, seconedItem: nil, attribute: .width, constant: 40)
-    avatarImage.updateLayoutConstraint(firstItem: avatarImage, seconedItem: nil, attribute: .height, constant: 40)
+    avatarImageView.layer.cornerRadius = 4
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: 40)
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: 40)
 
     titleLabel.textColor = .ne_darkText
 
     contentView.addSubview(bottomLine)
     NSLayoutConstraint.activate([
-      bottomLine.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
+      bottomLine.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
       bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
       bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       bottomLine.heightAnchor.constraint(equalToConstant: 1),

@@ -19,25 +19,25 @@ open class NEInputMoreCell: UICollectionViewCell {
   }
 
   func setupViews() {
-    contentView.addSubview(avatarImage)
+    contentView.addSubview(avatarImageView)
     contentView.addSubview(titleLabel)
 
     NSLayoutConstraint.activate([
-      avatarImage.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      avatarImage.topAnchor.constraint(equalTo: contentView.topAnchor),
-      avatarImage.widthAnchor.constraint(equalToConstant: NEMoreCell_Image_Size.width),
-      avatarImage.heightAnchor.constraint(equalToConstant: NEMoreCell_Image_Size.height),
+      avatarImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+      avatarImageView.widthAnchor.constraint(equalToConstant: NEMoreCell_Image_Size.width),
+      avatarImageView.heightAnchor.constraint(equalToConstant: NEMoreCell_Image_Size.height),
     ])
 
     NSLayoutConstraint.activate([
-      titleLabel.topAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+      titleLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
       titleLabel.heightAnchor.constraint(equalToConstant: NEMoreCell_Title_Height),
     ])
   }
 
-  lazy var avatarImage: UIImageView = {
+  public lazy var avatarImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.isUserInteractionEnabled = true
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -45,19 +45,19 @@ open class NEInputMoreCell: UICollectionViewCell {
     return imageView
   }()
 
-  lazy var titleLabel: UILabel = {
-    let title = UILabel()
-    title.textColor = UIColor.ne_greyText
-    title.font = UIFont.systemFont(ofSize: 10)
-    title.textAlignment = .center
-    title.translatesAutoresizingMaskIntoConstraints = false
-    title.accessibilityIdentifier = "id.menuIcon"
-    return title
+  public lazy var titleLabel: UILabel = {
+    let titleLabel = UILabel()
+    titleLabel.textColor = UIColor.ne_greyText
+    titleLabel.font = UIFont.systemFont(ofSize: 10)
+    titleLabel.textAlignment = .center
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.accessibilityIdentifier = "id.menuIcon"
+    return titleLabel
   }()
 
   func config(_ itemModel: NEMoreItemModel) {
     cellData = itemModel
-    avatarImage.image = itemModel.customImage == nil ? itemModel.image : itemModel.customImage
+    avatarImageView.image = itemModel.customImage == nil ? itemModel.image : itemModel.customImage
     titleLabel.text = itemModel.title
   }
 

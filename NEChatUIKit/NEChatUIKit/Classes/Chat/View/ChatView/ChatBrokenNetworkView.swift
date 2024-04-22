@@ -13,20 +13,20 @@ open class ChatBrokenNetworkView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func commonUI() {
     backgroundColor = HexRGB(0xFEE3E6)
-    addSubview(content)
+    addSubview(contentLabel)
     NSLayoutConstraint.activate([
-      content.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
-      content.centerYAnchor.constraint(equalTo: centerYAnchor),
-      content.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
+      contentLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
+      contentLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+      contentLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
     ])
   }
 
-  private lazy var content: UILabel = {
+  private lazy var contentLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = DefaultTextFont(14)

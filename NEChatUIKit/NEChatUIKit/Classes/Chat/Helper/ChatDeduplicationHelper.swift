@@ -3,9 +3,12 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEChatKit
+import NECoreIM2Kit
 import NIMSDK
+
 @objcMembers
-public class ChatDeduplicationHelper: NSObject, NIMLoginManagerDelegate {
+public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   // 单例变量
   static let instance = ChatDeduplicationHelper()
   // 最多缓存数量，可外部修改
@@ -14,25 +17,27 @@ public class ChatDeduplicationHelper: NSObject, NIMLoginManagerDelegate {
   public var blackListMessageIds = Set<String>()
   // 音频消息记录
   public var recordAudioMessagePaths = Set<String>()
+  // 发送中消息记录
+  public var sendingMessageIds = Set<String>()
   // 撤回消息记录
   public var revokeMessageIds = Set<String>()
 
   override private init() {
     super.init()
-    NIMSDK.shared().loginManager.add(self)
+    IMKitClient.instance.addLoginListener(self)
   }
 
   deinit {
-    NIMSDK.shared().loginManager.remove(self)
+    IMKitClient.instance.removeLoginListener(self)
   }
 
-  public func onLogin(_ step: NIMLoginStep) {
-    if step == .logout {
+  public func onLoginStatus(_ status: V2NIMLoginStatus) {
+    if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
-  public func onKickout(_ result: NIMLoginKickoutResult) {
+  public func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
     clearCache()
   }
 
@@ -40,9 +45,22 @@ public class ChatDeduplicationHelper: NSObject, NIMLoginManagerDelegate {
     blackListMessageIds.removeAll()
     recordAudioMessagePaths.removeAll()
     revokeMessageIds.removeAll()
+    NEFriendUserCache.shared.removeAllFriendInfo()
   }
 
   // 是否已经发送过对应消息的提示
+  public func isMessageSended(messageId: String) -> Bool {
+    if sendingMessageIds.contains(messageId) {
+      return true
+    }
+    if sendingMessageIds.count > limit {
+      sendingMessageIds.removeAll()
+    }
+    sendingMessageIds.insert(messageId)
+    return false
+  }
+
+  // 是否已经发送过黑名单消息的提示
   public func isBlackTipSended(messageId: String) -> Bool {
     if blackListMessageIds.contains(messageId) {
       return true

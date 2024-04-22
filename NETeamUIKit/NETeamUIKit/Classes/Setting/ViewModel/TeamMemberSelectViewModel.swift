@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
@@ -12,20 +12,21 @@ public protocol TeamMemberSelectViewModelDelegate: NSObject {
 }
 
 class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
-  let repo = TeamRepo.shared
-
+  /// 群API单例
+  let teamRepo = TeamRepo.shared
+  /// 选中成员数据
   var datas = [NESelectTeamMember]()
 
   var showDatas = [NESelectTeamMember]()
-
-  var teamInfoModel: TeamInfoModel?
-
+  /// 群信息
+  var teamInfoModel: NETeamInfoModel?
+  /// 代理
   weak var delegate: TeamMemberSelectViewModelDelegate?
-
-  var selectDic = [String: TeamMemberInfoModel]() // key 值为用户 id
-
+  /// 当前选中的数据
+  var selectDic = [String: NETeamMemberInfoModel]() // key 值为用户 id
+  /// 是否正在发送请求
   var isRequest = false
-
+  /// 管理员account id 存放
   var managerSet = Set<String>()
 
   override init() {
@@ -37,13 +38,16 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
     NIMSDK.shared().teamManager.remove(self)
   }
 
+  /// 群信息(包含群成员)
+  /// - Parameter teamId: 群id
+  /// - Parameter completion: 完成回调
   func getTeamInfo(_ teamId: String, _ completion: @escaping (Error?) -> Void) {
     if isRequest == true {
       return
     }
     weak var weakSelf = self
     isRequest = true
-    repo.fetchTeamInfo(teamId) { error, teamInfo in
+    teamRepo.getTeamWithMembers(teamId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { error, teamInfo in
       weakSelf?.isRequest = false
       if error == nil {
         weakSelf?.datas.removeAll()
@@ -55,23 +59,24 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
     }
   }
 
+  /// 获取选择器数据
   func getData() {
     var temFilters = Set<String>()
-    selectDic.forEach { (key: String, value: TeamMemberInfoModel) in
+    for (key, _) in selectDic {
       temFilters.insert(key)
     }
     managerSet.removeAll()
 
     teamInfoModel?.users.forEach { [weak self] userModel in
-      if let uid = userModel.nimUser?.userId {
+      if let uid = userModel.nimUser?.user?.accountId {
         temFilters.remove(uid)
-        if uid == IMKitClient.instance.imAccid() {
+        if uid == IMKitClient.instance.account() {
           return
         }
-        if uid == self?.teamInfoModel?.team?.owner {
+        if uid == self?.teamInfoModel?.team?.ownerAccountId {
           return
         }
-        if userModel.teamMember?.type == .manager {
+        if userModel.teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
           self?.managerSet.insert(uid)
           self?.selectDic.removeValue(forKey: uid)
           return
@@ -82,12 +87,12 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
       self?.datas.append(selectMember)
       self?.showDatas.append(selectMember)
     }
-    temFilters.forEach { uid in
+    for uid in temFilters {
       selectDic.removeValue(forKey: uid)
     }
-    datas.forEach { member in
-      if let accid = member.member?.nimUser?.userId {
-        if selectDic.contains(where: { (key: String, value: TeamMemberInfoModel) in
+    for member in datas {
+      if let accid = member.member?.nimUser?.user?.accountId {
+        if selectDic.contains(where: { (key: String, value: NETeamMemberInfoModel) in
           key == accid
         }) {
           member.isSelected = true
@@ -96,24 +101,29 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
     }
   }
 
+  /// 搜索所有数据
+  /// - Parameter searchText: 搜索关键字
   func searchAllData(_ searchText: String) -> [NESelectTeamMember] {
     let result = datas.filter { findContainStr(searchText, $0) }
     return result
   }
 
+  /// 所有展示数据
+  /// - Parameter searchText: 搜索关键字
   func searchShowData(_ searchText: String) -> [NESelectTeamMember] {
     let result = showDatas.filter { findContainStr(searchText, $0) }
     return result
   }
 
+  /// 判断选择器对象是否包含搜索字段
   func findContainStr(_ text: String, _ selectModel: NESelectTeamMember) -> Bool {
-    if let uid = selectModel.member?.nimUser?.userId, uid.contains(text) {
+    if let uid = selectModel.member?.nimUser?.user?.accountId, uid.contains(text) {
       return true
-    } else if let nick = selectModel.member?.nimUser?.userInfo?.nickName, nick.contains(text) {
+    } else if let nick = selectModel.member?.nimUser?.user?.name, nick.contains(text) {
       return true
-    } else if let alias = selectModel.member?.nimUser?.alias, alias.contains(text) {
+    } else if let alias = selectModel.member?.nimUser?.friend?.alias, alias.contains(text) {
       return true
-    } else if let tNick = selectModel.member?.teamMember?.nickname, tNick.contains(text) {
+    } else if let tNick = selectModel.member?.teamMember?.teamNick, tNick.contains(text) {
       return true
     }
     return false

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEContactUIKit'
-  s.version          = '9.7.0'
+  s.version          = '10.0.0-beta'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -34,5 +34,5 @@ Pod::Spec.new do |s|
   s.resource = 'NEContactUIKit/Assets/**/*'
   s.dependency 'NEChatKit'
   s.dependency 'NECommonUIKit'
-
+  s.dependency 'MJRefresh'
 end

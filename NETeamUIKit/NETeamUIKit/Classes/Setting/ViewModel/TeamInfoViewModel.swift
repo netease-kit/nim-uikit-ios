@@ -3,21 +3,45 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 
+/// 群信息变更回调协议
+@objc public protocol NETeamInfoDelegate: NSObjectProtocol {
+  /// 群信息变更
+  func teamInfoDidUpdate(_ team: V2NIMTeam)
+}
+
 @objcMembers
-open class TeamInfoViewModel: NSObject {
+open class TeamInfoViewModel: NSObject, NETeamListener {
+  /// UI 列表数据源
   var cellDatas = [SettingCellModel]()
 
-  func getData(_ team: NIMTeam?) {
-    NELog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(team?.teamId ?? "nil")")
+  /// chat kit 群 api 单例
+  public let teamRepo = TeamRepo.shared
+
+  /// 群
+  public var v2Team: V2NIMTeam?
+
+  /// 代理
+  public weak var delegate: NETeamInfoDelegate?
+
+  override public init() {
+    super.init()
+    teamRepo.addTeamListener(self)
+  }
+
+  /// 获取群信息
+  /// - Parameter team: 群
+  func getData(_ team: V2NIMTeam?) {
+    v2Team = team
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(team?.teamId ?? "nil")")
     cellDatas.removeAll()
 
     let headerCell = SettingCellModel()
     headerCell.cornerType = .topLeft.union(.topRight)
     headerCell.type = SettingCellType.SettingHeaderCell.rawValue
-    headerCell.headerUrl = team?.avatarUrl
+    headerCell.headerUrl = team?.avatar
     headerCell.rowHeight = 74.0
 
     let nameCell = SettingCellModel()
@@ -38,6 +62,15 @@ open class TeamInfoViewModel: NSObject {
       headerCell.cellName = localizable("team_header")
       nameCell.cellName = localizable("team_name")
       intrCell.cellName = localizable("team_intr")
+    }
+  }
+
+  /// 群信息更新
+  /// - Parameter team: 群
+  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+    if let teamId = v2Team?.teamId, teamId == team.teamId {
+      getData(team)
+      delegate?.teamInfoDidUpdate(team)
     }
   }
 }

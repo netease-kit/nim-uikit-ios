@@ -2,14 +2,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class BlackListCell: NEBaseBlackListCell {
+  private lazy var bottomLine: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.ne_greyLine
+    return view
+  }()
+
   override func commonUI() {
     super.commonUI()
-    avatarImage.layer.cornerRadius = 21
+    avatarImageView.layer.cornerRadius = 21
 
     titleLabel.font = UIFont.systemFont(ofSize: 16)
     titleLabel.textColor = UIColor(
@@ -31,11 +38,4 @@ open class BlackListCell: NEBaseBlackListCell {
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
     ])
   }
-
-  private lazy var bottomLine: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.ne_greyLine
-    return view
-  }()
 }

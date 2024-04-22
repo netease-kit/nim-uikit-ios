@@ -15,7 +15,7 @@ public enum RightStyle: Int {
 @objcMembers
 open class ChatStateCell: ChatCornerCell {
   private var style: RightStyle = .none
-  public var rightImage = UIImageView()
+  public var rightImageView = UIImageView()
   var rightImageMargin: NSLayoutConstraint?
   public var rightStyle: RightStyle {
     get {
@@ -25,33 +25,38 @@ open class ChatStateCell: ChatCornerCell {
       style = newValue
       switch style {
       case .none:
-        rightImage.image = nil
+        rightImageView.image = nil
       case .indicate:
-        rightImage.image = UIImage.ne_imageNamed(name: "arrowRight")
+        rightImageView.image = UIImage.ne_imageNamed(name: "arrowRight")
       case .delete:
-        rightImage.image = UIImage.ne_imageNamed(name: "delete")
+        rightImageView.image = UIImage.ne_imageNamed(name: "delete")
       }
     }
   }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    rightImage.contentMode = .center
-    rightImage.translatesAutoresizingMaskIntoConstraints = false
-    contentView.addSubview(rightImage)
-    rightImageMargin = rightImage.rightAnchor.constraint(
+    setupUI()
+  }
+
+  /// UI 初始化
+  open func setupUI() {
+    rightImageView.contentMode = .center
+    rightImageView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(rightImageView)
+    rightImageMargin = rightImageView.rightAnchor.constraint(
       equalTo: contentView.rightAnchor,
       constant: -36
     )
     rightImageMargin?.isActive = true
     NSLayoutConstraint.activate([
-      rightImage.widthAnchor.constraint(equalToConstant: 20),
-      rightImage.heightAnchor.constraint(equalToConstant: 20),
-      rightImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      rightImageView.widthAnchor.constraint(equalToConstant: 20),
+      rightImageView.heightAnchor.constraint(equalToConstant: 20),
+      rightImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 }

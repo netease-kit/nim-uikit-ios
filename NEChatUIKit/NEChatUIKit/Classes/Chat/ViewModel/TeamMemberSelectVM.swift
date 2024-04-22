@@ -4,17 +4,17 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NIMSDK
 
 @objcMembers
 open class TeamMemberSelectVM: NSObject {
-  public var chatRepo = ChatRepo.shared
+  public var teamRepo = TeamRepo.shared
   private let className = "TeamMemberSelectVM"
 
   open func fetchTeamMembers(sessionId: String,
-                             _ completion: @escaping (Error?, ChatTeamInfoModel?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId: " + sessionId)
-    chatRepo.getTeamInfo(sessionId, completion)
+                             _ completion: @escaping (Error?, NETeamInfoModel?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId: " + sessionId)
+    teamRepo.getTeamWithMembers(sessionId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL, completion)
   }
 }

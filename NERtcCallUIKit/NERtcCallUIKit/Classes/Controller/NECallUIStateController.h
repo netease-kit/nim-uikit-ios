@@ -83,8 +83,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)refreshVideoView;
 
-- (NSString *)localizableWithKey:(NSString *)key;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -3,7 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECommonKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -11,7 +12,39 @@ import UIKit
 open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFieldDelegate {
   public let viewModel = FindFriendViewModel()
   public let hasRequest = false
-  public let searchInput = UITextField()
+
+  /// 搜索输入框
+  public let searchInput: UITextField = {
+    let searchInput = UITextField()
+    searchInput.translatesAutoresizingMaskIntoConstraints = false
+    searchInput.textColor = UIColor(hexString: "333333")
+    searchInput.placeholder = localizable("input_userId")
+    searchInput.font = UIFont.systemFont(ofSize: 14.0)
+    searchInput.returnKeyType = .search
+    searchInput.clearButtonMode = .always
+    searchInput.accessibilityIdentifier = "id.addFriendAccount"
+    return searchInput
+  }()
+
+  public var isRequesting = false
+
+  /// 搜索背景
+  public lazy var searchBackView: UIView = {
+    let searchBackView = UIView()
+    searchBackView.backgroundColor = UIColor(hexString: "F2F4F5")
+    searchBackView.translatesAutoresizingMaskIntoConstraints = false
+    searchBackView.clipsToBounds = true
+    searchBackView.layer.cornerRadius = 4.0
+    return searchBackView
+  }()
+
+  /// 搜索图片
+  public lazy var searchImageView: UIImageView = {
+    let searchImageView = UIImageView()
+    searchImageView.image = UIImage.ne_imageNamed(name: "search")
+    searchImageView.translatesAutoresizingMaskIntoConstraints = false
+    return searchImageView
+  }()
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -25,49 +58,37 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
     }))
   }
 
+  /// UI 初始化
   open func setupUI() {
-    let searchBack = UIView()
-    view.addSubview(searchBack)
-    searchBack.backgroundColor = UIColor(hexString: "F2F4F5")
-    searchBack.translatesAutoresizingMaskIntoConstraints = false
-    searchBack.clipsToBounds = true
-    searchBack.layer.cornerRadius = 4.0
+    view.addSubview(searchBackView)
     NSLayoutConstraint.activate([
-      searchBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      searchBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      searchBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 20 + topConstant),
-      searchBack.heightAnchor.constraint(equalToConstant: 32),
+      searchBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      searchBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20 + topConstant),
+      searchBackView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    let searchImage = UIImageView()
-    searchBack.addSubview(searchImage)
-    searchImage.image = UIImage.ne_imageNamed(name: "search")
-    searchImage.translatesAutoresizingMaskIntoConstraints = false
+    searchBackView.addSubview(searchImageView)
     NSLayoutConstraint.activate([
-      searchImage.centerYAnchor.constraint(equalTo: searchBack.centerYAnchor),
-      searchImage.leftAnchor.constraint(equalTo: searchBack.leftAnchor, constant: 18),
-      searchImage.widthAnchor.constraint(equalToConstant: 13),
-      searchImage.heightAnchor.constraint(equalToConstant: 13),
+      searchImageView.centerYAnchor.constraint(equalTo: searchBackView.centerYAnchor),
+      searchImageView.leftAnchor.constraint(equalTo: searchBackView.leftAnchor, constant: 18),
+      searchImageView.widthAnchor.constraint(equalToConstant: 13),
+      searchImageView.heightAnchor.constraint(equalToConstant: 13),
     ])
 
-    searchBack.addSubview(searchInput)
-    searchInput.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      searchInput.leftAnchor.constraint(equalTo: searchImage.rightAnchor, constant: 5),
-      searchInput.rightAnchor.constraint(equalTo: searchBack.rightAnchor, constant: -18),
-      searchInput.topAnchor.constraint(equalTo: searchBack.topAnchor),
-      searchInput.bottomAnchor.constraint(equalTo: searchBack.bottomAnchor),
-    ])
-    searchInput.textColor = UIColor(hexString: "333333")
-    searchInput.placeholder = localizable("input_userId")
-    searchInput.font = UIFont.systemFont(ofSize: 14.0)
-    searchInput.returnKeyType = .search
+    searchBackView.addSubview(searchInput)
     searchInput.delegate = self
-    searchInput.clearButtonMode = .always
+
+    NSLayoutConstraint.activate([
+      searchInput.leftAnchor.constraint(equalTo: searchImageView.rightAnchor, constant: 5),
+      searchInput.rightAnchor.constraint(equalTo: searchBackView.rightAnchor, constant: -18),
+      searchInput.topAnchor.constraint(equalTo: searchBackView.topAnchor),
+      searchInput.bottomAnchor.constraint(equalTo: searchBackView.bottomAnchor),
+    ])
+
     if let clearButton = searchInput.value(forKey: "_clearButton") as? UIButton {
       clearButton.accessibilityIdentifier = "id.clear"
     }
-    searchInput.accessibilityIdentifier = "id.addFriendAccount"
 
     NotificationCenter.default.addObserver(
       self,
@@ -105,7 +126,12 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
   }
 
   open func startSearch(_ text: String) {
-    if IMKitClient.instance.isMySelf(text) {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+
+    if IMKitClient.instance.isMe(text) {
       Router.shared.use(
         MeSettingRouter,
         parameters: ["nav": navigationController as Any],
@@ -114,14 +140,19 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
       return
     }
 
+    if isRequesting == true {
+      return
+    }
+    isRequesting = true
     weak var weakSelf = self
-    viewModel.searchFriend(text) { users, error in
-      NELog.infoLog(
+    viewModel.searchFriend(text) { user, error in
+      weakSelf?.isRequesting = false
+      NEALog.infoLog(
         "NEBaseFindFriendViewController",
         desc: "CALLBACK searchFriend " + (error?.localizedDescription ?? "no error")
       )
       if error == nil {
-        if let user = users?.first {
+        if let user = user, user.user != nil || user.friend != nil {
           // go to detail
           Router.shared.use(
             ContactUserInfoPageRouter,

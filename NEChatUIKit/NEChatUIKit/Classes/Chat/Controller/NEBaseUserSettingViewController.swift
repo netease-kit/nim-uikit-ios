@@ -12,9 +12,9 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   UITableViewDataSource, UITableViewDelegate {
   public var userId: String?
 
-  let viewmodel = UserSettingViewModel()
+  let viewModel = UserSettingViewModel()
 
-  lazy var userHeader: NEUserHeaderView = {
+  public lazy var userHeaderView: NEUserHeaderView = {
     let imageView = NEUserHeaderView(frame: .zero)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
@@ -23,7 +23,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     return imageView
   }()
 
-  lazy var addBtn: ExpandButton = {
+  public lazy var addButton: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(coreLoader.loadImage("setting_add"), for: .normal)
@@ -31,7 +31,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     return button
   }()
 
-  lazy var nameLabel: UILabel = {
+  public lazy var nameLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(12.0)
@@ -41,22 +41,22 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     return label
   }()
 
-  lazy var contentTable: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
-    table
+  public lazy var contentTable: UITableView = {
+    let contentTable = UITableView()
+    contentTable.translatesAutoresizingMaskIntoConstraints = false
+    contentTable.backgroundColor = .clear
+    contentTable.dataSource = self
+    contentTable.delegate = self
+    contentTable.separatorColor = .clear
+    contentTable.separatorStyle = .none
+    contentTable.sectionHeaderHeight = 12.0
+    contentTable
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      contentTable.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return contentTable
   }()
 
   public var cellClassDic = [Int: NEBaseUserSettingCell.Type]()
@@ -67,16 +67,19 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    viewmodel.delegate = self
+    viewModel.delegate = self
     if let uid = userId {
-      viewmodel.getUserSettingModel(uid)
-      contentTable.tableHeaderView = headerView()
-      contentTable.reloadData()
+      viewModel.getConversation(uid) { [weak self] error in
+        self?.viewModel.getUserSettingModel(uid) { [weak self] in
+          self?.contentTable.tableHeaderView = self?.headerView()
+          self?.contentTable.reloadData()
+        }
+      }
     }
     setupUI()
   }
@@ -95,7 +98,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseUserSettingCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
     if let pan = navigationController?.interactivePopGestureRecognizer {
@@ -104,80 +107,80 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   }
 
   open func headerView() -> UIView {
-    let header = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 110))
-    header.backgroundColor = .clear
-    let cornerBack = UIView()
-    cornerBack.layer.cornerRadius = 8.0
-    cornerBack.backgroundColor = .white
-    cornerBack.translatesAutoresizingMaskIntoConstraints = false
-    header.addSubview(cornerBack)
+    let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.width, height: 110))
+    headerView.backgroundColor = .clear
+    let cornerBackView = UIView()
+    cornerBackView.layer.cornerRadius = 8.0
+    cornerBackView.backgroundColor = .white
+    cornerBackView.translatesAutoresizingMaskIntoConstraints = false
+    headerView.addSubview(cornerBackView)
     NSLayoutConstraint.activate([
-      cornerBack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -12),
-      cornerBack.leftAnchor.constraint(equalTo: header.leftAnchor, constant: 20),
-      cornerBack.widthAnchor.constraint(equalToConstant: kScreenWidth - 40),
-      cornerBack.heightAnchor.constraint(equalToConstant: 86.0),
+      cornerBackView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -12),
+      cornerBackView.leftAnchor.constraint(equalTo: headerView.leftAnchor, constant: 20),
+      cornerBackView.widthAnchor.constraint(equalToConstant: kScreenWidth - 40),
+      cornerBackView.heightAnchor.constraint(equalToConstant: 86.0),
     ])
 
-    cornerBack.addSubview(userHeader)
-    let tap = UITapGestureRecognizer()
-    userHeader.addGestureRecognizer(tap)
-    tap.numberOfTapsRequired = 1
-    tap.numberOfTouchesRequired = 1
+    cornerBackView.addSubview(userHeaderView)
+    let tapGesture = UITapGestureRecognizer()
+    userHeaderView.addGestureRecognizer(tapGesture)
+    tapGesture.numberOfTapsRequired = 1
+    tapGesture.numberOfTouchesRequired = 1
 
-    if let url = viewmodel.userInfo?.userInfo?.avatarUrl, !url.isEmpty {
-      userHeader.sd_setImage(with: URL(string: url), completed: nil)
-      userHeader.setTitle("")
-      userHeader.backgroundColor = .clear
-    } else if let name = viewmodel.userInfo?.showName(false) {
-      userHeader.sd_setImage(with: nil)
-      userHeader.setTitle(name)
-      userHeader.backgroundColor = UIColor.colorWithString(string: viewmodel.userInfo?.userId)
+    if let url = viewModel.userInfo?.user?.avatar, !url.isEmpty {
+      userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+      userHeaderView.setTitle("")
+      userHeaderView.backgroundColor = .clear
+    } else if let name = viewModel.userInfo?.showName(false) {
+      userHeaderView.sd_setImage(with: nil)
+      userHeaderView.setTitle(name)
+      userHeaderView.backgroundColor = UIColor.colorWithString(string: viewModel.userInfo?.user?.accountId)
     }
 
-    nameLabel.text = viewmodel.userInfo?.showName()
-    cornerBack.addSubview(nameLabel)
+    nameLabel.text = viewModel.userInfo?.showName()
+    cornerBackView.addSubview(nameLabel)
     if IMKitClient.instance.getConfigCenter().teamEnable {
       NSLayoutConstraint.activate([
-        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
-        userHeader.topAnchor.constraint(equalTo: cornerBack.topAnchor, constant: 12),
-        userHeader.widthAnchor.constraint(equalToConstant: 42),
-        userHeader.heightAnchor.constraint(equalToConstant: 42),
+        userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
+        userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 12),
+        userHeaderView.widthAnchor.constraint(equalToConstant: 42),
+        userHeaderView.heightAnchor.constraint(equalToConstant: 42),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(12)
       nameLabel.textAlignment = .center
       NSLayoutConstraint.activate([
-        nameLabel.leftAnchor.constraint(equalTo: userHeader.leftAnchor, constant: -12.0),
-        nameLabel.rightAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 12.0),
-        nameLabel.topAnchor.constraint(equalTo: userHeader.bottomAnchor, constant: 6.0),
+        nameLabel.leftAnchor.constraint(equalTo: userHeaderView.leftAnchor, constant: -12.0),
+        nameLabel.rightAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 12.0),
+        nameLabel.topAnchor.constraint(equalTo: userHeaderView.bottomAnchor, constant: 6.0),
       ])
 
-      cornerBack.addSubview(addBtn)
-      addBtn.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
+      cornerBackView.addSubview(addButton)
+      addButton.addTarget(self, action: #selector(createDiscuss), for: .touchUpInside)
       NSLayoutConstraint.activate([
-        addBtn.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 20.0),
-        addBtn.topAnchor.constraint(equalTo: userHeader.topAnchor),
-        addBtn.widthAnchor.constraint(equalToConstant: 42.0),
-        addBtn.heightAnchor.constraint(equalToConstant: 42.0),
+        addButton.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 20.0),
+        addButton.topAnchor.constraint(equalTo: userHeaderView.topAnchor),
+        addButton.widthAnchor.constraint(equalToConstant: 42.0),
+        addButton.heightAnchor.constraint(equalToConstant: 42.0),
       ])
     } else {
       NSLayoutConstraint.activate([
-        userHeader.leftAnchor.constraint(equalTo: cornerBack.leftAnchor, constant: 16),
-        userHeader.centerYAnchor.constraint(equalTo: cornerBack.centerYAnchor),
-        userHeader.widthAnchor.constraint(equalToConstant: 60),
-        userHeader.heightAnchor.constraint(equalToConstant: 60),
+        userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
+        userHeaderView.centerYAnchor.constraint(equalTo: cornerBackView.centerYAnchor),
+        userHeaderView.widthAnchor.constraint(equalToConstant: 60),
+        userHeaderView.heightAnchor.constraint(equalToConstant: 60),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(16)
       nameLabel.textAlignment = .left
       NSLayoutConstraint.activate([
-        nameLabel.leftAnchor.constraint(equalTo: userHeader.rightAnchor, constant: 16.0),
-        nameLabel.rightAnchor.constraint(equalTo: cornerBack.rightAnchor),
-        nameLabel.centerYAnchor.constraint(equalTo: userHeader.centerYAnchor),
+        nameLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 16.0),
+        nameLabel.rightAnchor.constraint(equalTo: cornerBackView.rightAnchor),
+        nameLabel.centerYAnchor.constraint(equalTo: userHeaderView.centerYAnchor),
       ])
     }
 
-    return header
+    return headerView
   }
 
   open func filterStackViewController() -> [UIViewController]? {
@@ -195,7 +198,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     Router.shared.register(ContactSelectedUsersRouter) { param in
       print("user setting create disscuss  : ", param)
       var convertParam = [String: Any]()
-      param.forEach { (key: String, value: Any) in
+      for (key, value) in param {
         if key == "names", let names = value as? String {
           convertParam[key] = "\(weakSelf?.nameLabel.text ?? "")、\(names)"
         } else {
@@ -205,7 +208,12 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       weakSelf?.view.makeToastActivity(.center)
       Router.shared.use(TeamCreateDisuss, parameters: convertParam, closure: nil)
     }
+
+    // 单聊设置-创建讨论组-人员选择页面不包含自己
     var filters = Set<String>()
+    filters.insert(IMKitClient.instance.account())
+
+    // 单聊设置-创建讨论组-人员选择页面不包含单聊对方
     if let uid = userId {
       filters.insert(uid)
     }
@@ -226,7 +234,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       weakSelf?.view.hideToastActivity()
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        let session = NIMSession(teamid, type: .team)
+        let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
 
         DispatchQueue.main.async {
           if let allControllers = weakSelf?.filterStackViewController() {
@@ -234,7 +242,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
             Router.shared.use(
               PushTeamChatVCRouter,
               parameters: ["nav": weakSelf?.navigationController as Any,
-                           "session": session as Any],
+                           "conversationId": conversationId as Any],
               closure: nil
             )
           }
@@ -246,7 +254,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   }
 
   open func showUserInfo() {
-    if let user = viewmodel.userInfo {
+    if let user = viewModel.userInfo {
       Router.shared.use(
         ContactUserInfoPageRouter,
         parameters: ["nav": navigationController as Any, "user": user],
@@ -266,12 +274,12 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   // MARK: UITableViewDataSource, UITableViewDelegate
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewmodel.cellDatas.count
+    viewModel.cellDatas.count
   }
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
@@ -282,15 +290,14 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     return UITableViewCell()
   }
 
-  func getPinMessageViewController(session: NIMSession) -> NEBasePinMessageViewController {
-    NEBasePinMessageViewController(session: session)
+  func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {
+    NEBasePinMessageViewController(conversationId: conversationId)
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if indexPath.row == 0 {
-      if let accid = userId {
-        let session = NIMSession(accid, type: .P2P)
-        let pin = getPinMessageViewController(session: session)
+      if let accid = userId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
+        let pin = getPinMessageViewController(conversationId: conversationId)
         navigationController?.pushViewController(pin, animated: true)
       }
     }

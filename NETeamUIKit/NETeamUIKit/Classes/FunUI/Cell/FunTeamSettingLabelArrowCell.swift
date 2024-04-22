@@ -18,8 +18,8 @@ open class FunTeamSettingLabelArrowCell: FunTeamArrowSettingCell {
     super.setupUI()
     contentView.addSubview(arrowLabel)
     NSLayoutConstraint.activate([
-      arrowLabel.centerYAnchor.constraint(equalTo: arrow.centerYAnchor),
-      arrowLabel.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -4),
+      arrowLabel.centerYAnchor.constraint(equalTo: arrowView.centerYAnchor),
+      arrowLabel.rightAnchor.constraint(equalTo: arrowView.leftAnchor, constant: -4),
     ])
   }
 

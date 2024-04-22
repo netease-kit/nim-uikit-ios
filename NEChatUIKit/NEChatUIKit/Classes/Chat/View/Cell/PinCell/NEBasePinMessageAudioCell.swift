@@ -71,7 +71,7 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
     if let m = item.chatmodel as? MessageAudioModel {
       audioTimeLabel.text = "\(m.duration)" + "s"
