@@ -14,6 +14,21 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self]
   var sectionData = [SettingSectionModel]()
 
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     sectionData.append(getSectionData())
@@ -36,18 +51,63 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     let showTeam = SettingCellModel()
     showTeam.cellName = "显示群聊"
     showTeam.type = SettingCellType.SettingSwitchCell.rawValue
-    showTeam.switchOpen = IMKitClient.instance.getConfigCenter().teamEnable
+    showTeam.switchOpen = IMKitConfigCenter.shared.teamEnable
     showTeam.swichChange = { isOpen in
-      IMKitClient.instance.getConfigCenter().teamEnable = isOpen
+      IMKitConfigCenter.shared.teamEnable = isOpen
     }
     model.cellModels.append(showTeam)
+
+    let showMessageCollection = SettingCellModel()
+    showMessageCollection.cellName = "显示收藏"
+    showMessageCollection.type = SettingCellType.SettingSwitchCell.rawValue
+    showMessageCollection.switchOpen = IMKitConfigCenter.shared.collectionEnable
+    showMessageCollection.swichChange = { isOpen in
+//      IMKitConfigCenter.shared.collectionEnable = isOpen
+    }
+    model.cellModels.append(showMessageCollection)
+
+    let showMessagePin = SettingCellModel()
+    showMessagePin.cellName = "显示标记"
+    showMessagePin.type = SettingCellType.SettingSwitchCell.rawValue
+    showMessagePin.switchOpen = IMKitConfigCenter.shared.pinEnable
+    showMessagePin.swichChange = { isOpen in
+      IMKitConfigCenter.shared.pinEnable = isOpen
+    }
+    model.cellModels.append(showMessagePin)
+
+    let showMessageTop = SettingCellModel()
+    showMessageTop.cellName = "显示置顶"
+    showMessageTop.type = SettingCellType.SettingSwitchCell.rawValue
+    showMessageTop.switchOpen = IMKitConfigCenter.shared.topEnable
+    showMessageTop.swichChange = { isOpen in
+//      IMKitConfigCenter.shared.topEnable = isOpen
+    }
+    model.cellModels.append(showMessageTop)
+
+    let showOnlineStatus = SettingCellModel()
+    showOnlineStatus.cellName = "显示在线状态"
+    showOnlineStatus.type = SettingCellType.SettingSwitchCell.rawValue
+    showOnlineStatus.switchOpen = IMKitConfigCenter.shared.onlineStatusEnable
+    showOnlineStatus.swichChange = { isOpen in
+//      IMKitConfigCenter.shared.onlineStatusEnable = isOpen
+    }
+    model.cellModels.append(showOnlineStatus)
+
+    let strangerCallEnable = SettingCellModel()
+    strangerCallEnable.cellName = "是否允许陌生人音视频通话"
+    strangerCallEnable.type = SettingCellType.SettingSwitchCell.rawValue
+    strangerCallEnable.switchOpen = IMKitConfigCenter.shared.strangerCallEnable
+    strangerCallEnable.swichChange = { isOpen in
+      IMKitConfigCenter.shared.strangerCallEnable = isOpen
+    }
+    model.cellModels.append(strangerCallEnable)
 
     model.setCornerType()
     return model
   }
 
   func initialConfig() {
-    title = "配置测试页"
+    title = "全局配置"
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
       navigationView.backgroundColor = .ne_backgroundColor
@@ -87,25 +147,10 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
-
-  lazy var tableView: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
-    if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
-    }
-    return table
-  }()
 
   @objc func saveConfig() {
     NotificationCenter.default.post(
@@ -156,8 +201,8 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let header = UIView()
-    header.backgroundColor = .ne_lightBackgroundColor
-    return header
+    let headerView = UIView()
+    headerView.backgroundColor = .ne_lightBackgroundColor
+    return headerView
   }
 }

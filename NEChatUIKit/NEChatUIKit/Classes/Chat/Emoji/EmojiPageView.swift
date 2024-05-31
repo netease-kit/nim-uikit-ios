@@ -26,13 +26,24 @@ open class EmojiPageView: UIView {
   private var pages = [AnyObject]()
   private let className = "EmojiPageView"
 
+  private lazy var scrollView: UIScrollView = {
+    let scrollView = UIScrollView(frame: self.bounds)
+    scrollView.autoresizingMask = .flexibleWidth
+    scrollView.showsVerticalScrollIndicator = false
+    scrollView.showsHorizontalScrollIndicator = false
+    scrollView.isPagingEnabled = true
+    scrollView.delegate = self
+    scrollView.scrollsToTop = false
+    return scrollView
+  }()
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
     setupControls()
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override public var frame: CGRect {
@@ -78,7 +89,7 @@ open class EmojiPageView: UIView {
   func reloadPage() {
     // reload时候记录上次位置
 //        guard let cPage = currentPage else {
-//            NELog.errorLog(className, desc: "❌currentPage is nil")
+//            NEALog.errorLog(className, desc: "❌currentPage is nil")
 //            return
 //        }
     if currentPage >= pages.count {
@@ -222,19 +233,6 @@ open class EmojiPageView: UIView {
     )
 //        }
   }
-
-  // MARK: private method
-
-  private lazy var scrollView: UIScrollView = {
-    let scrollView = UIScrollView(frame: self.bounds)
-    scrollView.autoresizingMask = .flexibleWidth
-    scrollView.showsVerticalScrollIndicator = false
-    scrollView.showsHorizontalScrollIndicator = false
-    scrollView.isPagingEnabled = true
-    scrollView.delegate = self
-    scrollView.scrollsToTop = false
-    return scrollView
-  }()
 
   // MARK: 辅助方法
 

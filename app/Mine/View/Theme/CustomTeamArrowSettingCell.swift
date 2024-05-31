@@ -28,10 +28,10 @@ class CustomTeamArrowSettingCell: TeamArrowSettingCell {
         titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -68),
       ])
 
-      contentView.addSubview(arrow)
+      contentView.addSubview(arrowView)
       NSLayoutConstraint.activate([
-        arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-        arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+        arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+        arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
       ])
       dividerLineLeftMargin?.constant = 20
       dividerLineRightMargin?.constant = 0

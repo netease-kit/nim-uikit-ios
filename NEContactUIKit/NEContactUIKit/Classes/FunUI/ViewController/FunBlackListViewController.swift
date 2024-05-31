@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
@@ -12,11 +12,10 @@ import UIKit
 open class FunBlackListViewController: NEBaseBlackListViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    className = "FunBlackListViewController"
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func commonUI() {
@@ -35,11 +34,15 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
     ) as! FunBlackListCell
     cell.delegate = self
     cell.index = indexPath.row
-    cell.setModel(blackList?[indexPath.row] as Any)
+    cell.setModel(viewModel.blockList[indexPath.row] as Any)
     return cell
   }
 
-  override open func getContactSelectVC() -> NEBaseContactsSelectedViewController {
-    FunContactsSelectedViewController()
+  /// 黑名单选择页面
+  /// - Returns: 人员选择控制器
+  override open func getContactSelectVC() -> NEBaseContactSelectedViewController {
+    var filterUsers = Set<String>()
+    filterUsers.insert(IMKitClient.instance.account())
+    return FunContactSelectedViewController(filterUsers: filterUsers)
   }
 }

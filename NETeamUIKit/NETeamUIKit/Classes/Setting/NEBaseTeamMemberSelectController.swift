@@ -5,41 +5,58 @@
 import NECommonKit
 import UIKit
 
-public typealias NESelectTeamMemberBlock = ([TeamMemberInfoModel]) -> Void
+public typealias NESelectTeamMemberBlock = ([NETeamMemberInfoModel]) -> Void
 
 @objcMembers
 open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, TeamMemberSelectViewModelDelegate {
   public var selectMemberBlock: NESelectTeamMemberBlock?
 
-  let viewmodel = TeamMemberSelectViewModel()
+  let viewModel = TeamMemberSelectViewModel()
 
+  /// 群id
   var teamId: String?
 
   public var cellClassDic = [Int: UITableViewCell.Type]() // key 值为 table section 值
 
-  public let searchInput = UITextField()
+  /// 搜索输入框
+  public lazy var searchInput: UITextField = {
+    let searchInput = UITextField()
+    searchInput.textColor = UIColor(hexString: "333333")
+    searchInput.placeholder = localizable("search_member")
+    searchInput.font = UIFont.systemFont(ofSize: 14.0)
+    searchInput.returnKeyType = .search
+    searchInput.delegate = self
+    searchInput.clearButtonMode = .always
+    return searchInput
+  }()
 
+  /// 选择数量限制
   public var selectCountLimit = 10
 
-  public lazy var contentTable: UITableView = {
-    let table = UITableView()
-    table.translatesAutoresizingMaskIntoConstraints = false
-    table.backgroundColor = .clear
-    table.dataSource = self
-    table.delegate = self
-    table.separatorColor = .clear
-    table.separatorStyle = .none
-    table.sectionHeaderHeight = 12.0
-    table.keyboardDismissMode = .onDrag
-    table
+  /// 内容列表
+  public lazy var contentTableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
+    tableView.keyboardDismissMode = .onDrag
+    tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     if #available(iOS 15.0, *) {
-      table.sectionHeaderTopPadding = 0.0
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    return table
+    return tableView
   }()
 
+  /// 搜索框背景视图
+  let searchBackView = UIView()
+
+  /// 数据为空占位图
   public lazy var emptyView: NEEmptyDataView = {
     let view = NEEmptyDataView(
       imageName: "user_empty",
@@ -47,6 +64,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
       frame: CGRect.zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
 
@@ -56,82 +74,84 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
     super.viewDidLoad()
 
     // Do any additional setup after loading the view.
-    viewmodel.delegate = self
+    viewModel.delegate = self
     setupUI()
     if let tid = teamId {
-      viewmodel.getTeamInfo(tid) { [weak self] error in
+      viewModel.getTeamInfo(tid) { [weak self] error in
         if let err = error {
           self?.view.makeToast(err.localizedDescription)
         } else {
-          self?.contentTable.reloadData()
+          self?.didReloadTableData()
+          print("获取群信息成功 : ", self?.viewModel.teamInfoModel?.users.count as Any)
         }
       }
     }
   }
 
+  /// 刷新列表
+  open func didReloadTableData() {
+    if viewModel.showDatas.count <= 0 {
+      emptyView.isHidden = false
+    } else {
+      emptyView.isHidden = true
+    }
+    contentTableView.reloadData()
+  }
+
+  let searchImageView: UIImageView = {
+    let searchImageView = UIImageView()
+    searchImageView.image = coreLoader.loadImage("search")
+    searchImageView.translatesAutoresizingMaskIntoConstraints = false
+    return searchImageView
+  }()
+
   open func setupUI() {
     title = localizable("team_member_select")
     view.backgroundColor = .white
-    view.addSubview(contentTable)
+    view.addSubview(contentTableView)
 
-    let searchBack = UIView()
-    view.addSubview(searchBack)
-    searchBack.backgroundColor = UIColor(hexString: "F2F4F5")
-    searchBack.translatesAutoresizingMaskIntoConstraints = false
-    searchBack.clipsToBounds = true
-    searchBack.layer.cornerRadius = 4.0
+    view.addSubview(searchBackView)
+    searchBackView.backgroundColor = UIColor(hexString: "F2F4F5")
+    searchBackView.translatesAutoresizingMaskIntoConstraints = false
+    searchBackView.clipsToBounds = true
+    searchBackView.layer.cornerRadius = 4.0
     NSLayoutConstraint.activate([
-      searchBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      searchBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      searchBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 13 + topConstant),
-      searchBack.heightAnchor.constraint(equalToConstant: 32),
+      searchBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      searchBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 13 + topConstant),
+      searchBackView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    let searchImage = UIImageView()
-    searchBack.addSubview(searchImage)
-    searchImage.image = coreLoader.loadImage("search")
-    searchImage.translatesAutoresizingMaskIntoConstraints = false
+    searchBackView.addSubview(searchImageView)
     NSLayoutConstraint.activate([
-      searchImage.centerYAnchor.constraint(equalTo: searchBack.centerYAnchor),
-      searchImage.leftAnchor.constraint(equalTo: searchBack.leftAnchor, constant: 18),
-      searchImage.widthAnchor.constraint(equalToConstant: 13),
-      searchImage.heightAnchor.constraint(equalToConstant: 13),
+      searchImageView.centerYAnchor.constraint(equalTo: searchBackView.centerYAnchor),
+      searchImageView.leftAnchor.constraint(equalTo: searchBackView.leftAnchor, constant: 18),
+      searchImageView.widthAnchor.constraint(equalToConstant: 13),
+      searchImageView.heightAnchor.constraint(equalToConstant: 13),
     ])
 
-    searchBack.addSubview(searchInput)
+    searchBackView.addSubview(searchInput)
     searchInput.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      searchInput.leftAnchor.constraint(equalTo: searchImage.rightAnchor, constant: 5),
-      searchInput.rightAnchor.constraint(equalTo: searchBack.rightAnchor, constant: -18),
-      searchInput.topAnchor.constraint(equalTo: searchBack.topAnchor),
-      searchInput.bottomAnchor.constraint(equalTo: searchBack.bottomAnchor),
+      searchInput.leftAnchor.constraint(equalTo: searchImageView.rightAnchor, constant: 5),
+      searchInput.rightAnchor.constraint(equalTo: searchBackView.rightAnchor, constant: -18),
+      searchInput.topAnchor.constraint(equalTo: searchBackView.topAnchor),
+      searchInput.bottomAnchor.constraint(equalTo: searchBackView.bottomAnchor),
     ])
-    searchInput.textColor = UIColor(hexString: "333333")
-    searchInput.placeholder = localizable("search_member")
-    searchInput.font = UIFont.systemFont(ofSize: 14.0)
-    searchInput.returnKeyType = .search
-    searchInput.delegate = self
-    searchInput.clearButtonMode = .always
+
     if let clearButton = searchInput.value(forKey: "_clearButton") as? UIButton {
       clearButton.accessibilityIdentifier = "id.clear"
     }
     searchInput.accessibilityIdentifier = "id.addFriendAccount"
 
-//        NotificationCenter.default.addObserver(
-//          self,
-//          selector: #selector(textFieldChange),
-//          name: UITextField.textDidChangeNotification,
-//          object: nil
-//        )
-
     NSLayoutConstraint.activate([
-      contentTable.leftAnchor.constraint(equalTo: view.leftAnchor),
-      contentTable.rightAnchor.constraint(equalTo: view.rightAnchor),
-      contentTable.topAnchor.constraint(equalTo: searchBack.bottomAnchor),
-      contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      contentTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      contentTableView.topAnchor.constraint(equalTo: searchBackView.bottomAnchor),
+      contentTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    cellClassDic.forEach { (key: Int, value: UITableViewCell.Type) in
-      contentTable.register(value, forCellReuseIdentifier: "\(key)")
+    for (key, value) in cellClassDic {
+      contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
 
     view.addSubview(emptyView)
@@ -149,12 +169,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if viewmodel.showDatas.count <= 0 {
-      emptyView.isHidden = false
-    } else {
-      emptyView.isHidden = true
-    }
-    return viewmodel.showDatas.count
+    viewModel.showDatas.count
   }
 
   open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -162,22 +177,17 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let model = viewmodel.showDatas[indexPath.row]
+    let model = viewModel.showDatas[indexPath.row]
     guard let cell = tableView.cellForRow(at: indexPath) as? NEBaseTeamMemberSelectCell else {
       return
     }
-    if let member = model.member, let accid = member.teamMember?.userId {
-      if viewmodel.selectDic[accid] != nil {
-        viewmodel.selectDic[accid] = nil
+    if let member = model.member, let accid = member.teamMember?.accountId {
+      if viewModel.selectDic[accid] != nil {
+        viewModel.selectDic[accid] = nil
         model.isSelected = false
         cell.checkImageView.isHighlighted = false
       } else {
-        if viewmodel.selectDic.count >= selectCountLimit {
-          let toastString = String(format: localizable("select_limit_tip"), selectCountLimit)
-          view.makeToast(toastString)
-          return
-        }
-        viewmodel.selectDic[accid] = member
+        viewModel.selectDic[accid] = member
         model.isSelected = true
         cell.checkImageView.isHighlighted = true
       }
@@ -200,42 +210,46 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
   }
 
   open func textFieldShouldClear(_ textField: UITextField) -> Bool {
-    viewmodel.showDatas = viewmodel.datas
-    contentTable.reloadData()
+    viewModel.showDatas = viewModel.datas
+    didReloadTableData()
     return true
   }
 
+  /// 文本输入变更
   open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
     let finalString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
     if string.count <= 0 {
       if finalString.count <= 0 {
-        viewmodel.showDatas = viewmodel.datas
-        contentTable.reloadData()
+        viewModel.showDatas = viewModel.datas
+        didReloadTableData()
       } else {
-        viewmodel.showDatas = viewmodel.searchAllData(finalString)
-        contentTable.reloadData()
+        viewModel.showDatas = viewModel.searchAllData(finalString)
+        didReloadTableData()
       }
     } else {
-      viewmodel.showDatas = viewmodel.searchAllData(finalString)
-      contentTable.reloadData()
+      viewModel.showDatas = viewModel.searchAllData(finalString)
+      didReloadTableData()
     }
     return true
   }
 
+  /// 选择成员变更回调，内部根据选择数量来做右上角状态变更
   func didChangeSelectMember() {
-    if viewmodel.selectDic.count > 0 {
-      let title = localizable("member_select_sure") + "(\(viewmodel.selectDic.count))"
+    if viewModel.selectDic.count > 0 {
+      let title = localizable("member_select_sure") + "(\(viewModel.selectDic.count))"
       navigationView.moreButton.setTitle(title, for: .normal)
     } else {
       navigationView.moreButton.setTitle(localizable("member_select_sure"), for: .normal)
     }
   }
 
+  /// 刷新回调
   open func didNeedRefresh() {
-    contentTable.reloadData()
+    contentTableView.reloadData()
     didChangeSelectMember()
   }
 
+  /// 点击确定添加回调
   open func didClickSure() {
     print("sure click")
 
@@ -244,18 +258,18 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
       return
     }
 
-    if viewmodel.selectDic.count + viewmodel.managerSet.count > selectCountLimit {
+    if viewModel.selectDic.count + viewModel.managerSet.count > selectCountLimit {
       view.makeToast(localizable("max_managers_tip"))
       return
     }
 
-    if viewmodel.selectDic.count <= 0 {
+    if viewModel.selectDic.count <= 0 {
       view.makeToast(localizable("member_empty_tip"))
       return
     }
 
-    var retArray = [TeamMemberInfoModel]()
-    viewmodel.selectDic.forEach { (key: String, value: TeamMemberInfoModel) in
+    var retArray = [NETeamMemberInfoModel]()
+    for (_, value) in viewModel.selectDic {
       retArray.append(value)
     }
     if let block = selectMemberBlock {

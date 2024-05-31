@@ -52,19 +52,19 @@ open class CirleProgressView: UIView {
       clockwise: false
     )
     borderLayer.path = borderPath.cgPath
-    borderLayer.strokeColor = UIColor.ne_blueText.cgColor
+    borderLayer.strokeColor = UIColor.ne_normalTheme.cgColor
     borderLayer.fillColor = UIColor.clear.cgColor
     borderLayer.lineWidth = 2
     borderLayer.frame = bounds
     layer.addSublayer(borderLayer)
 
     sectorLayer.frame = bounds
-    sectorLayer.fillColor = UIColor.ne_blueText.cgColor
+    sectorLayer.fillColor = UIColor.ne_normalTheme.cgColor
     layer.addSublayer(sectorLayer)
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   private func drawCircle(progress: Float) {

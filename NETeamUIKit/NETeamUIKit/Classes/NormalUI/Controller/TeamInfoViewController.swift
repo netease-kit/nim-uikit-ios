@@ -8,9 +8,9 @@ import UIKit
 
 @objcMembers
 open class TeamInfoViewController: NEBaseTeamInfoViewController {
-  override public init(team: NIMTeam?) {
+  override public init(team: V2NIMTeam?) {
     super.init(team: team)
-    cellClassDic = [
+    registerCellDic = [
       SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,
       SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self,
     ]
@@ -20,7 +20,7 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupUI() {
@@ -32,7 +32,7 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
 
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
       for: indexPath
@@ -44,15 +44,15 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
   }
 
   override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     if indexPath.row == 0 {
       let avatar = TeamAvatarViewController()
       avatar.team = team
       weak var weakSelf = self
       avatar.block = {
         if let t = weakSelf?.team {
-          weakSelf?.viewmodel.getData(t)
-          weakSelf?.contentTable.reloadData()
+          weakSelf?.viewModel.getData(t)
+          weakSelf?.contentTableView.reloadData()
         }
       }
       navigationController?.pushViewController(avatar, animated: true)
@@ -72,7 +72,7 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
 
   override open func tableView(_ tableView: UITableView,
                                heightForRowAt indexPath: IndexPath) -> CGFloat {
-    let model = viewmodel.cellDatas[indexPath.row]
+    let model = viewModel.cellDatas[indexPath.row]
     return model.rowHeight
   }
 }

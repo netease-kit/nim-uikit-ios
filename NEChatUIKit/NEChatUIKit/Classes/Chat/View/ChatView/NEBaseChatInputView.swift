@@ -88,6 +88,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = .clear
+    button.accessibilityIdentifier = "id.chatExpandButton"
     return button
   }()
 
@@ -101,13 +102,80 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   public var textviewLeftConstraint: NSLayoutConstraint?
   public var textviewRightConstraint: NSLayoutConstraint?
 
+  public var multipleLineView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.white
+    view.clipsToBounds = true
+    view.layer.cornerRadius = 6.0
+    view.isHidden = true
+
+    view.layer.shadowColor = UIColor.black.cgColor
+    view.layer.shadowOpacity = 0.5
+    view.layer.shadowOffset = CGSize(width: 3, height: 3)
+    view.layer.shadowRadius = 5
+    view.layer.masksToBounds = false
+    return view
+  }()
+
+  public var titleField: UITextField = {
+    let textField = UITextField()
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    textField.font = UIFont.systemFont(ofSize: 18.0)
+    textField.textColor = .ne_darkText
+    textField.returnKeyType = .send
+    textField.attributedPlaceholder = NSAttributedString(string: coreLoader.localizable("multiple_line_placleholder"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText])
+    textField.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    return textField
+  }()
+
+  public var multipleLineExpandButton: ExpandButton = {
+    let button = ExpandButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = .clear
+    return button
+  }()
+
+  public var multipleSendButton: ExpandButton = {
+    let button = ExpandButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = .clear
+    button.setImage(coreLoader.loadImage("multiple_send_image"), for: .normal)
+    return button
+  }()
+
+  public lazy var emojiView: UIView = {
+    let backView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    let view =
+      InputEmoticonContainerView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    view.delegate = self
+    backView.isHidden = true
+
+    backView.backgroundColor = UIColor.clear
+    backView.addSubview(view)
+    let tap = UITapGestureRecognizer()
+    backView.addGestureRecognizer(tap)
+    tap.addTarget(self, action: #selector(missClickEmoj))
+    return backView
+  }()
+
+  public lazy var chatAddMoreView: NEChatMoreActionView = {
+    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    view.delegate = self
+    return view
+  }()
+
+  public var multipleLineViewHeight: NSLayoutConstraint?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   deinit {
@@ -154,31 +222,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     atCache?.clean()
   }
 
-  // MARK: ===================== lazy method =====================
-
-  public lazy var emojiView: UIView = {
-    let backView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    let view =
-      InputEmoticonContainerView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    view.delegate = self
-    backView.isHidden = true
-
-    backView.backgroundColor = UIColor.clear
-    backView.addSubview(view)
-    let tap = UITapGestureRecognizer()
-    backView.addGestureRecognizer(tap)
-    tap.addTarget(self, action: #selector(missClickEmoj))
-    return backView
-  }()
-
-  public lazy var chatAddMoreView: NEChatMoreActionView = {
-    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
-    view.delegate = self
-    return view
-  }()
-
   open func textViewDidChange(_ textView: UITextView) {
     delegate?.textFieldDidChange(textView.text)
   }
@@ -206,7 +249,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_blueText) == false {
+      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
         return
       }
       if findRange.location <= start, start < findRange.location + findRange.length + atRangeOffset {
@@ -228,7 +271,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_blueText) == false {
+      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
         return
       }
       let findStart = findRange.location
@@ -267,6 +310,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
       mutaString.replaceCharacters(in: range, with: addString)
       textView.attributedText = mutaString
+      textView.accessibilityValue = text
       DispatchQueue.main.async {
         textView.selectedRange = NSMakeRange(range.location + addString.length, 0)
       }
@@ -305,6 +349,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     if let findRange = findShowPosition(range: range, attribute: textView.attributedText) {
       textView.selectedRange = NSMakeRange(findRange.location + findRange.length, 0)
     }
+
+    textView.scrollRangeToVisible(NSMakeRange(textView.selectedRange.location, 1))
+    textView.accessibilityValue = getRealSendText(textView.attributedText)
   }
 
   @available(iOS 10.0, *)
@@ -313,12 +360,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
     return true
   }
-
-//    @available(iOS 10.0, *)
-//    open func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-//
-//        return true
-//    }
 
   open func buttonEvent(button: UIButton) {
     button.isSelected = !button.isSelected
@@ -349,35 +390,30 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       textView.deleteBackward()
       print("delete ward")
     } else {
-      if let font = textView.font {
-        let attribute = NEEmotionTool.getAttWithStr(
-          str: description,
-          font: font,
-          CGPoint(x: 0, y: -4)
-        )
-        print("attribute : ", attribute)
-        let mutaAttribute = NSMutableAttributedString()
-        if let origin = textView.attributedText {
-          mutaAttribute.append(origin)
-        }
-        attribute.enumerateAttribute(
-          NSAttributedString.Key.attachment,
-          in: NSMakeRange(0, attribute.length)
-        ) { value, range, stop in
-          if let neAttachment = value as? NEEmotionAttachment {
-            print("ne attachment bounds ", neAttachment.bounds)
-          }
-        }
-        mutaAttribute.append(attribute)
-        mutaAttribute.addAttribute(
-          NSAttributedString.Key.font,
-          value: font,
-          range: NSMakeRange(0, mutaAttribute.length)
-        )
-        textView.attributedText = mutaAttribute
-        textView.scrollRangeToVisible(NSMakeRange(textView.attributedText.length, 1))
-      }
+      let range = textView.selectedRange
+      let attribute = NEEmotionTool.getAttWithStr(str: description, font: .systemFont(ofSize: 16))
+      let mutaAttribute = NSMutableAttributedString(attributedString: textView.attributedText)
+      mutaAttribute.insert(attribute, at: range.location)
+      textView.attributedText = mutaAttribute
+      textView.selectedRange = NSMakeRange(range.location + attribute.length, 0)
     }
+  }
+
+  /// 点击富文本图片
+  public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+    textView.becomeFirstResponder()
+
+    var offset = characterRange.location
+    // 修复iOS 14.1，点击空白识别为点击最后一个富文本图片的问题，待优化
+    if characterRange.location + characterRange.length == textView.text.count {
+      offset += 1
+    }
+
+    if let newPosition = textView.position(from: textView.beginningOfDocument, offset: offset) {
+      textView.selectedTextRange = textView.textRange(from: newPosition, to: newPosition)
+    }
+
+    return true
   }
 
   open func didPressSend(sender: UIButton) {
@@ -415,10 +451,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     delegate?.endRecord(insideView: insideView)
   }
 
-//  func textFieldChangeNoti() {
-//    delegate?.textFieldDidChange(textField)
-//  }
-
   func getRealSendText(_ attribute: NSAttributedString) -> String? {
     let muta = NSMutableString()
 
@@ -451,7 +483,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_blueText) == false {
+      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
         return
       }
       if let range = Range(findRange, in: string) {
@@ -491,33 +523,84 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     return nil
   }
 
-  open func getAtRemoteExtension() -> [String: Any]? {
-    var atDic = [String: Any]()
-    NELog.infoLog(className(), desc: "at range cache : \(atRangeCache)")
-    atRangeCache.forEach { (key: String, value: MessageAtCacheModel) in
-      if let userValue = atDic[value.accid] as? [String: AnyObject], var array = userValue[atSegmentsKey] as? [Any], let object = value.atModel.yx_modelToJSONObject() {
-        array.append(object)
-        if var dic = atDic[value.accid] as? [String: Any] {
-          dic[atSegmentsKey] = array
-          atDic[value.accid] = dic
+  open func getAtRemoteExtension(_ attri: NSAttributedString?) -> [String: Any]? {
+    guard let attribute = attri else {
+      return nil
+    }
+    var atDic = [String: [String: Any]]()
+    let string = attribute.string
+    attribute.enumerateAttribute(
+      NSAttributedString.Key.foregroundColor,
+      in: NSMakeRange(0, attribute.length)
+    ) { value, findRange, stop in
+      guard let findColor = value as? UIColor else {
+        return
+      }
+      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+        return
+      }
+      if let range = Range(findRange, in: string) {
+        let text = string[range]
+        let model = MessageAtInfoModel()
+        print("range text : ", String(text))
+        // 计算at前有表情导致索引新增的数量
+        let expandIndex = getConvertedExtraIndex(attribute.attributedSubstring(from: NSRange(location: 0, length: findRange.location)))
+        print("expand index value ", expandIndex)
+        model.start = findRange.location + expandIndex
+        let nameExpandCount = getConvertedExtraIndex(attribute.attributedSubstring(from: findRange))
+        print("name expand index value ", nameExpandCount)
+        model.end = model.start + findRange.length + nameExpandCount
+        print("model start : ", model.start, " model end : ", model.end)
+        var dic: [String: Any]?
+        var array: [Any]?
+        if let accid = nickAccidDic[String(text)] {
+          if let atCacheDic = atDic[accid] {
+            dic = atCacheDic
+          } else {
+            dic = [String: Any]()
+          }
+
+          if let atCacheArray = dic?[atSegmentsKey] as? [Any] {
+            array = atCacheArray
+          } else {
+            array = [Any]()
+          }
+
+          if let object = model.yx_modelToJSONObject() {
+            array?.append(object)
+          }
+          dic?[atSegmentsKey] = array
+          dic?[atTextKey] = String(text) + " "
+          dic?[#keyPath(MessageAtCacheModel.accid)] = accid
+          atDic[accid] = dic
         }
-      } else if let object = value.atModel.yx_modelToJSONObject() {
-        var array = [Any]()
-        array.append(object)
-        var dic = [String: Any]()
-        dic[atTextKey] = value.text
-        dic[atSegmentsKey] = array
-        atDic[value.accid] = dic
       }
     }
-    NELog.infoLog(className(), desc: "at dic value : \(atDic)")
     if atDic.count > 0 {
       return [yxAtMsg: atDic]
     }
     return nil
   }
 
-  open func cleartAtCache() {
+  /// 把表情转换成字符编码计算index的增量
+  /// - Parameter attribute： at 文本前的文本
+  func getConvertedExtraIndex(_ attribute: NSAttributedString) -> Int {
+    var count = 0
+    attribute.enumerateAttributes(
+      in: NSMakeRange(0, attribute.length),
+      options: NSAttributedString.EnumerationOptions(rawValue: 0)
+    ) { dics, range, stop in
+      if let neAttachment = dics[NSAttributedString.Key.attachment] as? NEEmotionAttachment {
+        if let tagCount = neAttachment.emotion?.tag?.count {
+          print(" \(count) getConvertedExtraIndex tag : ", neAttachment.emotion?.tag as Any)
+          count = count + tagCount - 1
+        }
+      }
+    }
+    return count
+  }
+
+  open func clearAtCache() {
     nickAccidDic.removeAll()
   }
 
@@ -587,50 +670,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       return
     }
   }
-
-  public var multipleLineView: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.white
-    view.clipsToBounds = true
-    view.layer.cornerRadius = 6.0
-    view.isHidden = true
-
-    view.layer.shadowColor = UIColor.black.cgColor
-    view.layer.shadowOpacity = 0.5
-    view.layer.shadowOffset = CGSize(width: 3, height: 3)
-    view.layer.shadowRadius = 5
-    view.layer.masksToBounds = false
-    return view
-  }()
-
-  public var titleField: UITextField = {
-    let text = UITextField()
-    text.translatesAutoresizingMaskIntoConstraints = false
-    text.font = UIFont.systemFont(ofSize: 18.0)
-    text.textColor = .ne_darkText
-    text.returnKeyType = .send
-    text.attributedPlaceholder = NSAttributedString(string: coreLoader.localizable("multiple_line_placleholder"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText])
-    text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
-    return text
-  }()
-
-  public var multipleLineExpandButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.backgroundColor = .clear
-    return button
-  }()
-
-  public var multipleSendButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.backgroundColor = .clear
-    button.setImage(coreLoader.loadImage("multiple_send_image"), for: .normal)
-    return button
-  }()
-
-  public var multipleLineViewHeight: NSLayoutConstraint?
 
   func setupMultipleLineView() {
     addSubview(multipleLineView)
@@ -710,7 +749,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }
 
   open func setMuteInputStyle() {
-    cleartAtCache()
+    clearAtCache()
     expandButton.isEnabled = false
     textView.attributedText = nil
     textView.text = nil

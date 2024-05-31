@@ -12,19 +12,19 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
   weak var weakModel: MessageFileModel?
 
   public lazy var imgViewLeft: UIImageView = {
-    let view_img = UIImageView()
-    view_img.translatesAutoresizingMaskIntoConstraints = false
-    view_img.backgroundColor = .clear
-    view_img.accessibilityIdentifier = "id.fileType"
-    return view_img
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.backgroundColor = .clear
+    imageView.accessibilityIdentifier = "id.fileType"
+    return imageView
   }()
 
   public lazy var stateViewLeft: FileStateView = {
-    let state = FileStateView()
-    state.translatesAutoresizingMaskIntoConstraints = false
-    state.backgroundColor = .clear
-    state.accessibilityIdentifier = "id.fileStatus"
-    return state
+    let stateView = FileStateView()
+    stateView.translatesAutoresizingMaskIntoConstraints = false
+    stateView.backgroundColor = .clear
+    stateView.accessibilityIdentifier = "id.fileStatus"
+    return stateView
   }()
 
   public lazy var titleLabelLeft: UILabel = {
@@ -71,11 +71,11 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
   }()
 
   public lazy var imgViewRight: UIImageView = {
-    let view_img = UIImageView()
-    view_img.translatesAutoresizingMaskIntoConstraints = false
-    view_img.backgroundColor = .clear
-    view_img.accessibilityIdentifier = "id.fileType"
-    return view_img
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.backgroundColor = .clear
+    imageView.accessibilityIdentifier = "id.fileType"
+    return imageView
   }()
 
   public lazy var stateViewRight: FileStateView = {
@@ -135,7 +135,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func setupUI() {
@@ -228,56 +228,55 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
 
     bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
 
-    if let fileObject = model.message?.messageObject as? NIMFileObject {
+    if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
       if let fileModel = model as? MessageFileModel {
         weakModel?.cell = nil
         weakModel = fileModel
         fileModel.cell = self
-        fileModel.size = Float(fileObject.fileLength)
+        fileModel.size = Float(fileObject.size)
         if fileModel.state == .Success {
           stateView.state = .FileOpen
         } else {
           stateView.state = .FileDownload
-          stateView.setProgress(fileModel.progress)
-          if fileModel.progress >= 1 {
+          stateView.setProgress(Float(fileModel.progress / 100))
+          if fileModel.progress >= 100 {
             fileModel.state = .Success
           }
         }
       }
       var imageName = "file_unknown"
-      var displayName = "未知文件"
-      if let filePath = fileObject.path as? NSString {
-        displayName = filePath.lastPathComponent
-        switch filePath.pathExtension.lowercased() {
-        case file_doc_support:
-          imageName = "file_doc"
-        case file_xls_support:
-          imageName = "file_xls"
-        case file_img_support:
-          imageName = "file_img"
-        case file_ppt_support:
-          imageName = "file_ppt"
-        case file_txt_support:
-          imageName = "file_txt"
-        case file_audio_support:
-          imageName = "file_audio"
-        case file_vedio_support:
-          imageName = "file_vedio"
-        case file_zip_support:
-          imageName = "file_zip"
-        case file_pdf_support:
-          imageName = "file_pdf"
-        case file_html_support:
-          imageName = "file_html"
-        case "key", "keynote":
-          imageName = "file_keynote"
-        default:
-          imageName = "file_unknown"
-        }
+      let suffix = (fileObject.name as NSString).pathExtension.lowercased()
+      switch suffix {
+      case file_doc_support:
+        imageName = "file_doc"
+      case file_xls_support:
+        imageName = "file_xls"
+      case file_img_support:
+        imageName = "file_img"
+      case file_ppt_support:
+        imageName = "file_ppt"
+      case file_txt_support:
+        imageName = "file_txt"
+      case file_audio_support:
+        imageName = "file_audio"
+      case file_vedio_support:
+        imageName = "file_vedio"
+      case file_zip_support:
+        imageName = "file_zip"
+      case file_pdf_support:
+        imageName = "file_pdf"
+      case file_html_support:
+        imageName = "file_html"
+      case "key", "keynote":
+        imageName = "file_keynote"
+      default:
+        imageName = "file_unknown"
       }
+
       imgView.image = UIImage.ne_imageNamed(name: imageName)
-      titleLabel.text = fileObject.displayName ?? displayName
-      let size_B = Double(fileObject.fileLength)
+      titleLabel.text = fileObject.name
+
+      let size_B = Double(fileObject.size)
       var size_str = String(format: "%.1f B", size_B)
       if size_B > 1e3 {
         let size_KB = size_B / 1e3
@@ -295,8 +294,8 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     }
   }
 
-  override open func uploadProgress(byRight: Bool, _ progress: Float) {
+  override open func uploadProgress(byRight: Bool, _ progress: UInt) {
     let stateView = byRight ? stateViewRight : stateViewLeft
-    stateView.setProgress(progress)
+    stateView.setProgress(Float(progress) / 100)
   }
 }

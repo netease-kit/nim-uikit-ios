@@ -8,14 +8,33 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class MultiForwardViewController: ChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, ChatBaseCellDelegate, UIDocumentInteractionControllerDelegate, MultiForwardViewModelDelegate {
-  public var viewmodel = MultiForwardViewModel()
+open class MultiForwardViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, ChatBaseCellDelegate, UIDocumentInteractionControllerDelegate, MultiForwardViewModelDelegate {
+  public var viewModel = MultiForwardViewModel()
   private var messageAttachmentUrl: String?
   private var messageAttachmentFilePath: String = ""
   private var messageAttachmentMD5: String?
   public var cellRegisterDic = [String: UITableViewCell.Type]()
   public var brokenNetworkViewHeight: CGFloat = 36
   let interactionController = UIDocumentInteractionController()
+
+  public lazy var brokenNetworkView: NEBrokenNetworkView = {
+    let view = NEBrokenNetworkView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+  }()
+
+  public lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.showsVerticalScrollIndicator = false
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.backgroundColor = .clear
+    tableView.keyboardDismissMode = .onDrag
+    return tableView
+  }()
 
   public init(_ attachmentUrl: String?,
               _ attachmentFilePath: String,
@@ -27,7 +46,7 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewWillAppear(_ animated: Bool) {
@@ -48,7 +67,7 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    viewmodel.delegate = self
+    viewModel.delegate = self
     commonUI()
     loadData()
   }
@@ -65,11 +84,11 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
       forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
     )
 
-    NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in NEChatUIKitClient.instance.getRegisterCustomCell() {
       cellRegisterDic[key] = value
     }
 
-    cellRegisterDic.forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: key)
     }
 
@@ -101,7 +120,7 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
 
   func loadData() {
     view.makeToastActivity(.center)
-    viewmodel.loadData(messageAttachmentUrl,
+    viewModel.loadData(messageAttachmentUrl,
                        messageAttachmentFilePath,
                        messageAttachmentMD5) { [weak self] error in
       self?.view.hideToastActivity()
@@ -121,34 +140,13 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
   private func showErrorToast(_ error: Error?) {
     if let err = error as? NSError {
       switch err.code {
-      case noNetworkCode, -1009:
+      case protocolSendFailed, -1009:
         showToast(commonLocalizable("network_error"))
       default:
         showToast(err.localizedDescription)
       }
     }
   }
-
-  // MARK: lazy Method
-
-  public lazy var brokenNetworkView: NEBrokenNetworkView = {
-    let view = NEBrokenNetworkView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
-    return view
-  }()
-
-  public lazy var tableView: UITableView = {
-    let tableView = UITableView(frame: .zero, style: .plain)
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.separatorStyle = .none
-    tableView.showsVerticalScrollIndicator = false
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.backgroundColor = .clear
-    tableView.keyboardDismissMode = .onDrag
-    return tableView
-  }()
 
   // MARK: UIDocumentInteractionControllerDelegate
 
@@ -159,14 +157,12 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
   // MARK: UITableViewDataSource, UITableViewDelegate
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    let count = viewmodel.messages.count
-    print("numberOfRowsInSection count : ", count)
-    return count
+    viewModel.messages.count
   }
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewmodel.messages[indexPath.row]
+    let model = viewModel.messages[indexPath.row]
     model.inMultiForward = true
     model.isPined = false
     var reuseId = ""
@@ -176,20 +172,17 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
     } else {
       let key = "\(model.type.rawValue)"
       if model.type == .custom {
-        if let attch = NECustomAttachment.attachmentOfCustomMessage(message: model.message) {
-          if attch.customType == customMultiForwardType {
-            reuseId = "\(MessageType.multiForward.rawValue)"
-          } else if attch.customType == customRichTextType {
-            reuseId = "\(MessageType.richText.rawValue)"
-          } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(attch.customType)"] != nil {
-            reuseId = "\(attch.customType)"
-          } else {
-            reuseId = "\(NEBaseChatMessageCell.self)"
-          }
+        let customType = model.customType
+        if customType == customMultiForwardType {
+          reuseId = "\(MessageType.multiForward.rawValue)"
+        } else if customType == customRichTextType {
+          reuseId = "\(MessageType.richText.rawValue)"
+        } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
+          reuseId = "\(customType)"
         } else {
           reuseId = "\(NEBaseChatMessageCell.self)"
         }
-      } else if model.type == .time || model.type == .notification || model.type == .tip {
+      } else if model.type == .notification || model.type == .tip {
         reuseId = "\(MessageType.time.rawValue)"
       } else if cellRegisterDic[key] != nil {
         reuseId = key
@@ -222,7 +215,7 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
 
   open func tableView(_ tableView: UITableView,
                       heightForRowAt indexPath: IndexPath) -> CGFloat {
-    viewmodel.messages[indexPath.row].cellHeight() + chat_content_margin
+    viewModel.messages[indexPath.row].cellHeight() + chat_content_margin
   }
 
   open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
@@ -233,7 +226,7 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
 
   // MARK: ChatBaseCellDelegate
 
-  open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?, _ replyModel: MessageModel?) {
     if let tapClick = NEKitChatConfig.shared.ui.messageItemClick {
       tapClick(cell, model)
       return
@@ -244,12 +237,12 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
       return
     }
 
-    didTapMessage(cell, model)
+    didTapMessage(cell, model, nil)
   }
 
   open func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     if model?.type == .image {
-      if let imageObject = model?.message?.messageObject as? NIMImageObject {
+      if let imageObject = model?.message?.attachment as? V2NIMMessageImageAttachment {
         var imageUrl = ""
 
         if let url = imageObject.url {
@@ -261,111 +254,113 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
         }
         if imageUrl.count > 0 {
           let showController = PhotoBrowserController(
-            urls: ChatMessageHelper.getUrls(messages: viewmodel.messages),
+            urls: ChatMessageHelper.getUrls(messages: viewModel.messages),
             url: imageUrl
           )
           showController.modalPresentationStyle = .overFullScreen
           present(showController, animated: false, completion: nil)
         }
       }
-
     } else if model?.type == .video,
-              let object = model?.message?.messageObject as? NIMVideoObject {
-      weak var weakSelf = self
-      let videoPlayer = VideoPlayerViewController()
-      videoPlayer.modalPresentationStyle = .overFullScreen
-      if let path = object.path, FileManager.default.fileExists(atPath: path) == true {
+              let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
+      let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
+      if FileManager.default.fileExists(atPath: path) {
         let url = URL(fileURLWithPath: path)
+        let videoPlayer = VideoPlayerViewController()
+        videoPlayer.modalPresentationStyle = .overFullScreen
         videoPlayer.videoUrl = url
-        videoPlayer.totalTime = object.duration
-        print("video url : ", videoPlayer.videoUrl as Any)
+        videoPlayer.totalTime = Int(object.duration)
         present(videoPlayer, animated: true, completion: nil)
-      } else if let urlString = object.url, let path = object.path,
-                let videoModel = model as? MessageVideoModel {
-        print("fetch message attachment")
-        if let index = replyIndex, index >= 0 {
+      } else {
+        if let index = replyIndex, index >= 0,
+           index < tableView.numberOfRows(inSection: 0) {
           tableView.scrollToRow(at: IndexPath(row: index, section: 0),
                                 at: .middle,
                                 animated: true)
         }
-        videoModel.state = .Downalod
-        if let videoCell = cell as? NEBaseChatMessageCell {
-          videoCell.setModel(videoModel, false)
-        }
-
-        viewmodel.downLoad(urlString, path) { progress in
-          NELog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: #function + "CALLBACK downLoad: \(progress)")
-
-          videoModel.progress = progress
-          if progress >= 1.0 {
-            videoModel.state = .Success
-          }
-          videoModel.cell?.uploadProgress(byRight: false, progress)
-        } _: { error in
-          weakSelf?.showErrorToast(error)
-        }
+        downloadFile(cell, model, object.url, path)
       }
     } else if model?.type == .location {
       if let locationModel = model as? MessageLocationModel, let lat = locationModel.lat, let lng = locationModel.lng {
-        let mapDetail = NEDetailMapController(type: .detail)
-        mapDetail.currentPoint = CGPoint(x: lat, y: lng)
-        mapDetail.locationTitle = locationModel.title
-        mapDetail.subTitle = locationModel.subTitle
-        navigationController?.pushViewController(mapDetail, animated: true)
+        var params = [String: Any]()
+        params["type"] = NEMapType.detail.rawValue
+        params["nav"] = navigationController
+        params["lat"] = lat
+        params["lng"] = lng
+        params["locationTitle"] = locationModel.title
+        params["subTitle"] = locationModel.subTitle
+        Router.shared.use(NERouterUrl.LocationVCRouter, parameters: params)
       }
     } else if model?.type == .file,
-              let object = model?.message?.messageObject as? NIMFileObject,
-              let path = object.path {
+              let object = model?.message?.attachment as? V2NIMMessageFileAttachment {
+      let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
       if !FileManager.default.fileExists(atPath: path) {
-        if let urlString = object.url, let path = object.path,
-           let fileModel = model as? MessageFileModel {
-          if let index = replyIndex, index >= 0 {
-            tableView.scrollToRow(at: IndexPath(row: index, section: 0),
-                                  at: .middle,
-                                  animated: true)
-          }
-          fileModel.state = .Downalod
-          if let fileCell = cell as? NEBaseChatMessageCell {
-            fileCell.setModel(fileModel, false)
-          }
-
-          viewmodel.downLoad(urlString, path) { [weak self] progress in
-            NELog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
-            var newProgress = progress
-            if newProgress < 0 {
-              newProgress = abs(progress) / fileModel.size
-            }
-            fileModel.progress = newProgress
-            if newProgress >= 1.0 {
-              fileModel.state = .Success
-            }
-            fileModel.cell?.uploadProgress(byRight: false, newProgress)
-
-          } _: { [weak self] error in
-            self?.showErrorToast(error)
-          }
+        if let index = replyIndex, index >= 0,
+           index < tableView.numberOfRows(inSection: 0) {
+          tableView.scrollToRow(at: IndexPath(row: index, section: 0),
+                                at: .middle,
+                                animated: true)
         }
+        downloadFile(cell, model, object.url, path)
       } else {
         let url = URL(fileURLWithPath: path)
         interactionController.url = url
         interactionController.delegate = self // UIDocumentInteractionControllerDelegate
-        if interactionController.presentPreview(animated: true) {} else {
+        if interactionController.presentPreview(animated: true) {}
+        else {
           interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
         }
       }
-    } else if model?.type == .custom, let attach = NECustomAttachment.attachmentOfCustomMessage(message: model?.message) {
-      if attach.customType == customMultiForwardType,
-         let data = NECustomAttachment.dataOfCustomMessage(message: model?.message) {
+    } else if model?.type == .custom {
+      if model?.customType == customMultiForwardType,
+         let data = NECustomAttachment.dataOfCustomMessage(model?.message?.attachment) {
         let url = data["url"] as? String
         let md5 = data["md5"] as? String
-        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        let fileName = multiForwardFileName + (model?.message?.messageId ?? "")
-        let filePath = documentsDirectory.appendingPathComponent("NEIMUIKit/\(fileName)").relativePath
+        guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) else { return }
+        let fileName = multiForwardFileName + (model?.message?.messageClientId ?? "")
+        let filePath = fileDirectory + fileName
         let multiForwardVC = getMultiForwardViewController(url, filePath, md5)
         navigationController?.pushViewController(multiForwardVC, animated: true)
       }
     } else {
       print(#function + "message did tap, type:\(String(describing: model?.type.rawValue))")
+    }
+
+    /// 下载附件（文件、视频消息）
+    /// - Parameters:
+    ///   - cell: 当前单元格
+    ///   - model: 消息模型
+    ///   - url: 远端下载链接
+    ///   - path: 本地保存路径
+    func downloadFile(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ url: String?, _ path: String) {
+      // 判断是否是视频或者文件对象
+      guard let urlString = url, let fileModel = model as? MessageVideoModel else {
+        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "MessageFileModel not exit")
+        return
+      }
+
+      // 判断状态，如果是下载中不能进行预览
+      if fileModel.state == .Downalod {
+        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
+        return
+      }
+
+      fileModel.state = .Downalod
+      if let fileCell = cell as? NEBaseChatMessageCell {
+        fileCell.setModel(fileModel, false)
+      }
+
+      viewModel.downLoad(urlString, path) { progress in
+        NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "downLoad file progress: \(progress)")
+        fileModel.progress = progress
+        fileModel.cell?.uploadProgress(byRight: false, progress)
+
+      } _: { [weak self] localPath, error in
+        self?.showErrorToast(error)
+        if localPath != nil {
+          fileModel.state = .Success
+        }
+      }
     }
   }
 

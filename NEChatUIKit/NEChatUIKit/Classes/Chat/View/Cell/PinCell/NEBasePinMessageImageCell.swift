@@ -51,10 +51,10 @@ open class NEBasePinMessageImageCell: NEBasePinMessageCell {
     }
   }
 
-  override open func configure(_ item: PinMessageModel) {
+  override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
 
-    if let m = item.chatmodel as? MessageImageModel, let imageUrl = m.imageUrl {
+    if let m = item.chatmodel as? MessageImageModel, let imageUrl = m.urlString {
       if imageUrl.hasPrefix("http") {
         contentImageView.sd_setImage(
           with: URL(string: imageUrl),

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEMapKit'
-  s.version          = '9.7.0'
+  s.version          = '10.1.0'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.

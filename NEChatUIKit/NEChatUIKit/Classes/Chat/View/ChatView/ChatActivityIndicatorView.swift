@@ -16,22 +16,22 @@ public enum ChatSendMessageStatus: Int {
 open class ChatActivityIndicatorView: UIView {
   public var messageStatus: ChatSendMessageStatus? {
     didSet {
-      failBtn.isHidden = true
-      activity.isHidden = true
-      activity.stopAnimating()
+      failButton.isHidden = true
+      activityView.isHidden = true
+      activityView.stopAnimating()
 
       switch messageStatus {
       case .sending:
-        self.isHidden = false
-        activity.isHidden = false
-        failBtn.isHidden = true
-        activity.startAnimating()
+        isHidden = false
+        activityView.isHidden = false
+        failButton.isHidden = true
+        activityView.startAnimating()
       case .failed:
-        self.isHidden = false
-        activity.isHidden = true
-        failBtn.isHidden = false
+        isHidden = false
+        activityView.isHidden = true
+        failButton.isHidden = false
       case .successed:
-        self.isHidden = true
+        isHidden = true
 
       default:
         print("default")
@@ -39,49 +39,47 @@ open class ChatActivityIndicatorView: UIView {
     }
   }
 
+  public lazy var failButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.contentMode = .scaleAspectFit
+    button.setImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
+    button.accessibilityIdentifier = "id.sendMessageFailed"
+    return button
+  }()
+
+  private lazy var activityView: UIActivityIndicatorView = {
+    let activityView = UIActivityIndicatorView()
+    activityView.translatesAutoresizingMaskIntoConstraints = false
+    activityView.color = .gray
+    return activityView
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func commonUI() {
     backgroundColor = .clear
-    addSubview(failBtn)
-    addSubview(activity)
+    addSubview(failButton)
+    addSubview(activityView)
     NSLayoutConstraint.activate([
-      failBtn.topAnchor.constraint(equalTo: topAnchor),
-      failBtn.leftAnchor.constraint(equalTo: leftAnchor),
-      failBtn.bottomAnchor.constraint(equalTo: bottomAnchor),
-      failBtn.rightAnchor.constraint(equalTo: rightAnchor),
+      failButton.topAnchor.constraint(equalTo: topAnchor),
+      failButton.leftAnchor.constraint(equalTo: leftAnchor),
+      failButton.bottomAnchor.constraint(equalTo: bottomAnchor),
+      failButton.rightAnchor.constraint(equalTo: rightAnchor),
     ])
 
     NSLayoutConstraint.activate([
-      activity.topAnchor.constraint(equalTo: topAnchor),
-      activity.leftAnchor.constraint(equalTo: leftAnchor),
-      activity.bottomAnchor.constraint(equalTo: bottomAnchor),
-      activity.rightAnchor.constraint(equalTo: rightAnchor),
+      activityView.topAnchor.constraint(equalTo: topAnchor),
+      activityView.leftAnchor.constraint(equalTo: leftAnchor),
+      activityView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      activityView.rightAnchor.constraint(equalTo: rightAnchor),
     ])
   }
-
-  // MARK: lazy Method
-
-  public lazy var failBtn: UIButton = {
-    let button = UIButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.imageView?.contentMode = .center
-    button.setBackgroundImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
-    button.accessibilityIdentifier = "id.sendMessageFailed"
-    return button
-  }()
-
-  private lazy var activity: UIActivityIndicatorView = {
-    let activity = UIActivityIndicatorView()
-    activity.translatesAutoresizingMaskIntoConstraints = false
-    activity.color = .gray
-    return activity
-  }()
 }

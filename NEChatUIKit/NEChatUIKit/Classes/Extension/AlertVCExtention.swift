@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+
 extension UIAlertController {
   class func reconfimAlertView(title: String?, message: String?,
                                confirm: @escaping () -> Void) -> UIAlertController {

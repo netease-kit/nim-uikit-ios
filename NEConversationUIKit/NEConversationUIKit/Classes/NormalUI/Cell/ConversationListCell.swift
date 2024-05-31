@@ -12,50 +12,45 @@ open class ConversationListCell: NEBaseConversationListCell {
     super.setupSubviews()
 
     NSLayoutConstraint.activate([
-      headImge.leftAnchor.constraint(
+      headImageView.leftAnchor.constraint(
         equalTo: contentView.leftAnchor,
         constant: NEConstant.screenInterval
       ),
-      headImge.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      headImge.widthAnchor.constraint(equalToConstant: 42),
-      headImge.heightAnchor.constraint(equalToConstant: 42),
+      headImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      headImageView.widthAnchor.constraint(equalToConstant: 42),
+      headImageView.heightAnchor.constraint(equalToConstant: 42),
     ])
 
     NSLayoutConstraint.activate([
-      title.leftAnchor.constraint(equalTo: headImge.rightAnchor, constant: 12),
-      title.rightAnchor.constraint(equalTo: timeLabel.leftAnchor, constant: -5),
-      title.topAnchor.constraint(equalTo: headImge.topAnchor),
+      titleLabel.leftAnchor.constraint(equalTo: headImageView.rightAnchor, constant: 12),
+      titleLabel.rightAnchor.constraint(equalTo: timeLabel.leftAnchor, constant: -5),
+      titleLabel.topAnchor.constraint(equalTo: headImageView.topAnchor),
     ])
 
     NSLayoutConstraint.activate([
-      notifyMsg.rightAnchor.constraint(equalTo: timeLabel.rightAnchor),
-      notifyMsg.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 5),
-      notifyMsg.widthAnchor.constraint(equalToConstant: 13),
-      notifyMsg.heightAnchor.constraint(equalToConstant: 13),
+      notifyMsgView.rightAnchor.constraint(equalTo: timeLabel.rightAnchor),
+      notifyMsgView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 5),
+      notifyMsgView.widthAnchor.constraint(equalToConstant: 13),
+      notifyMsgView.heightAnchor.constraint(equalToConstant: 13),
     ])
   }
 
   override func initSubviewsLayout() {
     if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .rectangle {
-      headImge.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
+      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
     } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
-      headImge.layer.cornerRadius = 21.0
+      headImageView.layer.cornerRadius = 21.0
     } else {
-      headImge.layer.cornerRadius = 21.0
+      headImageView.layer.cornerRadius = 21.0
     }
   }
 
-  override open func configData(sessionModel: ConversationListModel?) {
-    super.configData(sessionModel: sessionModel)
-
-    // backgroundColor
-    if let session = sessionModel?.recentSession?.session {
-      let isTop = topStickInfos[session] != nil
-      if isTop {
-        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
-      } else {
-        contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
-      }
+  override open func configureData(_ sessionModel: NEConversationListModel?) {
+    super.configureData(sessionModel)
+    if sessionModel?.conversation?.stickTop == true {
+      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
+    } else {
+      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
     }
   }
 }

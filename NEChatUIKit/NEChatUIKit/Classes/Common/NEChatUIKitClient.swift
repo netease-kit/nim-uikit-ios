@@ -43,12 +43,12 @@ open class NEChatUIKitClient: NSObject {
 
   /// 获取更多面板数据
   /// - Returns: 返回更多操作数据
-  open func getMoreActionData(sessionType: NIMSessionType) -> [NEMoreItemModel] {
+  open func getMoreActionData(sessionType: V2NIMConversationType) -> [NEMoreItemModel] {
     var more = [NEMoreItemModel]()
-    moreAction.forEach { model in
+    for model in moreAction {
       if model.type != .rtc {
         more.append(model)
-      } else if sessionType == .P2P {
+      } else if sessionType == .CONVERSATION_TYPE_P2P {
         more.append(model)
       }
     }
@@ -62,12 +62,26 @@ open class NEChatUIKitClient: NSObject {
 
   /// 新增聊天页针对自定义消息的cell扩展，以及现有cell样式覆盖
   open func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
-    registerDic.forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in registerDic {
       customRegisterDic[key] = value
     }
   }
 
   open func getRegisterCustomCell() -> [String: UITableViewCell.Type] {
     customRegisterDic
+  }
+
+  /// 获取图片资源
+  /// - Parameter imageName  图片名称
+  /// - Returns  图片资源
+  open func getImageSource(imageName: String) -> UIImage? {
+    coreLoader.loadImage(imageName)
+  }
+
+  /// 获取多语言
+  /// - Parameter key  多语言key
+  /// - Returns  多语言
+  open func getLanguage(key: String) -> String? {
+    coreLoader.localizable(key)
   }
 }

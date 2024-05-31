@@ -5,7 +5,7 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 
@@ -15,179 +15,127 @@ public enum TeamType {
 }
 
 open class NotificationMessageUtils: NSObject {
-  open class func textForNotification(message: NIMMessage) -> String {
-    if message.messageType != .notification {
+  open class func textForNotification(message: V2NIMMessage) -> String {
+    if message.messageType != .MESSAGE_TYPE_NOTIFICATION {
       return ""
     }
-    if let object = message.messageObject as? NIMNotificationObject {
-      switch object.notificationType {
-      case .team:
-        return textForTeamNotificationMessage(message: message)
-      case .superTeam:
-        return ""
-      case .netCall:
-        return ""
-      case .chatroom:
-        return ""
-      default:
-        return ""
-      }
+    if message.attachment is V2NIMMessageNotificationAttachment {
+      let text = textForTeamNotificationMessage(message: message)
+      return text
+    } else {
+      return fromName(message: message) + (message.text ?? "")
     }
-    return ""
   }
 
   /// 是否是群通知
-  open class func isDiscussSeniorTeamNoti(message: NIMMessage) -> Bool {
-    if let object = message.messageObject as? NIMNotificationObject,
-       let _ = object.content as? NIMTeamNotificationContent {
+  open class func isDiscussSeniorTeamNoti(message: V2NIMMessage) -> Bool {
+    if message.attachment is V2NIMMessageNotificationAttachment {
       return true
     }
     return false
   }
 
-  open class func isDiscussSeniorTeamUpdateCustomNoti(message: NIMMessage) -> Bool {
-    if let object = message.messageObject as? NIMNotificationObject {
-      guard let content = object.content as? NIMTeamNotificationContent else {
-        return false
-      }
-
-      // 转移讨论组的通知
-      if content.operationType == .transferOwner,
-         teamType(message: message) == .discussTeam {
-        return true
-      }
-
-      if content.operationType != .update {
-        return false
-      }
-      guard let attach = content.attachment as? NIMUpdateTeamInfoAttachment,
-            let tag = attach.values?.keys.first?.intValue else {
-        return false
-      }
-
-      // 18:客户端自定义拓展字段, 19: 服务器自定义拓展字段
-      if tag == 18 || tag == 19 {
-        return true
-      }
-    }
-    return false
-  }
-
-  open class func isTeamLeaveOrDismiss(message: NIMMessage) -> (isLeave: Bool, isDismiss: Bool) {
+  open class func isTeamLeaveOrDismiss(message: V2NIMMessage) -> (isLeave: Bool, isDismiss: Bool) {
     var leave = false
     var dismiss = false
-    if let object = message.messageObject as? NIMNotificationObject, object.notificationType == .team {
-      if let content = object.content as? NIMTeamNotificationContent {
-        switch content.operationType {
-        case .leave:
-          leave = true
-
-        case .dismiss:
-          dismiss = true
-
-        @unknown default:
-          break
-        }
+    if let content = message.attachment as? V2NIMMessageNotificationAttachment {
+      switch content.type {
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE:
+        leave = true
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS:
+        dismiss = true
+      default:
+        break
       }
     }
     return (leave, dismiss)
   }
 
-  open class func textForTeamNotificationMessage(message: NIMMessage) -> String {
+  open class func textForTeamNotificationMessage(message: V2NIMMessage) -> String {
     var text = chatLocalizable("unknown_system_message")
-    if let object = message.messageObject as? NIMNotificationObject {
-      if let content = object.content as? NIMTeamNotificationContent {
-        let fromName = fromName(message: message)
-        let toNames = toName(message: message)
-        let toFirstName = toNames.first ?? ""
-        let teamName = teamName(message: message)
-        var toNamestext = toNames.first ?? ""
-        if toNames.count > 1 {
-          toNamestext = toNames.joined(separator: "、")
-        }
-        switch content.operationType {
-        case .invite:
-          text = fromName + chatLocalizable("invite") + toNamestext + chatLocalizable("enter") + chatLocalizable("group_chat")
-        case .dismiss:
-          text = fromName + chatLocalizable("dissolve") + chatLocalizable("group_chat")
-        case .kick:
-          text = fromName + chatLocalizable("kick") + toNamestext + chatLocalizable("out") + chatLocalizable("group_chat")
-        case .update:
-          text = textOfUpdateTeam(
-            fromName: fromName,
-            teamName: teamName,
-            content: content
-          )
-        case .leave:
-          text = fromName + chatLocalizable("leave") + chatLocalizable("group_chat")
-        case .applyPass:
-          if fromName == toNamestext {
-            text = fromName + chatLocalizable("join") + chatLocalizable("group_chat")
-          } else {
-            text = fromName + chatLocalizable("pass") + toNamestext
-          }
-
-        case .transferOwner:
-          text = fromName + chatLocalizable("transfer") + toFirstName
-        case .addManager:
-          text = toNamestext + chatLocalizable("added_manager")
-        case .removeManager:
-          text = toFirstName + chatLocalizable("removed_manager")
-        case .acceptInvitation:
-          text = fromName + chatLocalizable("accept") + toNamestext
-        case .mute:
-          var mute = false
-          if let atta = content.attachment as? NIMMuteTeamMemberAttachment {
-            mute = atta.flag
-          }
-          if let atta = content.attachment as? NIMMuteSuperTeamMemberAttachment {
-            mute = atta.flag
-          }
-          // text = mute ? chatLocalizable("team_all_mute") : chatLocalizable("team_all_no_mute")
-          text = "\(toNamestext) \(mute ? chatLocalizable("mute") : chatLocalizable("not_mute"))"
-
-        default:
-          text = chatLocalizable("unknown_system_message")
-        }
+    if let content = message.attachment as? V2NIMMessageNotificationAttachment {
+      let fromName = fromName(message: message)
+      let toNames = toName(message: message)
+      let toFirstName = toNames.first ?? ""
+      let teamName = teamName(message: message)
+      var toNamestext = toNames.first ?? ""
+      if toNames.count > 1 {
+        toNamestext = toNames.joined(separator: "、")
       }
-    }
-    return text
-  }
-
-  open class func fromName(message: NIMMessage) -> String {
-    if let object = message.messageObject as? NIMNotificationObject {
-      if let content = object.content as? NIMTeamNotificationContent {
-        if content.sourceID == NIMSDK.shared().loginManager.currentAccount() {
-          return chatLocalizable("You") + " "
+      switch content.type {
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE:
+        text = fromName + chatLocalizable("invite") + toNamestext + chatLocalizable("enter") + chatLocalizable("group_chat")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS:
+        text = fromName + chatLocalizable("dissolve") + chatLocalizable("group_chat")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_KICK:
+        text = fromName + chatLocalizable("kick") + toNamestext + chatLocalizable("out") + chatLocalizable("group_chat")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO:
+        text = "update team info"
+        text = textOfUpdateTeam(
+          fromName: fromName,
+          teamName: teamName,
+          content: content
+        )
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE:
+        text = fromName + chatLocalizable("leave") + chatLocalizable("group_chat")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_APPLY_PASS:
+        if fromName == toNamestext {
+          text = fromName + chatLocalizable("join") + chatLocalizable("group_chat")
         } else {
-          if let sourceId = content.sourceID {
-            return ChatUserCache.getShowName(userId: sourceId, teamId: message.session?.sessionId)
-          }
+          text = fromName + chatLocalizable("pass") + toNamestext
         }
+
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_OWNER_TRANSFER:
+        text = fromName + chatLocalizable("transfer") + toFirstName
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_ADD_MANAGER:
+        text = toNamestext + chatLocalizable("added_manager")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_REMOVE_MANAGER:
+        text = toFirstName + chatLocalizable("removed_manager")
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE_ACCEPT:
+        text = fromName + chatLocalizable("accept") + toNamestext
+      case .MESSAGE_NOTIFICATION_TYPE_TEAM_BANNED_TEAM_MEMBER:
+        text = "\(toNamestext) \(content.chatBanned ? chatLocalizable("mute") : chatLocalizable("not_mute"))"
+
+      default:
+        text = chatLocalizable("unknown_system_message")
       }
+      return text
+    } else {
+      return text
     }
-    return ""
   }
 
-  open class func toName(message: NIMMessage) -> [String] {
+  open class func fromName(message: V2NIMMessage) -> String {
+    if let sourceId = message.senderId {
+      if sourceId == IMKitClient.instance.account() {
+        return chatLocalizable("You") + " "
+      } else {
+        return ChatTeamCache.shared.getShowName(sourceId)
+      }
+    } else {
+      return ""
+    }
+  }
+
+  open class func toName(message: V2NIMMessage) -> [String] {
     var toNames = [String]()
-    guard let object = message.messageObject as? NIMNotificationObject,
-          let content = object.content as? NIMTeamNotificationContent,
-          let targetIDs = content.targetIDs else {
+    guard let content = message.attachment as? V2NIMMessageNotificationAttachment,
+          let targetIDs = content.targetIds else {
       return toNames
     }
+
     for targetID in targetIDs {
-      if targetID == NIMSDK.shared().loginManager.currentAccount() {
+      if targetID == IMKitClient.instance.account() {
         toNames.append(chatLocalizable("You") + " ")
       } else {
-        toNames
-          .append(ChatUserCache.getShowName(userId: targetID, teamId: message.session?.sessionId))
+        let name = ChatTeamCache.shared.getShowName(targetID)
+        toNames.append(name)
       }
     }
     return toNames
   }
 
-  open class func teamName(message: NIMMessage) -> String {
+  open class func teamName(message: V2NIMMessage) -> String {
     let teamtype = teamType(message: message)
     switch teamtype {
     case .advanceTeam:
@@ -197,113 +145,120 @@ open class NotificationMessageUtils: NSObject {
     }
   }
 
-  open class func teamType(message: NIMMessage) -> TeamType {
-    let team = TeamProvider.shared.getTeam(teamId: message.session?.sessionId ?? "")
-    if team?.isDisscuss() == true {
-      return .discussTeam
-    } else {
-      return .advanceTeam
+  open class func teamType(message: V2NIMMessage) -> TeamType {
+    if let team = ChatTeamCache.shared.getTeamInfo() {
+      if team.isDisscuss() == true {
+        return .discussTeam
+      } else {
+        return .advanceTeam
+      }
     }
+    return .advanceTeam
   }
 
   private class func textOfUpdateTeam(fromName: String,
                                       teamName: String,
-                                      content: NIMTeamNotificationContent) -> String {
+                                      content: V2NIMMessageNotificationAttachment) -> String {
     var text = fromName + chatLocalizable("has_updated") + teamName
-    if let attach = content.attachment as? NIMUpdateTeamInfoAttachment {
-      if let tag = attach.values {
-        let string = getShowString(fromName, teamName, tag)
-        if string.count > 0 {
-          text = string
-        }
-      }
-    }
-    if let attach = content.attachment as? NIMMuteTeamMemberAttachment {
-      if attach.flag == false {
-        text = teamName + chatLocalizable("team_all_mute")
-      } else {
-        text = teamName + chatLocalizable("team_all_no_mute")
-      }
-    }
-    return text
-  }
 
-  private class func getShowString(_ fromName: String,
-                                   _ teamName: String,
-                                   _ tag: [NSNumber: String]) -> String {
-    var text = ""
+    guard let updatedTeamInfo = content.updatedTeamInfo else { return text }
 
     // 群名
-    if let value = tag[3] {
-      text = fromName + " " + chatLocalizable("has_updated") + teamName +
-        chatLocalizable("team_name") + chatLocalizable("to") + "\"" + value + "\""
+    if let name = updatedTeamInfo.name {
+      return fromName + " " + chatLocalizable("has_updated") + teamName +
+        chatLocalizable("team_name") + chatLocalizable("to") + "\"" + name + "\""
     }
 
     // 群简介
-    if let _ = tag[14] {
-      text = fromName + " " + chatLocalizable("has_updated") + teamName +
+    if updatedTeamInfo.intro != nil {
+      return fromName + " " + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_intro")
     }
 
     // 群公告
-    if let _ = tag[15] {
-      text = fromName + " " + chatLocalizable("has_updated") + teamName +
+    if updatedTeamInfo.announcement != nil {
+      return fromName + " " + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_anouncement")
     }
 
-    // 群验证方式
-    if let _ = tag[16] {
-      text = fromName + " " + chatLocalizable("has_updated") + teamName +
-        chatLocalizable("team_join_mode")
-    }
-
-    // 客户端自定义拓展字段
-    if let _ = tag[18] {
-      text = fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
-    }
-
-    // 服务器自定义拓展字段(SDK 无法直接修改这个字段, 请调用服务器接口)
-    if let _ = tag[19] {
-      text = fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
-    }
-
     // 头像
-    if let _ = tag[20] {
-      text = fromName + " " + chatLocalizable("has_updated") + teamName +
+    if updatedTeamInfo.avatar != nil {
+      return fromName + " " + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_avatar")
     }
 
+    // 群验证方式
+    if updatedTeamInfo.joinMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") + teamName +
+        chatLocalizable("team_join_mode")
+    }
+
     // 被邀请模式
-    if let _ = tag[21] {
-      text = fromName + " " + chatLocalizable("has_updated") +
+    if updatedTeamInfo.agreeMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") +
         chatLocalizable("team_be_invited_author")
     }
 
     // 邀请权限,仅高级群有效
-    if let value = tag[22] {
-      text = fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
-        chatLocalizable("team_be_invited_permission") + "\" " + chatLocalizable("to") + "\"" + (value == "0" ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
+    if updatedTeamInfo.inviteMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
+        chatLocalizable("team_be_invited_permission") + "\" " + chatLocalizable("to") + "\"" + (updatedTeamInfo.inviteMode == .TEAM_INVITE_MODE_MANAGER ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
     }
 
     // 更新群信息权限,仅高级群有效
-    if let value = tag[23] {
-      text = fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
-        chatLocalizable("team_update_info_permission") + "\" " + chatLocalizable("to") + "\"" + (value == "0" ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
+    if updatedTeamInfo.updateInfoMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
+        chatLocalizable("team_update_info_permission") + "\" " + chatLocalizable("to") + "\"" + (updatedTeamInfo.updateInfoMode == .TEAM_UPDATE_INFO_MODE_MANAGER ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
+    }
+
+    // 群整体禁言
+    if updatedTeamInfo.chatBannedMode.rawValue != -1 {
+      return updatedTeamInfo.chatBannedMode == .TEAM_CHAT_BANNED_MODE_BANNED_NORMAL ? chatLocalizable("team_all_mute") : chatLocalizable("team_all_no_mute")
+    }
+
+    // 客户端自定义拓展字段
+    if let serverExt = updatedTeamInfo.serverExtension, let extDic = getDictionaryFromJSONString(serverExt) {
+      var lastOpt = keyAllowAtAll
+
+      // 上一次操作的字段
+      if let opt = extDic["lastOpt"] as? String {
+        lastOpt = opt
+      }
+
+      // @所有人权限
+      if lastOpt == keyAllowAtAll, let allowAt = extDic[keyAllowAtAll] as? String {
+        if allowAt == allowAtManagerValue {
+          return chatLocalizable("team_at_permission") + chatLocalizable("only_team_owner")
+        }
+        if allowAt == allowAtAllValue {
+          return chatLocalizable("team_at_permission") + chatLocalizable("everyone")
+        }
+      }
+
+      // 置顶消息权限
+      if lastOpt == keyAllowTopMessage, let allowAt = extDic[keyAllowTopMessage] as? String {
+        if allowAt == allowAtManagerValue {
+          return chatLocalizable("team_top_permission") + chatLocalizable("only_team_owner")
+        }
+        if allowAt == allowAtAllValue {
+          return chatLocalizable("team_top_permission") + chatLocalizable("everyone")
+        }
+      }
+
+      // 置顶消息
+      if lastOpt == keyTopMessage, let topInfo = extDic[keyTopMessage] as? [String: Any] {
+        if let type = topInfo["operation"] as? Int {
+          return fromName + " " + (type == 0 ? chatLocalizable("top_message") : chatLocalizable("untop_message"))
+        }
+      }
+    } else {
+      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
     }
 
     // 更新群客户端自定义拓展字段权限
-    if let _ = tag[24] {
-      text = fromName + " " + chatLocalizable("has_updated") +
+    if updatedTeamInfo.updateExtensionMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") +
         chatLocalizable("team_update_client_custom")
-    }
-
-    // 群禁言模式
-    if let value = tag[100] {
-      if value == "1" || value == "3" {
-        text = chatLocalizable("team_all_mute")
-      } else if value == "0" {
-        text = chatLocalizable("team_all_no_mute")
-      }
     }
 
     return text

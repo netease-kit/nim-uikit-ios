@@ -21,7 +21,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -32,6 +32,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
   open func commonUILeft() {
     audioImageViewLeft.contentMode = .center
     audioImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
+    audioImageViewLeft.accessibilityIdentifier = "id.animation"
     bubbleImageLeft.addSubview(audioImageViewLeft)
     NSLayoutConstraint.activate([
       audioImageViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 16),
@@ -44,6 +45,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
     timeLabelLeft.textColor = UIColor.ne_darkText
     timeLabelLeft.textAlignment = .left
     timeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
+    timeLabelLeft.accessibilityIdentifier = "id.time"
     bubbleImageLeft.addSubview(timeLabelLeft)
     NSLayoutConstraint.activate([
       timeLabelLeft.leftAnchor.constraint(equalTo: audioImageViewLeft.rightAnchor, constant: 12),
@@ -62,6 +64,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
   open func commonUIRight() {
     audioImageViewRight.contentMode = .center
     audioImageViewRight.translatesAutoresizingMaskIntoConstraints = false
+    audioImageViewRight.accessibilityIdentifier = "id.animation"
     bubbleImageRight.addSubview(audioImageViewRight)
     NSLayoutConstraint.activate([
       audioImageViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -16),
@@ -74,6 +77,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
     timeLabelRight.textColor = UIColor.ne_darkText
     timeLabelRight.textAlignment = .right
     timeLabelRight.translatesAutoresizingMaskIntoConstraints = false
+    timeLabelRight.accessibilityIdentifier = "id.time"
     bubbleImageRight.addSubview(timeLabelRight)
     NSLayoutConstraint.activate([
       timeLabelRight.rightAnchor.constraint(equalTo: audioImageViewRight.leftAnchor, constant: -12),
@@ -90,13 +94,11 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   open func startAnimation(byRight: Bool) {
-    if byRight {
-      if !audioImageViewRight.isAnimating {
-        audioImageViewRight.startAnimating()
-      }
-    } else if !audioImageViewLeft.isAnimating {
-      audioImageViewLeft.startAnimating()
+    let audioImageView = byRight ? audioImageViewRight : audioImageViewLeft
+    if !audioImageView.isAnimating {
+      audioImageView.startAnimating()
     }
+
     if let m = contentModel as? MessageAudioModel {
       m.isPlaying = true
       isPlaying = true
@@ -104,13 +106,11 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   open func stopAnimation(byRight: Bool) {
-    if byRight {
-      if audioImageViewRight.isAnimating {
-        audioImageViewRight.stopAnimating()
-      }
-    } else if audioImageViewLeft.isAnimating {
-      audioImageViewLeft.stopAnimating()
+    let audioImageView = byRight ? audioImageViewRight : audioImageViewLeft
+    if audioImageView.isAnimating {
+      audioImageView.stopAnimating()
     }
+
     if let m = contentModel as? MessageAudioModel {
       m.isPlaying = false
       isPlaying = false
@@ -135,7 +135,7 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
         timeLabelLeft.text = "\(m.duration)" + "″"
       }
       m.isPlaying ? startAnimation(byRight: isSend) : stopAnimation(byRight: isSend)
-      messageId = m.message?.messageId
+      messageId = m.message?.messageClientId
     }
   }
 }

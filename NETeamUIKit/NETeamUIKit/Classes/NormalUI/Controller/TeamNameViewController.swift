@@ -27,10 +27,10 @@ open class TeamNameViewController: NEBaseTeamNameViewController {
     ])
 
     NSLayoutConstraint.activate([
-      textView.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 16),
-      textView.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: -32),
-      textView.topAnchor.constraint(equalTo: backView.topAnchor, constant: 0),
-      textView.heightAnchor.constraint(equalToConstant: 44),
+      textInputView.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 16),
+      textInputView.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: -40),
+      textInputView.topAnchor.constraint(equalTo: backView.topAnchor, constant: 0),
+      textInputView.heightAnchor.constraint(equalToConstant: 44),
     ])
 
     NSLayoutConstraint.activate([

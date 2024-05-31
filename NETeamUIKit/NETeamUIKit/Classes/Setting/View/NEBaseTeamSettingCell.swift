@@ -18,6 +18,7 @@ public enum TeamSettingType: Int {
 
 @objcMembers
 open class NEBaseTeamSettingCell: CornerCell {
+  /// 群设置数据模型
   var model: SettingCellModel?
 
   public lazy var titleLabel: UILabel = {
@@ -29,7 +30,7 @@ open class NEBaseTeamSettingCell: CornerCell {
     return label
   }()
 
-  public lazy var arrow: UIImageView = {
+  public lazy var arrowView: UIImageView = {
     let imageView = UIImageView(image: coreLoader.loadImage("arrowRight"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView

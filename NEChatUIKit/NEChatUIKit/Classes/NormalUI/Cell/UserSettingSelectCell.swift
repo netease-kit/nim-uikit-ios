@@ -23,8 +23,8 @@ open class UserSettingSelectCell: NEBaseUserSettingSelectCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      arrowImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
     ])
   }
 }

@@ -37,10 +37,10 @@ open class FunRecordAudioView: UIView {
   }()
 
   lazy var lottieContentView: UIView = {
-    let content = UIView()
-    content.translatesAutoresizingMaskIntoConstraints = false
-    content.backgroundColor = UIColor.clear
-    return content
+    let contentView = UIView()
+    contentView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.backgroundColor = UIColor.clear
+    return contentView
   }()
 
   public var triangleView: UIView = {
@@ -70,13 +70,13 @@ open class FunRecordAudioView: UIView {
   }()
 
   public let recordCloseImage: UIImageView = {
-    let close = UIImageView()
-    close.contentMode = .center
-    close.translatesAutoresizingMaskIntoConstraints = false
-    close.image = coreLoader.loadImage("fun_chat_record_close_dark")
-    close.highlightedImage = coreLoader.loadImage("fun_chat_record_close_light")
-    close.isHighlighted = false
-    return close
+    let imageView = UIImageView()
+    imageView.contentMode = .center
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = coreLoader.loadImage("fun_chat_record_close_dark")
+    imageView.highlightedImage = coreLoader.loadImage("fun_chat_record_close_light")
+    imageView.isHighlighted = false
+    return imageView
   }()
 
   public let releaseToSendLabel: UILabel = {

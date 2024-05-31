@@ -5,13 +5,13 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataProtrol {
-  public lazy var arrow: UIImageView = {
+  public lazy var arrowImageView: UIImageView = {
     let imageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.contentMode = .center
@@ -32,7 +32,7 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -40,23 +40,23 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
 
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -35),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
 
-    contentView.addSubview(arrow)
+    contentView.addSubview(arrowImageView)
     NSLayoutConstraint.activate([
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      arrow.widthAnchor.constraint(equalToConstant: 15),
-      arrow.topAnchor.constraint(equalTo: contentView.topAnchor),
-      arrow.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      arrowImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      arrowImageView.widthAnchor.constraint(equalToConstant: 15),
+      arrowImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+      arrowImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
 
     contentView.addSubview(bottomLine)
     NSLayoutConstraint.activate([
-      bottomLine.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
+      bottomLine.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
       bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
       bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
@@ -65,18 +65,18 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
     contentView.addSubview(redAngleView)
     NSLayoutConstraint.activate([
       redAngleView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      redAngleView.rightAnchor.constraint(equalTo: arrow.leftAnchor, constant: -10),
+      redAngleView.rightAnchor.constraint(equalTo: arrowImageView.leftAnchor, constant: -10),
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
   }
 
   open func initSubviewsLayout() {
     if NEKitContactConfig.shared.ui.contactProperties.avatarType == .rectangle {
-      avatarImage.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
+      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
     } else if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
-      avatarImage.layer.cornerRadius = 18.0
+      avatarImageView.layer.cornerRadius = 18.0
     } else {
-      avatarImage.layer.cornerRadius = 18.0 // Normal UI
+      avatarImageView.layer.cornerRadius = 18.0 // Normal UI
     }
   }
 
@@ -92,33 +92,34 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
     }
     setConfig()
 
-    if let userId = user.userId, let u = ChatUserCache.getUserInfo(userId) {
+    // 更新用户信息
+    if let userId = user.user?.accountId, let u = NEFriendUserCache.shared.getFriendInfo(userId) {
       user = u
     }
 
     if model.contactCellType == 1 {
-      NELog.infoLog("contact other cell configData", desc: "\(user.alias), image name:\(user.userInfo?.avatarUrl)")
+      NEALog.infoLog("contact other cell configData", desc: "\(user.friend?.alias), image name:\(user.user?.avatar)")
       nameLabel.text = ""
-      titleLabel.text = user.alias
-      avatarImage.image = UIImage.ne_imageNamed(name: user.userInfo?.avatarUrl)
-      avatarImage.backgroundColor = model.headerBackColor
-      arrow.isHidden = false
+      titleLabel.text = user.friend?.alias
+      avatarImageView.image = UIImage.ne_imageNamed(name: user.user?.avatar)
+      avatarImageView.backgroundColor = model.headerBackColor
+      arrowImageView.isHidden = false
     } else {
       // person、custom
       titleLabel.text = user.showName()
-      nameLabel.text = user.shortName(showAlias: false, count: 2)
+      nameLabel.text = user.shortName(count: 2)
 
-      if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
-        NELog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")
+      if let imageUrl = user.user?.avatar, !imageUrl.isEmpty {
+        NEALog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")
         nameLabel.isHidden = true
-        avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
+        avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
       } else {
-        NELog.infoLog("contact p2p cell configData", desc: "imageName is nil")
+        NEALog.infoLog("contact p2p cell configData", desc: "imageName is nil")
         nameLabel.isHidden = false
-        avatarImage.sd_setImage(with: nil)
-        avatarImage.backgroundColor = model.headerBackColor
+        avatarImageView.sd_setImage(with: nil)
+        avatarImageView.backgroundColor = model.headerBackColor
       }
-      arrow.isHidden = true
+      arrowImageView.isHidden = true
     }
   }
 }

@@ -18,7 +18,7 @@ public extension UIColor {
   static let funRecordAudioProgressCancelColor = UIColor(hexString: "#E75D58")
   static let funRecordAudioLastTimeColor = UIColor(hexString: "#000000", 0.4)
 
-  static let funChatThemeColor = UIColor(hexString: "#58BE6B")
+  static let funChatThemeColor = UIColor.ne_funTheme
   static let funChatBackgroundColor = UIColor(hexString: "#EDEDED")
   static let funChatLineBorderColor = UIColor(hexString: "#E5E5E5")
   static let funChatNavigationBottomLineColor = UIColor(hexString: "#D5D5D5", 0.4)

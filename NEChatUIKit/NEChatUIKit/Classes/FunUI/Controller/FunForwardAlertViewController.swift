@@ -8,10 +8,10 @@ import NECommonUIKit
 import UIKit
 
 @objcMembers
-open class FunForwardUserCell: NEBaseForwardUserCell {
+open class FunForwardSessionCell: NEBaseForwardSessionCell {
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = 4
+    sessionHeaderView.layer.cornerRadius = 4
   }
 }
 
@@ -19,20 +19,20 @@ open class FunForwardUserCell: NEBaseForwardUserCell {
 open class FunForwardAlertViewController: NEBaseForwardAlertViewController {
   override open func setupUI() {
     super.setupUI()
-    tip.font = .systemFont(ofSize: 16, weight: .semibold)
-    oneUserHead.layer.cornerRadius = 4.0
-    sureBtn.setTitleColor(.funChatThemeColor, for: .normal)
-    userCollection.register(
-      FunForwardUserCell.self,
-      forCellWithReuseIdentifier: "\(FunForwardUserCell.self)"
+    tipLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+    oneSessionHeadView.layer.cornerRadius = 4.0
+    sureButton.setTitleColor(.funChatThemeColor, for: .normal)
+    sessionCollectionView.register(
+      FunForwardSessionCell.self,
+      forCellWithReuseIdentifier: "\(FunForwardSessionCell.self)"
     )
   }
 
   override open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     if let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: "\(FunForwardUserCell.self)",
+      withReuseIdentifier: "\(FunForwardSessionCell.self)",
       for: indexPath
-    ) as? FunForwardUserCell {
+    ) as? FunForwardSessionCell {
       return setCellModel(cell: cell, indexPath: indexPath)
     }
     return UICollectionViewCell()

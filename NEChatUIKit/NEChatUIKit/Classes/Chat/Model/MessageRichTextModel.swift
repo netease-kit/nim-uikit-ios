@@ -12,8 +12,8 @@ open class MessageRichTextModel: MessageTextModel {
   public var titleAttributeStr: NSMutableAttributedString?
   public var titleTextHeight: CGFloat = 0
 
-  public required init(message: NIMMessage?) {
-    guard let data = NECustomAttachment.dataOfCustomMessage(message: message),
+  public required init(message: V2NIMMessage?) {
+    guard let data = NECustomAttachment.dataOfCustomMessage(message?.attachment),
           let title = data["title"] as? String else {
       super.init(message: message)
       return
@@ -23,6 +23,7 @@ open class MessageRichTextModel: MessageTextModel {
     message?.text = body
     super.init(message: message)
     type = .custom
+    customType = customRichTextType
 
     let font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
     titleAttributeStr = NEEmotionTool.getAttWithStr(
@@ -30,12 +31,11 @@ open class MessageRichTextModel: MessageTextModel {
       font: font
     )
 
-    let textSize = titleAttributeStr?.finalSize(font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
-
+    let textSize = NSAttributedString.getRealSize(titleAttributeStr, messageTextFont, messageMaxSize)
     titleTextHeight = textSize.height
-    contentSize = CGSize(width: max(contentSize.width, textSize.width + chat_content_margin * 2),
+    contentSize = CGSize(width: max(textWidght, textSize.width) + chat_content_margin * 2,
                          height: contentSize.height + titleTextHeight +
                            (body.isEmpty ? 0 : chat_content_margin))
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

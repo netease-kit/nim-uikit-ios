@@ -8,51 +8,9 @@ import UIKit
 @objcMembers
 open class NEBaseChatMessageTipCell: UITableViewCell {
   var timeLabelHeightAnchor: NSLayoutConstraint? // 消息时间高度约束
+  var contentLabelCenterYAnchor: NSLayoutConstraint? // 消息内容中心Y约束
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    selectionStyle = .none
-    backgroundColor = .clear
-    commonUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  open func commonUI() {
-    contentView.addSubview(timeLabel)
-    timeLabelHeightAnchor = timeLabel.heightAnchor.constraint(equalToConstant: 22)
-    NSLayoutConstraint.activate([
-      timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
-      timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
-      timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
-      timeLabelHeightAnchor!,
-    ])
-
-    contentView.addSubview(contentLabel)
-    NSLayoutConstraint.activate([
-      contentLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
-      contentLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      contentLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW),
-    ])
-  }
-
-  func setModel(_ model: MessageTipsModel) {
-    // time
-    if let time = model.timeContent, !time.isEmpty {
-      timeLabelHeightAnchor?.constant = chat_timeCellH
-      timeLabel.text = time
-      timeLabel.isHidden = false
-    } else {
-      timeLabelHeightAnchor?.constant = 0
-      timeLabel.text = ""
-      timeLabel.isHidden = true
-    }
-
-    contentLabel.text = model.text
-  }
-
+  /// 时间
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
@@ -63,6 +21,7 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
     return label
   }()
 
+  /// 内容
   public lazy var contentLabel: UILabel = {
     let label = UILabel()
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
@@ -73,4 +32,51 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
     label.accessibilityIdentifier = "id.messageTipText"
     return label
   }()
+
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    selectionStyle = .none
+    backgroundColor = .clear
+    commonUI()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  open func commonUI() {
+    contentView.addSubview(timeLabel)
+    timeLabelHeightAnchor = timeLabel.heightAnchor.constraint(equalToConstant: 22)
+    timeLabelHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
+      timeLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+    ])
+
+    contentView.addSubview(contentLabel)
+    contentLabelCenterYAnchor = contentLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+    contentLabelCenterYAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      contentLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+      contentLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW),
+    ])
+  }
+
+  func setModel(_ model: MessageTipsModel) {
+    // time
+    if let time = model.timeContent, !time.isEmpty {
+      timeLabelHeightAnchor?.constant = chat_timeCellH
+      contentLabelCenterYAnchor?.constant = chat_timeCellH / 2
+      timeLabel.text = time
+      timeLabel.isHidden = false
+    } else {
+      timeLabelHeightAnchor?.constant = 0
+      contentLabelCenterYAnchor?.constant = 0
+      timeLabel.text = ""
+      timeLabel.isHidden = true
+    }
+
+    contentLabel.text = model.text
+  }
 }

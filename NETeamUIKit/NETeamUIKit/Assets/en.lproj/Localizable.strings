@@ -36,7 +36,6 @@
 "discuss_info"="Temp Group Info";
 "group_info"="Group Info";
 "discuss_introduce"="Temp Group Introduce";
-"search_friend"="Search Contact";
 "no_result"="No Result";
 "discuss_name"="Temp Group Name";
 "dissolute_team_chat"="Wether to disband Group";
@@ -60,6 +59,7 @@
 "who_edit_team_info"="Edit group info permission";
 "who_edit_user_info"="Add member permission";
 "who_at_all"="@all permission";
+"who_can_top_message"="Top message permission";
 "who_mark"="Pin permission";
 "who_user_join_noti"="Group notification recipients";
 "manage_manger"="Manager management";
@@ -84,4 +84,4 @@
 "remove_member_tip"="This member will leave group after remove";
 "member_select_no_member"="No member";
 "remove_failed"="remove failed";
-"failed_operation"="操作失败";
+"failed_operation"="Operation failed";

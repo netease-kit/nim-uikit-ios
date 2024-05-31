@@ -9,10 +9,10 @@ import UIKit
 open class CustomConversationListCell: ConversationListCell {
   // 新增 UI 元素，用于展示在线状态
   private lazy var onlineView: UIImageView = {
-    let notify = UIImageView()
-    notify.translatesAutoresizingMaskIntoConstraints = false
-    notify.image = UIImage(named: "about_yunxin")
-    return notify
+    let notifyView = UIImageView()
+    notifyView.translatesAutoresizingMaskIntoConstraints = false
+    notifyView.image = UIImage(named: "about_yunxin")
+    return notifyView
   }()
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -21,20 +21,20 @@ open class CustomConversationListCell: ConversationListCell {
     // 头像右下角
     contentView.addSubview(onlineView)
     NSLayoutConstraint.activate([
-      onlineView.rightAnchor.constraint(equalTo: headImge.rightAnchor),
-      onlineView.bottomAnchor.constraint(equalTo: headImge.bottomAnchor),
+      onlineView.rightAnchor.constraint(equalTo: headImageView.rightAnchor),
+      onlineView.bottomAnchor.constraint(equalTo: headImageView.bottomAnchor),
       onlineView.widthAnchor.constraint(equalToConstant: 12),
       onlineView.heightAnchor.constraint(equalToConstant: 12),
     ])
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   // 此方法用于数据和 UI 的绑定，可在此处在数据展示前对数据进行处理
-  override open func configData(sessionModel: ConversationListModel?) {
-    super.configData(sessionModel: sessionModel)
-//    subTitle.text = "[自定义类型文案]"
+  override open func configureData(_ sessionModel: NEConversationListModel?) {
+    super.configureData(sessionModel)
+    //    subTitle.text = "[自定义类型文案]"
   }
 }

@@ -4,6 +4,7 @@
 
 import NEChatUIKit
 import UIKit
+
 class CustomChatCell: NEChatBaseCell {
   public var testLabel = UILabel()
 
@@ -19,13 +20,13 @@ class CustomChatCell: NEChatBaseCell {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
-    backgroundColor = .clear
+    backgroundColor = .lightGray
     testLabel.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(testLabel)
     NSLayoutConstraint.activate([
@@ -38,6 +39,6 @@ class CustomChatCell: NEChatBaseCell {
 
   override func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     print("this is custom message")
-    testLabel.text = "this is custom message"
+    testLabel.text = model.message?.text
   }
 }

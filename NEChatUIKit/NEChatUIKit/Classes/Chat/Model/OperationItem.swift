@@ -16,6 +16,8 @@ public enum OperationType: Int {
   case collection
   case delete
   case recall
+  case top
+  case untop
 }
 
 @objcMembers
@@ -24,6 +26,7 @@ open class OperationItem: NSObject {
   public var imageName: String = ""
   public var type: OperationType?
 
+  /// 复制
   public static func copyItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_copy")
@@ -32,6 +35,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 回复
   public static func replayItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_replay")
@@ -40,6 +44,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 转发
   public static func forwardItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_forward")
@@ -48,6 +53,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 标记
   public static func pinItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_pin")
@@ -56,6 +62,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 取消标记
   public static func removePinItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_cancel_pin")
@@ -64,6 +71,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 多选
   public static func selectItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_select")
@@ -72,14 +80,34 @@ open class OperationItem: NSObject {
     return item
   }
 
-//  static open func collectionItem() -> OperationItem {
-//    OperationItem(
-//      text: chatLocalizable("operation_collection"),
-//      imageName: "op_collection",
-//      type: .collection
-//    )
-//  }
+  /// 收藏
+  public static func collectionItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_collection")
+    item.imageName = "op_collect"
+    item.type = .collection
+    return item
+  }
 
+  /// 置顶
+  public static func topItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_top")
+    item.imageName = "op_delete"
+    item.type = .top
+    return item
+  }
+
+  /// 移除置顶
+  public static func untopItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_untop")
+    item.imageName = "op_delete"
+    item.type = .untop
+    return item
+  }
+
+  /// 删除
   public static func deleteItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_delete")
@@ -88,6 +116,7 @@ open class OperationItem: NSObject {
     return item
   }
 
+  /// 撤回
   public static func recallItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_recall")

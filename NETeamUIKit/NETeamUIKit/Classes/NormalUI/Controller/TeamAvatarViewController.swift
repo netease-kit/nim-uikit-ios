@@ -21,55 +21,55 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
     navigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
 
-    headerBack.layer.cornerRadius = 8.0
+    headerBackView.layer.cornerRadius = 8.0
 
     NSLayoutConstraint.activate([
-      headerBack.topAnchor.constraint(equalTo: view.topAnchor, constant: 12.0 + NEConstant.navigationAndStatusHeight),
-      headerBack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      headerBack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      headerBack.heightAnchor.constraint(equalToConstant: 128.0),
+      headerBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12.0 + NEConstant.navigationAndStatusHeight),
+      headerBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      headerBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+      headerBackView.heightAnchor.constraint(equalToConstant: 128.0),
     ])
 
     NSLayoutConstraint.activate([
-      photoImage.rightAnchor.constraint(equalTo: headerView.rightAnchor),
-      photoImage.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
+      photoImageView.rightAnchor.constraint(equalTo: headerView.rightAnchor),
+      photoImageView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor),
     ])
 
     let gesture = UITapGestureRecognizer()
     headerView.addGestureRecognizer(gesture)
     gesture.addTarget(self, action: #selector(uploadPhoto))
 
-    defaultHeaderBack.layer.cornerRadius = 8.0
+    defaultHeaderBackView.layer.cornerRadius = 8.0
     NSLayoutConstraint.activate([
-      defaultHeaderBack.leftAnchor.constraint(equalTo: headerBack.leftAnchor),
-      defaultHeaderBack.rightAnchor.constraint(equalTo: headerBack.rightAnchor),
-      defaultHeaderBack.topAnchor.constraint(
-        equalTo: headerBack.bottomAnchor,
+      defaultHeaderBackView.leftAnchor.constraint(equalTo: headerBackView.leftAnchor),
+      defaultHeaderBackView.rightAnchor.constraint(equalTo: headerBackView.rightAnchor),
+      defaultHeaderBackView.topAnchor.constraint(
+        equalTo: headerBackView.bottomAnchor,
         constant: 12.0
       ),
-      defaultHeaderBack.heightAnchor.constraint(equalToConstant: 114.0),
+      defaultHeaderBackView.heightAnchor.constraint(equalToConstant: 114.0),
     ])
 
     NSLayoutConstraint.activate([
-      tag.leftAnchor.constraint(equalTo: defaultHeaderBack.leftAnchor, constant: 16.0),
-      tag.topAnchor.constraint(equalTo: defaultHeaderBack.topAnchor, constant: 15.0),
+      tagLabel.leftAnchor.constraint(equalTo: defaultHeaderBackView.leftAnchor, constant: 16.0),
+      tagLabel.topAnchor.constraint(equalTo: defaultHeaderBackView.topAnchor, constant: 15.0),
     ])
 
-    iconCollection.register(
+    iconsCollectionView.register(
       TeamDefaultIconCell.self,
       forCellWithReuseIdentifier: "\(TeamDefaultIconCell.self)"
     )
     NSLayoutConstraint.activate([
-      iconCollection.topAnchor.constraint(equalTo: tag.bottomAnchor, constant: 16.0),
-      iconCollection.leftAnchor.constraint(
-        equalTo: defaultHeaderBack.leftAnchor,
+      iconsCollectionView.topAnchor.constraint(equalTo: tagLabel.bottomAnchor, constant: 16.0),
+      iconsCollectionView.leftAnchor.constraint(
+        equalTo: defaultHeaderBackView.leftAnchor,
         constant: 18
       ),
-      iconCollection.rightAnchor.constraint(
-        equalTo: defaultHeaderBack.rightAnchor,
+      iconsCollectionView.rightAnchor.constraint(
+        equalTo: defaultHeaderBackView.rightAnchor,
         constant: -18.0
       ),
-      iconCollection.heightAnchor.constraint(equalToConstant: 48.0),
+      iconsCollectionView.heightAnchor.constraint(equalToConstant: 48.0),
     ])
   }
 
@@ -79,8 +79,8 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
       withReuseIdentifier: "\(TeamDefaultIconCell.self)",
       for: indexPath
     ) as? TeamDefaultIconCell {
-      cell.iconImage.image = coreLoader.loadImage("icon_\(indexPath.row)")
-      cell.iconImage.accessibilityIdentifier = "id.default\(indexPath.row + 1)"
+      cell.iconImageView.image = coreLoader.loadImage("icon_\(indexPath.row)")
+      cell.iconImageView.accessibilityIdentifier = "id.default\(indexPath.row + 1)"
       return cell
     }
     return UICollectionViewCell()

@@ -10,6 +10,7 @@
 #import <SDWebImage/SDWebImage.h>
 #import <YXAlog_iOS/YXAlog.h>
 #include <mach/mach_time.h>
+#import "NECallKitUtil.h"
 #import "NECallUIStateController.h"
 #import "NECustomButton.h"
 #import "NEExpandButton.h"
@@ -147,7 +148,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
               });
             }
             weakSelf.videoCallingController.bigVideoView.userID =
-                weakSelf.callParam.currentUserAccid;
+                NIMSDK.sharedSDK.loginManager.currentAccount;
           }
 
           if (error) {
@@ -307,7 +308,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   self.mediaSwitchBtn.imageView.image = [UIImage imageNamed:@"switch_audio"
                                                    inBundle:self.bundle
                               compatibleWithTraitCollection:nil];
-  self.mediaSwitchBtn.titleLabel.text = [self localizableWithKey:@"switch_to_audio"];
+  self.mediaSwitchBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"switch_to_audio"];
   self.mediaSwitchBtn.tag = NERtcCallTypeAudio;
   [self showVideoView];
   [self setUrl:self.callParam.remoteAvatar withPlaceholder:@"avator"];
@@ -318,7 +319,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   self.mediaSwitchBtn.imageView.image = [UIImage imageNamed:@"switch_video"
                                                    inBundle:self.bundle
                               compatibleWithTraitCollection:nil];
-  self.mediaSwitchBtn.titleLabel.text = [self localizableWithKey:@"switch_to_video"];
+  self.mediaSwitchBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"switch_to_video"];
   self.mediaSwitchBtn.tag = NERtcCallTypeVideo;
   [self hideVideoView];
   [self setUrl:self.callParam.remoteAvatar withPlaceholder:@"avator"];
@@ -354,13 +355,13 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
         self.mediaSwitchBtn.imageView.image = [UIImage imageNamed:@"switch_audio"
                                                          inBundle:self.bundle
                                     compatibleWithTraitCollection:nil];
-        self.mediaSwitchBtn.titleLabel.text = [self localizableWithKey:@"switch_to_audio"];
+        self.mediaSwitchBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"switch_to_audio"];
         [self setSwitchAudioStyle];
       } else {
         self.mediaSwitchBtn.imageView.image = [UIImage imageNamed:@"switch_video"
                                                          inBundle:self.bundle
                                     compatibleWithTraitCollection:nil];
-        self.mediaSwitchBtn.titleLabel.text = [self localizableWithKey:@"switch_to_video"];
+        self.mediaSwitchBtn.titleLabel.text = [NECallKitUtil localizableWithKey:@"switch_to_video"];
         [self setSwitchVideoStyle];
       }
       __weak typeof(self) weakSelf = self;
@@ -483,7 +484,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
 
 - (void)acceptEvent:(UIButton *)button {
   if ([[NetManager shareInstance] isClose] == YES) {
-    [self.view ne_makeToast:[self localizableWithKey:@"network_error"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"network_error"]];
     return;
   }
 
@@ -491,26 +492,27 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   self.calledController.acceptBtn.userInteractionEnabled = NO;
   __weak typeof(self) weakSelf = self;
 
-  [[NECallEngine sharedInstance] accept:^(NSError *_Nullable error,
-                                          NECallInfo *_Nullable callInfo) {
-    weakSelf.calledController.rejectBtn.userInteractionEnabled = YES;
-    weakSelf.calledController.acceptBtn.userInteractionEnabled = YES;
-    if (error) {
-      if (error.code != 10420) {
-        [weakSelf.preiousWindow
-            ne_makeToast:[NSString stringWithFormat:@"%@ %@",
-                                                    [weakSelf localizableWithKey:@"accept_failed"],
-                                                    error.localizedDescription]];
-      }
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
-                     dispatch_get_main_queue(), ^{
-                       [weakSelf destroy];
-                     });
-    } else {
-      self.calledController.connectingLabel.hidden = NO;
-      [self stopCurrentPlaying];
-    }
-  }];
+  [[NECallEngine sharedInstance]
+      accept:^(NSError *_Nullable error, NECallInfo *_Nullable callInfo) {
+        weakSelf.calledController.rejectBtn.userInteractionEnabled = YES;
+        weakSelf.calledController.acceptBtn.userInteractionEnabled = YES;
+        if (error) {
+          if (error.code != 10420) {
+            [weakSelf.preiousWindow
+                ne_makeToast:[NSString stringWithFormat:@"%@ %@",
+                                                        [NECallKitUtil
+                                                            localizableWithKey:@"accept_failed"],
+                                                        error.localizedDescription]];
+          }
+          dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
+                         dispatch_get_main_queue(), ^{
+                           [weakSelf destroy];
+                         });
+        } else {
+          self.calledController.connectingLabel.hidden = NO;
+          [self stopCurrentPlaying];
+        }
+      }];
 }
 
 - (void)switchCameraBtn:(UIButton *)button {
@@ -538,7 +540,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
     [[NECallEngine sharedInstance] muteLocalVideo:button.selected];
   }
   [self changeDefaultImage:button.selected];
-  [self cameraAvailble:!button.selected userId:self.callParam.currentUserAccid];
+  [self cameraAvailble:!button.selected userId:NIMSDK.sharedSDK.loginManager.currentAccount];
 }
 
 - (void)hangupBtnClick:(UIButton *)button {
@@ -576,7 +578,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
       [self setAudioOutputToSpeaker];
     }
   } else {
-    [self.view ne_makeToast:[self localizableWithKey:@"operation_failed"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"operation_failed"]];
   }
 }
 
@@ -597,7 +599,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
 
 - (void)operationSwitchClick:(UIButton *)btn {
   if ([[NetManager shareInstance] isClose] == YES) {
-    [self.view ne_makeToast:[self localizableWithKey:@"network_error"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"network_error"]];
     return;
   }
   __weak typeof(self) weakSelf = self;
@@ -624,10 +626,10 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
               }
             } else {
               [weakSelf.view
-                  ne_makeToast:[NSString
-                                   stringWithFormat:@"%@: %@",
-                                                    [weakSelf localizableWithKey:@"switch_error"],
-                                                    error]];
+                  ne_makeToast:[NSString stringWithFormat:@"%@: %@",
+                                                          [NECallKitUtil
+                                                              localizableWithKey:@"switch_error"],
+                                                          error]];
             }
           }];
 }
@@ -637,13 +639,13 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   if (ret == 0) {
     btn.selected = !btn.selected;
   } else {
-    [self.view ne_makeToast:[self localizableWithKey:@"operation_failed"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"operation_failed"]];
   }
 }
 
 - (void)mediaClick:(UIButton *)btn {
   if ([[NetManager shareInstance] isClose] == YES) {
-    [self.view ne_makeToast:[self localizableWithKey:@"network_error"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"network_error"]];
     return;
   }
   __weak typeof(self) weakSelf = self;
@@ -670,10 +672,10 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
               }
             } else {
               [weakSelf.view
-                  ne_makeToast:[NSString
-                                   stringWithFormat:@"%@ : %@",
-                                                    [weakSelf localizableWithKey:@"switch_error"],
-                                                    error]];
+                  ne_makeToast:[NSString stringWithFormat:@"%@ : %@",
+                                                          [NECallKitUtil
+                                                              localizableWithKey:@"switch_error"],
+                                                          error]];
             }
           }];
 }
@@ -745,35 +747,37 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
 - (void)onCallEnd:(NECallEndInfo *)info {
   switch (info.reasonCode) {
     case TerminalCodeTimeOut:
-      [self playRingWithType:CRTNoResponseRing];
+      if (self.callParam.isCaller == YES) {
+        [self playRingWithType:CRTNoResponseRing];
+      }
       if ([[NetManager shareInstance] isClose] == YES) {
         [self destroy];
         return;
       }
       if (self.callParam.isCaller == YES) {
-        [self showToastWithContent:[self localizableWithKey:@"remote_timeout"]];
+        [self showToastWithContent:[NECallKitUtil localizableWithKey:@"remote_timeout"]];
       }
       break;
     case TerminalCodeBusy:
-      [self showToastWithContent:[self localizableWithKey:@"remote_busy"]];
+      [self showToastWithContent:[NECallKitUtil localizableWithKey:@"remote_busy"]];
       [self playRingWithType:CRTBusyRing];
       break;
 
     case TerminalCalleeCancel:
-      [self showToastWithContent:[self localizableWithKey:@"remote_cancel"]];
+      [self showToastWithContent:[NECallKitUtil localizableWithKey:@"remote_cancel"]];
       break;
 
     case TerminalCallerRejcted:
-      [self showToastWithContent:[self localizableWithKey:@"remote_reject"]];
+      [self showToastWithContent:[NECallKitUtil localizableWithKey:@"remote_reject"]];
       [self playRingWithType:CRTRejectRing];
       break;
 
     case TerminalOtherRejected:
-      [self.preiousWindow ne_makeToast:[self localizableWithKey:@"other_client_reject"]];
+      [self.preiousWindow ne_makeToast:[NECallKitUtil localizableWithKey:@"other_client_reject"]];
       break;
 
     case TerminalOtherAccepted:
-      [self.preiousWindow ne_makeToast:[self localizableWithKey:@"other_client_accept"]];
+      [self.preiousWindow ne_makeToast:[NECallKitUtil localizableWithKey:@"other_client_accept"]];
       break;
 
     case TerminalCallerCancel:
@@ -800,16 +804,16 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
         return;
       }
       UIAlertController *alert = [UIAlertController
-          alertControllerWithTitle:[self localizableWithKey:@"permission"]
+          alertControllerWithTitle:[NECallKitUtil localizableWithKey:@"permission"]
                            message:info.callType == NECallTypeVideo
-                                       ? [self localizableWithKey:@"audio_to_video"]
-                                       : [self localizableWithKey:@"video_to_audio"]
+                                       ? [NECallKitUtil localizableWithKey:@"audio_to_video"]
+                                       : [NECallKitUtil localizableWithKey:@"video_to_audio"]
                     preferredStyle:UIAlertControllerStyleAlert];
       self.alert = alert;
       __weak typeof(self) weakSelf = self;
 
       UIAlertAction *rejectAction = [UIAlertAction
-          actionWithTitle:[self localizableWithKey:@"reject"]
+          actionWithTitle:[NECallKitUtil localizableWithKey:@"reject"]
                     style:UIAlertActionStyleDefault
                   handler:^(UIAlertAction *_Nonnull action) {
                     NESwitchParam *param = [[NESwitchParam alloc] init];
@@ -824,7 +828,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
                             }];
                   }];
       UIAlertAction *agreeAction = [UIAlertAction
-          actionWithTitle:[self localizableWithKey:@"agree"]
+          actionWithTitle:[NECallKitUtil localizableWithKey:@"agree"]
                     style:UIAlertActionStyleDefault
                   handler:^(UIAlertAction *_Nonnull action) {
                     NESwitchParam *param = [[NESwitchParam alloc] init];
@@ -866,7 +870,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
     break;
     case NECallSwitchStateReject:
       [self hideBannerView];
-      [self.view ne_makeToast:[self localizableWithKey:@"reject_tip"]];
+      [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"reject_tip"]];
       break;
     default:
       break;
@@ -952,8 +956,8 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
 
 - (NSString *)getInviteText {
   return (self.callParam.callType == NECallTypeAudio
-              ? [self localizableWithKey:@"invite_audio_call"]
-              : [self localizableWithKey:@"invite_video_call"]);
+              ? [NECallKitUtil localizableWithKey:@"invite_audio_call"]
+              : [NECallKitUtil localizableWithKey:@"invite_video_call"]);
 }
 
 - (void)hideBannerView {
@@ -1043,7 +1047,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
     ]];
 
     label.adjustsFontSizeToFitWidth = YES;
-    label.text = [self localizableWithKey:@"waitting_remote_response"];
+    label.text = [NECallKitUtil localizableWithKey:@"waitting_remote_response"];
   }
   return _bannerView;
 }
@@ -1267,10 +1271,6 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   return headerView;
 }
 
-- (NSString *)localizableWithKey:(NSString *)key {
-  return [self.bundle localizedStringForKey:key value:nil table:@"Localizable"];
-}
-
 #pragma mark CallEngine Key Value
 
 - (BOOL)isGlobalInit {
@@ -1287,7 +1287,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
                                              reason:
                                                  (NERtcVirtualBackgroundSourceStateReason)reason {
   if (reason == kNERtcVirtualBackgroundSourceStateReasonDeviceNotSupported) {
-    [self.view ne_makeToast:[self localizableWithKey:@"device_not_support"]];
+    [self.view ne_makeToast:[NECallKitUtil localizableWithKey:@"device_not_support"]];
     self.operationView.virtualBtn.selected = NO;
   }
 }

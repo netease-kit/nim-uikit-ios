@@ -16,6 +16,7 @@ open class FunTeamListViewController: NEBaseTeamListViewController {
       forCellReuseIdentifier: "\(NSStringFromClass(FunTeamTableViewCell.self))"
     )
     tableView.rowHeight = 72
+    emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
   override open func tableView(_ tableView: UITableView,

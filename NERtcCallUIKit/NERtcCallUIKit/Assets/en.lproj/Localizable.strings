@@ -4,40 +4,40 @@
 // found in the LICENSE file.
 
 
-"switch_to_audio"="Switch to audio";
-"switch_to_video"="Switch to video";
+"switch_to_audio"="Switch to Voice";
+"switch_to_video"="Switch to Video";
 "accept_failed"="Answer Failed";
-"network_error"="Network error, try later";
-"switch_error"="Switch Error";
-"remote_cancel"="Cancelled by the opposite";
-"remote_busy"="Busy-line";
-"remote_timeout"="No Responding";
-"remote_reject"="Reject";
-"other_client_accept"="Accept by other client";
-"other_client_reject"="Reject by other client";
+"network_error"="Network exception, please try again later";
+"switch_error"="Failed to switch";
+"remote_cancel"="The call was canceled";
+"remote_busy"="The subscriber you dialed is busy";
+"remote_timeout"="Timeout and no response";
+"remote_reject"="The user has declined your  call invitation";
+"other_client_accept"="The other client has answered the call";
+"other_client_reject"="The other client has rejected the call";
 
 "permission"="Permission Require";
 "reject"="Reject";
 "agree"="Agree";
-"audio_to_video"="Opposite requests to switch to video,  have to turn on your camera";
-"video_to_audio"="Opposite requests to switch to audio,  will turn off your camera directly";
-"reject_tip"="Request Denied";
+"audio_to_video"="A request to convert video to audio will turn off your camera directly";
+"The other party requests to convert audio to video, which requires turning on your camera";
+"reject_tip"="The invitation was rejected.";
 
-"invite_audio_call"="Invite for audio call";
-"invite_video_call"="Invite for video call";
+"invite_audio_call"="Invite you to voice call...";
+"invite_video_call"="Invite you to video call...";
 
-"waitting_remote_response"="Waiting for response";
+"waitting_remote_response"="Awaiting response...";
 "call_cancel"="Cancel";
 "call_reject"="Reject";
 "call_accept"="Accept";
-"call_micro_phone"="Microphone";
+"call_micro_phone"="Mic";
 "call_speaker"="Speaker";
-"waitting_remote_accept"="Waitting to connect";
+"waitting_remote_accept"="Waiting for the call...";
 "calling"="Calling";
 "cancel_failed"="The invitation has been accepted and cannot be canceled";
 
 "operation_failed"="operation failed";
 
-"device_not_support"="The current device does not support virtualization";
+"device_not_support"="This device does not support the blurring feature";
 
-"connecting"="Connecting…";
+"connecting"="Connecting...";

@@ -4,14 +4,15 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class ContactSelectedCell: NEBaseContactSelectedCell {
   override open func commonUI() {
     super.commonUI()
-    sImage.highlightedImage = UIImage.ne_imageNamed(name: "select")
+    sImageView.highlightedImage = UIImage.ne_imageNamed(name: "select")
     NSLayoutConstraint.activate([
-      sImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      sImage.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      sImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      sImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
     ])
   }
 
@@ -23,9 +24,9 @@ open class ContactSelectedCell: NEBaseContactSelectedCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImage.widthAnchor.constraint(equalToConstant: 36),
-      avatarImage.heightAnchor.constraint(equalToConstant: 36),
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 }

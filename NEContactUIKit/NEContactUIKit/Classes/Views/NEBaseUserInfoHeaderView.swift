@@ -3,20 +3,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECommonUIKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
 open class NEBaseUserInfoHeaderView: UIView {
   public var labelConstraints = [NSLayoutConstraint]()
-  public lazy var avatarImage: UIImageView = {
-    let avatarImage = UIImageView()
-    avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
-    avatarImage.translatesAutoresizingMaskIntoConstraints = false
-    avatarImage.contentMode = .scaleAspectFill
-    avatarImage.clipsToBounds = true
-    avatarImage.accessibilityIdentifier = "id.avatar"
-    return avatarImage
+  public lazy var avatarImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.backgroundColor = UIColor(hexString: "#537FF4")
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    imageView.clipsToBounds = true
+    imageView.accessibilityIdentifier = "id.avatar"
+    return imageView
   }()
 
   public lazy var nameLabel: UILabel = {
@@ -28,8 +29,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return nameLabel
   }()
 
-  public lazy var titleLabel: UILabel = {
-    let titleLabel = UILabel()
+  public lazy var titleLabel: CopyableLabel = {
+    let titleLabel = CopyableLabel()
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.font = UIFont.boldSystemFont(ofSize: 22)
     titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
@@ -37,8 +38,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return titleLabel
   }()
 
-  public lazy var detailLabel: UILabel = {
-    let detailLabel = UILabel()
+  public lazy var detailLabel: CopyableLabel = {
+    let detailLabel = CopyableLabel()
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
@@ -46,8 +47,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return detailLabel
   }()
 
-  public lazy var detailLabel2: UILabel = {
-    let detailLabel = UILabel()
+  public lazy var detailLabel2: CopyableLabel = {
+    let detailLabel = CopyableLabel()
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
@@ -68,29 +69,29 @@ open class NEBaseUserInfoHeaderView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
     backgroundColor = .white
-    addSubview(avatarImage)
+    addSubview(avatarImageView)
     addSubview(nameLabel)
     addSubview(titleLabel)
     addSubview(detailLabel)
     addSubview(lineView)
 
     NSLayoutConstraint.activate([
-      avatarImage.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
-      avatarImage.widthAnchor.constraint(equalToConstant: 60),
-      avatarImage.heightAnchor.constraint(equalToConstant: 60),
-      avatarImage.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0),
+      avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 60),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 60),
+      avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0),
     ])
 
     NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatarImage.leftAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: avatarImage.rightAnchor),
-      nameLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor),
-      nameLabel.bottomAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+      nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
+      nameLabel.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
+      nameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
+      nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
     ])
 
     commonUI(showDetail: false)
@@ -103,9 +104,9 @@ open class NEBaseUserInfoHeaderView: UIView {
     var detail2Constraint = [NSLayoutConstraint]()
     if showDetail {
       titleConstraint = [
-        titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 20),
+        titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 20),
         titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -35),
-        titleLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor, constant: -2),
+        titleLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor, constant: -2),
         titleLabel.heightAnchor.constraint(equalToConstant: 22),
       ]
 
@@ -125,9 +126,9 @@ open class NEBaseUserInfoHeaderView: UIView {
       ]
     } else {
       titleConstraint = [
-        titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 16),
+        titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 16),
         titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
-        titleLabel.topAnchor.constraint(equalTo: avatarImage.topAnchor, constant: 7),
+        titleLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor, constant: 7),
         titleLabel.heightAnchor.constraint(equalToConstant: 22),
       ]
 
@@ -146,21 +147,37 @@ open class NEBaseUserInfoHeaderView: UIView {
     updateConstraintsIfNeeded()
   }
 
-  open func setData(user: NEKitUser?) {
-    guard let user = user else {
+  open func setData(user: NEUserWithFriend?) {
+    guard let userFriend = user else {
       return
     }
 
     // avatar
-    if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
-      avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      avatarImage.backgroundColor = .clear
+    if let imageUrl = userFriend.user?.avatar, !imageUrl.isEmpty {
+      avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
+      avatarImageView.backgroundColor = .clear
       nameLabel.isHidden = true
     } else {
-      avatarImage.sd_setImage(with: nil)
-      avatarImage.backgroundColor = UIColor.colorWithString(string: user.userId)
-      nameLabel.text = user.shortName(showAlias: false, count: 2)
+      avatarImageView.sd_setImage(with: nil)
+      avatarImageView.backgroundColor = UIColor.colorWithString(string: userFriend.user?.accountId)
+      nameLabel.text = userFriend.shortName(count: 2)
       nameLabel.isHidden = false
+    }
+
+    // title
+    let uid = userFriend.user?.accountId ?? ""
+    if let alias = userFriend.friend?.alias, !alias.isEmpty {
+      commonUI(showDetail: true)
+      titleLabel.text = alias
+      detailLabel.text = "\(localizable("nick")):\(userFriend.user?.name ?? uid)"
+      detailLabel.copyString = userFriend.user?.name ?? uid
+      detailLabel2.text = "\(localizable("account")):\(uid)"
+      detailLabel2.copyString = uid
+    } else {
+      commonUI(showDetail: false)
+      titleLabel.text = userFriend.showName()
+      detailLabel.text = "\(localizable("account")):\(uid)"
+      detailLabel.copyString = uid
     }
   }
 }

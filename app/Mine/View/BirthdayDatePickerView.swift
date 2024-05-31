@@ -11,7 +11,7 @@ public class BirthdayDatePickerView: UIView {
   public typealias SelectTimeCallBack = (String?) -> Void
   public var timeCallBack: SelectTimeCallBack?
 
-  lazy var cancelBtn: UIButton = {
+  lazy var cancelButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
@@ -21,7 +21,7 @@ public class BirthdayDatePickerView: UIView {
     return button
   }()
 
-  lazy var sureBtn: UIButton = {
+  lazy var sureButton: UIButton = {
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitle(NSLocalizedString("confirm", comment: ""), for: .normal)
@@ -56,6 +56,14 @@ public class BirthdayDatePickerView: UIView {
     return datePicker
   }()
 
+  /// 日期选择器背景视图
+  public lazy var pickerBackView: UIView = {
+    let pickerBackView = UIView()
+    pickerBackView.translatesAutoresizingMaskIntoConstraints = false
+    pickerBackView.backgroundColor = .white
+    return pickerBackView
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = UIColor(white: 0, alpha: 0.25)
@@ -65,13 +73,11 @@ public class BirthdayDatePickerView: UIView {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
+  /// UI 初始化
   func setupSubviews() {
-    let pickerBackView = UIView()
-    pickerBackView.translatesAutoresizingMaskIntoConstraints = false
-    pickerBackView.backgroundColor = .white
     addSubview(pickerBackView)
 
     NSLayoutConstraint.activate([
@@ -81,29 +87,29 @@ public class BirthdayDatePickerView: UIView {
       pickerBackView.heightAnchor.constraint(equalToConstant: 229),
     ])
 
-    pickerBackView.addSubview(cancelBtn)
-    pickerBackView.addSubview(sureBtn)
+    pickerBackView.addSubview(cancelButton)
+    pickerBackView.addSubview(sureButton)
     pickerBackView.addSubview(bottomLine)
     pickerBackView.addSubview(picker)
 
     NSLayoutConstraint.activate([
-      cancelBtn.leftAnchor.constraint(equalTo: pickerBackView.leftAnchor, constant: 15),
-      cancelBtn.topAnchor.constraint(equalTo: pickerBackView.topAnchor, constant: 8),
-      cancelBtn.widthAnchor.constraint(equalToConstant: 45),
-      cancelBtn.heightAnchor.constraint(equalToConstant: 20),
+      cancelButton.leftAnchor.constraint(equalTo: pickerBackView.leftAnchor, constant: 15),
+      cancelButton.topAnchor.constraint(equalTo: pickerBackView.topAnchor, constant: 8),
+      cancelButton.widthAnchor.constraint(equalToConstant: 45),
+      cancelButton.heightAnchor.constraint(equalToConstant: 20),
     ])
 
     NSLayoutConstraint.activate([
-      sureBtn.rightAnchor.constraint(equalTo: pickerBackView.rightAnchor, constant: -15),
-      sureBtn.topAnchor.constraint(equalTo: pickerBackView.topAnchor, constant: 8),
-      sureBtn.widthAnchor.constraint(equalToConstant: 45),
-      sureBtn.heightAnchor.constraint(equalToConstant: 20),
+      sureButton.rightAnchor.constraint(equalTo: pickerBackView.rightAnchor, constant: -15),
+      sureButton.topAnchor.constraint(equalTo: pickerBackView.topAnchor, constant: 8),
+      sureButton.widthAnchor.constraint(equalToConstant: 45),
+      sureButton.heightAnchor.constraint(equalToConstant: 20),
     ])
 
     NSLayoutConstraint.activate([
       bottomLine.leftAnchor.constraint(equalTo: pickerBackView.leftAnchor),
       bottomLine.rightAnchor.constraint(equalTo: pickerBackView.rightAnchor),
-      bottomLine.topAnchor.constraint(equalTo: cancelBtn.bottomAnchor, constant: 8),
+      bottomLine.topAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: 8),
       bottomLine.heightAnchor.constraint(equalToConstant: 0.5),
     ])
 

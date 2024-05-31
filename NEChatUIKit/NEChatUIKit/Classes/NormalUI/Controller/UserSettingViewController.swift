@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -20,15 +21,15 @@ open class UserSettingViewController: NEBaseUserSettingViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func setupUI() {
     super.setupUI()
-    userHeader.layer.cornerRadius = IMKitClient.instance.getConfigCenter().teamEnable ? 21.0 : 30.0
+    userHeaderView.layer.cornerRadius = IMKitConfigCenter.shared.teamEnable ? 21.0 : 30.0
   }
 
-  override func getPinMessageViewController(session: NIMSession) -> NEBasePinMessageViewController {
-    PinMessageViewController(session: session)
+  override func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {
+    PinMessageViewController(conversationId: conversationId)
   }
 }

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objc
@@ -14,14 +14,22 @@ protocol BlackListCellDelegate: AnyObject {
 open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
   weak var delegate: BlackListCellDelegate?
   var index = 0
-  private var model: NEKitUser?
+  private var model: NEUserWithFriend?
   var button = UIButton()
+
+  private lazy var bottomLine: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.ne_greyLine
+    return view
+  }()
+
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func commonUI() {
@@ -55,11 +63,11 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
   }
 
   func buttonEvent(sender: UIButton) {
-    delegate?.removeUser(account: model?.userId, index: index)
+    delegate?.removeUser(account: model?.user?.accountId, index: index)
   }
 
   override open func setModel(_ model: Any) {
-    guard let user = model as? NEKitUser else {
+    guard let user = model as? NEUserWithFriend else {
       return
     }
     self.model = user
@@ -68,21 +76,14 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     titleLabel.text = user.showName()
 
     // avatar
-    if let imageUrl = user.userInfo?.avatarUrl, !imageUrl.isEmpty {
+    if let imageUrl = user.user?.avatar, !imageUrl.isEmpty {
       nameLabel.text = ""
-      avatarImage.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      avatarImage.backgroundColor = .clear
+      avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
+      avatarImageView.backgroundColor = .clear
     } else {
-      nameLabel.text = user.shortName(showAlias: false, count: 2)
-      avatarImage.image = nil
-      avatarImage.backgroundColor = UIColor.colorWithString(string: user.userId)
+      nameLabel.text = user.shortName(count: 2)
+      avatarImageView.image = nil
+      avatarImageView.backgroundColor = UIColor.colorWithString(string: user.user?.accountId)
     }
   }
-
-  private lazy var bottomLine: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.ne_greyLine
-    return view
-  }()
 }

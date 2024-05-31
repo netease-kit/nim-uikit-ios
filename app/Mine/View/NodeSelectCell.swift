@@ -7,6 +7,22 @@ import NETeamUIKit
 import UIKit
 
 class NodeSelectCell: CornerCell {
+  lazy var titleLabel: UILabel = {
+    let label = UILabel()
+    label.textColor = UIColor.ne_darkText
+    label.font = NEConstant.defaultTextFont(14.0)
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
+
+  lazy var stateImageView: UIImageView = {
+    let imgView = UIImageView()
+    imgView.image = UIImage(named: "unselect")
+    imgView.highlightedImage = UIImage(named: "select")
+    imgView.translatesAutoresizingMaskIntoConstraints = false
+    return imgView
+  }()
+
   override func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
@@ -25,43 +41,27 @@ class NodeSelectCell: CornerCell {
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   public func configure(_ cellModel: SettingCellModel) {
     cornerType = cellModel.cornerType
-    stateImg.isHighlighted = cellModel.switchOpen ? true : false
+    stateImageView.isHighlighted = cellModel.switchOpen ? true : false
     titleLabel.text = cellModel.subTitle
   }
 
   func setupUI() {
     contentView.addSubview(titleLabel)
-    contentView.addSubview(stateImg)
+    contentView.addSubview(stateImageView)
 
     NSLayoutConstraint.activate([
-      stateImg.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      stateImg.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 30),
+      stateImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      stateImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 30),
     ])
 
     NSLayoutConstraint.activate([
       titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      titleLabel.leftAnchor.constraint(equalTo: stateImg.rightAnchor, constant: 10),
+      titleLabel.leftAnchor.constraint(equalTo: stateImageView.rightAnchor, constant: 10),
     ])
   }
-
-  lazy var titleLabel: UILabel = {
-    let label = UILabel()
-    label.textColor = UIColor.ne_darkText
-    label.font = NEConstant.defaultTextFont(14.0)
-    label.translatesAutoresizingMaskIntoConstraints = false
-    return label
-  }()
-
-  lazy var stateImg: UIImageView = {
-    let img = UIImageView()
-    img.image = UIImage(named: "unselect")
-    img.highlightedImage = UIImage(named: "select")
-    img.translatesAutoresizingMaskIntoConstraints = false
-    return img
-  }()
 }

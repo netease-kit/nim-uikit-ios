@@ -45,20 +45,20 @@ public class ConversationUIConfig: NSObject {
   public var conversationProperties = ConversationProperties()
 
   /// 会话列表 cell 左划置顶按钮文案内容
-  public var stickTopBottonTitle = localizable("stickTop")
+  public var stickTopButtonTitle = localizable("stickTop")
   /// 会话列表 cell 左划取消置顶按钮文案内容(会话置顶后生效)
-  public var stickTopBottonCancelTitle = localizable("cancel_stickTop")
+  public var stickTopButtonCancelTitle = localizable("cancel_stickTop")
   /// 会话列表 cell 左划置顶按钮背景颜色
-  public var stickTopBottonBackgroundColor: UIColor?
+  public var stickTopButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划置顶按钮点击事件
-  public var stickTopBottonClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var stickTopButtonClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表 cell 左划删除按钮文案内容
-  public var deleteBottonTitle = localizable("delete")
+  public var deleteButtonTitle = localizable("delete")
   /// 会话列表 cell 左划删除按钮背景颜色
-  public var deleteBottonBackgroundColor: UIColor?
+  public var deleteButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划删除按钮点击事件
-  public var deleteBottonClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var deleteButtonClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 标题栏左侧按钮点击事件
   public var titleBarLeftClick: (() -> Void)?
@@ -70,7 +70,7 @@ public class ConversationUIConfig: NSObject {
   public var titleBarRight2Click: (() -> Void)?
 
   /// 会话列表点击事件
-  public var itemClick: ((ConversationListModel?, IndexPath) -> Void)?
+  public var itemClick: ((NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表的视图控制器回调，回调中会返回会话列表的视图控制器
   public var customController: ((NEBaseConversationController) -> Void)?

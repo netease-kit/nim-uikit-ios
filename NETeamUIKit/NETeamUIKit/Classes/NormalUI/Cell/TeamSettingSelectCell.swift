@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class TeamSettingSelectCell: NEBaseTeamSettingSelectCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
@@ -22,8 +22,8 @@ open class TeamSettingSelectCell: NEBaseTeamSettingSelectCell {
     ])
 
     NSLayoutConstraint.activate([
-      arrow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      arrow.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
     ])
   }
 }

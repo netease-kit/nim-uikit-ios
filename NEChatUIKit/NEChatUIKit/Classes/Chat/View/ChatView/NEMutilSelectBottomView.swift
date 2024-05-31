@@ -21,15 +21,15 @@ open class NEMutilSelectBottomView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func setupSubview() {
     // 逐条转发
     addSubview(singleForwardButton)
     buttonTopAnchor = singleForwardButton.topAnchor.constraint(equalTo: topAnchor, constant: 12)
+    buttonTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      buttonTopAnchor!,
       singleForwardButton.centerXAnchor.constraint(equalTo: centerXAnchor),
       singleForwardButton.widthAnchor.constraint(equalToConstant: 48),
       singleForwardButton.heightAnchor.constraint(equalToConstant: 48),

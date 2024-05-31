@@ -9,13 +9,18 @@ import UIKit
 @objc
 @objcMembers
 open class TeamNameViewModel: NSObject {
-  let repo = ChatRepo.shared
-  var currentTeamMember: NIMTeamMember?
+  let teamRepo = TeamRepo.shared
+  var currentTeamMember: V2NIMTeamMember?
 
-  func getCurrentUserTeamMember(_ teamId: String?) {
+  /// 获取当前用户群信息
+  /// - Parameter teamId 群id
+  func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
     if let tid = teamId {
-      let currentUserAccid = IMKitClient.instance.imAccid()
-      currentTeamMember = repo.getTeamMemberList(userId: currentUserAccid, teamId: tid)
+      let currentUserAccid = IMKitClient.instance.account()
+      teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, currentUserAccid) { member, error in
+        self.currentTeamMember = member
+        completion(error)
+      }
     }
   }
 }

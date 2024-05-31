@@ -11,16 +11,20 @@ import UIKit
 open class MessageCallRecordModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
 
-  public required init(message: NIMMessage?) {
+  public required init(message: V2NIMMessage?) {
     super.init(message: message)
     type = .rtcCallRecord
     var isAuiodRecord = false
-    if let object = message?.messageObject as? NIMRtcCallRecordObject, let isSend = message?.isOutgoingMsg {
+
+    if let attach = message?.attachment as? V2NIMMessageCallAttachment {
       attributeStr = NSMutableAttributedString()
+      let callType = attach.type
+      let callStatus = attach.status
       var image: UIImage?
       var bound = CGRect.zero
       let offset: CGFloat = -1
-      if object.callType == .audio {
+
+      if callType == 1 {
         isAuiodRecord = true
         image = coreLoader.loadImage("audio_record")
         bound = CGRect(x: 0, y: offset - 5, width: 24, height: 24)
@@ -28,20 +32,26 @@ open class MessageCallRecordModel: MessageContentModel {
         image = coreLoader.loadImage("video_record")
         bound = CGRect(x: 0, y: offset, width: 24, height: 14)
       }
-      switch object.callStatus {
-      case .complete:
-        var timeString = "00:00"
-        if let duration = object.durations[NIMSDK.shared().loginManager.currentAccount()] {
-          timeString = Date.getFormatPlayTime(duration.doubleValue)
+
+      switch callStatus {
+      case 1:
+        var duration: TimeInterval = 0
+        for durationModel in attach.durations {
+          if durationModel.accountId == message?.senderId {
+            duration = TimeInterval(durationModel.duration)
+            break
+          }
         }
+
+        let timeString = Date.getFormatPlayTime(duration)
         attributeStr?.append(NSAttributedString(string: chatLocalizable("call_complete") + " \(timeString)"))
-      case .canceled:
+      case 2:
         attributeStr?.append(NSAttributedString(string: chatLocalizable("call_canceled")))
-      case .rejected:
+      case 3:
         attributeStr?.append(NSAttributedString(string: chatLocalizable("call_rejected")))
-      case .timeout:
+      case 4:
         attributeStr?.append(NSAttributedString(string: chatLocalizable("call_timeout")))
-      case .busy:
+      case 5:
         attributeStr?.append(NSAttributedString(string: chatLocalizable("call_busy")))
       default:
         break
@@ -49,7 +59,7 @@ open class MessageCallRecordModel: MessageContentModel {
       let attachment = NSTextAttachment()
       attachment.image = image
       attachment.bounds = bound
-      if isSend {
+      if message?.isSelf == true {
         attributeStr?.append(NSAttributedString(string: " "))
         attributeStr?.append(NSAttributedString(attachment: attachment))
       } else {
@@ -57,17 +67,15 @@ open class MessageCallRecordModel: MessageContentModel {
         attributeStr?.insert(NSAttributedString(attachment: attachment), at: 0)
       }
 
-      attributeStr?.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.font, value: messageTextFont, range: NSMakeRange(0, attributeStr?.length ?? 0))
 
       attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
-    let textSize = attributeStr?.finalSize(.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize), CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)) ?? .zero
-
+    let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
     var h = chat_min_h
     h = textSize.height + (isAuiodRecord ? 20 : 24)
     contentSize = CGSize(width: textSize.width + chat_cell_margin * 2, height: h)
-
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight
+    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

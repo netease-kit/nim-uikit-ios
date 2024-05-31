@@ -17,7 +17,6 @@
 "record_too_short"="Time is too short";
 "no_microphone_permission"="no micro permission";
 "choose"="select";
-"take_photo"="camera";
 "select_from_album"="album";
 "select_from_icloud"="icloud";
 "editing"="typing";
@@ -51,9 +50,11 @@
 "team_join_mode" = "join mode";
 "team_be_invited_mode" = "invite mode";
 "team_be_invited_permission" = "Invite Permission";
-"team_be_invited_author" = "是否需要被邀请者同意权限";
-"team_update_info_permission" = "update info permission";
+"team_be_invited_author" = "BeInvite Permission";
+"team_update_info_permission" = "Update info permission";
 "team_update_client_custom"="Update Permission";
+"team_at_permission"="@All Permission update to ";
+"team_top_permission"="Top message permission update to ";
 
 "team_custom_info" = "custom info";
 "not_mute" = "unmute";
@@ -75,11 +76,15 @@
 "pin_text_P2P"="pinned this message";
 "pin_text_team"="pinned this message";
 
+"top_message"="top message";
+"untop_message"="untop message";
+
 "chat_setting"="chat setting";
 "session_set_top"="sticky to top";
 "message_remind"="open notification";
 
 "open_soon"="Not open";
+"no_permission_tip"="No permission";
 
 //MARK: operation
 "operation_copy"="copy";
@@ -87,8 +92,11 @@
 "operation_forward"="forward";
 "operation_pin"="pin";
 "operation_cancel_pin"="unpin";
+"operation_delete_collection"="delete collection";
 "operation_select"="multi-select";
-"operation_collection"="favorite";
+"operation_collection"="collection";
+"operation_top"="top";
+"operation_untop"="untop";
 "operation_delete"="delete";
 "operation_recall"="recall";
 "withdrew_message" = "withdrew this message";
@@ -98,7 +106,6 @@
 
 
 //MARK: toast
-"copy_success"="Copy successfully";
 "collection_success"="Favorite";
 "no_permession"="No Permission";
 "msg_reply"="reply";
@@ -123,6 +130,9 @@
 "send_to"="send to";
 "send"="send";
 "confirm"="yes";
+"session_record"="session record";
+
+"collection_message"=" collection message";
 
 
 "mdhm"="MM.dd HH:mm";
@@ -163,12 +173,14 @@
 "pin_jump_detail"="jump to details";
 "cancel_pin_success"="Unpin";
 "no_pin_message"="No pin message";
+"no_collection_message"="No collection message";
 
 "you_were_mentioned"="[You were mentioned]";
 // MARK: error toast
 "failed_operation"="Failed Operation";
 "team_not_exist"="team not exist";
 "unpin_failed"="Unpin failed";
+"pin_limit_exceeded"="The number of pin has reached the upper limit";
 
 "fun_hold_to_talk"="Hold to talk";
 
@@ -194,6 +206,7 @@
 "multiForward_open_failed"="Failed to obtain information";
 "file_check_failed"="File verification failed";
 "per_item_forward_limit"="Forward one by one to limit %d messages";
+"selete_messages_limit"="Delete limits %d messages";
 "multiForward_forward_limit"="Combined forwarding limits %d messages";
 "exception_description"="Exception description";
 
@@ -201,3 +214,8 @@
 "null_message_not_support"="Empty messages are not allowed to be sent";
 
 "black_list_tip"="Opposite has blocked you and the message cannot be sent.";
+"disable_stranger_call"="Cannot make audio or video calls to someone who is not in your friends list.";
+
+"chat_collection_p2p_tip"="From Chat with %@";
+
+"chat_collection_team_tip"="From %@ ";

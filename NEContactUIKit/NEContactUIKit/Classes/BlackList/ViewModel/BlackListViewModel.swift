@@ -4,60 +4,135 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 
+public protocol BlackListViewModelDelegate: NSObjectProtocol {
+  func tableViewReload()
+  func tableViewReload(_ indexs: [IndexPath])
+  func tableViewDelete(_ indexs: [IndexPath])
+  func tableViewInsert(_ indexs: [IndexPath])
+}
+
 @objcMembers
-open class BlackListViewModel: NSObject, FriendProviderDelegate {
+open class BlackListViewModel: NSObject, NEContactListener {
   var contactRepo = ContactRepo.shared
-  public weak var delegate: FriendProviderDelegate?
-  private let className = "BlackListViewModel"
+  public var blockList = [NEUserWithFriend]()
+  public weak var delegate: BlackListViewModelDelegate?
 
   override init() {
-    NELog.infoLog(ModuleName + " " + className, desc: #function)
     super.init()
-    contactRepo.addContactDelegate(delegate: self)
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    contactRepo.addContactListener(self)
   }
 
-  func getBlackList() -> [NEKitUser]? {
-    NELog.infoLog(ModuleName + " " + className, desc: #function)
-    return contactRepo.getBlackList()
+  /// 获取黑名单列表
+  func getBlackList() {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    blockList = NEFriendUserCache.shared.getBlocklist().map(\.value)
   }
 
+  /// 移除黑名单
+  /// - Parameters:
+  ///   - account: 好友 Id
+  ///   - index: 该用户在表格中的位置
+  ///   - completion: 回调
   func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account:\(account)")
-    contactRepo.removeBlackList(account: account, completion)
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
+    contactRepo.removeBlockList(accountId: account) { error in
+      if let err = error as? NSError {
+        NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
+        completion(err)
+      } else {
+        NEFriendUserCache.shared.removeBlockAccount(account)
+        completion(nil)
+      }
+    }
   }
 
-  func addBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", account:\(account)")
-    contactRepo.addBlackList(account: account, completion)
+  /// 将好友添加到黑名单
+  /// - Parameters:
+  ///   - users: 好友列表
+  ///   - completion: 回调
+  func addBlackList(users: [NEUserWithFriend], _ completion: @escaping (NSError?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", users.count:\(users.count)")
+
+    for (i, user) in users.enumerated() {
+      contactRepo.addBlockList(accountId: user.user?.accountId ?? "") { error in
+        if let err = error as? NSError {
+          NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
+          completion(err)
+        } else {
+          completion(nil)
+        }
+      }
+    }
   }
 
-  // MARK: callback
+  // MARK: - NEContactListener
 
-  public func onFriendChanged(user: NEKitUser) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
-    delegate?.onFriendChanged(user: user)
+  /// 用户信息变更回调
+  /// - Parameter users: 用户列表
+  public func onUserProfileChanged(_ users: [V2NIMUser]) {
+    for user in users {
+      for (index, friendUser) in blockList.enumerated() {
+        if friendUser.user?.accountId == user.accountId {
+          friendUser.user = user
+          delegate?.tableViewReload([IndexPath(row: index, section: 0)])
+          break
+        }
+      }
+    }
   }
 
-  public func onUserInfoChanged(user: NEKitUser) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(user.userId ?? "nil")")
-    delegate?.onUserInfoChanged(user: user)
+  /// 黑名单添加回调
+  /// - Parameter user: 用户信息
+  public func onBlockListAdded(_ user: V2NIMUser) {
+    guard let accountId = user.accountId else { return }
+
+    // 黑名单中已存在
+    if blockList.contains(where: { $0.user?.accountId == user.accountId }) {
+      return
+    }
+
+    let blockUser = NEFriendUserCache.shared.getFriendInfo(accountId) ?? NEUserWithFriend(user: user)
+    let index = IndexPath(row: blockList.count, section: 0)
+    blockList.append(blockUser)
+    delegate?.tableViewInsert([index])
   }
 
-  public func onBlackListChanged() {
-    NELog.infoLog(ModuleName + " " + className, desc: #function)
-    delegate?.onBlackListChanged()
+  /// 黑名单移除回调
+  /// - Parameter accountId: 好友 Id
+  public func onBlockListRemoved(_ accountId: String) {
+    for (index, friendUser) in blockList.enumerated() {
+      if friendUser.user?.accountId == accountId {
+        blockList.remove(at: index)
+        delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+        break
+      }
+    }
   }
 
-  public func onRecieveNotification(notification: NENotification) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function)
-    print(#file + #function)
+  /// 删除好友通知
+  /// 本端删除好友，多端同步
+  /// - Parameters:
+  ///   - accountId: 删除的好友账号ID
+  ///   - deletionType: 好友删除的类型
+  public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+    if NEFriendUserCache.shared.isBlockAccount(accountId) {
+      onBlockListRemoved(accountId)
+    }
   }
 
-  public func onNotificationUnreadCountChanged(count: Int) {
-    NELog.infoLog(ModuleName + " " + className, desc: #function + ", count:\(count)")
-    print(#file + #function)
+  /// 好友信息变更回调
+  /// - Parameter friendInfo: 好友信息
+  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
+    for (index, friendUser) in blockList.enumerated() {
+      if friendUser.user?.accountId == friendInfo.accountId {
+        friendUser.friend = friendInfo
+        delegate?.tableViewReload([IndexPath(row: index, section: 0)])
+        break
+      }
+    }
   }
 }

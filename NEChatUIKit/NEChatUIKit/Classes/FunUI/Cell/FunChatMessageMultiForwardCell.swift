@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -19,7 +20,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func setupUI() {
@@ -175,7 +176,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
-    guard let data = NECustomAttachment.dataOfCustomMessage(message: model.message) else {
+    guard let data = NECustomAttachment.dataOfCustomMessage(model.message?.attachment) else {
       return
     }
 
@@ -214,13 +215,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
 
       var contentText = ""
       if var senderNick = abstracts[i]["senderNick"] as? String {
-        if senderNick.count > 5 {
-          // 截取字符串 abcdefg -> ab...fg
-          let leftEndIndex = senderNick.index(senderNick.startIndex, offsetBy: 2)
-          let rightStartIndex = senderNick.index(senderNick.endIndex, offsetBy: -2)
-          senderNick = senderNick[senderNick.startIndex ..< leftEndIndex] + "..." + senderNick[rightStartIndex ..< senderNick.endIndex]
-        }
-        contentText = senderNick
+        contentText = NEFriendUserCache.getCutName(senderNick)
         if let content = abstracts[i]["content"] as? String {
           contentText += "：" + content
         }
@@ -259,9 +254,9 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   // MARK: - lazy load
 
   public lazy var backViewLeft: UIImageView = {
-    let view = UIImageView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    return imageView
   }()
 
   public lazy var titleLabelLeft1: UILabel = {
@@ -321,9 +316,9 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   }()
 
   public lazy var backViewRight: UIImageView = {
-    let view = UIImageView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    return imageView
   }()
 
   public lazy var titleLabelRight1: UILabel = {

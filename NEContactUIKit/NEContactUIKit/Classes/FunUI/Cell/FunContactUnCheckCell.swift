@@ -9,12 +9,24 @@ import UIKit
 open class FunContactUnCheckCell: NEBaseContactUnCheckCell {
   override func setupUI() {
     super.setupUI()
-    avatarImage.layer.cornerRadius = 4
+    avatarImageView.layer.cornerRadius = 4
     NSLayoutConstraint.activate([
-      avatarImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      avatarImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      avatarImage.widthAnchor.constraint(equalToConstant: 40),
-      avatarImage.heightAnchor.constraint(equalToConstant: 40),
+      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      avatarImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
     ])
+  }
+
+  /// 重写控件赋值方法
+  /// - Parameter model: 数据模型（ContactInfo）
+  override func configure(_ model: Any) {
+    guard let model = model as? ContactInfo else { return }
+
+    avatarImageView.configHeadData(
+      headUrl: model.user?.user?.avatar,
+      name: model.user?.showName() ?? "",
+      uid: model.user?.user?.accountId ?? ""
+    )
   }
 }

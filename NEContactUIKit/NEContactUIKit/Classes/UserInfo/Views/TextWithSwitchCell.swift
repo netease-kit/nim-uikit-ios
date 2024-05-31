@@ -27,7 +27,7 @@ open class TextWithSwitchCell: ContactBaseTextCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func valueChanged(switchBtn: UISwitch) {

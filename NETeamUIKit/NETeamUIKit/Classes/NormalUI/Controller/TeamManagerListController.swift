@@ -16,6 +16,7 @@ open class TeamManagerListController: NEBaseTeamManagerListController {
   public lazy var emptyView: NEEmptyDataView = {
     let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
   }()
@@ -59,8 +60,8 @@ open class TeamManagerListController: NEBaseTeamManagerListController {
     cell.delegate = self
     cell.index = indexPath.row
     cell.configure(viewmodel.managers[indexPath.row])
-    if let type = viewmodel.currentMember?.type, type == .manager {
-      cell.removeBtn.isHidden = true
+    if let type = viewmodel.currentMember?.memberRole, type == .TEAM_MEMBER_ROLE_MANAGER {
+      cell.removeButton.isHidden = true
       cell.removeLabel.isHidden = true
     }
     return cell

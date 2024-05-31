@@ -8,8 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
-  public let navigationView = NENavigationView()
+open class NEBaseTeamListViewController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource {
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = TeamListViewModel()
   var isClickCallBack = false
@@ -28,12 +27,13 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     loadData()
     weak var weakSelf = self
     viewModel.refresh = {
+      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.teamList.count ?? 0) > 0
       weakSelf?.tableView.reloadData()
     }
   }
 
   func commonUI() {
-    title = localizable("mine_groupchat")
+    title = localizable("my_teams")
     navigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
@@ -69,11 +69,26 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+
+    emptyView.setText(localizable("team_empty"))
+    view.addSubview(emptyView)
+    NSLayoutConstraint.activate([
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+    ])
   }
 
   func loadData() {
-    viewModel.getTeamList()
-    tableView.reloadData()
+    viewModel.getTeamList { [weak self] teams, error in
+      if let err = error {
+        print("getTeamList error: \(err)")
+      } else {
+        self?.tableView.reloadData()
+        self?.emptyView.isHidden = (teams?.count ?? 0) > 0
+      }
+    }
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -90,17 +105,17 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     if isClickCallBack == true {
       Router.shared.use(
         ContactTeamDataRouter,
-        parameters: ["team": model.nimTeam as Any],
+        parameters: ["team": model.v2Team as Any],
         closure: nil
       )
       navigationController?.popViewController(animated: true)
       return
     }
     if let teamid = model.teamId {
-      let session = NIMSession(teamid, type: .team)
+      let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
       Router.shared.use(
         PushTeamChatVCRouter,
-        parameters: ["nav": navigationController as Any, "session": session as Any],
+        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
         closure: nil
       )
     }

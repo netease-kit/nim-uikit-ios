@@ -19,12 +19,12 @@ class NodeViewModel: NSObject {
     let home = SettingCellModel()
     home.subTitle = NSLocalizedString("domestic_node", comment: "")
     home.rowHeight = 44.0
-    home.switchOpen = IMKitClient.instance.getSettingRepo().getNodeValue() == true ? true : false
+    home.switchOpen = SettingRepo.shared.getNodeValue() == true ? true : false
 
     // 海外节点配置
     let overseas = SettingCellModel()
     overseas.subTitle = NSLocalizedString("overseas_node", comment: "")
-    overseas.switchOpen = IMKitClient.instance.getSettingRepo().getNodeValue() == true ? false : true
+    overseas.switchOpen = SettingRepo.shared.getNodeValue() == true ? false : true
     overseas.rowHeight = 44.0
 
     model.cellModels.append(contentsOf: [

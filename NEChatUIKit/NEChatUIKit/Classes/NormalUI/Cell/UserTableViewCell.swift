@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import NECoreIM2Kit
 import UIKit
 
 @objcMembers
@@ -11,12 +11,12 @@ open class UserTableViewCell: UserBaseTableViewCell {
   override open func baseCommonUI() {
     super.baseCommonUI()
     // avatar
-    avatarImage.layer.cornerRadius = 21
+    avatarImageView.layer.cornerRadius = 21
     NSLayoutConstraint.activate([
-      avatarImage.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
-      avatarImage.widthAnchor.constraint(equalToConstant: 42),
-      avatarImage.heightAnchor.constraint(equalToConstant: 42),
-      avatarImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+      avatarImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      avatarImageView.widthAnchor.constraint(equalToConstant: 42),
+      avatarImageView.heightAnchor.constraint(equalToConstant: 42),
+      avatarImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
     ])
 
     titleLabel.font = UIFont.systemFont(ofSize: 16)
@@ -27,7 +27,7 @@ open class UserTableViewCell: UserBaseTableViewCell {
       alpha: 1.0
     )
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImage.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -35),
       titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),

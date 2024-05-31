@@ -17,15 +17,15 @@ open class FunMultiForwardViewController: MultiForwardViewController {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
-    brokenNetworkView.errorIcon.isHidden = false
+    brokenNetworkView.errorIconView.isHidden = false
     brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
-    brokenNetworkView.content.textColor = .funChatNetworkBrokenTitleColor
+    brokenNetworkView.contentLabel.textColor = .funChatNetworkBrokenTitleColor
     navigationView.backgroundColor = .funChatBackgroundColor
     navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
   }
@@ -37,17 +37,13 @@ open class FunMultiForwardViewController: MultiForwardViewController {
   }
 
   override open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    viewmodel.messages[indexPath.row].cellHeight()
+    viewModel.messages[indexPath.row].cellHeight()
   }
 
   open func getMessageModel(model: MessageModel) {
-    if model.type == .tip ||
-      model.type == .notification ||
-      model.type == .time {
-      if let tipModel = model as? MessageTipsModel {
-        tipModel.contentSize = String.getTextRectSize(tipModel.text ?? "",
-                                                      font: .systemFont(ofSize: 14),
-                                                      size: CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
+    if model.type == .tip || model.type == .notification {
+      if let tipModel = model as? MessageTipsModel, let text = tipModel.text {
+        tipModel.contentSize = String.getRealSize(text, .systemFont(ofSize: 14), CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
         tipModel.height = max(tipModel.contentSize.height + chat_content_margin, 28)
       }
       return

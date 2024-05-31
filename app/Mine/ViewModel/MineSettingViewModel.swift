@@ -55,7 +55,7 @@ public class MineSettingViewModel: NSObject {
 
     #if DEBUG
       let configTest = SettingCellModel()
-      configTest.cellName = "配置测试页"
+      configTest.cellName = "全局配置"
       configTest.type = SettingCellType.SettingArrowCell.rawValue
       configTest.cellClick = {
         weakSelf?.delegate?.didClickConfigTest()
@@ -74,10 +74,10 @@ public class MineSettingViewModel: NSObject {
     receiverModel.cellName = NSLocalizedString("receiver_mode", comment: "")
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
-    receiverModel.switchOpen = IMKitClient.instance.getSettingRepo().getHandsetMode()
+    receiverModel.switchOpen = SettingRepo.shared.getHandsetMode()
 
     receiverModel.swichChange = { isOpen in
-      IMKitClient.instance.getSettingRepo().setHandsetMode(isOpen)
+      SettingRepo.shared.setHandsetMode(isOpen)
     }
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
@@ -93,10 +93,10 @@ public class MineSettingViewModel: NSObject {
 //    let deleteFriend = SettingCellModel()
 //    deleteFriend.cellName = NSLocalizedString("delete_friend", comment: "")
 //    deleteFriend.type = SettingCellType.SettingSwitchCell.rawValue
-//    deleteFriend.switchOpen = IMKitClient.instance.getSettingRepo().getDeleteFriendAlias()
+//    deleteFriend.switchOpen = SettingRepo.shared.getDeleteFriendAlias()
 //
 //    deleteFriend.swichChange = { isOpen in
-//      IMKitClient.instance.getSettingRepo().setDeleteFriendAlias(isOpen)
+//      SettingRepo.shared.setDeleteFriendAlias(isOpen)
 //    }
 
     // 消息已读未读功能
@@ -104,9 +104,9 @@ public class MineSettingViewModel: NSObject {
     hasRead.cellName = NSLocalizedString("message_read_function", comment: "")
     hasRead.type = SettingCellType.SettingSwitchCell.rawValue
 //        hasRead.switchOpen = true
-    hasRead.switchOpen = IMKitClient.instance.getSettingRepo().getShowReadStatus()
+    hasRead.switchOpen = SettingRepo.shared.getShowReadStatus()
     hasRead.swichChange = { isOpen in
-      IMKitClient.instance.getSettingRepo().setShowReadStatus(isOpen)
+      SettingRepo.shared.setShowReadStatus(isOpen)
     }
     model.cellModels.append(contentsOf: [
       receiverModel, // 听筒模式

@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 /// 头像枚举类型
 @objc public enum NEContactAvatarType: Int {
   case rectangle = 1 // 矩形
@@ -55,7 +56,7 @@ public class ContactUIConfig: NSObject {
   public var contactProperties = ContactProperties()
 
   /// 通讯录列表的视图控制器回调，回调中会返回通讯录列表的视图控制器
-  public var customController: ((NEBaseContactsViewController) -> Void)?
+  public var customController: ((NEBaseContactViewController) -> Void)?
 }
 
 /// 通讯录页面的 UI 个性化定制

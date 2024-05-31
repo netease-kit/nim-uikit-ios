@@ -8,29 +8,31 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, NIMUserManagerDelegate, FunChatRecordViewDelegate {
+open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, FunChatRecordViewDelegate {
   public weak var recordView: FunRecordAudioView?
 
-  override public init(session: NIMSession) {
-    super.init(session: session)
+  override public init(conversationId: String) {
+    super.init(conversationId: conversationId)
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: true)
 
     normalInputHeight = 90
     brokenNetworkViewHeight = 48
     navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
+
+    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
     view.bringSubviewToFront(chatInputView)
-    brokenNetworkView.errorIcon.isHidden = false
+    brokenNetworkView.errorIconView.isHidden = false
     brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
-    brokenNetworkView.content.textColor = .funChatNetworkBrokenTitleColor
+    brokenNetworkView.contentLabel.textColor = .funChatNetworkBrokenTitleColor
     getFunInputView()?.funDelegate = self
   }
 
@@ -42,21 +44,25 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     return input
   }
 
+  /// 获取转发确认弹窗 - 通用版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     FunForwardAlertViewController()
   }
 
+  /// 获取合并转发详情页视图控制器 - 通用版
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
                                                    _ messageAttachmentFilePath: String,
                                                    _ messageAttachmentMD5: String?) -> MultiForwardViewController {
     FunMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
 
+  /// 获取@列表视图控制器 - 通用版
   override func getUserSelectVC() -> NEBaseSelectUserViewController {
-    FunSelectUserViewController(sessionId: viewmodel.session.sessionId, showSelf: false)
+    FunSelectUserViewController(sessionId: viewModel.sessionId, showSelf: false)
   }
 
-  override func getTextViewController(title: String?, body: String?) -> TextViewController {
+  /// 获取文本详情页视图控制器 - 通用版
+  override func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = super.getTextViewController(title: title, body: body)
     textViewController.view.backgroundColor = .funChatBackgroundColor
     return textViewController
@@ -87,7 +93,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func didHideReplyMode() {
-    viewmodel.isReplying = false
+    viewModel.isReplying = false
 
     if currentKeyboardHeight > 0 {
       normalOffset = 30
@@ -98,12 +104,20 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func didShowReplyMode() {
-    viewmodel.isReplying = true
+    viewModel.isReplying = true
     chatInputView.textView.becomeFirstResponder()
   }
 
   override open func expandMoreAction() {
-    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType)
+    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: V2NIMConversationIdUtil.conversationType(viewModel.conversationId))
+    if NEChatKitClient.instance.delegate == nil {
+      items = items.filter { item in
+        if item.type == .location {
+          return false
+        }
+        return true
+      }
+    }
     let photo = NEMoreItemModel()
     photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
     photo.title = chatLocalizable("chat_photo")
@@ -115,37 +129,29 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   func openPhoto() {
-    NELog.infoLog(className(), desc: "open photo")
+    NEALog.infoLog(className(), desc: "open photo")
     willSelectItem(button: chatInputView.currentButton, index: showPhotoTag)
   }
 
   override open func showRtcCallAction() {
-    var param = [String: AnyObject]()
-    param["remoteUserAccid"] = viewmodel.session.sessionId as AnyObject
-    param["currentUserAccid"] = NIMSDK.shared().loginManager.currentAccount() as AnyObject
-    param["remoteShowName"] = titleContent as AnyObject
-    if let user = viewmodel.repo.getUserInfo(userId: viewmodel.session.sessionId), let avatar = user.userInfo?.avatarUrl {
-      param["remoteAvatar"] = avatar as AnyObject
+    let videoCallAction = NECustomAlertAction(title: chatLocalizable("video_call")) { [weak self] in
+      self?.useToCallViewRouter(2)
     }
 
-    let videoCallAction = NECustomAlertAction(title: chatLocalizable("video_call")) {
-      param["type"] = NSNumber(integerLiteral: 2) as AnyObject
-      Router.shared.use(CallViewRouter, parameters: param)
+    let audioCallAction = NECustomAlertAction(title: chatLocalizable("audio_call")) { [weak self] in
+      self?.useToCallViewRouter(1)
     }
-    let audioCallAction = NECustomAlertAction(title: chatLocalizable("audio_call")) {
-      param["type"] = NSNumber(integerLiteral: 1) as AnyObject
-      Router.shared.use(CallViewRouter, parameters: param)
-    }
+
     showCustomActionSheet([videoCallAction, audioCallAction])
   }
 
   override func getUserSettingViewController() -> NEBaseUserSettingViewController {
-    FunUserSettingViewController(userId: viewmodel.session.sessionId)
+    FunUserSettingViewController(userId: viewModel.sessionId)
   }
 
   override open func keyBoardWillShow(_ notification: Notification) {
     if chatInputView.chatInpuMode == .normal || chatInputView.chatInpuMode == .multipleSend {
-      if viewmodel.isReplying {
+      if viewModel.isReplying {
         normalOffset = -10
       } else {
         normalOffset = 30
@@ -160,7 +166,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func keyBoardWillHide(_ notification: Notification) {
     if chatInputView.chatInpuMode == .normal || chatInputView.chatInpuMode == .multipleSend {
-      if viewmodel.isReplying {
+      if viewModel.isReplying {
         normalOffset = -30
       } else {
         normalOffset = 0
@@ -274,41 +280,41 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   override open func closeReply(button: UIButton?) {
-    viewmodel.isReplying = false
+    viewModel.isReplying = false
     getFunInputView()?.hideReplyMode()
     getFunInputView()?.replyLabel.attributedText = nil
   }
 
   override open func showReplyMessageView(isReEdit: Bool = false) {
-    viewmodel.isReplying = true
+    viewModel.isReplying = true
     guard let replyView = getFunInputView() else { return }
     replyView.showReplyMode()
-    if let message = viewmodel.operationModel?.message {
+    if let message = viewModel.operationModel?.message {
       if isReEdit {
-        replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: viewmodel.operationModel?.replyText ?? "",
+        replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: viewModel.operationModel?.replyText ?? "",
                                                                           font: .systemFont(ofSize: 13),
                                                                           color: .ne_greyText)
-        if let replyMessage = viewmodel.getReplyMessageWithoutThread(message: message) as? MessageContentModel {
-          viewmodel.operationModel = replyMessage
+        viewModel.getReplyMessageWithoutThread(message: message) { model in
+          if let replyMessage = model as? MessageContentModel {
+            self.viewModel.operationModel = replyMessage
+          }
         }
       } else {
         var text = chatLocalizable("msg_reply")
-        if let uid = message.from {
-          var showName = ChatUserCache.getShowName(userId: uid, teamId: viewmodel.session.sessionId, false)
-          if viewmodel.session.sessionType != .P2P,
-             !IMKitClient.instance.isMySelf(uid) {
+        if let uid = message.senderId {
+          var showName = ChatTeamCache.shared.getShowName(uid, false)
+          if V2NIMConversationIdUtil.conversationType(viewModel.conversationId) != .CONVERSATION_TYPE_P2P,
+             !IMKitClient.instance.isMe(uid) {
             addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
           }
-          let user = viewmodel.getUserInfo(userId: uid)
-          if let alias = user?.alias, !alias.isEmpty {
-            showName = alias
-          }
+
+          showName = ChatTeamCache.shared.getShowName(uid)
           text += " " + showName
+          text += ": \(ChatMessageHelper.contentOfMessage(message))"
+          getFunInputView()?.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
+                                                                                     font: .systemFont(ofSize: 13),
+                                                                                     color: .ne_greyText)
         }
-        text += ": \(ChatMessageHelper.contentOfMessage(message))"
-        getFunInputView()?.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
-                                                                                   font: .systemFont(ofSize: 13),
-                                                                                   color: .ne_greyText)
       }
       if chatInputView.textView.isFirstResponder {
         normalOffset = -10
@@ -319,19 +325,15 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     }
   }
 
-  override open func getReadView(_ message: NIMMessage) -> NEBaseReadViewController {
-    FunReadViewController(message: message)
+  override open func getReadView(_ message: V2NIMMessage, _ teamId: String) -> NEBaseReadViewController {
+    FunReadViewController(message: message, teamId: teamId)
   }
 
   override open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    let model = viewmodel.messages[indexPath.row]
+    guard indexPath.row < viewModel.messages.count else { return 0 }
 
+    let model = viewModel.messages[indexPath.row]
     if let contentModel = model as? MessageContentModel {
-      if let tipModel = model as? MessageTipsModel {
-        tipModel.commonInit()
-        return tipModel.cellHeight() + chat_content_margin
-      }
-
       if contentModel.type == .revoke {
         if let time = contentModel.timeContent, !time.isEmpty {
           return 28 + chat_timeCellH
@@ -344,15 +346,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func getMessageModel(model: MessageModel) {
-    if model.type == .tip ||
-      model.type == .notification ||
-      model.type == .time {
-      if let tipModel = model as? MessageTipsModel {
-        tipModel.contentSize = String.getTextRectSize(tipModel.text ?? "",
-                                                      font: .systemFont(ofSize: 14),
-                                                      size: CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
-        tipModel.height = max(tipModel.contentSize.height + chat_content_margin, 28)
-      }
+    if model.type == .tip || model.type == .notification {
       return
     }
 
@@ -383,52 +377,6 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   // MARK: NEMutilSelectBottomViewDelegate
-
-  override open func multiForwardForward(_ depth: Int) {
-    weak var weakSelf = self
-    if IMKitClient.instance.getConfigCenter().teamEnable {
-      let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) {
-        weakSelf?.forwardMessageToUser(isMultiForward: true, depth: depth) {
-          weakSelf?.cancelMutilSelect()
-        }
-      }
-
-      let teamAction = NECustomAlertAction(title: chatLocalizable("team")) {
-        weakSelf?.forwardMessageToTeam(isMultiForward: true, depth: depth) {
-          weakSelf?.cancelMutilSelect()
-        }
-      }
-
-      showCustomActionSheet([teamAction, userAction])
-    } else {
-      forwardMessageToUser(isMultiForward: true, depth: depth) {
-        weakSelf?.cancelMutilSelect()
-      }
-    }
-  }
-
-  override open func singleForward() {
-    weak var weakSelf = self
-    if IMKitClient.instance.getConfigCenter().teamEnable {
-      let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) {
-        weakSelf?.forwardMessageToUser {
-          weakSelf?.cancelMutilSelect()
-        }
-      }
-
-      let teamAction = NECustomAlertAction(title: chatLocalizable("team")) {
-        weakSelf?.forwardMessageToTeam {
-          weakSelf?.cancelMutilSelect()
-        }
-      }
-
-      showCustomActionSheet([teamAction, userAction])
-    } else {
-      forwardMessageToUser {
-        weakSelf?.cancelMutilSelect()
-      }
-    }
-  }
 
   override open func expandButtonDidClick() {
     super.expandButtonDidClick()
@@ -461,7 +409,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       normalInputHeight = 130
     }
 
-    if viewmodel.isReplying {
+    if viewModel.isReplying {
       normalOffset = -30
     } else {
       normalOffset = 0

@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class ContactBaseTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()
@@ -37,7 +38,7 @@ open class ContactBaseTextCell: UITableViewCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func setModel(model: UserItem) {

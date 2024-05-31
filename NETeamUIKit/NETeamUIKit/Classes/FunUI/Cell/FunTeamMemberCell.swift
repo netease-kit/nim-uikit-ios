@@ -59,9 +59,9 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
   }
 
   func setOwnerStyle() {
-    ownerLabel.textColor = UIColor.funTeamMemberOwnerFlagColor
-    ownerLabel.backgroundColor = UIColor.funTeamMemberOwnerFlagColor.withAlphaComponent(0.1)
-    ownerLabel.layer.borderColor = UIColor.funTeamMemberOwnerFlagColor.cgColor
+    ownerLabel.textColor = UIColor.funTeamThemeColor
+    ownerLabel.backgroundColor = UIColor.funTeamThemeColor.withAlphaComponent(0.1)
+    ownerLabel.layer.borderColor = UIColor.funTeamThemeColor.cgColor
     ownerWidth?.constant = 48
   }
 

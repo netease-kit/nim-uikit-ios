@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 

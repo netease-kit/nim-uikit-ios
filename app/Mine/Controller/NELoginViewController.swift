@@ -5,7 +5,8 @@
 
 import NEChatUIKit
 import NECommonKit
-import NECoreIMKit
+import NECoreIM2Kit
+import NIMSDK
 import UIKit
 import YXLogin
 
@@ -14,6 +15,66 @@ public class NELoginViewController: UIViewController {
   public typealias LoginBlock = () -> Void
 
   public var successLogin: LoginBlock?
+
+  lazy var launchIconView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.image = UIImage(named: "launchIcon")
+    return imageView
+  }()
+
+  lazy var launchIconLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = NSLocalizedString("appName", comment: "")
+    label.font = UIFont.systemFont(ofSize: 24.0)
+    label.textColor = UIColor(hexString: "333333")
+    label.accessibilityIdentifier = "id.appYunxin"
+    return label
+  }()
+
+  lazy var loginButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.layer.cornerRadius = 8
+    button.backgroundColor = UIColor.ne_normalTheme
+    button.setTitleColor(UIColor.white, for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
+    button.setTitle(NSLocalizedString("register_login", comment: ""), for: .normal)
+    button.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
+    button.accessibilityIdentifier = "id.loginButton"
+    return button
+  }()
+
+  lazy var emailLoginButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setTitleColor(UIColor.ne_lightText, for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
+    button.setTitle(NSLocalizedString("email_login", comment: ""), for: .normal)
+    button.addTarget(self, action: #selector(emailLoginBtnClick), for: .touchUpInside)
+    button.accessibilityIdentifier = "id.emailLogin"
+    return button
+  }()
+
+  lazy var dividerLineView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = UIColor.ne_lightText
+    return view
+  }()
+
+  /// 节点按钮
+  lazy var nodeButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setTitleColor(UIColor.ne_lightText, for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
+    button.setTitle(NSLocalizedString("node_select", comment: ""), for: .normal)
+    button.addTarget(self, action: #selector(nodeBtnClick), for: .touchUpInside)
+    button.accessibilityIdentifier = "id.serverConfig"
+    return button
+  }()
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -29,61 +90,77 @@ public class NELoginViewController: UIViewController {
   }
 
   func setupUI() {
-    view.addSubview(launchIcon)
+    view.addSubview(launchIconView)
     view.addSubview(launchIconLabel)
-    view.addSubview(loginBtn)
-    view.addSubview(emailLoginBtn)
-    view.addSubview(divideView)
-    view.addSubview(nodeBtn)
+    view.addSubview(loginButton)
+    view.addSubview(emailLoginButton)
+    view.addSubview(dividerLineView)
+    view.addSubview(nodeButton)
 
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        launchIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIcon.topAnchor.constraint(
+        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        launchIconView.topAnchor.constraint(
           equalTo: view.safeAreaLayoutGuide.topAnchor,
           constant: 145.0
         ),
       ])
     } else {
       NSLayoutConstraint.activate([
-        launchIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIcon.topAnchor.constraint(equalTo: view.topAnchor, constant: 145.0),
+        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        launchIconView.topAnchor.constraint(equalTo: view.topAnchor, constant: 145.0),
       ])
     }
     NSLayoutConstraint.activate([
       launchIconLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      launchIconLabel.topAnchor.constraint(equalTo: launchIcon.bottomAnchor, constant: -12.0),
+      launchIconLabel.topAnchor.constraint(equalTo: launchIconView.bottomAnchor, constant: -12.0),
     ])
 
     NSLayoutConstraint.activate([
-      loginBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      loginBtn.topAnchor.constraint(equalTo: launchIconLabel.bottomAnchor, constant: 20),
-      loginBtn.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth - 80),
-      loginBtn.heightAnchor.constraint(equalToConstant: 44),
+      loginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      loginButton.topAnchor.constraint(equalTo: launchIconLabel.bottomAnchor, constant: 20),
+      loginButton.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth - 80),
+      loginButton.heightAnchor.constraint(equalToConstant: 44),
     ])
 
     NSLayoutConstraint.activate([
-      divideView.bottomAnchor.constraint(
+      dividerLineView.bottomAnchor.constraint(
         equalTo: view.bottomAnchor,
         constant: -10 - NEConstant.statusBarHeight
       ),
-      divideView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      divideView.widthAnchor.constraint(equalToConstant: 1),
-      divideView.heightAnchor.constraint(equalToConstant: 10),
+      dividerLineView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      dividerLineView.widthAnchor.constraint(equalToConstant: 1),
+      dividerLineView.heightAnchor.constraint(equalToConstant: 10),
     ])
 
     NSLayoutConstraint.activate([
-      emailLoginBtn.centerYAnchor.constraint(equalTo: divideView.centerYAnchor),
-      emailLoginBtn.rightAnchor.constraint(equalTo: divideView.leftAnchor, constant: -8),
+      emailLoginButton.centerYAnchor.constraint(equalTo: dividerLineView.centerYAnchor),
+      emailLoginButton.rightAnchor.constraint(equalTo: dividerLineView.leftAnchor, constant: -8),
     ])
 
     NSLayoutConstraint.activate([
-      nodeBtn.centerYAnchor.constraint(equalTo: divideView.centerYAnchor),
-      nodeBtn.leftAnchor.constraint(equalTo: divideView.rightAnchor, constant: 8),
+      nodeButton.centerYAnchor.constraint(equalTo: dividerLineView.centerYAnchor),
+      nodeButton.leftAnchor.constraint(equalTo: dividerLineView.rightAnchor, constant: 8),
     ])
   }
 
   @objc func loginBtnClick(sender: UIButton) {
+    // login to business server
+    let config = YXConfig()
+    config.appKey = AppKey.appKey
+    config.parentScope = NSNumber(integerLiteral: 2)
+    config.scope = NSNumber(integerLiteral: 7)
+    config.supportInternationalize = true
+    config.type = .phone
+    #if DEBUG
+      config.isOnline = false
+      print("debug")
+    #else
+      config.isOnline = true
+      print("release")
+    #endif
+    AuthorManager.shareInstance()?.initAuthor(with: config)
+
     weak var weakSelf = self
     AuthorManager.shareInstance()?.startLogin(completion: { user, error in
       if let err = error {
@@ -110,6 +187,7 @@ public class NELoginViewController: UIViewController {
       print("release")
     #endif
     AuthorManager.shareInstance()?.initAuthor(with: config)
+
     weak var weakSelf = self
     AuthorManager.shareInstance()?.startLogin(completion: { user, error in
       if let err = error {
@@ -128,11 +206,16 @@ public class NELoginViewController: UIViewController {
   private func setupSuccessLogic(_ user: YXUserInfo?) {
     if let token = user?.imToken, let account = user?.imAccid {
       weak var weakSelf = self
-      IMKitClient.instance.loginIM(account, token) { error in
+      print("login accid : ", account)
+      print("login token : ", token)
+
+      let option = V2NIMLoginOption()
+      IMKitClient.instance.login(account, token, option) { error in
         if let err = error {
-          print("loginIM error : ", err)
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
           UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
         } else {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
           ChatRouter.setupInit()
           if let block = weakSelf?.successLogin {
             block()
@@ -141,64 +224,4 @@ public class NELoginViewController: UIViewController {
       }
     }
   }
-
-  // lazy method
-  lazy var launchIcon: UIImageView = {
-    let imageView = UIImageView()
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = UIImage(named: "launchIcon")
-    return imageView
-  }()
-
-  lazy var launchIconLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = NSLocalizedString("appName", comment: "")
-    label.font = UIFont.systemFont(ofSize: 24.0)
-    label.textColor = UIColor(hexString: "333333")
-    label.accessibilityIdentifier = "id.appYunxin"
-    return label
-  }()
-
-  lazy var loginBtn: UIButton = {
-    let btn = UIButton()
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.layer.cornerRadius = 8
-    btn.backgroundColor = UIColor.ne_blueText
-    btn.setTitleColor(UIColor.white, for: .normal)
-    btn.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
-    btn.setTitle(NSLocalizedString("register_login", comment: ""), for: .normal)
-    btn.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
-    btn.accessibilityIdentifier = "id.loginButton"
-    return btn
-  }()
-
-  lazy var emailLoginBtn: UIButton = {
-    let btn = UIButton()
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(UIColor.ne_lightText, for: .normal)
-    btn.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
-    btn.setTitle(NSLocalizedString("email_login", comment: ""), for: .normal)
-    btn.addTarget(self, action: #selector(emailLoginBtnClick), for: .touchUpInside)
-    btn.accessibilityIdentifier = "id.emailLogin"
-    return btn
-  }()
-
-  lazy var divideView: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.ne_lightText
-    return view
-  }()
-
-  lazy var nodeBtn: UIButton = {
-    let btn = UIButton()
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(UIColor.ne_lightText, for: .normal)
-    btn.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
-    btn.setTitle(NSLocalizedString("node_select", comment: ""), for: .normal)
-    btn.addTarget(self, action: #selector(nodeBtnClick), for: .touchUpInside)
-    btn.accessibilityIdentifier = "id.serverConfig"
-    return btn
-  }()
 }

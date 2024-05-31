@@ -25,6 +25,31 @@ open class NEChatMoreActionView: UIView {
 
   public weak var delegate: NEMoreViewDelegate?
 
+  /// 更多面板列表
+  lazy var collcetionView: UICollectionView = {
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .horizontal
+    layout.minimumLineSpacing = 0
+    layout.minimumInteritemSpacing = 0
+    layout.sectionInset = UIEdgeInsets(top: 0, left: NEMoreView_Section_Padding, bottom: 0, right: NEMoreView_Section_Padding)
+    self.moreFlowLayout = layout
+    let collcetionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collcetionView.backgroundColor = UIColor.ne_backgroundColor
+    collcetionView.translatesAutoresizingMaskIntoConstraints = false
+    collcetionView.dataSource = self
+    collcetionView.delegate = self
+    collcetionView.isUserInteractionEnabled = true
+    collcetionView.isPagingEnabled = true
+    collcetionView.showsHorizontalScrollIndicator = false
+    collcetionView.showsVerticalScrollIndicator = false
+    collcetionView.alwaysBounceHorizontal = true
+    collcetionView.register(
+      NEInputMoreCell.self,
+      forCellWithReuseIdentifier: NEMoreCell_ReuseId
+    )
+    return collcetionView
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     addSubview(collcetionView)
@@ -32,7 +57,7 @@ open class NEChatMoreActionView: UIView {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   func configData(data: [NEMoreItemModel]) {
@@ -73,33 +98,6 @@ open class NEChatMoreActionView: UIView {
 
 //        let height: CGFloat = collcetionView.frame.origin.y + collcetionView.height + NEMoreView_Margin
   }
-
-  // MARK: 懒加载方法
-
-  lazy var collcetionView: UICollectionView = {
-    let layout = UICollectionViewFlowLayout()
-    layout.scrollDirection = .horizontal
-//        layout.itemSize = CGSize(width: 56, height: 80)
-    layout.minimumLineSpacing = 0
-    layout.minimumInteritemSpacing = 0
-    layout.sectionInset = UIEdgeInsets(top: 0, left: NEMoreView_Section_Padding, bottom: 0, right: NEMoreView_Section_Padding)
-    self.moreFlowLayout = layout
-    let collcetionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collcetionView.backgroundColor = UIColor.ne_backgroundColor
-    collcetionView.translatesAutoresizingMaskIntoConstraints = false
-    collcetionView.dataSource = self
-    collcetionView.delegate = self
-    collcetionView.isUserInteractionEnabled = true
-    collcetionView.isPagingEnabled = true
-    collcetionView.showsHorizontalScrollIndicator = false
-    collcetionView.showsVerticalScrollIndicator = false
-    collcetionView.alwaysBounceHorizontal = true
-    collcetionView.register(
-      NEInputMoreCell.self,
-      forCellWithReuseIdentifier: NEMoreCell_ReuseId
-    )
-    return collcetionView
-  }()
 }
 
 extension NEChatMoreActionView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {

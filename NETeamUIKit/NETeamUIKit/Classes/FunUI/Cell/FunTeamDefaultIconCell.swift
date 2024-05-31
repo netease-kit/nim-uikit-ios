@@ -10,17 +10,17 @@ open class FunTeamDefaultIconCell: NEBaseTeamDefaultIconCell {
   override func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
-      selectBack.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      selectBack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      selectBack.widthAnchor.constraint(equalToConstant: 56.0),
-      selectBack.heightAnchor.constraint(equalToConstant: 56.0),
+      selectBackView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      selectBackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      selectBackView.widthAnchor.constraint(equalToConstant: 56.0),
+      selectBackView.heightAnchor.constraint(equalToConstant: 56.0),
     ])
 
     NSLayoutConstraint.activate([
-      iconImage.centerXAnchor.constraint(equalTo: selectBack.centerXAnchor),
-      iconImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      iconImage.heightAnchor.constraint(equalToConstant: 40),
-      iconImage.widthAnchor.constraint(equalToConstant: 40),
+      iconImageView.centerXAnchor.constraint(equalTo: selectBackView.centerXAnchor),
+      iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      iconImageView.heightAnchor.constraint(equalToConstant: 40),
+      iconImageView.widthAnchor.constraint(equalToConstant: 40),
     ])
   }
 }

@@ -14,6 +14,7 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
     label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.messageTitle"
     return label
   }()
 
@@ -25,6 +26,7 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     label.isUserInteractionEnabled = false
     label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
     label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.messageTitle"
     return label
   }()
 
@@ -37,20 +39,22 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     /// left
     bubbleImageLeft.addSubview(titleLabelLeft)
     titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    titleLabelLeftHeightAnchor?.priority = .fittingSizeLevel
+    titleLabelLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       titleLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
       titleLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: chat_content_margin + funMargin),
       titleLabelLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: chat_content_margin),
-      titleLabelLeftHeightAnchor!,
     ])
 
     bubbleImageLeft.addSubview(contentLabelLeft)
     contentLabelLeftHeightAnchor = contentLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelLeftHeightAnchor?.priority = .fittingSizeLevel
+    contentLabelLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: titleLabelLeft.rightAnchor, constant: -0),
       contentLabelLeft.leftAnchor.constraint(equalTo: titleLabelLeft.leftAnchor, constant: 0),
       contentLabelLeft.topAnchor.constraint(equalTo: titleLabelLeft.bottomAnchor, constant: chat_content_margin),
-      contentLabelLeftHeightAnchor!,
     ])
 
     commonUILeft()
@@ -58,20 +62,22 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     /// right
     bubbleImageRight.addSubview(titleLabelRight)
     titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    titleLabelRightHeightAnchor?.priority = .fittingSizeLevel
+    titleLabelRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       titleLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin - funMargin),
       titleLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: chat_content_margin),
       titleLabelRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: chat_content_margin),
-      titleLabelRightHeightAnchor!,
     ])
 
     bubbleImageRight.addSubview(contentLabelRight)
     contentLabelRightHeightAnchor = contentLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelRightHeightAnchor?.priority = .fittingSizeLevel
+    contentLabelRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: titleLabelRight.rightAnchor, constant: -0),
       contentLabelRight.leftAnchor.constraint(equalTo: titleLabelRight.leftAnchor, constant: 0),
       contentLabelRight.topAnchor.constraint(equalTo: titleLabelRight.bottomAnchor, constant: chat_content_margin),
-      contentLabelRightHeightAnchor!,
     ])
 
     commonUIRight()
@@ -89,17 +95,11 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let titleLabelHeightAnchor = isSend ? titleLabelRightHeightAnchor : titleLabelLeftHeightAnchor
     let contentLabelHeightAnchor = isSend ? contentLabelRightHeightAnchor : contentLabelLeftHeightAnchor
-    let pinLabelTopAnchor = isSend ? pinLabelRightTopAnchor : pinLabelLeftTopAnchor
-    let funPinLabelTopAnchor = isSend ? funPinLabelRightTopAnchor : funPinLabelLeftTopAnchor
 
     if model.replyText == nil || model.replyText!.isEmpty {
       replyView.isHidden = true
-      funPinLabelTopAnchor?.isActive = false
-      pinLabelTopAnchor?.isActive = true
     } else {
       replyView.isHidden = false
-      funPinLabelTopAnchor?.isActive = true
-      pinLabelTopAnchor?.isActive = false
     }
 
     if let m = model as? MessageTextModel {
@@ -109,9 +109,6 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     if let m = model as? MessageRichTextModel {
       titleLabel.attributedText = m.titleAttributeStr
       titleLabelHeightAnchor?.constant = m.titleTextHeight
-      if m.message?.text?.isEmpty == true {
-        titleLabelHeightAnchor?.constant = 26
-      }
     }
   }
 }

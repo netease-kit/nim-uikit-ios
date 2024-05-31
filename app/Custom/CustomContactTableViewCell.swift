@@ -7,26 +7,26 @@ import NEContactUIKit
 
 public class CustomContactTableViewCell: ContactTableViewCell {
   private lazy var onlineView: UIImageView = {
-    let notify = UIImageView()
-    notify.translatesAutoresizingMaskIntoConstraints = false
-    notify.image = UIImage(named: "about_yunxin")
-    notify.isHidden = true
-    return notify
+    let notifyView = UIImageView()
+    notifyView.translatesAutoresizingMaskIntoConstraints = false
+    notifyView.image = UIImage(named: "about_yunxin")
+    notifyView.isHidden = true
+    return notifyView
   }()
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     contentView.addSubview(onlineView)
     NSLayoutConstraint.activate([
-      onlineView.rightAnchor.constraint(equalTo: avatarImage.rightAnchor),
-      onlineView.bottomAnchor.constraint(equalTo: avatarImage.bottomAnchor),
+      onlineView.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
+      onlineView.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
       onlineView.widthAnchor.constraint(equalToConstant: 12),
       onlineView.heightAnchor.constraint(equalToConstant: 12),
     ])
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   // 根据数据模型设置 cell 内容

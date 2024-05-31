@@ -2,15 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIMKit
+import MJRefresh
+import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseValidationMessageViewController: NEBaseContactViewController {
+open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   public let viewModel = ValidationMessageViewModel()
-  public let tableView = UITableView()
-  var tag = "ValidationMessageViewController"
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -26,26 +25,97 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
   }
 
-  // 返回上一级页面
+  override open func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    viewModel.setAddApplicationRead(nil)
+  }
+
+  /// 返回上一级页面
   override open func backToPrevious() {
     super.backToPrevious()
-    viewModel.clearNotiUnreadCount()
+    viewModel.setAddApplicationRead(nil)
   }
 
+  /// 进入后台，清空未读
   func appEnterBackground() {
-    viewModel.clearNotiUnreadCount()
-    loadData()
-  }
-
-  func loadData() {
-    weak var weakSelf = self
-    viewModel.getValidationMessage {
-      NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "✅ getValidationMessage SUCCESS")
-      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.datas.count ?? 0) > 0
-      weakSelf?.tableView.reloadData()
+    viewModel.setAddApplicationRead { [weak self] success, error in
+      if success {
+        self?.loadData()
+      }
     }
   }
 
+  public lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.showsVerticalScrollIndicator = false
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.backgroundColor = .clear
+    tableView.keyboardDismissMode = .onDrag
+
+    tableView.mj_header = MJRefreshNormalHeader(
+      refreshingTarget: self,
+      refreshingAction: #selector(loadData)
+    )
+    return tableView
+  }()
+
+  /// 表格添加底部 loading
+  func addBottomLoadMore() {
+    let footer = MJRefreshAutoFooter(
+      refreshingTarget: self,
+      refreshingAction: #selector(loadMoreData)
+    )
+    footer.triggerAutomaticallyRefreshPercent = -10
+    tableView.mj_footer = footer
+  }
+
+  /// 表格移除底部 loading
+  func removeBottomLoadMore() {
+    tableView.mj_footer?.endRefreshingWithNoMoreData()
+    tableView.mj_footer = nil
+  }
+
+  /// 加载数据
+  func loadData() {
+    viewModel.loadApplicationList(true) { [weak self] finished, error in
+      if let err = error {
+        NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
+      } else {
+        if finished {
+          self?.removeBottomLoadMore()
+        } else {
+          self?.addBottomLoadMore()
+        }
+
+        self?.tableView.mj_header?.endRefreshing()
+        self?.emptyView.isHidden = (self?.viewModel.datas.count ?? 0) > 0
+        self?.tableView.reloadData()
+      }
+    }
+  }
+
+  /// 加载更多
+  func loadMoreData() {
+    viewModel.loadApplicationList(false) { [weak self] finished, error in
+      if let err = error {
+        NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadMoreApplicationList CALLBACK error: \(err.localizedDescription)")
+      } else {
+        if finished {
+          self?.removeBottomLoadMore()
+        } else {
+          self?.addBottomLoadMore()
+        }
+
+        self?.tableView.mj_footer?.endRefreshing()
+        self?.tableView.reloadData()
+      }
+    }
+  }
+
+  /// 控件初始化
   open func setupUI() {
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),
@@ -66,11 +136,7 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(clearMessage))
 
-    tableView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(tableView)
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.separatorStyle = .none
 
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
@@ -79,7 +145,7 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    emptyView.settingContent(content: localizable("no_validation_message"))
+    emptyView.setText(localizable("no_validation_message"))
     view.addSubview(emptyView)
     NSLayoutConstraint.activate([
       emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
@@ -89,17 +155,14 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
     ])
   }
 
+  /// 清空好友申请
   func clearMessage() {
-    viewModel.clearAllNoti {
-      NELog.infoLog(ModuleName + " " + self.tag, desc: "✅ clearAllNoti SUCCESS")
-      tableView.reloadData()
-      emptyView.isHidden = false
-    }
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    viewModel.clearNotification()
   }
 
   open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    viewModel.clearNotiUnreadCount()
-    return true
+    true
   }
 }
 
@@ -120,114 +183,74 @@ extension NEBaseValidationMessageViewController: UITableViewDelegate, UITableVie
 }
 
 extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate {
-  open func changeValidationStatus(notifiModel: NENotification, notiStatus: NEHandleStatus) {
-    var notifiModels = [NENotification]()
-    if let msgList = notifiModel.msgList,
-       msgList.count > 0 {
-      for msg in msgList {
-        notifiModels.append(msg)
-      }
+  /// 处理好友申请
+  /// - Parameters:
+  ///   - notifiModel: 申请模型
+  ///   - notiStatus: 处理状态
+  public func changeValidationStatus(notifiModel: NENotification, notiStatus: NEHandleStatus) {
+    notifiModel.handleStatus = notiStatus
+    notifiModel.unReadCount = 0
+    for msg in notifiModel.msgList ?? [] {
+      msg.handleStatus = notiStatus
     }
 
-    notifiModel.handleStatus = notiStatus
-    notifiModel.imNotification?.handleStatus = notiStatus.rawValue
-    viewModel.clearSingleNotifyUnreadCount(notification: notifiModel.imNotification!)
-    for noti in notifiModels {
-      noti.handleStatus = notiStatus
-      noti.imNotification?.handleStatus = notiStatus.rawValue
-      viewModel.clearSingleNotifyUnreadCount(notification: noti.imNotification!)
+    DispatchQueue.main.async {
+      self.tableView.reloadData()
     }
-    notifiModel.unReadCount = 0
-    loadData()
   }
 
+  /// 同意好友申请
+  /// - Parameter notifiModel: 申请模型
   open func onAccept(_ notifiModel: NENotification) {
     weak var weakSelf = self
-    guard let teamId = notifiModel.targetID, let invitorId = notifiModel.sourceID else {
+    guard let info = notifiModel.v2Notification else {
       return
     }
 
-    if notifiModel.type == .teamInvite {
-      viewModel.acceptInviteWithTeam(teamId, invitorId) { error in
-        NELog.infoLog(
-          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
-          desc: "CALLBACK acceptInviteWithTeam " + (error?.localizedDescription ?? "no error")
-        )
-        if let err = error as? NSError {
-          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK acceptInviteWithTeam failed,error = \(error!.localizedDescription)")
-          if err.code == 807 || err.code == 809 {
-            weakSelf?.showToast(localizable("validate_processed"))
-          } else if err.code == teamNotExistCode {
-            weakSelf?.showToast(localizable("team_not_exist"))
-          } else {
-            weakSelf?.showToast(localizable("failed_operation"))
-          }
-        } else {
-          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
-        }
-      }
-    } else if notifiModel.type == .addFriendRequest {
-      viewModel.agreeRequest(invitorId) { error in
-        NELog.infoLog(
-          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
-          desc: "CALLBACK agreeRequest " + (error?.localizedDescription ?? "no error")
-        )
-        if let err = error {
-          NELog.infoLog(ModuleName + " " + self.tag, desc: "❌CALLBACK agreeRequest failed,error = \(error!)")
+    viewModel.agreeRequest(application: info) { error in
+      if let err = error as? NSError, err.code != friendAlreadyExist {
+        NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        switch err.code {
+        case protocolSendFailed:
+          weakSelf?.showToast(commonLocalizable("network_error"))
+        default:
           weakSelf?.showToast(localizable("failed_operation"))
-        } else {
-          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+        }
+      } else {
+        weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+        weakSelf?.viewModel.setAddApplicationRead(nil)
 
+        if let accid = info.applicantAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
           Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
-                                                              "sessionId": invitorId,
-                                                              "sessionType": NIMSessionType.P2P])
+                                                              "conversationId": conversationId as Any])
         }
       }
     }
   }
 
+  /// 拒绝好友申请
+  /// - Parameter notifiModel: 申请模型
   open func onRefuse(_ notifiModel: NENotification) {
     weak var weakSelf = self
-    guard let teamId = notifiModel.targetID, let invitorId = notifiModel.sourceID else {
+    guard let info = notifiModel.v2Notification else {
       return
     }
 
-    if notifiModel.type == .teamInvite {
-      weakSelf?.viewModel.rejectInviteWithTeam(teamId, invitorId) { error in
-        NELog.infoLog(
-          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
-          desc: "CALLBACK rejectInviteWithTeam " + (error?.localizedDescription ?? "no error")
-        )
-        if let err = error as? NSError {
-          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK rejectInviteWithTeam failed,error = \(error!.localizedDescription)")
-          if err.code == 807 || err.code == 809 {
-            weakSelf?.showToast(localizable("validate_processed"))
-          } else if err.code == teamNotExistCode {
-            weakSelf?.showToast(localizable("team_not_exist"))
-          } else {
-            weakSelf?.showToast(localizable("failed_operation"))
-          }
-        } else {
-          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
+    viewModel.refuseRequest(application: info) { error in
+      if let err = error as? NSError {
+        NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        switch err.code {
+        case protocolSendFailed:
+          weakSelf?.showToast(commonLocalizable("network_error"))
+        case friendAlreadyExist:
+          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+          weakSelf?.showToast(localizable("validate_processed"))
+        default:
+          weakSelf?.showToast(localizable("failed_operation"))
         }
-      }
-    } else if notifiModel.type == .addFriendRequest {
-      viewModel.refuseRequest(invitorId) { error in
-        NELog.infoLog(
-          ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"),
-          desc: "CALLBACK refuseRequest " + (error?.localizedDescription ?? "no error")
-        )
-        if let err = error {
-          NELog.infoLog(ModuleName + " " + (weakSelf?.tag ?? "ValidationMessageViewController"), desc: "❌CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
-          if err.code == 509 {
-            weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
-            weakSelf?.showToast(localizable("validate_processed"))
-          } else {
-            weakSelf?.showToast(localizable("failed_operation"))
-          }
-        } else {
-          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
-        }
+      } else {
+        weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
+        weakSelf?.viewModel.setAddApplicationRead(nil)
       }
     }
   }

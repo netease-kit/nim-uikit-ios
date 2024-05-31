@@ -21,15 +21,33 @@ protocol PersonInfoViewModelDelegate: AnyObject {
 @objcMembers
 public class PersonInfoViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
-  public let friendProvider = FriendProvider.shared
-  public let userProvider = UserInfoProvider.shared
 
-  private var userInfo: NEKitUser?
+  let contactRepo = ContactRepo.shared
+
+  var userInfo: NEUserWithFriend?
   weak var delegate: PersonInfoViewModelDelegate?
 
-  func getData() {
+  func getData(_ completion: @escaping () -> Void) {
     sectionData.removeAll()
-    userInfo = userProvider.getUserInfo(userId: IMKitClient.instance.imAccid())
+
+    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+      userInfo = userFriend
+      sectionData.append(getFirstSection())
+      sectionData.append(getSecondSection())
+      completion()
+    } else {
+      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { [weak self] userFriend, error in
+        guard let self = self else { return }
+        self.userInfo = userFriend?.first
+        self.sectionData.append(self.getFirstSection())
+        self.sectionData.append(self.getSecondSection())
+        completion()
+      }
+    }
+  }
+
+  func refreshData() {
+    sectionData.removeAll()
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())
   }
@@ -45,8 +63,9 @@ public class PersonInfoViewModel: NSObject {
     let headImageItem = SettingCellModel()
     headImageItem.type = SettingCellType.SettingHeaderCell.rawValue
     headImageItem.cellName = NSLocalizedString("headImage", comment: "")
-    headImageItem.headerUrl = userInfo?.userInfo?.avatarUrl
+    headImageItem.headerUrl = userInfo?.user?.avatar
     headImageItem.defaultHeadData = userInfo?.showName()
+    headImageItem.subTitle = userInfo?.user?.accountId
     headImageItem.rowHeight = 64.0
     headImageItem.cellClick = {
       weakSelf?.delegate?.didClickHeadImage()
@@ -66,11 +85,11 @@ public class PersonInfoViewModel: NSObject {
     let accountItem = SettingCellModel()
     accountItem.type = SettingCellType.SettingSubtitleCustomCell.rawValue
     accountItem.cellName = NSLocalizedString("account", comment: "")
-    accountItem.subTitle = mineInfo.userId
+    accountItem.subTitle = mineInfo.user?.accountId
     accountItem.rowHeight = 46.0
     accountItem.rightCustomViewIcon = "copy_icon"
     accountItem.customViewClick = {
-      weakSelf?.delegate?.didCopyAccount(account: mineInfo.userId ?? "")
+      weakSelf?.delegate?.didCopyAccount(account: mineInfo.user?.accountId ?? "")
     }
 
     // 性别
@@ -78,10 +97,10 @@ public class PersonInfoViewModel: NSObject {
     sexItem.type = SettingCellType.SettingSubtitleCell.rawValue
     sexItem.cellName = NSLocalizedString("gender", comment: "")
     var sex = NSLocalizedString("unknown", comment: "")
-    switch mineInfo.userInfo?.gender {
-    case .male:
+    switch mineInfo.user?.gender {
+    case 1:
       sex = NSLocalizedString("male", comment: "")
-    case .female:
+    case 2:
       sex = NSLocalizedString("female", comment: "")
     default:
       sex = NSLocalizedString("unknown", comment: "")
@@ -96,16 +115,17 @@ public class PersonInfoViewModel: NSObject {
     let birthdayItem = SettingCellModel()
     birthdayItem.type = SettingCellType.SettingSubtitleCell.rawValue
     birthdayItem.cellName = NSLocalizedString("birthday", comment: "")
-    birthdayItem.subTitle = mineInfo.userInfo?.birth
+    birthdayItem.subTitle = mineInfo.user?.birthday
     birthdayItem.rowHeight = 46.0
     birthdayItem.cellClick = {
-      weakSelf?.delegate?.didClickBirthday(birth: mineInfo.userInfo?.birth ?? "")
+      weakSelf?.delegate?.didClickBirthday(birth: mineInfo.user?.birthday ?? "")
     }
+
     // 手机
     let telephoneItem = SettingCellModel()
     telephoneItem.type = SettingCellType.SettingSubtitleCell.rawValue
     telephoneItem.cellName = NSLocalizedString("phone", comment: "")
-    telephoneItem.subTitle = mineInfo.userInfo?.mobile
+    telephoneItem.subTitle = mineInfo.user?.mobile
     telephoneItem.rowHeight = 46.0
     telephoneItem.cellClick = {
       weakSelf?.delegate?.didClickMobile(mobile: telephoneItem.subTitle ?? "")
@@ -115,11 +135,12 @@ public class PersonInfoViewModel: NSObject {
     let emailItem = SettingCellModel()
     emailItem.type = SettingCellType.SettingSubtitleCell.rawValue
     emailItem.cellName = NSLocalizedString("email", comment: "")
-    emailItem.subTitle = mineInfo.userInfo?.email
+    emailItem.subTitle = mineInfo.user?.email
     emailItem.rowHeight = 46.0
     emailItem.cellClick = {
       weakSelf?.delegate?.didClickEmail(email: emailItem.subTitle ?? "")
     }
+
     model.cellModels.append(contentsOf: [
       headImageItem,
       nickNameItem,
@@ -142,7 +163,7 @@ public class PersonInfoViewModel: NSObject {
     let signItem = SettingCellModel()
     signItem.type = SettingCellType.SettingSubtitleCell.rawValue
     signItem.cellName = NSLocalizedString("individuality_sign", comment: "")
-    signItem.subTitle = mineInfo.userInfo?.sign
+    signItem.subTitle = mineInfo.user?.sign
     signItem.rowHeight = 46.0
     signItem.titleWidth = 64
     weak var weakSelf = self
@@ -154,81 +175,86 @@ public class PersonInfoViewModel: NSObject {
     return model
   }
 
-  func updateAvatar(avatar: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.avatar.rawValue): avatar]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户头像
+  /// - Parameter avatar: 头像地址
+  /// - Parameter completion: 更新结果回调
+  func updateSelfAvatar(_ avatar: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.avatar = avatar
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateSex(sex: NIMUserGender, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue =
-      [NSNumber(value: NIMUserInfoUpdateTag.gender.rawValue): NSNumber(value: sex.rawValue)]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户性别
+  /// - Parameter gender: 用户性别
+  /// - Parameter completion: 更新结果回调
+  func updateSelfSex(_ gender: V2NIMGender, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.gender = gender
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateBirthday(birthDay: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.birth.rawValue): birthDay]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户生日
+  /// - Parameter birthDay: 生日
+  /// - Parameter completion: 更新结果回调
+  func updateSelfBirthday(_ birthDay: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.birthday = birthDay
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateNickName(name: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.nick.rawValue): name]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户昵称
+  /// - Parameter nickName: 昵称
+  /// - Parameter completion: 更新结果回调
+  func updateSelfNickName(_ nickName: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.name = nickName
+
+    // 如果昵称为空(不设置昵称)，则使用账号作为昵称
+    if nickName.isEmpty {
+      parameter.name = IMKitClient.instance.account()
+    }
+
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateMobile(mobile: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.mobile.rawValue): mobile]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户电话号码
+  /// - Parameter mobile: 电话号码
+  /// - Parameter completion: 更新结果回调
+  func updateSelfMobile(_ mobile: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.mobile = mobile
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateEmail(email: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.email.rawValue): email]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户的邮箱
+  /// - Parameter email: 邮箱
+  /// - Parameter completion: 完成回调
+  func updateSelfEmail(_ email: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.email = email
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 
-  func updateSign(sign: String, _ completion: @escaping (NSError?) -> Void) {
-    let changeValue = [NSNumber(value: NIMUserInfoUpdateTag.sign.rawValue): sign]
-    userProvider.updateMyUserInfo(values: changeValue) { error in
-      if error == nil {
-        completion(nil)
-      } else {
-        completion(error)
-      }
+  /// 更新当前用户的签名
+  /// - Parameter sign: 签名
+  /// - Parameter completion: 完成回调
+  func updateSelfSign(_ sign: String, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIMUserUpdateParams()
+    parameter.sign = sign
+    contactRepo.updateSelfUserProfile(parameter) { error in
+      completion(error)
     }
   }
 }

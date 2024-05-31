@@ -7,15 +7,19 @@ import UIKit
 
 @objcMembers
 open class NormalChatViewController: ChatViewController {
-  override public init(session: NIMSession) {
-    super.init(session: session)
+  override public init(conversationId: String) {
+    super.init(conversationId: conversationId)
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: false)
+
+    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
+    topMessageView.layer.borderColor = UIColor(hexString: "#E8EAED").cgColor
+    topMessageView.layer.borderWidth = 1
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func viewDidLoad() {
@@ -28,18 +32,21 @@ open class NormalChatViewController: ChatViewController {
     return chat
   }
 
+  /// 获取转发确认弹窗 - 协同版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     ForwardAlertViewController()
   }
 
+  /// 获取合并转发详情页视图控制器 - 协同版
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
                                                    _ messageAttachmentFilePath: String,
                                                    _ messageAttachmentMD5: String?) -> MultiForwardViewController {
     NormalMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
 
+  /// 获取@列表视图控制器 - 协同版
   override func getUserSelectVC() -> NEBaseSelectUserViewController {
-    SelectUserViewController(sessionId: viewmodel.session.sessionId, showSelf: false)
+    SelectUserViewController(sessionId: viewModel.sessionId, showSelf: false)
   }
 
   open func getMessageModel(model: MessageModel) {
@@ -72,7 +79,8 @@ open class NormalChatViewController: ChatViewController {
     } else {
       normalInputHeight = 150
     }
-    bottomViewTopAnchor?.constant = -normalInputHeight
+
+    layoutInputViewWithAnimation(offset: 0)
     checkAndRestoreReplyView()
   }
 
@@ -87,7 +95,7 @@ open class NormalChatViewController: ChatViewController {
 
   // 切换到单行输入框如果有回复显示回复视图
   func checkAndRestoreReplyView() {
-    if viewmodel.isReplying == true, replyView.superview == nil {
+    if viewModel.isReplying == true, replyView.superview == nil {
       view.addSubview(replyView)
       replyView.closeButton.addTarget(self, action: #selector(closeReply), for: .touchUpInside)
       replyView.translatesAutoresizingMaskIntoConstraints = false

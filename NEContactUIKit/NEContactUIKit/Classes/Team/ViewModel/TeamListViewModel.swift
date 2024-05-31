@@ -4,52 +4,57 @@
 
 import Foundation
 import NEChatKit
-import NECoreIMKit
+import NECoreIM2Kit
 import NECoreKit
 
 @objcMembers
-open class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
-  var contactRepo = ContactRepo.shared
+open class TeamListViewModel: NSObject, NETeamListener {
+  var teamRepo = TeamRepo.shared
   var refresh: () -> Void = {}
   public var teamList = [NETeam]()
-  private let className = "TeamListViewModel"
 
   override public init() {
     super.init()
-    contactRepo.addTeamDelegate(delegate: self)
+    teamRepo.addTeamListener(self)
   }
 
   deinit {
-    contactRepo.removeTeamDelegate(delegate: self)
+    teamRepo.removeTeamListener(self)
   }
 
-  func getTeamList() -> [NETeam]? {
-    NELog.infoLog(ModuleName + " " + className, desc: #function)
-    teamList = contactRepo.getTeamList()
-    teamList.sort(by: { team1, team2 in
-      (team1.createTime ?? 0) > (team2.createTime ?? 0)
-    })
-    return teamList
+  func getTeamList(_ completion: @escaping ([NETeam]?, Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    teamRepo.getTeamList { [weak self] teams, error in
+      if let error = error {
+        NEALog.errorLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + ", error: " + error.localizedDescription)
+      } else if let teams = teams {
+        self?.teamList = teams
+        self?.teamList.sort(by: { team1, team2 in
+          (team1.createTime ?? 0) > (team2.createTime ?? 0)
+        })
+        completion(teams, nil)
+      }
+    }
   }
 
   // MARK: NIMTeamManagerDelegate
 
-  public func onTeamAdded(_ team: NIMTeam) {
-    teamList.insert(NETeam(teamInfo: team), at: 0)
+  public func onTeamAdded(_ team: V2NIMTeam) {
+    teamList.insert(NETeam(v2teamInfo: team), at: 0)
     refresh()
   }
 
-  public func onTeamUpdated(_ team: NIMTeam) {
+  public func onTeamUpdated(_ team: V2NIMTeam) {
     for (i, t) in teamList.enumerated() {
       if t.teamId == team.teamId {
-        teamList[i] = NETeam(teamInfo: team)
+        teamList[i] = NETeam(v2teamInfo: team)
         refresh()
         break
       }
     }
   }
 
-  public func onTeamRemoved(_ team: NIMTeam) {
+  public func onTeamRemoved(_ team: V2NIMTeam) {
     for (i, t) in teamList.enumerated() {
       if t.teamId == team.teamId {
         teamList.remove(at: i)
@@ -57,5 +62,27 @@ open class TeamListViewModel: NSObject, NIMTeamManagerDelegate {
         break
       }
     }
+  }
+
+  // MARK: - V2NIMTeamListener
+
+  public func onTeamCreated(_ team: V2NIMTeam) {
+    onTeamAdded(team)
+  }
+
+  public func onTeamJoined(_ team: V2NIMTeam) {
+    onTeamAdded(team)
+  }
+
+  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+    onTeamUpdated(team)
+  }
+
+  public func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {
+    onTeamRemoved(team)
+  }
+
+  public func onTeamDismissed(_ team: V2NIMTeam) {
+    onTeamRemoved(team)
   }
 }

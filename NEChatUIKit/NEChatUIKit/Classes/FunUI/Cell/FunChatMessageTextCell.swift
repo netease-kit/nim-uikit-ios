@@ -12,8 +12,9 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    label.font = messageTextFont
     label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.messageText"
     return label
   }()
 
@@ -23,8 +24,9 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isEnabled = false
     label.numberOfLines = 0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    label.font = messageTextFont
     label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.messageText"
     return label
   }()
 
@@ -34,7 +36,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -45,7 +47,6 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       contentLabelLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: chat_content_margin),
       contentLabelLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: -chat_content_margin),
     ])
-    contentView.updateLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .left, constant: 14 + funMargin)
 
     bubbleImageRight.addSubview(contentLabelRight)
     NSLayoutConstraint.activate([
@@ -54,7 +55,6 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       contentLabelRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: chat_content_margin),
       contentLabelRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: -chat_content_margin),
     ])
-    contentView.updateLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .right, constant: -funMargin)
   }
 
   override open func showLeftOrRight(showRight: Bool) {
@@ -70,6 +70,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
     if let m = model as? MessageTextModel {
       contentLabel.attributedText = m.attributeStr
+      contentLabel.accessibilityValue = m.message?.text
     }
     bubbleW?.constant += funMargin
   }

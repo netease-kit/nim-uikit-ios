@@ -12,6 +12,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     replyLabelLeft.textColor = .ne_greyText
     replyLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     replyLabelLeft.font = UIFont.systemFont(ofSize: 13)
+    replyLabelLeft.accessibilityIdentifier = "id.messageReply"
     return replyLabelLeft
   }()
 
@@ -32,6 +33,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     replyLabelRight.textColor = .ne_greyText
     replyLabelRight.translatesAutoresizingMaskIntoConstraints = false
     replyLabelRight.font = UIFont.systemFont(ofSize: 13)
+    replyLabelRight.accessibilityIdentifier = "id.messageReply"
     return replyLabelRight
   }()
 
@@ -44,9 +46,6 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
     return replyTextView
   }()
 
-  public var funPinLabelLeftTopAnchor: NSLayoutConstraint? // 左侧标记文案顶部布局约束
-  public var funPinLabelRightTopAnchor: NSLayoutConstraint? // 右侧标记文案顶部布局约束
-
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -54,7 +53,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func commonUI() {
@@ -71,11 +70,6 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
       replyTextViewLeft.heightAnchor.constraint(equalToConstant: 44),
       replyTextViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
-
-    contentView.updateLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .left, constant: 14 + funMargin)
-    pinLabelLeftTopAnchor?.isActive = false
-    funPinLabelLeftTopAnchor = pinLabelLeft.topAnchor.constraint(equalTo: replyTextViewLeft.bottomAnchor, constant: 4)
-    funPinLabelLeftTopAnchor?.isActive = true
 
     replyTextViewLeft.addSubview(replyLabelLeft)
     NSLayoutConstraint.activate([
@@ -95,11 +89,6 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
       replyTextViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
 
-    contentView.updateLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .right, constant: -funMargin)
-    pinLabelRightTopAnchor?.isActive = false
-    funPinLabelRightTopAnchor = pinLabelRight.topAnchor.constraint(equalTo: replyTextViewRight.bottomAnchor, constant: 4)
-    funPinLabelRightTopAnchor?.isActive = true
-
     replyTextViewRight.addSubview(replyLabelRight)
     NSLayoutConstraint.activate([
       replyLabelRight.topAnchor.constraint(equalTo: replyTextViewRight.topAnchor, constant: 4),
@@ -112,7 +101,9 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
   override open func showLeftOrRight(showRight: Bool) {
     super.showLeftOrRight(showRight: showRight)
     replyTextViewLeft.isHidden = showRight
+    replyLabelLeft.isHidden = showRight
     replyTextViewRight.isHidden = !showRight
+    replyLabelRight.isHidden = !showRight
   }
 
   open func addReplyGesture() {
@@ -126,8 +117,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
   }
 
   open func tapReplyView(tap: UITapGestureRecognizer) {
-    print(#function)
-    delegate?.didTapMessageView(self, contentModel)
+    delegate?.didTapMessageView(self, contentModel, contentModel?.replyedModel)
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
@@ -139,6 +129,7 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
       replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
                                                               font: font,
                                                               color: replyLabel.textColor)
+      replyLabel.accessibilityValue = text
     }
   }
 }

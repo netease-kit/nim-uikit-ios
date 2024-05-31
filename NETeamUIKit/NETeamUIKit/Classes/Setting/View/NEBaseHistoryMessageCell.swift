@@ -1,64 +1,20 @@
-
-import NIMSDK
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
+
+import NECommonKit
+import NIMSDK
 import UIKit
 
 @objcMembers
 open class NEBaseHistoryMessageCell: UITableViewCell {
+  /// 搜索文案(用户匹配高亮)
   public var searchText: String?
-  public var rangeTextColor = UIColor.ne_blueText
+  /// 高亮颜色
+  public var rangeTextColor = UIColor.ne_normalTheme
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupSubviews()
-  }
-
-  public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  func setupSubviews() {
-    selectionStyle = .none
-    contentView.addSubview(headImge)
-    contentView.addSubview(title)
-    contentView.addSubview(subTitle)
-    contentView.addSubview(bottomLine)
-    contentView.addSubview(timeLabel)
-  }
-
-  func configData(message: HistoryMessageModel?) {
-    guard let resultText = message?.content else { return }
-
-    guard let searchStr = searchText else { return }
-
-    let attributedStr = NSMutableAttributedString(string: resultText)
-    // range 表示从索引几开始取几个字符
-    let range = attributedStr.mutableString.range(of: searchStr)
-    attributedStr.addAttribute(
-      .foregroundColor,
-      value: rangeTextColor,
-      range: range
-    )
-    subTitle.attributedText = attributedStr
-
-    title.text = message?.name
-    timeLabel.text = message?.time
-
-    if let imageName = message?.avatar, !imageName.isEmpty {
-      headImge.setTitle("")
-      headImge.sd_setImage(with: URL(string: imageName), completed: nil)
-    } else {
-      headImge.setTitle(message?.name ?? "")
-      headImge.sd_setImage(with: nil, completed: nil)
-      headImge.backgroundColor = UIColor.colorWithString(string: message?.imMessage?.from)
-    }
-  }
-
-  // MARK: lazy Method
-
-  public lazy var headImge: NEUserHeaderView = {
+  /// 用户头像视图
+  public lazy var headView: NEUserHeaderView = {
     let headView = NEUserHeaderView(frame: .zero)
     headView.titleLabel.textColor = .white
     headView.titleLabel.font = NEConstant.defaultTextFont(14)
@@ -68,24 +24,29 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     return headView
   }()
 
-  public lazy var title: UILabel = {
+  /// 用户昵称
+  public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.font = NEConstant.defaultTextFont(14)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.name"
     return label
   }()
 
-  public lazy var subTitle: UILabel = {
+  /// 消息内容
+  public lazy var subTitleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_lightText
     label.font = NEConstant.defaultTextFont(12)
     label.textAlignment = .left
+    label.accessibilityIdentifier = "id.message"
     return label
   }()
 
+  /// 分割线
   public lazy var bottomLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -93,12 +54,102 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     return view
   }()
 
+  /// 消息时间
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = NEConstant.hexRGB(0xCCCCCC)
     label.font = NEConstant.defaultTextFont(12)
     label.textAlignment = .right
+    label.accessibilityIdentifier = "id.time"
     return label
   }()
+
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    setupSubviews()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  open func setupSubviews() {
+    selectionStyle = .none
+    contentView.addSubview(headView)
+    contentView.addSubview(titleLabel)
+    contentView.addSubview(subTitleLabel)
+    contentView.addSubview(bottomLine)
+    contentView.addSubview(timeLabel)
+  }
+
+  open func configData(message: HistoryMessageModel?) {
+    if message?.fullName?.count ?? 0 <= 0 {
+      message?.fullName = message?.imMessage?.senderId
+    }
+    titleLabel.text = message?.fullName
+    timeLabel.text = message?.time
+
+    if let imageName = message?.avatar, !imageName.isEmpty {
+      headView.setTitle("")
+      headView.sd_setImage(with: URL(string: imageName), completed: nil)
+    } else {
+      headView.setTitle(message?.shortName ?? "")
+      headView.sd_setImage(with: nil, completed: nil)
+      headView.backgroundColor = UIColor.colorWithString(string: message?.imMessage?.senderId)
+    }
+  }
+
+  /// 根据label宽度显示关键字段
+  /// - Parameter label: 文本控件
+  /// - Parameter maxWidth: 最大宽度
+  /// - Parameter importantText: 关键字段
+  /// - Parameter fullText: 全文本
+  public func truncateTextForLabel(_ label: UILabel, _ maxWidth: CGFloat, _ importantText: String, _ fullText: String) {
+    guard let font = label.font else {
+      return
+    }
+
+    var truncatedText = ""
+    var displayText = fullText
+
+    let importantTextWidth = importantText.width(withConstrainedHeight: label.frame.size.height, font: font)
+    let fullTextWidth = fullText.width(withConstrainedHeight: label.frame.size.height, font: font)
+
+    if fullTextWidth > maxWidth {
+      let ellipsis = "..."
+      var accumulatedWidth: CGFloat = 0
+
+      for (_, char) in fullText.enumerated() {
+        let charWidth = String(char).width(withConstrainedHeight: label.frame.size.height, font: font)
+        if accumulatedWidth + charWidth + importantTextWidth + ellipsis.width(withConstrainedHeight: label.frame.size.height, font: font) <= maxWidth {
+          truncatedText.append(char)
+          accumulatedWidth += charWidth
+        } else {
+          break
+        }
+      }
+
+      displayText = truncatedText + ellipsis + importantText
+    }
+
+    let attributedStr = NSMutableAttributedString(string: displayText)
+
+    do {
+      let regex = try NSRegularExpression(pattern: importantText, options: [])
+      let matches = regex.matches(in: displayText, options: [], range: NSRange(location: 0, length: displayText.count))
+
+      for match in matches {
+        let matchRange = match.range
+        attributedStr.addAttribute(
+          .foregroundColor,
+          value: rangeTextColor,
+          range: matchRange
+        )
+      }
+    } catch {
+      print("Regex error: \(error.localizedDescription)")
+    }
+    label.attributedText = attributedStr
+  }
 }

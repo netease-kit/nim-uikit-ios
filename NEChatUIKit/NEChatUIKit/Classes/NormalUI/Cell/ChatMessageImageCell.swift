@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NIMSDK
+import SDWebImage
 import UIKit
 
 @objcMembers
@@ -16,7 +17,7 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -79,18 +80,19 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
-    if let m = model as? MessageImageModel, let imageUrl = m.imageUrl {
+    if let m = model as? MessageImageModel, let imageUrl = m.urlString {
+      var options: SDWebImageOptions = [.retryFailed]
+      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment, imageObject.ext?.lowercased() != ".gif" {
+        options = [.retryFailed, .progressiveLoad]
+      }
+
+      let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 1000, height: 1000)]
       if imageUrl.hasPrefix("http") {
-        contentImageView.sd_setImage(
-          with: URL(string: imageUrl),
-          placeholderImage: nil,
-          options: .retryFailed,
-          progress: nil,
-          completed: nil
-        )
+        let url = URL(string: imageUrl)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
       } else {
         let url = URL(fileURLWithPath: imageUrl)
-        contentImageView.sd_setImage(with: url)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
       }
     } else {
       contentImageView.image = nil

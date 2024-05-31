@@ -28,7 +28,7 @@ public let chat_min_h: CGFloat = 40.0
 public let chat_reply_height: CGFloat = 16.0
 
 // 气泡最大宽度
-public let chat_content_maxW: CGFloat = (kScreenWidth - 136)
+public let chat_content_maxW: CGFloat = (kScreenWidth - 156)
 
 // 文本内容最大宽度
 public let chat_text_maxW: CGFloat = chat_content_maxW - 2 * chat_content_margin

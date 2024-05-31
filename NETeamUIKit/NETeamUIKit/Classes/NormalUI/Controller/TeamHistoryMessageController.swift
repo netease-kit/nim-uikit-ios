@@ -8,15 +8,15 @@ import UIKit
 
 @objcMembers
 open class TeamHistoryMessageController: NEBaseTeamHistoryMessageController {
-  override public init(session: NIMSession?) {
-    super.init(session: session)
+  override public init(teamId: String?) {
+    super.init(teamId: teamId)
     tag = "TeamHistoryMessageController"
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override open func setupSubviews() {
@@ -49,7 +49,7 @@ open class TeamHistoryMessageController: NEBaseTeamHistoryMessageController {
       withIdentifier: "\(NSStringFromClass(HistoryMessageCell.self))",
       for: indexPath
     ) as! NEBaseHistoryMessageCell
-    let cellModel = viewmodel.searchResultInfos?[indexPath.row]
+    let cellModel = viewModel.searchResultInfos?[indexPath.row]
     cell.searchText = searchStr
     cell.configData(message: cellModel)
     return cell

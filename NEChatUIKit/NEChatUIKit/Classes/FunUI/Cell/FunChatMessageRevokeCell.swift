@@ -17,7 +17,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
   }
 
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   open func commonUI() {
@@ -31,6 +31,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     revokeLabelLeft.textAlignment = .center
     revokeLabelLeft.lineBreakMode = .byTruncatingMiddle
     revokeLabelLeft.font = UIFont.systemFont(ofSize: 14.0)
+    revokeLabelLeft.accessibilityIdentifier = "id.messageText"
     contentView.addSubview(revokeLabelLeft)
     NSLayoutConstraint.activate([
       revokeLabelLeft.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
@@ -45,6 +46,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     revokeLabelRight.textColor = UIColor.ne_greyText
     revokeLabelRight.textAlignment = .center
     revokeLabelRight.font = UIFont.systemFont(ofSize: 14.0)
+    revokeLabelRight.accessibilityIdentifier = "id.messageText"
     contentView.addSubview(revokeLabelRight)
     revokeLabelRightXAnchor = revokeLabelRight.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0)
     revokeLabelRightXAnchor?.isActive = true
@@ -56,7 +58,8 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
 
     reeditButton.translatesAutoresizingMaskIntoConstraints = false
     reeditButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-    reeditButton.setTitleColor(UIColor.ne_blueText, for: .normal)
+    reeditButton.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    reeditButton.accessibilityIdentifier = "id.reeditButton"
 
     contentView.addSubview(reeditButton)
     NSLayoutConstraint.activate([
@@ -83,22 +86,23 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     pinLabelRight.isHidden = true
     activityView.isHidden = true
     readView.isHidden = true
-    seletedBtn.isHidden = true
+    selectedButton.isHidden = true
 
     revokeLabelLeft.isHidden = showRight
     revokeLabelRight.isHidden = !showRight
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
-    if let time = model.message?.timestamp {
+    let isSend = IMKitClient.instance.isMe(model.message?.senderId)
+    let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
+
+    if let time = model.message?.createTime {
       let date = Date()
       let currentTime = date.timeIntervalSince1970
       if currentTime - time >= 60 * 2 {
         model.timeOut = true
       }
     }
-
-    let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
 
     model.contentSize = CGSize(width: kScreenWidth, height: 0)
     super.setModel(model, isSend)
@@ -111,7 +115,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
       revokeLabel.text = (model.fullName ?? "") + " " + chatLocalizable("withdrew_message")
     }
 
-    if isSend, model.isRevokedText == true {
+    if isSend, model.isReedit == true {
       if model.timeOut == true {
         reeditButton.isHidden = true
         revokeLabelRightXAnchor?.constant = 0
@@ -127,7 +131,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
   }
 
   func reeditEvent(button: UIButton) {
-    print(#function)
     delegate?.didTapReeditButton(self, contentModel)
   }
 }

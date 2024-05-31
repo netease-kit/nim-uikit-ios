@@ -7,7 +7,7 @@ import NECommonKit
 
 extension UIColor {
   static let funConversationPopViewBg = UIColor(hexString: "#4C4C4C")
-  static let funConversationThemeColor = UIColor(hexString: "#58BE6B")
+  static let funConversationThemeColor = UIColor.ne_funTheme
   static let funConversationBackgroundColor = UIColor(hexString: "#EDEDED")
   static let funConversationLineBorderColor = UIColor(hexString: "#E5E5E5")
   static let funConversationListLineBorderColor = UIColor(hexString: "#D8D8D8")
