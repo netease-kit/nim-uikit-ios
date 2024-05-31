@@ -6,7 +6,7 @@ import Foundation
 import NECommonKit
 
 @objcMembers
-open class TextViewController: ChatBaseViewController {
+open class TextViewController: NEChatBaseViewController {
   let leftRightMargin: CGFloat = 20
   var contentMaxWidth: CGFloat = 0
   let titleFont = UIFont.systemFont(ofSize: 24, weight: .semibold)
@@ -65,7 +65,7 @@ open class TextViewController: ChatBaseViewController {
   var contentLabelTopAnchor: NSLayoutConstraint?
   var contentLabelLeftAnchor: NSLayoutConstraint?
 
-  init(title: String?, body: String?) {
+  init(title: String?, body: NSAttributedString?) {
     super.init(nibName: nil, bundle: nil)
     contentMaxWidth = kScreenWidth - leftRightMargin * 2
     if let title = title {
@@ -75,9 +75,8 @@ open class TextViewController: ChatBaseViewController {
     }
 
     if let body = body {
-      bodyLabel.copyString = body
-      let bodyAtt = NEEmotionTool.getAttWithStr(str: body, font: bodyFont, CGPoint(x: 0, y: -3))
-      bodyLabel.attributedText = bodyAtt
+      bodyLabel.copyString = body.string
+      bodyLabel.attributedText = body
     }
   }
 
@@ -133,26 +132,21 @@ open class TextViewController: ChatBaseViewController {
 
   // textView 垂直居中
   func contentSizeToFit() {
-    var label = bodyLabel
-    if let titleLength = titleLabel.attributedText?.length {
-      if let bodyLength = bodyLabel.attributedText?.length {
-        label = titleLength > bodyLength ? titleLabel : bodyLabel
-      } else {
-        label = titleLabel
-      }
-    }
+    let titleSize = NSAttributedString.getRealSize(titleLabel.attributedText, titleFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
+    let bodySize = NSAttributedString.getRealSize(bodyLabel.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
 
-    let textSize = NSAttributedString.getRealSize(label.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
+    let textHeight = titleSize.height + bodySize.height
     let textViewHeight = kScreenHeight - kNavigationHeight - KStatusBarHeight
-    if textSize.height <= textViewHeight {
-      let offsetY = (textViewHeight - textSize.height) / 2
+    if textHeight <= textViewHeight {
+      let offsetY = (textViewHeight - textHeight) / 2
       contentLabelTopAnchor?.constant = offsetY
     }
 
-    if textSize.width <= contentMaxWidth {
-      let offsetX = (kScreenWidth - textSize.width) / 2
+    let textWidth = max(titleSize.width, bodySize.width)
+    if textWidth <= contentMaxWidth {
+      let offsetX = (kScreenWidth - textWidth) / 2
       contentLabelLeftAnchor?.constant = offsetX
     }
-    scrollView.contentSize = textSize
+    scrollView.contentSize = CGSize(width: textWidth, height: textHeight)
   }
 }

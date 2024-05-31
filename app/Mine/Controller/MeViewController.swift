@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEChatUIKit
 import NECommonUIKit
 import NECoreIM2Kit
 import NECoreKit
@@ -12,7 +13,7 @@ import UIKit
 import YXLogin
 
 class MeViewController: UIViewController, UIGestureRecognizerDelegate {
-  private let mineData = [
+  private var mineData = [
     [NSLocalizedString("setting", comment: ""): "mine_setting"],
     [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
   ]
@@ -86,6 +87,9 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     super.viewDidLoad()
     view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
     setupSubviews()
+    if IMKitConfigCenter.shared.collectionEnable {
+      mineData.insert([NSLocalizedString("mine_collection", comment: ""): "mine_collection"], at: 1)
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -193,9 +197,9 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
 
   func setupUserInfo(_ userFriend: NEUserWithFriend?) {
     idLabel.text = "\(NSLocalizedString("account", comment: "")):\(userFriend?.user?.accountId ?? "")"
-    nameLabel.text = userFriend?.showName(false)
+    nameLabel.text = userFriend?.showName()
     header.configHeadData(headUrl: userFriend?.user?.avatar,
-                          name: userFriend?.showName(false) ?? "",
+                          name: userFriend?.showName() ?? "",
                           uid: userFriend?.user?.accountId ?? "")
   }
 
@@ -203,8 +207,8 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
       setupUserInfo(userFriend)
     } else {
-      ContactRepo.shared.getMyUserInfo { [weak self] userFriend in
-        self?.setupUserInfo(userFriend)
+      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { [weak self] users, error in
+        self?.setupUserInfo(users?.first)
       }
     }
   }
@@ -229,23 +233,31 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if indexPath.row == 0 {
-//
-//        }else if indexPath.row == 1{
-//            let ctrl = IntroduceBrandViewController()
-//            navigationController?.pushViewController(ctrl, animated: true)
-//        }else if indexPath.row == 2{
-//            let ctrl = MineSettingViewController()
-//            navigationController?.pushViewController(ctrl, animated: true)
-//        }
-
-    if indexPath.row == 0 {
-      let ctrl = MineSettingViewController()
-      navigationController?.pushViewController(ctrl, animated: true)
-    } else if indexPath.row == 1 {
-      let ctrl = IntroduceBrandViewController()
-      navigationController?.pushViewController(ctrl, animated: true)
-    } else if indexPath.row == 2 {}
+    if IMKitConfigCenter.shared.collectionEnable {
+      if indexPath.row == 0 {
+        let ctrl = MineSettingViewController()
+        navigationController?.pushViewController(ctrl, animated: true)
+      } else if indexPath.row == 1 {
+        if NEStyleManager.instance.isNormalStyle() == true {
+          let collectionCtrl = CollectionMessageController()
+          navigationController?.pushViewController(collectionCtrl, animated: true)
+        } else {
+          let collectionCtrl = FunCollectionMessageController()
+          navigationController?.pushViewController(collectionCtrl, animated: true)
+        }
+      } else if indexPath.row == 2 {
+        let ctrl = IntroduceBrandViewController()
+        navigationController?.pushViewController(ctrl, animated: true)
+      }
+    } else {
+      if indexPath.row == 0 {
+        let ctrl = MineSettingViewController()
+        navigationController?.pushViewController(ctrl, animated: true)
+      } else if indexPath.row == 1 {
+        let ctrl = IntroduceBrandViewController()
+        navigationController?.pushViewController(ctrl, animated: true)
+      }
+    }
   }
 
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {

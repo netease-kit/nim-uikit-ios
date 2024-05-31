@@ -52,24 +52,9 @@ open class FunPinMessageViewController: NEBasePinMessageViewController {
     showCustomActionSheet(actions)
   }
 
+  /// 获取转发确认弹窗 - 通用版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     FunForwardAlertViewController()
-  }
-
-  override open func forwardMessage(_ message: V2NIMMessage) {
-    if IMKitClient.instance.getConfigCenter().teamEnable {
-      let userAction = NECustomAlertAction(title: chatLocalizable("contact_user")) { [weak self] in
-        self?.forwardMessageToUser(message)
-      }
-
-      let teamAction = NECustomAlertAction(title: chatLocalizable("team")) { [weak self] in
-        self?.forwardMessageToTeam(message)
-      }
-
-      showCustomActionSheet([teamAction, userAction])
-    } else {
-      forwardMessageToUser(message)
-    }
   }
 
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,

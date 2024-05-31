@@ -3,12 +3,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingViewModelDelegate,
+open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettingViewModelDelegate,
   UITableViewDataSource, UITableViewDelegate {
   public var userId: String?
 
@@ -77,12 +78,16 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       viewModel.getConversation(uid) { [weak self] error in
         self?.viewModel.getUserSettingModel(uid) { [weak self] in
           self?.contentTable.tableHeaderView = self?.headerView()
+          self?.didLoadData()
           self?.contentTable.reloadData()
         }
       }
     }
     setupUI()
   }
+
+  /// 渲染数据开始，在子类中使用
+  open func didLoadData() {}
 
   func setupUI() {
     view.backgroundColor = .ne_lightBackgroundColor
@@ -131,7 +136,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
       userHeaderView.setTitle("")
       userHeaderView.backgroundColor = .clear
-    } else if let name = viewModel.userInfo?.showName(false) {
+    } else if let name = viewModel.userInfo?.showName() {
       userHeaderView.sd_setImage(with: nil)
       userHeaderView.setTitle(name)
       userHeaderView.backgroundColor = UIColor.colorWithString(string: viewModel.userInfo?.user?.accountId)
@@ -139,7 +144,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
 
     nameLabel.text = viewModel.userInfo?.showName()
     cornerBackView.addSubview(nameLabel)
-    if IMKitClient.instance.getConfigCenter().teamEnable {
+    if IMKitConfigCenter.shared.teamEnable {
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
         userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 12),
@@ -223,7 +228,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       parameters: [
         "nav": navigationController as Any,
         "filters": filters,
-        "limit": 199,
+        "limit": inviteNumberLimit,
         "uid": userId ?? "",
       ],
       closure: nil
@@ -264,6 +269,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
   }
 
   func didNeedRefreshUI() {
+    didLoadData()
     contentTable.reloadData()
   }
 

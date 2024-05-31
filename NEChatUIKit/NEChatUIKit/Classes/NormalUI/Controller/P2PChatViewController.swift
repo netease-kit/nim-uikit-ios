@@ -53,7 +53,7 @@ open class P2PChatViewController: NormalChatViewController {
     chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("send_to"))
     super.getSessionInfo(sessionId: sessionId) { [weak self] in
       self?.viewModel.loadShowName([sessionId]) {
-        let name = self?.viewModel.getShowName(sessionId).name ?? sessionId
+        let name = self?.viewModel.getShowName(sessionId) ?? sessionId
         self?.titleContent = name
         self?.title = name
       }

@@ -17,4 +17,16 @@ open class FunContactUnCheckCell: NEBaseContactUnCheckCell {
       avatarImageView.heightAnchor.constraint(equalToConstant: 40),
     ])
   }
+
+  /// 重写控件赋值方法
+  /// - Parameter model: 数据模型（ContactInfo）
+  override func configure(_ model: Any) {
+    guard let model = model as? ContactInfo else { return }
+
+    avatarImageView.configHeadData(
+      headUrl: model.user?.user?.avatar,
+      name: model.user?.showName() ?? "",
+      uid: model.user?.user?.accountId ?? ""
+    )
+  }
 }

@@ -7,6 +7,7 @@ import NEChatKit
 import NECommonUIKit
 import NECoreIM2Kit
 import NECoreKit
+import NIMSDK
 import UIKit
 
 @objcMembers
@@ -71,6 +72,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     // member_select_no_member
     let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_result"), frame: .zero)
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
   }()
@@ -113,6 +115,21 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
             weakSelf?.title = localizable("group_memmber")
           } else {
             weakSelf?.title = localizable("discuss_mebmer")
+          }
+          if IMKitConfigCenter.shared.onlineStatusEnable {
+            if let members = teamInfo?.users {
+              var subcribeMembers = [NETeamMemberInfoModel]()
+              for model in members {
+                if let account = model.teamMember?.accountId {
+                  if account != IMKitClient.instance.account() {
+                    subcribeMembers.append(model)
+                  }
+                }
+              }
+              weakSelf?.viewModel.subcribeMembers(members) { error in
+                NEALog.infoLog(weakSelf?.className() ?? "", desc: "sub cribe members error : \(error?.localizedDescription ?? "")")
+              }
+            }
           }
           weakSelf?.didNeedRefreshUI()
         }
@@ -315,5 +332,16 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
       emptyView.isHidden = viewModel.searchDatas.count > 0
     }
     contentTableView.reloadData()
+  }
+
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      if parent == nil {
+        viewModel.unSubcribeMembers(viewModel.datas) { [weak self] error in
+          NEALog.infoLog(self?.className() ?? " ", desc: #function + " un sub scribe member error : \(error?.localizedDescription ?? "")")
+        }
+      }
+    }
   }
 }

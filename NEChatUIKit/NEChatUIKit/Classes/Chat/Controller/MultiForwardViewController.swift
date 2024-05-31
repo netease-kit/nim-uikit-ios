@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class MultiForwardViewController: ChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, ChatBaseCellDelegate, UIDocumentInteractionControllerDelegate, MultiForwardViewModelDelegate {
+open class MultiForwardViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, ChatBaseCellDelegate, UIDocumentInteractionControllerDelegate, MultiForwardViewModelDelegate {
   public var viewModel = MultiForwardViewModel()
   private var messageAttachmentUrl: String?
   private var messageAttachmentFilePath: String = ""
@@ -16,6 +16,25 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
   public var cellRegisterDic = [String: UITableViewCell.Type]()
   public var brokenNetworkViewHeight: CGFloat = 36
   let interactionController = UIDocumentInteractionController()
+
+  public lazy var brokenNetworkView: NEBrokenNetworkView = {
+    let view = NEBrokenNetworkView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    return view
+  }()
+
+  public lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.showsVerticalScrollIndicator = false
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.backgroundColor = .clear
+    tableView.keyboardDismissMode = .onDrag
+    return tableView
+  }()
 
   public init(_ attachmentUrl: String?,
               _ attachmentFilePath: String,
@@ -129,27 +148,6 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
     }
   }
 
-  // MARK: lazy Method
-
-  public lazy var brokenNetworkView: NEBrokenNetworkView = {
-    let view = NEBrokenNetworkView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isHidden = true
-    return view
-  }()
-
-  public lazy var tableView: UITableView = {
-    let tableView = UITableView(frame: .zero, style: .plain)
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.separatorStyle = .none
-    tableView.showsVerticalScrollIndicator = false
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.backgroundColor = .clear
-    tableView.keyboardDismissMode = .onDrag
-    return tableView
-  }()
-
   // MARK: UIDocumentInteractionControllerDelegate
 
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
@@ -174,16 +172,13 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
     } else {
       let key = "\(model.type.rawValue)"
       if model.type == .custom {
-        if let customType = NECustomAttachment.typeOfCustomMessage(model.message?.attachment) {
-          if customType == customMultiForwardType {
-            reuseId = "\(MessageType.multiForward.rawValue)"
-          } else if customType == customRichTextType {
-            reuseId = "\(MessageType.richText.rawValue)"
-          } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
-            reuseId = "\(customType)"
-          } else {
-            reuseId = "\(NEBaseChatMessageCell.self)"
-          }
+        let customType = model.customType
+        if customType == customMultiForwardType {
+          reuseId = "\(MessageType.multiForward.rawValue)"
+        } else if customType == customRichTextType {
+          reuseId = "\(MessageType.richText.rawValue)"
+        } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
+          reuseId = "\(customType)"
         } else {
           reuseId = "\(NEBaseChatMessageCell.self)"
         }
@@ -316,13 +311,12 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
           interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
         }
       }
-    } else if model?.type == .custom,
-              let customType = NECustomAttachment.typeOfCustomMessage(model?.message?.attachment) {
-      if customType == customMultiForwardType,
+    } else if model?.type == .custom {
+      if model?.customType == customMultiForwardType,
          let data = NECustomAttachment.dataOfCustomMessage(model?.message?.attachment) {
         let url = data["url"] as? String
         let md5 = data["md5"] as? String
-        guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/") else { return }
+        guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) else { return }
         let fileName = multiForwardFileName + (model?.message?.messageClientId ?? "")
         let filePath = fileDirectory + fileName
         let multiForwardVC = getMultiForwardViewController(url, filePath, md5)
@@ -359,13 +353,13 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
       viewModel.downLoad(urlString, path) { progress in
         NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "downLoad file progress: \(progress)")
         fileModel.progress = progress
-        if progress >= 100 {
-          fileModel.state = .Success
-        }
         fileModel.cell?.uploadProgress(byRight: false, progress)
 
-      } _: { [weak self] _, error in
+      } _: { [weak self] localPath, error in
         self?.showErrorToast(error)
+        if localPath != nil {
+          fileModel.state = .Success
+        }
       }
     }
   }

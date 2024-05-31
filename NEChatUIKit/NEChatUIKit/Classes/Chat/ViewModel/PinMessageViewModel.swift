@@ -30,7 +30,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     let group = DispatchGroup()
     weak var weakSelf = self
     self.conversationId = conversationId
-    chatRepo.searchMessagePinHistory(conversationId: conversationId) { pinItems, error in
+    chatRepo.getPinnedMessageList(conversationId: conversationId) { pinItems, error in
       if let pins = pinItems {
         let messageRefers = pins.compactMap(\.messageRefer)
         group.enter()
@@ -76,10 +76,12 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     if let conversationId = conversationId, let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
       ChatTeamCache.shared.loadShowName(userIds: userIds, teamId: teamId) {
         for item in items {
-          let (name, user) = ChatTeamCache.shared.getShowName(item.chatmodel.message?.senderId ?? "")
+          let senderId = item.chatmodel.message?.senderId ?? ""
+          let name = ChatTeamCache.shared.getShowName(senderId)
+          let user = NEFriendUserCache.shared.getFriendInfo(senderId) ?? ChatUserCache.shared.getUserInfo(senderId)
           item.chatmodel.avatar = user?.user?.avatar
           item.chatmodel.fullName = name
-          item.chatmodel.shortName = ChatMessageHelper.getShortName(user?.showName(false) ?? "")
+          item.chatmodel.shortName = NEFriendUserCache.getShortName(user?.showName() ?? "")
         }
         completion()
       }
@@ -90,7 +92,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
                              _ completion: @escaping (Error?)
                                -> Void) {
     NEALog.infoLog("PinMessageViewModel", desc: #function + ", messageId: \(String(describing: message.messageClientId))")
-    chatRepo.removeMessagePin(messageRefer: message, serverExtension: "") { error in
+    chatRepo.unpinMessage(messageRefer: message, serverExtension: "") { error in
       completion(error)
     }
   }
@@ -107,34 +109,23 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     )
   }
 
-  open func forwardUserMessage(_ message: V2NIMMessage,
-                               _ users: [V2NIMUser],
-                               _ comment: String?,
-                               _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
+  /// 转发消息
+  /// - Parameters:
+  ///   - conversationIds: 会话 id 列表
+  ///   - comment: 留言
+  ///   - completion: 完成回调
+  open func forwardMessages(_ message: V2NIMMessage,
+                            _ conversationIds: [String],
+                            _ comment: String?,
+                            _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
-    for user in users {
-      if let uid = user.accountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(uid) {
-        let forwardMessage = MessageUtils.forwardMessage(message: message)
-        ChatMessageHelper.clearForwardAtMark(forwardMessage)
-        chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, completion)
-        if let text = comment {
-          sendTextMessage(text: text, conversationId: conversationId, completion)
-        }
+    for conversationId in conversationIds {
+      let forwardMessage = MessageUtils.forwardMessage(message: message)
+      ChatMessageHelper.clearForwardAtMark(forwardMessage)
+      chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, completion)
+      if let text = comment, !text.isEmpty {
+        sendTextMessage(text: text, conversationId: conversationId, completion)
       }
-    }
-  }
-
-  open func forwardTeamMessage(_ message: V2NIMMessage,
-                               _ team: V2NIMTeam,
-                               _ comment: String?,
-                               _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
-    let conversationId = V2NIMConversationIdUtil.teamConversationId(team.teamId) ?? ""
-    let forwardMessage = MessageUtils.forwardMessage(message: message)
-    ChatMessageHelper.clearForwardAtMark(forwardMessage)
-    chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, completion)
-    if let text = comment {
-      sendTextMessage(text: text, conversationId: conversationId, completion)
     }
   }
 

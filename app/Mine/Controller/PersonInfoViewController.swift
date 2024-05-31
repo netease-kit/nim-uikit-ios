@@ -20,12 +20,34 @@ class PersonInfoViewController: NEBaseViewController,
   private var viewModel = PersonInfoViewModel()
   private var className = "PersonInfoViewController"
 
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
+  private lazy var pickerView: BirthdayDatePickerView = {
+    let picker = BirthdayDatePickerView()
+    picker.translatesAutoresizingMaskIntoConstraints = false
+    return picker
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     ContactRepo.shared.addContactListener(self)
-    viewModel.getData()
-    setupSubviews()
     initialConfig()
+    setupSubviews()
+    viewModel.getData { [weak self] in
+      self?.tableView.reloadData()
+    }
   }
 
   func initialConfig() {
@@ -125,26 +147,6 @@ class PersonInfoViewController: NEBaseViewController,
     ])
   }
 
-  lazy var tableView: UITableView = {
-    let tableView = UITableView()
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.backgroundColor = .clear
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.separatorColor = .clear
-    tableView.separatorStyle = .none
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0.0
-    }
-    return tableView
-  }()
-
-  private lazy var pickerView: BirthdayDatePickerView = {
-    let picker = BirthdayDatePickerView()
-    picker.translatesAutoresizingMaskIntoConstraints = false
-    return picker
-  }()
-
   /// 用户信息变更回调
   /// - Parameter users: 用户列表
   func onUserProfileChanged(_ users: [V2NIMUser]) {
@@ -178,7 +180,7 @@ class PersonInfoViewController: NEBaseViewController,
 
     view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData?,
-       var filePath = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/image/") {
+       var filePath = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
       filePath += "\(IMKitClient.instance.account())_avatar.jpg"
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
@@ -295,7 +297,7 @@ class PersonInfoViewController: NEBaseViewController,
     weak var weakSelf = self
     ctrl.callBack = { editText in
 
-      if weakSelf?.isValidEmail(editText) == false {
+      if editText.count > 0, weakSelf?.isValidEmail(editText) == false {
         weakSelf?.showToastInWindow(NSLocalizedString("change_email_failure", comment: ""))
         return
       }
@@ -329,7 +331,7 @@ class PersonInfoViewController: NEBaseViewController,
   }
 
   func didCopyAccount(account: String) {
-    showToast(NSLocalizedString("copy_success", comment: ""))
+    showToast(commonLocalizable("copy_success"))
     UIPasteboard.general.string = account
   }
 

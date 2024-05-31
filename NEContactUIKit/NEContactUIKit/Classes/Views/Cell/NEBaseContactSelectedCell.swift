@@ -20,22 +20,10 @@ open class NEBaseContactSelectedCell: NEBaseContactTableViewCell {
     sImageView.accessibilityIdentifier = "id.selector"
   }
 
+  /// 重写 setModel 方法，设置 sImageView
+  /// - Parameter model: ContactInfo
   override open func setModel(_ model: ContactInfo) {
     super.setModel(model)
-    if model.isSelected == false {
-      sImageView.isHighlighted = false
-    } else {
-      sImageView.isHighlighted = true
-    }
-  }
-
-  func setSelect() {
-    sModel?.isSelected = true
-    sImageView.isHighlighted = true
-  }
-
-  func setUnselect() {
-    sModel?.isSelected = false
-    sImageView.isHighlighted = false
+    sImageView.isHighlighted = model.isSelected
   }
 }

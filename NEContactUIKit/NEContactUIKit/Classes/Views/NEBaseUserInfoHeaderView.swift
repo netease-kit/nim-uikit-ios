@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECommonUIKit
 import NECoreIM2Kit
 import UIKit
 
@@ -28,8 +29,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return nameLabel
   }()
 
-  public lazy var titleLabel: UILabel = {
-    let titleLabel = UILabel()
+  public lazy var titleLabel: CopyableLabel = {
+    let titleLabel = CopyableLabel()
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.font = UIFont.boldSystemFont(ofSize: 22)
     titleLabel.textColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)
@@ -37,8 +38,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return titleLabel
   }()
 
-  public lazy var detailLabel: UILabel = {
-    let detailLabel = UILabel()
+  public lazy var detailLabel: CopyableLabel = {
+    let detailLabel = CopyableLabel()
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
@@ -46,8 +47,8 @@ open class NEBaseUserInfoHeaderView: UIView {
     return detailLabel
   }()
 
-  public lazy var detailLabel2: UILabel = {
-    let detailLabel = UILabel()
+  public lazy var detailLabel2: CopyableLabel = {
+    let detailLabel = CopyableLabel()
     detailLabel.translatesAutoresizingMaskIntoConstraints = false
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.textColor = .ne_greyText
@@ -159,8 +160,24 @@ open class NEBaseUserInfoHeaderView: UIView {
     } else {
       avatarImageView.sd_setImage(with: nil)
       avatarImageView.backgroundColor = UIColor.colorWithString(string: userFriend.user?.accountId)
-      nameLabel.text = userFriend.shortName(showAlias: false, count: 2)
+      nameLabel.text = userFriend.shortName(count: 2)
       nameLabel.isHidden = false
+    }
+
+    // title
+    let uid = userFriend.user?.accountId ?? ""
+    if let alias = userFriend.friend?.alias, !alias.isEmpty {
+      commonUI(showDetail: true)
+      titleLabel.text = alias
+      detailLabel.text = "\(localizable("nick")):\(userFriend.user?.name ?? uid)"
+      detailLabel.copyString = userFriend.user?.name ?? uid
+      detailLabel2.text = "\(localizable("account")):\(uid)"
+      detailLabel2.copyString = uid
+    } else {
+      commonUI(showDetail: false)
+      titleLabel.text = userFriend.showName()
+      detailLabel.text = "\(localizable("account")):\(uid)"
+      detailLabel.copyString = uid
     }
   }
 }

@@ -235,7 +235,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// at 消息记录写文件缓存
   private func writeCacheToDocument(dictionary: [String: AtMEMessageRecord]) {
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-      let filePath = documentsDirectory.appendingPathComponent("NEIMUIKit/\(currentAccid)_at_message.plist")
+      let filePath = documentsDirectory.appendingPathComponent(imkitDir + "\(currentAccid)_at_message.plist")
       NEALog.infoLog(className(), desc: "writeCacheToDocument path : \(filePath)")
       do {
         var jsonObject = [String: Any]()
@@ -247,6 +247,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
         let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
         try jsonData.write(to: filePath)
+        print("write cache success")
       } catch {
         NEALog.infoLog(className(), desc: "write cache error : \(error.localizedDescription)")
       }
@@ -258,7 +259,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     NEALog.infoLog(className(), desc: "loadCacheFromDocument")
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
       weak var weakSelf = self
-      let documentDir = documentsDirectory.appendingPathComponent("NEIMUIKit/")
+      let documentDir = documentsDirectory.appendingPathComponent(imkitDir)
       if FileManager.default.fileExists(atPath: documentDir.path) == false {
         do {
           try FileManager.default.createDirectory(at: documentDir, withIntermediateDirectories: false)

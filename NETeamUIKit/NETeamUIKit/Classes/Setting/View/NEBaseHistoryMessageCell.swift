@@ -1,9 +1,9 @@
-
-import NIMSDK
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
+
+import NECommonKit
+import NIMSDK
 import UIKit
 
 @objcMembers
@@ -11,7 +11,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
   /// 搜索文案(用户匹配高亮)
   public var searchText: String?
   /// 高亮颜色
-  public var rangeTextColor = UIColor.ne_blueText
+  public var rangeTextColor = UIColor.ne_normalTheme
 
   /// 用户头像视图
   public lazy var headView: NEUserHeaderView = {
@@ -74,7 +74,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     super.init(coder: coder)
   }
 
-  func setupSubviews() {
+  open func setupSubviews() {
     selectionStyle = .none
     contentView.addSubview(headView)
     contentView.addSubview(titleLabel)
@@ -83,21 +83,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     contentView.addSubview(timeLabel)
   }
 
-  func configData(message: HistoryMessageModel?) {
-    guard let resultText = message?.content else { return }
-
-    guard let searchStr = searchText else { return }
-
-    let attributedStr = NSMutableAttributedString(string: resultText)
-    // range 表示从索引几开始取几个字符
-    let range = attributedStr.mutableString.range(of: searchStr)
-    attributedStr.addAttribute(
-      .foregroundColor,
-      value: rangeTextColor,
-      range: range
-    )
-    subTitleLabel.attributedText = attributedStr
-
+  open func configData(message: HistoryMessageModel?) {
     if message?.fullName?.count ?? 0 <= 0 {
       message?.fullName = message?.imMessage?.senderId
     }
@@ -112,5 +98,58 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
       headView.sd_setImage(with: nil, completed: nil)
       headView.backgroundColor = UIColor.colorWithString(string: message?.imMessage?.senderId)
     }
+  }
+
+  /// 根据label宽度显示关键字段
+  /// - Parameter label: 文本控件
+  /// - Parameter maxWidth: 最大宽度
+  /// - Parameter importantText: 关键字段
+  /// - Parameter fullText: 全文本
+  public func truncateTextForLabel(_ label: UILabel, _ maxWidth: CGFloat, _ importantText: String, _ fullText: String) {
+    guard let font = label.font else {
+      return
+    }
+
+    var truncatedText = ""
+    var displayText = fullText
+
+    let importantTextWidth = importantText.width(withConstrainedHeight: label.frame.size.height, font: font)
+    let fullTextWidth = fullText.width(withConstrainedHeight: label.frame.size.height, font: font)
+
+    if fullTextWidth > maxWidth {
+      let ellipsis = "..."
+      var accumulatedWidth: CGFloat = 0
+
+      for (_, char) in fullText.enumerated() {
+        let charWidth = String(char).width(withConstrainedHeight: label.frame.size.height, font: font)
+        if accumulatedWidth + charWidth + importantTextWidth + ellipsis.width(withConstrainedHeight: label.frame.size.height, font: font) <= maxWidth {
+          truncatedText.append(char)
+          accumulatedWidth += charWidth
+        } else {
+          break
+        }
+      }
+
+      displayText = truncatedText + ellipsis + importantText
+    }
+
+    let attributedStr = NSMutableAttributedString(string: displayText)
+
+    do {
+      let regex = try NSRegularExpression(pattern: importantText, options: [])
+      let matches = regex.matches(in: displayText, options: [], range: NSRange(location: 0, length: displayText.count))
+
+      for match in matches {
+        let matchRange = match.range
+        attributedStr.addAttribute(
+          .foregroundColor,
+          value: rangeTextColor,
+          range: matchRange
+        )
+      }
+    } catch {
+      print("Regex error: \(error.localizedDescription)")
+    }
+    label.attributedText = attributedStr
   }
 }

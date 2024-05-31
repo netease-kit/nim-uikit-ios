@@ -23,6 +23,7 @@ open class MessageRichTextModel: MessageTextModel {
     message?.text = body
     super.init(message: message)
     type = .custom
+    customType = customRichTextType
 
     let font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
     titleAttributeStr = NEEmotionTool.getAttWithStr(

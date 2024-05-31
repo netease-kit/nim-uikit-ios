@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
+import NIMSDK
 import UIKit
 
 @objcMembers
@@ -61,12 +62,28 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
         cell.configure(model)
         cell.removeButton.isHidden = !isShowRemove
         cell.removeLabel.isHidden = !isShowRemove
+
+        if IMKitConfigCenter.shared.onlineStatusEnable {
+          cell.headerView.alpha = 0.5
+
+          if let accountId = model.nimUser?.user?.accountId {
+            if accountId == IMKitClient.instance.account() {
+              cell.headerView.alpha = 1.0
+            } else if let event = viewModel.onLineEventDic[accountId] {
+              if event.value == NIMSubscribeEventOnlineValue.login.rawValue {
+                cell.headerView.alpha = 1.0
+              }
+            }
+          }
+        }
       }
+
       if isLastRow(indexPath.row) {
         cell.dividerLine.isHidden = true
       } else {
         cell.dividerLine.isHidden = false
       }
+
       return cell
     }
     return UITableViewCell()

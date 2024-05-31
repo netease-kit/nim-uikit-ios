@@ -79,6 +79,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   // 已读未读视图
   public var readView = CirleProgressView(frame: CGRect(x: 0, y: 0, width: 16, height: 16))
   public var activityView = ChatActivityIndicatorView() // 消息状态视图
+  public var activityViewCenterYAnchor: NSLayoutConstraint? // 消息状态视图 Y 布局约束
   public var selectedButton = UIButton(type: .custom) // 多选按钮
   public var selectedButtonCenterYAnchor: NSLayoutConstraint? // 多选按钮中心 Y 布局约束
   public var timeLabel = UILabel() // 消息时间
@@ -185,6 +186,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     readView.translatesAutoresizingMaskIntoConstraints = false
     readView.accessibilityIdentifier = "id.readView"
 
+    activityView.translatesAutoresizingMaskIntoConstraints = false
+    activityView.failButton.addTarget(self, action: #selector(resend), for: .touchUpInside)
     activityView.accessibilityIdentifier = "id.status"
 
     selectedButton.translatesAutoresizingMaskIntoConstraints = false
@@ -295,13 +298,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
 
 //        activityView
     contentView.addSubview(activityView)
-    activityView.translatesAutoresizingMaskIntoConstraints = false
-    activityView.failButton.addTarget(self, action: #selector(resend), for: .touchUpInside)
+    activityViewCenterYAnchor = activityView.centerYAnchor.constraint(equalTo: bubbleImageRight.centerYAnchor, constant: 0)
+    activityViewCenterYAnchor?.isActive = true
     NSLayoutConstraint.activate([
       activityView.rightAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: -chat_content_margin),
-      activityView.centerYAnchor.constraint(equalTo: bubbleImageRight.centerYAnchor, constant: 0),
-      activityView.widthAnchor.constraint(equalToConstant: 25),
-      activityView.heightAnchor.constraint(equalToConstant: 25),
+      activityView.widthAnchor.constraint(equalToConstant: 22),
+      activityView.heightAnchor.constraint(equalToConstant: 22),
     ])
 
 //        readView
@@ -441,7 +443,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     // 多选框
     selectedButton.isHidden = model.isRevoked || !enableSelect
     selectedButton.isSelected = model.isSelected
+
+    // 多选状态下，头像右移
     avatarImageLeftAnchor?.constant = enableSelect ? 42 : 16
+
+    // 多选状态下，消息状态视图（发送失败）位置下移，避免与多选重叠
+    activityViewCenterYAnchor?.constant = enableSelect ? model.contentSize.height / 2 - 12 : 0
   }
 
   override open func setModel(_ model: MessageContentModel) {
@@ -523,6 +530,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       default:
         activityView.messageStatus = .sending
       }
+    } else {
+      activityView.messageStatus = .successed
     }
 
     if isSend, model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED {

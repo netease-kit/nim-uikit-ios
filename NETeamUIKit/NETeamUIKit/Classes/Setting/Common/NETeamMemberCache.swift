@@ -2,12 +2,20 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
+
+@objc public protocol NETeamMemberCacheListener: NSObjectProtocol {
+  /// 缓存变更回调协议
+  @objc optional func memberCacheDidChange()
+}
 
 @objc
 @objcMembers
 open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, NEContactListener {
+  private let teamMemberCacheMultiDelegate = MultiDelegate<NETeamMemberCacheListener>(strongReferences: false)
+
   public static let shared = NETeamMemberCache()
   /// 当前缓存的群id
   var currentTeamId = ""
@@ -46,6 +54,18 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
     NotificationCenter.default.removeObserver(self)
   }
 
+  /// 添加缓存监听
+  /// - Parameter listener: 缓存监听
+  public func addTeamCacheListener(_ listener: NETeamMemberCacheListener) {
+    teamMemberCacheMultiDelegate.addDelegate(listener)
+  }
+
+  /// 移除缓存监听
+  /// - Parameter listener: 缓存监听
+  public func removeTeamCacheListener(_ listener: NETeamMemberCacheListener) {
+    teamMemberCacheMultiDelegate.removeDelegate(listener)
+  }
+
   /// 应用进入后台时执行的操作
   func appDidEnterBackground() {
     clearCache()
@@ -62,11 +82,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   public func setCacheMembers(_ teamId: String, _ members: [NETeamMemberInfoModel]) {
     cacheDic.removeAll()
     currentTeamId = teamId
-
-    // 启动新的定时器确保前面开启的停止
     endTimer()
-
-    startTimer()
     for model in members {
       if let accountId = model.teamMember?.accountId {
         cacheDic[accountId] = model
@@ -98,6 +114,23 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     if let account = friendInfo.accountId, let model = cacheDic[account] {
       model.nimUser = NEUserWithFriend(friend: friendInfo)
+      updateFinish()
+    }
+  }
+
+  /// 用户信息变更
+  ///  - Parameter users: 变更用户
+  public func onUserProfileChanged(_ users: [V2NIMUser]) {
+    NEALog.infoLog(className(), desc: #function + " onUserProfileChanged count : \(users.count)")
+    var needUpdate = false
+    for user in users {
+      if let accout = user.accountId, let model = cacheDic[accout] {
+        model.nimUser = NEUserWithFriend(user: user)
+        needUpdate = true
+      }
+    }
+    if needUpdate == true {
+      updateFinish()
     }
   }
 
@@ -106,7 +139,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// - parameter deletionType: 删除类型
   public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
     if let model = cacheDic[accountId] {
-      model.nimUser = nil
+      model.nimUser?.friend = nil
     }
   }
 
@@ -114,7 +147,15 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// - Parameter status: 登录状态枚举
   public func onLoginStatus(_ status: V2NIMLoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
-      cacheDic.removeAll()
+      clearCache()
+    }
+  }
+
+  /// 加入回调
+  public func onTeamJoined(_ team: V2NIMTeam) {
+    if team.teamId == currentTeamId {
+      clearCache()
+      updateFinish()
     }
   }
 
@@ -147,7 +188,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// - Parameter team: 群对象
   public func onTeamDismissed(_ team: V2NIMTeam) {
     if team.teamId == currentTeamId {
-      cacheDic.removeAll()
+      clearCache()
     }
   }
 
@@ -162,6 +203,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
         model.teamMember = member
       }
     }
+    updateFinish()
   }
 
   /// 群成员减少统一处理处理
@@ -172,6 +214,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
         continue
       }
       cacheDic.removeValue(forKey: member.accountId)
+      updateFinish()
     }
   }
 
@@ -191,12 +234,13 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
     }
     if allMembmers.count > 0 {
       let accids = allMembmers.map(\.accountId)
-      contactRepo.getFriendInfoList(accountIds: accids) { [weak self] users, error in
+      contactRepo.getUserWithFriend(accountIds: accids) { [weak self] users, error in
         users?.forEach { user in
-          if let accountId = user.friend?.accountId {
+          if let accountId = user.user?.accountId {
             self?.cacheDic[accountId]?.nimUser = user
           }
         }
+        self?.updateFinish()
       }
     }
   }
@@ -208,14 +252,143 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
     endTimer()
   }
 
+  /// 定时移除缓存
+  public func triggerClearCache() {
+    NEALog.infoLog(className(), desc: "triggerClearCache")
+    clearCache()
+  }
+
   /// 启动定时器
-  func startTimer() {
-    timer = Timer.scheduledTimer(timeInterval: 300, target: self, selector: #selector(clearCache), userInfo: nil, repeats: true)
+  func trigerTimer() {
+    timer = Timer.scheduledTimer(timeInterval: 300, target: self, selector: #selector(triggerClearCache), userInfo: nil, repeats: false)
   }
 
   /// 停止定时器
   func endTimer() {
     timer?.invalidate()
     timer = nil
+  }
+
+  public func updateFinish() {
+    teamMemberCacheMultiDelegate |> { delegate in
+      delegate.memberCacheDidChange?()
+    }
+  }
+
+  /// 获取所有群成员信息
+  /// - Parameter teamId:  群id
+  /// - Parameter queryType:  查询类型
+  /// - Parameter completion:  完成后的回调
+  public func getAllTeamMemberInfos(_ teamId: String,
+                                    _ queryType: V2NIMTeamMemberRoleQueryType,
+                                    _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
+    var memberLists = [V2NIMTeamMember]()
+    weak var weakSelf = self
+    getAllTeamMemberWithMaxLimit(teamId, nil, &memberLists, queryType) { members, error in
+      if let err = error {
+        completion(err, nil)
+      } else {
+        if let teamMembers = members {
+          let teamInfo = NETeamInfoModel()
+          weakSelf?.splitMembers(teamMembers, teamInfo) { error, retTeamInfo in
+            completion(error, retTeamInfo)
+          }
+        }
+      }
+    }
+  }
+
+  /// 获取群成员(使用最大分页参数，防止触发频控)
+  /// - Parameter teamId:  群ID
+  /// - Parameter completion:  完成回调
+  public func getAllTeamMemberWithMaxLimit(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
+    NEALog.infoLog(className(), desc: #function + " teamId : \(teamId)")
+    let option = V2NIMTeamMemberQueryOption()
+    option.direction = .QUERY_DIRECTION_ASC
+    option.limit = 1000
+    option.onlyChatBanned = false
+    option.roleQueryType = queryType
+    if let token = nextToken {
+      option.nextToken = token
+    } else {
+      option.nextToken = ""
+    }
+    var temMemberLists = memberList
+    teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { [weak self] result, error in
+      if let err = error {
+        completion(nil, err)
+      } else {
+        if let members = result?.memberList {
+          temMemberLists.append(contentsOf: members)
+        }
+        if let finished = result?.finished {
+          if finished == true {
+            completion(temMemberLists, nil)
+          } else {
+            self?.getAllTeamMemberWithMaxLimit(teamId, result?.nextToken, &temMemberLists, queryType, completion)
+          }
+        }
+      }
+    }
+  }
+
+  /// 分页查询群成员信息
+  /// - Parameter members:          要查询的群成员列表
+  /// - Parameter model :           群信息
+  /// - Parameter maxSizeByPage:    单页最大查询数量
+  /// - Parameter completion:       完成后的回调
+  private func splitMembers(_ members: [V2NIMTeamMember],
+                            _ model: NETeamInfoModel,
+                            _ maxSizeByPage: Int = 150,
+                            _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
+    var remaind = [[V2NIMTeamMember]]()
+    remaind.append(contentsOf: members.chunk(maxSizeByPage))
+    fetchTeamMemberUserInfos(&remaind, model, completion)
+  }
+
+  /// 从云信服务器批量获取用户资料
+  ///   - Parameter remainUserIds:  用户集合
+  ///   - Parameter completion:    成功回调
+  private func fetchTeamMemberUserInfos(_ remainUserIds: inout [[V2NIMTeamMember]],
+                                        _ model: NETeamInfoModel,
+                                        _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
+    guard let members = remainUserIds.first else {
+      completion(nil, model)
+      return
+    }
+
+    let accids = members.map(\.accountId)
+    var temArray = remainUserIds
+    weak var weakSelf = self
+
+    contactRepo.getUserWithFriend(accountIds: accids) { infos, v2Error in
+      if let err = v2Error {
+        completion(err as NSError, model)
+      } else {
+        if let users = infos {
+          for index in 0 ..< members.count {
+            let memberInfoModel = NETeamMemberInfoModel()
+            memberInfoModel.teamMember = members[index]
+            if users.count > index {
+              let user = users[index]
+              memberInfoModel.nimUser = user
+            }
+            model.users.append(memberInfoModel)
+          }
+        }
+        temArray.removeFirst()
+        weakSelf?.fetchTeamMemberUserInfos(&temArray, model, completion)
+      }
+    }
+  }
+
+  /// 群信息同步完成回调
+  public func onTeamSyncFinished() {
+    NEALog.infoLog(className(), desc: #function + " onTeamSyncFinished call back happen")
+    clearCache()
+    updateFinish()
   }
 }

@@ -10,7 +10,7 @@ import NIMSDK
 public class ChatTeamCache: NSObject {
   public static let shared = ChatTeamCache()
   private var teamInfo: V2NIMTeam?
-  private var cacheTeamMemberInfoDic = [String: NETeamMemberInfoModel]()
+  private var cacheTeamMemberInfoDic = [String: V2NIMTeamMember]()
 
   override private init() {
     super.init()
@@ -22,46 +22,12 @@ public class ChatTeamCache: NSObject {
     teamInfo = team
   }
 
-  public func updateTeamMemberInfo(_ userFriend: NEUserWithFriend?) {
-    guard let userId = userFriend?.user?.accountId, !NEFriendUserCache.shared.isFriend(userId) else {
-      return
-    }
-
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId:\(userId)")
-
-    if let teamMemberInfo = cacheTeamMemberInfoDic[userId] {
-      teamMemberInfo.nimUser = userFriend
-    } else {
-      let teamMemberInfo = NETeamMemberInfoModel()
-      teamMemberInfo.nimUser = userFriend
-      cacheTeamMemberInfoDic[userId] = teamMemberInfo
-    }
-  }
-
   public func updateTeamMemberInfo(_ teamMember: V2NIMTeamMember?) {
     guard let teamMember = teamMember else {
       return
     }
 
     let accountId = teamMember.accountId
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:\(accountId)")
-
-    if let teamMemberInfo = cacheTeamMemberInfoDic[accountId] {
-      teamMemberInfo.teamMember = teamMember
-      teamMemberInfo.nimUser = teamMemberInfo.nimUser ?? NEFriendUserCache.shared.getFriendInfo(accountId)
-    } else {
-      let teamMemberInfo = NETeamMemberInfoModel()
-      teamMemberInfo.teamMember = teamMember
-      teamMemberInfo.nimUser = teamMemberInfo.nimUser ?? NEFriendUserCache.shared.getFriendInfo(accountId)
-      cacheTeamMemberInfoDic[accountId] = teamMemberInfo
-    }
-  }
-
-  public func updateTeamMemberInfo(_ teamMember: NETeamMemberInfoModel?) {
-    guard let teamMember = teamMember,
-          let accountId = teamMember.teamMember?.accountId else {
-      return
-    }
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:\(accountId)")
     cacheTeamMemberInfoDic[accountId] = teamMember
   }
@@ -72,7 +38,7 @@ public class ChatTeamCache: NSObject {
   }
 
   /// 获取缓存的群成员信息
-  public func getTeamMemberInfo(accountId: String) -> NETeamMemberInfoModel? {
+  public func getTeamMemberInfo(accountId: String) -> V2NIMTeamMember? {
     cacheTeamMemberInfoDic[accountId]
   }
 
@@ -91,32 +57,34 @@ public class ChatTeamCache: NSObject {
 
   /// 获取缓存群成员名字，team: 备注 > 群昵称 > 昵称 > ID
   public func getShowName(_ accountId: String,
-                          _ showAlias: Bool = true) -> (name: String, user: NEUserWithFriend?) {
+                          _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId: " + accountId)
     // 好友缓存
-    var (fullName, user) = NEFriendUserCache.shared.getShowName(accountId, showAlias)
+    var fullName = NEFriendUserCache.shared.getShowName(accountId, showAlias)
 
     // 非好友缓存
-    if user == nil {
-      (fullName, user) = ChatUserCache.shared.getShowName(accountId, showAlias)
+    if !NEFriendUserCache.shared.isFriend(accountId) {
+      fullName = ChatUserCache.shared.getShowName(accountId)
     }
 
     // 群成员缓存
     if let teamMember = cacheTeamMemberInfoDic[accountId] {
-      if teamMember.nimUser?.user?.accountId == accountId ||
-        teamMember.teamMember?.accountId == accountId {
-        if let teamNick = teamMember.teamMember?.teamNick, !teamNick.isEmpty {
+      if teamMember.accountId == accountId {
+        if let teamNick = teamMember.teamNick, !teamNick.isEmpty {
           fullName = teamNick
         }
 
-        if showAlias, let alias = user?.friend?.alias, !alias.isEmpty {
+        if showAlias,
+           let friend = NEFriendUserCache.shared.getFriendInfo(accountId),
+           let alias = friend.friend?.alias,
+           !alias.isEmpty {
           fullName = alias
         }
 
-        return (fullName, user)
+        return fullName
       }
     }
-    return (fullName, user)
+    return fullName
   }
 
   //    获取展示的群成员名字, 备注 > 群昵称 > 昵称 > ID
@@ -136,17 +104,19 @@ public class ChatTeamCache: NSObject {
       }
     }
 
-    // 先查询用户信息
-    group.enter()
-    ContactRepo.shared.getFriendInfoList(accountIds: Array(loadUserIds)) { users, error in
-      users?.forEach { ChatUserCache.shared.updateUserInfo($0) }
-      group.leave()
+    // 先查询用户信息(陌生人)
+    if !loadUserIds.isEmpty {
+      group.enter()
+      ContactRepo.shared.getUserList(accountIds: Array(loadUserIds)) { users, error in
+        users?.forEach { ChatUserCache.shared.updateUserInfo($0) }
+        group.leave()
+      }
     }
 
     // 再查询群成员信息
     if !loadMemberIds.isEmpty {
       group.enter()
-      TeamRepo.shared.getTeamMemberList(teamId, Array(loadMemberIds)) { [weak self] teamMember, error in
+      TeamRepo.shared.getTeamMemberListByIds(teamId, .TEAM_TYPE_NORMAL, Array(loadMemberIds)) { [weak self] teamMember, error in
         teamMember?.forEach { self?.updateTeamMemberInfo($0) }
         group.leave()
       }

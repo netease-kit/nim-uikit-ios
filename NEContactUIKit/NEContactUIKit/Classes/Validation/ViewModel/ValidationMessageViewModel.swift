@@ -50,7 +50,12 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   ///   - completin: 完成回调（验证消息列表，下一次偏移量，是否还有数据，错误信息）
   func getValidationMessage(_ offset: UInt, _ completin: @escaping (UInt, Bool, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    contactRepo.getNotificationList(offset: offset, limit: pageMaxLimit) { [weak self] result, error in
+
+    let option = V2NIMFriendAddApplicationQueryOption()
+    option.offset = offset
+    option.limit = pageMaxLimit
+
+    contactRepo.getAddApplicationList(option: option) { [weak self] result, error in
       if let err = error {
         completin(0, false, err)
       } else if let result = result, let infos = result.infos {
@@ -78,8 +83,8 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
           if let uid = uid {
             group.enter()
-            self?.contactRepo.getFriendInfo(uid) { user, error in
-              noti.userInfo = user
+            self?.contactRepo.getUserWithFriend(accountIds: [uid]) { users, error in
+              noti.userInfo = users?.first
               if var datas = self?.datas, self?.isExist(xNoti: &noti, list: &datas) == false {
                 self?.datas.append(noti)
               }
@@ -172,10 +177,9 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
   // MARK: - NEContactListener
 
-  /// 收到好友添加申请回调
+  /// 好友添加申请变更
   /// - Parameter application: 申请添加好友信息
-  public func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  func applicationChanged(_ application: V2NIMFriendAddApplication) {
     var noti = NENotification(info: application)
     let group = DispatchGroup()
 
@@ -191,8 +195,8 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
     if let uid = uid {
       group.enter()
-      contactRepo.getFriendInfo(uid) { [self] user, error in
-        noti.userInfo = user
+      contactRepo.getUserWithFriend(accountIds: [uid]) { [self] users, error in
+        noti.userInfo = users?.first
         if !isExist(xNoti: &noti, list: &datas) {
           datas.insert(noti, at: 0)
         }
@@ -206,5 +210,19 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
     group.notify(queue: .main) { [weak self] in
       self?.dataRefresh?()
     }
+  }
+
+  /// 收到好友添加申请回调
+  /// - Parameter application: 申请添加好友信息
+  public func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    applicationChanged(application)
+  }
+
+  /// 好友添加申请被拒绝回调
+  /// - Parameter rejectionInfo: 申请添加好友拒绝信息
+  public func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    applicationChanged(rejectionInfo)
   }
 }

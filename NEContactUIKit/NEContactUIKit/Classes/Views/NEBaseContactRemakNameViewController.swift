@@ -9,7 +9,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UITextFieldDelegate {
+open class NEBaseContactRemakNameViewController: NEContactBaseViewController, UITextFieldDelegate {
   typealias ModifyBlock = (_ user: NEUserWithFriend) -> Void
 
   var completion: ModifyBlock?
@@ -85,9 +85,9 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
 
     user?.friend?.alias = aliasInput.text
 
-    if let u = user {
+    if let uid = user?.user?.accountId, let alias = aliasInput.text {
       view.makeToastActivity(.center)
-      viewmodel.update(u) { error in
+      viewmodel.updateAlias(accountId: uid, alias: alias) { error in
         NEALog.infoLog(
           "ContactRemakNameViewController",
           desc: "CALLBACK update " + (error?.localizedDescription ?? "no error")
@@ -100,7 +100,7 @@ open class NEBaseContactRemakNameViewController: NEBaseContactViewController, UI
             position: .center
           )
         } else {
-          if let block = weakSelf?.completion {
+          if let block = weakSelf?.completion, let u = weakSelf?.user {
             block(u)
           }
           weakSelf?.navigationController?.popViewController(animated: true)

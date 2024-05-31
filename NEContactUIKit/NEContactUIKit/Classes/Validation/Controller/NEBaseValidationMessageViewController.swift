@@ -8,7 +8,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseValidationMessageViewController: NEBaseContactViewController {
+open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   public let viewModel = ValidationMessageViewModel()
 
   override open func viewDidLoad() {
@@ -145,7 +145,7 @@ open class NEBaseValidationMessageViewController: NEBaseContactViewController {
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    emptyView.settingContent(content: localizable("no_validation_message"))
+    emptyView.setText(localizable("no_validation_message"))
     view.addSubview(emptyView)
     NSLayoutConstraint.activate([
       emptyView.topAnchor.constraint(equalTo: tableView.topAnchor, constant: 100),
@@ -220,7 +220,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
         weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
         weakSelf?.viewModel.setAddApplicationRead(nil)
 
-        if let accid = info.operatorAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
+        if let accid = info.applicantAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
           Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
                                                               "conversationId": conversationId as Any])
         }

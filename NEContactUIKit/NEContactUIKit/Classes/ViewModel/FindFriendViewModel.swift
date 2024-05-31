@@ -15,13 +15,8 @@ open class FindFriendViewModel: NSObject {
   func searchFriend(_ text: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
 
-    // 优先去缓存中取
-    if let userFriend = NEFriendUserCache.shared.getFriendInfo(text) {
-      completion(userFriend, nil)
-      return
+    contactRepo.getUserWithFriend(accountIds: [text]) { userFriends, error in
+      completion(userFriends?.first, error)
     }
-
-    // 缓存中没有则去远端查询
-    contactRepo.getFriendInfo(text, completion)
   }
 }

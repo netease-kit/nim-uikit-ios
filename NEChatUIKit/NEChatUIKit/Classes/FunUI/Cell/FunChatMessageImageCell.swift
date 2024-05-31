@@ -72,17 +72,13 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
         options = [.retryFailed, .progressiveLoad]
       }
 
+      let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 1000, height: 1000)]
       if imageUrl.hasPrefix("http") {
-        contentImageView.sd_setImage(
-          with: URL(string: imageUrl),
-          placeholderImage: nil,
-          options: options,
-          progress: nil,
-          completed: nil
-        )
+        let url = URL(string: imageUrl)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
       } else {
         let url = URL(fileURLWithPath: imageUrl)
-        contentImageView.sd_setImage(with: url)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
       }
     } else {
       contentImageView.image = nil

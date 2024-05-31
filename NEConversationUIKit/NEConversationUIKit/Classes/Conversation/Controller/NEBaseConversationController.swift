@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import MJRefresh
+import NEChatKit
 import NECommonKit
-import NECoreIM2Kit
 import NIMSDK
 
 @objc
@@ -13,10 +13,11 @@ public protocol NEBaseConversationControllerDelegate {
   func onDataLoaded()
 }
 
+/// 会话列表页面 - 基类
 @objcMembers
 open class NEBaseConversationController: UIViewController, UIGestureRecognizerDelegate {
   var className = "NEBaseConversationController"
-  public var deleteBottonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
+  public var deleteButtonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
 
   public var brokenNetworkViewHeight = 36.0
   private var bodyTopViewHeightAnchor: NSLayoutConstraint?
@@ -152,6 +153,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
       frame: CGRect.zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     view.backgroundColor = .clear
     return view
@@ -223,7 +225,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
     // 拉取好友信息
     DispatchQueue.global().async {
-      ContactRepo.shared.getMyUserInfo(nil)
+      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { _, _ in }
       ContactRepo.shared.getContactList { _, _ in }
     }
   }
@@ -446,7 +448,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       return
     }
 
-    if IMKitClient.instance.getConfigCenter().teamEnable {
+    if IMKitConfigCenter.shared.teamEnable {
       popListView.itemDatas = getPopListItems()
       popListView.frame = CGRect(origin: .zero, size: view.frame.size)
       popListView.removeSelf()
@@ -509,7 +511,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     Router.shared.use(
       ContactUserSelectRouter,
       parameters: ["nav": navigationController as Any,
-                   "limit": 200,
+                   "limit": inviteNumberLimit,
                    "filters": filters],
       closure: nil
     )
@@ -594,19 +596,19 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     var rowActions = [UITableViewRowAction]()
     let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: NEKitConversationConfig.shared.ui.deleteBottonTitle) { action, indexPath in
+                                            title: NEKitConversationConfig.shared.ui.deleteButtonTitle) { action, indexPath in
       weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
 
     // 置顶和取消置顶
     let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle :
-                                           NEKitConversationConfig.shared.ui.stickTopBottonTitle) { action, indexPath in
+                                         title: isTop ? NEKitConversationConfig.shared.ui.stickTopButtonCancelTitle :
+                                           NEKitConversationConfig.shared.ui.stickTopButtonTitle) { action, indexPath in
       weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
-    deleteAction.backgroundColor = NEKitConversationConfig.shared.ui.deleteBottonBackgroundColor ?? deleteBottonBackgroundColor
-    topAction.backgroundColor = NEKitConversationConfig.shared.ui.stickTopBottonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
+    deleteAction.backgroundColor = NEKitConversationConfig.shared.ui.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
+    topAction.backgroundColor = NEKitConversationConfig.shared.ui.stickTopButtonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
     rowActions.append(deleteAction)
     rowActions.append(topAction)
 
@@ -629,8 +631,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
-    if let deleteBottonClick = NEKitConversationConfig.shared.ui.deleteBottonClick {
-      deleteBottonClick(conversationModel, indexPath)
+    if let deleteButtonClick = NEKitConversationConfig.shared.ui.deleteButtonClick {
+      deleteButtonClick(conversationModel, indexPath)
       return
     }
 
@@ -646,7 +648,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
   /// 点击会话
   open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
-    if !NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(localizable("network_error"))
       return
     }
@@ -657,8 +659,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
-    if let stickTopBottonClick = NEKitConversationConfig.shared.ui.stickTopBottonClick {
-      stickTopBottonClick(conversationModel, indexPath)
+    if let stickTopButtonClick = NEKitConversationConfig.shared.ui.stickTopButtonClick {
+      stickTopButtonClick(conversationModel, indexPath)
       return
     }
 
@@ -773,15 +775,19 @@ extension NEBaseConversationController {
   /// cell点击事件,可重写该事件处理自己的逻辑业务，例如跳转到指定的会话页面
   /// - Parameter conversation: 会话
   open func onselectedTableRow(conversation: V2NIMConversation) {
+    let conversationId = conversation.conversationId
+
+    let param = ["sessionId": conversationId]
+    Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
+
+    // 路由跳转到聊天页面
     if conversation.type == .CONVERSATION_TYPE_P2P {
-      let conversationId = V2NIMConversationIdUtil.p2pConversationId(conversation.getUid())
       Router.shared.use(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
         closure: nil
       )
     } else if conversation.type == .CONVERSATION_TYPE_TEAM {
-      let conversationId = V2NIMConversationIdUtil.teamConversationId(conversation.getTeamId())
       Router.shared.use(
         PushTeamChatVCRouter,
         parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
@@ -809,22 +815,8 @@ extension NEBaseConversationController {
 // MARK: ================= ConversationViewModelDelegate===================
 
 extension NEBaseConversationController: ConversationViewModelDelegate {
-  open func didAddRecentSession() {
-    NEALog.infoLog("ConversationController", desc: "didAddRecentSession")
-    reloadTableView()
-  }
-
-  open func didUpdateRecentSession(index: Int) {
-    let indexPath = IndexPath(row: index, section: 0)
-    tableView.reloadRows(at: [indexPath], with: .none)
-  }
-
   open func reloadData() {
     delegate?.onDataLoaded()
-  }
-
-  open func didRefreshTable() {
-    reloadTableView()
   }
 
   /// 带排序的刷新
@@ -837,5 +829,17 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
     viewModel.conversationListData.sort()
     viewModel.stickTopConversations.sort()
     tableView.reloadData()
+  }
+
+  /// 由于数据变更可能导致底部有更多数据，此方法重新使列表加载更多能力开启
+  public func loadMoreStateChange(_ finish: Bool) {
+    if finish {
+      tableView.mj_footer = nil
+    } else {
+      tableView.mj_footer = MJRefreshBackNormalFooter(
+        refreshingTarget: self,
+        refreshingAction: #selector(loadMoreData)
+      )
+    }
   }
 }

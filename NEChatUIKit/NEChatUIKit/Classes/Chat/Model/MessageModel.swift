@@ -34,6 +34,7 @@ public enum MessageType: Int {
 public protocol MessageModel: NSObjectProtocol {
   var message: V2NIMMessage? { get set }
   var type: MessageType { get set }
+  var customType: Int { get set }
 
   // 宽高
   var contentSize: CGSize { get set } // 气泡区域的大小 不包含气泡上下到cell上下的边距

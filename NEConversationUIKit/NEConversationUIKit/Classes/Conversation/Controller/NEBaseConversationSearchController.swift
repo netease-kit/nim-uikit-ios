@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseConversationSearchController: NEBaseConversationNavigationController, UITableViewDelegate,
+open class NEBaseConversationSearchController: NEConversationBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   var viewModel = ConversationSearchViewModel()
   var tag = "ConversationSearchBaseController"
@@ -61,6 +61,7 @@ open class NEBaseConversationSearchController: NEBaseConversationNavigationContr
       frame: CGRect.zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     view.backgroundColor = .clear
     return view

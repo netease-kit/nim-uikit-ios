@@ -16,6 +16,17 @@ open class InputEmoticonTabView: UIControl {
   private var seps = [UIView]()
   private var className = "InputEmoticonTabView"
 
+  public lazy var sendButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setTitle(coreLoader.localizable("send"), for: .normal)
+    button.titleLabel?.textColor = .white
+    button.backgroundColor = UIColor.ne_normalTheme
+    button.titleLabel?.font = DefaultTextFont(14)
+    button.accessibilityIdentifier = "id.emojiSend"
+    return button
+  }()
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
     setUpSubViews()
@@ -77,17 +88,4 @@ open class InputEmoticonTabView: UIControl {
       delegate?.tabView?(self, didSelectTabIndex: index)
     }
   }
-
-  // MARK: lazy method
-
-  public lazy var sendButton: UIButton = {
-    let button = UIButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(coreLoader.localizable("send"), for: .normal)
-    button.titleLabel?.textColor = .white
-    button.backgroundColor = UIColor.ne_blueText
-    button.titleLabel?.font = DefaultTextFont(14)
-    button.accessibilityIdentifier = "id.emojiSend"
-    return button
-  }()
 }

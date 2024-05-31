@@ -9,7 +9,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFieldDelegate {
+open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFieldDelegate {
   public let viewModel = FindFriendViewModel()
   public let hasRequest = false
 
@@ -50,7 +50,7 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
     super.viewDidLoad()
     title = localizable("add_friend")
     navigationView.navTitle.text = title
-    emptyView.settingContent(content: localizable("user_not_exist"))
+    emptyView.setText(localizable("user_not_exist"))
     setupUI()
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.52, execute: DispatchWorkItem(block: { [weak self] in
@@ -156,7 +156,7 @@ open class NEBaseFindFriendViewController: NEBaseContactViewController, UITextFi
           // go to detail
           Router.shared.use(
             ContactUserInfoPageRouter,
-            parameters: ["nav": weakSelf?.navigationController as Any, "nim_user": user],
+            parameters: ["nav": weakSelf?.navigationController as Any, "user": user],
             closure: nil
           )
           weakSelf?.emptyView.isHidden = true

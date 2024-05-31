@@ -63,11 +63,14 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
       if let err = error {
         weakSelf?.view.makeToast(err.localizedDescription)
       }
-      weakSelf?.setupUI()
+      DispatchQueue.main.async {
+        weakSelf?.configData()
+      }
     }
+    setupUI()
   }
 
-  /// UI 控件出事还
+  /// UI 控件初始化
   open func setupUI() {
     navigationView.setMoreButtonTitle(localizable("save"))
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
@@ -85,7 +88,10 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
       countLabel.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: -16),
       countLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -8.0),
     ])
+  }
 
+  /// 绑定数据
+  func configData() {
     var name = ""
     if type == .TeamName, let n = team?.name {
       name = n
@@ -100,7 +106,6 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
         name = n
       }
     }
-
     figureTextCount(name)
 
     if name.count <= 0, type != .NickName {
@@ -171,7 +176,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     if type == .TeamName {
       let n = textInputView.text ?? ""
       view.makeToastActivity(.center)
-      repo.updateTeamName(tid, n) { error in
+      repo.updateTeamName(tid, .TEAM_TYPE_NORMAL, n) { error in
         weakSelf?.view.hideToastActivity()
         if error != nil {
           if error?.code == noPermissionOperationCode {
@@ -186,7 +191,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
     } else if type == .NickName, let uid = teamMember?.accountId {
       let n = textInputView.text ?? ""
       view.makeToastActivity(.center)
-      repo.updateMemberNick(tid, uid, n) { error in
+      repo.updateMemberNick(tid, .TEAM_TYPE_NORMAL, uid, n) { error in
 
         weakSelf?.view.hideToastActivity()
         if error != nil {

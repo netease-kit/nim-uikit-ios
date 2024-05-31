@@ -7,6 +7,8 @@ import Foundation
 
 public extension ConversationRouter {
   static func register() {
+    registerCommon()
+
     Router.shared.register(SearchContactPageRouter) { param in
       let nav = param["nav"] as? UINavigationController
       let searchCtrl = ConversationSearchController()
@@ -17,12 +19,6 @@ public extension ConversationRouter {
       let nav = param["nav"] as? UINavigationController
       let conversation = ConversationController()
       nav?.pushViewController(conversation, animated: true)
-    }
-
-    Router.shared.register("ClearAtMessageRemind") { param in
-      if let sessionId = param["sessionId"] as? String {
-        NEAtMessageManager.instance?.clearAtRecord(sessionId)
-      }
     }
   }
 }

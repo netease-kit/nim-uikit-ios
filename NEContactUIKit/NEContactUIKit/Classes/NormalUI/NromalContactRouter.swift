@@ -14,7 +14,7 @@ public extension ContactRouter {
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
       let filters = param["filters"] as? Set<String>
-      let contactSelectVC = ContactsSelectedViewController(filterUsers: filters)
+      let contactSelectVC = ContactSelectedViewController(filterUsers: filters)
       if let limit = param["limit"] as? Int, limit > 0 {
         contactSelectVC.limit = limit
       }
@@ -22,6 +22,20 @@ public extension ContactRouter {
         contactSelectVC.userId = uid
       }
       nav?.pushViewController(contactSelectVC, animated: true)
+    }
+
+    // 转发选择页面
+    Router.shared.register(ForwardMultiSelectRouter) { param in
+      let nav = param["nav"] as? UINavigationController
+      let filters = param["filters"] as? Set<String>
+      let contactSelectVC = MultiSelectViewController(filterUsers: filters)
+      if let limit = param["limit"] as? Int, limit > 0 {
+        contactSelectVC.limit = limit
+      }
+      if let uid = param["uid"] as? String {
+        contactSelectVC.userId = uid
+      }
+      nav?.present(contactSelectVC, animated: true)
     }
 
     Router.shared.register(ContactAddFriendRouter) { param in
@@ -35,8 +49,8 @@ public extension ContactRouter {
         if let user = param["user"] as? NEUserWithFriend {
           let userInfoVC = ContactUserViewController(user: user)
           nav.pushViewController(userInfoVC, animated: true)
-        } else if let nimUser = param["nim_user"] as? NEUserWithFriend {
-          let userInfoVC = ContactUserViewController(user: nimUser)
+        } else if let nimUser = param["nim_user"] as? V2NIMUser {
+          let userInfoVC = ContactUserViewController(nim_user: nimUser)
           nav.pushViewController(userInfoVC, animated: true)
         } else if let uid = param["uid"] as? String {
           let userInfoVC = ContactUserViewController(uid: uid)
@@ -47,7 +61,7 @@ public extension ContactRouter {
 
     Router.shared.register(ContactPageRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
-        let contactVC = ContactsViewController()
+        let contactVC = ContactViewController()
         nav.pushViewController(contactVC, animated: true)
       }
     }

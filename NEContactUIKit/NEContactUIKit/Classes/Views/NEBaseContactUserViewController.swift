@@ -9,12 +9,12 @@ import NECoreKit
 import NIMSDK
 import UIKit
 
+/// 用户信息界面 - 基类
 @objcMembers
-open class NEBaseContactUserViewController: NEBaseContactViewController, UITableViewDelegate,
+open class NEBaseContactUserViewController: NEContactBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   var user: NEUserWithFriend?
   var uid: String?
-  public var isBlack: Bool = false
   var className = "ContactUserViewController"
 
   public let viewModel = ContactUserViewModel()
@@ -22,15 +22,27 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   var data = [[UserItem]]()
   public var headerView = NEBaseUserInfoHeaderView()
 
+  /// 使用 accountId 初始化
+  /// - Parameter accountId: 用户 id
+  public init(uid: String) {
+    super.init(nibName: nil, bundle: nil)
+    self.uid = uid
+  }
+
+  /// 使用 V2NIMUser 初始化
+  /// - Parameter nim_user: V2NIMUser 对象
+  public init(nim_user: V2NIMUser) {
+    super.init(nibName: nil, bundle: nil)
+    user = NEUserWithFriend(user: nim_user)
+    uid = user?.user?.accountId
+  }
+
+  /// 使用 NEUserWithFriend 初始化
+  /// - Parameter user: NEUserWithFriend 对象
   public init(user: NEUserWithFriend?) {
     super.init(nibName: nil, bundle: nil)
     self.user = user
     uid = user?.user?.accountId
-  }
-
-  public init(uid: String) {
-    super.init(nibName: nil, bundle: nil)
-    self.uid = uid
   }
 
   public required init?(coder: NSCoder) {
@@ -62,7 +74,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       }
     }
 
-    NIMSDK.shared().systemNotificationManager.add(self)
+    ContactRepo.shared.addContactListener(self)
   }
 
   open func commonUI() {
@@ -108,79 +120,75 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
 
   func loadData() {
     guard let uid = user?.user?.accountId else { return }
-    viewModel.contactRepo.isFriend(accountId: uid) { [weak self] isFriend in
-      self?.viewModel.contactRepo.isBlockList(accountId: uid) { isBlack in
-        self?.isBlack = isBlack
-        if isFriend {
-          self?.data = [
-            [
-              UserItem(title: localizable("noteName"),
-                       detailTitle: self?.user?.friend?.alias,
-                       value: false,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithRightArrowCell.self),
-            ],
-            [
-              UserItem(title: localizable("birthday"),
-                       detailTitle: self?.user?.user?.birthday,
-                       value: false,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithDetailTextCell.self),
-              UserItem(title: localizable("phone"),
-                       detailTitle: self?.user?.user?.mobile,
-                       value: false,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithDetailTextCell.self),
-              UserItem(title: localizable("email"),
-                       detailTitle: self?.user?.user?.email,
-                       value: false,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithDetailTextCell.self),
-              UserItem(title: localizable("sign"),
-                       detailTitle: self?.user?.user?.sign,
-                       value: false,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithDetailTextCell.self),
-            ],
 
-            [
-              UserItem(title: localizable("add_blackList"),
-                       detailTitle: "",
-                       value: isBlack,
-                       textColor: UIColor.darkText,
-                       cellClass: TextWithSwitchCell.self),
-            ],
-            [
-              UserItem(title: localizable("chat"),
-                       detailTitle: "",
-                       value: false,
-                       textColor: UIColor(hexString: "#337EFF"),
-                       cellClass: CenterTextCell.self),
-              UserItem(title: localizable("delete_friend"),
-                       detailTitle: "",
-                       value: false,
-                       textColor: UIColor.red,
-                       cellClass: CenterTextCell.self),
-            ],
-          ]
-        } else {
-          self?.data = [
-            [
-              UserItem(title: localizable("add_friend"),
-                       detailTitle: self?.user?.friend?.alias,
-                       value: false,
-                       textColor: UIColor(hexString: "#337EFF"),
-                       cellClass: CenterTextCell.self),
-            ],
-          ]
-        }
+    if NEFriendUserCache.shared.isFriend(uid) {
+      data = [
+        [
+          UserItem(title: localizable("noteName"),
+                   detailTitle: user?.friend?.alias,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithRightArrowCell.self),
+        ],
+        [
+          UserItem(title: localizable("birthday"),
+                   detailTitle: user?.user?.birthday,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("phone"),
+                   detailTitle: user?.user?.mobile,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("email"),
+                   detailTitle: user?.user?.email,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+          UserItem(title: localizable("sign"),
+                   detailTitle: user?.user?.sign,
+                   value: false,
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithDetailTextCell.self),
+        ],
 
-        self?.headerView.setData(user: self?.user)
-        self?.tableView.tableHeaderView = self?.tableView.tableHeaderView
-        self?.tableView.tableHeaderView?.layoutIfNeeded()
-        self?.tableView.reloadData()
-      }
+        [
+          UserItem(title: localizable("add_blackList"),
+                   detailTitle: "",
+                   value: NEFriendUserCache.shared.isBlockAccount(uid),
+                   textColor: UIColor.darkText,
+                   cellClass: TextWithSwitchCell.self),
+        ],
+        [
+          UserItem(title: localizable("chat"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+          UserItem(title: localizable("delete_friend"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor.red,
+                   cellClass: CenterTextCell.self),
+        ],
+      ]
+    } else {
+      data = [
+        [
+          UserItem(title: localizable("add_friend"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+        ],
+      ]
     }
+
+    headerView.setData(user: user)
+    tableView.tableHeaderView = tableView.tableHeaderView
+    tableView.tableHeaderView?.layoutIfNeeded()
+    tableView.reloadData()
   }
 
   open func numberOfSections(in tableView: UITableView) -> Int {
@@ -217,7 +225,6 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       c.titleLabel.text = item.title
       c.switchButton.isOn = item.value
       c.block = { [weak self] title, value in
-        print("title:\(title) value\(value)")
         if title == localizable("add_blackList") {
           self?.blackList(isBlack: value) {
             c.switchButton.isOn = !c.switchButton.isOn
@@ -275,13 +282,11 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
       deleteFriend(user: user)
     }
     if item.title == localizable("add_friend") {
-      if let uId = user?.user?.accountId {
-        viewModel.isFriend(account: uId) { isFriend in
-          if isFriend {
-            self.loadData()
-          } else {
-            self.addFriend()
-          }
+      if let uid = user?.user?.accountId {
+        if NEFriendUserCache.shared.isFriend(uid) {
+          loadData()
+        } else {
+          addFriend()
         }
       }
     }
@@ -307,10 +312,9 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     print("edit remarks")
   }
 
-  func blackList(isBlack: Bool, completion: () -> Void) {
-    weak var weakSelf = self
+  func blackList(isBlack: Bool, completion: @escaping () -> Void) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      weakSelf?.showToast(commonLocalizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       completion()
       return
     }
@@ -318,27 +322,22 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
     guard let userId = user?.user?.accountId else {
       return
     }
+
     if isBlack {
       // add
       viewModel.contactRepo.addBlockList(accountId: userId) { [weak self] error in
-        if error != nil {
-          self?.view.makeToast(error?.localizedDescription)
-        } else {
-          // success
-          self?.isBlack = true
-          self?.loadData()
+        if let err = error {
+          self?.showToast(err.localizedDescription)
+          completion()
         }
       }
 
     } else {
       // remove
       viewModel.contactRepo.removeBlockList(accountId: userId) { [weak self] error in
-        if error != nil {
-          self?.view.makeToast(error?.localizedDescription)
-        } else {
-          // success
-          self?.isBlack = false
-          self?.loadData()
+        if let err = error {
+          self?.showToast(err.localizedDescription)
+          completion()
         }
       }
     }
@@ -380,7 +379,7 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 
   open func deleteFriend(user: NEUserWithFriend?) {
-    let alertTitle = String(format: localizable("delete_title"), user?.showName(true) ?? "")
+    let alertTitle = String(format: localizable("delete_title"), user?.showName() ?? "")
     let alertController = UIAlertController(
       title: alertTitle,
       message: nil,
@@ -426,14 +425,12 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
         } else {
           weakSelf?.showToast(localizable("send_friend_apply"))
           if let model = weakSelf?.viewModel {
-            model.isBlack(account: account) { isBlack in
-              if isBlack {
-                weakSelf?.viewModel.removeBlackList(account: account) { err in
-                  NEALog.infoLog(
-                    self.className,
-                    desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
-                  )
-                }
+            if NEFriendUserCache.shared.isBlockAccount(account) {
+              weakSelf?.viewModel.removeBlackList(account: account) { err in
+                NEALog.infoLog(
+                  self.className,
+                  desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
+                )
               }
             }
           }
@@ -443,11 +440,49 @@ open class NEBaseContactUserViewController: NEBaseContactViewController, UITable
   }
 }
 
-extension NEBaseContactUserViewController: NIMSystemNotificationManagerDelegate {
-  open func onReceive(_ notification: NIMSystemNotification) {
-    if notification.type == .friendAdd,
-       let obj = notification.attachment as? NIMUserAddAttachment,
-       obj.operationType == .verify {
+// MARK: - NEContactListener
+
+extension NEBaseContactUserViewController: NEContactListener {
+  /// 黑名单添加回调
+  /// - Parameter user: 加入黑名单的好友
+  public func onBlockListAdded(_ user: V2NIMUser) {
+    guard let accountId = user.accountId else { return }
+    NEFriendUserCache.shared.addBlockAccount(accountId)
+    if accountId == uid {
+      loadData()
+    }
+  }
+
+  /// 黑名单移除回调
+  /// - Parameter accountId: 移除黑名的用户账号ID
+  public func onBlockListRemoved(_ accountId: String) {
+    NEFriendUserCache.shared.removeBlockAccount(accountId)
+    if accountId == uid {
+      loadData()
+    }
+  }
+
+  /// 添加好友通知
+  /// - Parameter friendInfo: 好友信息
+  public func onFriendAdded(_ friendInfo: V2NIMFriend) {
+    if friendInfo.accountId == uid {
+      user?.friend = friendInfo
+      loadData()
+    }
+  }
+
+  public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+    NEFriendUserCache.shared.removeFriendInfo(accountId)
+    if accountId == uid {
+      loadData()
+    }
+  }
+
+  /// 好友信息变更回调
+  /// - Parameter friendInfo: 好友信息
+  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
+    if friendInfo.accountId == uid {
+      user?.friend = friendInfo
       loadData()
     }
   }

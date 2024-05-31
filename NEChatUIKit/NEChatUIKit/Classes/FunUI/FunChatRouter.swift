@@ -7,6 +7,8 @@ import NIMSDK
 
 public extension ChatRouter {
   static func registerFun() {
+    registerCommon()
+
     // pin
     Router.shared.register(PushPinMessageVCRouter) { param in
       let nav = param["nav"] as? UINavigationController

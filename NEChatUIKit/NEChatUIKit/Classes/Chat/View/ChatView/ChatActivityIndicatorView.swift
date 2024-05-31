@@ -39,6 +39,22 @@ open class ChatActivityIndicatorView: UIView {
     }
   }
 
+  public lazy var failButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.contentMode = .scaleAspectFit
+    button.setImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
+    button.accessibilityIdentifier = "id.sendMessageFailed"
+    return button
+  }()
+
+  private lazy var activityView: UIActivityIndicatorView = {
+    let activityView = UIActivityIndicatorView()
+    activityView.translatesAutoresizingMaskIntoConstraints = false
+    activityView.color = .gray
+    return activityView
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
@@ -66,22 +82,4 @@ open class ChatActivityIndicatorView: UIView {
       activityView.rightAnchor.constraint(equalTo: rightAnchor),
     ])
   }
-
-  // MARK: lazy Method
-
-  public lazy var failButton: UIButton = {
-    let button = UIButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.imageView?.contentMode = .center
-    button.setBackgroundImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
-    button.accessibilityIdentifier = "id.sendMessageFailed"
-    return button
-  }()
-
-  private lazy var activityView: UIActivityIndicatorView = {
-    let activityView = UIActivityIndicatorView()
-    activityView.translatesAutoresizingMaskIntoConstraints = false
-    activityView.color = .gray
-    return activityView
-  }()
 }

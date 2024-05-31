@@ -31,10 +31,10 @@ open class BlackListViewController: NEBaseBlackListViewController {
 
   /// 黑名单选择页面
   /// - Returns: 人员选择控制器
-  override open func getContactSelectVC() -> NEBaseContactsSelectedViewController {
+  override open func getContactSelectVC() -> NEBaseContactSelectedViewController {
     var filterUsers = Set<String>()
     filterUsers.insert(IMKitClient.instance.account())
-    return ContactsSelectedViewController(filterUsers: filterUsers)
+    return ContactSelectedViewController(filterUsers: filterUsers)
   }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

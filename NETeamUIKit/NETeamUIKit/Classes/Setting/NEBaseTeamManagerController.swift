@@ -222,6 +222,10 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
   /// 更新邀请人权限为所有人
   /// - Parameter model: 数据模型
   func updateInvitePermissionToEveryone(_ model: SettingCellModel) {
+    if viewModel.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL {
+      showToast(localizable("failed_operation"))
+      return
+    }
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateInviteMode(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_INVITE_MODE_ALL) { error, team in
@@ -380,6 +384,75 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
         return
       }
       weakSelf?.viewModel.updateTeamAtAllPermission(true) { error in
+        if let err = error as? NSError {
+          if err.code == protocolSendFailed {
+            weakSelf?.showToast(commonLocalizable("network_error"))
+          } else if err.code == noPermissionCode {
+            weakSelf?.showToast(localizable("no_permission_tip"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
+        } else {
+          model.subTitle = localizable("team_owner_and_manager")
+          weakSelf?.contentTableView.reloadData()
+        }
+      }
+    }
+    managerAction.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    managerAction.accessibilityIdentifier = "id.teamOwner"
+    actionSheetController.addAction(managerAction)
+
+    navigationController?.present(actionSheetController, animated: true, completion: nil)
+  }
+
+  /// 点击修改置顶权限回调
+  open func didTopMessagePermissionClick(_ model: SettingCellModel) {
+    weak var weakSelf = self
+
+    let actionSheetController = UIAlertController(
+      title: nil,
+      message: nil,
+      preferredStyle: .actionSheet
+    )
+
+    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+      print("Cancel")
+    }
+    cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    actionSheetController.addAction(cancelActionButton)
+
+    let allAction = UIAlertAction(title: localizable("team_all"), style: .default) { [weak self] _ in
+
+      if self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER, self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
+        self?.showToast(localizable("no_permission_tip"))
+        return
+      }
+      weakSelf?.viewModel.updateTeamTopMessagePermission(false) { error in
+        if let err = error as? NSError {
+          if err.code == protocolSendFailed {
+            weakSelf?.showToast(commonLocalizable("network_error"))
+          } else if err.code == noPermissionCode {
+            weakSelf?.showToast(localizable("no_permission_tip"))
+          } else {
+            weakSelf?.showToast(localizable("failed_operation"))
+          }
+        } else {
+          model.subTitle = localizable("team_all")
+          weakSelf?.contentTableView.reloadData()
+        }
+      }
+    }
+    allAction.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
+    allAction.accessibilityIdentifier = "id.teamAllMember"
+    actionSheetController.addAction(allAction)
+    actionSheetController.fixIpadAction()
+
+    let managerAction = UIAlertAction(title: localizable("team_owner_and_manager"), style: .default) { [weak self] _ in
+      if self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER, self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
+        self?.showToast(localizable("no_permission_tip"))
+        return
+      }
+      weakSelf?.viewModel.updateTeamTopMessagePermission(true) { error in
         if let err = error as? NSError {
           if err.code == protocolSendFailed {
             weakSelf?.showToast(commonLocalizable("network_error"))

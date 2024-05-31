@@ -14,7 +14,7 @@ public protocol ContactViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-open class ContactViewModel: NSObject, NEContactListener {
+open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
   typealias RefreshBlock = () -> Void
   public var contacts: [ContactSection] = []
   public var indexs: [String]?
@@ -22,6 +22,9 @@ open class ContactViewModel: NSObject, NEContactListener {
   public var contactRepo = ContactRepo.shared
   private var initalDict = [String: [ContactInfo]]()
   public weak var delegate: ContactViewModelDelegate?
+
+  /// 在线状态记录
+  public var onlineStatusDic = [String: NIMSubscribeEvent]()
 
   var unreadCount = 0 {
     didSet {
@@ -43,6 +46,16 @@ open class ContactViewModel: NSObject, NEContactListener {
       self.contactHeaders = headSection
       contacts.append(headSection)
     }
+
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      EventSubscribeRepo.shared.addListener(self)
+    }
+  }
+
+  deinit {
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      EventSubscribeRepo.shared.removeListener(self)
+    }
   }
 
   func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
@@ -58,6 +71,9 @@ open class ContactViewModel: NSObject, NEContactListener {
         weakSelf?.contacts.append(contentsOf: users)
         weakSelf?.indexs = self.getIndexs(contactSections: users)
         completion(nil, users.count)
+        if IMKitConfigCenter.shared.onlineStatusEnable {
+          weakSelf?.subscribeOnlineStatus()
+        }
       } else {
         completion(nil, 0)
       }
@@ -272,14 +288,6 @@ open class ContactViewModel: NSObject, NEContactListener {
     }
   }
 
-  /// 用户信息变更回调
-  /// - Parameter users: 用户信息
-  public func onUserProfileChanged(_ users: [V2NIMUser]) {
-    loadData { [weak self] _, _ in
-      self?.delegate?.reloadTableView()
-    }
-  }
-
   /// 黑名单添加回调
   /// - Parameter user: 用户信息
   public func onBlockListAdded(_ user: V2NIMUser) {
@@ -290,10 +298,58 @@ open class ContactViewModel: NSObject, NEContactListener {
   /// 黑名单移除回调
   /// - Parameter accountId: 用户 Id
   public func onBlockListRemoved(_ accountId: String) {
+    NEFriendUserCache.shared.removeBlockAccount(accountId)
     if NEFriendUserCache.shared.isFriend(accountId) {
       loadData { [weak self] _, _ in
         self?.delegate?.reloadTableView()
       }
     }
+  }
+
+  // MARK: - NEEventListener
+
+  /// 订阅在线状态
+  public func subscribeOnlineStatus() {
+    var subscribeList: [String] = []
+    for section in contacts {
+      for contact in section.contacts {
+        if let accountId = contact.user?.user?.accountId {
+          subscribeList.append(accountId)
+        }
+      }
+    }
+    weak var weakSelf = self
+    if subscribeList.count > 0 {
+      NEEventSubscribeManager.shared.subscribeUsersOnlineState(subscribeList) { error in
+        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " contact subscribeUsersOnlineState : \(error?.localizedDescription ?? "")")
+      }
+    }
+  }
+
+  /// 取消订阅
+  public func unsubscribeOnlineStatus() {
+    var subscribeList: [String] = []
+    for section in contacts {
+      for contact in section.contacts {
+        if let accountId = contact.user?.user?.accountId {
+          subscribeList.append(accountId)
+        }
+      }
+    }
+    weak var weakSelf = self
+    NEEventSubscribeManager.shared.unSubscribeUsersOnlineState(subscribeList) { error in
+      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " contact unSubscribeUsersOnlineState : \(error?.localizedDescription ?? "")")
+    }
+  }
+
+  public func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
+    NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
+    for e in event {
+      print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")
+      if e.type == NIMSubscribeSystemEventType.online.rawValue, let acountId = e.from {
+        onlineStatusDic[acountId] = e
+      }
+    }
+    delegate?.reloadTableView()
   }
 }

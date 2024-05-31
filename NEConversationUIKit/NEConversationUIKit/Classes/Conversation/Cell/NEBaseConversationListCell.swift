@@ -162,16 +162,26 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
 
     // time
-    if let time = conversationModel.conversation?.lastMessage?.messageRefer.createTime {
+    var useTime: TimeInterval?
+
+    if let createTime = conversationModel.conversation?.lastMessage?.messageRefer.createTime {
+      useTime = createTime
+
+    } else if let updateTime = conversationModel.conversation?.updateTime {
+      useTime = updateTime
+    }
+    if let time = useTime {
       timeLabel
         .text =
         dealTime(time: time)
       if let text = timeLabel.text {
         let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
         let attibutes = [NSAttributedString.Key.font: timeLabel.font]
-        let labelSize = NSString(string: text).boundingRect(with: maxSize, attributes: attibutes, context: nil)
+        let labelSize = NSString(string: text).boundingRect(with: maxSize, attributes: attibutes as [NSAttributedString.Key: Any], context: nil)
         timeWidth?.constant = labelSize.width + 1 // ceil()
       }
+    } else {
+      timeLabel.text = ""
     }
   }
 

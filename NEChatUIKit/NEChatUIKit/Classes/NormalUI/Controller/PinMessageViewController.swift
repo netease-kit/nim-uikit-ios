@@ -18,6 +18,7 @@ open class PinMessageViewController: NEBasePinMessageViewController {
     ChatMessageHelper.getPinCellRegisterDic(isFun: false)
   }
 
+  /// 获取转发确认弹窗 - 协同版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     ForwardAlertViewController()
   }

@@ -12,10 +12,10 @@ class CustomP2PChatViewController: P2PChatViewController {
     // 自定义消息cell绑定需要放在 super.viewDidLoad() 之前
     NEChatUIKitClient.instance.regsiterCustomCell(["\(customMessageType)": CustomChatCell.self])
 
-    // 通过配置项实现自定义
+    // 通过配置项实现自定义，该方式不需要继承自 ChatViewController
     customByConfig()
 
-    // 通过重写实现自定义
+    // 通过重写实现自定义，该方式需要继承自 ChatViewController
 //    customByOverread()
 
     super.viewDidLoad()
@@ -24,30 +24,30 @@ class CustomP2PChatViewController: P2PChatViewController {
     customMessage()
   }
 
-  /// 通过配置项实现 UI 自定义
+  /// 通过配置项实现 UI 自定义，该方式不需要继承自 ChatViewController
   func customByConfig() {
-//    NEKitChatConfig.shared.ui.messageProperties.avatarType = .rectangle
-//    NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius = 8.0
-//    NEKitChatConfig.shared.ui.messageProperties.signalBgColor = UIColor.ne_backcolor
-//    NEKitChatConfig.shared.ui.messageProperties.selfMessageBg = UIColor.ne_greenText
-//    NEKitChatConfig.shared.ui.messageProperties.receiveMessageBg = UIColor.ne_greenText
-//    NEKitChatConfig.shared.ui.messageProperties.timeTextColor = UIColor.ne_redText
-//    NEKitChatConfig.shared.ui.messageProperties.timeTextSize = 18
-//    NEKitChatConfig.shared.ui.messageProperties.userNickColor = UIColor.ne_redText
-//    NEKitChatConfig.shared.ui.messageProperties.userNickTextSize = 8.0
-//    NEKitChatConfig.shared.ui.messageProperties.messageTextColor = UIColor.ne_redColor
-//    NEKitChatConfig.shared.ui.messageProperties.messageTextSize = 12
-//    NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg = UIImage(named: "copy_right")
-//    NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg = UIImage(named: "copy_right")
-//    NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus = false
-//    NEKitChatConfig.shared.ui.messageProperties.showTeamMessageStatus = false
+    NEKitChatConfig.shared.ui.messageProperties.avatarType = .rectangle
+    NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius = 8.0
+    NEKitChatConfig.shared.ui.messageProperties.signalBgColor = UIColor.ne_backcolor
+    NEKitChatConfig.shared.ui.messageProperties.selfMessageBg = UIColor.ne_greenText
+    NEKitChatConfig.shared.ui.messageProperties.receiveMessageBg = UIColor.ne_greenText
+    NEKitChatConfig.shared.ui.messageProperties.timeTextColor = UIColor.ne_redText
+    NEKitChatConfig.shared.ui.messageProperties.timeTextSize = 18
+    NEKitChatConfig.shared.ui.messageProperties.userNickColor = UIColor.ne_redText
+    NEKitChatConfig.shared.ui.messageProperties.userNickTextSize = 8.0
+    NEKitChatConfig.shared.ui.messageProperties.messageTextColor = UIColor.ne_redColor
+    NEKitChatConfig.shared.ui.messageProperties.messageTextSize = 12
+    NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg = UIImage(named: "copy_right")
+    NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg = UIImage(named: "copy_right")
+    NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus = false
+    NEKitChatConfig.shared.ui.messageProperties.showTeamMessageStatus = false
 //    NEKitChatConfig.shared.ui.messageProperties.showTitleBar = false
 //    NEKitChatConfig.shared.ui.messageProperties.showTitleBarRightIcon = false
-//    NEKitChatConfig.shared.ui.messageProperties.titleBarRightRes = UIImage(named: "copy_right")
-//    NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick = { [weak self] in
-//      self?.showToast("标题栏右侧图标的点击事件")
-//    }
-//    NEKitChatConfig.shared.ui.messageProperties.chatViewBackground = UIColor.ne_redText
+    NEKitChatConfig.shared.ui.messageProperties.titleBarRightRes = UIImage(named: "copy_right")
+    NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick = { [weak self] in
+      self?.showToast("标题栏右侧图标的点击事件")
+    }
+    NEKitChatConfig.shared.ui.messageProperties.chatViewBackground = UIColor.ne_redText
 
     NEKitChatConfig.shared.ui.messageItemClick = { [weak self] cell, model in
       self?.showToast("点击了消息: \(String(describing: model?.message?.text))")
@@ -143,9 +143,20 @@ class CustomP2PChatViewController: P2PChatViewController {
       viewController.bodyBottomView.addSubview(self.customBottomView)
       viewController.bodyBottomViewHeight = 60
     }
+
+    /// 消息列表发送消息时的视图控制器回调
+    /// 回调参数：消息体和消息列表的视图控制器
+    /// 返回值：是否继续发送消息
+    NEKitChatConfig.shared.ui.onSendMessage = { message, ViewController in
+      if let text = message.text, text.starts(with: "哈") {
+        ViewController.showToast(text)
+        return false
+      }
+      return true
+    }
   }
 
-  /// 通过重写实现自定义
+  /// 通过重写实现自定义布局(这种方式需要继承，从而拿到父类属性)
   func customByOverread() {
     // 聊天页顶部导航栏下方扩展视图示例
     customTopView.button.setTitle("通过重写方式添加", for: .normal)
@@ -203,15 +214,14 @@ class CustomP2PChatViewController: P2PChatViewController {
 
   /// 自定义消息以及外部扩展 覆盖cell UI 样式示例
   func customMessage() {
-    // 注册自定义消息的解析器
-    NIMCustomObject.registerCustomDecoder(CustomAttachmentDecoder())
-
     // 测试自定义消息发送按钮
     let testButton = UIButton()
     testButton.translatesAutoresizingMaskIntoConstraints = false
+    testButton.setTitle("发送自定义消息", for: .normal)
+    testButton.titleLabel?.font = .systemFont(ofSize: 12)
     view.addSubview(testButton)
     NSLayoutConstraint.activate([
-      testButton.widthAnchor.constraint(equalToConstant: 100),
+      testButton.widthAnchor.constraint(equalToConstant: 120),
       testButton.heightAnchor.constraint(equalToConstant: 40),
       testButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       testButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -221,18 +231,19 @@ class CustomP2PChatViewController: P2PChatViewController {
   }
 
   // 自定义标题
-//  override func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
-//    super.getSessionInfo(sessionId: sessionId) {
-//      self.title = "小易助手"
-//    }
-//  }
+  override func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
+    super.getSessionInfo(sessionId: sessionId) {
+      self.title = "小易助手"
+      completion()
+    }
+  }
 
   // 长按消息功能弹窗列表自定义（可针对不同 type 消息自定义长按功能项）
-//  override func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {
-//    if model?.type == .rtcCallRecord {
-//      items.append(OperationItem.deleteItem())
-//    }
-//  }
+  override func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {
+    if model?.type == .rtcCallRecord {
+      items.append(OperationItem.replayItem())
+    }
+  }
 
   @objc func customClick() {
     showToast("自定义点击事件")
@@ -274,17 +285,29 @@ class CustomP2PChatViewController: P2PChatViewController {
   }
 
   @objc func sendCustomButton() {
-    let data = ["type": customMessageType]
-    let attachment = CustomAttachment(customType: customMessageType, cellHeight: 50, data: data)
-    let message = V2NIMMessage()
-    let object = V2NIMMessageAttachment()
-    message.attachment = object
+    // type 字段必须指定，且不可为 101、102（UIKit 内部已使用），否则解析为【未知消息体】
+    let dataDic: [String: Any] = ["type": customMessageType]
+    let dataJson = NECommonUtil.getJSONStringFromDictionary(dataDic)
+    let customMessage = MessageUtils.customMessage(text: "this is a custom message, create time:\(Date.timeIntervalSinceReferenceDate)",
+                                                   rawAttachment: dataJson)
 
-    NIMSDK.shared().v2MessageService.send(message, conversationId: V2NIMConversationIdUtil.conversationTargetId(viewModel.conversationId) ?? "", params: nil) { _ in
+    ChatRepo.shared.sendMessage(message: customMessage, conversationId: viewModel.conversationId) { result, error, pro in
+      if let err = error {
+        print("send custom message error : ", err.localizedDescription)
+      }
+    }
+  }
 
-    } failure: { error in
-      print("send custom message error : ", error.nserror.localizedDescription)
-    } progress: { _ in
+  /// 获取消息模型，可在此处对消息体进行修改
+  /// - Parameter model: 模型
+  override func getMessageModel(model: any MessageModel) {
+    super.getMessageModel(model: model)
+
+    // 例如设置自定义消息高度
+    if model.type == .custom {
+      if model.customType == customMessageType {
+        model.height = 50
+      }
     }
   }
 

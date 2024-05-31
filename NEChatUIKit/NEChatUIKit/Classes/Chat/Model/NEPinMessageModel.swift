@@ -33,7 +33,7 @@ open class NEPinMessageModel: NSObject {
   private func modelFromMessage(message: V2NIMMessage) -> MessageModel {
     let model = ChatMessageHelper.modelFromMessage(message: message)
     model.fullName = message.senderId
-    model.shortName = ChatMessageHelper.getShortName(message.senderId ?? "")
+    model.shortName = NEFriendUserCache.getShortName(message.senderId ?? "")
     return model
   }
 
@@ -66,28 +66,5 @@ open class NEPinMessageModel: NSObject {
     }
 
     return height
-  }
-
-  open func getReplyMessageWithoutThread(message: V2NIMMessage, _ completion: @escaping (MessageModel?) -> Void) {
-    var replyId: String? = message.threadReply?.messageClientId
-    if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""),
-       let yxReplyMsg = remoteExt[keyReplyMsgKey] as? [String: Any] {
-      replyId = yxReplyMsg["idClient"] as? String
-    }
-
-    guard let id = replyId, !id.isEmpty else {
-      completion(nil)
-      return
-    }
-
-    repo.getMessageListByIds([id]) { [weak self] messages, error in
-      if let m = messages?.first {
-        let model = self?.modelFromMessage(message: m)
-        model?.isReplay = true
-        completion(model)
-      } else {
-        completion(nil)
-      }
-    }
   }
 }

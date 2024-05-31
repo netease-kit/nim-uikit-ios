@@ -9,26 +9,24 @@ target 'app' do
   #登录组件
   pod 'YXLogin', '1.0.0'
   
-  #可选UI库
-  pod 'NEContactUIKit', '10.0.0-beta'
-  pod 'NEConversationUIKit', '10.0.0-beta'
-  pod 'NEChatUIKit', '10.0.0-beta'
-  pod 'NETeamUIKit', '10.0.0-beta'
-
-  #可选Kit库（和UIKit对应）
-  pod 'NEChatKit', '10.0.0-beta'
-
-  #基础kit库
-  pod 'NECommonUIKit', '9.6.7'
-  pod 'NECommonKit', '9.6.7'
-  pod 'NECoreIM2Kit', '1.0.0-beta'
-  pod 'NECoreKit', '9.6.8'
-
-  #扩展库
-  pod 'NEMapKit', '10.0.0-beta'
+  # 不指定 NIM SDK 版本
+  pod 'NEChatUIKit', '10.1.0'
+  pod 'NEContactUIKit', '10.1.0'
+  pod 'NEConversationUIKit', '10.1.0'
+  pod 'NETeamUIKit', '10.1.0'
+  pod 'NEMapKit', '10.1.0'
+  
+  # 指定 NIM SDK 版本
+#  pod 'lottie-ios', '2.5.3'
+#  pod 'NEChatKit/NOS_Special', '10.1.0'
+#  pod 'NEChatUIKit/NOS_Special', '10.1.0'
+#  pod 'NEContactUIKit/NOS_Special', '10.1.0'
+#  pod 'NEConversationUIKit/NOS_Special', '10.1.0'
+#  pod 'NETeamUIKit/NOS_Special', '10.1.0'
+#  pod 'NEMapKit/NOS_Special', '10.1.0'
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
-  pod 'NIMSDK_LITE','10.2.5-beta'
+  pod 'NIMSDK_LITE','10.2.6-beta'
   pod 'NERtcCallKit/NOS_Special', '2.4.0'
   pod 'NERtcCallUIKit/NOS_Special', '2.4.0'
   pod 'NERtcSDK', '5.5.33'

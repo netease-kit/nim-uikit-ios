@@ -64,7 +64,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
     param.teamIds = [teamId]
 
     weak var weakSelf = self
-    chatRepo.searchMessages(param: param) { error, messages in
+    chatRepo.searchMessages(params: param) { error, messages in
 
       if error == nil {
         // 未找到用户信息信息记录
@@ -138,7 +138,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
   /// - Parameter completion: 完成回调
   public func getSearchMessageMembers(_ teamId: String, _ accounts: [String], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
     weak var weakSelf = self
-    teamRepo.getTeamMemberList(teamId, accounts) { members, error in
+    teamRepo.getTeamMemberListByIds(teamId, .TEAM_TYPE_NORMAL, accounts) { members, error in
       if let err = error {
         completion(err, nil)
       } else {
@@ -171,7 +171,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
       memberModels.append(model)
     }
 
-    contactRepo.getFriendInfoList(accountIds: accids) { users, v2Error in
+    contactRepo.getUserWithFriend(accountIds: accids) { users, v2Error in
 
       if v2Error != nil {
         completion(nil, memberModels)

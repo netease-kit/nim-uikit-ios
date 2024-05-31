@@ -15,22 +15,17 @@ open class ContactUserViewModel: NSObject {
 
   func addFriend(_ account: String, _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    contactRepo.addFriend(accountId: account, completion)
+    let params = V2NIMFriendAddParams()
+    params.addMode = .FRIEND_MODE_TYPE_APPLAY
+    contactRepo.addFriend(accountId: account, params: params, completion)
   }
 
   open func deleteFriend(account: String, _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    contactRepo.deleteFriend(account: account, completion)
-  }
 
-  open func isFriend(account: String, _ completion: @escaping (Bool) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    contactRepo.isFriend(accountId: account, completion)
-  }
-
-  open func isBlack(account: String, _ completion: @escaping (Bool) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    contactRepo.isBlockList(accountId: account, completion)
+    let params = V2NIMFriendDeleteParams()
+    params.deleteAlias = true
+    contactRepo.deleteFriend(account: account, params: params, completion)
   }
 
   open func removeBlackList(account: String, _ completion: @escaping (Error?) -> Void) {
@@ -38,13 +33,26 @@ open class ContactUserViewModel: NSObject {
     contactRepo.removeBlockList(accountId: account, completion)
   }
 
-  open func update(_ user: NEUserWithFriend, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + (user.user?.accountId ?? "nil"))
-    contactRepo.updateUser(user, completion)
+  /// 更新好友备注
+  /// - Parameters:
+  ///   - accountId: 用户Id
+  ///   - alias: 备注
+  ///   - completion: 请求回调
+  open func updateAlias(accountId: String,
+                        alias: String,
+                        _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: \(accountId)")
+
+    let params = V2NIMFriendSetParams()
+    params.alias = alias
+
+    contactRepo.setFriendInfo(accountId: accountId, params: params, completion)
   }
 
   open func getUserInfo(_ uid: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
-    contactRepo.getFriendInfo(uid, completion)
+    contactRepo.getUserWithFriend(accountIds: [uid]) { userFriends, error in
+      completion(userFriends?.first, error)
+    }
   }
 }

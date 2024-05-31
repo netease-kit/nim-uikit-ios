@@ -23,7 +23,7 @@ open class NotificationMessageUtils: NSObject {
       let text = textForTeamNotificationMessage(message: message)
       return text
     } else {
-      return ""
+      return fromName(message: message) + (message.text ?? "")
     }
   }
 
@@ -110,8 +110,7 @@ open class NotificationMessageUtils: NSObject {
       if sourceId == IMKitClient.instance.account() {
         return chatLocalizable("You") + " "
       } else {
-        let (name, _) = ChatTeamCache.shared.getShowName(sourceId)
-        return name
+        return ChatTeamCache.shared.getShowName(sourceId)
       }
     } else {
       return ""
@@ -129,7 +128,7 @@ open class NotificationMessageUtils: NSObject {
       if targetID == IMKitClient.instance.account() {
         toNames.append(chatLocalizable("You") + " ")
       } else {
-        let (name, _) = ChatTeamCache.shared.getShowName(targetID)
+        let name = ChatTeamCache.shared.getShowName(targetID)
         toNames.append(name)
       }
     }
@@ -212,12 +211,6 @@ open class NotificationMessageUtils: NSObject {
         chatLocalizable("team_update_info_permission") + "\" " + chatLocalizable("to") + "\"" + (updatedTeamInfo.updateInfoMode == .TEAM_UPDATE_INFO_MODE_MANAGER ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
     }
 
-    // 更新群客户端自定义拓展字段权限
-    if updatedTeamInfo.updateExtensionMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") +
-        chatLocalizable("team_update_client_custom")
-    }
-
     // 群整体禁言
     if updatedTeamInfo.chatBannedMode.rawValue != -1 {
       return updatedTeamInfo.chatBannedMode == .TEAM_CHAT_BANNED_MODE_BANNED_NORMAL ? chatLocalizable("team_all_mute") : chatLocalizable("team_all_no_mute")
@@ -225,8 +218,15 @@ open class NotificationMessageUtils: NSObject {
 
     // 客户端自定义拓展字段
     if let serverExt = updatedTeamInfo.serverExtension, let extDic = getDictionaryFromJSONString(serverExt) {
+      var lastOpt = keyAllowAtAll
+
+      // 上一次操作的字段
+      if let opt = extDic["lastOpt"] as? String {
+        lastOpt = opt
+      }
+
       // @所有人权限
-      if let allowAt = extDic[keyAllowAtAll] as? String {
+      if lastOpt == keyAllowAtAll, let allowAt = extDic[keyAllowAtAll] as? String {
         if allowAt == allowAtManagerValue {
           return chatLocalizable("team_at_permission") + chatLocalizable("only_team_owner")
         }
@@ -234,9 +234,33 @@ open class NotificationMessageUtils: NSObject {
           return chatLocalizable("team_at_permission") + chatLocalizable("everyone")
         }
       }
+
+      // 置顶消息权限
+      if lastOpt == keyAllowTopMessage, let allowAt = extDic[keyAllowTopMessage] as? String {
+        if allowAt == allowAtManagerValue {
+          return chatLocalizable("team_top_permission") + chatLocalizable("only_team_owner")
+        }
+        if allowAt == allowAtAllValue {
+          return chatLocalizable("team_top_permission") + chatLocalizable("everyone")
+        }
+      }
+
+      // 置顶消息
+      if lastOpt == keyTopMessage, let topInfo = extDic[keyTopMessage] as? [String: Any] {
+        if let type = topInfo["operation"] as? Int {
+          return fromName + " " + (type == 0 ? chatLocalizable("top_message") : chatLocalizable("untop_message"))
+        }
+      }
     } else {
       return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
     }
+
+    // 更新群客户端自定义拓展字段权限
+    if updatedTeamInfo.updateExtensionMode.rawValue != -1 {
+      return fromName + " " + chatLocalizable("has_updated") +
+        chatLocalizable("team_update_client_custom")
+    }
+
     return text
   }
 }

@@ -48,10 +48,9 @@ public class ChatUserCache: NSObject {
 
   /// 获取缓存用户名字，p2p： 备注 > 昵称 > ID
   public func getShowName(_ userId: String,
-                          _ showAlias: Bool = true) -> (String, NEUserWithFriend?) {
+                          _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId: " + userId)
     let user = getUserInfo(userId)
-    let fullName = user?.showName(showAlias) ?? userId
-    return (fullName, user)
+    return user?.showName(showAlias) ?? userId
   }
 }

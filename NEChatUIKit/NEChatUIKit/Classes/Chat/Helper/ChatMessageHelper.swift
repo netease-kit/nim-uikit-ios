@@ -58,7 +58,7 @@ public class ChatMessageHelper: NSObject {
       return ""
     }
     if V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
-      return NEFriendUserCache.shared.getShowName(sessionId).name
+      return NEFriendUserCache.shared.getShowName(sessionId)
     } else {
       return ChatTeamCache.shared.getTeamInfo()?.name ?? ""
     }
@@ -124,6 +124,32 @@ public class ChatMessageHelper: NSObject {
     ]
   }
 
+  /// 获取收藏列表单元格注册列表
+  /// - Parameter isFun: 是否是娱乐皮肤
+  /// - Returns: 单元格注册列表
+  public static func getCollectionCellRegisterDic(isFun: Bool) -> [String: NEBaseCollectionMessageCell.Type] {
+    [
+      "\(MessageType.text.rawValue)":
+        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
+      "\(MessageType.image.rawValue)":
+        isFun ? FunCollectionMessageImageCell.self : CollectionMessageImageCell.self,
+      "\(MessageType.audio.rawValue)":
+        isFun ? FunCollectionMessageAudioCell.self : CollectionMessageAudioCell.self,
+      "\(MessageType.video.rawValue)":
+        isFun ? FunCollectionMessageVideoCell.self : CollectionMessageVideoCell.self,
+      "\(MessageType.location.rawValue)":
+        isFun ? FunCollectionMessageLocationCell.self : CollectionMessageLocationCell.self,
+      "\(MessageType.file.rawValue)":
+        isFun ? FunCollectionMessageFileCell.self : CollectionMessageFileCell.self,
+      "\(MessageType.multiForward.rawValue)":
+        isFun ? FunCollectionMessageMultiForwardCell.self : CollectionMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)":
+        isFun ? FunCollectionMessageRichTextCell.self : CollectionMessageRichTextCell.self,
+      "\(NEBasePinMessageTextCell.self)":
+        isFun ? FunCollectionMessageDefaultCell.self : CollectionMessageDefaultCell.self,
+    ]
+  }
+
   /// 构造消息体
   /// - Parameter message: 消息
   /// - Returns: 消息体
@@ -154,6 +180,9 @@ public class ChatMessageHelper: NSObject {
         if type == customRichTextType {
           return MessageRichTextModel(message: message)
         }
+
+        // 注册过的自定义消息类型
+        return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
       }
       fallthrough
     default:
@@ -221,6 +250,10 @@ public class ChatMessageHelper: NSObject {
           completion(MessageRichTextModel(message: message))
           return
         }
+
+        // 注册过的自定义消息类型
+        completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
+        return
       }
       fallthrough
     default:
@@ -295,17 +328,19 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_FILE:
       return chatLocalizable("msg_file")
     case .MESSAGE_TYPE_LOCATION:
-      return chatLocalizable("msg_location")
+      return chatLocalizable("msg_location") + " \(message?.text ?? "")"
     case .MESSAGE_TYPE_CALL:
       if let attachment = message?.attachment as? V2NIMMessageCallAttachment {
         return attachment.type == 1 ? chatLocalizable("msg_rtc_audio") : chatLocalizable("msg_rtc_video")
       }
       return chatLocalizable("msg_rtc_call")
     case .MESSAGE_TYPE_CUSTOM:
+      // 换行消息
       if let content = NECustomAttachment.contentOfRichText(message?.attachment) {
         return content
       }
 
+      // 合并转发
       if let customType = NECustomAttachment.typeOfCustomMessage(message?.attachment),
          customType == customMultiForwardType {
         return "[\(chatLocalizable("chat_history"))]"
@@ -361,12 +396,12 @@ public class ChatMessageHelper: NSObject {
 
       // 保存消息昵称和头像
       if let from = msg.senderId {
-        let user = ChatTeamCache.shared.getTeamMemberInfo(accountId: from)?.nimUser ?? NEFriendUserCache.shared.getFriendInfo(from) ?? ChatUserCache.shared.getUserInfo(from)
+        let user = NEFriendUserCache.shared.getFriendInfo(from) ?? ChatUserCache.shared.getUserInfo(from)
         if let user = user {
-          let senderNick = user.showNameWithAliasControl(false)
+          let senderNick = user.showName(false)
           if var remoteExt = getDictionaryFromJSONString(msg.serverExtension ?? "") as? [String: Any] {
             remoteExt[mergedMessageNickKey] = senderNick
-            remoteExt[mergedMessageAvatarKey] = user.user?.avatar ?? getShortName(senderNick ?? "")
+            remoteExt[mergedMessageAvatarKey] = user.user?.avatar ?? NEFriendUserCache.getShortName(senderNick ?? "")
             msg.serverExtension = getJSONStringFromDictionary(remoteExt)
           } else {
             let remoteExt = [mergedMessageNickKey: senderNick as Any,
@@ -382,7 +417,7 @@ public class ChatMessageHelper: NSObject {
                               "userAccId": from])
           }
         }
-        if let stringData = ChatRepo.shared.messageSerialization(msg) {
+        if let stringData = V2NIMMessageConverter.messageSerialization(msg) {
           body.append(enter + stringData)
         }
       }
@@ -445,11 +480,22 @@ public class ChatMessageHelper: NSObject {
     return nil
   }
 
-  ///    全名后几位
-  public static func getShortName(_ name: String, _ length: Int = 2) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", name: " + name)
-    return name
-      .count > length ? String(name[name.index(name.endIndex, offsetBy: -length)...]) : name
+  /// 查找回复信息键值对
+  /// - Parameter message: 消息
+  /// - Returns: 回复消息的 id
+  public static func createMessageRefer(_ params: [String: Any]?) -> V2NIMMessageRefer {
+    let refer = V2NIMMessageRefer()
+    refer.messageClientId = params?["idClient"] as? String
+    refer.messageServerId = params?["idServer"] as? String
+    refer.senderId = params?["from"] as? String
+    refer.createTime = TimeInterval((params?["time"] as? Int ?? 0) / 1000)
+    if let conversationId = params?["to"] as? String {
+      refer.conversationId = conversationId
+      refer.receiverId = V2NIMConversationIdUtil.conversationTargetId(conversationId)
+      refer.conversationType = V2NIMConversationIdUtil.conversationType(conversationId)
+    }
+
+    return refer
   }
 
   /// 获取文件 MD5 值
@@ -490,20 +536,20 @@ public class ChatMessageHelper: NSObject {
   /// - Parameter message: 消息
   /// - Returns: 本地文件路径
   public static func createFilePath(_ message: V2NIMMessage?) -> String {
-    var path = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit") ?? ""
+    var path = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) ?? ""
     guard let attach = message?.attachment as? V2NIMMessageFileAttachment else {
       return path
     }
 
     switch message?.messageType {
     case .MESSAGE_TYPE_AUDIO:
-      path = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/audio/") ?? ""
+      path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)audio/") ?? ""
     case .MESSAGE_TYPE_IMAGE:
-      path = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/image/") ?? ""
+      path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") ?? ""
     case .MESSAGE_TYPE_VIDEO:
-      path = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/video/") ?? ""
+      path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)video/") ?? ""
     default:
-      path = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/file/") ?? ""
+      path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)file/") ?? ""
     }
 
     if let messageClientId = message?.messageClientId {
@@ -511,7 +557,7 @@ public class ChatMessageHelper: NSObject {
     }
 
     // 后缀（例如：.png）
-    if let ext = attach.ext {
+    if let ext = attach.ext, ext.count < 5 {
       path += ext
     }
 

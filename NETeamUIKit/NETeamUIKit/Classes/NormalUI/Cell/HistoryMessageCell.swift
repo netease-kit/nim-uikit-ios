@@ -8,7 +8,7 @@ import UIKit
 
 @objcMembers
 open class HistoryMessageCell: NEBaseHistoryMessageCell {
-  override func setupSubviews() {
+  override open func setupSubviews() {
     super.setupSubviews()
     NSLayoutConstraint.activate([
       headView.leftAnchor.constraint(
@@ -46,5 +46,13 @@ open class HistoryMessageCell: NEBaseHistoryMessageCell {
       ),
       timeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
+  }
+
+  override open func configData(message: HistoryMessageModel?) {
+    super.configData(message: message)
+    guard let searchStr = searchText, let fullText = message?.imMessage?.text else { return }
+    let windowWidth = UIScreen.main.bounds.width
+    let maxWidth = windowWidth - NEConstant.screenInterval - 36 - 12 - 50
+    truncateTextForLabel(subTitleLabel, maxWidth, searchStr, fullText)
   }
 }

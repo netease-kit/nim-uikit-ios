@@ -83,8 +83,4 @@ open class MessageUtils: NSObject {
   open class func tipMessage(text: String) -> V2NIMMessage {
     V2NIMMessageCreator.createTipsMessage(text)
   }
-
-  open class func messageConfig() -> V2NIMMessageConfig {
-    ChatRepo.shared.messageConfig()
-  }
 }

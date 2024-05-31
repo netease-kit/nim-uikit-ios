@@ -26,7 +26,7 @@ open class NEMessageUtil {
     case .MESSAGE_TYPE_VIDEO:
       return localizable("video")
     case .MESSAGE_TYPE_LOCATION:
-      return localizable("location")
+      return localizable("location") + " \(text ?? "")"
     case .MESSAGE_TYPE_NOTIFICATION:
       return localizable("notification")
     case .MESSAGE_TYPE_FILE:
@@ -55,6 +55,8 @@ open class NEMessageUtil {
           return title
         }
       }
+
+      return localizable("custom")
     }
     return localizable("unknown")
   }

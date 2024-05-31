@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
+import NIMSDK
 import UIKit
 
 /// 头像枚举类型
@@ -34,6 +35,11 @@ public class ChatUIConfig: NSObject {
 
   /// 消息列表的视图控制器回调，回调中会返回消息列表的视图控制器
   public var customController: ((ChatViewController) -> Void)?
+
+  /// 消息列表发送消息时的视图控制器回调
+  /// 回调参数：消息体和消息列表的视图控制器
+  /// 返回值：是否继续发送消息
+  public var onSendMessage: ((V2NIMMessage, ChatViewController) -> Bool)?
 
   /// 用户可自定义参数
 

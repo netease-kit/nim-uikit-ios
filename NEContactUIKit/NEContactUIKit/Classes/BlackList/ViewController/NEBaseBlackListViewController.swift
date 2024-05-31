@@ -116,8 +116,8 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     navigationController?.popViewController(animated: true)
   }
 
-  open func getContactSelectVC() -> NEBaseContactsSelectedViewController {
-    NEBaseContactsSelectedViewController()
+  open func getContactSelectVC() -> NEBaseContactSelectedViewController {
+    NEBaseContactSelectedViewController()
   }
 
   func addBlack() {

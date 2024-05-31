@@ -160,7 +160,7 @@ open class NEBasePinMessageCell: UITableViewCell {
   open func configure(_ item: NEPinMessageModel) {
     pinModel = item
     headerView.configHeadData(headUrl: item.chatmodel.avatar,
-                              name: item.chatmodel.fullName ?? "",
+                              name: item.chatmodel.shortName ?? "",
                               uid: item.chatmodel.message?.senderId ?? "")
     nameLabel.text = item.chatmodel.fullName
     timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: item.message.createTime))

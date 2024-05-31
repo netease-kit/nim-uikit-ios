@@ -8,8 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
-  public let navigationView = NENavigationView()
+open class NEBaseTeamListViewController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource {
   var tableView = UITableView(frame: .zero, style: .plain)
   var viewModel = TeamListViewModel()
   var isClickCallBack = false
@@ -28,12 +27,13 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
     loadData()
     weak var weakSelf = self
     viewModel.refresh = {
+      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.teamList.count ?? 0) > 0
       weakSelf?.tableView.reloadData()
     }
   }
 
   func commonUI() {
-    title = localizable("mine_groupchat")
+    title = localizable("my_teams")
     navigationView.navTitle.text = title
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
@@ -69,14 +69,24 @@ open class NEBaseTeamListViewController: UIViewController, UITableViewDelegate, 
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+
+    emptyView.setText(localizable("team_empty"))
+    view.addSubview(emptyView)
+    NSLayoutConstraint.activate([
+      emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
+      emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
+    ])
   }
 
   func loadData() {
-    viewModel.getTeamList { [weak self] _, error in
+    viewModel.getTeamList { [weak self] teams, error in
       if let err = error {
         print("getTeamList error: \(err)")
       } else {
         self?.tableView.reloadData()
+        self?.emptyView.isHidden = (teams?.count ?? 0) > 0
       }
     }
   }

@@ -33,7 +33,7 @@ class CustomTeamSettingSwitchCell: TeamSettingSwitchCell {
         tSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
         tSwitch.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
       ])
-      tSwitch.onTintColor = UIColor(hexString: "#58BE6B")
+      tSwitch.onTintColor = .ne_funTheme
 
       tSwitch.addTarget(self, action: #selector(switchChange(_:)), for: .touchUpInside)
 

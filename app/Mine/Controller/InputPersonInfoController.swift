@@ -24,6 +24,31 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
 
   public var callBack: ResultCallBack?
   private var limitNumberCount = 0
+
+  lazy var textField: UITextField = {
+    let text = UITextField()
+    text.translatesAutoresizingMaskIntoConstraints = false
+    text.textColor = UIColor(hexString: "0x333333")
+    text.font = UIFont.systemFont(ofSize: 14)
+    text.delegate = self
+    text.clearButtonMode = .always
+    text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    if let clearButton = text.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    text.accessibilityIdentifier = "id.nickname"
+    return text
+  }()
+
+  lazy var textfieldBgView: UIView = {
+    let backView = UIView()
+    backView.backgroundColor = .white
+    backView.clipsToBounds = true
+    backView.layer.cornerRadius = 8.0
+    backView.translatesAutoresizingMaskIntoConstraints = false
+    return backView
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     setupSubviews()
@@ -119,32 +144,6 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
       limitNumberCount = 50
     }
   }
-
-  // MARK: lazy Method
-
-  lazy var textField: UITextField = {
-    let text = UITextField()
-    text.translatesAutoresizingMaskIntoConstraints = false
-    text.textColor = UIColor(hexString: "0x333333")
-    text.font = UIFont.systemFont(ofSize: 14)
-    text.delegate = self
-    text.clearButtonMode = .always
-    text.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
-    if let clearButton = text.value(forKey: "_clearButton") as? UIButton {
-      clearButton.accessibilityIdentifier = "id.clear"
-    }
-    text.accessibilityIdentifier = "id.nickname"
-    return text
-  }()
-
-  lazy var textfieldBgView: UIView = {
-    let backView = UIView()
-    backView.backgroundColor = .white
-    backView.clipsToBounds = true
-    backView.layer.cornerRadius = 8.0
-    backView.translatesAutoresizingMaskIntoConstraints = false
-    return backView
-  }()
 
   @objc
   func textFieldChange() {

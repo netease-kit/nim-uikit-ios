@@ -26,6 +26,17 @@ open class EmojiPageView: UIView {
   private var pages = [AnyObject]()
   private let className = "EmojiPageView"
 
+  private lazy var scrollView: UIScrollView = {
+    let scrollView = UIScrollView(frame: self.bounds)
+    scrollView.autoresizingMask = .flexibleWidth
+    scrollView.showsVerticalScrollIndicator = false
+    scrollView.showsHorizontalScrollIndicator = false
+    scrollView.isPagingEnabled = true
+    scrollView.delegate = self
+    scrollView.scrollsToTop = false
+    return scrollView
+  }()
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
     setupControls()
@@ -222,19 +233,6 @@ open class EmojiPageView: UIView {
     )
 //        }
   }
-
-  // MARK: private method
-
-  private lazy var scrollView: UIScrollView = {
-    let scrollView = UIScrollView(frame: self.bounds)
-    scrollView.autoresizingMask = .flexibleWidth
-    scrollView.showsVerticalScrollIndicator = false
-    scrollView.showsHorizontalScrollIndicator = false
-    scrollView.isPagingEnabled = true
-    scrollView.delegate = self
-    scrollView.scrollsToTop = false
-    return scrollView
-  }()
 
   // MARK: 辅助方法
 

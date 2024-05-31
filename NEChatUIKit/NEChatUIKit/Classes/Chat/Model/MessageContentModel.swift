@@ -10,7 +10,8 @@ import NIMSDK
 
 @objcMembers
 open class MessageContentModel: NSObject, MessageModel {
-  public var type: MessageType = .custom
+  public var type: MessageType = .custom // 消息类型（文本、图片、自定义消息...）
+  public var customType: Int = 0 // 自定义消息的子类型（合并转发、换行消息...）
   public var message: V2NIMMessage?
 
   public var offset: CGFloat = 0

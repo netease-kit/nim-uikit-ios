@@ -61,7 +61,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
   /// - Parameter completion: 完成回调
   func getCurrentUserTeamMember(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     weak var weakSelf = self
-    teamRepo.getTeamMember(teamId, IMKitClient.instance.account()) { member, error in
+    teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
       weakSelf?.currentMember = member
       completion(error)
     }
@@ -72,7 +72,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
   /// - Parameter uids: 用户id
   /// - Parameter completion: 结果回调
   open func addTeamManager(_ teamId: String, _ uids: [String], _ completion: @escaping (Error?) -> Void) {
-    teamRepo.addManagers(teamId, uids) { error in
+    teamRepo.addManagers(teamId, .TEAM_TYPE_NORMAL, uids) { error in
       completion(error)
     }
   }
@@ -82,7 +82,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
   /// - Parameter uids: 用户id
   /// - Parameter completion: 结果回调
   open func removeTeamManager(_ teamId: String, _ uids: [String], _ completion: @escaping (Error?) -> Void) {
-    teamRepo.removeManagers(teamId, uids) { error in
+    teamRepo.removeManagers(teamId, .TEAM_TYPE_NORMAL, uids) { error in
       completion(error)
     }
   }
@@ -91,7 +91,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
   /// - Parameter teamId: 群id
   open func getCurrentMember(_ teamId: String) {
     weak var weakSelf = self
-    teamRepo.getTeamMember(teamId, IMKitClient.instance.account()) { member, error in
+    teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
       weakSelf?.currentMember = member
     }
   }
@@ -198,6 +198,12 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
                 if let datas = teamInfo?.users {
                   weakSelf?.managers.removeAll()
                   weakSelf?.managers.append(contentsOf: datas)
+                  weakSelf?.managers.sort(by: { model1, model2 in
+                    if let time1 = model1.teamMember?.joinTime, let time2 = model2.teamMember?.joinTime {
+                      return time2 > time1
+                    }
+                    return false
+                  })
                 }
                 completion(teamInfo, error)
               }
@@ -271,7 +277,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
     var temArray = remainUserIds
     weak var weakSelf = self
 
-    ContactRepo.shared.getFriendInfoList(accountIds: accids) { infos, v2Error in
+    ContactRepo.shared.getUserWithFriend(accountIds: accids) { infos, v2Error in
       if let err = v2Error {
         completion(err as NSError, model)
       } else {

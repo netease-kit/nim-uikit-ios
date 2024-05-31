@@ -86,7 +86,7 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
       avatarImageView.backgroundColor = .clear
     } else {
       // 无头像设置其name
-      showNameOnCircleHeader(model.userInfo?.showName(false) ?? "")
+      showNameOnCircleHeader(model.userInfo?.showName() ?? "")
       avatarImageView.sd_setImage(with: URL(string: ""), completed: nil)
       avatarImageView.backgroundColor = UIColor.colorWithString(string: model.userInfo?.user?.accountId)
     }

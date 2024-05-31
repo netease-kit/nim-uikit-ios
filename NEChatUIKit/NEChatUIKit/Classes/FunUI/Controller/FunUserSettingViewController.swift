@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -63,7 +64,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
       userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
       userHeaderView.setTitle("")
       userHeaderView.backgroundColor = .clear
-    } else if let name = viewModel.userInfo?.shortName(showAlias: false, count: 2) {
+    } else if let name = viewModel.userInfo?.shortName(count: 2) {
       userHeaderView.sd_setImage(with: nil)
       userHeaderView.setTitle(name)
       userHeaderView.backgroundColor = UIColor.colorWithString(string: viewModel.userInfo?.user?.accountId)
@@ -72,7 +73,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     nameLabel.text = viewModel.userInfo?.showName()
     cornerBackView.addSubview(nameLabel)
 
-    if IMKitClient.instance.getConfigCenter().teamEnable {
+    if IMKitConfigCenter.shared.teamEnable {
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 22),
         userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 22),
@@ -124,6 +125,10 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
       }
       return true
     }
+  }
+
+  override open func didLoadData() {
+    viewModel.setFunType()
   }
 
   override func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {

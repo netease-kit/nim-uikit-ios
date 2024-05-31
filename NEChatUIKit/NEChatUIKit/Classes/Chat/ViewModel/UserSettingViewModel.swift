@@ -58,8 +58,8 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
   /// - Parameter completion: 完成回调
   func getUserSettingModel(_ userId: String, _ completion: @escaping () -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + userId)
-    contactRepo.getFriendInfo(userId) { [weak self] user, error in
-      self?.userInfo = user
+    contactRepo.getUserWithFriend(accountIds: [userId]) { [weak self] userfriends, error in
+      self?.userInfo = userfriends?.first
 
       self?.getSectionDatas()
 
@@ -76,7 +76,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
     let mark = UserSettingCellModel()
     mark.cellName = chatLocalizable("operation_pin")
     mark.type = UserSettingType.SelectType.rawValue
-    mark.cornerType = .topLeft.union(.topRight)
+//    mark.cornerType = .topLeft.union(.topRight)
 
     let remind = UserSettingCellModel()
     remind.cellName = chatLocalizable("message_remind")
@@ -101,7 +101,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
 
     let setTop = UserSettingCellModel()
     setTop.cellName = chatLocalizable("session_set_top")
-    setTop.cornerType = .bottomRight.union(.bottomLeft)
+//    setTop.cornerType = .bottomRight.union(.bottomLeft)
 
     if let currentConversation = conversation {
       setTop.switchOpen = currentConversation.stickTop
@@ -110,7 +110,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
     setTop.swichChange = { isOpen in
       if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
         if isOpen {
-          weakSelf?.conversationRepo.addStickTop(cid) { error in
+          weakSelf?.conversationRepo.setStickTop(cid, true) { error in
             print("add stick : ", error as Any)
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
@@ -121,7 +121,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
           }
 
         } else {
-          weakSelf?.conversationRepo.removeStickTop(cid) { error in
+          weakSelf?.conversationRepo.setStickTop(cid, false) { error in
             print("remote stick : ", error as Any)
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
@@ -133,7 +133,35 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
         }
       }
     }
-    cellDatas.append(contentsOf: [mark, remind, setTop])
+    if IMKitConfigCenter.shared.pinEnable {
+      cellDatas.append(mark)
+    }
+    cellDatas.append(remind)
+    cellDatas.append(setTop)
+
+    setAudoType()
+  }
+
+  // 设置圆角
+  open func setAudoType() {
+    for model in cellDatas {
+      if model == cellDatas.first {
+        model.cornerType = .topLeft.union(.topRight)
+        if model == cellDatas.last {
+          model.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
+        }
+      } else if model == cellDatas.last {
+        model.cornerType = .bottomLeft.union(.bottomRight)
+      } else {
+        model.cornerType = .none
+      }
+    }
+  }
+
+  open func setFunType() {
+    for model in cellDatas {
+      model.cornerType = .none
+    }
   }
 
   /// 会话变更回调

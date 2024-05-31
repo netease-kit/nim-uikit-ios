@@ -64,7 +64,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     reeditButton.accessibilityIdentifier = "id.reeditButton"
     reeditButton.setImage(UIImage.ne_imageNamed(name: "right_arrow"), for: .normal)
     reeditButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
-    reeditButton.setTitleColor(UIColor.ne_blueText, for: .normal)
+    reeditButton.setTitleColor(UIColor.ne_normalTheme, for: .normal)
     reeditButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -30, bottom: 0, right: 0)
     reeditButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 70, bottom: 0, right: 0)
 

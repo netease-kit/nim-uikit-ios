@@ -211,6 +211,10 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
           weakSelf?.viewModel.teamSettingType = type
         }
         weakSelf?.resetupUI()
+
+        weakSelf?.viewModel.getAllTeamMemberInfos(tid, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { error in
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "CALLBACK getAllTeamMemberInfos \(error?.localizedDescription ?? "no error")")
+        }
       }
     }
   }
@@ -253,8 +257,6 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
          let beInviteMode = weakSelf?.viewModel.teamInfoModel?.team?.agreeMode,
          let type = weakSelf?.viewModel.teamInfoModel?.team?.teamType {
         if beInviteMode == .TEAM_AGREE_MODE_NO_AUTH || type == .TEAM_TYPE_NORMAL {
-          weakSelf?.didAddUserAndRefreshUI(accids, tid)
-        } else {
           weakSelf?.didAddUser(accids, tid)
         }
       }
@@ -263,9 +265,11 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     var param = [String: Any]()
     param["nav"] = navigationController as Any
     var filters = Set<String>()
-    if viewModel.allMembersDic.count > 0 {
-      for (key, value) in viewModel.allMembersDic {
-        filters.insert(value.accountId)
+    if let tid = teamId, let models = NETeamMemberCache.shared.getTeamMemberCache(tid) {
+      for model in models {
+        if let accountId = model.teamMember?.accountId {
+          filters.insert(accountId)
+        }
       }
     } else {
       viewModel.teamInfoModel?.users.forEach { model in
@@ -279,7 +283,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       param["filters"] = filters
     }
 
-    param["limit"] = inviteNumberLimit - filters.count
+    param["limit"] = (viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
     Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
   }
 
@@ -446,8 +450,8 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     return 0
   }
 
-  /// 添加好友并刷新UI
-  func didAddUserAndRefreshUI(_ accids: [String], _ tid: String) {
+  /// 添加好友
+  func didAddUser(_ accids: [String], _ tid: String) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
 
@@ -468,24 +472,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     }
   }
 
-  func didAddUser(_ accids: [String], _ tid: String) {
-    weak var weakSelf = self
-    view.makeToastActivity(.center)
-    viewModel.teamRepo.inviteUsers(tid, accids) { error, members in
-      NEALog.infoLog(
-        ModuleName + " " + self.className(),
-        desc: "CALLBACK inviteUser " + (error?.localizedDescription ?? "no error")
-      )
-      weakSelf?.view.hideToastActivity()
-      if let err = error {
-        weakSelf?.didError(err)
-      } else {
-        weakSelf?.showToast(localizable("invite_has_send"))
-      }
-    }
-  }
-
-  /// 结算群聊
+  /// 解散群聊
   func dismissTeam() {
     if let tid = teamId {
       weak var weakSelf = self
@@ -576,7 +563,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   func updateInviteModeOwnerAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
-    weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_INVITE_MODE_MANAGER) { error, team in
+    weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_MANAGER) { error, team in
       NEALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
@@ -595,7 +582,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   func updateInviteModeAllAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
-    weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_INVITE_MODE_ALL) { error, team in
+    weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_ALL) { error, team in
       NEALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
@@ -648,7 +635,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo
-      .updateTeamInfoPrivilege(weakSelf?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_MANAGER) { error, team in
+      .updateTeamInfoMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_UPDATE_INFO_MODE_MANAGER) { error, team in
         NEALog.infoLog(
           ModuleName + " " + self.className(),
           desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
@@ -668,7 +655,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo
-      .updateTeamInfoPrivilege(weakSelf?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_ALL) { error, team in
+      .updateTeamInfoMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_UPDATE_INFO_MODE_ALL) { error, team in
         NEALog.infoLog(
           ModuleName + " " + self.className(),
           desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
@@ -728,5 +715,14 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       }
     }
     return members
+  }
+
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      if parent == nil {
+        viewModel.clear()
+      }
+    }
   }
 }

@@ -12,6 +12,10 @@ open class NormalChatViewController: ChatViewController {
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: false)
+
+    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
+    topMessageView.layer.borderColor = UIColor(hexString: "#E8EAED").cgColor
+    topMessageView.layer.borderWidth = 1
   }
 
   public required init?(coder: NSCoder) {
@@ -28,16 +32,19 @@ open class NormalChatViewController: ChatViewController {
     return chat
   }
 
+  /// 获取转发确认弹窗 - 协同版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     ForwardAlertViewController()
   }
 
+  /// 获取合并转发详情页视图控制器 - 协同版
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
                                                    _ messageAttachmentFilePath: String,
                                                    _ messageAttachmentMD5: String?) -> MultiForwardViewController {
     NormalMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
 
+  /// 获取@列表视图控制器 - 协同版
   override func getUserSelectVC() -> NEBaseSelectUserViewController {
     SelectUserViewController(sessionId: viewModel.sessionId, showSelf: false)
   }

@@ -16,6 +16,7 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
   public lazy var emptyView: NEEmptyDataView = {
     let view = NEEmptyDataView(imageName: "fun_user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
   }()

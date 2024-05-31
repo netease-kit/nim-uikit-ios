@@ -15,7 +15,7 @@
 "remove_black" = "解除";
 
 "blacklist"="黑名单";
-"mine_groupchat"="我的群聊";
+"my_teams"="我的群聊";
 "save"="保存";
 "input_noteName"="请输入备注名";
 "birthday"="生日";
@@ -43,6 +43,8 @@
 "user_not_exist"="该用户不存在";
 "team_not_exist"="该群不存在";
 "no_friend"="暂无好友";
+"session_empty"="暂无会话";
+"team_empty"="暂无群组";
 "chat"="聊天";
 "message_remind"="消息提醒";
 "clear_all_validate_message"="是否要清除所有验证消息？";
@@ -52,6 +54,18 @@
 
 
 "let_us_chat"="我已经同意了你的申请，现在开始聊天吧~";
+
+// 转发多选
+"recent_forward"="最近转发";
+"recent_session"="最近会话";
+"my_friends"="我的好友";
+"selected"="已选";
+"multi_select"="多选";
+"single_select"="单选";
+"complete"="完成";
+"choose_one_chat"="选择一个聊天";
+"exceeded_limit"="超出%d人限制";
+"choose_max_limit"="最多只能选择%d个会话";
 
 // error toast
 "validate_processed"="该验证消息已在其他端处理";

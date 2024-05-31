@@ -85,7 +85,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     button.setTitleColor(.white, for: .normal)
     button.setTitle(mapLocalizable("send"), for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-    button.backgroundColor = UIColor.ne_blueText
+    button.backgroundColor = UIColor.ne_normalTheme
     button.layer.cornerRadius = 4
     button.addTarget(self, action: #selector(sendBtnClick), for: .touchUpInside)
     return button
@@ -206,7 +206,6 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   /// UI 初始化
   func setupSubviews() {
     weak var weakSelf = self
-    toSearchCurrentUserLocation()
 
     // 获取地图视图加载
     if let mapView = NEMapClient.shared().getMapView() as? UIView {
@@ -228,6 +227,8 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
       resetButton.isSelected = true
       NEMapClient.shared().setMapviewLocationWithLat(currentPoint.x, lng: currentPoint.y, mapview: map)
     } else {
+      toSearchCurrentUserLocation()
+
       if let map = mapView {
         map.addSubview(pointImage)
         NSLayoutConstraint.activate([
@@ -583,7 +584,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     locations.removeAll()
     if let keyword = searchTextField.text, keyword.count > 0 {
       for model in models {
-        model.attribute = model.title.highlight(keyWords: keyword, highlightColor: UIColor.ne_blueText)
+        model.attribute = model.title.highlight(keyWords: keyword, highlightColor: UIColor.ne_normalTheme)
       }
     } else {
       for model in models {

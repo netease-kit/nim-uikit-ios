@@ -18,7 +18,7 @@ open class TeamAvatarViewModel: NSObject {
   func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
     if let tid = teamId {
       let currentUserAccid = IMKitClient.instance.account()
-      teamRepo.getTeamMember(tid, currentUserAccid) { member, error in
+      teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, currentUserAccid) { member, error in
         self.currentTeamMember = member
         completion(error)
       }
@@ -30,10 +30,12 @@ open class TeamAvatarViewModel: NSObject {
   /// - Parameter teamId : 群组ID
   /// - Parameter antispamConfig: 反垃圾配置
   /// - Parameter completion: 完成后的回调
-  public func updateTeamAvatar(_ url: String, _ teamId: String, _ antispamConfig: V2NIMAntispamConfig?,
+  public func updateTeamAvatar(_ url: String,
+                               _ teamId: String,
+                               _ antispamConfig: V2NIMAntispamConfig?,
                                _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", url:\(url)")
-    teamRepo.updateTeamIcon(teamId, url, antispamConfig) { error in
+    teamRepo.updateTeamIcon(teamId, .TEAM_TYPE_NORMAL, url) { error in
       completion(error)
     }
   }

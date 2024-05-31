@@ -19,6 +19,25 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
   private var tag = "MineSettingViewController"
   private let userDefault = UserDefaults.standard
 
+  /// 设置列表
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.tableFooterView = getFooterView()
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
+  /// 退出登录按钮
+  let logoutButton = UIButton()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     viewModel.delegate = self
@@ -56,43 +75,27 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     }
   }
 
-  lazy var tableView: UITableView = {
-    let tableView = UITableView()
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.backgroundColor = .clear
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.separatorColor = .clear
-    tableView.separatorStyle = .none
-    tableView.tableFooterView = getFooterView()
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0.0
-    }
-    return tableView
-  }()
-
   func getFooterView() -> UIView? {
     let footerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 64.0))
-    let button = UIButton()
-    footerView.addSubview(button)
-    button.backgroundColor = .white
-    button.clipsToBounds = true
-    button.setTitleColor(UIColor(hexString: "0xE6605C"), for: .normal)
-    button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-    button.setTitle(title, for: .normal)
-    button.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
-    button.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
-    button.accessibilityIdentifier = "id.logout"
+    footerView.addSubview(logoutButton)
+    logoutButton.backgroundColor = .white
+    logoutButton.clipsToBounds = true
+    logoutButton.setTitleColor(UIColor(hexString: "0xE6605C"), for: .normal)
+    logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+    logoutButton.setTitle(title, for: .normal)
+    logoutButton.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
+    logoutButton.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
+    logoutButton.accessibilityIdentifier = "id.logout"
     if NEStyleManager.instance.isNormalStyle() {
-      button.layer.cornerRadius = 8.0
-      button.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
+      logoutButton.layer.cornerRadius = 8.0
+      logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
     } else {
-      button.translatesAutoresizingMaskIntoConstraints = false
+      logoutButton.translatesAutoresizingMaskIntoConstraints = false
       NSLayoutConstraint.activate([
-        button.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
-        button.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
-        button.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
-        button.heightAnchor.constraint(equalToConstant: 40),
+        logoutButton.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
+        logoutButton.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
+        logoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
+        logoutButton.heightAnchor.constraint(equalToConstant: 40),
       ])
     }
 
@@ -100,6 +103,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
   }
 
   @objc func loginOutAction() {
+    weak var weakSelf = self
     AuthorManager.shareInstance()?
       .logout(
         withConfirm: NSLocalizedString("want_to_logout", comment: ""),
@@ -112,7 +116,9 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
               desc: "CALLBACK logout failed,error = \(error!)"
             )
           } else {
+            weakSelf?.logoutButton.isEnabled = false
             IMKitClient.instance.logoutIM { error in
+              weakSelf?.logoutButton.isEnabled = true
               if error != nil {
                 NEALog.infoLog(self?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
                 self?.view.makeToast(error?.localizedDescription)

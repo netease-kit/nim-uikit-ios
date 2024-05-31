@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -214,13 +215,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
 
       var contentText = ""
       if var senderNick = abstracts[i]["senderNick"] as? String {
-        if senderNick.count > 7 {
-          // 截取字符串 abcdefghi -> abcd...hi
-          let leftEndIndex = senderNick.index(senderNick.startIndex, offsetBy: 4)
-          let rightStartIndex = senderNick.index(senderNick.endIndex, offsetBy: -2)
-          senderNick = senderNick[senderNick.startIndex ..< leftEndIndex] + "..." + senderNick[rightStartIndex ..< senderNick.endIndex]
-        }
-        contentText = senderNick
+        contentText = NEFriendUserCache.getCutName(senderNick)
         if let content = abstracts[i]["content"] as? String {
           contentText += "：" + content
         }

@@ -10,7 +10,7 @@ import UIKit
 public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoModel?) -> Void
 
 @objcMembers
-open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDelegate,
+open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   public var tableView = UITableView(frame: .zero, style: .plain)
   public var sessionId: String
@@ -112,7 +112,7 @@ open class NEBaseSelectUserViewController: ChatBaseViewController, UITableViewDe
   }
 
   func loadData() {
-    viewModel.fetchTeamMembers(sessionId: sessionId) { [weak self] error, team in
+    viewModel.fetchTeamMembers(sessionId) { [weak self] error, team in
       NEALog.infoLog(
         ModuleName + " " + (self?.className ?? "SelectUserViewController"),
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")

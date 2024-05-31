@@ -37,7 +37,7 @@ public class NELoginViewController: UIViewController {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.layer.cornerRadius = 8
-    button.backgroundColor = UIColor.ne_blueText
+    button.backgroundColor = UIColor.ne_normalTheme
     button.setTitleColor(UIColor.white, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
     button.setTitle(NSLocalizedString("register_login", comment: ""), for: .normal)
@@ -147,7 +147,7 @@ public class NELoginViewController: UIViewController {
   @objc func loginBtnClick(sender: UIButton) {
     // login to business server
     let config = YXConfig()
-      config.appKey = AppKey.appKey
+    config.appKey = AppKey.appKey
     config.parentScope = NSNumber(integerLiteral: 2)
     config.scope = NSNumber(integerLiteral: 7)
     config.supportInternationalize = true

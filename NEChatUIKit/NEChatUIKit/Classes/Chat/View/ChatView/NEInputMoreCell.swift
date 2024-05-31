@@ -8,6 +8,25 @@ import UIKit
 @objcMembers
 open class NEInputMoreCell: UICollectionViewCell {
   public var cellData: NEMoreItemModel?
+  /// 功能标识图片
+  public lazy var avatarImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.isUserInteractionEnabled = true
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.accessibilityIdentifier = "id.actionIcon"
+    return imageView
+  }()
+
+  /// 功能说明文本
+  public lazy var titleLabel: UILabel = {
+    let titleLabel = UILabel()
+    titleLabel.textColor = UIColor.ne_greyText
+    titleLabel.font = UIFont.systemFont(ofSize: 10)
+    titleLabel.textAlignment = .center
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.accessibilityIdentifier = "id.menuIcon"
+    return titleLabel
+  }()
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -36,24 +55,6 @@ open class NEInputMoreCell: UICollectionViewCell {
       titleLabel.heightAnchor.constraint(equalToConstant: NEMoreCell_Title_Height),
     ])
   }
-
-  public lazy var avatarImageView: UIImageView = {
-    let imageView = UIImageView()
-    imageView.isUserInteractionEnabled = true
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.accessibilityIdentifier = "id.actionIcon"
-    return imageView
-  }()
-
-  public lazy var titleLabel: UILabel = {
-    let titleLabel = UILabel()
-    titleLabel.textColor = UIColor.ne_greyText
-    titleLabel.font = UIFont.systemFont(ofSize: 10)
-    titleLabel.textAlignment = .center
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.accessibilityIdentifier = "id.menuIcon"
-    return titleLabel
-  }()
 
   func config(_ itemModel: NEMoreItemModel) {
     cellData = itemModel

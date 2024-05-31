@@ -49,16 +49,12 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
     weak var weakSelf = self
     // 被移除群聊
     if isLeaveTeamByOther {
-      showSingleAlert(message: chatLocalizable("team_has_been_quit")) {
-        weakSelf?.navigationController?.popViewController(animated: true)
-      }
+      showLeaveTeamAlert()
     }
 
     // 解散群聊
     if isdismissTeam {
-      showSingleAlert(message: chatLocalizable("team_has_been_removed")) {
-        weakSelf?.navigationController?.popViewController(animated: true)
-      }
+      showDismissTeamAlert()
     }
   }
 
@@ -79,8 +75,9 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
       if let vm = self?.viewModel as? TeamChatViewModel {
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
-            if team.isValidTeam == false {
+            if IMKitConfigCenter.shared.dismissTeamDeleteConversation == true, team.isValidTeam == false {
               self?.showSingleAlert(message: coreLoader.localizable("team_not_exist")) {
+                NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
               }
             }
@@ -172,12 +169,26 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
     }
   }
 
-  override open func onRecvMessages(_ messages: [V2NIMMessage]) {
-    super.onRecvMessages(messages)
+  override open func onRecvMessages(_ messages: [V2NIMMessage], _ index: [IndexPath]) {
+    super.onRecvMessages(messages, index)
     for message in messages {
       if let content = message.attachment as? V2NIMMessageNotificationAttachment {
-        if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE,
-           message.senderId == IMKitClient.instance.account() {
+        if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO,
+           let updatedTeamInfo = content.updatedTeamInfo {
+          if let name = updatedTeamInfo.name {
+            title = name
+            onTeamMemberUpdate([])
+          }
+        } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE,
+                  let targetIDs = content.targetIds,
+                  targetIDs.contains(IMKitClient.instance.account()) {
+          // 被重新拉进群聊
+          isLeaveTeamByOther = false
+          if onCurrentPage {
+            dismissAlert()
+          }
+        } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE,
+                  message.senderId == IMKitClient.instance.account() {
           isLeaveTeamBySelf = true
           if onCurrentPage {
             popGroupChatVC()
@@ -188,9 +199,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
           // 被移出群聊
           isLeaveTeamByOther = true
           if onCurrentPage {
-            showSingleAlert(message: chatLocalizable("team_has_been_quit")) { [weak self] in
-              self?.navigationController?.popViewController(animated: true)
-            }
+            showLeaveTeamAlert()
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS {
           if isdismissDiscuss {
@@ -200,9 +209,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
           // 解散群聊
           isdismissTeam = true
           if onCurrentPage {
-            showSingleAlert(message: chatLocalizable("team_has_been_removed")) { [weak self] in
-              self?.navigationController?.popViewController(animated: true)
-            }
+            showDismissTeamAlert()
           }
         }
       }

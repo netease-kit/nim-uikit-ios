@@ -237,7 +237,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
           stateView.state = .FileOpen
         } else {
           stateView.state = .FileDownload
-          stateView.setProgress(Float(fileModel.progress))
+          stateView.setProgress(Float(fileModel.progress / 100))
           if fileModel.progress >= 100 {
             fileModel.state = .Success
           }

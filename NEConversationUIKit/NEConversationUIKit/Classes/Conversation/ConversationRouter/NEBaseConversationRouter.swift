@@ -6,4 +6,13 @@
 import Foundation
 
 @objcMembers
-open class ConversationRouter: NSObject {}
+open class ConversationRouter: NSObject {
+  /// 注册通用路由
+  static func registerCommon() {
+    Router.shared.register("ClearAtMessageRemind") { param in
+      if let sessionId = param["sessionId"] as? String {
+        NEAtMessageManager.instance?.clearAtRecord(sessionId)
+      }
+    }
+  }
+}

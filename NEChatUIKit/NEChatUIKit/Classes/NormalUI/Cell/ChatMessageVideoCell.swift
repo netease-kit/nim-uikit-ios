@@ -158,7 +158,7 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
           stateView.state = .VideoPlay
         } else {
           stateView.state = .VideoDownload
-          stateView.setProgress(Float(videoModel.progress))
+          stateView.setProgress(Float(videoModel.progress / 100))
           if videoModel.progress >= 100 {
             videoModel.state = .Success
           }

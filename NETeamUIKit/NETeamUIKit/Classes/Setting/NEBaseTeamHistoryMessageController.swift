@@ -52,6 +52,8 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     textField.clearButtonMode = .always
     textField.returnKeyType = .search
     textField.delegate = self
+    textField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
+
     if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
       clearButton.accessibilityIdentifier = "id.clear"
     }
@@ -68,6 +70,7 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
       frame: CGRect.zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
 
@@ -165,6 +168,13 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     }
     toSearchHistory()
     return true
+  }
+
+  /// 监听键盘内容变化
+  func searchTextChanged() {
+    if searchTextField.text?.isEmpty == true {
+      toSearchHistory()
+    }
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

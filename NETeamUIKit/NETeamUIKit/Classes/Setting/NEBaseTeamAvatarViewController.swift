@@ -239,7 +239,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
     }
     view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData?,
-       var filePath = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/image/") {
+       var filePath = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
       filePath += "\(team?.teamId ?? "team")_avatar.jpg"
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {

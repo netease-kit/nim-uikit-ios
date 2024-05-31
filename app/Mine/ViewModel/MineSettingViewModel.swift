@@ -55,7 +55,7 @@ public class MineSettingViewModel: NSObject {
 
     #if DEBUG
       let configTest = SettingCellModel()
-      configTest.cellName = "配置测试页"
+      configTest.cellName = "全局配置"
       configTest.type = SettingCellType.SettingArrowCell.rawValue
       configTest.cellClick = {
         weakSelf?.delegate?.didClickConfigTest()

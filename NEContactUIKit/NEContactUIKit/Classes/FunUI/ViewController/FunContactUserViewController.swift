@@ -14,13 +14,18 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     headerView = FunUserInfoHeaderView()
   }
 
-  override public init(user: NEUserWithFriend?) {
-    super.init(user: user)
+  override public init(uid: String) {
+    super.init(uid: uid)
     initFun()
   }
 
-  override public init(uid: String) {
-    super.init(uid: uid)
+  override public init(nim_user: V2NIMUser) {
+    super.init(nim_user: nim_user)
+    initFun()
+  }
+
+  override public init(user: NEUserWithFriend?) {
+    super.init(user: user)
     initFun()
   }
 
@@ -61,7 +66,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
   }
 
   override open func deleteFriend(user: NEUserWithFriend?) {
-    let titleAction = NECustomAlertAction(title: String(format: localizable("delete_title"), user?.showName(true) ?? "")) {}
+    let titleAction = NECustomAlertAction(title: String(format: localizable("delete_title"), user?.showName() ?? "")) {}
     titleAction.contentText.font = .systemFont(ofSize: 13)
     titleAction.contentText.textColor = UIColor(hexString: "#8F8F8F")
 

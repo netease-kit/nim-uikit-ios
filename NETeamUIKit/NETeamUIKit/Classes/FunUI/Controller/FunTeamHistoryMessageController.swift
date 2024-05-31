@@ -11,8 +11,8 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
   public lazy var searchView: FunSearchView = {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchBotton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
-    view.searchBotton.setTitle(localizable("search"), for: .normal)
+    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setTitle(localizable("search"), for: .normal)
     return view
   }()
 

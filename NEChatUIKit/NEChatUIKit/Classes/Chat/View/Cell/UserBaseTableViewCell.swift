@@ -74,7 +74,7 @@ open class UserBaseTableViewCell: UITableViewCell {
 
   open func setModel(_ model: NETeamMemberInfoModel) {
     userModel = model
-    nameLabel.text = ChatMessageHelper.getShortName(model.showNickInTeam() ?? "")
+    nameLabel.text = NEFriendUserCache.getShortName(model.showNickInTeam() ?? "")
     titleLabel.text = model.atNameInTeam()
 
     if let avatarURL = model.nimUser?.user?.avatar, !avatarURL.isEmpty {

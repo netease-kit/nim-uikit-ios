@@ -30,7 +30,7 @@ open class FunP2PChatViewController: FunChatViewController {
   override open var title: String? {
     didSet {
       super.title = title
-      if let showName = title {
+      if title != nil {
         let text = chatLocalizable("fun_chat_input_placeholder")
         let attribute = NSMutableAttributedString(string: text)
         let style = NSMutableParagraphStyle()
@@ -48,7 +48,7 @@ open class FunP2PChatViewController: FunChatViewController {
   override open func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
     super.getSessionInfo(sessionId: sessionId) { [weak self] in
       self?.viewModel.loadShowName([sessionId]) {
-        let name = self?.viewModel.getShowName(sessionId).name ?? sessionId
+        let name = self?.viewModel.getShowName(sessionId) ?? sessionId
         self?.title = name
         self?.titleContent = name
       }

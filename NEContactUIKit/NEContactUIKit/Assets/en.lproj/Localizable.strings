@@ -15,7 +15,7 @@
 "remove_black" = "Remove";
 
 "blacklist"="Blacklist";
-"mine_groupchat"="My Group";
+"my_teams"="My Group";
 "save"="Save";
 "input_noteName"="Please enter nick name";
 "birthday"="birthday";
@@ -43,6 +43,8 @@
 "user_not_exist"="No contact";
 "team_not_exist"="No team";
 "no_friend"="No Friend";
+"session_empty"="No Session";
+"team_empty"="No Team";
 "chat"="Chat";
 "message_remind"="Message notification";
 "clear_all_validate_message"="Wether to clear all verification";
@@ -52,6 +54,18 @@
 
 
 "let_us_chat"="Nice to meet you, let's chat";
+
+// 转发多选
+"recent_forward"="Recent forward";
+"recent_session"="Recent";
+"my_friends"="Friends";
+"selected"="Selected";
+"multi_select"="Multi Select";
+"single_select"="Single Select";
+"complete"="Complete";
+"choose_one_chat"="Choose one chat";
+"exceeded_limit"="Exceed the %d person limit";
+"choose_max_limit"="Can only choose %d sessions";
 
 // error toast
 "validate_processed"="Already done on other devices";

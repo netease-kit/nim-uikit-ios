@@ -10,6 +10,29 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
   var timeLabelHeightAnchor: NSLayoutConstraint? // 消息时间高度约束
   var contentLabelCenterYAnchor: NSLayoutConstraint? // 消息内容中心Y约束
 
+  /// 时间
+  public lazy var timeLabel: UILabel = {
+    let label = UILabel()
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    label.textAlignment = .center
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.messageTipText"
+    return label
+  }()
+
+  /// 内容
+  public lazy var contentLabel: UILabel = {
+    let label = UILabel()
+    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    label.textAlignment = .center
+    label.numberOfLines = 0
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.messageTipText"
+    return label
+  }()
+
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
@@ -56,25 +79,4 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
 
     contentLabel.text = model.text
   }
-
-  public lazy var timeLabel: UILabel = {
-    let label = UILabel()
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
-    label.textAlignment = .center
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.accessibilityIdentifier = "id.messageTipText"
-    return label
-  }()
-
-  public lazy var contentLabel: UILabel = {
-    let label = UILabel()
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
-    label.textAlignment = .center
-    label.numberOfLines = 0
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.accessibilityIdentifier = "id.messageTipText"
-    return label
-  }()
 }

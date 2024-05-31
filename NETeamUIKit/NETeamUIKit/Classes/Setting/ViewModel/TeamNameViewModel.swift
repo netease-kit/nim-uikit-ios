@@ -17,7 +17,7 @@ open class TeamNameViewModel: NSObject {
   func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
     if let tid = teamId {
       let currentUserAccid = IMKitClient.instance.account()
-      teamRepo.getTeamMember(tid, currentUserAccid) { member, error in
+      teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, currentUserAccid) { member, error in
         self.currentTeamMember = member
         completion(error)
       }

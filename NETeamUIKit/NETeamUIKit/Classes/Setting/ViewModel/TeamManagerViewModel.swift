@@ -17,6 +17,9 @@ public protocol TeamManagerViewModelDelegate: NSObjectProtocol {
   /// at权限变更回调
   /// - Parameter model: 设置数据模型
   func didAtPermissionClick(_ model: SettingCellModel)
+  /// 置顶权限变更回调
+  /// - Parameter model: 设置数据模型
+  func didTopMessagePermissionClick(_ model: SettingCellModel)
   /// 管理员点击回调
   func didManagerClick()
   /// 通知页面刷新回调
@@ -68,7 +71,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// - Parameter completion: 完成回调
   func getCurrentUserTeamMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
     if let tid = teamId {
-      teamRepo.getTeamMember(tid, userId) { [weak self] member, error in
+      teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, userId) { [weak self] member, error in
         if let currentMember = member {
           self?.teamMember = currentMember
           completion(currentMember, nil)
@@ -147,6 +150,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     weak var weakSelf = self
     let model = SettingSectionModel()
 
+    // 谁可以编辑群信息
     let editTeamPermission = SettingCellModel()
     editTeamPermission.cellName = localizable("who_edit_team_info")
     editTeamPermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -162,6 +166,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       weakSelf?.delegate?.didUpdateTeamInfoClick(editTeamPermission)
     }
 
+    // 谁可以添加群成员
     let invitePermission = SettingCellModel()
     invitePermission.cellName = localizable("who_edit_user_info")
     invitePermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -176,6 +181,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       weakSelf?.delegate?.didChangeInviteModeClick(invitePermission)
     }
 
+    // 谁可以 @所有人
     let atAllPermission = SettingCellModel()
     atAllPermission.cellName = localizable("who_at_all")
     atAllPermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -188,6 +194,24 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     }
 
     model.cellModels.append(contentsOf: [editTeamPermission, invitePermission, atAllPermission])
+
+    if IMKitConfigCenter.shared.topEnable {
+      // 谁可以置顶消息
+      let topMessagePermission = SettingCellModel()
+      topMessagePermission.cellName = localizable("who_can_top_message")
+      topMessagePermission.type = SettingCellType.SettingSelectCell.rawValue
+      topMessagePermission.rowHeight = 73
+      topMessagePermission.subTitle = localizable("team_owner_and_manager")
+      topMessagePermission.subTitle = getTeamTopMessagePermissionValue()
+
+      topMessagePermission.cellClick = {
+        weakSelf?.delegate?.didTopMessagePermissionClick(topMessagePermission)
+      }
+
+      model.cellModels.append(topMessagePermission)
+    }
+
+    // 设置 section 圆角
     model.setCornerType()
 
     return model
@@ -206,16 +230,18 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       if let custom = team?.serverExtension {
         if var dic = NECommonUtil.getDictionaryFromJSONString(custom) as? [String: Any] {
           dic[keyAllowAtAll] = value
+          dic["lastOpt"] = keyAllowAtAll
           let info = NECommonUtil.getJSONStringFromDictionary(dic)
-          weakSelf?.teamRepo.updateTeamExtension(tid, info) { error in
+          weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
             completion(error)
           }
         }
       } else {
         var dic = [String: Any]()
         dic[keyAllowAtAll] = value
+        dic["lastOpt"] = keyAllowAtAll
         let info = NECommonUtil.getJSONStringFromDictionary(dic)
-        weakSelf?.teamRepo.updateTeamExtension(tid, info) { error in
+        weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
           completion(error)
         }
       }
@@ -234,6 +260,51 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       }
     }
     return localizable("team_all")
+  }
+
+  /// 获取置顶消息权限值
+  func getTeamTopMessagePermissionValue() -> String {
+    if let custom = teamInfoModel?.team?.serverExtension {
+      if let dic = NECommonUtil.getDictionaryFromJSONString(custom) as? [String: Any] {
+        if let value = dic[keyAllowTopMessage] as? String {
+          if value == allowAtAllValue {
+            return localizable("team_all")
+          }
+        }
+      }
+    }
+    return localizable("team_owner_and_manager")
+  }
+
+  /// 更新置顶权限
+  ///  - Parameter  isManager: 是否只有管理员能置顶消息，false 允许所有人置顶消息
+  ///  - Parameter completion: 完成回调
+  open func updateTeamTopMessagePermission(_ isManager: Bool, _ completion: @escaping (Error?) -> Void) {
+    let value = isManager == true ? allowAtManagerValue : allowAtAllValue
+    guard let tid = teamInfoModel?.team?.teamId else {
+      return
+    }
+    weak var weakSelf = self
+    teamRepo.getTeamInfo(tid) { team, error in
+      if let custom = team?.serverExtension {
+        if var dic = NECommonUtil.getDictionaryFromJSONString(custom) as? [String: Any] {
+          dic[keyAllowTopMessage] = value
+          dic["lastOpt"] = keyAllowTopMessage
+          let info = NECommonUtil.getJSONStringFromDictionary(dic)
+          weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
+            completion(error)
+          }
+        }
+      } else {
+        var dic = [String: Any]()
+        dic[keyAllowTopMessage] = value
+        dic["lastOpt"] = keyAllowTopMessage
+        let info = NECommonUtil.getJSONStringFromDictionary(dic)
+        weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
+          completion(error)
+        }
+      }
+    }
   }
 
   /// 群成员离开
@@ -261,7 +332,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   public func updateTeamInfoPrivilege(_ teamId: String, _ mode: V2NIMTeamUpdateInfoMode,
                                       _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
-    teamRepo.updateTeamInfoPrivilege(teamId, mode) { error, team in
+    teamRepo.updateTeamInfoMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
     }
   }
@@ -273,7 +344,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   public func updateInviteMode(_ teamId: String, _ mode: V2NIMTeamInviteMode,
                                _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
-    teamRepo.updateInviteMode(teamId, mode) { error, team in
+    teamRepo.updateInviteMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
     }
   }

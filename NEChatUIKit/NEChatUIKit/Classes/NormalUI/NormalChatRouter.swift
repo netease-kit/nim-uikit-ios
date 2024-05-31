@@ -7,6 +7,8 @@ import NIMSDK
 
 public extension ChatRouter {
   static func register() {
+    registerCommon()
+
     // pin
     Router.shared.register(PushPinMessageVCRouter) { param in
       let nav = param["nav"] as? UINavigationController
@@ -15,27 +17,6 @@ public extension ChatRouter {
       }
       let pin = PinMessageViewController(conversationId: conversationId)
       nav?.pushViewController(pin, animated: true)
-    }
-    // sendMessage
-    Router.shared.register(ChatAddFriendRouter) { param in
-      if let text = param["text"] as? String,
-         let sessionId = param["conversationId"] as? String {
-        let msg = V2NIMMessage()
-        msg.text = text
-
-        let config = V2NIMMessageConfig()
-        config.lastMessageUpdateEnabled = true
-        config.onlineSyncEnabled = true
-        config.unreadEnabled = true
-        let param = V2NIMSendMessageParams()
-        param.messageConfig = MessageUtils.messageConfig()
-        NIMSDK.shared().v2MessageService.send(msg, conversationId: sessionId, params: param) { result in
-
-        } failure: { error in
-          NEALog.errorLog("ChatAddFriendRouter", desc: "send P2P message error:\(error.nserror.localizedDescription)")
-        } progress: { _ in
-        }
-      }
     }
 
     // p2p

@@ -3,21 +3,22 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NECommonUIKit
 import UIKit
 
 @objcMembers
 open class ForwardItem: NSObject {
+  var conversationId: String?
   var name: String?
-  var uid: String?
   var avatar: String?
   override public init() {}
 }
 
 @objcMembers
-open class NEBaseForwardUserCell: UICollectionViewCell {
-  public lazy var userHeaderView: NEUserHeaderView = {
+open class NEBaseForwardSessionCell: UICollectionViewCell {
+  public lazy var sessionHeaderView: NEUserHeaderView = {
     let headerView = NEUserHeaderView(frame: .zero)
     headerView.translatesAutoresizingMaskIntoConstraints = false
     headerView.titleLabel.font = NEConstant.defaultTextFont(11.0)
@@ -36,12 +37,12 @@ open class NEBaseForwardUserCell: UICollectionViewCell {
   }
 
   func setupUI() {
-    contentView.addSubview(userHeaderView)
+    contentView.addSubview(sessionHeaderView)
     NSLayoutConstraint.activate([
-      userHeaderView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      userHeaderView.widthAnchor.constraint(equalToConstant: 32.0),
-      userHeaderView.heightAnchor.constraint(equalToConstant: 32.0),
+      sessionHeaderView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      sessionHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      sessionHeaderView.widthAnchor.constraint(equalToConstant: 32.0),
+      sessionHeaderView.heightAnchor.constraint(equalToConstant: 32.0),
     ])
   }
 }
@@ -49,19 +50,49 @@ open class NEBaseForwardUserCell: UICollectionViewCell {
 @objcMembers
 open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource,
   UICollectionViewDelegateFlowLayout {
-  var datas = [ForwardItem]()
-
+  let settingRepo = SettingRepo.shared
   typealias ForwardCallBack = (String?) -> Void
   var cancelBlock: ForwardCallBack?
   var sureBlock: ForwardCallBack?
-  var type = chatLocalizable("operation_forward") // 合并转发/逐条转发/转发
-  var context = ""
 
-  public let sureButton = UIButton()
-  public let tipLabel = UILabel()
+  /// 转发会话列表
+  var forwardSessions = [ForwardItem]()
+
+  /// 转发方式，合并转发 / 逐条转发 / 转发
+  var forwardType = chatLocalizable("operation_forward")
+
+  /// 会话名称
+  var sessionName = ""
+
+  /// 消息发送者名称
+  var senderName = ""
+
+  /// 确定按钮
+  lazy var sureButton: UIButton = {
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
+    button.setTitle(chatLocalizable("send"), for: .normal)
+    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.accessibilityIdentifier = "id.forwardSendBtn"
+    return button
+  }()
+
+  /// 【发送给】 标签
+  lazy var tipLabel: UILabel = {
+    let tipLabel = UILabel()
+    tipLabel.translatesAutoresizingMaskIntoConstraints = false
+    tipLabel.font = NEConstant.defaultTextFont(16.0)
+    tipLabel.textColor = .ne_darkText
+    tipLabel.text = chatLocalizable("send_to")
+    tipLabel.accessibilityIdentifier = "id.forwardTitle"
+    return tipLabel
+  }()
+
   public var contentViewCenterYAnchor: NSLayoutConstraint?
 
-  public lazy var userCollectionView: UICollectionView = {
+  /// 多个转发的 CollectionView
+  public lazy var sessionCollectionView: UICollectionView = {
     let flowLayout = UICollectionViewFlowLayout()
     flowLayout.scrollDirection = .horizontal
     flowLayout.minimumLineSpacing = 9.5
@@ -75,6 +106,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     return collectionView
   }()
 
+  /// 背景容器
   public lazy var contentView: UIView = {
     let backView = UIView()
     backView.backgroundColor = .white
@@ -84,7 +116,8 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     return backView
   }()
 
-  public lazy var oneUserHeadView: NEUserHeaderView = {
+  /// 单个转发对象时的 头像
+  public lazy var oneSessionHeadView: NEUserHeaderView = {
     let headerView = NEUserHeaderView(frame: .zero)
     headerView.clipsToBounds = true
     headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -92,7 +125,8 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     return headerView
   }()
 
-  public lazy var oneUserNameLabel: UILabel = {
+  /// 单个转发对象时的 名称
+  public lazy var oneSessionNameLabel: UILabel = {
     let nameLabel = UILabel()
     nameLabel.textColor = .ne_darkText
     nameLabel.font = NEConstant.defaultTextFont(14.0)
@@ -100,6 +134,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     return nameLabel
   }()
 
+  /// 转发描述
   public lazy var contentLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -111,7 +146,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     return label
   }()
 
-  // 留言
+  /// 留言
   public lazy var commentTextFeild: UITextField = {
     let textFeild = UITextField()
     textFeild.translatesAutoresizingMaskIntoConstraints = false
@@ -153,6 +188,8 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
 
   open func setupUI() {
     view.backgroundColor = NEConstant.hexRGB(0x000000).withAlphaComponent(0.4)
+
+    // 添加背景容器
     view.addSubview(contentView)
     contentViewCenterYAnchor = contentView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
     contentViewCenterYAnchor?.isActive = true
@@ -162,11 +199,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       contentView.heightAnchor.constraint(equalToConstant: 250),
     ])
 
-    tipLabel.translatesAutoresizingMaskIntoConstraints = false
-    tipLabel.font = NEConstant.defaultTextFont(16.0)
-    tipLabel.textColor = .ne_darkText
-    tipLabel.text = chatLocalizable("send_to")
-    tipLabel.accessibilityIdentifier = "id.forwardTitle"
+    // 【发送给】
     contentView.addSubview(tipLabel)
     NSLayoutConstraint.activate([
       tipLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
@@ -174,32 +207,36 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       tipLabel.heightAnchor.constraint(equalToConstant: 18.0),
     ])
 
-    contentView.addSubview(oneUserHeadView)
+    // 单个转发的头像
+    contentView.addSubview(oneSessionHeadView)
     NSLayoutConstraint.activate([
-      oneUserHeadView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
-      oneUserHeadView.topAnchor.constraint(equalTo: tipLabel.bottomAnchor, constant: 16),
-      oneUserHeadView.widthAnchor.constraint(equalToConstant: 32.0),
-      oneUserHeadView.heightAnchor.constraint(equalToConstant: 32.0),
+      oneSessionHeadView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
+      oneSessionHeadView.topAnchor.constraint(equalTo: tipLabel.bottomAnchor, constant: 16),
+      oneSessionHeadView.widthAnchor.constraint(equalToConstant: 32.0),
+      oneSessionHeadView.heightAnchor.constraint(equalToConstant: 32.0),
     ])
 
-    contentView.addSubview(oneUserNameLabel)
+    // 单个转发的名称
+    contentView.addSubview(oneSessionNameLabel)
     NSLayoutConstraint.activate([
-      oneUserNameLabel.leftAnchor.constraint(equalTo: oneUserHeadView.rightAnchor, constant: 8.0),
-      oneUserNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
-      oneUserNameLabel.centerYAnchor.constraint(equalTo: oneUserHeadView.centerYAnchor),
+      oneSessionNameLabel.leftAnchor.constraint(equalTo: oneSessionHeadView.rightAnchor, constant: 8.0),
+      oneSessionNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
+      oneSessionNameLabel.centerYAnchor.constraint(equalTo: oneSessionHeadView.centerYAnchor),
     ])
 
-    contentView.addSubview(userCollectionView)
+    // 多个转发的 CollectionView
+    contentView.addSubview(sessionCollectionView)
     NSLayoutConstraint.activate([
-      userCollectionView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
-      userCollectionView.rightAnchor.constraint(
+      sessionCollectionView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
+      sessionCollectionView.rightAnchor.constraint(
         equalTo: contentView.rightAnchor,
         constant: -16.0
       ),
-      userCollectionView.heightAnchor.constraint(equalToConstant: 32.0),
-      userCollectionView.topAnchor.constraint(equalTo: oneUserHeadView.topAnchor),
+      sessionCollectionView.heightAnchor.constraint(equalToConstant: 32.0),
+      sessionCollectionView.topAnchor.constraint(equalTo: oneSessionHeadView.topAnchor),
     ])
 
+    // 转发描述的背景
     let textBackView = UIView()
     textBackView.translatesAutoresizingMaskIntoConstraints = false
     textBackView.backgroundColor = NEConstant.hexRGB(0xF2F4F5)
@@ -209,9 +246,10 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     NSLayoutConstraint.activate([
       textBackView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16.0),
       textBackView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16.0),
-      textBackView.topAnchor.constraint(equalTo: oneUserHeadView.bottomAnchor, constant: 12.0),
+      textBackView.topAnchor.constraint(equalTo: oneSessionHeadView.bottomAnchor, constant: 12.0),
     ])
 
+    // 转发描述
     textBackView.addSubview(contentLabel)
     NSLayoutConstraint.activate([
       contentLabel.leftAnchor.constraint(equalTo: textBackView.leftAnchor, constant: 12),
@@ -219,7 +257,11 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       contentLabel.topAnchor.constraint(equalTo: textBackView.topAnchor, constant: 7),
       contentLabel.bottomAnchor.constraint(equalTo: textBackView.bottomAnchor, constant: -7),
     ])
-    contentLabel.text = "[\(type)]\(context)的会话记录"
+    if sessionName.count > 0 {
+      contentLabel.text = "[\(forwardType)]\(sessionName)\(chatLocalizable("session_record"))"
+    } else if senderName.count > 0 {
+      contentLabel.text = "[\(forwardType)]\(senderName)\(chatLocalizable("collection_message"))"
+    }
 
     // 留言
     contentView.addSubview(commentTextFeild)
@@ -230,6 +272,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       commentTextFeild.heightAnchor.constraint(equalToConstant: 32),
     ])
 
+    // 水平分割线
     let verticalLine = UIView()
     verticalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(verticalLine)
@@ -241,6 +284,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       verticalLine.topAnchor.constraint(equalTo: commentTextFeild.bottomAnchor, constant: 24.0),
     ])
 
+    // 竖直分割线
     let horizontalLine = UIView()
     horizontalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(horizontalLine)
@@ -252,18 +296,13 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       horizontalLine.bottomAnchor.constraint(equalTo: verticalLine.topAnchor),
     ])
 
+    // 取消按钮
     let canceButton = UIButton()
     canceButton.translatesAutoresizingMaskIntoConstraints = false
     canceButton.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
     canceButton.setTitle(chatLocalizable("cancel"), for: .normal)
     canceButton.setTitleColor(.ne_greyText, for: .normal)
     canceButton.accessibilityIdentifier = "id.forwardCancelBtn"
-
-    sureButton.translatesAutoresizingMaskIntoConstraints = false
-    sureButton.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
-    sureButton.setTitle(chatLocalizable("send"), for: .normal)
-    sureButton.setTitleColor(.ne_blueText, for: .normal)
-    sureButton.accessibilityIdentifier = "id.forwardSendBtn"
 
     contentView.addSubview(canceButton)
     NSLayoutConstraint.activate([
@@ -273,6 +312,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       canceButton.rightAnchor.constraint(equalTo: verticalLine.leftAnchor),
     ])
 
+    // 确定按钮
     contentView.addSubview(sureButton)
     NSLayoutConstraint.activate([
       sureButton.bottomAnchor.constraint(equalTo: verticalLine.bottomAnchor),
@@ -301,32 +341,25 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   }
 
   open func setItems(_ items: [ForwardItem]) {
-    datas.append(contentsOf: items)
-    if datas.count == 1 {
-      let item = datas[0]
-      if let name = item.name {
-        oneUserHeadView.setTitle(name)
-        oneUserNameLabel.text = name
-      } else if let uid = item.uid {
-        oneUserHeadView.setTitle(uid)
-        oneUserNameLabel.text = uid
-      }
-      if let url = item.avatar, !url.isEmpty {
-        oneUserHeadView.sd_setImage(with: URL(string: url), completed: nil)
-        oneUserHeadView.titleLabel.text = ""
-        oneUserHeadView.backgroundColor = .clear
-      } else {
-        oneUserHeadView.backgroundColor = UIColor.colorWithString(string: item.uid)
-        oneUserHeadView.image = nil
-      }
-      userCollectionView.isHidden = true
+    forwardSessions.append(contentsOf: items)
+    if forwardSessions.count == 1 {
+      let item = forwardSessions[0]
+      oneSessionHeadView.configHeadData(headUrl: item.avatar,
+                                        name: item.name ?? "",
+                                        uid: item.conversationId ?? "")
+      oneSessionNameLabel.text = item.name ?? item.conversationId
+      sessionCollectionView.isHidden = true
     } else {
-      oneUserHeadView.isHidden = true
-      oneUserNameLabel.isHidden = true
+      oneSessionHeadView.isHidden = true
+      oneSessionNameLabel.isHidden = true
     }
   }
 
   func sureClick() {
+    // 更新最近转发列表
+    let recentForwardIdList = forwardSessions.map { $0.conversationId ?? "" }
+    settingRepo.updateRecentForward(recentForwardIdList)
+
     if let block = sureBlock {
       block(commentTextFeild.text)
     }
@@ -352,26 +385,16 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     removeFromParent()
   }
 
+  // MARK: - UICollectionViewDelegate
+
   open func collectionView(_ collectionView: UICollectionView,
                            numberOfItemsInSection section: Int) -> Int {
-    datas.count
+    forwardSessions.count
   }
 
-  open func setCellModel(cell: NEBaseForwardUserCell, indexPath: IndexPath) -> UICollectionViewCell {
-    let item = datas[indexPath.row]
-    if let url = item.avatar, !url.isEmpty {
-      cell.userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-      cell.userHeaderView.titleLabel.text = ""
-      cell.userHeaderView.backgroundColor = .clear
-    } else {
-      cell.userHeaderView.backgroundColor = UIColor.colorWithString(string: item.uid)
-      cell.userHeaderView.image = nil
-      if let name = item.name {
-        cell.userHeaderView.setTitle(name)
-      } else if let uid = item.uid {
-        cell.userHeaderView.setTitle(uid)
-      }
-    }
+  open func setCellModel(cell: NEBaseForwardSessionCell, indexPath: IndexPath) -> UICollectionViewCell {
+    let item = forwardSessions[indexPath.row]
+    cell.sessionHeaderView.configHeadData(headUrl: item.avatar, name: item.name ?? "", uid: item.conversationId ?? "")
     return cell
   }
 

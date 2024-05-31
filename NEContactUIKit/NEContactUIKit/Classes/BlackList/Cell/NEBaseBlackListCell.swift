@@ -81,7 +81,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
       avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
       avatarImageView.backgroundColor = .clear
     } else {
-      nameLabel.text = user.shortName(showAlias: false, count: 2)
+      nameLabel.text = user.shortName(count: 2)
       avatarImageView.image = nil
       avatarImageView.backgroundColor = UIColor.colorWithString(string: user.user?.accountId)
     }

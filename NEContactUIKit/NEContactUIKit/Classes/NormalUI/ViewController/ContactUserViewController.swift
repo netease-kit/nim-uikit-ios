@@ -15,13 +15,18 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     headerView = UserInfoHeaderView()
   }
 
-  override public init(user: NEUserWithFriend?) {
-    super.init(user: user)
+  override public init(uid: String) {
+    super.init(uid: uid)
     initNormal()
   }
 
-  override public init(uid: String) {
-    super.init(uid: uid)
+  override public init(nim_user: V2NIMUser) {
+    super.init(nim_user: nim_user)
+    initNormal()
+  }
+
+  override public init(user: NEUserWithFriend?) {
+    super.init(user: user)
     initNormal()
   }
 

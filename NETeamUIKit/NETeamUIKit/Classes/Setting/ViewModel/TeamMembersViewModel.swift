@@ -11,7 +11,7 @@ protocol TeamMembersViewModelDelegate: NSObject {
   func didNeedRefreshUI()
 }
 
-class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
+class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConversationListener, NETeamMemberCacheListener, NEEventListener {
   /// 是否正在请求数据
   public var isRequest = false
   /// 群id
@@ -28,15 +28,28 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
 
   public var currentMember: V2NIMTeamMember?
 
+  /// 在线状态记录
+  var onLineEventDic = [String: NIMSubscribeEvent]()
+
   override init() {
     super.init()
     teamRepo.addTeamListener(self)
     ContactRepo.shared.addContactListener(self)
+    ConversationRepo.shared.addListener(self)
+    NETeamMemberCache.shared.addTeamCacheListener(self)
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      EventSubscribeRepo.shared.addListener(self)
+    }
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
     ContactRepo.shared.removeContactListener(self)
+    ConversationRepo.shared.removeListener(self)
+    NETeamMemberCache.shared.removeTeamCacheListener(self)
+    if IMKitConfigCenter.shared.onlineStatusEnable {
+      EventSubscribeRepo.shared.removeListener(self)
+    }
   }
 
   /// 获取群成员信息
@@ -44,7 +57,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
   /// - Parameter completion: 完成回调
   func getMemberInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     weak var weakSelf = self
-    teamRepo.getTeamMember(teamId, IMKitClient.instance.account()) { member, error in
+    teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
       weakSelf?.currentMember = member
       completion(error)
     }
@@ -54,7 +67,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
   /// - Parameter teamdId: 群id
   /// - Parameter uids: 用户id
   func removeTeamMember(_ teamdId: String, _ uids: [String], _ completion: @escaping (NSError?) -> Void) {
-    teamRepo.removeMembers(teamdId, uids) { error in
+    teamRepo.removeMembers(teamdId, .TEAM_TYPE_NORMAL, uids) { error in
       completion(error as NSError?)
     }
   }
@@ -122,13 +135,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
   func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     datas.forEach { [weak self] model in
       if let accountId = model.nimUser?.user?.accountId, accountId == friendInfo.accountId {
-        if let tid = self?.teamId {
-          self?.getTeamInfo(tid) { model, error in
-            if error == nil {
-              self?.delegate?.didNeedRefreshUI()
-            }
-          }
-        }
+        if let tid = self?.teamId {}
         return
       }
     }
@@ -136,15 +143,12 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
 
   /// 群成员信息更新
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
-    changeMembers(teamMembers)
-  }
+  func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {}
 
   /// 群成员离开
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     removeSearchData(teamMembers)
-    changeMembers(teamMembers)
   }
 
   /// 判断离开用户是不是当前搜索展示用户
@@ -173,16 +177,13 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
 
   /// 群成员加入
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
-    changeMembers(teamMembers)
-  }
+  func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {}
 
   /// 群成员被踢
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     removeSearchData(teamMembers)
-    changeMembers(teamMembers)
   }
 
   /// 群成员信息更新统一处理方法
@@ -262,117 +263,87 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener {
 
     weak var weakSelf = self
 
-    if let members = NETeamMemberCache.shared.getTeamMemberCache(teamId) {
+    if let members = NETeamMemberCache.shared.getTeamMemberCache(teamId), teamInfo.team?.memberCount == members.count {
       teamInfo.users = members
       completion(nil, teamInfo)
       NEALog.infoLog(weakSelf?.className() ?? "", desc: "load team member from cache success.")
       return
     }
 
-    var memberLists = [V2NIMTeamMember]()
-
-    weakSelf?.getAllTeamMemberInfos(teamId, nil, &memberLists, queryType) { ms, error in
-      if let e = error {
+    NETeamMemberCache.shared.getAllTeamMemberInfos(teamId, queryType) { error, teamInfo in
+      if let err = error {
         NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
-        completion(e, nil)
+        completion(err, nil)
       } else {
-        if let members = ms {
-          weakSelf?.splitTeamMembers(members, teamInfo, 150) { error, model in
-            if let users = model?.users, users.count > 0 {
-              NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
-              NETeamMemberCache.shared.setCacheMembers(teamId, users)
-            }
-            completion(error, model)
-          }
-        } else {
-          completion(error, teamInfo)
+        if let members = teamInfo?.users, members.count > 0 {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
+          NETeamMemberCache.shared.setCacheMembers(teamId, members)
         }
+        completion(error, teamInfo)
       }
     }
   }
 
-  /// 分页查询群成员信息
-  /// - Parameter members:          要查询的群成员列表
-  /// - Parameter model :           群信息
-  /// - Parameter maxSizeByPage:    单页最大查询数量
-  /// - Parameter completion:       完成后的回调
-  private func splitTeamMembers(_ members: [V2NIMTeamMember],
-                                _ model: NETeamInfoModel,
-                                _ maxSizeByPage: Int = 150,
-                                _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
-    var remaind = [[V2NIMTeamMember]]()
-    remaind.append(contentsOf: members.chunk(maxSizeByPage))
-    fetchUsersInfo(&remaind, model, completion)
+  /// 订阅群成员在线状态
+  ///  - Parameter members:  成员列表
+  func subcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
+    var accounts = [String]()
+    for model in members {
+      if let accountId = model.teamMember?.accountId {
+        accounts.append(accountId)
+      }
+    }
+    NEEventSubscribeManager.shared.subscribeUsersOnlineState(accounts) { error in
+      completion(error)
+    }
   }
 
-  /// 从云信服务器批量获取用户资料
-  ///   - Parameter remainUserIds: 用户集合
-  ///   - Parameter model： 群信息
-  ///   - Parameter completion: 成功回调
-  private func fetchUsersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
-                              _ model: NETeamInfoModel,
-                              _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
-    guard let members = remainUserIds.first else {
-      completion(nil, model)
+  /// 取消订阅群成员
+  func unSubcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
+    var accounts = [String]()
+    for model in members {
+      if let accountId = model.teamMember?.accountId {
+        accounts.append(accountId)
+      }
+    }
+    NEEventSubscribeManager.shared.unSubscribeUsersOnlineState(accounts) { error in
+      completion(error)
+    }
+  }
+
+  /// 订阅状态变更回调
+  /// - Parameter event: 订阅事件
+  func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
+    NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
+    for e in event {
+      print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")
+      if e.type == NIMSubscribeSystemEventType.online.rawValue, let acountId = e.from {
+        onLineEventDic[acountId] = e
+      }
+    }
+    delegate?.didNeedRefreshUI()
+  }
+
+  /// 缓存数据变更回调
+  func memberCacheDidChange() {
+    NEALog.infoLog(className(), desc: #function + " memberCacheDidChange")
+    guard let tid = teamId else {
       return
     }
 
-    let accids = members.map(\.accountId)
-    var temArray = remainUserIds
     weak var weakSelf = self
-
-    ContactRepo.shared.getFriendInfoList(accountIds: accids) { infos, v2Error in
-      if let err = v2Error {
-        completion(err as NSError, model)
-      } else {
-        if let users = infos {
-          for index in 0 ..< members.count {
-            let memberInfoModel = NETeamMemberInfoModel()
-            memberInfoModel.teamMember = members[index]
-            if users.count > index {
-              let user = users[index]
-              memberInfoModel.nimUser = user
-            }
-            model.users.append(memberInfoModel)
-          }
+    if let members = NETeamMemberCache.shared.getTeamMemberCache(tid) {
+      getMemberInfo(tid) { error in
+        if error == nil {
+          weakSelf?.setShowDatas(members)
+          weakSelf?.delegate?.didNeedRefreshUI()
+        } else {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " getMemberInfo error:\(String(describing: error))")
         }
-        temArray.removeFirst()
-        weakSelf?.fetchUsersInfo(&temArray, model, completion)
       }
-    }
-  }
-
-  /// 获取群成员
-  /// - Parameter teamId:  群ID
-  /// - Parameter completion:  完成回调
-  private func getAllTeamMemberInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
-    let option = V2NIMTeamMemberQueryOption()
-    option.limit = 1000
-    option.direction = .QUERY_DIRECTION_ASC
-    option.onlyChatBanned = false
-    option.roleQueryType = queryType
-    if let token = nextToken {
-      option.nextToken = token
     } else {
-      option.nextToken = ""
-    }
-    var temMemberLists = memberList
-    teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { [weak self] result, error in
-      if let err = error {
-        completion(nil, err)
-      } else {
-        if let members = result?.memberList {
-          temMemberLists.append(contentsOf: members)
-        }
-        if let finished = result?.finished {
-          if finished == true {
-            completion(temMemberLists, nil)
-          } else {
-            self?.getAllTeamMemberInfos(teamId, result?.nextToken, &temMemberLists, queryType, completion)
-          }
-        }
+      getTeamInfo(tid) { teamInfo, error in
+        weakSelf?.delegate?.didNeedRefreshUI()
       }
     }
   }

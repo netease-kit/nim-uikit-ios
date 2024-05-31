@@ -3,11 +3,12 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
 @objcMembers
-open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListener {
+open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListener, NEIMKitClientListener {
   let conversationRepo = ConversationRepo.shared
 
   /// 群数据缓存
@@ -27,17 +28,18 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
     super.init()
     ContactRepo.shared.addContactListener(self)
     TeamRepo.shared.addTeamListener(self)
+    IMKitClient.instance.addLoginListener(self)
 
     weak var weakSelf = self
     getSearchData {
       NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "get data finish")
-      print("get data finish")
     }
   }
 
   deinit {
     ContactRepo.shared.removeContactListener(self)
     TeamRepo.shared.removeTeamListener(self)
+    IMKitClient.instance.removeLoginListener(self)
   }
 
   /// 搜索
@@ -85,7 +87,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
 
   /// 获取所有数据
   /// - Parameter completion: 完成回调
-  func getSearchData(_ completion: @escaping () -> Void) {
+  func getSearchData(_ removeTeamData: Bool = false, _ completion: @escaping () -> Void) {
     let workingGroup = DispatchGroup()
     let workingQueue = DispatchQueue(label: "get_search_data_queue")
     weak var weakSelf = self
@@ -97,11 +99,19 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
         model.userInfo = userFriend
         weakSelf?.friendDic[uid] = model
       }
+      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + "conversation search get friend list ")
+      workingGroup.leave()
     }
 
     workingGroup.enter()
     workingQueue.async {
       TeamRepo.shared.getTeamList { teams, error in
+        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " conversation search get team list \(error?.localizedDescription ?? "")")
+        if removeTeamData == true {
+          if error == nil {
+            weakSelf?.teamDic.removeAll()
+          }
+        }
         teams?.forEach { team in
           if let tid = team.v2Team?.teamId {
             let model = ConversationSearchListModel()
@@ -126,13 +136,9 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
   /// - Parameter friendInfo: 好友信息
   public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     if let uid = friendInfo.accountId {
-      ContactRepo.shared.getFriendInfoList(accountIds: [uid]) { [weak self] u, error in
-        if let user = u?.first {
-          let model = ConversationSearchListModel()
-          model.userInfo = user
-          self?.friendDic[uid] = model
-        }
-      }
+      let model = ConversationSearchListModel()
+      model.userInfo = NEFriendUserCache.shared.getFriendInfo(uid)
+      friendDic[uid] = model
     }
   }
 
@@ -187,5 +193,14 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
     let model = ConversationSearchListModel()
     model.team = team
     teamDic[team.teamId] = model
+  }
+
+  /// 群数据同步完成回调
+  public func onTeamSyncFinished() {
+    NEALog.infoLog(className(), desc: #function + ", onTeamSyncFinished get search data")
+    weak var weakSelf = self
+    getSearchData(true) {
+      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + ", get data finish")
+    }
   }
 }

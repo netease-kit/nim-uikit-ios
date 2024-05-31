@@ -9,9 +9,7 @@
 /* Begin PBXBuildFile section */
 		181EE5872B234C510043817F /* CustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57E2B234C510043817F /* CustomView.swift */; };
 		181EE5882B234C510043817F /* CustomP2PChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */; };
-		181EE58A2B234C510043817F /* CustomContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5812B234C510043817F /* CustomContactsViewController.swift */; };
 		181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5822B234C510043817F /* CustomConversationController.swift */; };
-		181EE58C2B234C510043817F /* CustomAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5832B234C510043817F /* CustomAttachment.swift */; };
 		181EE58D2B234C510043817F /* CustomContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5842B234C510043817F /* CustomContactTableViewCell.swift */; };
 		181EE58E2B234C510043817F /* CustomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5852B234C510043817F /* CustomChatCell.swift */; };
 		181EE58F2B234C510043817F /* CustomConversationListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5862B234C510043817F /* CustomConversationListCell.swift */; };
@@ -46,6 +44,7 @@
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
 		4B3B9BE6277AFEE50091A74E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE4277AFEE50091A74E /* Main.storyboard */; };
 		4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */; };
+		962DCBBD1E7AEAFEF8DF27AE /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B974281E00A6C11F3A28F391 /* Pods_app.framework */; };
 		DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC82A56ABFD0091318F /* Constant.swift */; };
 		DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC92A56ABFD0091318F /* ViewController.swift */; };
 		DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DCB2A56ABFD0091318F /* NENavigationController.swift */; };
@@ -54,7 +53,6 @@
 		DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD02A56ABFD0091318F /* NETabBarController.swift */; };
 		DD141E052A56ABFE0091318F /* AppKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DD12A56ABFD0091318F /* AppKey.swift */; };
 		DDCE2A652A56BDB800E17751 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDCE2A642A56BDB800E17751 /* Assets.xcassets */; };
-		E3361980803427B31EB33C64 /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2833D0D33BD28525D83EAB4 /* Pods_app.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -76,11 +74,10 @@
 		01B0A28E2816CF41009065C5 /* app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app.entitlements; sourceTree = "<group>"; };
 		01C0FC0F27BE754400C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		01C0FC1027BE754500C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
 		181EE57E2B234C510043817F /* CustomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomView.swift; sourceTree = "<group>"; };
 		181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomP2PChatViewController.swift; sourceTree = "<group>"; };
-		181EE5812B234C510043817F /* CustomContactsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactsViewController.swift; sourceTree = "<group>"; };
 		181EE5822B234C510043817F /* CustomConversationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationController.swift; sourceTree = "<group>"; };
-		181EE5832B234C510043817F /* CustomAttachment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAttachment.swift; sourceTree = "<group>"; };
 		181EE5842B234C510043817F /* CustomContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactTableViewCell.swift; sourceTree = "<group>"; };
 		181EE5852B234C510043817F /* CustomChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomChatCell.swift; sourceTree = "<group>"; };
 		181EE5862B234C510043817F /* CustomConversationListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationListCell.swift; sourceTree = "<group>"; };
@@ -117,8 +114,8 @@
 		4B3B9BDB277AFEE50091A74E /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3B9BE5277AFEE50091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4B3B9BEA277AFEE70091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		852A4E08916CBE74DF8872B0 /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
-		B7F66F12DB299173053C1C33 /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
+		7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
+		B974281E00A6C11F3A28F391 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD141DC82A56ABFD0091318F /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		DD141DC92A56ABFD0091318F /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DD141DCB2A56ABFD0091318F /* NENavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENavigationController.swift; sourceTree = "<group>"; };
@@ -127,7 +124,6 @@
 		DD141DD02A56ABFD0091318F /* NETabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
 		DD141DD12A56ABFD0091318F /* AppKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKey.swift; sourceTree = "<group>"; };
 		DDCE2A642A56BDB800E17751 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F2833D0D33BD28525D83EAB4 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,7 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E3361980803427B31EB33C64 /* Pods_app.framework in Frameworks */,
+				962DCBBD1E7AEAFEF8DF27AE /* Pods_app.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,9 +145,7 @@
 				18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */,
 				181EE57E2B234C510043817F /* CustomView.swift */,
 				181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */,
-				181EE5812B234C510043817F /* CustomContactsViewController.swift */,
 				181EE5822B234C510043817F /* CustomConversationController.swift */,
-				181EE5832B234C510043817F /* CustomAttachment.swift */,
 				181EE5842B234C510043817F /* CustomContactTableViewCell.swift */,
 				181EE5852B234C510043817F /* CustomChatCell.swift */,
 				181EE5862B234C510043817F /* CustomConversationListCell.swift */,
@@ -224,21 +218,13 @@
 			path = Theme;
 			sourceTree = "<group>";
 		};
-		405473F1290906C67D0BFCE0 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F2833D0D33BD28525D83EAB4 /* Pods_app.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		4B3B9BD2277AFEE50091A74E = {
 			isa = PBXGroup;
 			children = (
 				4B3B9BDD277AFEE50091A74E /* app */,
 				4B3B9BDC277AFEE50091A74E /* Products */,
 				BF083551FB71DB2F668919FB /* Pods */,
-				405473F1290906C67D0BFCE0 /* Frameworks */,
+				C8F542C0762421B5D64218AA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -268,10 +254,18 @@
 		BF083551FB71DB2F668919FB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				852A4E08916CBE74DF8872B0 /* Pods-app.debug.xcconfig */,
-				B7F66F12DB299173053C1C33 /* Pods-app.release.xcconfig */,
+				16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */,
+				7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		C8F542C0762421B5D64218AA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B974281E00A6C11F3A28F391 /* Pods_app.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		DD141DC62A56ABFD0091318F /* Main */ = {
@@ -295,13 +289,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B3B9BEF277AFEE70091A74E /* Build configuration list for PBXNativeTarget "app" */;
 			buildPhases = (
-				F6BBE706AB53572CEA1E810B /* [CP] Check Pods Manifest.lock */,
+				A560DA587DC897F27FDFE32F /* [CP] Check Pods Manifest.lock */,
 				4B3B9BD7277AFEE50091A74E /* Sources */,
 				4B3B9BD8277AFEE50091A74E /* Frameworks */,
 				4B3B9BD9277AFEE50091A74E /* Resources */,
 				39722F9327998A14007BFC8B /* Embed Frameworks */,
-				DDF8E1695FBE0EE8EC771C05 /* [CP] Embed Pods Frameworks */,
-				BCB7AB04958A9EAFB3582CAA /* [CP] Copy Pods Resources */,
+				264CA3266150FDF885781FE5 /* [CP] Embed Pods Frameworks */,
+				0707A69D252FA43BDDD73B34 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -363,7 +357,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BCB7AB04958A9EAFB3582CAA /* [CP] Copy Pods Resources */ = {
+		0707A69D252FA43BDDD73B34 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -380,7 +374,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DDF8E1695FBE0EE8EC771C05 /* [CP] Embed Pods Frameworks */ = {
+		264CA3266150FDF885781FE5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -397,7 +391,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F6BBE706AB53572CEA1E810B /* [CP] Check Pods Manifest.lock */ = {
+		A560DA587DC897F27FDFE32F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -448,11 +442,9 @@
 				DD141E032A56ABFE0091318F /* AppDelegate.swift in Sources */,
 				181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */,
 				181EE5F92B234E540043817F /* IntroduceBrandViewController.swift in Sources */,
-				181EE58A2B234C510043817F /* CustomContactsViewController.swift in Sources */,
 				181EE5F62B234E540043817F /* NENodeViewController.swift in Sources */,
 				181EE5FB2B234E540043817F /* StyleSelectionCell.swift in Sources */,
 				181EE5EB2B234E540043817F /* MineSettingViewModel.swift in Sources */,
-				181EE58C2B234C510043817F /* CustomAttachment.swift in Sources */,
 				DD141E052A56ABFE0091318F /* AppKey.swift in Sources */,
 				181EE5EF2B234E540043817F /* MeViewController.swift in Sources */,
 				181EE5FE2B234E540043817F /* CustomTeamSettingSubtitleCell.swift in Sources */,
@@ -629,7 +621,7 @@
 		};
 		4B3B9BF0277AFEE70091A74E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 852A4E08916CBE74DF8872B0 /* Pods-app.debug.xcconfig */;
+			baseConfigurationReference = 16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -663,7 +655,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.6.5;
+				MARKETING_VERSION = 10.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -678,7 +670,7 @@
 		};
 		4B3B9BF1277AFEE70091A74E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B7F66F12DB299173053C1C33 /* Pods-app.release.xcconfig */;
+			baseConfigurationReference = 7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -712,7 +704,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.6.5;
+				MARKETING_VERSION = 10.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = inHouseYunxin;

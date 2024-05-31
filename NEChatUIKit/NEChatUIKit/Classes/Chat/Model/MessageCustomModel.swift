@@ -16,6 +16,11 @@ open class MessageCustomModel: MessageContentModel {
   public init(message: V2NIMMessage?, contentHeight: Int) {
     super.init(message: message)
     type = .custom
+
+    if let type = NECustomAttachment.typeOfCustomMessage(message?.attachment) {
+      customType = type
+    }
+
     contentSize = CGSize(width: 0, height: contentHeight)
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }

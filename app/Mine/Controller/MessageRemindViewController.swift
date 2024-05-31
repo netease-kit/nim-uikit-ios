@@ -14,6 +14,21 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
     [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self]
   private var viewModel = MessageRemindViewModel()
 
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     viewModel.getData()
@@ -50,21 +65,6 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
-
-  lazy var tableView: UITableView = {
-    let tableView = UITableView()
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.backgroundColor = .clear
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.separatorColor = .clear
-    tableView.separatorStyle = .none
-    tableView.sectionHeaderHeight = 12.0
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0.0
-    }
-    return tableView
-  }()
 
   // MARK: UITableViewDelegate, UITableViewDataSource
 

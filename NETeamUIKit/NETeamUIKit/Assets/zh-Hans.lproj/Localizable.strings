@@ -56,6 +56,7 @@
 "who_edit_team_info"="谁可以编辑群信息";
 "who_edit_user_info"="谁可以添加群成员";
 "who_at_all"="谁可以@所有人";
+"who_can_top_message"="谁可以置顶消息";
 "who_mark"="谁可以标记";
 "who_user_join_noti"="谁可以收到用户进群通知";
 "manage_manger"="管理管理员";

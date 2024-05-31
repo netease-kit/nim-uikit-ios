@@ -64,6 +64,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
       frame: CGRect.zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
 
@@ -80,10 +81,21 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
         if let err = error {
           self?.view.makeToast(err.localizedDescription)
         } else {
-          self?.contentTableView.reloadData()
+          self?.didReloadTableData()
+          print("获取群信息成功 : ", self?.viewModel.teamInfoModel?.users.count as Any)
         }
       }
     }
+  }
+
+  /// 刷新列表
+  open func didReloadTableData() {
+    if viewModel.showDatas.count <= 0 {
+      emptyView.isHidden = false
+    } else {
+      emptyView.isHidden = true
+    }
+    contentTableView.reloadData()
   }
 
   let searchImageView: UIImageView = {
@@ -157,12 +169,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if viewModel.showDatas.count <= 0 {
-      emptyView.isHidden = false
-    } else {
-      emptyView.isHidden = true
-    }
-    return viewModel.showDatas.count
+    viewModel.showDatas.count
   }
 
   open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -204,7 +211,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
 
   open func textFieldShouldClear(_ textField: UITextField) -> Bool {
     viewModel.showDatas = viewModel.datas
-    contentTableView.reloadData()
+    didReloadTableData()
     return true
   }
 
@@ -214,14 +221,14 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
     if string.count <= 0 {
       if finalString.count <= 0 {
         viewModel.showDatas = viewModel.datas
-        contentTableView.reloadData()
+        didReloadTableData()
       } else {
         viewModel.showDatas = viewModel.searchAllData(finalString)
-        contentTableView.reloadData()
+        didReloadTableData()
       }
     } else {
       viewModel.showDatas = viewModel.searchAllData(finalString)
-      contentTableView.reloadData()
+      didReloadTableData()
     }
     return true
   }

@@ -13,16 +13,16 @@ open class FunConversationController: NEBaseConversationController {
   public lazy var searchView: FunSearchView = {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchBotton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
-    view.searchBotton.setTitle(commonLocalizable("search"), for: .normal)
-    view.searchBotton.accessibilityIdentifier = "id.titleBarSearchImg"
+    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setTitle(commonLocalizable("search"), for: .normal)
+    view.searchButton.accessibilityIdentifier = "id.titleBarSearchImg"
     return view
   }()
 
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     className = "FunConversationController"
-    deleteBottonBackgroundColor = .funConversationdeleteActionColor
+    deleteButtonBackgroundColor = .funConversationdeleteActionColor
     cellRegisterDic = [0: FunConversationListCell.self]
     brokenNetworkViewHeight = 48
     brokenNetworkView.errorIconView.isHidden = false

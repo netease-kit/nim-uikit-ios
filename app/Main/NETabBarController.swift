@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NECommonKit
 import NEContactUIKit
 import NEConversationUIKit
 import NIMSDK
@@ -56,7 +57,7 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let chatNav = NENavigationController(rootViewController: chat)
 
       // Contacts
-      let contactVC = ContactsViewController()
+      let contactVC = ContactViewController()
       contactVC.tabBarItem = UITabBarItem(
         title: NSLocalizedString("contact", comment: ""),
         image: UIImage(named: "contact"),
@@ -107,7 +108,7 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let chatNav = NENavigationController(rootViewController: chat)
 
       // Contacts
-      let contactVC = FunContactsViewController()
+      let contactVC = FunContactViewController()
       contactVC.tabBarItem = UITabBarItem(
         title: NSLocalizedString("contact", comment: ""),
         image: UIImage(named: "funContact"),
@@ -131,7 +132,7 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       viewControllers = [chatNav, contactsNav, meNav]
       viewControllers?.forEach { vc in
         vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-        vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#58BE6B")], for: .selected)
+        vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
       }
       selectedIndex = 0
 
@@ -139,20 +140,20 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
         let appearance = UITabBarAppearance()
         appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#58BE6B")]
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.ne_funTheme]
         tabBar.standardAppearance = appearance
       } else {
         tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
         viewControllers?.forEach { vc in
           vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#58BE6B")], for: .selected)
+          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
         }
       }
     }
   }
 
   func setUpSessionBadgeValue() {
-    sessionUnreadCount = ConversationRepo.shared.getMsgUnreadCount()
+    sessionUnreadCount = ConversationRepo.shared.getTotalUnreadCount()
     if sessionUnreadCount > 0 {
       tabBar.showBadgOn(index: 0, tabbarItemNums: 3)
     } else {

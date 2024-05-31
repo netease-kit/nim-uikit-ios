@@ -107,7 +107,7 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
     } else {
       // person、custom
       titleLabel.text = user.showName()
-      nameLabel.text = user.shortName(showAlias: false, count: 2)
+      nameLabel.text = user.shortName(count: 2)
 
       if let imageUrl = user.user?.avatar, !imageUrl.isEmpty {
         NEALog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")

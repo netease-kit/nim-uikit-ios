@@ -48,7 +48,7 @@ open class MultiForwardViewModel: NSObject {
       let subStringData = strData?.components(separatedBy: "\n")
       if let msgCount = subStringData?.count, msgCount > 1 {
         for i in 1 ..< msgCount {
-          if let msgString = subStringData?[i], let msg = ChatRepo.shared.messageDeserialization(msgString) {
+          if let msgString = subStringData?[i], let msg = V2NIMMessageConverter.messageDeserialization(msgString) {
             let model = modelFromMessage(message: msg)
             ChatMessageHelper.addTimeMessage(model, messages.last)
             messages.append(model)
@@ -79,11 +79,11 @@ open class MultiForwardViewModel: NSObject {
 
     if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? "") {
       model.fullName = remoteExt[mergedMessageNickKey] as? String
-      model.shortName = ChatMessageHelper.getShortName(model.fullName ?? "")
+      model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
       model.avatar = remoteExt[mergedMessageAvatarKey] as? String
     } else {
       model.fullName = message.senderId
-      model.shortName = ChatMessageHelper.getShortName(model.fullName ?? "")
+      model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
     }
 
     delegate?.getMessageModel?(model: model)

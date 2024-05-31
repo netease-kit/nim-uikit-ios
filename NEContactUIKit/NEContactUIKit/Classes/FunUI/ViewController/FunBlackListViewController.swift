@@ -40,9 +40,9 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
 
   /// 黑名单选择页面
   /// - Returns: 人员选择控制器
-  override open func getContactSelectVC() -> NEBaseContactsSelectedViewController {
+  override open func getContactSelectVC() -> NEBaseContactSelectedViewController {
     var filterUsers = Set<String>()
     filterUsers.insert(IMKitClient.instance.account())
-    return FunContactsSelectedViewController(filterUsers: filterUsers)
+    return FunContactSelectedViewController(filterUsers: filterUsers)
   }
 }

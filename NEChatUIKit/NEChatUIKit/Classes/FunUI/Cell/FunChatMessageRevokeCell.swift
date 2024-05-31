@@ -58,7 +58,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
 
     reeditButton.translatesAutoresizingMaskIntoConstraints = false
     reeditButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-    reeditButton.setTitleColor(UIColor.ne_blueText, for: .normal)
+    reeditButton.setTitleColor(UIColor.ne_normalTheme, for: .normal)
     reeditButton.accessibilityIdentifier = "id.reeditButton"
 
     contentView.addSubview(reeditButton)

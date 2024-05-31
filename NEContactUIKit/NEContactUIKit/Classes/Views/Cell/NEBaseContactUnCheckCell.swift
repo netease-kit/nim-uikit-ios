@@ -28,11 +28,7 @@ open class NEBaseContactUnCheckCell: UICollectionViewCell {
     return view
   }()
 
-  func configure(_ model: ContactInfo) {
-    avatarImageView.configHeadData(
-      headUrl: model.user?.user?.avatar,
-      name: model.user?.showName() ?? "",
-      uid: model.user?.user?.accountId ?? ""
-    )
-  }
+  /// 控件赋值方法，具体实现见子类
+  /// - Parameter model: 数据模型（Any）
+  func configure(_ model: Any) {}
 }

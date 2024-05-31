@@ -27,11 +27,23 @@ public class PersonInfoViewModel: NSObject {
   var userInfo: NEUserWithFriend?
   weak var delegate: PersonInfoViewModelDelegate?
 
-  func getData() {
+  func getData(_ completion: @escaping () -> Void) {
     sectionData.removeAll()
-    userInfo = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())
-    sectionData.append(getFirstSection())
-    sectionData.append(getSecondSection())
+
+    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+      userInfo = userFriend
+      sectionData.append(getFirstSection())
+      sectionData.append(getSecondSection())
+      completion()
+    } else {
+      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { [weak self] userFriend, error in
+        guard let self = self else { return }
+        self.userInfo = userFriend?.first
+        self.sectionData.append(self.getFirstSection())
+        self.sectionData.append(self.getSecondSection())
+        completion()
+      }
+    }
   }
 
   func refreshData() {
@@ -169,7 +181,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfAvatar(_ avatar: String, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.avatar = avatar
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -180,7 +192,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfSex(_ gender: V2NIMGender, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.gender = gender
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -191,7 +203,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfBirthday(_ birthDay: String, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.birthday = birthDay
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -208,7 +220,7 @@ public class PersonInfoViewModel: NSObject {
       parameter.name = IMKitClient.instance.account()
     }
 
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -219,7 +231,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfMobile(_ mobile: String, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.mobile = mobile
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -230,7 +242,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfEmail(_ email: String, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.email = email
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }
@@ -241,7 +253,7 @@ public class PersonInfoViewModel: NSObject {
   func updateSelfSign(_ sign: String, _ completion: @escaping (NSError?) -> Void) {
     let parameter = V2NIMUserUpdateParams()
     parameter.sign = sign
-    contactRepo.updateSelfUserInfo(parameter) { error in
+    contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
     }
   }

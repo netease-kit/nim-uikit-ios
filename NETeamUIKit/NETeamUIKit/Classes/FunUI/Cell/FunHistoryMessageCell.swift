@@ -8,7 +8,7 @@ import UIKit
 
 @objcMembers
 open class FunHistoryMessageCell: NEBaseHistoryMessageCell {
-  override func setupSubviews() {
+  override open func setupSubviews() {
     super.setupSubviews()
     rangeTextColor = .funTeamThemeColor
 
@@ -47,5 +47,13 @@ open class FunHistoryMessageCell: NEBaseHistoryMessageCell {
       timeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
       timeLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
     ])
+  }
+
+  override open func configData(message: HistoryMessageModel?) {
+    super.configData(message: message)
+    guard let searchStr = searchText, let fullText = message?.imMessage?.text else { return }
+    let windowWidth = UIScreen.main.bounds.width
+    let maxWidth = windowWidth - 16 - 32 - 12 - 50
+    truncateTextForLabel(subTitleLabel, maxWidth, searchStr, fullText)
   }
 }

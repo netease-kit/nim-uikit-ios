@@ -7,10 +7,42 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamTableViewCell: UITableViewCell {
-  public var avatarImageView = UIImageView()
-  public var nameLabel = UILabel()
-  public var titleLabel = UILabel()
-//    public var arrow = UIImageView(image:UIImage.ne_imageNamed(name: "arrowRight"))
+  // 头像图片
+  lazy var avatarImageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.clipsToBounds = true
+    imageView.contentMode = .scaleAspectFill
+    imageView.accessibilityIdentifier = "id.avatar"
+    return imageView
+  }()
+
+  // 头像文本
+  lazy var nameLabel: UILabel = {
+    let label = UILabel()
+    label.textAlignment = .center
+    label.font = UIFont.systemFont(ofSize: 16)
+    label.textColor = .white
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
+
+  // 名称
+  lazy var titleLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.name"
+    return label
+  }()
+
+  // 右侧图标
+  lazy var arrowImageView: UIImageView = {
+    let arrow = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
+    arrow.translatesAutoresizingMaskIntoConstraints = false
+    arrow.contentMode = .center
+    arrow.isHidden = true
+    return arrow
+  }()
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -23,10 +55,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
 
   func commonUI() {
     selectionStyle = .none
-    avatarImageView.translatesAutoresizingMaskIntoConstraints = false
-    avatarImageView.clipsToBounds = true
-    avatarImageView.contentMode = .scaleAspectFill
-    avatarImageView.accessibilityIdentifier = "id.avatar"
+
     contentView.addSubview(avatarImageView)
     NSLayoutConstraint.activate([
       avatarImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
@@ -35,10 +64,6 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
       avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
 
-    nameLabel.textAlignment = .center
-    nameLabel.font = UIFont.systemFont(ofSize: 16)
-    nameLabel.textColor = .white
-    nameLabel.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
@@ -47,8 +72,6 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
       nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
     ])
 
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.accessibilityIdentifier = "id.name"
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
@@ -57,16 +80,13 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
 
-//        self.arrow.translatesAutoresizingMaskIntoConstraints = false
-//        self.arrow.isHidden = true
-//        self.arrow.contentMode = .center
-//        self.contentView.addSubview(self.arrow)
-//        NSLayoutConstraint.activate([
-//            self.arrow.rightAnchor.constraint(equalTo: self.contentView.rightAnchor, constant: -20),
-//            self.arrow.widthAnchor.constraint(equalToConstant: 15),
-//            self.arrow.topAnchor.constraint(equalTo: self.contentView.topAnchor),
-//            self.arrow.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor)
-//        ])
+    contentView.addSubview(arrowImageView)
+    NSLayoutConstraint.activate([
+      arrowImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      arrowImageView.widthAnchor.constraint(equalToConstant: 15),
+      arrowImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+      arrowImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+    ])
   }
 
   open func setModel(_ model: Any) {

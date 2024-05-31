@@ -16,7 +16,7 @@ public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
 }
 
 @objcMembers
-open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
+open class TeamChatViewModel: ChatViewModel, NETeamListener {
   public let teamRepo = TeamRepo.shared
   public var team: V2NIMTeam?
   /// 当前成员的群成员对象类
@@ -25,13 +25,11 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
   override init(conversationId: String) {
     super.init(conversationId: conversationId)
     teamRepo.addTeamListener(self)
-    contactRepo.addContactListener(self)
   }
 
   override init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
     teamRepo.addTeamListener(self)
-    contactRepo.addContactListener(self)
     getTeamMember {}
   }
 
@@ -40,7 +38,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
   ///   - accountId: 用户 accountId
   ///   - showAlias: 是否展示备注
   /// - Returns: 名称和好友信息
-  override open func getShowName(_ accountId: String, _ showAlias: Bool = true) -> (name: String, user: NEUserWithFriend?) {
+  override open func getShowName(_ accountId: String, _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
     return ChatTeamCache.shared.getShowName(accountId, showAlias)
   }
@@ -61,6 +59,197 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
     ChatTeamCache.shared.loadShowName(userIds: accountIds, teamId: teamId, completion)
   }
 
+  /// 加载置顶消息
+  override open func loadTopMessage() {
+    // 校验配置项
+    if !IMKitConfigCenter.shared.topEnable {
+      return
+    }
+
+    if let serverJson = team?.serverExtension, let extDic = getDictionaryFromJSONString(serverJson) {
+      if let topInfo = extDic[keyTopMessage] as? [String: Any] {
+        if let type = topInfo["operation"] as? Int, type == 0 {
+          let refer = ChatMessageHelper.createMessageRefer(topInfo)
+          chatRepo.getMessageListByRefers([refer]) { [weak self] messages, error in
+            // 这里查询只是为了校验消息是否还存在（未被删除或撤回）
+            if let topMessage = messages?.first, let senderId = topMessage.senderId {
+              var senderName = self?.getShowName(senderId) ?? ""
+              let group = DispatchGroup()
+
+              if senderName == senderId {
+                group.enter()
+                self?.loadShowName([senderId], self?.sessionId) {
+                  senderName = self?.getShowName(senderId) ?? ""
+                  group.leave()
+                }
+              }
+
+              group.notify(queue: .main) {
+                let content = ChatMessageHelper.contentOfMessage(topMessage)
+                var thumbUrl: String?
+                var isVideo = false
+                var hideClose = false
+
+                // 获取图片缩略图
+                if let attach = topMessage.attachment as? V2NIMMessageFileAttachment, let imageUrl = attach.url {
+                  thumbUrl = ResourceRepo.shared.imageThumbnailURL(imageUrl)
+                }
+
+                // 获取视频首帧
+                if let attach = topMessage.attachment as? V2NIMMessageVideoAttachment, let videoUrl = attach.url {
+                  thumbUrl = ResourceRepo.shared.videoThumbnailURL(videoUrl)
+                  isVideo = true
+                }
+
+                // 是否隐藏移除置顶按钮
+                if self?.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
+                   let topAllow = extDic[keyAllowTopMessage] as? String,
+                   topAllow == allowAtManagerValue {
+                  hideClose = true
+                }
+
+                self?.delegate?.setTopValue(name: senderName,
+                                            content: content,
+                                            url: thumbUrl,
+                                            isVideo: isVideo,
+                                            hideClose: hideClose)
+                self?.topMessage = topMessage
+              }
+            }
+          }
+        } else {
+          topMessage = nil
+          delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
+        }
+      }
+    }
+  }
+
+  /// 校验置顶消息权限
+  /// - Returns: 是否具有置顶消息权限
+  func hasTopMessagePremission() -> Bool {
+    // 讨论组所有人都有权限
+    if team?.isDisscuss() == true {
+      return true
+    }
+
+    // 高级群
+    if teamMember?.memberRole == .TEAM_MEMBER_ROLE_OWNER || teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
+      // 群主和管理员都有权限
+      return true
+    } else if teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL {
+      if let custom = team?.serverExtension,
+         let json = getDictionaryFromJSONString(custom) {
+        if let atValue = json[keyAllowTopMessage] as? String, atValue == allowAtAllValue {
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
+    }
+
+    return false
+  }
+
+  /// 置顶消息
+  /// - Parameter completion: 回调
+  override open func topMessage(_ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: operationModel?.message?.messageClientId))")
+    guard let message = operationModel?.message else { return }
+
+    let topMessageDic: [String: Any] = [
+      "idClient": message.messageClientId as Any,
+      "scene": message.conversationType.rawValue,
+      "from": message.senderId as Any,
+      "to": message.conversationId as Any,
+      "idServer": message.messageServerId as Any,
+      "time": Int(message.createTime * 1000),
+      "operator": IMKitClient.instance.account(), // 操作者
+      "operation": 0, // 操作: 0 - "add"; 1 - "remove";
+    ]
+
+    // 更新群扩展
+    TeamRepo.shared.getTeamInfo(sessionId) { [weak self] team, error in
+      if let err = error {
+        print("getTeamInfo error: \(String(describing: err))")
+        completion(err)
+        return
+      }
+
+      guard let tid = self?.sessionId else { return }
+
+      // 校验权限
+      if self?.hasTopMessagePremission() == false {
+        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode)
+        completion(error)
+        return
+      }
+
+      var serverExtension = [String: Any]()
+      if let serverJson = team?.serverExtension, let serverExt = NECommonUtil.getDictionaryFromJSONString(serverJson) as? [String: Any] {
+        serverExtension = serverExt
+      }
+
+      serverExtension[keyTopMessage] = topMessageDic
+      serverExtension["lastOpt"] = keyTopMessage
+      TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { error in
+        print("updateTeamExtension error: \(String(describing: error))")
+        completion(error)
+      }
+    }
+  }
+
+  /// 取消置顶消息
+  /// - Parameter completion: 回调
+  override open func untopMessage(_ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
+
+    guard let _ = topMessage?.messageClientId else {
+      let error = NSError(domain: chatLocalizable("failed_operation"), code: failedOperation)
+      completion(error)
+      return
+    }
+
+    let topMessageDic: [String: Any] = [
+      "idClient": topMessage?.messageClientId as Any,
+      "operator": IMKitClient.instance.account(), // 操作者
+      "operation": 1, // 操作: 0 - "add"; 1 - "remove";
+    ]
+
+    // 更新群扩展
+    TeamRepo.shared.getTeamInfo(sessionId) { [weak self] team, error in
+      if let err = error {
+        print("getTeamInfo error: \(String(describing: err))")
+        completion(err)
+        return
+      }
+
+      guard let tid = self?.sessionId else { return }
+
+      // 校验权限
+      if self?.hasTopMessagePremission() == false {
+        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode)
+        completion(error)
+        return
+      }
+
+      if let serverJson = team?.serverExtension,
+         var serverExtension = NECommonUtil.getDictionaryFromJSONString(serverJson) as? [String: Any],
+         serverExtension[keyTopMessage] != nil {
+        serverExtension[keyTopMessage] = topMessageDic
+        serverExtension["lastOpt"] = keyTopMessage
+
+        self?.topMessage = nil
+        TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { error in
+          print("updateTeamExtension error: \(String(describing: error))")
+          completion(error)
+        }
+      }
+    }
+  }
+
   open func getTeamInfo(teamId: String,
                         _ completion: @escaping (Error?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + teamId)
@@ -72,21 +261,9 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
     }
   }
 
-  open func getTeamMemberInfo(teamId: String,
-                              _ completion: @escaping (Error?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + teamId)
-    teamRepo.getTeamWithMembers(teamId,
-                                .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { [weak self] error, teamInfoModel in
-      if error == nil {
-        self?.team = teamInfoModel?.team
-      }
-      completion(error, teamInfoModel)
-    }
-  }
-
   /// 获取自己的群成员信息
   public func getTeamMember(_ completion: @escaping () -> Void) {
-    teamRepo.getTeamMember(sessionId, IMKitClient.instance.account()) { [weak self] member, error in
+    teamRepo.getTeamMember(sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
       self?.teamMember = member
       completion()
     }
@@ -113,7 +290,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
         markMessages.append(message)
       }
     }
-    chatRepo.markTeamMessageRead(messages: markMessages, completion)
+    chatRepo.markTeamMessagesRead(messages: markMessages, completion)
   }
 
   /// 重写获取消息已读未读回执
@@ -169,26 +346,6 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
     }
   }
 
-  // MARK: - NEContactListener
-
-  /// 用户信息变更回调
-  /// - Parameter users: 用户列表
-  public func onUserProfileChanged(_ users: [V2NIMUser]) {
-    for item in users {
-      let userFriend = NEUserWithFriend(user: item)
-      ChatTeamCache.shared.updateTeamMemberInfo(userFriend)
-      updateMessageInfo(item.accountId)
-    }
-  }
-
-  /// 好友信息变更回调
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    let userFriend = NEUserWithFriend(friend: friendInfo)
-    ChatTeamCache.shared.updateTeamMemberInfo(userFriend)
-    updateMessageInfo(friendInfo.accountId)
-  }
-
   // MARK: - NETeamListener
 
   public func onTeamDismissed(_ team: V2NIMTeam) {
@@ -208,6 +365,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
         delegate.onTeamUpdate?(team: team)
       }
     }
+
+    loadTopMessage()
   }
 
   /// 群成员加入回调
@@ -227,6 +386,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener, NEContactListener {
 
       if teamMember.accountId == self.teamMember?.accountId {
         self.teamMember = teamMember
+        loadTopMessage()
       }
 
       ChatTeamCache.shared.updateTeamMemberInfo(teamMember)

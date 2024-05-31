@@ -7,6 +7,17 @@ import UIKit
 
 @objcMembers
 open class ChatBrokenNetworkView: UIView {
+  /// 内容文本
+  private lazy var contentLabel: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.font = DefaultTextFont(14)
+    label.textColor = HexRGB(0xFC596A)
+    label.textAlignment = .center
+    label.text = commonLocalizable("network_error")
+    return label
+  }()
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
@@ -25,14 +36,4 @@ open class ChatBrokenNetworkView: UIView {
       contentLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
     ])
   }
-
-  private lazy var contentLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.font = DefaultTextFont(14)
-    label.textColor = HexRGB(0xFC596A)
-    label.textAlignment = .center
-    label.text = commonLocalizable("network_error")
-    return label
-  }()
 }

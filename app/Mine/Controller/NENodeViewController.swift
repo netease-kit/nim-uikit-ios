@@ -12,6 +12,21 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
   // 记录默认选中的cell
   private var selectIndex = 0
 
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .ne_lightBackgroundColor
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.sectionHeaderHeight = 12.0
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
   override func viewDidLoad() {
     super.viewDidLoad()
     viewModel.getData()
@@ -48,28 +63,12 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
     alertController.addAction(cancelAction)
     let sureAction = UIAlertAction(title: NSLocalizedString("restart", comment: ""), style: .default) { action in
       // 设置节点
-      // TODO: - 未实现
-//      SettingRepo.shared.setNodeValue(isDomestic)
+      SettingRepo.shared.setNodeValue(isDomestic)
       exit(0)
     }
     alertController.addAction(sureAction)
     present(alertController, animated: true, completion: nil)
   }
-
-  lazy var tableView: UITableView = {
-    let tableView = UITableView()
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.backgroundColor = .ne_lightBackgroundColor
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.separatorColor = .clear
-    tableView.separatorStyle = .none
-    tableView.sectionHeaderHeight = 12.0
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0.0
-    }
-    return tableView
-  }()
 
   // MARK: UITableViewDataSource, UITableViewDelegate
 

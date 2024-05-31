@@ -19,16 +19,16 @@ open class CustomConversationController: ConversationController, NEBaseConversat
   }
 
   override public func viewDidLoad() {
-    // 通过配置项实现自定义
+    // 通过配置项实现自定义，该方式不需要继承自 ChatViewController
     customByConfig()
 
-    // 通过重写实现自定义
+    // 通过重写实现自定义，该方式需要继承自 ChatViewController
 //      customByOverread()
 
     super.viewDidLoad()
   }
 
-  // 通过配置项实现自定义(这种方式不需要继承就可以实现 UI 自定义)
+  /// 通过配置项实现自定义(这种方式不需要继承就可以实现 UI 自定义)
   open func customByConfig() {
     /*
      UI 属性自定义
@@ -82,22 +82,22 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     NEKitConversationConfig.shared.ui.conversationProperties.itemDateSize = 14
 
     /// 会话列表 cell 左划置顶按钮文案内容
-    NEKitConversationConfig.shared.ui.stickTopBottonTitle = "左侧"
+    NEKitConversationConfig.shared.ui.stickTopButtonTitle = "左侧"
     /// 会话列表 cell 左划取消置顶按钮文案内容（会话置顶后生效）
-    NEKitConversationConfig.shared.ui.stickTopBottonCancelTitle = "左侧1"
+    NEKitConversationConfig.shared.ui.stickTopButtonCancelTitle = "左侧1"
     /// 会话列表 cell 左划置顶按钮背景颜色
-    NEKitConversationConfig.shared.ui.stickTopBottonBackgroundColor = UIColor.brown
+    NEKitConversationConfig.shared.ui.stickTopButtonBackgroundColor = UIColor.brown
     /// 会话列表 cell 左划置顶按钮点击事件
-    NEKitConversationConfig.shared.ui.stickTopBottonClick = { model, indexPath in
+    NEKitConversationConfig.shared.ui.stickTopButtonClick = { model, indexPath in
       self.showToast("会话列表 cell 左划置顶按钮点击事件")
     }
 
     /// 会话列表 cell 左划删除按钮文案内容
-    NEKitConversationConfig.shared.ui.deleteBottonTitle = "右侧"
+    NEKitConversationConfig.shared.ui.deleteButtonTitle = "右侧"
     /// 会话列表 cell 左划删除按钮背景颜色
-    NEKitConversationConfig.shared.ui.deleteBottonBackgroundColor = UIColor.purple
+    NEKitConversationConfig.shared.ui.deleteButtonBackgroundColor = UIColor.purple
     /// 会话列表 cell 左划删除按钮点击事件
-    NEKitConversationConfig.shared.ui.deleteBottonClick = { model, indexPath in
+    NEKitConversationConfig.shared.ui.deleteButtonClick = { model, indexPath in
       self.showToast("会话列表 cell 左划删除按钮点击事件")
     }
 
@@ -118,7 +118,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
 
     /// 会话列表点击事件
     NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
-      // self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
+      self.showToast(model?.conversation?.name ?? "会话列表点击事件")
     }
 
     /*
@@ -143,7 +143,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     }
   }
 
-  // 通过重写实现自定义布局(这种方式需要继承，拿到父类属性)
+  /// 通过重写实现自定义布局(这种方式需要继承，拿到父类属性)
   open func customByOverread() {
     // 实现协议（重写tabbar点击事件）
     navigationView.delegate = self
@@ -168,7 +168,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
 
     // 自定义占位图文案、背景图片
     emptyView.setEmptyImage(image: UIImage())
-    emptyView.settingContent(content: "")
+    emptyView.setText("")
   }
 
   // 通过继承方式重写次最右侧按钮点击事件, 这种方式会覆盖配置项中的点击事件

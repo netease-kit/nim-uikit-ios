@@ -9,10 +9,10 @@ import NIMSDK
 
 @objc
 public protocol ConversationViewModelDelegate: NSObjectProtocol {
-  func didAddRecentSession()
-  func didUpdateRecentSession(index: Int)
   func reloadData()
   func reloadTableView()
+  /// 底部加载更多状态变更
+  func loadMoreStateChange(_ finish: Bool)
 }
 
 public typealias ConversationCallBack = (NSError?, Bool?) -> Void
@@ -29,7 +29,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   public var offset: Int64 = 0
 
   /// 会话列表分页大小
-  public var page = 20
+  public var page = 200
 
   /// 非置顶会话数据
   public var conversationListData = [NEConversationListModel]()
@@ -57,6 +57,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     super.init()
     NotificationCenter.default.addObserver(self, selector: #selector(atMessageChange), name: Notification.Name(AtMessageChangeNoti), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(deleteConversationNoti), name: NENotificationName.deleteConversationNotificationName, object: nil)
     conversationRepo.addListener(self)
     ChatRepo.shared.addChatListener(self)
     TeamRepo.shared.addTeamListener(self)
@@ -77,6 +78,15 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   func atMessageChange() {
     NEALog.infoLog(className(), desc: "atMessageChange")
     delegate?.reloadTableView()
+  }
+
+  func deleteConversationNoti(_ noti: NSNotification) {
+    if let conversationId = noti.object as? String {
+      weak var weakSelf = self
+      conversationRepo.deleteConversation(conversationId) { error in
+        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " deleteConversationNoti \(error?.localizedDescription ?? "") ")
+      }
+    }
   }
 
   /// 分页获取会话列表
@@ -113,13 +123,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter conversation 会话对象
   open func addOrUpdateConversationData(_ conversation: V2NIMConversation) {
     if let cacheModel = conversationDic[conversation.conversationId] {
-      if let lastMsg = conversation.lastMessage, let cacheLastMsg = cacheModel.conversation?.lastMessage {
-        let createTime = lastMsg.messageRefer.createTime
-        let cacheCreateTime = cacheLastMsg.messageRefer.createTime
-        if cacheCreateTime < createTime {
-          cacheModel.conversation = conversation
-        }
-      }
+      cacheModel.conversation = conversation
     } else {
       let model = NEConversationListModel()
       model.conversation = conversation
@@ -153,7 +157,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
                         _ completion: @escaping (NSError?)
                           -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
-    conversationRepo.addStickTop(conversation.conversationId) { error in
+    conversationRepo.setStickTop(conversation.conversationId, true) { error in
       completion(error)
     }
   }
@@ -165,39 +169,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
                            _ completion: @escaping (NSError?)
                              -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
-    conversationRepo.removeStickTop(conversation.conversationId) { error in
+    conversationRepo.setStickTop(conversation.conversationId, false) { error in
       completion(error)
     }
   }
 
   open func onMuteListChanged() {
-    delegate?.reloadTableView()
-  }
-
-  // 创建会话回调
-  public func onConversationCreated(_ conversation: V2NIMConversation) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + conversation.conversationId)
-    if checkDismissTeamNoti(conversation) {
-      return
-    }
-
-    addOrUpdateConversationData(conversation)
-    delegate?.reloadTableView()
-  }
-
-  /// 会话变更
-  /// - Parameter conversations 会话列表
-  public func onConversationChanged(_ conversations: [V2NIMConversation]) {
-    // 置顶逻辑处理
-    filterStickTopData(conversations)
-
-    for conversation in conversations {
-      if checkDismissTeamNoti(conversation) {
-        continue
-      }
-      addOrUpdateConversationData(conversation)
-    }
-
     delegate?.reloadTableView()
   }
 
@@ -247,6 +224,33 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
   }
 
+  // 创建会话回调
+  public func onConversationCreated(_ conversation: V2NIMConversation) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + conversation.conversationId)
+    if checkDismissTeamNoti(conversation) {
+      return
+    }
+
+    addOrUpdateConversationData(conversation)
+    delegate?.reloadTableView()
+  }
+
+  /// 会话变更
+  /// - Parameter conversations 会话列表
+  public func onConversationChanged(_ conversations: [V2NIMConversation]) {
+    // 置顶逻辑处理
+    filterStickTopData(conversations)
+
+    for conversation in conversations {
+      if checkDismissTeamNoti(conversation) {
+        continue
+      }
+      addOrUpdateConversationData(conversation)
+    }
+
+    delegate?.reloadTableView()
+  }
+
   /// 会话删除
   /// - Parameter conversationIds: 会话id列表
   public func onConversationDeleted(_ conversationIds: [String]) {
@@ -273,9 +277,17 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 检查会话是否包含解散通知的变更
   /// - Parameter conversation: 会话
   public func checkDismissTeamNoti(_ conversation: V2NIMConversation) -> Bool {
+    if IMKitConfigCenter.shared.dismissTeamDeleteConversation == false {
+      return false
+    }
+
+    if conversation.type != V2NIMConversationType.CONVERSATION_TYPE_TEAM {
+      return false
+    }
     // 解散、退出群聊
     let targetId = conversation.conversationId
-    if conversation.type == V2NIMConversationType.CONVERSATION_TYPE_TEAM, conversation.lastMessage?.messageType == V2NIMMessageType.MESSAGE_TYPE_NOTIFICATION {
+
+    if conversation.lastMessage?.messageType == V2NIMMessageType.MESSAGE_TYPE_NOTIFICATION {
       if let content = conversation.lastMessage?.attachment as? V2NIMMessageNotificationAttachment {
         if content.type == V2NIMMessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS ||
           (content.type == V2NIMMessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_KICK &&
@@ -327,10 +339,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       messageNew.localExtension = NECommonUtil.getJSONStringFromDictionary(muta)
     }
 
-    ChatRepo.shared.saveMessageToDB(message: messageNew,
-                                    conversationId: messageRevoke.messageRefer?.conversationId ?? "",
-                                    senderId: messageRevoke.revokeAccountId,
-                                    createTime: messageRevoke.messageRefer?.createTime) { _, error in
+    ChatRepo.shared.insertMessageToLocal(message: messageNew,
+                                         conversationId: messageRevoke.messageRefer?.conversationId ?? "",
+                                         senderId: messageRevoke.revokeAccountId,
+                                         createTime: messageRevoke.messageRefer?.createTime) { _, error in
       completion(error)
     }
   }
@@ -391,12 +403,17 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter team: 群信息
   public func onTeamDismissed(_ team: V2NIMTeam) {
     NEALog.infoLog(className(), desc: "onTeamDismissed team id : \(team.teamId) team name: \(team.name)")
-    if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
-      didDeleteConversation(cid)
+    if IMKitConfigCenter.shared.dismissTeamDeleteConversation {
+      if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
+        didDeleteConversation(cid)
+      }
     }
   }
 
   private func didDeleteConversation(_ cid: String) {
+    if IMKitConfigCenter.shared.dismissTeamDeleteConversation == false {
+      return
+    }
     conversationRepo.deleteConversation(cid) { [weak self] error in
       if let err = error {
         NEALog.infoLog(self?.className() ?? " ", desc: "onTeamDismissed delete conversation error : \(err.localizedDescription)")
@@ -419,22 +436,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
   }
 
-  public func createConversation(_ team: V2NIMTeam) {
-    if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
-      conversationRepo.createConversation(cid) { [weak self] conversation, error in
-        if let conv = conversation {
-          let model = NEConversationListModel()
-          model.conversation = conv
-          self?.conversationDic[cid] = model
-          self?.conversationListData.append(model)
-          self?.delegate?.reloadTableView()
-        } else {
-          NEALog.infoLog(self?.className() ?? " ", desc: "createConversation error : \(error?.localizedDescription ?? "")")
-        }
-      }
-    }
-  }
-
   public func onConversationSyncFinished() {
     NEALog.infoLog(className(), desc: "onConversationSyncFinished")
     delegate?.reloadTableView()
@@ -451,6 +452,39 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         getConversationListByPage(completion)
         /// 回调置空
         callBack = nil
+      } else {
+        NEALog.infoLog(className(), desc: #function + " retrieveConversationDatas")
+        retrieveConversationDatas()
+      }
+    }
+  }
+
+  /// 发生重连的情况重新获取数据
+  public func retrieveConversationDatas() {
+    var limit = 0
+    if conversationDic.count > page {
+      limit = conversationDic.count
+    } else {
+      limit = page
+    }
+    conversationRepo.getConversationList(0, limit) { [weak self] conversations, offset, finished, error in
+      if error == nil {
+        if let set = offset {
+          // 更新索引
+          self?.offset = set
+        }
+        // 清理之前数据
+        self?.stickTopConversations.removeAll()
+        self?.conversationListData.removeAll()
+        self?.conversationDic.removeAll()
+        // 区分置顶消息和非置顶消息
+        conversations?.forEach { conversation in
+          self?.addOrUpdateConversationData(conversation)
+        }
+        self?.delegate?.reloadTableView()
+        if let complete = finished {
+          self?.delegate?.loadMoreStateChange(complete)
+        }
       }
     }
   }
@@ -469,6 +503,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     NEALog.infoLog(className(), desc: "onFriendInfoChanged : \(friendInfo.accountId ?? "")")
+    delegate?.reloadTableView()
+  }
+
+  /// 用户信息变更回调
+  /// - Parameter users: 用户信息列表
+  public func onUserProfileChanged(_ users: [V2NIMUser]) {
     delegate?.reloadTableView()
   }
 }

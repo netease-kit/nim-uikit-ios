@@ -28,7 +28,7 @@ open class P2PChatViewModel: ChatViewModel {
   ///   - showAlias: 是否展示备注
   /// - Returns: 名称和好友信息
   override open func getShowName(_ accountId: String,
-                                 _ showAlias: Bool = true) -> (name: String, user: NEUserWithFriend?) {
+                                 _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
     if NEFriendUserCache.shared.isFriend(accountId) {
       return NEFriendUserCache.shared.getShowName(accountId, showAlias)
@@ -71,9 +71,13 @@ open class P2PChatViewModel: ChatViewModel {
   ///   - completion: 完成回调
   private func markReadInP2P(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
+
+    let messages = messages.sorted { msg1, msg2 in
+      msg1.createTime > msg2.createTime
+    }
     for message in messages {
       if !message.isSelf {
-        chatRepo.markP2pMessageRead(message: message, completion)
+        chatRepo.markP2PMessageRead(message: message, completion)
         return
       }
     }
@@ -153,9 +157,11 @@ open class P2PChatViewModel: ChatViewModel {
       }
     }
   }
+}
 
-  //    MARK: - NENotiListener
+//    MARK: - NENotiListener
 
+extension P2PChatViewModel: NENotiListener {
   /// 收到自定义系统通知回调
   /// 用于展示对方输入状态
   /// - Parameter customNotifications: 自定义系统通知

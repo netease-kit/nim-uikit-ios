@@ -7,6 +7,22 @@ import NETeamUIKit
 import UIKit
 
 class NodeSelectCell: CornerCell {
+  lazy var titleLabel: UILabel = {
+    let label = UILabel()
+    label.textColor = UIColor.ne_darkText
+    label.font = NEConstant.defaultTextFont(14.0)
+    label.translatesAutoresizingMaskIntoConstraints = false
+    return label
+  }()
+
+  lazy var stateImageView: UIImageView = {
+    let imgView = UIImageView()
+    imgView.image = UIImage(named: "unselect")
+    imgView.highlightedImage = UIImage(named: "select")
+    imgView.translatesAutoresizingMaskIntoConstraints = false
+    return imgView
+  }()
+
   override func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
@@ -48,20 +64,4 @@ class NodeSelectCell: CornerCell {
       titleLabel.leftAnchor.constraint(equalTo: stateImageView.rightAnchor, constant: 10),
     ])
   }
-
-  lazy var titleLabel: UILabel = {
-    let label = UILabel()
-    label.textColor = UIColor.ne_darkText
-    label.font = NEConstant.defaultTextFont(14.0)
-    label.translatesAutoresizingMaskIntoConstraints = false
-    return label
-  }()
-
-  lazy var stateImageView: UIImageView = {
-    let imgView = UIImageView()
-    imgView.image = UIImage(named: "unselect")
-    imgView.highlightedImage = UIImage(named: "select")
-    imgView.translatesAutoresizingMaskIntoConstraints = false
-    return imgView
-  }()
 }

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NIMSDK
 import UIKit
 
 @objcMembers
@@ -43,7 +44,22 @@ open class TeamMembersController: NEBaseTeamMembersController {
         cell.configure(model)
         cell.removeButton.isHidden = !isShowRemove
         cell.removeLabel.isHidden = !isShowRemove
+
+        if IMKitConfigCenter.shared.onlineStatusEnable {
+          cell.headerView.alpha = 0.5
+
+          if let account = model.nimUser?.user?.accountId {
+            if account == IMKitClient.instance.account() {
+              cell.headerView.alpha = 1.0
+            } else if let event = viewModel.onLineEventDic[account] {
+              if event.value == NIMSubscribeEventOnlineValue.login.rawValue {
+                cell.headerView.alpha = 1.0
+              }
+            }
+          }
+        }
       }
+
       return cell
     }
     return UITableViewCell()

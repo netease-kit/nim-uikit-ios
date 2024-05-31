@@ -54,6 +54,7 @@
 "team_update_info_permission" = "群资料修改权限";
 "team_update_client_custom"="更新客户端自定义字段的权限";
 "team_at_permission"="@所有人权限更新为";
+"team_top_permission"="置顶消息权限更新为";
 
 "team_custom_info" = "自定义扩展字段";
 "not_mute" = "解除禁言";
@@ -73,10 +74,13 @@
 "team_all_no_mute"="群禁言已关闭";
 "pin_text_P2P"="标记了这条信息";
 "pin_text_team"="标记了这条信息";
+"top_message"="置顶了一条消息";
+"untop_message"="移除了置顶消息";
 "chat_setting"="聊天设置";
 "session_set_top"="聊天置顶";
 "message_remind"="开启消息提醒";
 "open_soon"="暂未开放";
+"no_permission_tip"="暂无操作权限";
 
 //MARK: operation
 "operation_copy"="复制";
@@ -84,8 +88,11 @@
 "operation_forward"="转发";
 "operation_pin"="标记";
 "operation_cancel_pin"="取消标记";
+"operation_delete_collection"="删除收藏";
 "operation_select"="多选";
 "operation_collection"="收藏";
+"operation_top"="置顶";
+"operation_untop"="移除置顶";
 "operation_delete"="删除";
 "operation_recall"="撤回";
 "withdrew_message" = "撤回了一条消息";
@@ -95,7 +102,6 @@
 
 
 //MARK: toast
-"copy_success"="复制成功";
 "collection_success"="已收藏";
 "no_permession"="暂无权限";
 "msg_reply"="回复";
@@ -120,6 +126,9 @@
 "send_to"="发送给";
 "send"="发送";
 "confirm"="确定";
+"session_record"="的会话记录";
+
+"collection_message"="的收藏消息";
 
 
 "mdhm"="MM月dd日 HH:mm";
@@ -161,6 +170,7 @@
 "pin_jump_detail"="跳转查看";
 "cancel_pin_success"="已取消标记";
 "no_pin_message"="暂无标记消息";
+"no_collection_message"="暂无收藏消息";
 
 "you_were_mentioned"="[有人@我]";
 // MARK: error toast
@@ -201,3 +211,8 @@
 "null_message_not_support"="不支持发送空消息";
 
 "black_list_tip"="对方已将您拉黑，消息无法发送";
+"disable_stranger_call"="非好友暂不支持音视频通话";
+
+"chat_collection_p2p_tip"="来自于 与%@的会话";
+
+"chat_collection_team_tip"="来自于 %@";

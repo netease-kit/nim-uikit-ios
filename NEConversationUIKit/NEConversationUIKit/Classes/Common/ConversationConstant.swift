@@ -12,6 +12,3 @@ func localizable(_ key: String) -> String {
 }
 
 public let ModuleName = "NEConversationUIKit"
-
-// 创建群聊 选择人数限制
-public var inviteNumberLimit: Int = 200

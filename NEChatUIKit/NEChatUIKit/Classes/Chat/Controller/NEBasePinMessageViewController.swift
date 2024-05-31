@@ -11,8 +11,9 @@ import UIKit
 let PinMessageDefaultType = 1000
 
 @objcMembers
-open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDataSource, UITableViewDelegate, PinMessageViewModelDelegate, PinMessageCellDelegate, UIDocumentInteractionControllerDelegate, NIMMediaManagerDelegate, NEIMKitClientListener {
+open class NEBasePinMessageViewController: NEChatBaseViewController, UITableViewDataSource, UITableViewDelegate, PinMessageViewModelDelegate, PinMessageCellDelegate, UIDocumentInteractionControllerDelegate, NEIMKitClientListener {
   let viewModel = PinMessageViewModel()
+  var audioPlayer: AVAudioPlayer? // 仅用于语音消息的播放
 
   /// 会话id
   var conversationId: String?
@@ -24,31 +25,14 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
   var playingCell: NEBasePinMessageAudioCell?
   var playingModel: MessageAudioModel?
 
-  // 网络断开标志
+  /// 网络断开标志
   var networkBroken = false
 
-  // 数据拉取标志
+  /// 数据拉取标志
   var isLoadingData = false
 
-  /// 初始化
-  /// - Parameter conversationId: 会话id
-  public init(conversationId: String) {
-    self.conversationId = conversationId
-    super.init(nibName: nil, bundle: nil)
-    NIMSDK.shared().mediaManager.add(self)
-    IMKitClient.instance.addLoginListener(self)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  deinit {
-    NIMSDK.shared().mediaManager.remove(self)
-    IMKitClient.instance.removeLoginListener(self)
-  }
-
-  private lazy var tableView: UITableView = {
+  /// 内容列表
+  public lazy var tableView: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
@@ -67,11 +51,28 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
       frame: .zero
     )
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
     view.isHidden = true
     return view
   }()
 
   let interactionController = UIDocumentInteractionController()
+
+  /// 初始化
+  /// - Parameter conversationId: 会话id
+  public init(conversationId: String) {
+    self.conversationId = conversationId
+    super.init(nibName: nil, bundle: nil)
+    IMKitClient.instance.addLoginListener(self)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  deinit {
+    IMKitClient.instance.removeLoginListener(self)
+  }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -177,8 +178,8 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
 
     let model = viewModel.items[indexPath.row]
     var reuseId = "\(model.chatmodel.type.rawValue)"
-    if model.chatmodel.type == .custom,
-       let customType = NECustomAttachment.typeOfCustomMessage(model.chatmodel.message?.attachment) {
+    if model.chatmodel.type == .custom {
+      let customType = model.chatmodel.customType
       if customType == customMultiForwardType {
         reuseId = "\(MessageType.multiForward.rawValue)"
       } else if customType == customRichTextType {
@@ -213,10 +214,8 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     }
 
     let model = viewModel.items[indexPath.row]
-    if let customType = NECustomAttachment.typeOfCustomMessage(model.message.attachment) {
-      if customType == customMultiForwardType {
-        return model.cellHeight(pinContentMaxW: pin_content_maxW) - 30
-      }
+    if model.chatmodel.customType == customMultiForwardType {
+      return model.cellHeight(pinContentMaxW: pin_content_maxW) - 30
     }
     return model.cellHeight(pinContentMaxW: pin_content_maxW)
   }
@@ -242,11 +241,10 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
   /// 拷贝文本消息
   /// - Parameter item: pin消息对象
   func copyActionClicked(item: NEPinMessageModel) {
-    weak var weakSelf = self
     let text = item.message.text
     let pasteboard = UIPasteboard.general
     pasteboard.string = text
-    weakSelf?.view.makeToast(chatLocalizable("copy_success"), duration: 2, position: .center)
+    showToast(commonLocalizable("copy_success"))
   }
 
   /// 转发消息
@@ -290,130 +288,76 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     showActionSheet(actions)
   }
 
+  /// 获取转发确认弹窗
   open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     NEBaseForwardAlertViewController()
   }
 
-  /// 转发消息到单聊
-  /// - Parameter message： 转发消息体
-  func forwardMessageToUser(_ message: V2NIMMessage) {
+  /// 添加转发确认弹窗
+  /// - Parameters:
+  ///   - items: 转发对象
+  ///   - type: 转发类型（合并转发/逐条转发/转发）
+  ///   - sureBlock: 确认按钮点击回调
+  func addForwardAlertController(items: [ForwardItem],
+                                 type: String,
+                                 _ sureBlock: ((String?) -> Void)? = nil) {
+    let forwardAlert = getForwardAlertController()
+    forwardAlert.setItems(items)
+    forwardAlert.forwardType = type
+    forwardAlert.sureBlock = sureBlock
+    if let conversationId = conversationId {
+      let content = ChatMessageHelper.getSessionName(conversationId: conversationId)
+      forwardAlert.sessionName = content
+    }
+
+    addChild(forwardAlert)
+    view.addSubview(forwardAlert.view)
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
+      UIApplication.shared.keyWindow?.endEditing(true)
+    }))
+  }
+
+  /// 转发消息
+  /// - Parameters:
+  ///   - message: 转发的消息
+  open func forwardMessage(_ message: V2NIMMessage) {
     weak var weakSelf = self
-    Router.shared.register(ContactSelectedUsersRouter) { param in
-      print("user setting accids : ", param)
+    Router.shared.register(ForwardMultiSelectedRouter) { param in
       var items = [ForwardItem]()
 
-      if let users = param["im_user"] as? [V2NIMUser] {
-        for user in users {
-          let item = ForwardItem()
-          item.uid = user.accountId
-          item.avatar = user.avatar
-          item.name = user.name
-          items.append(item)
+      if let conversations = param["conversations"] as? [[String: Any]] {
+        var conversationIds = [String]()
+
+        for conversation in conversations {
+          if let conversationId = conversation["conversationId"] as? String {
+            conversationIds.append(conversationId)
+
+            let item = ForwardItem()
+            item.conversationId = conversationId
+            item.name = conversation["name"] as? String
+            item.avatar = conversation["avatar"] as? String
+            items.append(item)
+          }
         }
 
-        let forwardAlert = weakSelf!.getForwardAlertController()
-        forwardAlert.setItems(items)
-        if let session = weakSelf?.viewModel.conversationId {
-          let content = ChatMessageHelper.getSessionName(conversationId: session)
-          forwardAlert.context = content
-        }
-        weakSelf?.addChild(forwardAlert)
-        weakSelf?.view.addSubview(forwardAlert.view)
-
-        forwardAlert.sureBlock = { comment in
+        let type = chatLocalizable("operation_forward")
+        weakSelf?.addForwardAlertController(items: items, type: type) { comment in
           if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
             weakSelf?.showToast(commonLocalizable("network_error"))
             return
           }
-          weakSelf?.viewModel.forwardUserMessage(message, users, comment) { result, error, progress in
-            if let err = error as? NSError {
-              if err.code == protocolSendFailed {
-                weakSelf?.showToast(commonLocalizable("network_error"))
-              } else {
-                weakSelf?.showToast(err.localizedDescription)
-              }
-            }
+
+          weakSelf?.viewModel.forwardMessages(message, conversationIds, comment) { result, error, pro in
+            // 转发失败不展示错误信息
           }
         }
       }
     }
-    var param = [String: Any]()
-    param["nav"] = weakSelf?.navigationController as Any
-    param["limit"] = 6
 
-    // 标记列表-转发-人员选择页面不包含自己
-    var filters = Set<String>()
-    filters.insert(IMKitClient.instance.account())
-    param["filters"] = filters
-
-    Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
-  }
-
-  /// 转发消息到群聊
-  /// - Parameter message： 消息对象
-  func forwardMessageToTeam(_ message: V2NIMMessage) {
-    weak var weakSelf = self
-    Router.shared.register(ContactTeamDataRouter) { param in
-      if let team = param["team"] as? V2NIMTeam {
-        let item = ForwardItem()
-        item.avatar = team.avatar
-        item.name = team.getShowName()
-        item.uid = team.teamId
-
-        let forwardAlert = weakSelf!.getForwardAlertController()
-        forwardAlert.setItems([item])
-        if let conversationId = weakSelf?.viewModel.conversationId {
-          let content = ChatMessageHelper.getSessionName(conversationId: conversationId)
-          forwardAlert.context = content
-        }
-        forwardAlert.sureBlock = { comment in
-          if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-            return
-          }
-          weakSelf?.viewModel.forwardTeamMessage(message, team, comment) { result, error, progress in
-            if let err = error as? NSError {
-              if err.code == protocolSendFailed {
-                weakSelf?.showToast(commonLocalizable("network_error"))
-              } else {
-                weakSelf?.showToast(err.localizedDescription)
-              }
-            }
-          }
-        }
-        weakSelf?.addChild(forwardAlert)
-        weakSelf?.view.addSubview(forwardAlert.view)
-      }
-    }
-
-    Router.shared.use(
-      ContactTeamListRouter,
-      parameters: ["nav": weakSelf?.navigationController as Any,
-                   "isClickCallBack": true],
-      closure: nil
-    )
-  }
-
-  open func forwardMessage(_ message: V2NIMMessage) {
-    if IMKitClient.instance.getConfigCenter().teamEnable {
-      weak var weakSelf = self
-      let userAction = UIAlertAction(title: chatLocalizable("contact_user"),
-                                     style: .default) { action in
-        weakSelf?.forwardMessageToUser(message)
-      }
-
-      let teamAction = UIAlertAction(title: chatLocalizable("team"), style: .default) { action in
-        weakSelf?.forwardMessageToTeam(message)
-      }
-
-      let cancelAction = UIAlertAction(title: chatLocalizable("cancel"),
-                                       style: .cancel) { action in
-      }
-
-      showActionSheet([teamAction, userAction, cancelAction])
-    } else {
-      forwardMessageToUser(message)
-    }
+    Router.shared.use(ForwardMultiSelectRouter,
+                      parameters: ["nav": navigationController as Any, "selctorMode": 0],
+                      closure: nil)
   }
 
   open func tableViewReload(needLoad: Bool) {
@@ -592,29 +536,37 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
       }
       // 更新ui进度
       fileModel.cell?.uploadProgress(progress: progress)
-    } _: { _, error in
-      NEALog.infoLog(self.className(), desc: "download error \(error?.localizedDescription ?? "")")
+    } _: { [weak self] localPath, error in
+      if let err = error {
+        switch err.code {
+        case protocolSendFailed:
+          self?.showToast(commonLocalizable("network_error"))
+        default:
+          print(err.localizedDescription)
+        }
+      } else if localPath != nil {
+        fileModel.state = .Success
+      }
     }
   }
 
   /// 跳转文本显示器
   /// - Parameter model: 标记对象
   open func toTextViewShow(_ model: NEPinMessageModel?) {
-    if let customType = NECustomAttachment.typeOfCustomMessage(model?.message.attachment) {
-      if customType == customRichTextType {
-        showTextViewController(model)
+    let customType = model?.chatmodel.customType
+    if customType == customRichTextType {
+      showTextViewController(model)
 
-      } else if customType == customMultiForwardType,
-                let data = NECustomAttachment.dataOfCustomMessage(model?.message.attachment) {
-        let url = data["url"] as? String
-        let md5 = data["md5"] as? String
+    } else if customType == customMultiForwardType,
+              let data = NECustomAttachment.dataOfCustomMessage(model?.message.attachment) {
+      let url = data["url"] as? String
+      let md5 = data["md5"] as? String
 
-        guard var fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: "NEIMUIKit/") else { return }
-        let fileName = multiForwardFileName + (model?.message.messageClientId ?? "")
-        let filePath = fileDirectory + fileName
-        let multiForwardVC = getMultiForwardViewController(url, filePath, md5)
-        navigationController?.pushViewController(multiForwardVC, animated: true)
-      }
+      guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) else { return }
+      let fileName = multiForwardFileName + (model?.message.messageClientId ?? "")
+      let filePath = fileDirectory + fileName
+      let multiForwardVC = getMultiForwardViewController(url, filePath, md5)
+      navigationController?.pushViewController(multiForwardVC, animated: true)
     }
   }
 
@@ -625,7 +577,7 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     NEALog.infoLog(className(), desc: #function + "didClickContent")
 
     if model?.message.messageType == .MESSAGE_TYPE_AUDIO {
-      startPlay(cell: cell, model: model)
+      didPlay(cell: cell, model: model)
 
     } else if model?.message.messageType == .MESSAGE_TYPE_IMAGE {
       toImageView(model)
@@ -647,6 +599,31 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     }
   }
 
+  /// 点击开始播放
+  /// - Parameter cell: 标记列表视图对象
+  /// - Parameter model: 标记对象
+  private func didPlay(cell: NEBasePinMessageCell?, model: NEPinMessageModel?) {
+    guard let message = model?.message, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
+      return
+    }
+
+    let path = audio.path ?? ChatMessageHelper.createFilePath(message)
+    if !FileManager.default.fileExists(atPath: path) {
+      if let urlString = audio.url {
+        viewModel.downLoad(urlString, path, nil) { [weak self] _, error in
+          if error == nil {
+            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
+            self?.startPlay(cell: cell, model: model)
+          } else {
+            self?.showToast(error!.localizedDescription)
+          }
+        }
+      }
+    } else {
+      startPlay(cell: cell, model: model)
+    }
+  }
+
   /// 开始播放
   /// - Parameter cell: 标记列表视图对象
   /// - Parameter model: 标记对象
@@ -656,7 +633,7 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     }
 
     if playingModel == audioModel {
-      if NIMSDK.shared().mediaManager.isPlaying() {
+      if audioPlayer?.isPlaying == true {
         stopPlay()
       } else {
         startPlaying(audioMessage: model?.message)
@@ -679,74 +656,53 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     guard let message = audioMessage, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
       return
     }
+
     playingCell?.startAnimation()
 
     let path = audio.path ?? ChatMessageHelper.createFilePath(message)
-    if !FileManager.default.fileExists(atPath: path) {
-      if let urlString = audio.url {
-        viewModel.downLoad(urlString, path, nil) { [weak self] _, error in
-          if error == nil {
-            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
-            NIMSDK.shared().mediaManager.play(path)
-          } else {
-            self?.showToast(error!.localizedDescription)
-          }
-        }
+    if FileManager.default.fileExists(atPath: path) {
+      NEALog.infoLog(className(), desc: #function + " play path : " + path)
+
+      // 创建一个URL对象，指向音频文件
+      let audioURL = URL(fileURLWithPath: path)
+
+      do {
+        let cate: AVAudioSession.Category = viewModel.getHandSetEnable() ? AVAudioSession.Category.playAndRecord : AVAudioSession.Category.playback
+        try AVAudioSession.sharedInstance().setCategory(cate, options: .duckOthers)
+        try AVAudioSession.sharedInstance().setActive(true)
+
+        // 检查URL是否有效并尝试加载音频
+        audioPlayer = try AVAudioPlayer(contentsOf: audioURL)
+        audioPlayer?.delegate = self
+
+        // 开始播放
+        audioPlayer?.play()
+      } catch {
+        // 处理加载音频文件失败的情况
+        playingCell?.stopAnimation()
+        print("Error loading audio: \(error.localizedDescription)")
       }
     } else {
-      NIMSDK.shared().mediaManager.play(path)
+      NEALog.infoLog(className(), desc: #function + " audio path is empty, play url : " + (audio.url ?? ""))
+      playingCell?.stopAnimation()
     }
   }
 
   func stopPlay() {
-    if NIMSDK.shared().mediaManager.isPlaying() {
-      playingCell?.stopAnimation()
-      playingModel?.isPlaying = false
-      NIMSDK.shared().mediaManager.stopPlay()
+    if audioPlayer?.isPlaying == true {
+      audioPlayer?.stop()
     }
-  }
 
-  //    play
-  open func playAudio(_ filePath: String, didBeganWithError error: Error?) {
-    print(#function + "\(error?.localizedDescription ?? "")")
-    NIMSDK.shared().mediaManager.switch(viewModel.getHandSetEnable() ? .receiver : .speaker)
-    if let e = error {
-      if e.localizedDescription.count > 0 {
-        view.makeToast(e.localizedDescription)
-      }
-      playingCell?.stopAnimation()
-      playingModel?.isPlaying = false
+    playingCell?.stopAnimation()
+    playingModel?.isPlaying = false
+
+    do {
+      // 将当前的音频会话设置为非活动状态
+      try AVAudioSession.sharedInstance().setActive(false)
+    } catch {
+      // 处理设置失败的情况
+      print("Error setActive: \(error.localizedDescription)")
     }
-  }
-
-  open func playAudio(_ filePath: String, didCompletedWithError error: Error?) {
-    print(#function + "\(error?.localizedDescription ?? "")")
-    if error?.localizedDescription.count ?? 0 > 0 {
-      view.makeToast(error?.localizedDescription ?? "")
-    }
-    // stop
-    playingCell?.stopAnimation()
-    playingModel?.isPlaying = false
-  }
-
-  open func stopPlayAudio(_ filePath: String, didCompletedWithError error: Error?) {
-    print(#function + "\(error?.localizedDescription ?? "")")
-
-    playingCell?.stopAnimation()
-    playingModel?.isPlaying = false
-  }
-
-  open func playAudio(_ filePath: String, progress value: Float) {}
-
-  open func playAudioInterruptionEnd() {
-    playingCell?.stopAnimation()
-    playingModel?.isPlaying = false
-  }
-
-  open func playAudioInterruptionBegin() {
-    // stop play
-    playingCell?.stopAnimation()
-    playingModel?.isPlaying = false
   }
 
   open func getRegisterCellDic() -> [String: NEBasePinMessageCell.Type] {
@@ -754,8 +710,10 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
   }
 
   open func showTextViewController(_ model: NEPinMessageModel?) {
-    let title = NECustomAttachment.titleOfRichText(model?.message.attachment)
-    let body = NECustomAttachment.bodyOfRichText(model?.message.attachment) ?? model?.message.text
+    guard let model = model?.chatmodel as? MessageTextModel else { return }
+
+    let title = NECustomAttachment.titleOfRichText(model.message?.attachment)
+    let body = model.attributeStr
     let textView = getTextViewController(title: title, body: body)
     textView.modalPresentationStyle = .fullScreen
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
@@ -763,7 +721,7 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     }))
   }
 
-  func getTextViewController(title: String?, body: String?) -> TextViewController {
+  func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = TextViewController(title: title, body: body)
     textViewController.view.backgroundColor = .white
     return textViewController
@@ -797,5 +755,19 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
         self?.loadData()
       }))
     }
+  }
+}
+
+// MARK: - AVAudioPlayerDelegate
+
+extension NEBasePinMessageViewController: AVAudioPlayerDelegate {
+  /// 声音播放完成回调
+  public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+    stopPlay()
+  }
+
+  /// 声音解码失败回调
+  public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
+    stopPlay()
   }
 }
