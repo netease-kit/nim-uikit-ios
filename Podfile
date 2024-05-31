@@ -37,7 +37,8 @@ target 'app' do
   pod 'NERtcSDK', '5.5.33'
 
 
-  # # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
+  # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
+  # 源码依赖时如果需要指定 NIM SDK 版本（Special），建议同样在 podspec 中指定基础库版本
 #   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
 #   pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
 #   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
