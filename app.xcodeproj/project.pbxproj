@@ -21,7 +21,6 @@
 		181EE5EF2B234E540043817F /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D32B234E540043817F /* MeViewController.swift */; };
 		181EE5F02B234E540043817F /* StyleSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D42B234E540043817F /* StyleSelectionViewController.swift */; };
 		181EE5F12B234E540043817F /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D52B234E540043817F /* NEAboutWebViewController.swift */; };
-		181EE5F22B234E540043817F /* NELoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D62B234E540043817F /* NELoginViewController.swift */; };
 		181EE5F32B234E540043817F /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D72B234E540043817F /* InputPersonInfoController.swift */; };
 		181EE5F42B234E540043817F /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D82B234E540043817F /* MineSettingViewController.swift */; };
 		181EE5F52B234E540043817F /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D92B234E540043817F /* MessageRemindViewController.swift */; };
@@ -89,7 +88,6 @@
 		181EE5D32B234E540043817F /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
 		181EE5D42B234E540043817F /* StyleSelectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleSelectionViewController.swift; sourceTree = "<group>"; };
 		181EE5D52B234E540043817F /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
-		181EE5D62B234E540043817F /* NELoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NELoginViewController.swift; sourceTree = "<group>"; };
 		181EE5D72B234E540043817F /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
 		181EE5D82B234E540043817F /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
 		181EE5D92B234E540043817F /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
@@ -181,7 +179,6 @@
 				181EE5D32B234E540043817F /* MeViewController.swift */,
 				181EE5D42B234E540043817F /* StyleSelectionViewController.swift */,
 				181EE5D52B234E540043817F /* NEAboutWebViewController.swift */,
-				181EE5D62B234E540043817F /* NELoginViewController.swift */,
 				181EE5D72B234E540043817F /* InputPersonInfoController.swift */,
 				181EE5D82B234E540043817F /* MineSettingViewController.swift */,
 				181EE5D92B234E540043817F /* MessageRemindViewController.swift */,
@@ -434,7 +431,6 @@
 				181EE58E2B234C510043817F /* CustomChatCell.swift in Sources */,
 				181EE5F02B234E540043817F /* StyleSelectionViewController.swift in Sources */,
 				181EE5F42B234E540043817F /* MineSettingViewController.swift in Sources */,
-				181EE5F22B234E540043817F /* NELoginViewController.swift in Sources */,
 				DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */,
 				DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */,
 				181EE5FF2B234E540043817F /* CustomTeamArrowSettingCell.swift in Sources */,

@@ -6,9 +6,6 @@ target 'app' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   
-  # 登录组件
-  pod 'YXLogin', '1.0.0'
-  
   # UI 库
   pod 'NEChatUIKit', '10.1.0'
   pod 'NEContactUIKit', '10.1.0'
