@@ -10,7 +10,6 @@ import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
 import UIKit
-import YXLogin
 
 class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   private var mineData = [
