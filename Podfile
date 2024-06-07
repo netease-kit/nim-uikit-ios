@@ -5,23 +5,31 @@ source 'https://github.com/CocoaPods/Specs.git'
 target 'app' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-  
-  # UI 库
-  pod 'NEChatUIKit', '10.1.0'
-  pod 'NEContactUIKit', '10.1.0'
-  pod 'NEConversationUIKit', '10.1.0'
-  pod 'NETeamUIKit', '10.1.0'
-  pod 'NEMapKit', '10.1.0'
-  
-  # 呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
+
+  # 基础库
   pod 'NIMSDK_LITE','10.2.6-beta'
+  pod 'NEChatKit', '10.1.1'
+
+  # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
+  pod 'NEChatUIKit', '10.1.1'
+  pod 'NEContactUIKit', '10.1.1'
+  pod 'NEConversationUIKit', '10.1.1'
+  pod 'NETeamUIKit', '10.1.1'
+
+  # 扩展库-地理位置组件
+  pod 'NEMapKit', '10.1.1'
+
+  # 扩展库-呼叫组件
   pod 'NERtcCallKit/NOS_Special', '2.4.0'
   pod 'NERtcCallUIKit/NOS_Special', '2.4.0'
-  pod 'NERtcSDK', '5.5.33'
+
+  # 扩展库，依次为 RTC 音视频基础组件、RTC 音视频神经网络组件（使用背景虚化功能需要集成）、RTC 音视频背景分割组件（使用背景虚化功能需要集成）
+  pod 'NERtcSDK/RtcBasic', '5.5.33'
+  pod 'NERtcSDK/Nenn'
+  pod 'NERtcSDK/Segment'
 
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-  # 源码依赖时如果需要指定 NIM SDK 版本（Special），建议同样在 podspec 中指定基础库版本
 #   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
 #   pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
 #   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
