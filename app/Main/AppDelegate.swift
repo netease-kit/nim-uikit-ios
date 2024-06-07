@@ -5,7 +5,6 @@
 
 import UIKit
 import NEContactUIKit
-import YXLogin
 import NECoreKit
 import NIMSDK
 import NECoreIM2Kit
