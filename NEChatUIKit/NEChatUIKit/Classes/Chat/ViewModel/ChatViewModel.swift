@@ -1693,39 +1693,44 @@ open class ChatViewModel: NSObject {
       return
     }
 
+    var failedIndex = -1
     var index = -1
     for (i, msg) in messages.enumerated() {
       if message.messageClientId == msg.message?.messageClientId {
         if messages[i].message?.sendingState != .MESSAGE_SENDING_STATE_SUCCEEDED {
-          index = i
+          failedIndex = i
         }
+        index = i
         messages[i].message = message
         break
       }
     }
 
-    if index > 0 {
-      let indexPath = IndexPath(row: index, section: 0)
+    var indexPath = IndexPath(row: index, section: 0)
+    if failedIndex >= 0 {
+      indexPath = IndexPath(row: failedIndex, section: 0)
 
       // 重发消息位置替换
-      if index != messages.count - 1 {
+      if failedIndex != messages.count - 1 {
         for (i, model) in messages.enumerated() {
           if message.createTime < (model.message?.createTime ?? 0) {
-            if i - 1 != index {
-              exchangeMessageModel(index, i)
+            if i - 1 != failedIndex {
+              exchangeMessageModel(failedIndex, i)
               return
             } else {
               break
             }
           } else if i == messages.count - 1 {
-            if i != index {
-              exchangeMessageModel(index, i)
+            if i != failedIndex {
+              exchangeMessageModel(failedIndex, i)
               return
             }
           }
         }
       }
+    }
 
+    if indexPath.row >= 0 {
       delegate?.sendSuccess(message, indexPath)
     }
   }
