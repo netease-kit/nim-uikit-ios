@@ -72,6 +72,17 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
     return false
   }
 
+  // 移除黑名单消息提示去重 id
+  public func removeBlackTipSendedId(messageId: String?) {
+    guard let messageId = messageId else {
+      return
+    }
+
+    if blackListMessageIds.contains(messageId) {
+      blackListMessageIds.remove(messageId)
+    }
+  }
+
   // 是否已经发过对应路径的音频消息，防止重复发送
   public func isRecordAudioSended(path: String) -> Bool {
     if recordAudioMessagePaths.contains(path) {

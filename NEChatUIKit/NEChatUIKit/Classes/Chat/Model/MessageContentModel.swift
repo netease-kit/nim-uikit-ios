@@ -23,6 +23,8 @@ open class MessageContentModel: NSObject, MessageModel {
 
   public var showSelect: Bool = false // 多选按钮是否展示
   public var isSelected: Bool = false // 多选是否选中
+  public var isSelectAll: Bool = false // 是否全选
+  public var unkonwMessage: Bool = false
   public var inMultiForward: Bool = false { // 是否是合并消息中的子消息
     didSet {
 //      fullNameHeight = 0 // 合并消息中的子消息不显示昵称

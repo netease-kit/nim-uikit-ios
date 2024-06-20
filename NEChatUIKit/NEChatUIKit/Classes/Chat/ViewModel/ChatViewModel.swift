@@ -379,8 +379,13 @@ open class ChatViewModel: NSObject {
         indexPaths.append(IndexPath(row: i, section: 0))
       }
     }
+
+    // 更新置顶消息发送者昵称
+    if accid == topMessage?.senderId {
+      delegate?.updateTopName(name: showName)
+    }
+
     delegate?.onLoadMoreWithMessage(indexPaths)
-    delegate?.updateTopName(name: showName)
   }
 
   /// 插入消息
@@ -898,10 +903,10 @@ open class ChatViewModel: NSObject {
     }
 
     if message.messageType == .MESSAGE_TYPE_CUSTOM {
-      if let title = NECustomAttachment.titleOfRichText(message.attachment), !title.isEmpty {
+      if let title = NECustomUtils.titleOfRichText(message.attachment), !title.isEmpty {
         muta[revokeLocalMessageContent] = title
       }
-      if let body = NECustomAttachment.bodyOfRichText(message.attachment), !body.isEmpty {
+      if let body = NECustomUtils.bodyOfRichText(message.attachment), !body.isEmpty {
         muta[revokeLocalMessageContent] = body
       }
     }
@@ -981,16 +986,17 @@ open class ChatViewModel: NSObject {
     /// 消息发送成功
     let pinItem = model?.isPined == false ? OperationItem.pinItem() : OperationItem.removePinItem()
     let topItem = model?.message?.messageClientId == topMessage?.messageClientId ? OperationItem.untopItem() : OperationItem.topItem()
+
     switch model?.message?.messageType {
     case .MESSAGE_TYPE_LOCATION:
       items.append(contentsOf: [
         OperationItem.replayItem(),
         OperationItem.forwardItem(),
         pinItem,
-        topItem,
-        OperationItem.collectionItem(),
         OperationItem.deleteItem(),
         OperationItem.selectItem(),
+        OperationItem.collectionItem(),
+        topItem,
       ])
     case .MESSAGE_TYPE_TEXT:
       items = [
@@ -998,29 +1004,29 @@ open class ChatViewModel: NSObject {
         OperationItem.replayItem(),
         OperationItem.forwardItem(),
         pinItem,
-        topItem,
-        OperationItem.collectionItem(),
         OperationItem.deleteItem(),
         OperationItem.selectItem(),
+        OperationItem.collectionItem(),
+        topItem,
       ]
     case .MESSAGE_TYPE_IMAGE, .MESSAGE_TYPE_VIDEO, .MESSAGE_TYPE_FILE:
       items = [
         OperationItem.replayItem(),
         OperationItem.forwardItem(),
         pinItem,
-        topItem,
-        OperationItem.collectionItem(),
         OperationItem.deleteItem(),
         OperationItem.selectItem(),
+        OperationItem.collectionItem(),
+        topItem,
       ]
     case .MESSAGE_TYPE_AUDIO:
       items = [
         OperationItem.replayItem(),
         pinItem,
-        topItem,
-        OperationItem.collectionItem(),
         OperationItem.deleteItem(),
         OperationItem.selectItem(),
+        OperationItem.collectionItem(),
+        topItem,
       ]
     case .MESSAGE_TYPE_CUSTOM:
       if (model?.customType ?? 0) > 0 {
@@ -1033,15 +1039,14 @@ open class ChatViewModel: NSObject {
           OperationItem.replayItem(),
           OperationItem.forwardItem(),
           pinItem,
-          topItem,
-          OperationItem.collectionItem(),
           OperationItem.deleteItem(),
           OperationItem.selectItem(),
+          OperationItem.collectionItem(),
+          topItem,
         ])
       } else {
         // 未知消息体
         items = [
-          OperationItem.collectionItem(),
           OperationItem.deleteItem(),
           OperationItem.selectItem(),
         ]
@@ -1053,15 +1058,6 @@ open class ChatViewModel: NSObject {
         OperationItem.deleteItem(),
         OperationItem.selectItem(),
       ]
-    }
-
-    // 自己发送且非未知消息可以 【撤回】
-    if model?.message?.isSelf == true {
-      if model?.message?.messageType == .MESSAGE_TYPE_CUSTOM,
-         NECustomAttachment.dataOfCustomMessage(model?.message?.attachment) == nil {
-        return items
-      }
-      items.append(OperationItem.recallItem())
     }
 
     // 根据配置项移除 【收藏】
@@ -1079,9 +1075,26 @@ open class ChatViewModel: NSObject {
     }
 
     // 根据配置项移除 【置顶】
-    if IMKitConfigCenter.shared.topEnable == false {
+    // 单聊移除【置顶】
+    if IMKitConfigCenter.shared.topEnable == false || model?.message?.conversationType == .CONVERSATION_TYPE_P2P {
       items.removeAll { item in
         item.type == .top || item.type == .untop
+      }
+    }
+
+    // 自己发送且非未知消息可以 【撤回】
+    if model?.message?.isSelf == true {
+      if model?.message?.messageType == .MESSAGE_TYPE_CUSTOM,
+         model?.unkonwMessage == true {
+        return items
+      }
+
+      // 【撤回】位置在【删除】后面
+      for (i, item) in items.enumerated() {
+        if item.type == .delete {
+          items.insert(OperationItem.recallItem(), at: i + 1)
+          break
+        }
       }
     }
 
@@ -1608,7 +1621,7 @@ open class ChatViewModel: NSObject {
     let params = V2NIMAddCollectionParams()
     params.collectionType = Int32(collectionType)
     params.collectionData = content
-    params.uniqueId = message.messageClientId
+    params.uniqueId = message.messageServerId
 
     chatRepo.addCollection(params) { collection, error in
       if let err = error {

@@ -632,7 +632,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
       if let ms = weakSelf?.viewModel.messages, ms.count > 0 {
         weakSelf?.tableViewReload()
-        weakSelf?.hasFirstLoadData = true
         if weakSelf?.viewModel.isHistoryChat == true,
            let num = weakSelf?.tableView.numberOfRows(inSection: 0),
            index < num, index >= 0 {
@@ -654,6 +653,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       } else if let err = error {
         weakSelf?.showErrorToast(err)
       }
+
       weakSelf?.loadDataFinish()
     }
   }
@@ -1767,6 +1767,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   //  record
   open func recordAudio(_ filePath: String?, didBeganWithError error: Error?) {
     print("[record] sdk Began error:\(error?.localizedDescription ?? "")")
+    stopPlay()
   }
 
   open func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
@@ -2241,7 +2242,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     viewModel.collectMessage(operationModel, title ?? "") { [weak self] error in
       if error != nil {
-        self?.showToast(chatLocalizable("failed_operation"))
+        if error?.code == collectionLimitCode {
+          self?.showToast(chatLocalizable("collection_limit"))
+        } else {
+          self?.showToast(chatLocalizable("failed_operation"))
+        }
       } else {
         self?.showToast(chatLocalizable("collection_success"))
       }
@@ -2323,7 +2328,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard indexPath.row < viewModel.messages.count else { return NEBaseChatMessageCell() }
-    let model = viewModel.messages[indexPath.row]
+    var model = viewModel.messages[indexPath.row]
     var reuseId = "\(NEBaseChatMessageCell.self)"
     if model.replyedModel?.isReplay == true,
        model.isRevoked == false {
@@ -2567,7 +2572,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func showTextViewController(_ model: MessageContentModel?) {
     guard let model = model as? MessageTextModel else { return }
 
-    let title = NECustomAttachment.titleOfRichText(model.message?.attachment)
+    let title = NECustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
 
     if !(title?.isEmpty == false), !(body?.string.isEmpty == false) {
@@ -2791,7 +2796,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         showTextViewController(model)
       }
     } else if customType == customMultiForwardType,
-              let data = NECustomAttachment.dataOfCustomMessage(model?.message?.attachment) {
+              let data = NECustomUtils.dataOfCustomMessage(model?.message?.attachment) {
       let url = data["url"] as? String
       let md5 = data["md5"] as? String
       guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)file/") else { return }
@@ -2850,15 +2855,29 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 extension ChatViewController: TopMessageViewDelegate {
   /// 点击置顶消息视图中的关闭按钮
   public func didClickCloseButton() {
+    // 校验网络
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+
     viewModel.untopMessage { [weak self] error in
       if let err = error {
         self?.showErrorToast(err)
+      } else {
+        self?.topMessageView.removeFromSuperview()
       }
     }
   }
 
   /// 点击置顶消息视图
   public func didTapTopMessageView() {
+    // 校验网络
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+
     var index = -1
     for (i, m) in viewModel.messages.enumerated() {
       if viewModel.topMessage?.messageClientId == m.message?.messageClientId {
@@ -2929,7 +2948,7 @@ extension ChatViewController: NEMutilSelectBottomViewDelegate {
       }
 
       // 解析消息中的depth
-      if let data = NECustomAttachment.dataOfCustomMessage(msg.attachment) {
+      if let data = NECustomUtils.dataOfCustomMessage(msg.attachment) {
         if let dep = data["depth"] as? Int {
           if dep >= customMultiForwardMaxDepth {
             invalidMessages.append(msg)
@@ -3164,6 +3183,7 @@ extension ChatViewController: ChatBaseCellDelegate {
       }
 
       if index >= 0 {
+        ChatDeduplicationHelper.instance.removeBlackTipSendedId(messageId: msg.messageClientId)
         viewModel.sendMessage(message: msg) { _, error in
           if let err = error {
             print("resend message error: \(err.localizedDescription)")
@@ -3188,7 +3208,7 @@ extension ChatViewController: ChatBaseCellDelegate {
           return
         }
       }
-      let data = NECustomAttachment.dataOfCustomMessage(model?.message?.attachment)
+      let data = NECustomUtils.dataOfCustomMessage(model?.message?.attachment)
 
       let time = message.createTime
       let date = Date()
@@ -3285,7 +3305,9 @@ extension ChatViewController: ChatBaseCellDelegate {
     ReadViewController(message: message, teamId: teamId)
   }
 
-  open func loadDataFinish() {}
+  open func loadDataFinish() {
+    hasFirstLoadData = true
+  }
 
   // MARK: - call kit noti
 

@@ -62,7 +62,6 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
     label.textColor = .ne_greyText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.conversation"
-    label.lineBreakMode = .byTruncatingMiddle
     return label
   }()
 
@@ -185,7 +184,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
   open func configureData(_ model: CollectionMessageModel) {
     collectionModel = model
     headerView.configHeadData(headUrl: model.chatmodel.avatar,
-                              name: model.chatmodel.shortName ?? "",
+                              name: model.chatmodel.fullName ?? "",
                               uid: model.chatmodel.message?.senderId ?? "")
     nameLabel.text = model.chatmodel.fullName
     if let time = model.collection?.updateTime {

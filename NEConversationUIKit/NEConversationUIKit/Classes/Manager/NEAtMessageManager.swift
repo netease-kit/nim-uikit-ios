@@ -100,8 +100,6 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   ///  - Returns: 是否是当前用户
   open func isAtCurrentUser(sessionId: String) -> Bool {
     let dic = getMessageDic()
-    NEALog.infoLog(className(), desc: "session id : \(sessionId)")
-    NEALog.infoLog(className(), desc: "dic : \(dic)")
 
     if let model = dic[sessionId], model.isRead == false {
       NEALog.infoLog(className(), desc: "read == false")

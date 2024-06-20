@@ -172,7 +172,7 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
-    guard let data = NECustomAttachment.dataOfCustomMessage(model.message?.attachment) else {
+    guard let data = NECustomUtils.dataOfCustomMessage(model.message?.attachment) else {
       return
     }
 

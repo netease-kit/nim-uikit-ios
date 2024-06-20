@@ -99,6 +99,8 @@
 "message_reedit" = "重新编辑";
 "message_revoke_confirm" = "确认要撤回该消息吗？";
 "message_delete_confirm"="确认要删除该消息吗？";
+"collection_delete_confirm"="确认要删除该收藏吗？";
+"delete_collection_success"="删除成功";
 
 
 //MARK: toast
@@ -216,3 +218,5 @@
 "chat_collection_p2p_tip"="来自于 与%@的会话";
 
 "chat_collection_team_tip"="来自于 %@";
+
+"collection_limit"="收藏数已达到限制值";

@@ -148,13 +148,18 @@ open class TopMessageView: UIView {
       text = cutName + "："
     }
 
-    text += content ?? ""
-    topContentLabel.text = text
+    let attributedString = NSMutableAttributedString(string: text)
+
+    if let content = content {
+      let emojiAttr = NEEmotionTool.getAttWithStr(str: content, font: topContentLabel.font)
+      attributedString.append(emojiAttr)
+    }
+
+    topContentLabel.attributedText = attributedString
   }
 
   /// 点击关闭按钮
   func didClickCloseButton() {
-    removeFromSuperview()
     delegate?.didClickCloseButton()
   }
 

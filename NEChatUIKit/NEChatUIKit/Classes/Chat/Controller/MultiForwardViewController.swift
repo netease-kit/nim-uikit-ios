@@ -313,7 +313,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
       }
     } else if model?.type == .custom {
       if model?.customType == customMultiForwardType,
-         let data = NECustomAttachment.dataOfCustomMessage(model?.message?.attachment) {
+         let data = NECustomUtils.dataOfCustomMessage(model?.message?.attachment) {
         let url = data["url"] as? String
         let md5 = data["md5"] as? String
         guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) else { return }

@@ -536,21 +536,25 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
 
     if isSend, model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED {
       if model.message?.conversationType == .CONVERSATION_TYPE_P2P {
-        let receiptEnable = model.message?.messageConfig?.readReceiptEnabled ?? false
-        if receiptEnable,
-           !model.isRevoked,
-           SettingRepo.shared.getShowReadStatus(),
-           NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus == true {
-          readView.isHidden = false
-          if model.readCount == 1, model.unreadCount == 0 {
-            readView.progress = 1
-          } else {
-            readView.progress = 0
-          }
-        } else {
+        // 话单消息不显示已读未读
+        if model.type == .rtcCallRecord {
           readView.isHidden = true
+        } else {
+          let receiptEnable = model.message?.messageConfig?.readReceiptEnabled ?? false
+          if receiptEnable,
+             !model.isRevoked,
+             SettingRepo.shared.getShowReadStatus(),
+             NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus == true {
+            readView.isHidden = false
+            if model.readCount == 1, model.unreadCount == 0 {
+              readView.progress = 1
+            } else {
+              readView.progress = 0
+            }
+          } else {
+            readView.isHidden = true
+          }
         }
-
       } else if model.message?.conversationType == .CONVERSATION_TYPE_TEAM {
         let receiptEnable = model.message?.messageConfig?.readReceiptEnabled ?? false
         if receiptEnable,

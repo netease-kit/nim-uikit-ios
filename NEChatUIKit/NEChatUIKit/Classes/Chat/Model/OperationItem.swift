@@ -93,7 +93,7 @@ open class OperationItem: NSObject {
   public static func topItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_top")
-    item.imageName = "op_delete"
+    item.imageName = "op_top"
     item.type = .top
     return item
   }
@@ -102,7 +102,7 @@ open class OperationItem: NSObject {
   public static func untopItem() -> OperationItem {
     let item = OperationItem()
     item.text = chatLocalizable("operation_untop")
-    item.imageName = "op_delete"
+    item.imageName = "op_untop"
     item.type = .untop
     return item
   }

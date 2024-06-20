@@ -14,6 +14,15 @@ class CollectionMessageViewModel: NSObject {
   /// 消息API 单例
   let chatRepo = ChatRepo.shared
 
+  /// 记录音频下载，防止重复下载
+  public var audioDownloadSet = Set<String>()
+
+  /// 记录最后点击的音频消息，判断下载完成之后是否需要播放
+  public var lastClickAuidoMessageId: String?
+
+  /// 每页大小限制
+  public var pageSize: Int32 = 100
+
   /// 加载收藏数据
   /// - Parameter completion: 完成回调
   public func loadData(_ completion: @escaping (NSError?, Bool) -> Void) {
@@ -28,7 +37,7 @@ class CollectionMessageViewModel: NSObject {
       let timeInterval = tenYearsAgo!.timeIntervalSince1970
       option.beginTime = timeInterval
     }
-    option.limit = 100
+    option.limit = pageSize
     option.direction = .QUERY_DIRECTION_DESC
     chatRepo.getCollections(option) { [weak self] collections, error in
       if let error = error {
@@ -111,7 +120,16 @@ class CollectionMessageViewModel: NSObject {
     for conversationId in conversationIds {
       let forwardMessage = MessageUtils.forwardMessage(message: message)
       ChatMessageHelper.clearForwardAtMark(forwardMessage)
-      chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, completion)
+      if forwardMessage.senderId == nil {
+        forwardMessage.senderId = IMKitClient.instance.account()
+      }
+
+      if forwardMessage.conversationId == nil {
+        forwardMessage.conversationId = conversationId
+      }
+
+      ChatProvider.shared.sendMessage(message: forwardMessage, conversationId: conversationId, params: nil) { resut, error, progress in
+      }
       if let text = comment, !text.isEmpty {
         sendTextMessage(text, conversationId, completion)
       }

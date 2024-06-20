@@ -47,7 +47,7 @@ open class NEBasePinMessageMultiForwardCell: NEBasePinMessageCell {
 
   override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
-    guard let data = NECustomAttachment.dataOfCustomMessage(item.chatmodel.message?.attachment) else {
+    guard let data = NECustomUtils.dataOfCustomMessage(item.chatmodel.message?.attachment) else {
       return
     }
 

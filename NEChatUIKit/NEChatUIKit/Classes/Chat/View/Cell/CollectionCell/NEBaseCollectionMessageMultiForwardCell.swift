@@ -102,7 +102,7 @@ class NEBaseCollectionMessageMultiForwardCell: NEBaseCollectionMessageCell {
 
   override open func configureData(_ model: CollectionMessageModel) {
     super.configureData(model)
-    guard let data = NECustomAttachment.dataOfCustomMessage(model.chatmodel.message?.attachment) else {
+    guard let data = NECustomUtils.dataOfCustomMessage(model.chatmodel.message?.attachment) else {
       return
     }
 

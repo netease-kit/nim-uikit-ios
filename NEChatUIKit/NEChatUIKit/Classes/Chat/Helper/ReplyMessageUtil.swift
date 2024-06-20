@@ -13,7 +13,7 @@ open class ReplyMessageUtil: NSObject {
     }
 
     if model.type == .reply {
-      if let content = NECustomAttachment.contentOfRichText(model.message?.attachment) {
+      if let content = NECustomUtils.contentOfRichText(model.message?.attachment) {
         return text + content
       }
       text += "\(model.message?.text ?? chatLocalizable("message_not_found"))"

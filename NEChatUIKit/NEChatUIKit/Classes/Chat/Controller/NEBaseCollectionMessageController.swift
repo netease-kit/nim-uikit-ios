@@ -4,6 +4,7 @@
 
 import MJRefresh
 import NEChatKit
+import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
@@ -20,10 +21,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     tableView.delegate = self
     tableView.dataSource = self
     tableView.backgroundColor = .clear
-//    tableView.mj_footer = MJRefreshBackNormalFooter(
-//        refreshingTarget: self,
-//        refreshingAction: #selector(loadMoreData)
-//      )
+    tableView.mj_footer = MJRefreshAutoFooter(refreshingTarget: self, refreshingAction: #selector(loadMoreData))
     tableView.keyboardDismissMode = .onDrag
     return tableView
   }()
@@ -148,10 +146,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       } else if customType == customRichTextType {
         reuseId = "\(MessageType.richText.rawValue)"
       } else {
-        reuseId = "\(NEBaseCollectionMessageTextCell.self)"
+        reuseId = "\(NEBaseCollectionDefaultCell.self)"
       }
-    } else if cellClassDic[reuseId] == nil {
-      reuseId = "\(NEBaseCollectionMessageTextCell.self)"
+    } else if cellClassDic[reuseId] == nil || model.chatmodel.message == nil {
+      reuseId = "\(NEBaseCollectionDefaultCell.self)"
     }
     let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath) as! NEBaseCollectionMessageCell
     cell.delegate = self
@@ -169,17 +167,35 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
 
     let model = viewModel.collectionDatas[indexPath.row]
+    let defaultHeight = 143.0
+    if model.message == nil {
+      // 未解析到message对象，处理各个端可能序列化异常场景，正常不会出现
+      return defaultHeight
+    }
+
     if model.chatmodel.type == .custom {
       if model.chatmodel.customType == customMultiForwardType {
         return model.cellHeight(contenttMaxW: collection_content_maxW) - 30
+      } else if model.chatmodel.customType != customRichTextType {
+        // 不支持的自定义消息类型，如果后续有新增富文本类型需要添加处理逻辑
+        return defaultHeight
       }
     }
     return model.cellHeight(contenttMaxW: collection_content_maxW)
   }
 
-  /// 取消收藏消息
+  /// 弹出删除确认弹框
   /// - Parameter model: 收藏消息对象
   open func removeCollectionActionClicked(_ model: CollectionMessageModel) {
+    weak var weakSelf = self
+    showAlert(message: chatLocalizable("collection_delete_confirm")) {
+      weakSelf?.didRemoveCollectionActionClicked(model)
+    }
+  }
+
+  /// 取消收藏消息
+  /// - Parameter model: 收藏消息对象
+  open func didRemoveCollectionActionClicked(_ model: CollectionMessageModel) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
@@ -201,7 +217,12 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
         if weakSelf?.viewModel.collectionDatas.count ?? 0 <= 0 {
           weakSelf?.collectionEmptyView.isHidden = false
         }
+        weakSelf?.showToast(chatLocalizable("delete_collection_success"))
         weakSelf?.contentTable.reloadData()
+
+        if weakSelf?.viewModel.collectionDatas.count ?? 0 < weakSelf?.viewModel.pageSize ?? 0, weakSelf?.contentTable.mj_footer != nil {
+          weakSelf?.loadMoreData()
+        }
       }
     }
   }
@@ -300,7 +321,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// 弹出底操作悬浮框
   /// - Parameter model: 收藏对象
   open func showActions(_ model: CollectionMessageModel) {
-    guard let message = model.message else {
+    if model.collection == nil {
       return
     }
     var actions = [UIAlertAction]()
@@ -310,14 +331,14 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
     actions.append(deleteCollectionAction)
 
-    if message.messageType == .MESSAGE_TYPE_TEXT {
+    if model.message?.messageType == .MESSAGE_TYPE_TEXT {
       let copyAction = UIAlertAction(title: chatLocalizable("operation_copy"), style: .default) { _ in
         weakSelf?.copyCollectionActionClicked(model)
       }
       actions.append(copyAction)
     }
 
-    if message.messageType != .MESSAGE_TYPE_AUDIO {
+    if model.message?.messageType != .MESSAGE_TYPE_AUDIO {
       let forwardAction = UIAlertAction(title: chatLocalizable("operation_forward"), style: .default) { _ in
         weakSelf?.forwardCollectionActionClicked(model)
       }
@@ -367,7 +388,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       let player = VideoPlayerViewController()
       player.totalTime = Int(object.duration)
       player.modalPresentationStyle = .overFullScreen
-
+      viewModel.lastClickAuidoMessageId = nil
       let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
       if FileManager.default.fileExists(atPath: path) == true {
         let url = URL(fileURLWithPath: path)
@@ -457,10 +478,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       NEALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
 
       // 根据进度设置状态
-      fileModel.progress = progress
+      fileModel.progress = progress / UInt(100.0)
 
       // 更新ui进度
-      fileModel.cell?.uploadProgress(progress)
+      fileModel.cell?.uploadProgress(fileModel.progress)
     } _: { [weak self] localPath, error in
       if let err = error {
         switch err.code {
@@ -486,7 +507,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       showTextViewController(model)
 
     } else if customType == customMultiForwardType,
-              let data = NECustomAttachment.dataOfCustomMessage(message.attachment) {
+              let data = NECustomUtils.dataOfCustomMessage(message.attachment) {
       let url = data["url"] as? String
       let md5 = data["md5"] as? String
 
@@ -535,23 +556,35 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// - Parameter cell: 收藏列表视图对象
   /// - Parameter model: 收藏对象
   private func didPlay(cell: NEBaseCollectionMessageCell?, model: CollectionMessageModel?) {
-    guard let message = model?.message, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
+    guard let message = model?.message, let audio = message.attachment as? V2NIMMessageAudioAttachment, let messageId = message.messageServerId else {
       return
     }
 
     let path = audio.path ?? ChatMessageHelper.createFilePath(message)
     if !FileManager.default.fileExists(atPath: path) {
       if let urlString = audio.url {
+        if viewModel.audioDownloadSet.contains(messageId) {
+          // 当前语音消息正在下载无需重新下载
+          NEALog.infoLog(className(), desc: #function + " \(messageId) message's audio file downloading, not need download")
+          return
+        }
+        viewModel.audioDownloadSet.insert(messageId)
+        viewModel.lastClickAuidoMessageId = messageId
+
         viewModel.downloadFile(urlString, path, nil) { [weak self] _, error in
+          self?.viewModel.audioDownloadSet.remove(messageId)
           if error == nil {
-            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
-            self?.startPlay(cell: cell, model: model)
+            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "collection download audio CALLBACK downLoad")
+            if self?.viewModel.lastClickAuidoMessageId == messageId {
+              self?.startPlay(cell: cell, model: model)
+            }
           } else {
             self?.showToast(error!.localizedDescription)
           }
         }
       }
     } else {
+      viewModel.lastClickAuidoMessageId = nil
       startPlay(cell: cell, model: model)
     }
   }
@@ -637,7 +670,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   open func showTextViewController(_ model: CollectionMessageModel?) {
     guard let model = model?.chatmodel as? MessageTextModel else { return }
 
-    let title = NECustomAttachment.titleOfRichText(model.message?.attachment)
+    let title = NECustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
     let textView = getTextViewController(title: title, body: body)
     textView.modalPresentationStyle = .fullScreen
