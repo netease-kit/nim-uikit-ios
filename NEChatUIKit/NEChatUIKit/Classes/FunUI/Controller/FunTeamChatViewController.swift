@@ -46,7 +46,6 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
       popGroupChatVC()
     }
 
-    weak var weakSelf = self
     // 被移除群聊
     if isLeaveTeamByOther {
       showLeaveTeamAlert()

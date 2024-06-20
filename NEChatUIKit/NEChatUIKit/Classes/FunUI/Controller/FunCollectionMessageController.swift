@@ -28,9 +28,6 @@ open class FunCollectionMessageController: NEBaseCollectionMessageController {
   }
 
   override open func showActions(_ model: CollectionMessageModel) {
-    guard let message = model.message else {
-      return
-    }
     var actions = [NECustomAlertAction]()
     weak var weakSelf = self
 
@@ -39,14 +36,14 @@ open class FunCollectionMessageController: NEBaseCollectionMessageController {
     }
     actions.append(deleteCollectionAction)
 
-    if message.messageType == .MESSAGE_TYPE_TEXT {
+    if model.message?.messageType == .MESSAGE_TYPE_TEXT {
       let copyAction = NECustomAlertAction(title: chatLocalizable("operation_copy")) {
         weakSelf?.copyCollectionActionClicked(model)
       }
       actions.append(copyAction)
     }
 
-    if message.messageType != .MESSAGE_TYPE_AUDIO {
+    if let message = model.message, message.messageType != .MESSAGE_TYPE_AUDIO {
       let forwardAction = NECustomAlertAction(title: chatLocalizable("operation_forward")) {
         weakSelf?.forwardCollectionMessage(message, model.senderName ?? "")
       }

@@ -48,7 +48,6 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
       popGroupChatVC()
     }
 
-    weak var weakSelf = self
     // 被移除群聊
     if isLeaveTeamByOther {
       showLeaveTeamAlert()

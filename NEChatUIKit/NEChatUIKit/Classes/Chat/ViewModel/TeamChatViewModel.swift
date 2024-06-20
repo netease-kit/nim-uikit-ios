@@ -24,13 +24,16 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   override init(conversationId: String) {
     super.init(conversationId: conversationId)
+    getTeamMember {}
     teamRepo.addTeamListener(self)
+    IMKitClient.instance.addLoginListener(self)
   }
 
   override init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
-    teamRepo.addTeamListener(self)
     getTeamMember {}
+    teamRepo.addTeamListener(self)
+    IMKitClient.instance.addLoginListener(self)
   }
 
   /// 重写 获取用户展示名称
@@ -88,10 +91,10 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                 let content = ChatMessageHelper.contentOfMessage(topMessage)
                 var thumbUrl: String?
                 var isVideo = false
-                var hideClose = false
+                var hideClose = true
 
                 // 获取图片缩略图
-                if let attach = topMessage.attachment as? V2NIMMessageFileAttachment, let imageUrl = attach.url {
+                if let attach = topMessage.attachment as? V2NIMMessageImageAttachment, let imageUrl = attach.url {
                   thumbUrl = ResourceRepo.shared.imageThumbnailURL(imageUrl)
                 }
 
@@ -102,10 +105,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                 }
 
                 // 是否隐藏移除置顶按钮
-                if self?.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
-                   let topAllow = extDic[keyAllowTopMessage] as? String,
-                   topAllow == allowAtManagerValue {
-                  hideClose = true
+                if self?.hasTopMessagePremission() == true {
+                  hideClose = false
                 }
 
                 self?.delegate?.setTopValue(name: senderName,
@@ -395,6 +396,26 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
     if let delegate = delegate as? TeamChatViewModelDelegate {
       delegate.onTeamMemberUpdate?(teamMembers)
+    }
+  }
+}
+
+// MARK: - NEIMKitClientListener
+
+extension TeamChatViewModel: NEIMKitClientListener {
+  /// 登录连接状态回调
+  /// - Parameter status: 连接状态
+  public func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+    // 断网重连后，重新拉取群信息、自己的群成员信息
+    if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
+      getTeamInfo(teamId: sessionId) { [weak self] error, team in
+        if error == nil {
+          self?.team = team
+        }
+        self?.getTeamMember {
+          self?.loadTopMessage()
+        }
+      }
     }
   }
 }

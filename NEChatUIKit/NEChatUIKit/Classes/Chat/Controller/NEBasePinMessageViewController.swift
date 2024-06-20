@@ -558,7 +558,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       showTextViewController(model)
 
     } else if customType == customMultiForwardType,
-              let data = NECustomAttachment.dataOfCustomMessage(model?.message.attachment) {
+              let data = NECustomUtils.dataOfCustomMessage(model?.message.attachment) {
       let url = data["url"] as? String
       let md5 = data["md5"] as? String
 
@@ -712,7 +712,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   open func showTextViewController(_ model: NEPinMessageModel?) {
     guard let model = model?.chatmodel as? MessageTextModel else { return }
 
-    let title = NECustomAttachment.titleOfRichText(model.message?.attachment)
+    let title = NECustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
     let textView = getTextViewController(title: title, body: body)
     textView.modalPresentationStyle = .fullScreen

@@ -5,7 +5,7 @@
 
 "open_push"="Please open the push in the setting";
 "message"="Message";
-"qchat"="Qchat";
+"qchat"="QChat";
 "contact"="Contact";
 "mine"="Me";
 "logout"="Log out";
@@ -22,9 +22,8 @@
 "change_phone_failure"="Set mobile Failed";
 "change_email_failure"="Set e-mail Failed";
 "change_sign_failure"="Set What's up Failed";
-"copy_success"="Copy ssuccessfully";
 "save"="Save";
-"birehday"="Birthday";
+"birthday"="Birthday";
 "phone"="Mobile";
 "email"="E-mail";
 "sign_remind"="sign remind";
@@ -36,7 +35,7 @@
 "delete_friend"="删除好友是否同步删除备注";//功能移除可删除
 "message_read_function"="Read/Unread";
 "version"="Version";
-"headImage"="Avator";
+"headImage"="Avatar";
 "nickname"="Nick Name";
 "account"="ID";
 "gneder"="Sex";
@@ -69,3 +68,5 @@
 
 "change_normal_style"="是否切换基础版？";
 "change_fun_style"="是否切换娱乐版？";
+
+"mine_collection"="Collection";

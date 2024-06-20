@@ -22,9 +22,8 @@
 "change_phone_failure"="修改手机号失败";
 "change_email_failure"="修改邮箱失败";
 "change_sign_failure"="修改签名失败";
-"copy_success"="复制成功";
 "save"="完成";
-"birehday"="生日";
+"birthday"="生日";
 "phone"="手机";
 "email"="邮箱";
 "sign_remind"="个性签名消息提醒";
@@ -69,3 +68,5 @@
 
 "change_normal_style"="是否切换基础版？";
 "change_fun_style"="是否切换娱乐版？";
+
+"mine_collection"="收藏";

@@ -147,6 +147,7 @@ public class ChatMessageHelper: NSObject {
         isFun ? FunCollectionMessageRichTextCell.self : CollectionMessageRichTextCell.self,
       "\(NEBasePinMessageTextCell.self)":
         isFun ? FunCollectionMessageDefaultCell.self : CollectionMessageDefaultCell.self,
+      "\(NEBaseCollectionDefaultCell.self)": isFun ? FunCollectionDefaultCell.self : CollectionDefaultCell.self,
     ]
   }
 
@@ -173,7 +174,7 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_CALL:
       model = MessageCallRecordModel(message: message)
     case .MESSAGE_TYPE_CUSTOM:
-      if let type = NECustomAttachment.typeOfCustomMessage(message.attachment) {
+      if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
         if type == customMultiForwardType {
           return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
         }
@@ -182,13 +183,16 @@ public class ChatMessageHelper: NSObject {
         }
 
         // 注册过的自定义消息类型
-        return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
+        if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
+          return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
+        }
       }
       fallthrough
     default:
       // 未识别的消息类型，默认为文本消息类型，text为未知消息体
       message.text = chatLocalizable("msg_unknown")
       model = MessageTextModel(message: message)
+      model.unkonwMessage = true
     }
     return model
   }
@@ -241,7 +245,7 @@ public class ChatMessageHelper: NSObject {
       model = MessageCallRecordModel(message: message)
       completion(model)
     case .MESSAGE_TYPE_CUSTOM:
-      if let type = NECustomAttachment.typeOfCustomMessage(message.attachment) {
+      if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
         if type == customMultiForwardType {
           completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
           return
@@ -252,14 +256,17 @@ public class ChatMessageHelper: NSObject {
         }
 
         // 注册过的自定义消息类型
-        completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
-        return
+        if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
+          completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
+          return
+        }
       }
       fallthrough
     default:
       // 未识别的消息类型，默认为文本消息类型，text为未知消息体
       message.text = chatLocalizable("msg_unknown")
       model = MessageTextModel(message: message)
+      model.unkonwMessage = true
       completion(model)
     }
   }
@@ -336,12 +343,12 @@ public class ChatMessageHelper: NSObject {
       return chatLocalizable("msg_rtc_call")
     case .MESSAGE_TYPE_CUSTOM:
       // 换行消息
-      if let content = NECustomAttachment.contentOfRichText(message?.attachment) {
+      if let content = NECustomUtils.contentOfRichText(message?.attachment) {
         return content
       }
 
       // 合并转发
-      if let customType = NECustomAttachment.typeOfCustomMessage(message?.attachment),
+      if let customType = NECustomUtils.typeOfCustomMessage(message?.attachment),
          customType == customMultiForwardType {
         return "[\(chatLocalizable("chat_history"))]"
       }
@@ -488,7 +495,7 @@ public class ChatMessageHelper: NSObject {
     refer.messageClientId = params?["idClient"] as? String
     refer.messageServerId = params?["idServer"] as? String
     refer.senderId = params?["from"] as? String
-    refer.createTime = TimeInterval((params?["time"] as? Int ?? 0) / 1000)
+    refer.createTime = TimeInterval(Double(params?["time"] as? Int ?? 0) / 1000.0)
     if let conversationId = params?["to"] as? String {
       refer.conversationId = conversationId
       refer.receiverId = V2NIMConversationIdUtil.conversationTargetId(conversationId)

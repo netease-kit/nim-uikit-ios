@@ -45,12 +45,12 @@ open class NEMessageUtil {
 
   /// 返回自定义消息的外显文案
   static func contentOfCustomMessage(_ attachment: V2NIMMessageAttachment?) -> String {
-    if let customType = NECustomAttachment.typeOfCustomMessage(attachment) {
+    if let customType = NECustomUtils.typeOfCustomMessage(attachment) {
       if customType == customMultiForwardType {
         return localizable("chat_history")
       }
       if customType == customRichTextType {
-        if let data = NECustomAttachment.dataOfCustomMessage(attachment),
+        if let data = NECustomUtils.dataOfCustomMessage(attachment),
            let title = data["title"] as? String {
           return title
         }

@@ -103,6 +103,8 @@
 "message_reedit" = "reedit";
 "message_revoke_confirm" = "Wether to recall this message";
 "message_delete_confirm"="Wether to delete this message";
+"collection_delete_confirm"="Wether to delete this collection";
+"delete_collection_success"="delete success";
 
 
 //MARK: toast
@@ -219,3 +221,5 @@
 "chat_collection_p2p_tip"="From Chat with %@";
 
 "chat_collection_team_tip"="From %@ ";
+
+"collection_limit"="The number of favorites has reached the limit value";

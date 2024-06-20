@@ -73,5 +73,8 @@ public protocol MessageModel: NSObjectProtocol {
 
   var timeContent: String? { get set } // 具体时间
 
+  // 是否是未知消息
+  var unkonwMessage: Bool { get set }
+
   init(message: V2NIMMessage?)
 }

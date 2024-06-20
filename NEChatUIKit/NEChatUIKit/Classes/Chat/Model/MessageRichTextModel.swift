@@ -13,7 +13,7 @@ open class MessageRichTextModel: MessageTextModel {
   public var titleTextHeight: CGFloat = 0
 
   public required init(message: V2NIMMessage?) {
-    guard let data = NECustomAttachment.dataOfCustomMessage(message?.attachment),
+    guard let data = NECustomUtils.dataOfCustomMessage(message?.attachment),
           let title = data["title"] as? String else {
       super.init(message: message)
       return

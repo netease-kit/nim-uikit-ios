@@ -291,7 +291,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
           dic[keyAllowTopMessage] = value
           dic["lastOpt"] = keyAllowTopMessage
           let info = NECommonUtil.getJSONStringFromDictionary(dic)
-          weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
+          weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info, .TEAM_UPDATE_EXTENSION_MODE_ALL) { error in
             completion(error)
           }
         }
@@ -300,7 +300,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
         dic[keyAllowTopMessage] = value
         dic["lastOpt"] = keyAllowTopMessage
         let info = NECommonUtil.getJSONStringFromDictionary(dic)
-        weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info) { error in
+        weakSelf?.teamRepo.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, info, .TEAM_UPDATE_EXTENSION_MODE_ALL) { error in
           completion(error)
         }
       }
