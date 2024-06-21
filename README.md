@@ -3,6 +3,13 @@
 
 IM UIKit 简化了基于 NIM SDK 的应用开发过程。它不仅能助您快速实现 UI 功能，也支持调用 NIM SDK 相应的接口实现即时通讯业务逻辑和数据处理。因此，您在使用 IM UIKit 时仅需关注自身业务。
 
+im-uikit-uniapp 界面效果如下图所示：
+
+<img src="https://yx-web-nosdn.netease.im/common/7ffe6a8afe28b48405b41fb3313d1fa2/uniapp.png" width="800" height="550" />
+<br>
+<img src="https://yx-web-nosdn.netease.im/common/895963a051a2ae1fae685cfd1682a6bf/%E9%80%9A%E8%AE%AF%E6%A8%A1%E5%9D%97%E4%B8%BB%E8%A6%81%E7%95%8C%E9%9D%A2.png" width="800" height="500" />
+
+
 ## 功能优势
 
 优势 | 说明
@@ -10,7 +17,6 @@ IM UIKit 简化了基于 NIM SDK 的应用开发过程。它不仅能助您快�
 UI 组件解耦 | IM UIKit 不同组件可相互独立运行使用。您可按需选择组件，将其快速集成到您的应用，实现相应的 UI 功能，减少无用依赖。
 UI 能力简洁易用 |IM UIKit 的业务逻辑层与 UI 层相互独立。在 UI 层，您仅需关注视图展示和事件处理。IM UIKit 清晰的数据流转处理，让 UI 层代码更简洁易懂。
 完善的业务逻辑处理 | IM UIKit 业务逻辑层提供完善的业务逻辑处理能力。您无需关心 SDK 层不同接口间的复杂处理逻辑，业务逻辑层一个接口帮您搞定所有。
-
 
 ## 技术原理
 
@@ -29,8 +35,6 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 
 ### 产品架构
 
-
-
 ![app_structure_foure_iOS.png](https://yx-web-nosdn.netease.im/common/28d91f74b198c2ba1f1bdfabf19fdc06/app_structure_foure_iOS.png)
 
 上图中：
@@ -42,9 +46,8 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ## 示例项目下载
 
 扫描如下二维码下载和体验示例项目。
-
-
-![iOS二维码.png](https://yx-web-nosdn.netease.im/common/d1eaad1917c9d250bfbdac3e3b6b4a8d/im-demo.png)
+<br>
+![im-demo.png](https://yx-web-nosdn.netease.im/common/a1a63e6b32886e7e35af1b4ea974af44/imuikitios.png)
 
 
 详见[IM UIKit介绍](https://doc.yunxin.163.com/messaging-uikit/concept/zc3MDc4Nzk?platform=iOS)。
