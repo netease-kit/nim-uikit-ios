@@ -35,8 +35,6 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 
 ### 产品架构
 
-
-
 ![app_structure_foure_iOS.png](https://yx-web-nosdn.netease.im/common/28d91f74b198c2ba1f1bdfabf19fdc06/app_structure_foure_iOS.png)
 
 上图中：
@@ -48,6 +46,7 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ## 示例项目下载
 
 扫描如下二维码下载和体验示例项目。
+<pr>
 ![im-demo.png](https://yx-web-nosdn.netease.im/common/d1eaad1917c9d250bfbdac3e3b6b4a8d/im-demo.png)
 
 
