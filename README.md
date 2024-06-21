@@ -47,9 +47,6 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 
 扫描如下二维码下载和体验示例项目。
 <pr>
-![im-demo.png](https://yx-web-nosdn.netease.im/common/d1eaad1917c9d250bfbdac3e3b6b4a8d/im-demo.png)
-
-
 ![im-demo.png](https://yx-web-nosdn.netease.im/common/a1a63e6b32886e7e35af1b4ea974af44/imuikitios.png)
 
 
