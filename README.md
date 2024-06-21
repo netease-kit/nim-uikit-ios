@@ -50,7 +50,7 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ![im-demo.png](https://yx-web-nosdn.netease.im/common/d1eaad1917c9d250bfbdac3e3b6b4a8d/im-demo.png)
 
 
-![im-demo.png](https://yx-web-nosdn.netease.im/common/e7b53a04ee27f5ae726de6db8541af91/parties-demo.png)
+![im-demo.png](https://yx-web-nosdn.netease.im/common/a1a63e6b32886e7e35af1b4ea974af44/imuikitios.png)
 
 
 详见[IM UIKit介绍](https://doc.yunxin.163.com/messaging-uikit/concept/zc3MDc4Nzk?platform=iOS)。
