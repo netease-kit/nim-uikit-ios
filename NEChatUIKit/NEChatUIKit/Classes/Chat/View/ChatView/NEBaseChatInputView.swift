@@ -305,7 +305,8 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     }
 
     // 处理粘贴，表情解析（存在表情则字符数量>=3）
-    if text.count >= 3 {
+    if text.count >= 3,
+       (NEEmotionTool.getRegularArray(str: text)?.count ?? 0) > 0 {
       let mutaString = NSMutableAttributedString(attributedString: textView.attributedText)
       let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
       mutaString.replaceCharacters(in: range, with: addString)

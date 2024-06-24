@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEMapKit'
-  s.version          = '10.2.0'
+  s.version          = '10.2.1'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -33,7 +33,7 @@ TODO: Add long description of the pod here.
   s.source_files = 'NEMapKit/Classes/**/*'
 #  s.resource = 'NEMapKit/Assets/**/*'
   
-  s.dependency 'AMap2DMap'
+  s.dependency 'AMap3DMap'
   s.dependency 'AMapSearch'
   s.dependency 'AMapLocation'
   s.static_framework = true
