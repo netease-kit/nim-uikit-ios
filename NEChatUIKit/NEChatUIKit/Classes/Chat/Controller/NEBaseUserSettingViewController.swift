@@ -95,7 +95,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
-    cellClassDic.forEach { (key: Int, value: NEBaseUserSettingCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
     if let pan = navigationController?.interactivePopGestureRecognizer {
@@ -195,7 +195,7 @@ open class NEBaseUserSettingViewController: ChatBaseViewController, UserSettingV
     Router.shared.register(ContactSelectedUsersRouter) { param in
       print("user setting create disscuss  : ", param)
       var convertParam = [String: Any]()
-      param.forEach { (key: String, value: Any) in
+      for (key, value) in param {
         if key == "names", let names = value as? String {
           convertParam[key] = "\(weakSelf?.nameLabel.text ?? "")、\(names)"
         } else {

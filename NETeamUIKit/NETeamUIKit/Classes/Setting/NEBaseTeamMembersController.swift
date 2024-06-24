@@ -185,7 +185,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
   func textChange() {
     searchDatas.removeAll()
     if let text = searchTextField.text, text.count > 0 {
-      viewmodel.datas.forEach { model in
+      for model in viewmodel.datas {
         if let uid = model.nimUser?.userId, uid.contains(text) {
           searchDatas.append(model)
         } else if let nick = model.nimUser?.userInfo?.nickName, nick.contains(text) {

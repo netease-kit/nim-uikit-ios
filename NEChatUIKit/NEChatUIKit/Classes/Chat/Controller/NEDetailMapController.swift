@@ -566,11 +566,11 @@ open class NEDetailMapController: ChatBaseViewController, NEMapGuideBottomViewDe
     currentIndex = 0
     locations.removeAll()
     if let keyword = searchTextField.text, keyword.count > 0 {
-      models.forEach { model in
+      for model in models {
         model.attribute = model.title.highlight(keyWords: keyword, highlightColor: UIColor.ne_blueText)
       }
     } else {
-      models.forEach { model in
+      for model in models {
         model.attribute = NSMutableAttributedString(string: model.title)
       }
     }

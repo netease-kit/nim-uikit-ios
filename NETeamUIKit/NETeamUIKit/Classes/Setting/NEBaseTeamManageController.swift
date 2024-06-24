@@ -49,7 +49,7 @@ open class NEBaseTeamManageController: NEBaseViewController, UITableViewDelegate
       contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
     if let tid = viewmodel.teamInfoModel?.team?.teamId {

@@ -128,9 +128,9 @@ open class NEBaseContactsSelectedViewController: NEBaseContactViewController, UI
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    customCells.forEach { (key: Int, value: AnyClass) in
+    for (key, value) in customCells {
       if value is ContactCellDataProtrol.Type {
-        self.tableView.register(
+        tableView.register(
           value,
           forCellReuseIdentifier: "\(NSStringFromClass(value))"
         )

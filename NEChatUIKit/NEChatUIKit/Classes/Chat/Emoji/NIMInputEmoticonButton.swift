@@ -5,6 +5,7 @@
 
 import NECoreIMKit
 import UIKit
+
 public protocol NIMInputEmoticonButtonDelegate: NSObjectProtocol {
   func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String)
 }

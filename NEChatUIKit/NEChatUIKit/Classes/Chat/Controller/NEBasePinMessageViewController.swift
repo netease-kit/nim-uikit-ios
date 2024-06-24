@@ -114,7 +114,7 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
     ])
     cellClassDic = getRegisterCellDic()
     tableView.register(NEBasePinMessageTextCell.self, forCellReuseIdentifier: "\(NEBasePinMessageTextCell.self)")
-    cellClassDic.forEach { (key: String, value: NEBasePinMessageCell.Type) in
+    for (key, value) in cellClassDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -262,7 +262,7 @@ open class NEBasePinMessageViewController: ChatBaseViewController, UITableViewDa
       var items = [ForwardItem]()
 
       if let users = param["im_user"] as? [NIMUser] {
-        users.forEach { user in
+        for user in users {
           let item = ForwardItem()
           item.uid = user.userId
           item.avatar = user.userInfo?.avatarUrl

@@ -421,7 +421,7 @@ open class TeamSettingViewModel: NSObject, NIMTeamManagerDelegate {
 
   open func onTeamMemberRemoved(_ team: NIMTeam, withMembers memberIDs: [String]?) {
     if let accids = memberIDs {
-      accids.forEach { accid in
+      for accid in accids {
         if let users = teamInfoModel?.users {
           for (i, m) in users.enumerated() {
             if m.nimUser?.userId == accid {

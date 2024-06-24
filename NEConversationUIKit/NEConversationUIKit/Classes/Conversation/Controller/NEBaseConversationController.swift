@@ -193,7 +193,7 @@ open class NEBaseConversationController: UIViewController, NIMChatManagerDelegat
     bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
     bodyBottomViewHeightAnchor?.isActive = true
 
-    cellRegisterDic.forEach { (key: Int, value: NEBaseConversationListCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
 

@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class TextWithDetailTextCell: ContactBaseTextCell {
   public var detailTitleLabel = UILabel()

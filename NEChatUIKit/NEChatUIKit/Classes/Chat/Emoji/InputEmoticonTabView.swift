@@ -5,6 +5,7 @@
 
 import NECoreIMKit
 import UIKit
+
 @objc public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }
@@ -43,10 +44,10 @@ open class InputEmoticonTabView: UIControl {
   }
 
   open func loadCatalogs(_ emoticonCatalogs: [NIMInputEmoticonCatalog]?) {
-    tabs.forEach { btn in
+    for btn in tabs {
       btn.removeFromSuperview()
     }
-    seps.forEach { view in
+    for view in seps {
       view.removeFromSuperview()
     }
     tabs.removeAll()
@@ -56,17 +57,17 @@ open class InputEmoticonTabView: UIControl {
       NELog.errorLog(className, desc: "❌emoticonCatalogs is nil")
       return
     }
-    catalogs.forEach { catelog in
+    for catelog in catalogs {
       let button = UIButton()
       button.addTarget(self, action: #selector(onTouchTab), for: .touchUpInside)
       button.sizeToFit()
-      self.addSubview(button)
+      addSubview(button)
       tabs.append(button)
 
       let sep = UIView(frame: CGRect(x: 0, y: 0, width: 0.5, height: 35))
       sep.backgroundColor = UIColor.ne_borderColor
       seps.append(sep)
-      self.addSubview(sep)
+      addSubview(sep)
     }
   }
 

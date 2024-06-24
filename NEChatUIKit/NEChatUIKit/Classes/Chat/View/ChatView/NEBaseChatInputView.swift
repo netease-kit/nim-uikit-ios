@@ -262,7 +262,8 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     }
 
     // 处理粘贴，表情解析（存在表情则字符数量>=3）
-    if text.count >= 3 {
+    if text.count >= 3,
+       (NEEmotionTool.getRegularArray(str: text)?.count ?? 0) > 0 {
       let mutaString = NSMutableAttributedString(attributedString: textView.attributedText)
       let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
       mutaString.replaceCharacters(in: range, with: addString)
@@ -494,7 +495,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   open func getAtRemoteExtension() -> [String: Any]? {
     var atDic = [String: Any]()
     NELog.infoLog(className(), desc: "at range cache : \(atRangeCache)")
-    atRangeCache.forEach { (key: String, value: MessageAtCacheModel) in
+    for (key, value) in atRangeCache {
       if let userValue = atDic[value.accid] as? [String: AnyObject], var array = userValue[atSegmentsKey] as? [Any], let object = value.atModel.yx_modelToJSONObject() {
         array.append(object)
         if var dic = atDic[value.accid] as? [String: Any] {

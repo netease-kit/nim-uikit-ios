@@ -58,7 +58,7 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
       contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + 12),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    cellClassDic.forEach { (key: Int, value: NEBaseTeamSettingCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
   }

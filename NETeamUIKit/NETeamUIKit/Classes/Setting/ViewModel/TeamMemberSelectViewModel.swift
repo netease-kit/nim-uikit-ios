@@ -57,7 +57,7 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
 
   func getData() {
     var temFilters = Set<String>()
-    selectDic.forEach { (key: String, value: TeamMemberInfoModel) in
+    for (key, value) in selectDic {
       temFilters.insert(key)
     }
     managerSet.removeAll()
@@ -82,10 +82,10 @@ class TeamMemberSelectViewModel: NSObject, NIMTeamManagerDelegate {
       self?.datas.append(selectMember)
       self?.showDatas.append(selectMember)
     }
-    temFilters.forEach { uid in
+    for uid in temFilters {
       selectDic.removeValue(forKey: uid)
     }
-    datas.forEach { member in
+    for member in datas {
       if let accid = member.member?.nimUser?.userId {
         if selectDic.contains(where: { (key: String, value: TeamMemberInfoModel) in
           key == accid

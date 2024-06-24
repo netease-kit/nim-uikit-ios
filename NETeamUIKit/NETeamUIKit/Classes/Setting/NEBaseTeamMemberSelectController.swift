@@ -130,7 +130,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
       contentTable.topAnchor.constraint(equalTo: searchBack.bottomAnchor),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    cellClassDic.forEach { (key: Int, value: UITableViewCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
 
@@ -255,7 +255,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
     }
 
     var retArray = [TeamMemberInfoModel]()
-    viewmodel.selectDic.forEach { (key: String, value: TeamMemberInfoModel) in
+    for (key, value) in viewmodel.selectDic {
       retArray.append(value)
     }
     if let block = selectMemberBlock {

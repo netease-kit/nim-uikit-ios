@@ -124,7 +124,9 @@ public class ChatMessageHelper: NSObject {
         if attach.customType == customRichTextType {
           return MessageRichTextModel(message: message)
         }
-        return MessageCustomModel(message: message)
+        if attach.customType == customMultiForwardType {
+          return MessageCustomModel(message: message)
+        }
       }
       fallthrough
     default:
@@ -139,7 +141,7 @@ public class ChatMessageHelper: NSObject {
   public static func getUrls(messages: [MessageModel]) -> [String] {
     NELog.infoLog(ModuleName + " " + className(), desc: #function)
     var urls = [String]()
-    messages.forEach { model in
+    for model in messages {
       if model.type == .image, let message = model.message?.messageObject as? NIMImageObject {
         if let url = message.url {
           urls.append(url)

@@ -42,7 +42,7 @@ open class FunConversationController: NEBaseConversationController {
 
   deinit {
     if let searchViewGestures = searchView.gestureRecognizers {
-      searchViewGestures.forEach { gesture in
+      for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
       }
     }

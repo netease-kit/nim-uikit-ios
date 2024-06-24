@@ -44,7 +44,7 @@ open class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatMan
         }
         var remoteMessages = [NIMMessagePinItem]()
         var pinDic = [String: NIMMessagePinItem]()
-        pins.forEach { item in
+        for item in pins {
           if let message = ConversationProvider.shared.messagesInSession(item.session, messageIds: [item.messageId])?.first {
             let pinModel = PinMessageModel(message: message, item: item)
             weakSelf?.items.append(pinModel)
@@ -60,7 +60,7 @@ open class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatMan
           completion(error)
         } else {
           var infos = [NIMChatExtendBasicInfo]()
-          remoteMessages.forEach { item in
+          for item in remoteMessages {
             let info = NIMChatExtendBasicInfo()
             info.type = session.sessionType
             info.fromAccount = item.messageFromAccount
@@ -119,7 +119,7 @@ open class PinMessageViewModel: NSObject, ChatExtendProviderDelegate, NIMChatMan
                                _ comment: String?,
                                _ completion: @escaping (Error?) -> Void) {
     NELog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + message.messageId)
-    users.forEach { user in
+    for user in users {
       if let uid = user.userId {
         let session = NIMSession(uid, type: .P2P)
         if let forwardMessage = chatRepo.makeForwardMessage(message) {

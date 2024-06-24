@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class ContactBaseTextCell: UITableViewCell {
   public var titleLabel: UILabel = .init()

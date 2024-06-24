@@ -4,6 +4,7 @@
 
 import Foundation
 import NIMSDK
+
 @objcMembers
 public class ChatDeduplicationHelper: NSObject, NIMLoginManagerDelegate {
   // 单例变量
