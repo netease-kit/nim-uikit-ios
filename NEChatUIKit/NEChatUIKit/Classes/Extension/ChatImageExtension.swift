@@ -6,6 +6,7 @@
 import CoreGraphics
 import Foundation
 import UIKit
+
 public extension UIImage {
   class func ne_imageNamed(name: String?) -> UIImage? {
     guard let imageName = name else {

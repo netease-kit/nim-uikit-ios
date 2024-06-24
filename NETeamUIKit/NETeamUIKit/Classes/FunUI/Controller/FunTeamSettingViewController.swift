@@ -24,8 +24,8 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   }
 
   override open func reloadSectionData() {
-    viewmodel.sectionData.forEach { setionModel in
-      setionModel.cellModels.forEach { cellModel in
+    for setionModel in viewmodel.sectionData {
+      for cellModel in setionModel.cellModels {
         cellModel.cornerType = .none
         if cellModel.type == SettingCellType.SettingSelectCell.rawValue {
           cellModel.rowHeight = 78

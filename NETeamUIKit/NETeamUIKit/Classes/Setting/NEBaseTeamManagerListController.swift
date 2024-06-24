@@ -60,7 +60,7 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
     ])
 
-    cellClassDic.forEach { (key: Int, value: UITableViewCell.Type) in
+    for (key, value) in cellClassDic {
       contentTable.register(value, forCellReuseIdentifier: "\(key)")
     }
   }
@@ -110,7 +110,7 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
   open func didAddManagers(_ managers: [TeamMemberInfoModel]) {
     if let tid = teamId {
       var uids = [String]()
-      managers.forEach { member in
+      for member in managers {
         if let uid = member.nimUser?.userId {
           uids.append(uid)
         }
@@ -148,7 +148,7 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
 
   open func getFilters() -> Set<String> {
     var filters = Set<String>()
-    viewmodel.managers.forEach { model in
+    for model in viewmodel.managers {
       if let uid = model.nimUser?.userId {
         filters.insert(uid)
       }

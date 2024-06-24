@@ -418,7 +418,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
           if let object = msg.messageObject as? NIMNotificationObject,
              let content = object.content as? NIMTeamNotificationContent {
             let targetIDs = content.targetIDs ?? []
-            targetIDs.forEach { uid in
+            for uid in targetIDs {
               if ChatUserCache.getUserInfo(uid) == nil {
                 group.enter()
                 ChatUserCache.getUserInfo(uid) { _, _ in
@@ -838,7 +838,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
       }
     }
 
-    localMsgs.forEach { msg in
+    for msg in localMsgs {
       repo.deleteMessage(message: msg)
       deleteMessageUpdateUI(msg)
       deletingMsgDic.remove(msg.messageId)
@@ -847,7 +847,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
     weak var weakSelf = self
     repo.deleteRemoteMessages(messages: remoteMsgs, exts: nil) { error in
       if error == nil {
-        remoteMsgs.forEach { msg in
+        for msg in remoteMsgs {
           weakSelf?.deleteMessageUpdateUI(msg)
           weakSelf?.deletingMsgDic.remove(msg.messageId)
         }
@@ -1616,7 +1616,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
       msg1.timestamp < msg2.timestamp
     }
 
-    users.forEach { user in
+    for user in users {
       if let uid = user.userId {
         let session = NIMSession(uid, type: .P2P)
         if isMultiForward {
@@ -1771,7 +1771,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
   }
 
   open func filterRevokeMessage(_ messages: [MessageModel]) {
-    messages.forEach { model in
+    for model in messages {
       if let isRevoke = model.message?.localExt?[revokeLocalMessage] as? Bool, isRevoke == true {
         if let content = model.message?.localExt?[revokeLocalMessageContent] as? String, content.count > 0 {
           model.isRevokedText = true
@@ -1792,7 +1792,7 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
     }
     print("refresh team id : ", session.sessionId)
     var receiptsMessages = [NIMMessage]()
-    messages.forEach { message in
+    for message in messages {
       if message.setting?.teamReceiptEnabled == true {
         receiptsMessages.append(message)
       }
@@ -1821,12 +1821,12 @@ open class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDeleg
 
   // 多端登录删除消息
   open func onRecvMessagesDeleted(_ messages: [NIMMessage], exts: [String: String]?) {
-    messages.forEach { message in
+    for message in messages {
       if message.session?.sessionId != session.sessionId {
-        return
+        continue
       }
       if message.messageId.count <= 0 {
-        return
+        continue
       }
       deleteMessageUpdateUI(message)
     }

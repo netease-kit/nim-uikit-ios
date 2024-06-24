@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+
 extension NSError {
   class func paramError() -> NSError {
     NSError(

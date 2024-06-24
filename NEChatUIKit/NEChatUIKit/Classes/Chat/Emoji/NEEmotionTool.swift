@@ -6,8 +6,10 @@
 import UIKit
 
 open class NEEmotionTool: NSObject {
-  class func getAttWithStr(str: String, font: UIFont,
-                           _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
+  /// 找出所有表情的位置集合
+  /// - Parameter str: 字符串
+  /// - Returns: 表情位置
+  class func getRegularArray(str: String) -> [NSTextCheckingResult]? {
     let regular = "\\[[^\\[|^\\]]+\\]"
 
     var reExpression: NSRegularExpression?
@@ -21,6 +23,18 @@ open class NEEmotionTool: NSObject {
       range: NSRange(location: 0, length: str.utf16.count)
     )
 
+    return regularArr
+  }
+
+  /// 表情替换
+  /// - Parameters:
+  ///   - str: 原始文本
+  ///   - font: 字体
+  ///   - offset: 偏移量
+  /// - Returns: 替换表情后的富文本
+  class func getAttWithStr(str: String, font: UIFont,
+                           _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
+    let regularArr = getRegularArray(str: str)
     let emoticons = NIMInputEmoticonManager.shared
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
     let attStr = NSMutableAttributedString(string: str, attributes: [
@@ -32,7 +46,7 @@ open class NEEmotionTool: NSObject {
       for i in (0 ... regArr.count - 1).reversed() {
         let result = regArr[i]
 
-        for (idx, obj) in targetEmotions.enumerated() {
+        for obj in targetEmotions {
           let ocStr = str as NSString
           if ocStr.substring(with: result.range) == obj.tag {
             attStr.replaceCharacters(

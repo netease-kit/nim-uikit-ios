@@ -205,11 +205,11 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
     )
 
-    NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in NEChatUIKitClient.instance.getRegisterCustomCell() {
       cellRegisterDic[key] = value
     }
 
-    cellRegisterDic.forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: key)
     }
 
@@ -1470,7 +1470,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       tableView.endUpdates()
     }
 
-    indexs.forEach { index in
+    for index in indexs {
       if index.row == tableView.numberOfRows(inSection: 0) - 1 {
         tableView.scrollToRow(at: index, at: .bottom, animated: true)
       }
@@ -2000,7 +2000,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       var items = [ForwardItem]()
 
       if let users = param["im_user"] as? [NIMUser] {
-        users.forEach { user in
+        for user in users {
           let item = ForwardItem()
           item.uid = user.userId
           item.avatar = user.userInfo?.avatarUrl
@@ -2157,7 +2157,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
   func cancelMutilSelect() {
     isMutilSelect = false
     viewmodel.selectedMessages.removeAll()
-    viewmodel.messages.forEach { model in
+    for model in viewmodel.messages {
       model.isSelected = false
     }
     setMoreButton()
@@ -2865,11 +2865,11 @@ extension ChatViewController: ChatBaseCellDelegate {
       attributeStr?.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)], range: NSMakeRange(0, text.utf16.count))
 
       if let remoteExt = message.remoteExt, let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
-        dic.forEach { (key: String, value: AnyObject) in
+        for (key, value) in dic {
           if let contentDic = value as? [String: AnyObject] {
             if let array = contentDic[atSegmentsKey] as? [AnyObject] {
               if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
-                models.forEach { model in
+                for model in models {
                   if var text = contentDic[atTextKey] as? String {
                     if text.last == " " {
                       text = String(text.prefix(text.count - 1))

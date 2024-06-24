@@ -143,18 +143,18 @@ open class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManager
     weak var weakSelf = self
     var isAtMessageChange = false
     var temDic = getMessageDic()
-    messages.forEach { message in
+    for message in messages {
       if message.status == .read {
-        return
+        continue
       }
       if let remoteExt = message.remoteExt, let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
         if dic[atAllKey] != nil, message.from != currentAccid {
           isAtMessageChange = weakSelf?.removeRecord(message: message, record: &temDic) ?? false
-          return
+          continue
         }
         if dic[currentAccid] != nil {
           isAtMessageChange = weakSelf?.removeRecord(message: message, record: &temDic) ?? false
-          return
+          continue
         }
       }
     }
@@ -170,20 +170,20 @@ open class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManager
     var isExistAtMessage = false
     var temDic = getMessageDic()
 
-    messages.forEach { message in
+    for message in messages {
       if message.status == .read {
-        return
+        continue
       }
       if let remoteExt = message.remoteExt, let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
         if dic[atAllKey] != nil, message.from != currentAccid {
           weakSelf?.addAtRecord(message: message, record: &temDic)
           isExistAtMessage = true
-          return
+          continue
         }
         if dic[currentAccid] != nil {
           weakSelf?.addAtRecord(message: message, record: &temDic)
           isExistAtMessage = true
-          return
+          continue
         }
       }
     }
@@ -236,7 +236,7 @@ open class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManager
       NELog.infoLog(className(), desc: "writeCacheToDocument path : \(filePath)")
       do {
         var jsonObject = [String: Any]()
-        dictionary.forEach { (key: String, value: AtMEMessageRecord) in
+        for (key, value) in dictionary {
           if let jsonValue = value.yx_modelToJSONObject() {
             jsonObject[key] = jsonValue
           }
@@ -271,7 +271,7 @@ open class NEAtMessageManager: NSObject, NIMChatManagerDelegate, NIMLoginManager
           let data = try Data(contentsOf: filePath)
           if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
             var temdDic = weakSelf?.getMessageDic()
-            jsonObject.forEach { (key: String, value: [String: Any]) in
+            for (key, value) in jsonObject {
               if let model = AtMEMessageRecord.yx_model(with: value) {
                 temdDic?[key] = model
                 if let dic = jsonObject[key], let isRead = dic[#keyPath(AtMEMessageRecord.isRead)] as? Bool {

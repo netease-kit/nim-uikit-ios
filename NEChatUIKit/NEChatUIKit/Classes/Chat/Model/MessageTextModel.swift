@@ -22,11 +22,11 @@ open class MessageTextModel: MessageContentModel {
     )
 
     if let remoteExt = message?.remoteExt, let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
-      dic.forEach { (key: String, value: AnyObject) in
+      for (key, value) in dic {
         if let contentDic = value as? [String: AnyObject] {
           if let array = contentDic[atSegmentsKey] as? [AnyObject] {
             if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
-              models.forEach { model in
+              for model in models {
                 if attributeStr?.length ?? 0 > model.end {
                   attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_blueText, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
                 }

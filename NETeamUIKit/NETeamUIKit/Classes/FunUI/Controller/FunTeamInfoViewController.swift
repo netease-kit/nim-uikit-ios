@@ -22,7 +22,7 @@ open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    viewmodel.cellDatas.forEach { cellModel in
+    for cellModel in viewmodel.cellDatas {
       cellModel.cornerType = .none
       if cellModel.type == SettingCellType.SettingArrowCell.rawValue {
         cellModel.rowHeight = 56

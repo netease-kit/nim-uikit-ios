@@ -109,7 +109,7 @@ open class ConversationViewModel: NSObject, ConversationRepoDelegate,
         ChatUserCache.removeAllUserInfo()
         ContactRepo.shared.getFriendList(true, local: false) { friends, error in
           if let friends = friends {
-            friends.forEach { user in
+            for user in friends {
               ChatUserCache.updateUserInfo(user)
             }
           }
@@ -190,7 +190,7 @@ open class ConversationViewModel: NSObject, ConversationRepoDelegate,
 
     let resultArr = repo.sortSessionList(recentSessions: tempArr, stickTopInfo: stickTopInfos)
     var sortResultArr = [ConversationListModel]()
-    resultArr.forEach { recentSession in
+    for recentSession in resultArr {
       let listModel = ConversationListModel()
       listModel.recentSession = recentSession
       if recentSession.session?.sessionType == .P2P {
@@ -241,7 +241,7 @@ open class ConversationViewModel: NSObject, ConversationRepoDelegate,
   // MARK: ==================== NIMChatManagerDelegate ==========================
 
   open func onRecvMessageReceipts(_ receipts: [NIMMessageReceipt]) {
-    receipts.forEach { receipt in
+    for receipt in receipts {
       if receipt.session?.sessionType == .P2P {
         if let listArr = conversationListArray {
           for (i, listModel) in listArr.enumerated() {

@@ -118,7 +118,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     navigationController?.pushViewController(contactSelectVC, animated: true)
     contactSelectVC.callBack = { [weak self] selectMemberarray in
       var users = [NEKitUser]()
-      selectMemberarray.forEach { memberInfo in
+      for memberInfo in selectMemberarray {
         if let u = memberInfo.user {
           users.append(u)
         }

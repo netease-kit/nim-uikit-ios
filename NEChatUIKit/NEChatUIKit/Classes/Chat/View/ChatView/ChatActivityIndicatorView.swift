@@ -22,16 +22,16 @@ open class ChatActivityIndicatorView: UIView {
 
       switch messageStatus {
       case .sending:
-        self.isHidden = false
+        isHidden = false
         activity.isHidden = false
         failBtn.isHidden = true
         activity.startAnimating()
       case .failed:
-        self.isHidden = false
+        isHidden = false
         activity.isHidden = true
         failBtn.isHidden = false
       case .successed:
-        self.isHidden = true
+        isHidden = true
 
       default:
         print("default")

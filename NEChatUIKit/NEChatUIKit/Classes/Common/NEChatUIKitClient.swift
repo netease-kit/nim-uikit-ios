@@ -45,7 +45,7 @@ open class NEChatUIKitClient: NSObject {
   /// - Returns: 返回更多操作数据
   open func getMoreActionData(sessionType: NIMSessionType) -> [NEMoreItemModel] {
     var more = [NEMoreItemModel]()
-    moreAction.forEach { model in
+    for model in moreAction {
       if model.type != .rtc {
         more.append(model)
       } else if sessionType == .P2P {
@@ -62,7 +62,7 @@ open class NEChatUIKitClient: NSObject {
 
   /// 新增聊天页针对自定义消息的cell扩展，以及现有cell样式覆盖
   open func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
-    registerDic.forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in registerDic {
       customRegisterDic[key] = value
     }
   }

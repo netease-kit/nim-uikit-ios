@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import UIKit
+
 @objcMembers
 open class TextWithRightArrowCell: ContactBaseTextCell {
   public var arrowImage = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))

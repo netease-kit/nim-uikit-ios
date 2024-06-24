@@ -23,7 +23,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor
-    viewmodel.cellDatas.forEach { cellModel in
+    for cellModel in viewmodel.cellDatas {
       cellModel.cornerType = .none
     }
   }

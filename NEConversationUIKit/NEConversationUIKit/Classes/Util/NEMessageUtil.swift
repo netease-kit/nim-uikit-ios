@@ -5,6 +5,7 @@
 
 import Foundation
 import NIMSDK
+
 open class NEMessageUtil {
   /// last message
   /// - Parameter message: message

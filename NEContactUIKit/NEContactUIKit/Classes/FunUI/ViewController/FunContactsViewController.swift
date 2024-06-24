@@ -61,7 +61,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
 
   deinit {
     if let searchViewGestures = searchView.gestureRecognizers {
-      searchViewGestures.forEach { gesture in
+      for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
       }
     }
@@ -90,7 +90,7 @@ open class FunContactsViewController: NEBaseContactsViewController {
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    cellRegisterDic.forEach { (key: Int, value: NEBaseContactTableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
 

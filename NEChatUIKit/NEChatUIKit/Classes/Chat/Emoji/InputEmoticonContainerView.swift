@@ -5,6 +5,7 @@
 
 import NECoreIMKit
 import UIKit
+
 @objc public protocol InputEmoticonContainerViewDelegate: NSObjectProtocol {
   func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String)
   func didPressSend(sender: UIButton)

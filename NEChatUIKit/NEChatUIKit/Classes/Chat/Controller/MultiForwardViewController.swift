@@ -65,11 +65,11 @@ open class MultiForwardViewController: ChatBaseViewController, UINavigationContr
       forCellReuseIdentifier: "\(NEBaseChatMessageCell.self)"
     )
 
-    NEChatUIKitClient.instance.getRegisterCustomCell().forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in NEChatUIKitClient.instance.getRegisterCustomCell() {
       cellRegisterDic[key] = value
     }
 
-    cellRegisterDic.forEach { (key: String, value: UITableViewCell.Type) in
+    for (key, value) in cellRegisterDic {
       tableView.register(value, forCellReuseIdentifier: key)
     }
 
