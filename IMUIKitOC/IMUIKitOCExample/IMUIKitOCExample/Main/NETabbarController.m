@@ -11,7 +11,7 @@
 #import <NECommonUIKit/NECommonUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
-#import <NECoreIMKit/NECoreIMKit-Swift.h>
+#import <NECoreIM2Kit/NECoreIM2Kit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
 // #import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 
@@ -44,7 +44,7 @@
       [[NENavigationController alloc] initWithRootViewController:sessionCtrl];
 
   // 通讯录
-  ContactsViewController *contactCtrl = [[ContactsViewController alloc] init];
+  ContactViewController *contactCtrl = [[ContactViewController alloc] init];
   contactCtrl.tabBarItem =
       [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"contact", @"")
                                     image:[UIImage imageNamed:@"contact"]

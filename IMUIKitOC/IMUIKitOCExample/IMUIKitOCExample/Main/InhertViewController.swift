@@ -8,7 +8,7 @@ import UIKit
 public class InhertViewController: ConversationController {
   override public func viewDidLoad() {
     super.viewDidLoad()
-    let test = TestViewController(sessionId: "")
+    let test = TestViewController(conversationId: "")
     // Do any additional setup after loading the view.
   }
 

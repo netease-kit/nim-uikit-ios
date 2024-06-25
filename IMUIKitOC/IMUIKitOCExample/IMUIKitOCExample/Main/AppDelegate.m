@@ -11,7 +11,8 @@
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
-#import <NECoreIMKit/NECoreIMKit-Swift.h>
+#import <NETeamUIKit/NETeamUIKit-Swift.h>
+#import <NECoreIM2Kit/NECoreIM2Kit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
 // #import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 #import "CustomRouterViewController.h"
@@ -42,7 +43,8 @@
 - (void)setupInit {
   // 初始化NIMSDK
   NIMSDKOption *option = [NIMSDKOption optionWithAppKey:AppKey];
-  [[IMKitClient instance] setupCoreKitIM:option];
+  option.v2 = YES;
+  [[IMKitClient instance] setupIM:option];
 
   // 统一登录组件
   YXConfig *config = [[YXConfig alloc] init];
@@ -86,7 +88,7 @@
 - (void)setupXKit:(YXUserInfo *)user {
   // 登录云信IM
   if (user.imToken && user.imAccid) {
-    [[IMKitClient instance] loginIM:user.imAccid :user.imToken :^(NSError * _Nullable error) {
+    [[IMKitClient instance] login:user.imAccid :user.imToken : nil :^(NSError * _Nullable error) {
             if (!error) {
                 [ChatRouter setupInit];
                 [self setupTabbar];
@@ -124,6 +126,7 @@
   [ChatRouter register];
   [ConversationRouter register];
   [ContactRouter register];
+  [TeamRouter register];
 
   // 聊天页面自定义面板示例
   /*
