@@ -44,6 +44,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
     NotificationCenter.default.addObserver(self, selector: #selector(appDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
@@ -74,6 +75,17 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// 应用即将进入后台（包括锁屏）
   func appWillResignActive() {
     clearCache()
+  }
+
+  /// 点击消息发送者头像
+  /// 拉取最新用户信息后刷新消息发送者信息
+  /// - Parameter noti: 通知对象
+  func didTapHeader(_ noti: Notification) {
+    if let user = noti.object as? NEUserWithFriend,
+       let accid = user.user?.accountId {
+      cacheDic[accid]?.nimUser = user
+      updateFinish()
+    }
   }
 
   /// 设置缓存(对一个新群设置缓存会移除之前群的缓存，单例只保存一个群的成员缓存)
@@ -107,6 +119,15 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
       }
     }
     return nil
+  }
+
+  /// 判断是否是当前群成员
+  public func isCurrentMember(_ accountId: String) -> Bool {
+    if cacheDic[accountId] != nil {
+      return true
+    } else {
+      return false
+    }
   }
 
   /// 好友信息更新

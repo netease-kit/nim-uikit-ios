@@ -48,8 +48,8 @@ open class NEBaseChatTeamMemberCell: UITableViewCell {
     NSLayoutConstraint.activate([
       headerView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 21),
       headerView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      headerView.widthAnchor.constraint(equalToConstant: 42),
-      headerView.heightAnchor.constraint(equalToConstant: 42),
+      headerView.widthAnchor.constraint(equalToConstant: fun_chat_min_h),
+      headerView.heightAnchor.constraint(equalToConstant: fun_chat_min_h),
     ])
 
     contentView.addSubview(nameLabel)

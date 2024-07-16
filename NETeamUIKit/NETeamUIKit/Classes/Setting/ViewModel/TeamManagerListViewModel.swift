@@ -11,7 +11,7 @@ public protocol TeamManagerListViewModelDelegate: NSObject {
 }
 
 @objcMembers
-open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener {
+open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// 群API 单例
   public let teamRepo = TeamRepo.shared
   /// 当前用户的群成员对象
@@ -30,11 +30,33 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
     super.init()
     teamRepo.addTeamListener(self)
     ContactRepo.shared.addContactListener(self)
+    NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
     ContactRepo.shared.removeContactListener(self)
+  }
+
+  /// 点击消息发送者头像
+  /// 拉取最新用户信息后刷新消息发送者信息
+  /// - Parameter noti: 通知对象
+  func didTapHeader(_ noti: Notification) {
+    if let user = noti.object as? NEUserWithFriend,
+       let accid = user.user?.accountId {
+      if NETeamMemberCache.shared.isCurrentMember(accid) {
+        var isDidFind = false
+        for model in managers {
+          if let accountId = model.nimUser?.user?.accountId, accountId == accid {
+            model.nimUser = user
+            isDidFind = true
+          }
+        }
+        if isDidFind == true {
+          delegate?.didNeedReloadData()
+        }
+      }
+    }
   }
 
   /// 获取群成员信息
@@ -153,18 +175,6 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
         if error == nil {
           self?.delegate?.didNeedReloadData()
         }
-      }
-    }
-  }
-
-  /// 好友信息变更
-  /// - parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    for memberInfo in managers {
-      if memberInfo.teamMember?.accountId == friendInfo.accountId {
-        let user = NEUserWithFriend(friend: friendInfo)
-        memberInfo.nimUser = user
-        delegate?.didNeedReloadData()
       }
     }
   }
@@ -327,6 +337,23 @@ open class TeamManagerListViewModel: NSObject, NETeamListener, NEContactListener
           } else {
             self?.getAllTeamManagerInfos(teamId, result?.nextToken, &temMemberLists, queryType, completion)
           }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - NEContactListener
+
+extension TeamManagerListViewModel: NEContactListener {
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      for memberInfo in managers {
+        if memberInfo.teamMember?.accountId == contact.user?.accountId {
+          memberInfo.nimUser = contact
+          delegate?.didNeedReloadData()
         }
       }
     }

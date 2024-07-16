@@ -33,7 +33,7 @@ open class NEEmotionTool: NSObject {
   ///   - offset: 偏移量
   /// - Returns: 替换表情后的富文本
   class func getAttWithStr(str: String, font: UIFont,
-                           _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
+                           _ offset: CGPoint = CGPoint(x: 0, y: -4)) -> NSMutableAttributedString {
     let regularArr = getRegularArray(str: str)
     let emoticons = NIMInputEmoticonManager.shared
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
@@ -74,5 +74,29 @@ open class NEEmotionTool: NSObject {
     let height = font.lineHeight
     textAttachment.bounds = CGRect(x: offset.x, y: offset.y, width: height, height: height)
     return NSAttributedString(attachment: textAttachment)
+  }
+
+  /// 将富文本中的表情转换为文本
+  /// - Parameters:
+  ///   - att: 富文本
+  ///   - range: 范围
+  /// - Returns: 文本
+  class func getTextWithAtt(_ att: NSMutableAttributedString?, _ range: NSRange) -> String? {
+    guard let att = att else {
+      return nil
+    }
+
+    var text = ""
+    att.enumerateAttributes(in: range, using: { attrs, range, stop in
+      if let attachment = attrs[NSAttributedString.Key.attachment] as? NEEmotionAttachment {
+        text += attachment.emotion?.tag ?? ""
+      } else {
+        let subStr = (att.string as NSString).substring(with: range)
+        text += subStr
+      }
+
+    })
+
+    return text.isEmpty ? nil : text
   }
 }

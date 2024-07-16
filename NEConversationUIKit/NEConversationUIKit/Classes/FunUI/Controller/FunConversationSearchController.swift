@@ -32,9 +32,13 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funConversationBackgroundColor
+    emptyView.setEmptyImage(name: "fun_user_empty")
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
-    emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
   /// 初始化子视图
@@ -47,8 +51,9 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
     searchTextField.textColor = .black
     searchTextField.layer.cornerRadius = 4
     searchTextField.backgroundColor = .white
+    searchTextFieldTopAnchor = searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.statusBarHeight + 12)
+    searchTextFieldTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.statusBarHeight + 12),
       searchTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
       searchTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -72),
       searchTextField.heightAnchor.constraint(equalToConstant: 36),

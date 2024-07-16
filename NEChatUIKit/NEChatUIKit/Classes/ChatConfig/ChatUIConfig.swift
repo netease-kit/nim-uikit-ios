@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -54,7 +55,7 @@ public class MessageProperties: NSObject {
   public var avatarCornerRadius: CGFloat = 0
 
   // 头像类型
-  public var avatarType: NEChatAvatarType?
+  public var avatarType: NEChatAvatarType = .rectangle
 
   // 设置聊天消息标记的背景色
   public var signalBgColor = UIColor.ne_yellowBackgroundColor

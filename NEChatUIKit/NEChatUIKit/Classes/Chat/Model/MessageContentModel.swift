@@ -5,6 +5,7 @@
 
 import CoreAudio
 import Foundation
+import NEChatKit
 import NECoreIM2Kit
 import NIMSDK
 
@@ -13,12 +14,19 @@ open class MessageContentModel: NSObject, MessageModel {
   public var type: MessageType = .custom // 消息类型（文本、图片、自定义消息...）
   public var customType: Int = 0 // 自定义消息的子类型（合并转发、换行消息...）
   public var message: V2NIMMessage?
+  public weak var cell: NEBaseChatMessageCell? // 消息对应的cell
 
   public var offset: CGFloat = 0
+  public var textWidth: CGFloat = 0
   public var contentSize = CGSize(width: 32.0, height: chat_min_h)
   public var height: CGFloat = 48
   open func cellHeight() -> CGFloat {
     CGFloat(height) + offset
+  }
+
+  public var selectRange: NSRange? // 划词选择的范围
+  open func selectText() -> String? {
+    nil
   }
 
   public var showSelect: Bool = false // 多选按钮是否展示
@@ -50,6 +58,11 @@ open class MessageContentModel: NSObject, MessageModel {
   public var replyedModel: MessageModel? {
     didSet {
       if let reply = replyedModel as? MessageContentModel, reply.isReplay == true {
+        if type == .tip {
+          replyedModel?.isReplay = false
+          return
+        }
+
         type = .reply
         replyText = ReplyMessageUtil.textForReplyModel(model: reply)
         // height 计算移至 getMessageModel(model:)
@@ -114,7 +127,8 @@ open class MessageContentModel: NSObject, MessageModel {
   public required init(message: V2NIMMessage?) {
     self.message = message
     if message?.conversationType == .CONVERSATION_TYPE_TEAM,
-       !IMKitClient.instance.isMe(message?.senderId) {
+       let senderId = ChatMessageHelper.getSenderId(message),
+       !IMKitClient.instance.isMe(senderId) {
       fullNameHeight = NEKitChatConfig.shared.ui.messageProperties.showTeamMessageNick ? 20 : 0
     }
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height

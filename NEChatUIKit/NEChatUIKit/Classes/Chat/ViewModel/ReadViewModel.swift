@@ -24,9 +24,13 @@ open class ReadViewModel: NSObject {
   ///   - completion: 完成回调
   public func getTeamMessageReceiptDetail(_ message: V2NIMMessage, _ teamId: String, _ completion: @escaping (Error?) -> Void) {
     chatRepo.getTeamMessageReceiptDetail(message: message, memberAccountIds: []) { [weak self] readReceiptDetail, error in
-      guard let readReceiptDetail = readReceiptDetail else { return }
+      guard let readReceiptDetail = readReceiptDetail else {
+        completion(error)
+        return
+      }
+
       let group = DispatchGroup()
-      if let error = error as? NSError {
+      if let error = error {
         completion(error)
         return
       }
@@ -34,20 +38,20 @@ open class ReadViewModel: NSObject {
       // 加载用户信息
       let loadUserIds = readReceiptDetail.readAccountList + readReceiptDetail.unreadAccountList
       group.enter()
-      ChatTeamCache.shared.loadShowName(userIds: loadUserIds, teamId: teamId) {
+      NETeamUserManager.shared.getTeamMembers(accountIds: loadUserIds) {
         // 已读用户
         for userId in readReceiptDetail.readAccountList {
           let memberInfo = NETeamMemberInfoModel()
-          memberInfo.teamMember = ChatTeamCache.shared.getTeamMemberInfo(accountId: userId)
-          memberInfo.nimUser = NEFriendUserCache.shared.getFriendInfo(userId) ?? ChatUserCache.shared.getUserInfo(userId)
+          memberInfo.teamMember = NETeamUserManager.shared.getTeamMemberInfo(userId)
+          memberInfo.nimUser = ChatMessageHelper.getUserFromCache(userId)
           self?.readUsers.append(memberInfo)
         }
 
         // 未读用户
         for userId in readReceiptDetail.unreadAccountList {
           let memberInfo = NETeamMemberInfoModel()
-          memberInfo.teamMember = ChatTeamCache.shared.getTeamMemberInfo(accountId: userId)
-          memberInfo.nimUser = NEFriendUserCache.shared.getFriendInfo(userId) ?? ChatUserCache.shared.getUserInfo(userId)
+          memberInfo.teamMember = NETeamUserManager.shared.getTeamMemberInfo(userId)
+          memberInfo.nimUser = ChatMessageHelper.getUserFromCache(userId)
           self?.unReadUsers.append(memberInfo)
         }
 

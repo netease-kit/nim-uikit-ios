@@ -45,7 +45,7 @@ open class FunCollectionMessageController: NEBaseCollectionMessageController {
 
     if let message = model.message, message.messageType != .MESSAGE_TYPE_AUDIO {
       let forwardAction = NECustomAlertAction(title: chatLocalizable("operation_forward")) {
-        weakSelf?.forwardCollectionMessage(message, model.senderName ?? "")
+        weakSelf?.forwardCollectionMessage(message, model.conversationName ?? "")
       }
       actions.append(forwardAction)
     }

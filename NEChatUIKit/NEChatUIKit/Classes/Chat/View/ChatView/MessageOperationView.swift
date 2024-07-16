@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import UIKit
 
 @objc
@@ -83,7 +84,6 @@ open class MessageOperationView: UIView, UICollectionViewDataSource, UICollectio
 
   open func collectionView(_ collectionView: UICollectionView,
                            didSelectItemAt indexPath: IndexPath) {
-    removeFromSuperview()
     delegate?.didSelectedItem(item: items[indexPath.row])
   }
 

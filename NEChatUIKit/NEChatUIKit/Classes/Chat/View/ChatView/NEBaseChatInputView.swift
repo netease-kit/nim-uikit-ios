@@ -48,6 +48,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public var atRangeCache = [String: MessageAtCacheModel]()
 
+  public var nickAccidList = [String]()
   public var nickAccidDic = [String: String]()
 
   public var isMultipleLineMode = false // 是否是多行模式
@@ -66,7 +67,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textView.translatesAutoresizingMaskIntoConstraints = false
     textView.backgroundColor = .white
     textView.returnKeyType = .send
-    textView.allowsEditingTextAttributes = true
     textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.dataDetectorTypes = []
@@ -290,10 +290,12 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                      replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: NEKitChatConfig.shared.ui.messageProperties.messageTextColor,
+                                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
 
     if chatInpuMode == .normal || chatInpuMode == .multipleSend, text == "\n" {
       guard var realText = getRealSendText(textView.attributedText) else {
+        delegate?.textViewDidChange()
         return true
       }
       if realText.trimmingCharacters(in: .whitespaces).isEmpty {
@@ -315,6 +317,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       DispatchQueue.main.async {
         textView.selectedRange = NSMakeRange(range.location + addString.length, 0)
       }
+      delegate?.textViewDidChange()
       return false
     }
 
@@ -323,8 +326,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       if let findRange = temRange {
         let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
         if mutableAttri.length >= findRange.location + findRange.length {
-          mutableAttri.removeAttribute(NSAttributedString.Key.foregroundColor, range: findRange)
-          mutableAttri.removeAttribute(NSAttributedString.Key.font, range: findRange)
           if range.length == 1 {
             mutableAttri.replaceCharacters(in: findRange, with: "")
           }
@@ -337,11 +338,12 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         }
         return false
       }
+      delegate?.textViewDidChange()
       return true
     } else {
       delegate?.textChanged(text: text)
     }
-
+    delegate?.textViewDidChange()
     return true
   }
 
@@ -388,9 +390,11 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String) {
     if emoticonID.isEmpty { // 删除键
+      delegate?.textViewDidChange()
       textView.deleteBackward()
       print("delete ward")
     } else {
+      delegate?.textViewDidChange()
       let range = textView.selectedRange
       let attribute = NEEmotionTool.getAttWithStr(str: description, font: .systemFont(ofSize: 16))
       let mutaAttribute = NSMutableAttributedString(attributedString: textView.attributedText)
@@ -602,6 +606,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }
 
   open func clearAtCache() {
+    nickAccidList.removeAll()
     nickAccidDic.removeAll()
   }
 

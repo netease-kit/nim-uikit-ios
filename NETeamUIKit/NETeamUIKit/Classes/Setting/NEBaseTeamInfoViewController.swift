@@ -24,6 +24,16 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     tableView.delegate = self
     tableView.separatorStyle = .none
     tableView.sectionHeaderHeight = 0
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -66,6 +76,7 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     for (key, value) in registerCellDic {
       contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
+    navigationView.moreButton.isHidden = true
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

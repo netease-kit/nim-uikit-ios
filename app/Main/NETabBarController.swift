@@ -33,13 +33,13 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
     setUpControllers()
     setUpSessionBadgeValue()
     setUpContactBadgeValue()
-    ConversationRepo.shared.addListener(self)
+    ConversationRepo.shared.addConversationListener(self)
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
   }
 
   deinit {
-    ConversationRepo.shared.removeListener(self)
+    ConversationRepo.shared.removeConversationListener(self)
     ContactRepo.shared.removeContactListener(self)
   }
 

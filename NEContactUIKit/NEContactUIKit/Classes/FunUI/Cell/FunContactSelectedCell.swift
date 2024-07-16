@@ -28,10 +28,10 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
   }
 
   override open func initSubviewsLayout() {
-    if NEKitContactConfig.shared.ui.contactProperties.avatarType == .rectangle {
-      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
-    } else if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
+    if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
       avatarImageView.layer.cornerRadius = 20.0
+    } else if NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius > 0 {
+      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
     } else {
       avatarImageView.layer.cornerRadius = 4.0 // Fun UI
     }

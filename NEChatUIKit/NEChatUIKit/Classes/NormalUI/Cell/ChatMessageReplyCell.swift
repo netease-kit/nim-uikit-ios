@@ -96,9 +96,9 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
                                                               color: replyLabel.textColor)
       replyLabel.accessibilityValue = text
 
-      if let attriText = replyLabel.attributedText, let model = model as? MessageTextModel {
+      if let attriText = replyLabel.attributedText {
         let textSize = NSAttributedString.getRealSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
-        model.contentSize.width = max(textSize.width, model.textWidght) + chat_content_margin * 2
+        model.contentSize.width = max(textSize.width, model.textWidth) + chat_content_margin * 2
       }
     }
 

@@ -3,9 +3,6 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-//MAKR：common
-"ok"="OK";
-
 //MAKR：message
 "send_picture"="get a picture";
 "send_voice"="get a audio";
@@ -131,7 +128,6 @@
 "cancel"="cancel";
 "send_to"="send to";
 "send"="send";
-"confirm"="yes";
 "session_record"="session record";
 
 "collection_message"=" collection message";
@@ -223,3 +219,14 @@
 "chat_collection_team_tip"="From %@ ";
 
 "collection_limit"="The number of favorites has reached the limit value";
+"language_title"="Translate input content into";
+
+"translate_use"="Use";
+"translate_sure"="AI Translate";
+"ai_translating"="AI Translating...";
+"translate_default"="Translate as";
+"format_not_supported"="This format is not supported.";
+"chat_translate"="Translate";
+"ai_user_pin_top"="Pin to top";
+"request_exception" = "Request Exception";
+"ai_request_ing" = "Model request responsing";

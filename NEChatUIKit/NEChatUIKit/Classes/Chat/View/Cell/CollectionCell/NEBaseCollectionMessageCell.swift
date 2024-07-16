@@ -185,7 +185,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
     collectionModel = model
     headerView.configHeadData(headUrl: model.chatmodel.avatar,
                               name: model.chatmodel.fullName ?? "",
-                              uid: model.chatmodel.message?.senderId ?? "")
+                              uid: ChatMessageHelper.getSenderId(model.chatmodel.message) ?? "")
     nameLabel.text = model.chatmodel.fullName
     if let time = model.collection?.updateTime {
       timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: time))

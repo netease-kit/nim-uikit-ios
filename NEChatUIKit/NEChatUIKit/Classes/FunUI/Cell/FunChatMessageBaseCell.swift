@@ -27,7 +27,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
 
   override open func baseCommonUI() {
     super.baseCommonUI()
-    setAvatarImgSize(size: 42)
+    setAvatarImgSize(size: fun_chat_min_h)
 
     contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .left, constant: 8 + funMargin)
     contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .top, constant: -4)
@@ -37,13 +37,12 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   }
 
   override open func initSubviewsLayout() {
-    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .rectangle,
-       NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-    } else if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
+    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
       avatarImageRight.layer.cornerRadius = 21.0
       avatarImageLeft.layer.cornerRadius = 21.0
+    } else if NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
+      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
     } else {
       avatarImageRight.layer.cornerRadius = 4
       avatarImageLeft.layer.cornerRadius = 4

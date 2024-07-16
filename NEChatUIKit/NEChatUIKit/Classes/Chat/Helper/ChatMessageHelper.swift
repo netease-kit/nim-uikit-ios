@@ -58,9 +58,12 @@ public class ChatMessageHelper: NSObject {
       return ""
     }
     if V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
+      if NEAIUserManager.shared.isAIUser(sessionId) {
+        return NEAIUserManager.shared.getShowName(sessionId) ?? sessionId
+      }
       return NEFriendUserCache.shared.getShowName(sessionId)
     } else {
-      return ChatTeamCache.shared.getTeamInfo()?.name ?? ""
+      return NETeamUserManager.shared.getTeamInfo()?.name ?? sessionId
     }
   }
 
@@ -225,11 +228,7 @@ public class ChatMessageHelper: NSObject {
           accIds.append(senderId)
         }
 
-        if let conversationId = message.conversationId, let tid = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
-          ChatTeamCache.shared.loadShowName(userIds: accIds, teamId: tid) {
-            completion(MessageTipsModel(message: message))
-          }
-        } else {
+        NETeamUserManager.shared.getTeamMembers(accountIds: accIds) {
           completion(MessageTipsModel(message: message))
         }
       } else {
@@ -359,6 +358,45 @@ public class ChatMessageHelper: NSObject {
     }
   }
 
+  public static func getAIErrorMsage(_ errorCode: NSInteger) -> String? {
+    var content: String?
+    switch errorCode {
+    case failedOperation:
+      content = commonLocalizable("parameter_setting_error")
+    case rateLimitExceeded:
+      content = commonLocalizable("rate_limit_exceeded")
+    case userNotExistCode:
+      content = commonLocalizable("user_not_exist")
+    case userBannedCode:
+      content = commonLocalizable("user_banned")
+    case userChatBannedCode:
+      content = commonLocalizable("user_chat_banned")
+    case noFriendCode:
+      content = commonLocalizable("friend_not_exist")
+    case messageHitAntispam1, messageHitAntispam2:
+      content = commonLocalizable("message_hit_antispam")
+    case teamMemberNotExist:
+      content = commonLocalizable("team_member_not_exist")
+    case teamNormalMemberChatBanned:
+      content = commonLocalizable("team_normal_member_chat_banned")
+    case teamMemberChatBanned:
+      content = commonLocalizable("team_member_chat_banned")
+    case notAIAccount:
+      content = commonLocalizable("not_ai_account")
+    case cannotBlockAIAccount:
+      content = commonLocalizable("cannot_blocklist_ai_account")
+    case aiMessagesDisabled:
+      content = commonLocalizable("ai_messages_function_disabled")
+    case aiMessageRequestFailed:
+      content = commonLocalizable("failed_request_to_the_LLM")
+    case aiMessageNotSupport:
+      content = chatLocalizable("format_not_supported")
+    default:
+      break
+    }
+    return content
+  }
+
   /// 移除消息扩展字段中的 回复、@
   /// - Parameter forwardMessage: 消息
   public static func clearForwardAtMark(_ forwardMessage: V2NIMMessage) {
@@ -402,8 +440,8 @@ public class ChatMessageHelper: NSObject {
       clearForwardAtMark(msg)
 
       // 保存消息昵称和头像
-      if let from = msg.senderId {
-        let user = NEFriendUserCache.shared.getFriendInfo(from) ?? ChatUserCache.shared.getUserInfo(from)
+      if let from = ChatMessageHelper.getSenderId(msg) {
+        let user = getUserFromCache(from)
         if let user = user {
           let senderNick = user.showName(false)
           if var remoteExt = getDictionaryFromJSONString(msg.serverExtension ?? "") as? [String: Any] {
@@ -487,6 +525,38 @@ public class ChatMessageHelper: NSObject {
     return nil
   }
 
+  /// 判断是否是数字人发送的消息
+  /// - Parameter message: 消息
+  /// - Returns: 是否是数字人发送的消息
+  public static func isAISender(_ message: V2NIMMessage?) -> Bool {
+    if message?.aiConfig != nil, message?.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+      return true
+    }
+    return false
+  }
+
+  /// 获取消息发送者实际 id
+  /// - Parameter message: 消息
+  /// - Returns: 实际发送者的 id
+  public static func getSenderId(_ message: V2NIMMessage?) -> String? {
+    var senderId = message?.senderId
+    // 数字人回复的消息
+    if IMKitConfigCenter.shared.enableAIUser,
+       message?.aiConfig != nil,
+       message?.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+      senderId = message?.aiConfig?.accountId
+    }
+
+    return senderId
+  }
+
+  /// 从缓存中获取用户信息
+  /// - Parameter accountId: 用户 id
+  /// - Returns: 用户信息
+  public static func getUserFromCache(_ accountId: String) -> NEUserWithFriend? {
+    NEAIUserManager.shared.getAIUserById(accountId) ?? NEFriendUserCache.shared.getFriendInfo(accountId) ?? NEP2PChatUserCache.shared.getUserInfo(accountId) ?? NETeamUserManager.shared.getUserInfo(accountId)
+  }
+
   /// 查找回复信息键值对
   /// - Parameter message: 消息
   /// - Returns: 回复消息的 id
@@ -503,6 +573,111 @@ public class ChatMessageHelper: NSObject {
     }
 
     return refer
+  }
+
+  /// 计算减少的
+  /// - Parameter attribute： at 文本前的文本
+  static func getReduceIndexCount(_ attribute: NSAttributedString) -> Int {
+    var count = 0
+    attribute.enumerateAttributes(
+      in: NSMakeRange(0, attribute.length),
+      options: NSAttributedString.EnumerationOptions(rawValue: 0)
+    ) { dics, range, stop in
+      if let neAttachment = dics[NSAttributedString.Key.attachment] as? NEEmotionAttachment {
+        if let tagCount = neAttachment.emotion?.tag?.count {
+          count = count + tagCount - 1
+        }
+      }
+    }
+    return count
+  }
+
+  /// 解析消息中的 @
+  /// - Parameters:
+  ///   - message: 消息
+  ///   - attributeStr: 消息富文本
+  /// - Returns: 高亮 @ 后的消息富文本
+  public static func loadAtInMessage(_ message: V2NIMMessage?, _ attributeStr: NSMutableAttributedString?) -> NSMutableAttributedString? {
+    // 数字人回复的消息不展示高亮（serverExtension 会被带回）
+    if message?.aiConfig != nil, message?.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+      return nil
+    }
+
+    let text = message?.text ?? ""
+    let messageTextFont = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+
+    // 兼容老的表情消息，如果前面有表情而位置计算异常则回退回老的解析
+    var notFound = false
+
+    // 计算表情(根据转码后的index)
+    if let remoteExt = getDictionaryFromJSONString(message?.serverExtension ?? ""), let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
+      for (_, value) in dic {
+        if let contentDic = value as? [String: AnyObject] {
+          if let array = contentDic[atSegmentsKey] as? [AnyObject] {
+            if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
+              for model in models {
+                // 前面因为表情增加的索引数量
+                var count = 0
+                if text.count > model.start {
+                  let frontAttributeStr = NEEmotionTool.getAttWithStr(
+                    str: String(text.prefix(model.start)),
+                    font: messageTextFont
+                  )
+                  count = getReduceIndexCount(frontAttributeStr)
+                }
+                let start = model.start - count
+                if start < 0 {
+                  notFound = true
+                  break
+                }
+                var end = model.end - count
+
+                if model.end + atRangeOffset > text.count {
+                  notFound = true
+                  break
+                }
+                // 获取起始索引
+                let startIndex = text.index(text.startIndex, offsetBy: model.start)
+                // 获取结束索引
+                let endIndex = text.index(text.startIndex, offsetBy: model.end + atRangeOffset)
+                let frontAttributeStr = NEEmotionTool.getAttWithStr(
+                  str: String(text[startIndex ..< endIndex]),
+                  font: messageTextFont
+                )
+                let innerCount = getReduceIndexCount(frontAttributeStr)
+                end = end - innerCount
+                if end <= start {
+                  notFound = true
+                  break
+                }
+
+                if attributeStr?.length ?? 0 > end {
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(start, end - start + atRangeOffset))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if notFound == true, let remoteExt = getDictionaryFromJSONString(message?.serverExtension ?? ""), let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
+      for (_, value) in dic {
+        if let contentDic = value as? [String: AnyObject] {
+          if let array = contentDic[atSegmentsKey] as? [AnyObject] {
+            if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
+              for model in models {
+                if attributeStr?.length ?? 0 > model.end {
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return attributeStr
   }
 
   /// 获取文件 MD5 值

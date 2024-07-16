@@ -6,22 +6,9 @@
 import Foundation
 import NEChatKit
 import NECommonKit
-import NIMSDK
-import SDWebImage
-import SDWebImageSVGKitPlugin
-import SDWebImageWebPCoder
 
 @objcMembers
 open class ChatRouter: NSObject {
-  public static func setupInit() {
-    NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
-    NIMKitFileLocationHelper.setStaticUserId(IMKitClient.instance.account())
-    let webpCoder = SDImageWebPCoder()
-    SDImageCodersManager.shared.addCoder(webpCoder)
-    let svgCoder = SDImageSVGKCoder.shared
-    SDImageCodersManager.shared.addCoder(svgCoder)
-  }
-
   public static func registerCommon() {
     // sendMessage
     Router.shared.register(ChatAddFriendRouter) { param in

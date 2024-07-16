@@ -18,9 +18,9 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   var className = "ContactUserViewController"
 
   public let viewModel = ContactUserViewModel()
-  public var tableView = UITableView(frame: .zero, style: .grouped)
   var data = [[UserItem]]()
   public var headerView = NEBaseUserInfoHeaderView()
+  public var tableViewTopAnchor: NSLayoutConstraint?
 
   /// 使用 accountId 初始化
   /// - Parameter accountId: 用户 id
@@ -49,10 +49,23 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tableViewTopAnchor?.constant = topConstant
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     commonUI()
     loadData()
+    ContactRepo.shared.addContactListener(self)
+
+    // 数字人无需远端查询信息
+    if user?.user is V2NIMAIUser {
+      loadData()
+      return
+    }
+
     if let userId = uid {
       weak var weakSelf = self
       if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
@@ -70,24 +83,40 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
         } else if let u = user {
           weakSelf?.user = u
           weakSelf?.loadData()
+          NotificationCenter.default.post(name: NENotificationName.didTapHeader, object: user)
         }
       }
     }
-
-    ContactRepo.shared.addContactListener(self)
   }
+
+  lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .grouped)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
 
   open func commonUI() {
     navigationController?.navigationBar.backgroundColor = .white
     navigationView.backgroundColor = .white
+    navigationView.moreButton.isHidden = true
 
-    tableView.separatorStyle = .none
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(tableView)
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -119,9 +148,25 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   }
 
   func loadData() {
-    guard let uid = user?.user?.accountId else { return }
+    guard let uid = user?.user?.accountId ?? uid else { return }
 
-    if NEFriendUserCache.shared.isFriend(uid) {
+    // 数字人信息从缓存中取
+    if let aiUser: NEUserWithFriend = NEAIUserManager.shared.getAIUserById(uid) {
+      user = aiUser
+    }
+
+    if user?.user is V2NIMAIUser {
+      // 数字人仅展示【聊天】
+      data = [
+        [
+          UserItem(title: localizable("chat"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+        ],
+      ]
+    } else if NEFriendUserCache.shared.isFriend(uid) {
       data = [
         [
           UserItem(title: localizable("noteName"),
@@ -244,10 +289,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   }
 
   open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    if section == 0 {
-      return 0
-    }
-    return 6.0
+    0.1
   }
 
   open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -257,11 +299,13 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   }
 
   open func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-    0
+    0.1
   }
 
   open func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-    nil
+    let headerView = UIView()
+    headerView.backgroundColor = UIColor.clear
+    return headerView
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -292,12 +336,12 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
   }
 
-  open func getContactRemakNameViewController() -> NEBaseContactRemakNameViewController {
-    NEBaseContactRemakNameViewController()
+  open func getContactAliasViewController() -> NEBaseContactAliasViewController {
+    NEBaseContactAliasViewController()
   }
 
   func toEditRemarks() {
-    let remark = getContactRemakNameViewController()
+    let remark = getContactAliasViewController()
     remark.user = user
     remark.completion = { [weak self] u in
       self?.user = u
@@ -371,7 +415,6 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
         if error != nil {
           self.showToast(error?.localizedDescription ?? "")
         } else {
-          NEFriendUserCache.shared.removeFriendInfo(userId)
           self.navigationController?.popViewController(animated: true)
         }
       }
@@ -421,17 +464,15 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
           desc: "CALLBACK addFriend " + (error?.localizedDescription ?? "no error")
         )
         if let err = error {
-          NEALog.errorLog("ContactUserViewController", desc: "❌add friend failed :\(err)")
+          NEALog.errorLog("ContactUserViewController", desc: "add friend failed :\(err)")
         } else {
           weakSelf?.showToast(localizable("send_friend_apply"))
-          if let model = weakSelf?.viewModel {
-            if NEFriendUserCache.shared.isBlockAccount(account) {
-              weakSelf?.viewModel.removeBlackList(account: account) { err in
-                NEALog.infoLog(
-                  self.className,
-                  desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
-                )
-              }
+          if NEFriendUserCache.shared.isBlockAccount(account) {
+            weakSelf?.viewModel.removeBlackList(account: account) { err in
+              NEALog.infoLog(
+                self.className,
+                desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
+              )
             }
           }
         }
@@ -443,47 +484,14 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 // MARK: - NEContactListener
 
 extension NEBaseContactUserViewController: NEContactListener {
-  /// 黑名单添加回调
-  /// - Parameter user: 加入黑名单的好友
-  public func onBlockListAdded(_ user: V2NIMUser) {
-    guard let accountId = user.accountId else { return }
-    NEFriendUserCache.shared.addBlockAccount(accountId)
-    if accountId == uid {
-      loadData()
-    }
-  }
-
-  /// 黑名单移除回调
-  /// - Parameter accountId: 移除黑名的用户账号ID
-  public func onBlockListRemoved(_ accountId: String) {
-    NEFriendUserCache.shared.removeBlockAccount(accountId)
-    if accountId == uid {
-      loadData()
-    }
-  }
-
-  /// 添加好友通知
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendAdded(_ friendInfo: V2NIMFriend) {
-    if friendInfo.accountId == uid {
-      user?.friend = friendInfo
-      loadData()
-    }
-  }
-
-  public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
-    NEFriendUserCache.shared.removeFriendInfo(accountId)
-    if accountId == uid {
-      loadData()
-    }
-  }
-
-  /// 好友信息变更回调
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    if friendInfo.accountId == uid {
-      user?.friend = friendInfo
-      loadData()
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      if contact.user?.accountId == uid {
+        user = contact
+        loadData()
+      }
     }
   }
 }

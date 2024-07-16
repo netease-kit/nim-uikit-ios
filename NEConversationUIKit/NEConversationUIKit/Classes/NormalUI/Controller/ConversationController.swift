@@ -20,6 +20,14 @@ open class ConversationController: NEBaseConversationController {
     return searchBarButton
   }()
 
+  /// 数字人分割线
+  public lazy var pinUserDividerLine: UIView = {
+    let line = UIView()
+    line.backgroundColor = UIColor.ne_navLineColor
+    line.translatesAutoresizingMaskIntoConstraints = false
+    return line
+  }()
+
   /// 添加按钮
   public lazy var addBarButton: UIButton = {
     let addBarButton = UIButton()
@@ -33,6 +41,7 @@ open class ConversationController: NEBaseConversationController {
     super.init(nibName: nil, bundle: nil)
     className = "ConversationController"
     cellRegisterDic = [0: ConversationListCell.self]
+    stickTopCellRegisterDic = [0: StickTopCell.self]
   }
 
   public required init?(coder: NSCoder) {
@@ -57,6 +66,7 @@ open class ConversationController: NEBaseConversationController {
       navigationView.searchBtn.isHidden = true
       navigationItem.rightBarButtonItems = [addBarItem]
     }
+
     if !NEKitConversationConfig.shared.ui.showTitleBarRightIcon {
       navigationView.addBtn.isHidden = true
       navigationItem.rightBarButtonItems = [searchBarItem]
@@ -70,5 +80,42 @@ open class ConversationController: NEBaseConversationController {
 
     tableView.rowHeight = 62
     tableView.backgroundColor = .white
+
+    // 设置置顶列表宽高
+    stickTopCollcetionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width - 20.0, height: 181 - NEConstant.navigationAndStatusHeight)
+
+    stickTopCollcetionView.addSubview(pinUserDividerLine)
+    pinUserDividerLine.frame = CGRect(x: -10, y: 180 - NEConstant.navigationAndStatusHeight, width: view.frame.size.width + 20.0, height: 1.0)
+  }
+
+  /// 置顶cell大小
+  override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    CGSize(width: 62, height: 181 - NEConstant.navigationAndStatusHeight)
+  }
+
+  /// 置顶显示隐藏(根据是否有置顶数据)
+  open func setupNormalStickTopView() {
+    if viewModel.aiUserListData.count > 0 {
+      if let headerView = tableView.tableHeaderView {
+        if headerView.isKind(of: UICollectionView.self) == false {
+          tableView.tableHeaderView = stickTopCollcetionView
+        }
+      } else {
+        tableView.tableHeaderView = stickTopCollcetionView
+      }
+      stickTopCollcetionView.reloadData()
+      navigationView.titleBarBottomLine.isHidden = true
+    } else {
+      if tableView.tableHeaderView != nil {
+        tableView.tableHeaderView = nil
+      }
+      navigationView.titleBarBottomLine.isHidden = false
+    }
+  }
+
+  override open func reloadTableView() {
+    super.reloadTableView()
+    NEALog.infoLog(className(), desc: #function + " reloadTableView in conversation controller stick top count \(viewModel.stickTopConversations.count)")
+    setupNormalStickTopView()
   }
 }

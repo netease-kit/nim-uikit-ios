@@ -28,6 +28,8 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
 
   public var isRequesting = false
 
+  public var searchBackViewTopAnchor: NSLayoutConstraint?
+
   /// 搜索背景
   public lazy var searchBackView: UIView = {
     let searchBackView = UIView()
@@ -46,10 +48,15 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
     return searchImageView
   }()
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    searchBackViewTopAnchor?.constant = 20 + topConstant
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("add_friend")
-    navigationView.navTitle.text = title
+    navigationView.moreButton.isHidden = true
     emptyView.setText(localizable("user_not_exist"))
     setupUI()
 
@@ -61,10 +68,11 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
   /// UI 初始化
   open func setupUI() {
     view.addSubview(searchBackView)
+    searchBackViewTopAnchor = searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20 + topConstant)
+    searchBackViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       searchBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       searchBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20 + topConstant),
       searchBackView.heightAnchor.constraint(equalToConstant: 32),
     ])
 

@@ -272,7 +272,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       commentTextFeild.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    // 水平分割线
+    // 水平分隔线
     let verticalLine = UIView()
     verticalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(verticalLine)
@@ -284,7 +284,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       verticalLine.topAnchor.constraint(equalTo: commentTextFeild.bottomAnchor, constant: 24.0),
     ])
 
-    // 竖直分割线
+    // 竖直分隔线
     let horizontalLine = UIView()
     horizontalLine.translatesAutoresizingMaskIntoConstraints = false
     contentView.addSubview(horizontalLine)

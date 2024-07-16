@@ -5,6 +5,7 @@
 
 import NEChatKit
 import NECoreIM2Kit
+import NIMSDK
 import UIKit
 
 public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoModel?) -> Void
@@ -13,24 +14,27 @@ public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoMode
 open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   public var tableView = UITableView(frame: .zero, style: .plain)
-  public var sessionId: String
+  public var conversationId: String
   public var viewModel = TeamMemberSelectVM()
   public var selectedBlock: DidSelectedAtRow?
   var teamInfo: NETeamInfoModel?
   //// 是否展示自己
   private var showSelf = true
+  private var showTeamMembers: Bool = false
   var className = "SelectUserViewController"
   var isShowAtAll = true
 
-  init(sessionId: String, showSelf: Bool = true) {
-    self.sessionId = sessionId
+  init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
+    self.conversationId = conversationId
     self.showSelf = showSelf
+    self.showTeamMembers = showTeamMembers
     super.init(nibName: nil, bundle: nil)
   }
 
   public required init?(coder: NSCoder) {
-    sessionId = ""
+    conversationId = ""
     showSelf = true
+    showTeamMembers = false
     super.init(coder: coder)
   }
 
@@ -90,6 +94,17 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
     tableView.tableFooterView = UIView()
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+
     view.addSubview(tableView)
 
     if #available(iOS 11.0, *) {
@@ -112,7 +127,33 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
   }
 
   func loadData() {
-    viewModel.fetchTeamMembers(sessionId) { [weak self] error, team in
+    // 数字人列表
+    var aiUserMembers = [NETeamMemberInfoModel]()
+    if IMKitConfigCenter.shared.enableAIUser {
+      let aiUsers = NEAIUserManager.shared.getAIChatUserList()
+      aiUserMembers = aiUsers.map { user in
+        let teamMember = NETeamMemberInfoModel()
+        teamMember.nimUser = NEUserWithFriend(user: user)
+        return teamMember
+      }
+    }
+
+    if !showTeamMembers {
+      let team = NETeamInfoModel()
+      team.users = aiUserMembers
+      teamInfo = team
+      isShowAtAll = false
+      tableView.reloadData()
+      return
+    }
+
+    guard V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_TEAM,
+          let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+      return
+    }
+
+    // 获取群成员列表
+    viewModel.getTeamMembers(teamId) { [weak self] error, team in
       NEALog.infoLog(
         ModuleName + " " + (self?.className ?? "SelectUserViewController"),
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")
@@ -165,10 +206,30 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
           (m1.teamMember?.joinTime ?? 0) < (m2.teamMember?.joinTime ?? 0)
         })
 
+        // 管理员列表过滤重复的数字人
+        managers = managers.filter { member in
+          if aiUserMembers.contains(where: { $0.nimUser?.user?.accountId == member.nimUser?.user?.accountId
+          }) {
+            return false
+          } else {
+            return true
+          }
+        }
+
+        // 普通成员列表过滤重复的数字人
+        normals = normals.filter { member in
+          if aiUserMembers.contains(where: { $0.nimUser?.user?.accountId == member.nimUser?.user?.accountId
+          }) {
+            return false
+          } else {
+            return true
+          }
+        }
+
         if let owner = owner {
-          team?.users = [owner] + managers + normals
+          team?.users = aiUserMembers + [owner] + managers + normals
         } else {
-          team?.users = managers + normals
+          team?.users = aiUserMembers + managers + normals
         }
       }
 

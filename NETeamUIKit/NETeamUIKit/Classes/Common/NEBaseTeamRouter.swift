@@ -94,12 +94,26 @@ open class TeamRouter: NSObject {
             result["teamId"] = creatResult?.team?.teamId
 
             // 先插入【成功创建群聊】消息
-            ChatRepo.shared.sendCreateAdavanceNoti(creatResult?.team?.teamId ?? "", .TEAM_TYPE_NORMAL, localizable("create_senior_team_noti")) { error in
-              print("send noti message  : ", error as Any)
+            if let tid = creatResult?.team?.teamId, let cid = V2NIMConversationIdUtil.teamConversationId(tid) {
+              TeamProvider.shared.getTeamInfo(tid, .TEAM_TYPE_NORMAL) { retTeam, error in
+                print("getTeamInfo : ", error as Any)
+                var createTime: TimeInterval = 0
+                if let team = retTeam {
+                  createTime = team.createTime
+                } else {
+                  createTime = Date().timeIntervalSince1970
+                }
 
-              // 再邀请用户
-              repo.inviteMembers(creatResult?.team?.teamId ?? "", .TEAM_TYPE_NORMAL, accids) { error, members in
-                print("invite users : \(accids)", error as Any)
+                let message = V2NIMMessageCreator.createTipsMessage(localizable("create_senior_team_noti"))
+                ChatRepo.shared.insertMessageToLocal(message: message,
+                                                     conversationId: cid,
+                                                     createTime: createTime) { _, error in
+                  print("send noti message  : ", error as Any)
+                  // 再邀请用户
+                  repo.inviteTeamMembers(tid, .TEAM_TYPE_NORMAL, accids) { error, members in
+                    print("invite users : \(accids)", error as Any)
+                  }
+                }
               }
             }
           }

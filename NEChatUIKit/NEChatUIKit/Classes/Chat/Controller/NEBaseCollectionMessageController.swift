@@ -12,6 +12,8 @@ import UIKit
 open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableViewDelegate, UITableViewDataSource, CollectionMessageCellDelegate, UIDocumentInteractionControllerDelegate {
   var audioPlayer: AVAudioPlayer? // 仅用于语音消息的播放
 
+  /// 收藏列表顶部约束
+  public var contentTableTopAnchor: NSLayoutConstraint?
   /// 收藏列表
   public lazy var contentTable: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
@@ -23,6 +25,15 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     tableView.backgroundColor = .clear
     tableView.mj_footer = MJRefreshAutoFooter(refreshingTarget: self, refreshingAction: #selector(loadMoreData))
     tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -58,6 +69,11 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    contentTableTopAnchor?.constant = topConstant
   }
 
   override open func viewDidDisappear(_ animated: Bool) {
@@ -104,11 +120,12 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// UI初始化
   open func setupUI() {
     title = chatLocalizable("operation_collection")
-    navigationView.navTitle.text = chatLocalizable("operation_collection")
     navigationView.moreButton.isHidden = true
+
     view.addSubview(contentTable)
+    contentTableTopAnchor = contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    contentTableTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
       contentTable.leftAnchor.constraint(equalTo: view.leftAnchor),
       contentTable.rightAnchor.constraint(equalTo: view.rightAnchor),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -241,7 +258,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 转发
   /// - Parameter message: 消息
-  open func forwardCollectionMessage(_ message: V2NIMMessage, _ senderName: String) {
+  open func forwardCollectionMessage(_ message: V2NIMMessage, _ conversationName: String) {
     weak var weakSelf = self
     Router.shared.register(ForwardMultiSelectedRouter) { param in
       var items = [ForwardItem]()
@@ -262,7 +279,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
         }
 
         let type = chatLocalizable("operation_forward")
-        weakSelf?.showForwardAlertController(items: items, type: type, conversationId: message.conversationId, senderName: senderName) { comment in
+        weakSelf?.showForwardAlertController(items: items, type: type, conversationId: message.conversationId, conversationName: conversationName) { comment in
           if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
             weakSelf?.showToast(commonLocalizable("network_error"))
             return
@@ -284,17 +301,18 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// - Parameters:
   ///   - items: 转发对象
   ///   - type: 转发类型（合并转发/逐条转发/转发）
+  ///   - conversationName: 会话名称
   ///   - sureBlock: 确认按钮点击回调
   func showForwardAlertController(items: [ForwardItem],
                                   type: String,
                                   conversationId: String?,
-                                  senderName: String?,
+                                  conversationName: String?,
                                   _ sureBlock: ((String?) -> Void)? = nil) {
     let forwardAlert = getCollectionForwardAlertController()
     forwardAlert.setItems(items)
     forwardAlert.forwardType = type
     forwardAlert.sureBlock = sureBlock
-    if let name = senderName {
+    if let name = conversationName {
       forwardAlert.senderName = name
     }
 
@@ -314,7 +332,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       return
     }
     if let message = model.message {
-      forwardCollectionMessage(message, model.senderName ?? "")
+      forwardCollectionMessage(message, model.conversationName ?? "")
     }
   }
 

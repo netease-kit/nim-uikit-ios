@@ -36,10 +36,10 @@ open class ConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .rectangle {
-      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
-    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
+    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 21.0
+    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius > 0 {
+      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
     } else {
       headImageView.layer.cornerRadius = 21.0
     }

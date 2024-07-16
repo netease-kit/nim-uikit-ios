@@ -3,15 +3,16 @@
 // found in the LICENSE file.
 
 import NEChatUIKit
+import NECoreIM2Kit
 import NECoreKit
 import NETeamUIKit
 import NIMSDK
 import UIKit
 
 @objcMembers
-class PersonInfoViewController: NEBaseViewController,
+public class PersonInfoViewController: NEBaseViewController,
   UINavigationControllerDelegate, PersonInfoViewModelDelegate, UITableViewDelegate,
-  UITableViewDataSource, NEContactListener {
+  UITableViewDataSource, UIImagePickerControllerDelegate, NEContactListener {
   public var cellClassDic = [
     SettingCellType.SettingSubtitleCell.rawValue: CustomTeamSettingSubtitleCell.self,
     SettingCellType.SettingHeaderCell.rawValue: CustomTeamSettingHeaderCell.self,
@@ -28,6 +29,13 @@ class PersonInfoViewController: NEBaseViewController,
     tableView.delegate = self
     tableView.separatorColor = .clear
     tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -40,7 +48,7 @@ class PersonInfoViewController: NEBaseViewController,
     return picker
   }()
 
-  override func viewDidLoad() {
+  override public func viewDidLoad() {
     super.viewDidLoad()
     ContactRepo.shared.addContactListener(self)
     initialConfig()
@@ -52,7 +60,6 @@ class PersonInfoViewController: NEBaseViewController,
 
   func initialConfig() {
     title = NSLocalizedString("person_info", comment: "")
-    navigationView.navTitle.text = title
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
@@ -61,6 +68,8 @@ class PersonInfoViewController: NEBaseViewController,
     } else {
       view.backgroundColor = .funChatBackgroundColor
     }
+
+    navigationView.moreButton.isHidden = true
     viewModel.delegate = self
   }
 
@@ -147,25 +156,11 @@ class PersonInfoViewController: NEBaseViewController,
     ])
   }
 
-  /// 用户信息变更回调
-  /// - Parameter users: 用户列表
-  func onUserProfileChanged(_ users: [V2NIMUser]) {
-    for user in users {
-      if user.accountId == IMKitClient.instance.account() {
-        print("change self user profile : ", user.yx_modelToJSONString() as Any)
-        viewModel.userInfo = NEUserWithFriend(user: user)
-        viewModel.refreshData()
-        tableView.reloadData()
-        break
-      }
-    }
-  }
-
   // MARK: UIImagePickerControllerDelegate
 
-  func imagePickerController(_ picker: UIImagePickerController,
-                             didFinishPickingMediaWithInfo info: [UIImagePickerController
-                               .InfoKey: Any]) {
+  public func imagePickerController(_ picker: UIImagePickerController,
+                                    didFinishPickingMediaWithInfo info: [UIImagePickerController
+                                      .InfoKey: Any]) {
     let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
     uploadHeadImage(image: image)
     dismiss(animated: true, completion: nil)
@@ -195,7 +190,7 @@ class PersonInfoViewController: NEBaseViewController,
           } else {
             NEALog.errorLog(
               weakSelf?.className ?? "",
-              desc: "❌CALLBACK upload image failed,error = \(error!)"
+              desc: "CALLBACK upload image failed,error = \(error!)"
             )
           }
           self?.view.hideToastActivity()
@@ -221,7 +216,11 @@ class PersonInfoViewController: NEBaseViewController,
     weak var weakSelf = self
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfNickName(editText) { [weak self] error in
-        if error != nil {
+        if let err = error {
+          if err.code == antiErrorCode {
+            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            return
+          }
           self?.showToastInWindow(NSLocalizedString("setting_nickname_failure", comment: ""))
         } else {
           self?.navigationController?.popViewController(animated: true)
@@ -239,7 +238,11 @@ class PersonInfoViewController: NEBaseViewController,
       gender = value == 0 ? .GENDER_MALE : .GENDER_FEMALE
 
       weakSelf?.viewModel.updateSelfSex(gender) { [weak self] error in
-        if error != nil {
+        if let err = error {
+          if err.code == antiErrorCode {
+            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            return
+          }
           if error?.code == protocolSendFailed {
             self?.showToast(commonLocalizable("network_error"))
           } else {
@@ -275,7 +278,11 @@ class PersonInfoViewController: NEBaseViewController,
     weak var weakSelf = self
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfMobile(editText) { [weak self] error in
-        if error != nil {
+        if let err = error {
+          if err.code == antiErrorCode {
+            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            return
+          }
           self?.showToastInWindow(NSLocalizedString("change_phone_failure", comment: ""))
         } else {
           self?.navigationController?.popViewController(animated: true)
@@ -303,7 +310,11 @@ class PersonInfoViewController: NEBaseViewController,
       }
 
       weakSelf?.viewModel.updateSelfEmail(editText) { [weak self] error in
-        if error != nil {
+        if let err = error {
+          if err.code == antiErrorCode {
+            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            return
+          }
           self?.showToastInWindow(NSLocalizedString("change_email_failure", comment: ""))
         } else {
           self?.navigationController?.popViewController(animated: true)
@@ -320,7 +331,11 @@ class PersonInfoViewController: NEBaseViewController,
     weak var weakSelf = self
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfSign(editText) { [weak self] error in
-        if error != nil {
+        if let err = error {
+          if err.code == antiErrorCode {
+            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            return
+          }
           self?.showToastInWindow(NSLocalizedString("change_sign_failure", comment: ""))
         } else {
           self?.navigationController?.popViewController(animated: true)
@@ -337,7 +352,7 @@ class PersonInfoViewController: NEBaseViewController,
 
   // MARK: UITableViewDelegate, UITableViewDataSource
 
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
       return model.cellModels.count
@@ -345,11 +360,11 @@ class PersonInfoViewController: NEBaseViewController,
     return 0
   }
 
-  func numberOfSections(in tableView: UITableView) -> Int {
+  public func numberOfSections(in tableView: UITableView) -> Int {
     viewModel.sectionData.count
   }
 
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
@@ -361,19 +376,19 @@ class PersonInfoViewController: NEBaseViewController,
     return UITableViewCell()
   }
 
-  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     if let block = model.cellClick {
       block()
     }
   }
 
-  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     return model.rowHeight
   }
 
-  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     if section == 0 {
       return 0
     }
@@ -386,9 +401,23 @@ class PersonInfoViewController: NEBaseViewController,
     return 0
   }
 
-  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+  public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let headerView = UIView()
     headerView.backgroundColor = .ne_lightBackgroundColor
     return headerView
+  }
+
+  // MARK: - NEContactListener
+
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      if contact.user?.accountId == IMKitClient.instance.account() {
+        viewModel.userInfo = contact
+        viewModel.refreshData()
+        tableView.reloadData()
+      }
+    }
   }
 }

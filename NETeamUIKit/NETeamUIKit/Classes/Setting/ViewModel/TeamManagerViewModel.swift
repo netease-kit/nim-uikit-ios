@@ -195,7 +195,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
     model.cellModels.append(contentsOf: [editTeamPermission, invitePermission, atAllPermission])
 
-    if IMKitConfigCenter.shared.topEnable {
+    if IMKitConfigCenter.shared.enableTopMessage {
       // 谁可以置顶消息
       let topMessagePermission = SettingCellModel()
       topMessagePermission.cellName = localizable("who_can_top_message")

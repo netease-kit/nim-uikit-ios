@@ -46,3 +46,6 @@
 "tip"="[提醒消息]";
 "leave_team"="离开群聊";
 "leave_team_desc"="您已被移除群聊或群聊已解散";
+
+"ai_user_pin_top"="PIN置顶";
+"ai_user_cancel_pin_top"="取消PIN置顶";

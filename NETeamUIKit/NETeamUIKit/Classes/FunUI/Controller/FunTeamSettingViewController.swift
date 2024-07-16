@@ -30,7 +30,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     return arrowImageView
   }()
 
-  /// 分割线
+  /// 分隔线
   lazy var dividerLineView: UIView = {
     let dividerLineView = UIView()
     dividerLineView.translatesAutoresizingMaskIntoConstraints = false

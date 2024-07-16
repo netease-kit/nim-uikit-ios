@@ -64,6 +64,7 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
     }
     getData()
     setupSubviews()
+    navigationView.moreButton.isHidden = true
   }
 
   func getData() {

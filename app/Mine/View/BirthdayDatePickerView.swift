@@ -24,7 +24,7 @@ public class BirthdayDatePickerView: UIView {
   lazy var sureButton: UIButton = {
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(NSLocalizedString("confirm", comment: ""), for: .normal)
+    button.setTitle(commonLocalizable("ok"), for: .normal)
     button.setTitleColor(UIColor.ne_blueText, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     button.addTarget(self, action: #selector(sureBtnClick), for: .touchUpInside)

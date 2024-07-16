@@ -107,6 +107,16 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     tableView.separatorStyle = .none
     tableView.delegate = self
     tableView.dataSource = self
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 

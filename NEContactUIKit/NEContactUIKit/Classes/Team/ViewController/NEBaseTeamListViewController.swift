@@ -9,19 +9,38 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamListViewController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource {
-  var tableView = UITableView(frame: .zero, style: .plain)
-  var viewModel = TeamListViewModel()
   var isClickCallBack = false
+  var viewModel = TeamListViewModel()
+  public var tableViewTopAnchor: NSLayoutConstraint?
+
+  lazy var tableView: UITableView = {
+    var tableView = UITableView(frame: .zero, style: .plain)
+    tableView.separatorStyle = .none
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tableViewTopAnchor?.constant = topConstant
+  }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
-    navigationController?.interactivePopGestureRecognizer?.delegate = self
-    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
-      navigationController?.isNavigationBarHidden = false
-    } else {
-      navigationController?.isNavigationBarHidden = true
-    }
 
     commonUI()
     loadData()
@@ -30,11 +49,10 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
       weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.teamList.count ?? 0) > 0
       weakSelf?.tableView.reloadData()
     }
+    navigationView.moreButton.isHidden = true
   }
 
-  func commonUI() {
-    title = localizable("my_teams")
-    navigationView.navTitle.text = title
+  func initNav() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -45,30 +63,21 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
     backItem.accessibilityIdentifier = "id.backArrow"
 
     navigationItem.leftBarButtonItem = backItem
-
-    navigationView.translatesAutoresizingMaskIntoConstraints = false
-    navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
     navigationView.moreButton.isHidden = true
-    view.addSubview(navigationView)
-    NSLayoutConstraint.activate([
-      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      navigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
-    ])
+  }
 
-    tableView.separatorStyle = .none
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.translatesAutoresizingMaskIntoConstraints = false
+  func commonUI() {
+    title = localizable("my_teams")
+    initNav()
+
     view.addSubview(tableView)
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-    tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
 
     emptyView.setText(localizable("team_empty"))
     view.addSubview(emptyView)
@@ -119,9 +128,5 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
         closure: nil
       )
     }
-  }
-
-  func backEvent() {
-    navigationController?.popViewController(animated: true)
   }
 }

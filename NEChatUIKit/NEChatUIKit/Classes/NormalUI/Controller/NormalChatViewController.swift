@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -9,13 +10,7 @@ import UIKit
 open class NormalChatViewController: ChatViewController {
   override public init(conversationId: String) {
     super.init(conversationId: conversationId)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: false)
-
-    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
-    topMessageView.layer.borderColor = UIColor(hexString: "#E8EAED").cgColor
-    topMessageView.layer.borderWidth = 1
   }
 
   public required init?(coder: NSCoder) {
@@ -24,6 +19,12 @@ open class NormalChatViewController: ChatViewController {
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.navigationBar.backgroundColor = .white
+    navigationView.backgroundColor = .white
+
+    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
+    topMessageView.layer.borderColor = UIColor(hexString: "#E8EAED").cgColor
+    topMessageView.layer.borderWidth = 1
   }
 
   override open func getMenuView() -> NEBaseChatInputView {
@@ -45,8 +46,8 @@ open class NormalChatViewController: ChatViewController {
   }
 
   /// 获取@列表视图控制器 - 协同版
-  override func getUserSelectVC() -> NEBaseSelectUserViewController {
-    SelectUserViewController(sessionId: viewModel.sessionId, showSelf: false)
+  override func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
+    SelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
   open func getMessageModel(model: MessageModel) {
@@ -58,6 +59,21 @@ open class NormalChatViewController: ChatViewController {
       )
       model.height += normalMoreHeight
     }
+  }
+
+  @discardableResult
+  override open func expandMoreAction() -> [NEMoreItemModel] {
+    var items = super.expandMoreAction()
+
+    items.removeAll { item in
+      if item.type == .photo {
+        return true
+      }
+      return false
+    }
+
+    chatInputView.chatAddMoreView.configData(data: items)
+    return items
   }
 
   override open func expandButtonDidClick() {
@@ -97,14 +113,21 @@ open class NormalChatViewController: ChatViewController {
   func checkAndRestoreReplyView() {
     if viewModel.isReplying == true, replyView.superview == nil {
       view.addSubview(replyView)
-      replyView.closeButton.addTarget(self, action: #selector(closeReply), for: .touchUpInside)
-      replyView.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        replyView.leadingAnchor.constraint(equalTo: chatInputView.leadingAnchor),
-        replyView.trailingAnchor.constraint(equalTo: chatInputView.trailingAnchor),
-        replyView.bottomAnchor.constraint(equalTo: chatInputView.topAnchor),
-        replyView.heightAnchor.constraint(equalToConstant: 36),
-      ])
+      if IMKitConfigCenter.shared.enableAIUser {
+        NSLayoutConstraint.activate([
+          replyView.leadingAnchor.constraint(equalTo: translateLanguageView.leadingAnchor),
+          replyView.trailingAnchor.constraint(equalTo: translateLanguageView.trailingAnchor),
+          replyView.bottomAnchor.constraint(equalTo: translateLanguageView.topAnchor),
+          replyView.heightAnchor.constraint(equalToConstant: 36),
+        ])
+      } else {
+        NSLayoutConstraint.activate([
+          replyView.leadingAnchor.constraint(equalTo: chatInputView.leadingAnchor),
+          replyView.trailingAnchor.constraint(equalTo: chatInputView.trailingAnchor),
+          replyView.bottomAnchor.constraint(equalTo: chatInputView.topAnchor),
+          replyView.heightAnchor.constraint(equalToConstant: 36),
+        ])
+      }
     }
   }
 
@@ -142,5 +165,13 @@ open class NormalChatViewController: ChatViewController {
       normalInputHeight = 150
     }
     bottomViewTopAnchor?.constant = -(normalInputHeight + currentKeyboardHeight)
+  }
+
+  override open func didSwitchLanguageClick(_ currentLanguage: String?) {
+    let languageSelectController = SelectLanguageViewController()
+    if let current = currentLanguage {
+      languageSelectController.currentContent = current
+    }
+    showLanguageContentController(languageSelectController)
   }
 }

@@ -4,16 +4,18 @@
 
 import Foundation
 import NEChatKit
+import NECommonUIKit
 import NECoreIM2Kit
 import NIMSDK
 
 protocol UserSettingViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
   func didError(_ error: Error)
+  func didShowErrorMsg(_ msg: String)
 }
 
 @objcMembers
-open class UserSettingViewModel: NSObject, NEConversationListener {
+open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinListener {
   var chatRepo = ChatRepo.shared
   var contactRepo = ContactRepo.shared
   var conversationRepo = ConversationRepo.shared
@@ -29,11 +31,17 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
 
   override public init() {
     super.init()
-    conversationRepo.addListener(self)
+    conversationRepo.addConversationListener(self)
+    if IMKitConfigCenter.shared.enableAIUser {
+      NEAIUserPinManager.shared.addPinManagerListener(self)
+    }
   }
 
   deinit {
-    conversationRepo.removeListener(self)
+    conversationRepo.removeConversationListener(self)
+    if IMKitConfigCenter.shared.enableAIUser {
+      NEAIUserPinManager.shared.removePinManagerListener(self)
+    }
   }
 
   private let className = "UserSettingViewModel"
@@ -86,6 +94,12 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
 
     weak var weakSelf = self
     remind.swichChange = { isOpen in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+        remind.switchOpen = !isOpen
+        weakSelf?.delegate?.didNeedRefreshUI()
+        return
+      }
       if let uid = weakSelf?.userInfo?.user?.accountId {
         let muteMode: V2NIMP2PMessageMuteMode = isOpen ? .NIM_P2P_MESSAGE_MUTE_MODE_OFF : .NIM_P2P_MESSAGE_MUTE_MODE_ON
         weakSelf?.settingRepo.setP2PMessageMuteMode(accountId: uid, muteMode: muteMode) { error in
@@ -101,13 +115,18 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
 
     let setTop = UserSettingCellModel()
     setTop.cellName = chatLocalizable("session_set_top")
-//    setTop.cornerType = .bottomRight.union(.bottomLeft)
 
     if let currentConversation = conversation {
       setTop.switchOpen = currentConversation.stickTop
     }
 
     setTop.swichChange = { isOpen in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+        setTop.switchOpen = !isOpen
+        weakSelf?.delegate?.didNeedRefreshUI()
+        return
+      }
       if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
         if isOpen {
           weakSelf?.conversationRepo.setStickTop(cid, true) { error in
@@ -133,11 +152,41 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
         }
       }
     }
-    if IMKitConfigCenter.shared.pinEnable {
+    if IMKitConfigCenter.shared.enablePinMessage {
       cellDatas.append(mark)
     }
     cellDatas.append(remind)
     cellDatas.append(setTop)
+
+    if let user = userInfo?.user, let account = user.accountId, let serverExtensions = user.serverExtension, let jsonObject = NECommonUtil.getDictionaryFromJSONString(serverExtensions) {
+      if jsonObject[aiUserPinKey] != nil {
+        let changePin = UserSettingCellModel()
+        changePin.cellName = chatLocalizable("ai_user_pin_top")
+        if NEAIUserPinManager.shared.checkoutUnPinAIUser(user) == true {
+          changePin.switchOpen = true
+        } else {
+          changePin.switchOpen = false
+        }
+        changePin.swichChange = { isOpen in
+          if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+            weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+            changePin.switchOpen = !isOpen
+            weakSelf?.delegate?.didNeedRefreshUI()
+            return
+          }
+          if isOpen {
+            NEAIUserPinManager.shared.pinAIUser(account) { error, finish in
+              NEALog.infoLog(ModuleName, desc: #function + " pinAIUser error: \(String(describing: error)), finish: \(finish)")
+            }
+          } else {
+            NEAIUserPinManager.shared.unpinAIUser(account) { error, finish in
+              NEALog.infoLog(ModuleName, desc: #function + " unpinAIUser error: \(String(describing: error)), finish: \(finish)")
+            }
+          }
+        }
+        cellDatas.append(changePin)
+      }
+    }
 
     setAudoType()
   }
@@ -175,5 +224,10 @@ open class UserSettingViewModel: NSObject, NEConversationListener {
         continue
       }
     }
+  }
+
+  public func userInfoDidChange() {
+    getSectionDatas()
+    delegate?.didNeedRefreshUI()
   }
 }

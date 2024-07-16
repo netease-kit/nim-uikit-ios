@@ -294,8 +294,8 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     }
   }
 
-  override open func uploadProgress(byRight: Bool, _ progress: UInt) {
-    let stateView = byRight ? stateViewRight : stateViewLeft
+  override open func uploadProgress(_ progress: UInt) {
+    let stateView = stateViewLeft.isHidden ? stateViewRight : stateViewLeft
     stateView.setProgress(Float(progress) / 100)
   }
 }

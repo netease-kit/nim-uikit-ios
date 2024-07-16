@@ -14,7 +14,7 @@ public protocol ContactViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
+open class ContactViewModel: NSObject {
   typealias RefreshBlock = () -> Void
   public var contacts: [ContactSection] = []
   public var indexs: [String]?
@@ -40,12 +40,12 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
       desc: #function + ", contactHeaders.count: \(contactHeaders?.count ?? 0)"
     )
 
-    contactRepo.addContactListener(self)
-
     if let headSection = headerSection(headerItem: contactHeaders) {
       self.contactHeaders = headSection
       contacts.append(headSection)
     }
+
+    contactRepo.addContactListener(self)
 
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.addListener(self)
@@ -53,6 +53,7 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
   }
 
   deinit {
+    contactRepo.removeContactListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.removeListener(self)
     }
@@ -95,7 +96,7 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
     contactRepo.getContactList { [weak self] friends, error in
       NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
       let contactList = self?.formatData(friends, filters)
-      completion(contactList, error as? NSError)
+      completion(contactList, error)
     }
   }
 
@@ -219,8 +220,23 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
 
     return indexs
   }
+}
 
-  // MARK: - NEContactListener
+// MARK: - NEContactListener
+
+extension ContactViewModel: NEContactListener {
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      if let accid = contact.user?.accountId,
+         !NEFriendUserCache.shared.isBlockAccount(accid) {
+        loadData { [weak self] _, _ in
+          self?.delegate?.reloadTableView()
+        }
+      }
+    }
+  }
 
   /// 从通讯录中移除
   /// - Parameter accountId: 好友 Id
@@ -274,20 +290,6 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
     getAddApplicationUnreadCount(nil)
   }
 
-  /// 好友信息变更回调
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    guard let accountId = friendInfo.accountId else { return }
-
-    if NEFriendUserCache.shared.isBlockAccount(accountId) {
-      return
-    }
-
-    loadData { [weak self] _, _ in
-      self?.delegate?.reloadTableView()
-    }
-  }
-
   /// 黑名单添加回调
   /// - Parameter user: 用户信息
   public func onBlockListAdded(_ user: V2NIMUser) {
@@ -305,9 +307,11 @@ open class ContactViewModel: NSObject, NEContactListener, NEEventListener {
       }
     }
   }
+}
 
-  // MARK: - NEEventListener
+// MARK: - NEEventListener
 
+extension ContactViewModel: NEEventListener {
   /// 订阅在线状态
   public func subscribeOnlineStatus() {
     var subscribeList: [String] = []

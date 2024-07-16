@@ -11,6 +11,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didStyleClick()
   func didClickCleanCache()
   func didClickConfigTest()
+  func didClickSDKConfig()
 }
 
 @objcMembers
@@ -62,6 +63,16 @@ public class MineSettingViewModel: NSObject {
       }
       model.cellModels.append(configTest)
     #endif
+
+    /*
+     let sdkConfigModel = SettingCellModel()
+     sdkConfigModel.cellName = "私有云环境配置"
+     sdkConfigModel.type = SettingCellType.SettingArrowCell.rawValue
+     sdkConfigModel.cellClick = {
+       weakSelf?.delegate?.didClickSDKConfig()
+     }
+     model.cellModels.append(sdkConfigModel)
+     */
 
     model.setCornerType()
     return model

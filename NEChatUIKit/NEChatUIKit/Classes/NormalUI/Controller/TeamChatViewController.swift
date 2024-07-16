@@ -35,7 +35,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
 
   deinit {
     NotificationCenter.default.removeObserver(self)
-    ChatTeamCache.shared.removeAllTeamInfo()
+    NETeamUserManager.shared.removeAllTeamInfo()
   }
 
   override open func viewWillAppear(_ animated: Bool) {
@@ -76,7 +76,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
       if let vm = self?.viewModel as? TeamChatViewModel {
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
-            if IMKitConfigCenter.shared.dismissTeamDeleteConversation == true, team.isValidTeam == false {
+            if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == true, team.isValidTeam == false {
               self?.showSingleAlert(message: coreLoader.localizable("team_not_exist")) {
                 NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
@@ -124,7 +124,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
   open func updateTeamTitle(_ noti: Notification) {
     if let tid = noti.userInfo?["teamId"] as? String,
        tid == viewModel.sessionId,
-       let team = ChatTeamCache.shared.getTeamInfo() {
+       let team = NETeamUserManager.shared.getTeamInfo() {
       updateTeamInfo(team: team)
     }
   }
@@ -133,7 +133,6 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
   /// - Parameter team: 群聊信息
   open func updateTeamInfo(team: V2NIMTeam) {
     title = team.name
-    ChatTeamCache.shared.updateTeamInfo(team)
     setMute(team: team)
   }
 
@@ -228,7 +227,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
   public func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember]) {
-    if let team = ChatTeamCache.shared.getTeamInfo() {
+    if let team = NETeamUserManager.shared.getTeamInfo() {
       setMute(team: team)
     }
   }

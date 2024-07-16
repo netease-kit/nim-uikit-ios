@@ -84,7 +84,6 @@ open class NotificationMessageUtils: NSObject {
         } else {
           text = fromName + chatLocalizable("pass") + toNamestext
         }
-
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_OWNER_TRANSFER:
         text = fromName + chatLocalizable("transfer") + toFirstName
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_ADD_MANAGER:
@@ -95,7 +94,6 @@ open class NotificationMessageUtils: NSObject {
         text = fromName + chatLocalizable("accept") + toNamestext
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_BANNED_TEAM_MEMBER:
         text = "\(toNamestext) \(content.chatBanned ? chatLocalizable("mute") : chatLocalizable("not_mute"))"
-
       default:
         text = chatLocalizable("unknown_system_message")
       }
@@ -110,7 +108,7 @@ open class NotificationMessageUtils: NSObject {
       if sourceId == IMKitClient.instance.account() {
         return chatLocalizable("You") + " "
       } else {
-        return ChatTeamCache.shared.getShowName(sourceId)
+        return NETeamUserManager.shared.getShowName(sourceId)
       }
     } else {
       return ""
@@ -128,7 +126,7 @@ open class NotificationMessageUtils: NSObject {
       if targetID == IMKitClient.instance.account() {
         toNames.append(chatLocalizable("You") + " ")
       } else {
-        let name = ChatTeamCache.shared.getShowName(targetID)
+        let name = NETeamUserManager.shared.getShowName(targetID)
         toNames.append(name)
       }
     }
@@ -146,7 +144,7 @@ open class NotificationMessageUtils: NSObject {
   }
 
   open class func teamType(message: V2NIMMessage) -> TeamType {
-    if let team = ChatTeamCache.shared.getTeamInfo() {
+    if let team = NETeamUserManager.shared.getTeamInfo() {
       if team.isDisscuss() == true {
         return .discussTeam
       } else {

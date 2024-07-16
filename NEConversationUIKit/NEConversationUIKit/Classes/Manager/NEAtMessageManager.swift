@@ -45,7 +45,9 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 初始化
   public static func setupInstance() {
-    NEAtMessageManager.instance = NEAtMessageManager()
+    if NEAtMessageManager.instance == nil {
+      NEAtMessageManager.instance = NEAtMessageManager()
+    }
   }
 
   /// 登录状态变更
@@ -98,10 +100,10 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 判断是否是当前用户
   ///  - Parameter sessionId: 会话id
   ///  - Returns: 是否是当前用户
-  open func isAtCurrentUser(sessionId: String) -> Bool {
+  open func isAtCurrentUser(conversationId: String) -> Bool {
     let dic = getMessageDic()
 
-    if let model = dic[sessionId], model.isRead == false {
+    if let model = dic[conversationId], model.isRead == false {
       NEALog.infoLog(className(), desc: "read == false")
       return true
     }
@@ -159,12 +161,12 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     for message in messages {
       if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
         if dic[atAllKey] != nil, message.senderId != currentAccid {
-          weakSelf?.addAtRecord(message: message, record: &temDic)
+          weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
           isExistAtMessage = true
           continue
         }
         if dic[currentAccid] != nil {
-          weakSelf?.addAtRecord(message: message, record: &temDic)
+          weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
           isExistAtMessage = true
           continue
         }
@@ -204,12 +206,12 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
             messages?.forEach { message in
               if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
                 if dic[atAllKey] != nil, message.isSelf == false {
-                  weakSelf?.addAtRecord(message: message, record: &temDic)
+                  weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
                   isExistAtMessage = true
                   return
                 }
                 if dic[accid] != nil {
-                  weakSelf?.addAtRecord(message: message, record: &temDic)
+                  weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
                   isExistAtMessage = true
                   return
                 }
@@ -313,6 +315,60 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
       }
     }
     return didRemove
+  }
+
+  /// 添加at消息记录(有时间错比较)
+  /// - Parameter message: 消息
+  /// - Parameter record: at 消息记录缓存
+  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) {
+    guard let conversationId = message.conversationId else {
+      NEALog.infoLog(className(), desc: #function + " addAtRecord conversationId nil ")
+      return
+    }
+
+    let semaphore = DispatchSemaphore(value: 0)
+    var compareTimestap: Double = 0
+    ConversationRepo.shared.getConversationReadTime(conversationId) { [weak self] timestap, error in
+      if error != nil {
+        NEALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime error : \(error?.localizedDescription ?? "")")
+      }
+
+      if let t = timestap {
+        compareTimestap = t
+        NEALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime time \(t)")
+      }
+      semaphore.signal()
+    }
+
+    semaphore.wait()
+
+    if compareTimestap > 0, message.createTime > compareTimestap {
+      if let atMeRecord = record[message.conversationId ?? ""] {
+        let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
+        if lastTime < message.createTime {
+          let atMessage = AtMessageModel()
+          atMeRecord.isRead = false
+          atMessage.messageId = message.messageClientId
+          atMeRecord.lastTime = NSNumber(value: message.createTime)
+          atMessage.messageTime = NSNumber(value: message.createTime)
+          atMeRecord.atMessages[message.messageClientId ?? ""] = NSNumber(value: message.createTime)
+          if let conversationId = message.conversationId {
+            record[conversationId] = atMeRecord
+          }
+        }
+      } else {
+        let atMeRecord = AtMEMessageRecord()
+        let atMessage = AtMessageModel()
+        atMeRecord.isRead = false
+        atMessage.messageId = message.messageClientId
+        atMeRecord.lastTime = NSNumber(value: message.createTime)
+        atMessage.messageTime = NSNumber(value: message.createTime)
+        atMeRecord.atMessages[message.messageClientId ?? ""] = NSNumber(value: message.createTime)
+        if let conversationId = message.conversationId {
+          record[conversationId] = atMeRecord
+        }
+      }
+    }
   }
 
   /// 添加at消息记录

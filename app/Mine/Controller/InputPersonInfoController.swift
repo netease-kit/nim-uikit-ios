@@ -93,10 +93,10 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
 
   /// 初始化UI(导航栏)
   func initialConfig() {
-    addRightAction(NSLocalizedString("save", comment: ""), #selector(saveName), self)
+    addRightAction(commonLocalizable("complete"), #selector(saveName), self)
 
     view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
-    navigationView.setMoreButtonTitle(NSLocalizedString("save", comment: ""))
+    navigationView.setMoreButtonTitle(commonLocalizable("complete"))
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     if NEStyleManager.instance.isNormalStyle() {

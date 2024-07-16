@@ -28,6 +28,20 @@ open class P2PChatViewController: NormalChatViewController {
     super.init(coder: coder)
   }
 
+  /// 添加子类监听
+  override open func addListener() {
+    super.addListener()
+    ContactRepo.shared.addContactListener(self)
+    NEP2PChatUserCache.shared.addListener(self)
+  }
+
+  /// 移除子类监听
+  override open func removeListener() {
+    super.removeListener()
+    ContactRepo.shared.removeContactListener(self)
+    NEP2PChatUserCache.shared.removeListener(self)
+  }
+
   override open var title: String? {
     didSet {
       super.title = title
@@ -96,5 +110,39 @@ open class P2PChatViewController: NormalChatViewController {
         viewModel.sendInputTypingState()
       }
     }
+  }
+}
+
+// MARK: - NEContactListener
+
+extension P2PChatViewController: NEContactListener {
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      if let accid = contact.user?.accountId, contact.user?.accountId == viewModel.sessionId {
+        // 好友添加，则从 NEP2PChatUserCache 中移除信息缓存
+        if changeType == .addFriend {
+          NEP2PChatUserCache.shared.removeUserInfo(viewModel.sessionId)
+        }
+
+        // 好友被删除，则信息缓存移至 NEP2PChatUserCache
+        if changeType == .deleteFriend {
+          contact.friend = nil
+          NEP2PChatUserCache.shared.updateUserInfo(contact)
+        }
+        onUserOrFriendInfoChanged(accid)
+      }
+    }
+  }
+}
+
+// MARK: - NEP2PChatUserCacheListener
+
+extension P2PChatViewController: NEP2PChatUserCacheListener {
+  /// 非好友单聊信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onUserInfoUpdate(_ accountId: String) {
+    onUserOrFriendInfoChanged(accountId)
   }
 }

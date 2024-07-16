@@ -12,9 +12,6 @@ open class ContactSelectedViewController: NEBaseContactSelectedViewController {
   override public init(filterUsers: Set<String>? = nil) {
     super.init(filterUsers: filterUsers)
     customCells = [ContactCellType.ContactPerson.rawValue: ContactSelectedCell.self]
-    view.backgroundColor = .ne_backcolor
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
@@ -23,6 +20,9 @@ open class ContactSelectedViewController: NEBaseContactSelectedViewController {
 
   override open func setupUI() {
     super.setupUI()
+    view.backgroundColor = .ne_backcolor
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
 
     collectionView.register(
       ContactUnCheckCell.self,

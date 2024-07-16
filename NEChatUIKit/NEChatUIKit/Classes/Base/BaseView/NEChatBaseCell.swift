@@ -17,9 +17,7 @@ open class NEChatBaseCell: UITableViewCell {
     super.init(coder: coder)
   }
 
-  open func uploadProgress(byRight: Bool, _ progress: UInt) {
-    fatalError("override in sub class")
-  }
+  open func uploadProgress(_ progress: UInt) {}
 
   open func setModel(_ model: MessageContentModel) {}
   open func setModel(_ model: MessageContentModel, _ isSend: Bool = false) {}

@@ -11,13 +11,17 @@ open class NormalMultiForwardViewController: MultiForwardViewController {
                        _ attachmentFilePath: String,
                        _ attachmentMD5: String?) {
     super.init(attachmentUrl, attachmentFilePath, attachmentMD5)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: false)
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
   }
 
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,

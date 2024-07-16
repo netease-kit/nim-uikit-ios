@@ -13,13 +13,21 @@ open class P2PChatViewModel: ChatViewModel {
   /// 重写初始化方法
   override init(conversationId: String) {
     super.init(conversationId: conversationId)
-    chatRepo.addNotiListener(self)
   }
 
   /// 重写初始化方法
   override init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
+  }
+
+  /// 添加子类监听
+  override open func addListener() {
+    super.addListener()
     chatRepo.addNotiListener(self)
+  }
+
+  deinit {
+    chatRepo.removeNotiListener(self)
   }
 
   /// 重写 获取用户展示名称
@@ -33,7 +41,7 @@ open class P2PChatViewModel: ChatViewModel {
     if NEFriendUserCache.shared.isFriend(accountId) {
       return NEFriendUserCache.shared.getShowName(accountId, showAlias)
     } else {
-      return ChatUserCache.shared.getShowName(accountId, showAlias)
+      return NEP2PChatUserCache.shared.getShowName(accountId, showAlias)
     }
   }
 
@@ -50,7 +58,7 @@ open class P2PChatViewModel: ChatViewModel {
       for user in users ?? [] {
         // 非好友，单独缓存
         if let uid = user.user?.accountId, !NEFriendUserCache.shared.isFriend(uid) {
-          ChatUserCache.shared.updateUserInfo(user)
+          NEP2PChatUserCache.shared.updateUserInfo(user)
         }
       }
       completion()

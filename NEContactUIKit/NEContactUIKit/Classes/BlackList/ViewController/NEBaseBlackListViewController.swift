@@ -9,15 +9,15 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,
-  BlackListCellDelegate, UIGestureRecognizerDelegate, BlackListViewModelDelegate {
-  public let navigationView = NENavigationView()
-  var tableView = UITableView(frame: .zero, style: .plain)
+open class NEBaseBlackListViewController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource,
+  BlackListCellDelegate, BlackListViewModelDelegate {
   var viewModel = BlackListViewModel()
+  public var tableViewTopAnchor: NSLayoutConstraint?
 
   public lazy var headView: UIView = {
     let headView =
       UIView(frame: CGRect(x: 0, y: 0, width: Int(NEConstant.screenWidth), height: 40))
+    headView.addSubview(contentLabel)
     return headView
   }()
 
@@ -31,10 +31,34 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     return contentLabel
   }()
 
+  lazy var tableView: UITableView = {
+    let tableView = UITableView(frame: .zero, style: .plain)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.separatorStyle = .none
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.tableHeaderView = headView
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
+    return tableView
+  }()
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tableViewTopAnchor?.constant = topConstant
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .white
-    navigationController?.interactivePopGestureRecognizer?.delegate = self
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationController?.isNavigationBarHidden = false
     } else {
@@ -46,10 +70,7 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     loadData()
   }
 
-  /// UI 初始化
-  func commonUI() {
-    title = localizable("blacklist")
-    navigationView.navTitle.text = title
+  func initNav() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -65,37 +86,27 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
       image: addImage,
       style: .plain,
       target: self,
-      action: #selector(addBlack)
+      action: #selector(toSetting)
     )
     addItem.accessibilityIdentifier = "id.threePoint"
     navigationItem.rightBarButtonItem = addItem
 
-    navigationView.translatesAutoresizingMaskIntoConstraints = false
-    navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
     navigationView.setMoreButtonImage(UIImage.ne_imageNamed(name: "add"))
-    navigationView.addMoreButtonTarget(target: self, selector: #selector(addBlack))
-    view.addSubview(navigationView)
-    NSLayoutConstraint.activate([
-      navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      navigationView.topAnchor.constraint(equalTo: view.topAnchor),
-      navigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
-    ])
+  }
 
-    tableView.separatorStyle = .none
-    tableView.delegate = self
-    tableView.dataSource = self
-    tableView.translatesAutoresizingMaskIntoConstraints = false
+  /// UI 初始化
+  func commonUI() {
+    title = localizable("blacklist")
+    initNav()
+
     view.addSubview(tableView)
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
-
-    headView.addSubview(contentLabel)
-    tableView.tableHeaderView = headView
   }
 
   func loadData() {
@@ -112,15 +123,11 @@ open class NEBaseBlackListViewController: UIViewController, UITableViewDelegate,
     UITableViewCell()
   }
 
-  func backEvent() {
-    navigationController?.popViewController(animated: true)
-  }
-
   open func getContactSelectVC() -> NEBaseContactSelectedViewController {
     NEBaseContactSelectedViewController()
   }
 
-  func addBlack() {
+  override open func toSetting() {
     let contactSelectVC = getContactSelectVC()
     navigationController?.pushViewController(contactSelectVC, animated: true)
     contactSelectVC.callBack = { [weak self] selectMemberarray in

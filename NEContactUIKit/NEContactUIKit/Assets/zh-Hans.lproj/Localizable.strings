@@ -16,6 +16,7 @@
 
 "blacklist"="黑名单";
 "my_teams"="我的群聊";
+"my_ai_user"="我的数字人";
 "save"="保存";
 "input_noteName"="请输入备注名";
 "birthday"="生日";
@@ -43,6 +44,7 @@
 "user_not_exist"="该用户不存在";
 "team_not_exist"="该群不存在";
 "no_friend"="暂无好友";
+"no_ai_user"="暂无数字人";
 "session_empty"="暂无会话";
 "team_empty"="暂无群组";
 "chat"="聊天";
@@ -62,7 +64,6 @@
 "selected"="已选";
 "multi_select"="多选";
 "single_select"="单选";
-"complete"="完成";
 "choose_one_chat"="选择一个聊天";
 "exceeded_limit"="超出%d人限制";
 "choose_max_limit"="最多只能选择%d个会话";
@@ -73,3 +74,6 @@
 "network_error"="当前网络不可用，请检查你的网络设置";
 
 "black_tip"="   你不会收到列表中任何联系人的消息";
+
+"contact_friend"="好友";
+"contact_ai_user"="数字人";

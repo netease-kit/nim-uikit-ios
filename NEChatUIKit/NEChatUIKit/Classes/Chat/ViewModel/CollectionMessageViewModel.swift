@@ -91,6 +91,53 @@ class CollectionMessageViewModel: NSObject {
     return retArray
   }
 
+  /// 获取请求大模型的内容
+  /// - Parameters:
+  ///   - text: 请求/响应的文本内容
+  ///   - type: 类型
+  /// - Returns: 请求大模型的内容
+  open func getAIModelCallContent(_ text: String?,
+                                  _ type: V2NIMAIModelCallContentType) -> V2NIMAIModelCallContent {
+    let content = V2NIMAIModelCallContent()
+    content.msg = text ?? ""
+    content.type = type
+    return content
+  }
+
+  /// 获取消息发送参数
+  /// - Parameters:
+  ///   - aiUserAccid: 数字人 id
+  ///   - message: 消息
+  /// - Returns: 消息发送参数
+  func getSendMessageParams(_ conversationId: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+    let params = chatRepo.getSendMessageParams()
+    guard let cid = conversationId,
+          let aiAccid = V2NIMConversationIdUtil.conversationTargetId(cid),
+          NEAIUserManager.shared.isAIUser(aiAccid) else {
+      return params
+    }
+
+    let aiConfig = V2NIMMessageAIConfigParams()
+    aiConfig.accountId = aiAccid
+
+    if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
+      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+    }
+
+    if message.messageType == .MESSAGE_TYPE_CUSTOM,
+       let type = NECustomUtils.typeOfCustomMessage(message.attachment),
+       type == customRichTextType {
+      let title = NECustomUtils.titleOfRichText(message.attachment)
+      let body = NECustomUtils.bodyOfRichText(message.attachment)
+      let text = (title ?? "") + (body ?? "")
+      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+    }
+
+    params.aiConfig = aiConfig
+
+    return params
+  }
+
   /// 发送文本消息
   /// - Parameter text: 文本内容
   /// - Parameter conversationId: 会话ID
@@ -100,9 +147,13 @@ class CollectionMessageViewModel: NSObject {
     if text.count <= 0 {
       return
     }
+
+    let message = MessageUtils.textMessage(text: text)
+    let params = getSendMessageParams(conversationId, message)
     chatRepo.sendMessage(
-      message: MessageUtils.textMessage(text: text),
+      message: message,
       conversationId: conversationId,
+      params: params,
       completion
     )
   }
@@ -120,16 +171,8 @@ class CollectionMessageViewModel: NSObject {
     for conversationId in conversationIds {
       let forwardMessage = MessageUtils.forwardMessage(message: message)
       ChatMessageHelper.clearForwardAtMark(forwardMessage)
-      if forwardMessage.senderId == nil {
-        forwardMessage.senderId = IMKitClient.instance.account()
-      }
-
-      if forwardMessage.conversationId == nil {
-        forwardMessage.conversationId = conversationId
-      }
-
-      ChatProvider.shared.sendMessage(message: forwardMessage, conversationId: conversationId, params: nil) { resut, error, progress in
-      }
+      let params = getSendMessageParams(conversationId, message)
+      chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, params: params, completion)
       if let text = comment, !text.isEmpty {
         sendTextMessage(text, conversationId, completion)
       }

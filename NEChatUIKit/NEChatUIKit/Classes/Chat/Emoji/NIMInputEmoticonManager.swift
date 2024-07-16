@@ -71,10 +71,29 @@ open class NIMInputEmoticonManager: NSObject {
   private var catalogs: [NIMInputEmoticonCatalog]?
   private var classTag = "NIMInputEmoticonManager"
 
+  /// 是否是外部资源
+  private(set) var isCustomEmojResource = false
+
   override public init() {
     super.init()
     parsePlist()
     preloadEmoticonResource()
+  }
+
+  public func setCustomEmojConfig(_ array: NSArray) {
+    var catalogs = [NIMInputEmoticonCatalog]()
+    for dict in array {
+      if let convertDict = dict as? NSDictionary {
+        let info = convertDict["info"] as? [String: Any]
+        let emotions = convertDict["data"] as? NSArray
+        let cataLog = catalogByInfo(
+          info: info as NSDictionary?,
+          emoticonsArray: emotions
+        )
+      }
+    }
+    self.catalogs = catalogs
+    isCustomEmojResource = true
   }
 
   func parsePlist() {
@@ -101,7 +120,7 @@ open class NIMInputEmoticonManager: NSObject {
     let cataLog = NIMInputEmoticonCatalog()
 
     guard let infoDict = info, let emotions = emoticonsArray else {
-      NEALog.errorLog(classTag, desc: "❌info or emoticonsArray is nil")
+      NEALog.errorLog(classTag, desc: "info or emoticonsArray is nil")
       return cataLog
     }
     cataLog.catalogID = infoDict["id"] as? String
@@ -152,7 +171,7 @@ open class NIMInputEmoticonManager: NSObject {
     var emotion: NIMInputEmoticon?
 
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 
@@ -172,7 +191,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByID(emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 
@@ -192,7 +211,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByCatalogID(catalogID: String, emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "❌catalogs is nil")
+      NEALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 

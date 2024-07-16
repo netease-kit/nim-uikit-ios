@@ -63,10 +63,10 @@ public class ContactUIConfig: NSObject {
 @objcMembers
 public class ContactProperties: NSObject {
   /// 头像圆角大小
-  public var avatarCornerRadius = 4.0
+  public var avatarCornerRadius = 0.0
 
   /// 头像类型
-  public var avatarType: NEContactAvatarType?
+  public var avatarType: NEContactAvatarType = .rectangle
 
   // 通讯录好友标题大小
   public var itemTitleSize: CGFloat = 0

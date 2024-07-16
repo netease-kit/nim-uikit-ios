@@ -11,6 +11,7 @@ public protocol TeamMemberSelectViewModelDelegate: NSObject {
   func didNeedRefresh()
 }
 
+@objcMembers
 class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheListener {
   /// 群API单例
   let teamRepo = TeamRepo.shared
@@ -33,11 +34,33 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
     super.init()
     teamRepo.addTeamListener(self)
     NETeamMemberCache.shared.addTeamCacheListener(self)
+    NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
     NETeamMemberCache.shared.removeTeamCacheListener(self)
+  }
+
+  // 点击消息发送者头像
+  /// 拉取最新用户信息后刷新消息发送者信息
+  /// - Parameter noti: 通知对象
+  func didTapHeader(_ noti: Notification) {
+    if let user = noti.object as? NEUserWithFriend,
+       let accid = user.user?.accountId {
+      if NETeamMemberCache.shared.isCurrentMember(accid) {
+        var isDidFind = false
+        for model in showDatas {
+          if let accountId = model.member?.nimUser?.user?.accountId, accountId == accid {
+            model.member?.nimUser = user
+            isDidFind = true
+          }
+        }
+        if isDidFind == true {
+          delegate?.didNeedRefresh()
+        }
+      }
+    }
   }
 
   /// 群信息(包含群成员)
@@ -56,7 +79,15 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
       } else {
         let teamInfo = NETeamInfoModel()
         teamInfo.team = team
-        if let members = NETeamMemberCache.shared.getTeamMemberCache(teamId), team?.memberCount == members.count {
+        if var members = NETeamMemberCache.shared.getTeamMemberCache(teamId), team?.memberCount == members.count {
+          members.removeAll { model in
+            if let account = model.nimUser?.user?.accountId {
+              if NEAIUserManager.shared.isAIUser(account) {
+                return true
+              }
+            }
+            return false
+          }
           teamInfo.users = members
           weakSelf?.teamInfoModel = teamInfo
           weakSelf?.datas.removeAll()
@@ -75,9 +106,18 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
             } else {
               if let members = ms {
                 weakSelf?.splitSelectMembers(members, teamInfo, 150) { error, model in
-                  if let users = model?.users, users.count > 0 {
+                  if var users = model?.users, users.count > 0 {
                     NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
                     NETeamMemberCache.shared.setCacheMembers(teamId, users)
+
+                    users.removeAll { model in
+                      if let account = model.nimUser?.user?.accountId {
+                        if NEAIUserManager.shared.isAIUser(account) {
+                          return true
+                        }
+                      }
+                      return false
+                    }
                     model?.users = users
                   }
                   weakSelf?.teamInfoModel = model

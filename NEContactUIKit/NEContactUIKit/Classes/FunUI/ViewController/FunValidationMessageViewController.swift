@@ -17,13 +17,13 @@ open class FunValidationMessageViewController: NEBaseValidationMessageViewContro
     super.init(coder: coder)
   }
 
-  override open func setupUI() {
-    super.setupUI()
+  override func initNav() {
+    super.initNav()
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),
       style: .done,
       target: self,
-      action: #selector(clearMessage)
+      action: #selector(toSetting)
     )
     clearItem.tintColor = .ne_darkText
     let textAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 16, weight: .regular)]
@@ -32,6 +32,10 @@ open class FunValidationMessageViewController: NEBaseValidationMessageViewContro
     navigationItem.rightBarButtonItem = clearItem
 
     navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
+  }
+
+  override open func setupUI() {
+    super.setupUI()
 
     tableView.register(
       FunSystemNotificationCell.self,

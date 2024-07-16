@@ -122,8 +122,14 @@ open class FunChatMessageReplyCell: FunChatMessageTextCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
-    let replyLabel = isSend ? replyLabelRight : replyLabelLeft
 
+    if model.contentSize.height == fun_chat_min_h {
+      // 单行消息单独设置文本内边距
+      let contentLabel = isSend ? contentLabelRight : contentLabelLeft
+      contentLabel.textContainerInset = UIEdgeInsets(top: 4, left: 0, bottom: 0, right: 0)
+    }
+
+    let replyLabel = isSend ? replyLabelRight : replyLabelLeft
     if let text = model.replyText,
        let font = replyLabel.font {
       replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,

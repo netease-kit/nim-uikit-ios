@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -51,9 +52,9 @@ open class FunMultiForwardViewController: MultiForwardViewController {
 
     let contentWidth = model.contentSize.width
     let contentHeight = model.contentSize.height
-    if contentHeight < 42 {
-      let subHeight = 42 - contentHeight
-      model.contentSize = CGSize(width: contentWidth, height: 42)
+    if contentHeight < fun_chat_min_h {
+      let subHeight = fun_chat_min_h - contentHeight
+      model.contentSize = CGSize(width: contentWidth, height: fun_chat_min_h)
       model.offset = CGFloat(subHeight)
     }
 

@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -14,6 +15,12 @@ open class NEChatUIKitClient: NSObject {
   public var moreAction = [NEMoreItemModel]()
 
   override init() {
+    let photo = NEMoreItemModel()
+    photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
+    photo.title = chatLocalizable("chat_photo")
+    photo.type = .photo
+    moreAction.append(photo)
+
     let picture = NEMoreItemModel()
     picture.image = UIImage.ne_imageNamed(name: "chat_takePicture")
     picture.title = chatLocalizable("chat_takePicture")
@@ -38,6 +45,14 @@ open class NEChatUIKitClient: NSObject {
       rtc.title = chatLocalizable("chat_rtc")
       rtc.type = .rtc
       moreAction.append(rtc)
+    }
+
+    if IMKitConfigCenter.shared.enableAIUser == true {
+      let translate = NEMoreItemModel()
+      translate.image = UIImage.ne_imageNamed(name: "chat_translation")
+      translate.title = chatLocalizable("chat_translate")
+      translate.type = .translate
+      moreAction.append(translate)
     }
   }
 

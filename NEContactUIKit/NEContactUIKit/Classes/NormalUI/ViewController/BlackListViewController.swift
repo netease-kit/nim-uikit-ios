@@ -12,8 +12,6 @@ import UIKit
 open class BlackListViewController: NEBaseBlackListViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
@@ -22,6 +20,9 @@ open class BlackListViewController: NEBaseBlackListViewController {
 
   override func commonUI() {
     super.commonUI()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
+
     tableView.register(
       BlackListCell.self,
       forCellReuseIdentifier: "\(NSStringFromClass(BlackListCell.self))"

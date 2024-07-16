@@ -16,6 +16,7 @@
 
 "blacklist"="Blacklist";
 "my_teams"="My Group";
+"my_ai_user"="My AI User";
 "save"="Save";
 "input_noteName"="Please enter nick name";
 "birthday"="birthday";
@@ -43,6 +44,7 @@
 "user_not_exist"="No contact";
 "team_not_exist"="No team";
 "no_friend"="No Friend";
+"no_ai_user"="NO AI User";
 "session_empty"="No Session";
 "team_empty"="No Team";
 "chat"="Chat";
@@ -62,7 +64,6 @@
 "selected"="Selected";
 "multi_select"="Multi Select";
 "single_select"="Single Select";
-"complete"="Complete";
 "choose_one_chat"="Choose one chat";
 "exceeded_limit"="Exceed the %d person limit";
 "choose_max_limit"="Can only choose %d sessions";
@@ -73,3 +74,6 @@
 "network_error"="Network is not available, please check";
 
 "black_tip"="   You won't receive message from this memberlist";
+
+"contact_friend"="Friend";
+"contact_ai_user"="AI User";

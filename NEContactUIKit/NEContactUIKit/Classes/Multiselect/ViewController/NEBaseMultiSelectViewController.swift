@@ -241,7 +241,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       arrowRight.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5),
     ])
 
-    // 分割线
+    // 分隔线
     let dividerLine = UIView()
     dividerLine.translatesAutoresizingMaskIntoConstraints = false
     dividerLine.backgroundColor = UIColor.ne_backcolor
@@ -298,7 +298,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       recentCollectionView.heightAnchor.constraint(equalToConstant: 84),
     ])
 
-    // 分割线
+    // 分隔线
     let dividerLine = UIView()
     dividerLine.translatesAutoresizingMaskIntoConstraints = false
     dividerLine.backgroundColor = UIColor.ne_backcolor
@@ -432,7 +432,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
 
-    let tabButtonWidth = IMKitConfigCenter.shared.teamEnable ? NEConstant.screenWidth / 3.0 : NEConstant.screenWidth / 2.0
+    let tabButtonWidth = IMKitConfigCenter.shared.enableTeam ? NEConstant.screenWidth / 3.0 : NEConstant.screenWidth / 2.0
 
     view.addSubview(recentButton)
     NSLayoutConstraint.activate([
@@ -450,7 +450,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       friendButton.heightAnchor.constraint(equalTo: recentButton.heightAnchor),
     ])
 
-    if IMKitConfigCenter.shared.teamEnable {
+    if IMKitConfigCenter.shared.enableTeam {
       view.addSubview(teamButton)
       NSLayoutConstraint.activate([
         teamButton.topAnchor.constraint(equalTo: recentButton.topAnchor),
@@ -497,8 +497,15 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.delegate = self
     tableView.dataSource = self
     tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0
+      tableView.sectionHeaderTopPadding = 0.0
     }
     return tableView
   }()
@@ -512,10 +519,17 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.delegate = self
     tableView.dataSource = self
     tableView.separatorStyle = .none
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0
-    }
     tableView.isHidden = true
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -528,10 +542,17 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.delegate = self
     tableView.dataSource = self
     tableView.separatorStyle = .none
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0
-    }
     tableView.isHidden = true
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 

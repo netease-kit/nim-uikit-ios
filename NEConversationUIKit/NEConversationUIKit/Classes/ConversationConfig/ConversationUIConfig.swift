@@ -80,10 +80,10 @@ public class ConversationUIConfig: NSObject {
 @objcMembers
 public class ConversationProperties: NSObject {
   /// 头像圆角大小
-  public var avatarCornerRadius = 4.0
+  public var avatarCornerRadius = 0.0
 
   /// 头像类型
-  public var avatarType: NEConversationAvatarType?
+  public var avatarType: NEConversationAvatarType = .rectangle
 
   /// 未被置顶的会话项的背景色
   public var itemBackground: UIColor?

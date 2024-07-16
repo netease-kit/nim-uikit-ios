@@ -3,9 +3,6 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-//MAKR：common
-"ok"="确认";
-
 //MAKR：message
 "send_picture"="发来了一张图片";
 "send_voice"="发来了一段语音";
@@ -92,7 +89,7 @@
 "operation_select"="多选";
 "operation_collection"="收藏";
 "operation_top"="置顶";
-"operation_untop"="移除置顶";
+"operation_untop"="取消置顶";
 "operation_delete"="删除";
 "operation_recall"="撤回";
 "withdrew_message" = "撤回了一条消息";
@@ -127,7 +124,6 @@
 "cancel"="取消";
 "send_to"="发送给";
 "send"="发送";
-"confirm"="确定";
 "session_record"="的会话记录";
 
 "collection_message"="的收藏消息";
@@ -220,3 +216,14 @@
 "chat_collection_team_tip"="来自于 %@";
 
 "collection_limit"="收藏数已达到限制值";
+"language_title"="将输入内容翻译为";
+
+"translate_use"="使用";
+"translate_sure"="AI处理";
+"ai_translating"="AI处理中...";
+"translate_default"="翻译为...";
+"chat_translate"="翻译";
+"ai_user_pin_top"="PIN置顶";
+"format_not_supported"="暂不支持该格式";
+"request_exception" = "模型请求异常";
+"ai_request_ing" = "大模型请求响应中...";
