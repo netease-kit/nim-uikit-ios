@@ -73,9 +73,9 @@ open class MessageCallRecordModel: MessageContentModel {
     }
 
     let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
-    var h = chat_min_h
-    h = textSize.height + (isAuiodRecord ? 20 : 24)
-    contentSize = CGSize(width: textSize.width + chat_cell_margin * 2, height: h)
+    let contentSizeWidth = textSize.width + chat_cell_margin * 2
+    let contentSizeHeight = textSize.height + (isAuiodRecord ? 20 : 24)
+    contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 }

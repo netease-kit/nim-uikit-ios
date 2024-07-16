@@ -12,12 +12,16 @@ import UIKit
 open class ReadViewController: NEBaseReadViewController {
   override init(message: V2NIMMessage, teamId: String) {
     super.init(message: message, teamId: teamId)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
   }
 
   override open func commonUI() {

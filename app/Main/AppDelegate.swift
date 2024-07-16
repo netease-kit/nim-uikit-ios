@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         return true
     }
     
-        
+    
     func setupInit(){
         
         // 初始化NIMSDK
@@ -39,8 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         option.apnsCername = AppKey.pushCerName
         IMKitClient.instance.setupIM(option)
         
-        // 登录IM之前先初始化 @ 消息监听mananger
-        NEAtMessageManager.setupInstance()
+        NEAIUserManager.shared.setProvider(provider: self)
         
         let account = "<#account#>"
         let token = "<#token#>"
@@ -50,8 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             if let err = error {
                 print("login error in app : ", err.localizedDescription)
             }else {
-                let _ = NEAtMessageManager.instance
-                ChatRouter.setupInit()
+                weakSelf?.initConfig()
                 weakSelf?.initializePage()
             }
         }
@@ -101,59 +99,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func initializePage() {
         self.window?.rootViewController = NETabBarController(true)
-        loadService()
     }
     
-//    regist router
+    func initConfig() {
+        //地图组件初始化
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
+        
+        //呼叫组件初始化
+        let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+        NECallEngine.sharedInstance().setup(setupConfig)
+        NECallEngine.sharedInstance().setTimeout(30)
+        
+        let uiConfig = NECallUIKitConfig()
+        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+    }
+    
+    //    regist router
     func loadService() {
         
-        ContactRouter.register()
-        ChatRouter.register()
-        TeamRouter.register()
-        ConversationRouter.register()
-        if NEStyleManager.instance.isNormalStyle() == false {
-            ContactRouter.registerFun()
-            ChatRouter.registerFun()
-            TeamRouter.registerFun()
-            ConversationRouter.registerFun()
-        }
+        ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
         
         // 自定义示例
         customVerification()
-        
-        //地图map初始化
-        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
-        
-        /* 聊天面板外部扩展示例
-         // 新增未知类型
-        let item = NEMoreItemModel()
-        item.customDelegate = self
-        item.action = #selector(testLog)
-        item.customImage = UIImage(named: "chatSelect")
-        NEChatUIKitClient.instance.moreAction.append(item)
-         
-         // 覆盖已有类型
-         let item = NEMoreItemModel()
-         item.customImage = UIImage(named: "chatSelect")
-         item.type = .rtc
-         item.title = "测试"
-         NEChatUIKitClient.instance.moreAction.append(item)
-         
-         // 移除已有类型
-         // 遍历 NEChatUIKitClient.instance.moreAction， 根据type 移除已有类型
-         */
-        
-        //呼叫组件初始化
-        let option = NERtcCallOptions()
-        option.apnsCerName = AppKey.pushCerName
-        option.isDisableLog = true
-        option.supportAutoJoinWhenCalled = false
-        NERtcCallKit.sharedInstance().setupAppKey(AppKey.appKey, options: option)
-        let uiConfig = NECallUIKitConfig()
-        uiConfig.appKey = AppKey.appKey
-        uiConfig.uiConfig.showCallingSwitchCallType = option.supportAutoJoinWhenCalled
-        NERtcCallKit.sharedInstance().timeOutSeconds = 30
-        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
         
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
@@ -170,52 +137,75 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func customVerification(){
         if NEStyleManager.instance.isNormalStyle() {
             Router.shared.register(PushP2pChatVCRouter) { param in
-              print("param:\(param)")
-              let nav = param["nav"] as? UINavigationController
-              guard let conversationId = param["conversationId"] as? String else {
-                return
-              }
-              let anchor = param["anchor"] as? V2NIMMessage
-              let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
-                
-              for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-                if vc.isKind(of: ChatViewController.self) {
-                  nav?.viewControllers[i] = p2pChatVC
-                  nav?.popToViewController(p2pChatVC, animated: true)
-                  return
+                print("param:\(param)")
+                let nav = param["nav"] as? UINavigationController
+                guard let conversationId = param["conversationId"] as? String else {
+                    return
                 }
-              }
+                let anchor = param["anchor"] as? V2NIMMessage
+                let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
+                
+                for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                    if vc.isKind(of: ChatViewController.self) {
+                        nav?.viewControllers[i] = p2pChatVC
+                        nav?.popToViewController(p2pChatVC, animated: true)
+                        return
+                    }
+                }
                 if let remove = param["removeUserVC"] as? Bool, remove {
                     nav?.viewControllers.removeLast()
                 }
                 
-              nav?.pushViewController(p2pChatVC, animated: true)
+                nav?.pushViewController(p2pChatVC, animated: true)
             }
         } else {
             Router.shared.register(PushP2pChatVCRouter) { param in
-              print("param:\(param)")
-              let nav = param["nav"] as? UINavigationController
-              guard let conversationId = param["conversationId"] as? String else {
-                return
-              }
-              let anchor = param["anchor"] as? V2NIMMessage
-              let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
-                
-              for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-                if vc.isKind(of: ChatViewController.self) {
-                  nav?.viewControllers[i] = p2pChatVC
-                  nav?.popToViewController(p2pChatVC, animated: true)
-                  return
+                print("param:\(param)")
+                let nav = param["nav"] as? UINavigationController
+                guard let conversationId = param["conversationId"] as? String else {
+                    return
                 }
-              }
+                let anchor = param["anchor"] as? V2NIMMessage
+                let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
+                
+                for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                    if vc.isKind(of: ChatViewController.self) {
+                        nav?.viewControllers[i] = p2pChatVC
+                        nav?.popToViewController(p2pChatVC, animated: true)
+                        return
+                    }
+                }
                 
                 if let remove = param["removeUserVC"] as? Bool, remove {
                     nav?.viewControllers.removeLast()
                 }
                 
-              nav?.pushViewController(p2pChatVC, animated: true)
+                nav?.pushViewController(p2pChatVC, animated: true)
             }
         }
     }
 }
 
+extension AppDelegate: AIUserAgentProvider {
+    public func getAISearchUser(_ users: [V2NIMAIUser]) -> V2NIMAIUser? {
+        for user in users {
+            if user.accountId == "search" {
+                return user
+            }
+        }
+        return nil
+    }
+    
+    public func getAITranslateUser(_ users: [V2NIMAIUser]) -> V2NIMAIUser? {
+        for user in users {
+            if user.accountId == "translation" {
+                return user
+            }
+        }
+        return nil
+    }
+    
+    public func getAITranslateLangs(_ users: [V2NIMAIUser]) -> [String] {
+        ["英语", "日语", "韩语", "俄语", "法语", "德语"]
+    }
+}

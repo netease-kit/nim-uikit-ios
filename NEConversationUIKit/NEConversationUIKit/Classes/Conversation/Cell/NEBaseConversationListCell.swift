@@ -132,9 +132,14 @@ open class NEBaseConversationListCell: UITableViewCell {
     // last message
     if let lastMessage = conversationModel.conversation?.lastMessage {
       let text = contentForConversation(lastMessage: lastMessage)
-      let mutaAttri = NSMutableAttributedString(string: text)
+      let mutaAttri = NSMutableAttributedString()
+      if let lastContent = conversationModel.lastMessageConent {
+        mutaAttri.append(lastContent)
+      } else {
+        mutaAttri.append(NSAttributedString(string: text))
+      }
       if let sessionId = conversationModel.conversation?.conversationId {
-        let isAtMessage = NEAtMessageManager.instance?.isAtCurrentUser(sessionId: sessionId)
+        let isAtMessage = NEAtMessageManager.instance?.isAtCurrentUser(conversationId: sessionId)
         if isAtMessage == true {
           let atStr = localizable("you_were_mentioned")
           mutaAttri.insert(NSAttributedString(string: atStr), at: 0)

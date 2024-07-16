@@ -39,7 +39,7 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     tableView.rowHeight = 62
   }
 
-  override open func getContactRemakNameViewController() -> NEBaseContactRemakNameViewController {
-    ContactRemakNameViewController()
+  override open func getContactAliasViewController() -> NEBaseContactAliasViewController {
+    ContactAliasViewController()
   }
 }

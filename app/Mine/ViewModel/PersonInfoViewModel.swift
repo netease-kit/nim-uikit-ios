@@ -36,7 +36,7 @@ public class PersonInfoViewModel: NSObject {
       sectionData.append(getSecondSection())
       completion()
     } else {
-      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { [weak self] userFriend, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { [weak self] userFriend, error in
         guard let self = self else { return }
         self.userInfo = userFriend?.first
         self.sectionData.append(self.getFirstSection())

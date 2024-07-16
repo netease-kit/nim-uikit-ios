@@ -52,12 +52,34 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
-    conversationRepo.addListener(self)
+    conversationRepo.addConversationListener(self)
+    NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
+  }
+
+  /// 点击消息发送者头像
+  /// 拉取最新用户信息后刷新消息发送者信息
+  /// - Parameter noti: 通知对象
+  func didTapHeader(_ noti: Notification) {
+    if let user = noti.object as? NEUserWithFriend,
+       let accid = user.user?.accountId {
+      if NETeamMemberCache.shared.isCurrentMember(accid) {
+        var isDidFind = false
+        teamInfoModel?.users.forEach { model in
+          if let accountId = model.nimUser?.user?.accountId, accountId == accid {
+            model.nimUser = user
+            isDidFind = true
+          }
+        }
+        if isDidFind == true {
+          delegate?.didNeedRefreshUI()
+        }
+      }
+    }
   }
 
   func clear() {
     teamRepo.removeTeamListener(self)
-    conversationRepo.removeListener(self)
+    conversationRepo.removeConversationListener(self)
     NETeamMemberCache.shared.trigerTimer()
   }
 
@@ -206,7 +228,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     nick.cellClick = {
       weakSelf?.delegate?.didClickChangeNick()
     }
-    if IMKitConfigCenter.shared.pinEnable {
+    if IMKitConfigCenter.shared.enablePinMessage {
       model.cellModels.append(mark)
     }
     model.cellModels.append(history)
@@ -520,7 +542,9 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     }
 
     for model in sortArr {
-      if model.teamMember?.accountId != owner {
+      if let accid = model.teamMember?.accountId,
+         accid != owner,
+         !NEAIUserManager.shared.isAIUser(accid) {
         return model.teamMember?.accountId
       }
     }
@@ -535,11 +559,19 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
       return
     }
 
-    guard let members = teamInfoModel?.users, let teamId = teamInfoModel?.team?.teamId else {
+    guard var members = teamInfoModel?.users, let teamId = teamInfoModel?.team?.teamId else {
       completion(NSError(domain: "imuikit", code: -1, userInfo: [NSLocalizedDescriptionKey: "team info error"]))
       return
     }
-
+    // 移除数字人
+    members.removeAll { model in
+      if let accountId = model.nimUser?.user?.accountId {
+        if NEAIUserManager.shared.isAIUser(accountId) {
+          return true
+        }
+      }
+      return false
+    }
     var userId = IMKitClient.instance.account()
     if members.count == 1 {
       dismissTeam(teamId, completion)
@@ -664,7 +696,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
   open func inviteUsers(_ members: [String], _ teamId: String, _ completion: @escaping (NSError?, [V2NIMTeamMember]?) -> Void) {
-    teamRepo.inviteMembers(teamId, .TEAM_TYPE_NORMAL, members) { error, members in
+    teamRepo.inviteTeamMembers(teamId, .TEAM_TYPE_NORMAL, members) { error, members in
       completion(error, members)
     }
   }

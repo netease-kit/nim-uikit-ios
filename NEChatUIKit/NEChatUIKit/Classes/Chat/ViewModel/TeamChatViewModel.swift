@@ -24,16 +24,23 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   override init(conversationId: String) {
     super.init(conversationId: conversationId)
-    getTeamMember {}
-    teamRepo.addTeamListener(self)
-    IMKitClient.instance.addLoginListener(self)
   }
 
   override init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
-    getTeamMember {}
+  }
+
+  /// 添加子类监听
+  override open func addListener() {
+    super.addListener()
     teamRepo.addTeamListener(self)
-    IMKitClient.instance.addLoginListener(self)
+    NETeamUserManager.shared.addListener(self)
+    NETeamUserManager.shared.loadData(sessionId)
+  }
+
+  deinit {
+    teamRepo.removeTeamListener(self)
+    NETeamUserManager.shared.removeListener(self)
   }
 
   /// 重写 获取用户展示名称
@@ -43,7 +50,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Returns: 名称和好友信息
   override open func getShowName(_ accountId: String, _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
-    return ChatTeamCache.shared.getShowName(accountId, showAlias)
+    return NETeamUserManager.shared.getShowName(accountId, showAlias)
   }
 
   /// 重写 获取用户展示名称
@@ -55,17 +62,13 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                                   _ teamId: String?,
                                   _ completion: @escaping () -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(String(describing: teamId))")
-    guard let teamId = teamId else {
-      return
-    }
-
-    ChatTeamCache.shared.loadShowName(userIds: accountIds, teamId: teamId, completion)
+    NETeamUserManager.shared.getTeamMembers(accountIds: accountIds, completion)
   }
 
   /// 加载置顶消息
   override open func loadTopMessage() {
     // 校验配置项
-    if !IMKitConfigCenter.shared.topEnable {
+    if !IMKitConfigCenter.shared.enableTopMessage {
       return
     }
 
@@ -75,7 +78,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
           let refer = ChatMessageHelper.createMessageRefer(topInfo)
           chatRepo.getMessageListByRefers([refer]) { [weak self] messages, error in
             // 这里查询只是为了校验消息是否还存在（未被删除或撤回）
-            if let topMessage = messages?.first, let senderId = topMessage.senderId {
+            if let topMessage = messages?.first,
+               let senderId = ChatMessageHelper.getSenderId(topMessage) {
               var senderName = self?.getShowName(senderId) ?? ""
               let group = DispatchGroup()
 
@@ -95,12 +99,12 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
                 // 获取图片缩略图
                 if let attach = topMessage.attachment as? V2NIMMessageImageAttachment, let imageUrl = attach.url {
-                  thumbUrl = ResourceRepo.shared.imageThumbnailURL(imageUrl)
+                  thumbUrl = V2NIMStorageUtil.imageThumbUrl(imageUrl, thumbSize: 350)
                 }
 
                 // 获取视频首帧
                 if let attach = topMessage.attachment as? V2NIMMessageVideoAttachment, let videoUrl = attach.url {
-                  thumbUrl = ResourceRepo.shared.videoThumbnailURL(videoUrl)
+                  thumbUrl = V2NIMStorageUtil.videoCoverUrl(videoUrl, offset: 0)
                   isVideo = true
                 }
 
@@ -116,6 +120,10 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                                             hideClose: hideClose)
                 self?.topMessage = topMessage
               }
+            } else {
+              // 置顶消息已被删除
+              self?.topMessage = nil
+              self?.delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
             }
           }
         } else {
@@ -164,6 +172,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
       "idClient": message.messageClientId as Any,
       "scene": message.conversationType.rawValue,
       "from": message.senderId as Any,
+      "receiverId": message.receiverId as Any,
       "to": message.conversationId as Any,
       "idServer": message.messageServerId as Any,
       "time": Int(message.createTime * 1000),
@@ -254,19 +263,30 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   open func getTeamInfo(teamId: String,
                         _ completion: @escaping (Error?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + teamId)
-    teamRepo.getTeamInfo(teamId) { [weak self] team, error in
-      if error == nil {
-        self?.team = team
+    if let team = NETeamUserManager.shared.getTeamInfo() {
+      self.team = team
+      teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+      completion(nil, team)
+    } else {
+      teamRepo.getTeamInfo(teamId) { [weak self] team, error in
+        if error == nil {
+          self?.team = team
+        }
+        completion(error, team)
       }
-      completion(error, team)
     }
   }
 
   /// 获取自己的群成员信息
   public func getTeamMember(_ completion: @escaping () -> Void) {
-    teamRepo.getTeamMember(sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
-      self?.teamMember = member
+    if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account()) {
+      self.teamMember = teamMember
       completion()
+    } else {
+      teamRepo.getTeamMember(sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
+        self?.teamMember = member
+        completion()
+      }
     }
   }
 
@@ -357,45 +377,38 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
       }
     }
   }
+}
 
-  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + (team.teamId))
-    if sessionId == team.teamId {
-      self.team = team
-      if let delegate = delegate as? TeamChatViewModelDelegate {
-        delegate.onTeamUpdate?(team: team)
-      }
-    }
+// MARK: - NETeamChatUserCacheListener
 
+extension TeamChatViewModel: NETeamChatUserCacheListener {
+  /// 群信息更新
+  /// - Parameter teamId: 群 id
+  public func onTeamInfoUpdate(_ teamId: String) {
+    guard let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == sessionId else { return }
+
+    self.team = team
     loadTopMessage()
-  }
-
-  /// 群成员加入回调
-  /// - Parameter teamMembers: 群成员列表
-  public func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
-    for teamMember in teamMembers {
-      guard teamMember.teamId == team?.teamId else { break }
-
-      ChatTeamCache.shared.updateTeamMemberInfo(teamMember)
-      updateMessageInfo(teamMember.accountId)
-    }
-  }
-
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
-    for teamMember in teamMembers {
-      guard teamMember.teamId == team?.teamId else { break }
-
-      if teamMember.accountId == self.teamMember?.accountId {
-        self.teamMember = teamMember
-        loadTopMessage()
-      }
-
-      ChatTeamCache.shared.updateTeamMemberInfo(teamMember)
-      updateMessageInfo(teamMember.accountId)
-    }
 
     if let delegate = delegate as? TeamChatViewModelDelegate {
-      delegate.onTeamMemberUpdate?(teamMembers)
+      delegate.onTeamUpdate?(team: team)
+    }
+  }
+
+  /// 群成员更新
+  /// - Parameter accountId: 用户 id
+  public func onTeamMemberUpdate(_ accountId: String) {
+    guard let teamMember = NETeamUserManager.shared.getTeamMemberInfo(accountId) else { return }
+
+    if self.teamMember == nil || accountId == self.teamMember?.accountId {
+      self.teamMember = teamMember
+      loadTopMessage()
+    }
+
+    updateMessageInfo(accountId)
+
+    if let delegate = delegate as? TeamChatViewModelDelegate {
+      delegate.onTeamMemberUpdate?([teamMember])
     }
   }
 }

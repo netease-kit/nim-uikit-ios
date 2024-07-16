@@ -43,10 +43,16 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
     tableView.separatorColor = .clear
     tableView.separatorStyle = .none
     tableView.sectionHeaderHeight = 12.0
-    tableView.keyboardDismissMode = .onDrag
     tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }

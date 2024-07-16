@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEMapKit'
-  s.version          = '10.2.1'
+  s.version          = '10.3.0'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'ssh://git@g.hz.netease.com:22222/yunxin-app/xkit-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '12.0'
 
   s.source_files = 'NEMapKit/Classes/**/*'
 #  s.resource = 'NEMapKit/Assets/**/*'

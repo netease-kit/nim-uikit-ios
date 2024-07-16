@@ -61,8 +61,8 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     return 46
   }
 
-  override open func getContactRemakNameViewController() -> NEBaseContactRemakNameViewController {
-    FunContactRemakNameViewController()
+  override open func getContactAliasViewController() -> NEBaseContactAliasViewController {
+    FunContactAliasViewController()
   }
 
   override open func deleteFriend(user: NEUserWithFriend?) {

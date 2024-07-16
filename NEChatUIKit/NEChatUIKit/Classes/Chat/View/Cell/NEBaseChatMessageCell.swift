@@ -34,6 +34,9 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 
   // 单击多选按钮
   func didTapSelectButton(_ cell: UITableViewCell, _ model: MessageContentModel?)
+
+  // 划词选中失去焦点
+  @objc optional func didTextViewLoseFocus(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 @objc
@@ -373,13 +376,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func initSubviewsLayout() {
-    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .rectangle,
-       NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-    } else if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
+    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
       avatarImageRight.layer.cornerRadius = 16.0
       avatarImageLeft.layer.cornerRadius = 16.0
+    } else if NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
+      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
     } else {
       avatarImageRight.layer.cornerRadius = 16.0
       avatarImageLeft.layer.cornerRadius = 16.0
@@ -403,20 +405,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func longPress(longPress: UILongPressGestureRecognizer) {
-    switch longPress.state {
-    case .began:
-      print("state:begin")
+    if longPress.state == .began {
       delegate?.didLongPressMessageView(self, contentModel)
-    case .changed:
-      print("state:changed")
-    case .ended:
-      print("state:ended")
-    case .cancelled:
-      print("state:cancelled")
-    case .failed:
-      print("state:failed")
-    default:
-      print("state:default")
     }
   }
 
@@ -439,13 +429,17 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
 
 //    MARK: set data
 
+  /// 设置是否允许多选
+  /// - Parameters:
+  ///   - model: 数据模型
+  ///   - enableSelect: 是否处于多选状态
   open func setSelect(_ model: MessageContentModel, _ enableSelect: Bool = false) {
     // 多选框
     selectedButton.isHidden = model.isRevoked || !enableSelect
     selectedButton.isSelected = model.isSelected
 
     // 多选状态下，头像右移
-    avatarImageLeftAnchor?.constant = enableSelect ? 42 : 16
+    avatarImageLeftAnchor?.constant = enableSelect ? fun_chat_min_h : 16
 
     // 多选状态下，消息状态视图（发送失败）位置下移，避免与多选重叠
     activityViewCenterYAnchor?.constant = enableSelect ? model.contentSize.height / 2 - 12 : 0
@@ -462,9 +456,10 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     let avatarImage = isSend ? avatarImageRight : avatarImageLeft
 
     contentModel = model
+    contentModel?.cell = self
     tapGesture?.isEnabled = true
     showLeftOrRight(showRight: isSend)
-    updatePinStatus(model)
+    updatePinStatus(model, isSend)
 
     // time
     if let time = model.timeContent, !time.isEmpty {
@@ -498,14 +493,14 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
             avatarImage.image = nil
             nameLabel.isHidden = false
             avatarImage.backgroundColor = UIColor
-              .colorWithString(string: model.message?.senderId)
+              .colorWithString(string: ChatMessageHelper.getSenderId(model.message))
           }
         }
     } else {
       avatarImage.image = nil
       nameLabel.isHidden = false
       avatarImage.backgroundColor = UIColor
-        .colorWithString(string: model.message?.senderId)
+        .colorWithString(string: ChatMessageHelper.getSenderId(model.message))
     }
 
     if model.fullNameHeight > 0 {
@@ -562,7 +557,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
            SettingRepo.shared.getShowReadStatus(),
            NEKitChatConfig.shared.ui.messageProperties.showTeamMessageStatus == true {
           readView.isHidden = false
-          var total = ChatTeamCache.shared.getTeamInfo()?.memberCount ?? 0
+          var total = NETeamUserManager.shared.getTeamInfo()?.memberCount ?? 0
           if model.readCount + model.unreadCount != 0 {
             total = model.readCount + model.unreadCount + 1
           }
@@ -607,11 +602,14 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     readView.isHidden = !showRight
   }
 
+  /// 重置文本选中状态
+  open func resetSelectRange() {}
+
+  /// 选中所有文本
+  open func selectAllRange() {}
+
   /// 更新标记状态
-  open func updatePinStatus(_ model: MessageContentModel) {
-    guard let isSend = model.message?.isSelf else {
-      return
-    }
+  open func updatePinStatus(_ model: MessageContentModel, _ isSend: Bool) {
     let pinLabel = isSend ? pinLabelRight : pinLabelLeft
     let pinImage = isSend ? pinImageRight : pinImageLeft
     let pinLabelH = isSend ? pinLabelHRight : pinLabelHLeft

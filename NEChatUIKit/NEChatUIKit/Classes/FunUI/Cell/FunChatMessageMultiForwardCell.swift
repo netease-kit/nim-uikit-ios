@@ -214,7 +214,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
       }
 
       var contentText = ""
-      if var senderNick = abstracts[i]["senderNick"] as? String {
+      if let senderNick = abstracts[i]["senderNick"] as? String {
         contentText = NEFriendUserCache.getCutName(senderNick)
         if let content = abstracts[i]["content"] as? String {
           contentText += "：" + content

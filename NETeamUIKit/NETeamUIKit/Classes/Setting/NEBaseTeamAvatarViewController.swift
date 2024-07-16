@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionViewDelegate,
-  UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate {
+  UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
   public typealias SaveCompletion = () -> Void
   public var block: SaveCompletion?
   public var team: V2NIMTeam?

@@ -75,4 +75,28 @@ open class NEEmotionTool: NSObject {
     textAttachment.bounds = CGRect(x: offset.x, y: offset.y, width: height, height: height)
     return NSAttributedString(attachment: textAttachment)
   }
+
+  /// 将富文本中的表情转换为文本
+  /// - Parameters:
+  ///   - att: 富文本
+  ///   - range: 范围
+  /// - Returns: 文本
+  class func getTextWithAtt(_ att: NSMutableAttributedString?, _ range: NSRange) -> String? {
+    guard let att = att else {
+      return nil
+    }
+
+    var text = ""
+    att.enumerateAttributes(in: range, using: { attrs, range, stop in
+      if let attachment = attrs[NSAttributedString.Key.attachment] as? NEEmotionAttachment {
+        text += attachment.emotion?.tag ?? ""
+      } else {
+        let subStr = (att.string as NSString).substring(with: range)
+        text += subStr
+      }
+
+    })
+
+    return text.isEmpty ? nil : text
+  }
 }

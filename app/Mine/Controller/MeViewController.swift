@@ -28,6 +28,16 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
       forCellReuseIdentifier: "\(NSStringFromClass(MineTableViewCell.self))"
     )
     tableView.rowHeight = 52
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -86,7 +96,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     super.viewDidLoad()
     view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
     setupSubviews()
-    if IMKitConfigCenter.shared.collectionEnable {
+    if IMKitConfigCenter.shared.enableCollectionMessage {
       mineData.insert([NSLocalizedString("mine_collection", comment: ""): "mine_collection"], at: 1)
     }
   }
@@ -206,7 +216,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
       setupUserInfo(userFriend)
     } else {
-      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { [weak self] users, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { [weak self] users, error in
         self?.setupUserInfo(users?.first)
       }
     }
@@ -232,7 +242,7 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
   }
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if IMKitConfigCenter.shared.collectionEnable {
+    if IMKitConfigCenter.shared.enableCollectionMessage {
       if indexPath.row == 0 {
         let ctrl = MineSettingViewController()
         navigationController?.pushViewController(ctrl, animated: true)

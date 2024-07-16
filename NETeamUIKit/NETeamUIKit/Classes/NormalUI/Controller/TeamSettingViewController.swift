@@ -12,8 +12,6 @@ import UIKit
 open class TeamSettingViewController: NEBaseTeamSettingViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    navigationView.backgroundColor = .ne_lightBackgroundColor
-    navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
     className = "TeamSettingViewController"
     cellClassDic = [
       SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,
@@ -47,7 +45,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     return arrowImageView
   }()
 
-  /// 分割线
+  /// 分隔线
   lazy var dividerLineView: UIView = {
     let dividerLineView = UIView()
     dividerLineView.translatesAutoresizingMaskIntoConstraints = false
@@ -83,6 +81,9 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
 
   override open func setupUI() {
     super.setupUI()
+    navigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
+
     teamHeaderView.layer.cornerRadius = 21.0
     addButton.setImage(coreLoader.loadImage("add"), for: .normal)
   }

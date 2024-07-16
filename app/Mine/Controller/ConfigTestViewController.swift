@@ -23,6 +23,13 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     tableView.separatorColor = .clear
     tableView.separatorStyle = .none
     tableView.sectionHeaderHeight = 12.0
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -51,36 +58,36 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     let showTeam = SettingCellModel()
     showTeam.cellName = "显示群聊"
     showTeam.type = SettingCellType.SettingSwitchCell.rawValue
-    showTeam.switchOpen = IMKitConfigCenter.shared.teamEnable
+    showTeam.switchOpen = IMKitConfigCenter.shared.enableTeam
     showTeam.swichChange = { isOpen in
-      IMKitConfigCenter.shared.teamEnable = isOpen
+      IMKitConfigCenter.shared.enableTeam = isOpen
     }
     model.cellModels.append(showTeam)
 
     let showMessageCollection = SettingCellModel()
     showMessageCollection.cellName = "显示收藏"
     showMessageCollection.type = SettingCellType.SettingSwitchCell.rawValue
-    showMessageCollection.switchOpen = IMKitConfigCenter.shared.collectionEnable
+    showMessageCollection.switchOpen = IMKitConfigCenter.shared.enableCollectionMessage
     showMessageCollection.swichChange = { isOpen in
-//      IMKitConfigCenter.shared.collectionEnable = isOpen
+      IMKitConfigCenter.shared.enableCollectionMessage = isOpen
     }
     model.cellModels.append(showMessageCollection)
 
     let showMessagePin = SettingCellModel()
     showMessagePin.cellName = "显示标记"
     showMessagePin.type = SettingCellType.SettingSwitchCell.rawValue
-    showMessagePin.switchOpen = IMKitConfigCenter.shared.pinEnable
+    showMessagePin.switchOpen = IMKitConfigCenter.shared.enablePinMessage
     showMessagePin.swichChange = { isOpen in
-      IMKitConfigCenter.shared.pinEnable = isOpen
+      IMKitConfigCenter.shared.enablePinMessage = isOpen
     }
     model.cellModels.append(showMessagePin)
 
     let showMessageTop = SettingCellModel()
     showMessageTop.cellName = "显示置顶"
     showMessageTop.type = SettingCellType.SettingSwitchCell.rawValue
-    showMessageTop.switchOpen = IMKitConfigCenter.shared.topEnable
+    showMessageTop.switchOpen = IMKitConfigCenter.shared.enableTopMessage
     showMessageTop.swichChange = { isOpen in
-//      IMKitConfigCenter.shared.topEnable = isOpen
+      IMKitConfigCenter.shared.enableTopMessage = isOpen
     }
     model.cellModels.append(showMessageTop)
 
@@ -89,18 +96,18 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     showOnlineStatus.type = SettingCellType.SettingSwitchCell.rawValue
     showOnlineStatus.switchOpen = IMKitConfigCenter.shared.onlineStatusEnable
     showOnlineStatus.swichChange = { isOpen in
-//      IMKitConfigCenter.shared.onlineStatusEnable = isOpen
+      IMKitConfigCenter.shared.onlineStatusEnable = isOpen
     }
     model.cellModels.append(showOnlineStatus)
 
-    let strangerCallEnable = SettingCellModel()
-    strangerCallEnable.cellName = "是否允许陌生人音视频通话"
-    strangerCallEnable.type = SettingCellType.SettingSwitchCell.rawValue
-    strangerCallEnable.switchOpen = IMKitConfigCenter.shared.strangerCallEnable
-    strangerCallEnable.swichChange = { isOpen in
-      IMKitConfigCenter.shared.strangerCallEnable = isOpen
+    let strangerCallModel = SettingCellModel()
+    strangerCallModel.cellName = "好友能否进行音视频通话"
+    strangerCallModel.type = SettingCellType.SettingSwitchCell.rawValue
+    strangerCallModel.switchOpen = IMKitConfigCenter.shared.enableOnlyFriendCall
+    strangerCallModel.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableOnlyFriendCall = isOpen
     }
-    model.cellModels.append(strangerCallEnable)
+    model.cellModels.append(strangerCallModel)
 
     model.setCornerType()
     return model

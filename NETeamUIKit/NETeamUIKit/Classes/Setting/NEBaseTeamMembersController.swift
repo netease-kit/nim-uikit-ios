@@ -60,10 +60,16 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
-    tableView.keyboardDismissMode = .onDrag
     return tableView
   }()
 
@@ -99,7 +105,7 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     addObserver()
     viewModel.delegate = self
     viewModel.teamId = teamId
-
+    navigationView.moreButton.isHidden = true
     weak var weakSelf = self
     if let tid = teamId {
       weakSelf?.viewModel.getTeamInfo(tid) { teamInfo, error in
@@ -209,17 +215,12 @@ open class NEBaseTeamMembersController: NEBaseViewController, UITableViewDelegat
     viewModel.searchDatas.removeAll()
     if let text = searchTextField.text, text.count > 0 {
       for model in viewModel.datas {
-        if let uid = model.nimUser?.user?.accountId, uid.contains(text) {
-          viewModel.searchDatas.append(model)
-        } else if let nick = model.nimUser?.user?.name, nick.contains(text) {
-          viewModel.searchDatas.append(model)
-        } else if let alias = model.nimUser?.friend?.alias, alias.contains(text) {
-          viewModel.searchDatas.append(model)
-        } else if let tNick = model.teamMember?.teamNick, tNick.contains(text) {
-          viewModel.searchDatas.append(model)
+        if let teamName = model.atNameInTeam() {
+          if teamName.contains(text) {
+            viewModel.searchDatas.append(model)
+          }
         }
       }
-
     } else {
       emptyView.isHidden = true
     }

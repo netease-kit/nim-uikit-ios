@@ -82,7 +82,7 @@ open class MultiForwardViewModel: NSObject {
       model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
       model.avatar = remoteExt[mergedMessageAvatarKey] as? String
     } else {
-      model.fullName = message.senderId
+      model.fullName = ChatMessageHelper.getSenderId(message)
       model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
     }
 

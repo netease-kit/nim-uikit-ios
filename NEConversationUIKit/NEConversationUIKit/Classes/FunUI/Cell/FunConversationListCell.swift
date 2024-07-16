@@ -9,7 +9,7 @@ import UIKit
 open class FunConversationListCell: NEBaseConversationListCell {
   var contentModel: NEConversationListModel?
 
-  /// 分割线视图
+  /// 分隔线视图
   public lazy var bottomLine: UIView = {
     let bottomLine = UIView()
     bottomLine.translatesAutoresizingMaskIntoConstraints = false
@@ -54,10 +54,10 @@ open class FunConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .rectangle {
-      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
-    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
+    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 24.0
+    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius > 0 {
+      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
     } else {
       headImageView.layer.cornerRadius = 4.0
     }
@@ -66,6 +66,7 @@ open class FunConversationListCell: NEBaseConversationListCell {
   override open func configureData(_ sessionModel: NEConversationListModel?) {
     super.configureData(sessionModel)
     contentModel = sessionModel
+
     if sessionModel?.conversation?.stickTop == true {
       contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? .funConversationBackgroundColor
     } else {

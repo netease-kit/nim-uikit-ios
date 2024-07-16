@@ -23,9 +23,14 @@ open class MessageTipsModel: MessageContentModel {
       }
     }
 
-    let font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    var font: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
+    if ChatMessageHelper.isAISender(message) {
+      font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    }
 
-    contentSize = String.getRealSize(text, font, messageMaxSize)
+    let textSize = String.getRealSize(text, font, messageMaxSize)
+    textWidth = textSize.width
+    contentSize = textSize
     height = contentSize.height + chat_content_margin * 3
 
     // time

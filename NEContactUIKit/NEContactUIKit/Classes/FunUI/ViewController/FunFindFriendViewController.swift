@@ -8,12 +8,6 @@ import UIKit
 
 @objc
 open class FunFindFriendViewController: NEBaseFindFriendViewController {
-  override open func viewDidLoad() {
-    super.viewDidLoad()
-
-    // Do any additional setup after loading the view.
-  }
-
   override open func setupUI() {
     view.backgroundColor = UIColor(hexString: "0xEDEDED")
 
@@ -23,10 +17,11 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
     searchBackView.translatesAutoresizingMaskIntoConstraints = false
     searchBackView.clipsToBounds = true
     searchBackView.layer.cornerRadius = 4.0
+    searchBackViewTopAnchor = searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10 + topConstant)
+    searchBackViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       searchBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       searchBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      searchBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10 + topConstant),
       searchBackView.heightAnchor.constraint(equalToConstant: 36),
     ])
 

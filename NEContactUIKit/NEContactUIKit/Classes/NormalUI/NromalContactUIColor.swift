@@ -9,4 +9,10 @@ public extension UIColor {
   static let disableButtonTitleColor = UIColor(hexString: "#DDDDDD")
   /// #F2F4F5, 搜索区域背景颜色
   static let searchTextFeildBackColor = UIColor(hexString: "#F2F4F5")
+
+  static let contactBlueDividerLineColor = UIColor(hexString: "#337EFF")
+
+  static let contactNormalTextColor = UIColor(hexString: "#333333")
+
+  static let contactFusionSelectButtonBGColor = UIColor(hexString: "#337EFF")
 }

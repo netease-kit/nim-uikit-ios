@@ -73,7 +73,7 @@ open class FunUserSettingViewController: NEBaseUserSettingViewController {
     nameLabel.text = viewModel.userInfo?.showName()
     cornerBackView.addSubview(nameLabel)
 
-    if IMKitConfigCenter.shared.teamEnable {
+    if IMKitConfigCenter.shared.enableTeam {
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 22),
         userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 22),

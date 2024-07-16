@@ -42,6 +42,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
     return label
   }()
 
+  public var contentTableTopAnchor: NSLayoutConstraint?
   public lazy var contentTable: UITableView = {
     let contentTable = UITableView()
     contentTable.translatesAutoresizingMaskIntoConstraints = false
@@ -71,6 +72,11 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    contentTableTopAnchor?.constant = topConstant
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     viewModel.delegate = self
@@ -96,10 +102,11 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
     navigationView.backgroundColor = .ne_lightBackgroundColor
 
     view.addSubview(contentTable)
+    contentTableTopAnchor = contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    contentTableTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentTable.leftAnchor.constraint(equalTo: view.leftAnchor),
       contentTable.rightAnchor.constraint(equalTo: view.rightAnchor),
-      contentTable.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       contentTable.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
@@ -144,12 +151,12 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
 
     nameLabel.text = viewModel.userInfo?.showName()
     cornerBackView.addSubview(nameLabel)
-    if IMKitConfigCenter.shared.teamEnable {
+    if IMKitConfigCenter.shared.enableTeam {
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
         userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 12),
-        userHeaderView.widthAnchor.constraint(equalToConstant: 42),
-        userHeaderView.heightAnchor.constraint(equalToConstant: 42),
+        userHeaderView.widthAnchor.constraint(equalToConstant: fun_chat_min_h),
+        userHeaderView.heightAnchor.constraint(equalToConstant: fun_chat_min_h),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(12)
@@ -168,6 +175,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
         addButton.widthAnchor.constraint(equalToConstant: 42.0),
         addButton.heightAnchor.constraint(equalToConstant: 42.0),
       ])
+
     } else {
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
@@ -223,16 +231,29 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
       filters.insert(uid)
     }
 
-    Router.shared.use(
-      ContactUserSelectRouter,
-      parameters: [
-        "nav": navigationController as Any,
-        "filters": filters,
-        "limit": inviteNumberLimit,
-        "uid": userId ?? "",
-      ],
-      closure: nil
-    )
+    if IMKitConfigCenter.shared.enableAIUser {
+      Router.shared.use(
+        ContactFusionSelectRouter,
+        parameters: [
+          "nav": navigationController as Any,
+          "filters": filters,
+          "limit": inviteNumberLimit,
+          "uid": userId ?? "",
+        ],
+        closure: nil
+      )
+    } else {
+      Router.shared.use(
+        ContactUserSelectRouter,
+        parameters: [
+          "nav": navigationController as Any,
+          "filters": filters,
+          "limit": inviteNumberLimit,
+          "uid": userId ?? "",
+        ],
+        closure: nil
+      )
+    }
 
     Router.shared.register(TeamCreateDiscussResult) { param in
       print("create discuss ", param)
@@ -275,6 +296,10 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
 
   func didError(_ error: Error) {
     showToast(error.localizedDescription)
+  }
+
+  func didShowErrorMsg(_ msg: String) {
+    showToast(msg)
   }
 
   // MARK: UITableViewDataSource, UITableViewDelegate

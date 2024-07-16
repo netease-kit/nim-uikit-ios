@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class FunConversationSearchCell: NEBaseConversationSearchCell {
-  /// 分割线视图
+  /// 分隔线视图
   lazy var bottomLine: UIView = {
     let bottomLine = UIView()
     bottomLine.translatesAutoresizingMaskIntoConstraints = false

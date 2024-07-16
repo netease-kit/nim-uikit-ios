@@ -22,7 +22,7 @@ open class MessageCustomModel: MessageContentModel {
     }
 
     contentSize = CGSize(width: 0, height: contentHeight)
-    height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
+    height = CGFloat(contentHeight) + chat_content_margin * 2 + fullNameHeight + chat_pin_height
     if let customHeight = NECustomUtils.heightOfCustomMessage(message?.attachment) {
       height = customHeight
     }

@@ -33,6 +33,15 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     tableView.dataSource = self
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -353,7 +362,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
       viewModel.downLoad(urlString, path) { progress in
         NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "downLoad file progress: \(progress)")
         fileModel.progress = progress
-        fileModel.cell?.uploadProgress(byRight: false, progress)
+        fileModel.cell?.uploadProgress(progress)
 
       } _: { [weak self] localPath, error in
         self?.showErrorToast(error)

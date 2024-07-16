@@ -65,7 +65,7 @@ open class InputEmoticonTabView: UIControl {
     seps.removeAll()
 
     guard let catalogs = emoticonCatalogs else {
-      NEALog.errorLog(className, desc: "❌emoticonCatalogs is nil")
+      NEALog.errorLog(className, desc: "emoticonCatalogs is nil")
       return
     }
     for catelog in catalogs {

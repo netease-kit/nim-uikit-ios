@@ -110,8 +110,17 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     tableView.backgroundColor = UIColor.ne_backgroundColor
     tableView.sectionFooterHeight = 0
     tableView.sectionIndexColor = .ne_greyText
-
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -148,6 +157,13 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         }
       }
     }
+
+    if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
+      navigationController?.isNavigationBarHidden = false
+    } else {
+      navigationController?.isNavigationBarHidden = true
+    }
+
     loadData()
     viewModel.getAddApplicationUnreadCount(nil)
   }
@@ -165,7 +181,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: UIApplication.didEnterBackgroundNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NENotificationName.friendCacheInit, object: nil)
   }
 
   /// 清除未读数
@@ -263,6 +279,14 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     }
   }
 
+  /// 重新加载数据
+  func reloadData() {
+    // 从缓存中取
+    if !NEFriendUserCache.shared.isEmpty() {
+      loadData()
+    }
+  }
+
   // UITableViewDataSource
   open func numberOfSections(in tableView: UITableView) -> Int {
     viewModel.contacts.count
@@ -343,6 +367,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         Router.shared.use(ValidationMessageRouter,
                           parameters: ["nav": navigationController as Any],
                           closure: nil)
+
       case ContactBlackListRouter:
         Router.shared.use(ContactBlackListRouter,
                           parameters: ["nav": navigationController as Any],
@@ -361,7 +386,11 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         break
 
       default:
-        break
+        if info.router.count > 0 {
+          Router.shared.use(info.router,
+                            parameters: ["nav": navigationController as Any],
+                            closure: nil)
+        }
       }
     } else {
       if let friendItemClick = NEKitContactConfig.shared.ui.friendItemClick {

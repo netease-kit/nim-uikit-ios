@@ -161,7 +161,7 @@ open class FunChatInputView: NEBaseChatInputView {
       replyLabel.leftAnchor.constraint(equalTo: replyBackView.leftAnchor, constant: 5),
       replyLabel.topAnchor.constraint(equalTo: replyBackView.topAnchor),
       replyLabel.bottomAnchor.constraint(equalTo: replyBackView.bottomAnchor),
-      replyLabel.rightAnchor.constraint(equalTo: replyBackView.rightAnchor, constant: -42),
+      replyLabel.rightAnchor.constraint(equalTo: replyBackView.rightAnchor, constant: -fun_chat_min_h),
     ])
 
     replyBackView.addSubview(clearBtn)

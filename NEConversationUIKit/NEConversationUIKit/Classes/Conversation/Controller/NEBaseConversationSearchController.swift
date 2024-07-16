@@ -19,7 +19,6 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
-    tableView.keyboardDismissMode = .onDrag
     tableView.delegate = self
     tableView.dataSource = self
     tableView.rowHeight = 60
@@ -27,9 +26,20 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
     tableView.sectionHeaderHeight = 30
     tableView.sectionFooterHeight = 0
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
+  public var searchTextFieldTopAnchor: NSLayoutConstraint?
   public lazy var searchTextField: SearchTextField = {
     let textField = SearchTextField()
     let leftImageView = UIImageView(image: UIImage

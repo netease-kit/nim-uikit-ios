@@ -1,0 +1,18 @@
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+
+// MARK: AI 划词搜
+"operation_ai_word_search"="AI Search";
+
+"ok"="OK";
+"complete"="Complete";
+"cancel"="Cancel";
+
+"ai_word_search" = "AI Word Search";
+"ai_word_searching" = "AI Word Searching";
+"input_more_button" = "Additional information";
+"input_more_placeholder" = "Please provide more information.";
+"not_supported" = "Not supported";
+"request_exception" = "Request Exception";

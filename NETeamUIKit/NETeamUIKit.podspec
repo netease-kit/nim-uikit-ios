@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NETeamUIKit'
-  s.version          = '10.2.1'
+  s.version          = '10.3.0'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -31,12 +31,11 @@ TODO: Add long description of the pod here.
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
   
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '12.0'
   s.swift_version = '5.0'
 
   s.source_files = 'NETeamUIKit/Classes/**/*'
   s.resource = 'NETeamUIKit/Assets/**/*'
-  s.dependency 'NECommonUIKit'
-  s.dependency 'NEChatKit'
+  s.dependency 'NEChatUIKit'
 
 end

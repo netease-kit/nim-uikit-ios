@@ -10,6 +10,12 @@ import UIKit
 @objcMembers
 open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   public let viewModel = ValidationMessageViewModel()
+  public var tableViewTopAnchor: NSLayoutConstraint?
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tableViewTopAnchor?.constant = topConstant
+  }
 
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -31,8 +37,8 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   }
 
   /// 返回上一级页面
-  override open func backToPrevious() {
-    super.backToPrevious()
+  override open func backEvent() {
+    super.backEvent()
     viewModel.setAddApplicationRead(nil)
   }
 
@@ -54,6 +60,15 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     tableView.dataSource = self
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
 
     tableView.mj_header = MJRefreshNormalHeader(
       refreshingTarget: self,
@@ -115,13 +130,12 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     }
   }
 
-  /// 控件初始化
-  open func setupUI() {
+  func initNav() {
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),
       style: .done,
       target: self,
-      action: #selector(clearMessage)
+      action: #selector(toSetting)
     )
     clearItem.tintColor = UIColor(hexString: "666666")
     var textAttributes = [NSAttributedString.Key: Any]()
@@ -130,16 +144,19 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     clearItem.setTitleTextAttributes(textAttributes, for: .normal)
     navigationItem.rightBarButtonItem = clearItem
 
-    title = localizable("validation_message")
-    navigationView.navTitle.text = title
     navigationView.setMoreButtonTitle(localizable("clear"))
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
-    navigationView.addMoreButtonTarget(target: self, selector: #selector(clearMessage))
+  }
+
+  /// 控件初始化
+  open func setupUI() {
+    title = localizable("validation_message")
+    initNav()
 
     view.addSubview(tableView)
-
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -156,7 +173,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   }
 
   /// 清空好友申请
-  func clearMessage() {
+  override open func toSetting() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     viewModel.clearNotification()
   }

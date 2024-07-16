@@ -12,8 +12,7 @@ import UIKit
 open class UserSettingViewController: NEBaseUserSettingViewController {
   override public init(userId: String) {
     super.init(userId: userId)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
+
     cellClassDic = [
       UserSettingType.SwitchType.rawValue: UserSettingSwitchCell.self,
       UserSettingType.SelectType.rawValue: UserSettingSelectCell.self,
@@ -26,7 +25,9 @@ open class UserSettingViewController: NEBaseUserSettingViewController {
 
   override func setupUI() {
     super.setupUI()
-    userHeaderView.layer.cornerRadius = IMKitConfigCenter.shared.teamEnable ? 21.0 : 30.0
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
+    userHeaderView.layer.cornerRadius = IMKitConfigCenter.shared.enableTeam ? 21.0 : 30.0
   }
 
   override func getPinMessageViewController(conversationId: String) -> NEBasePinMessageViewController {

@@ -8,11 +8,15 @@ import UIKit
 open class FindFriendViewController: NEBaseFindFriendViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
   }
 }

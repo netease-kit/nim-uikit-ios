@@ -89,7 +89,7 @@ class NEBaseCollectionMessageVideoCell: NEBaseCollectionMessageImageCell {
     if let videoObject = model.chatmodel.message?.attachment as? V2NIMMessageVideoAttachment {
       // 获取首帧
       let videoUrl = videoObject.url ?? ""
-      let thumbUrl = ResourceRepo.shared.videoThumbnailURL(videoUrl)
+      let thumbUrl = V2NIMStorageUtil.videoCoverUrl(videoUrl, offset: 0)
       collectionContentImageView.sd_setImage(
         with: URL(string: thumbUrl),
         placeholderImage: nil,

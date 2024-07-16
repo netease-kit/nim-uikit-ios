@@ -24,6 +24,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
   public let selectDic = [String: ContactInfo]()
   public var isCreating = false // 是否正在创建群组
 
+  public var collectionBackViewTopAnchor: NSLayoutConstraint?
   public lazy var collectionBackView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -62,10 +63,16 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
     tableView.contentInset = .init(top: -10, left: 0, bottom: 0, right: 0)
-    if #available(iOS 15.0, *) {
-      tableView.sectionHeaderTopPadding = 0
-    }
+    tableView.keyboardDismissMode = .onDrag
 
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -80,10 +87,15 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    collectionBackViewTopAnchor?.constant = topConstant + collectionBackViewTopMargin
+    tableViewTopAnchor?.constant = topConstant
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("select")
-    navigationView.navTitle.text = title
     emptyView.setText(localizable("no_friend"))
     setupUI()
     setupNavRightItem()
@@ -97,8 +109,9 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
 
   open func setupUI() {
     view.addSubview(collectionBackView)
+    collectionBackViewTopAnchor = collectionBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + collectionBackViewTopMargin)
+    collectionBackViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      collectionBackView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + collectionBackViewTopMargin),
       collectionBackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
       collectionBackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
       collectionBackView.heightAnchor.constraint(equalToConstant: collectionBackViewHeight),
@@ -202,7 +215,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
       mine = mineInfo
     } else {
       group.enter()
-      ContactRepo.shared.getUserList(accountIds: [IMKitClient.instance.account()]) { users, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { users, error in
         mine = users?.first
         group.leave()
       }

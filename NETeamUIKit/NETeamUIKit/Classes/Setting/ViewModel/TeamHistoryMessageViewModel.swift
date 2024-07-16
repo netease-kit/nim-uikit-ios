@@ -2,12 +2,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatUIKit
 import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
 @objcMembers
-open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListener {
+open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   /// 群信息
   public var teamInfoModel: NETeamInfoModel?
   /// 搜索结果
@@ -31,7 +32,10 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
     contactRepo.addContactListener(self)
   }
 
-  deinit {}
+  deinit {
+    teamRepo.removeTeamListener(self)
+    contactRepo.removeContactListener(self)
+  }
 
   /// 设置从上一个页面传入的成员
   public func setupCache() {
@@ -64,17 +68,21 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
     param.teamIds = [teamId]
 
     weak var weakSelf = self
-    chatRepo.searchMessages(params: param) { error, messages in
+    chatRepo.searchMessages(params: param) { messages, error in
 
       if error == nil {
         // 未找到用户信息信息记录
         var noFindUserSet = Set<String>()
         for message in messages ?? [] {
-          if let uid = message.imMessage?.senderId {
+          if let uid = ChatMessageHelper.getSenderId(message.imMessage) {
             if let member = infoDic[uid] {
               message.avatar = member.nimUser?.user?.avatar
               message.fullName = member.atNameInTeam()
               message.shortName = member.getShortName(member.showNickInTeam() ?? "")
+            } else if let aiUser: V2NIMAIUser = NEAIUserManager.shared.getAIUserById(uid) {
+              message.avatar = aiUser.avatar
+              message.fullName = aiUser.showName()
+              message.shortName = aiUser.shortName()
             } else {
               noFindUserSet.insert(uid)
             }
@@ -112,7 +120,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
   /// 获取消息对应的用户信息
   public func bindMessageUserInfo(_ messages: [HistoryMessageModel], _ infoDic: [String: NETeamMemberInfoModel]) {
     for message in messages {
-      if let uid = message.imMessage?.senderId {
+      if let uid = ChatMessageHelper.getSenderId(message.imMessage) {
         if let member = infoDic[uid] {
           message.avatar = member.nimUser?.user?.avatar
           message.fullName = member.atNameInTeam()
@@ -196,14 +204,6 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
     }
   }
 
-  /// 好友变更回调
-  /// - parameter friendInfo: 好友信息对象
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    if let accountId = friendInfo.accountId {
-      memberModelCacheDic[accountId]?.nimUser?.friend = friendInfo
-    }
-  }
-
   /// 群成员变更回调
   /// - parameter teamMembers: 群成员信息对象列表
   public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
@@ -219,6 +219,21 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener, NEContactListe
     }
     for member in currentMembers {
       memberModelCacheDic[member.accountId]?.teamMember = member
+    }
+  }
+}
+
+// MARK: - NEContactListener
+
+extension TeamHistoryMessageViewModel: NEContactListener {
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      if let accid = contact.user?.accountId,
+         memberModelCacheDic[accid] != nil {
+        memberModelCacheDic[accid]?.nimUser = contact
+      }
     }
   }
 }

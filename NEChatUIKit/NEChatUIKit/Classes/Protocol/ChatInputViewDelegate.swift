@@ -21,4 +21,5 @@ public protocol ChatInputViewDelegate: NSObjectProtocol {
   func textFieldDidEndEditing(_ text: String?)
   func textFieldDidBeginEditing(_ text: String?)
   func titleTextDidClearEmpty()
+  func textViewDidChange()
 }

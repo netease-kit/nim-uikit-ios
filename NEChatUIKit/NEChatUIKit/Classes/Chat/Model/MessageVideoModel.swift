@@ -16,7 +16,6 @@ public enum DownloadState: Int {
 open class MessageVideoModel: MessageImageModel {
   public var state = DownloadState.Success
   public var progress: UInt = 0
-  public weak var cell: NEChatBaseCell?
 
   public required init(message: V2NIMMessage?) {
     super.init(message: message)
@@ -31,5 +30,18 @@ open class MessageVideoModel: MessageImageModel {
       contentSize = chat_pic_size
     }
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
+  }
+
+  /// 设置（视频、文件）消息模型（上传、下载）进度
+  /// - Parameters:
+  ///   - progress:（上传、下载）进度
+  public func setModelProgress(_ progress: UInt) {
+    if progress == 100 {
+      state = .Success
+    } else {
+      state = .Downalod
+    }
+
+    cell?.uploadProgress(progress)
   }
 }

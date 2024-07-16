@@ -27,11 +27,20 @@ open class ContactViewController: NEBaseContactViewController {
         ),
       ]
 
-      if IMKitConfigCenter.shared.teamEnable {
+      if IMKitConfigCenter.shared.enableTeam {
         contactHeaders.append(ContactHeadItem(
           name: localizable("my_teams"),
           imageName: "group",
           router: ContactTeamListRouter,
+          color: UIColor(hexString: "#BE65D9")
+        ))
+      }
+
+      if IMKitConfigCenter.shared.enableAIUser {
+        contactHeaders.append(ContactHeadItem(
+          name: localizable("my_ai_user"),
+          imageName: "aiUser",
+          router: ContactAIUserListRouter,
           color: UIColor(hexString: "#BE65D9")
         ))
       }

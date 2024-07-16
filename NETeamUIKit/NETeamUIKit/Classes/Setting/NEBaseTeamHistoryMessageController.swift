@@ -22,7 +22,6 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     let tableView = UITableView(frame: .zero, style: .plain)
     tableView.translatesAutoresizingMaskIntoConstraints = false
     tableView.separatorStyle = .none
-    tableView.keyboardDismissMode = .onDrag
     tableView.delegate = self
     tableView.dataSource = self
     tableView.register(
@@ -33,6 +32,16 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     tableView.backgroundColor = .white
     tableView.sectionHeaderHeight = 30
     tableView.sectionFooterHeight = 0
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -112,6 +121,8 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
       emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
       emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
     ])
+
+    navigationView.moreButton.isHidden = true
   }
 
   open func initialConfig() {
@@ -154,7 +165,7 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
       } else {
         NEALog.errorLog(
           ModuleName + " " + (weakSelf?.tag ?? "TeamHistoryMessageController"),
-          desc: "❌searchMessages failed, error = \(error!)"
+          desc: "searchMessages failed, error = \(error!)"
         )
       }
     }

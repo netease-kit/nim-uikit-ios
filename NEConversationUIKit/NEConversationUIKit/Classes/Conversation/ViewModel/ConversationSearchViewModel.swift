@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListener, NEIMKitClientListener {
+open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientListener {
   let conversationRepo = ConversationRepo.shared
 
   /// 群数据缓存
@@ -130,18 +130,6 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
     }
   }
 
-  // MARK: - NEContactListener
-
-  /// 好友信息更新
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    if let uid = friendInfo.accountId {
-      let model = ConversationSearchListModel()
-      model.userInfo = NEFriendUserCache.shared.getFriendInfo(uid)
-      friendDic[uid] = model
-    }
-  }
-
   // MARK: - V2NIMTeamListener
 
   /// 群信息更新回调
@@ -201,6 +189,26 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEContactListe
     weak var weakSelf = self
     getSearchData(true) {
       NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + ", get data finish")
+    }
+  }
+}
+
+// MARK: - NEContactListener
+
+extension ConversationSearchViewModel: NEContactListener {
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    guard changeType == .update else {
+      return
+    }
+
+    for contact in contacts {
+      if let accid = contact.user?.accountId {
+        let model = ConversationSearchListModel()
+        model.userInfo = contact
+        friendDic[accid] = model
+      }
     }
   }
 }

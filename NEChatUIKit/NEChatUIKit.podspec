@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = 'NEChatUIKit'
-  s.version      = '10.2.1'
+  s.version      = '10.3.0'
   s.summary      = 'Chat Module of IM.'
 
   # This description is used to generate tags and improve search results.
@@ -32,7 +32,7 @@ TODO: Add long description of the pod here.
   s.author           = 'yunxin engineering department'
   s.source           = { :git => 'ssh://git@g.hz.netease.com:22222/yunxin-app/xkit-ios.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '12.0'
   s.swift_version = '5.0'
 
   s.source_files = 'NEChatUIKit/Classes/**/*'

@@ -14,12 +14,6 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   override public init(conversationId: String) {
     super.init(conversationId: conversationId)
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: true)
-
-    normalInputHeight = 90
-    brokenNetworkViewHeight = 48
-    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
-
-    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
   }
 
   public required init?(coder: NSCoder) {
@@ -29,10 +23,18 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
-    view.bringSubviewToFront(chatInputView)
+
+    normalInputHeight = 90
+    brokenNetworkViewHeight = 48
+    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
+
+    topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
+
     brokenNetworkView.errorIconView.isHidden = false
     brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
     brokenNetworkView.contentLabel.textColor = .funChatNetworkBrokenTitleColor
+
+    view.bringSubviewToFront(chatInputView)
     getFunInputView()?.funDelegate = self
   }
 
@@ -57,8 +59,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   /// 获取@列表视图控制器 - 通用版
-  override func getUserSelectVC() -> NEBaseSelectUserViewController {
-    FunSelectUserViewController(sessionId: viewModel.sessionId, showSelf: false)
+  override func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
+    FunSelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
   /// 获取文本详情页视图控制器 - 通用版
@@ -69,6 +71,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func recordModeChangeDidClick() {
+    translateLanguageView.changeToIdleState(true)
+    translateLanguageViewHeightAnchor?.constant = 0
     normalOffset = 0
     if chatInputView.chatInpuMode == .multipleSend {
       normalInputHeight = 90
@@ -108,27 +112,14 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     chatInputView.textView.becomeFirstResponder()
   }
 
-  override open func expandMoreAction() {
-    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: V2NIMConversationIdUtil.conversationType(viewModel.conversationId))
-    if NEChatKitClient.instance.delegate == nil {
-      items = items.filter { item in
-        if item.type == .location {
-          return false
-        }
-        return true
-      }
-    }
-    let photo = NEMoreItemModel()
-    photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
-    photo.title = chatLocalizable("chat_photo")
-    photo.type = .photo
-    photo.customDelegate = self
-    photo.action = #selector(openPhoto)
-    items.insert(photo, at: 0)
+  @discardableResult
+  override open func expandMoreAction() -> [NEMoreItemModel] {
+    let items = super.expandMoreAction()
     chatInputView.chatAddMoreView.configData(data: items)
+    return items
   }
 
-  func openPhoto() {
+  override open func openPhoto() {
     NEALog.infoLog(className(), desc: "open photo")
     willSelectItem(button: chatInputView.currentButton, index: showPhotoTag)
   }
@@ -301,14 +292,14 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         }
       } else {
         var text = chatLocalizable("msg_reply")
-        if let uid = message.senderId {
-          var showName = ChatTeamCache.shared.getShowName(uid, false)
+        if let uid = ChatMessageHelper.getSenderId(message) {
+          var showName = NETeamUserManager.shared.getShowName(uid, false)
           if V2NIMConversationIdUtil.conversationType(viewModel.conversationId) != .CONVERSATION_TYPE_P2P,
              !IMKitClient.instance.isMe(uid) {
             addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
           }
 
-          showName = ChatTeamCache.shared.getShowName(uid)
+          showName = NETeamUserManager.shared.getShowName(uid)
           text += " " + showName
           text += ": \(ChatMessageHelper.contentOfMessage(message))"
           getFunInputView()?.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: text,
@@ -352,9 +343,9 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     let contentWidth = model.contentSize.width
     let contentHeight = model.contentSize.height
-    if contentHeight < 42 {
-      let subHeight = 42 - contentHeight
-      model.contentSize = CGSize(width: contentWidth, height: 42)
+    if contentHeight < fun_chat_min_h {
+      let subHeight = fun_chat_min_h - contentHeight
+      model.contentSize = CGSize(width: contentWidth, height: fun_chat_min_h)
       model.offset = CGFloat(subHeight)
     }
 
@@ -423,5 +414,13 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       normalOffset = 30
     }
     layoutInputViewWithAnimation(offset: currentKeyboardHeight)
+  }
+
+  override open func didSwitchLanguageClick(_ currentLanguage: String?) {
+    let funLanguageSelectController = FunSelectLanguageViewController()
+    if let current = currentLanguage {
+      funLanguageSelectController.currentContent = current
+    }
+    showLanguageContentController(funLanguageSelectController)
   }
 }

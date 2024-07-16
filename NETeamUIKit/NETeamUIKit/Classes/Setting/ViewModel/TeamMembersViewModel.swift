@@ -11,7 +11,7 @@ protocol TeamMembersViewModelDelegate: NSObject {
   func didNeedRefreshUI()
 }
 
-class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConversationListener, NETeamMemberCacheListener, NEEventListener {
+class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NETeamMemberCacheListener, NEEventListener {
   /// 是否正在请求数据
   public var isRequest = false
   /// 群id
@@ -34,8 +34,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConve
   override init() {
     super.init()
     teamRepo.addTeamListener(self)
-    ContactRepo.shared.addContactListener(self)
-    ConversationRepo.shared.addListener(self)
+    ConversationRepo.shared.addConversationListener(self)
     NETeamMemberCache.shared.addTeamCacheListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.addListener(self)
@@ -44,8 +43,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConve
 
   deinit {
     teamRepo.removeTeamListener(self)
-    ContactRepo.shared.removeContactListener(self)
-    ConversationRepo.shared.removeListener(self)
+    ConversationRepo.shared.removeConversationListener(self)
     NETeamMemberCache.shared.removeTeamCacheListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.removeListener(self)
@@ -67,7 +65,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConve
   /// - Parameter teamdId: 群id
   /// - Parameter uids: 用户id
   func removeTeamMember(_ teamdId: String, _ uids: [String], _ completion: @escaping (NSError?) -> Void) {
-    teamRepo.removeMembers(teamdId, .TEAM_TYPE_NORMAL, uids) { error in
+    teamRepo.removeTeamMembers(teamdId, .TEAM_TYPE_NORMAL, uids) { error in
       completion(error as NSError?)
     }
   }
@@ -126,19 +124,6 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEContactListener, NEConve
       }
       return false
     })
-  }
-
-  // MARK: - NEContactListener
-
-  /// 好友信息变更回调
-  /// - Parameter friendInfo: 好友信息
-  func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    datas.forEach { [weak self] model in
-      if let accountId = model.nimUser?.user?.accountId, accountId == friendInfo.accountId {
-        if let tid = self?.teamId {}
-        return
-      }
-    }
   }
 
   /// 群成员信息更新

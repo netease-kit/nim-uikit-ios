@@ -25,7 +25,7 @@ public class MineTableViewCell: UITableViewCell {
     return nameLabel
   }()
 
-  /// 分割线
+  /// 分隔线
   private lazy var bottomLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false

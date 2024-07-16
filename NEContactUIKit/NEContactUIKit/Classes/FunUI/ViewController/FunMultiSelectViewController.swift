@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NECommonUIKit
 import NECoreIM2Kit
 import NECoreKit
 import NIMSDK
@@ -15,7 +16,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
     super.init(filterUsers: filterUsers)
     themeColor = .funContactThemeColor
     titleText = localizable("select")
-    sureButtonText = localizable("complete")
+    sureButtonText = commonLocalizable("complete")
   }
 
   public required init?(coder: NSCoder) {

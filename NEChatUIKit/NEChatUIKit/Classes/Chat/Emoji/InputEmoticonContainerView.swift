@@ -142,7 +142,7 @@ open class InputEmoticonContainerView: UIView {
         return emotionsCount / layoutCount + 1
       }
     } else {
-      NEALog.errorLog(classTag, desc: "❌count maybe nil")
+      NEALog.errorLog(classTag, desc: "count maybe nil")
       return 0
     }
   }
@@ -251,7 +251,7 @@ extension InputEmoticonContainerView {
                                  startX: CGFloat, startY: CGFloat, iconWidth: CGFloat,
                                  iconHeight: CGFloat, emotion: NIMInputEmoticonCatalog) {
     guard let layout = emotion.layout else {
-      NEALog.errorLog(classTag, desc: "❌emotion is nill")
+      NEALog.errorLog(classTag, desc: "emotion is nill")
       return
     }
 
@@ -298,7 +298,7 @@ extension InputEmoticonContainerView: EmojiPageViewDelegate, EmojiPageViewDataSo
     var resultEmotion = NIMInputEmoticonCatalog()
 
     guard let totalData = totalCatalogData, let targetView = pageView else {
-      NEALog.errorLog(classTag, desc: "❌totalCatalogData is nil")
+      NEALog.errorLog(classTag, desc: "totalCatalogData is nil")
       return UIView()
     }
 
@@ -336,7 +336,7 @@ extension InputEmoticonContainerView: InputEmoticonTabViewDelegate {
 extension InputEmoticonContainerView: NIMInputEmoticonButtonDelegate {
   open func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String) {
     guard let emotionId = emotion.emoticonID else {
-      NEALog.errorLog(classTag, desc: "❌emoticonID is nil")
+      NEALog.errorLog(classTag, desc: "emoticonID is nil")
       return
     }
     if emotion.type == .unicode {

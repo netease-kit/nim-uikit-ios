@@ -11,21 +11,19 @@ import UIKit
 open class ValidationMessageViewController: NEBaseValidationMessageViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  override open func setupUI() {
-    super.setupUI()
+  override func initNav() {
+    super.initNav()
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),
       style: .done,
       target: self,
-      action: #selector(clearMessage)
+      action: #selector(toSetting)
     )
     clearItem.tintColor = .ne_darkText
     var textAttributes = [NSAttributedString.Key: Any]()
@@ -35,6 +33,12 @@ open class ValidationMessageViewController: NEBaseValidationMessageViewControlle
     navigationItem.rightBarButtonItem = clearItem
 
     navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 16)
+  }
+
+  override open func setupUI() {
+    super.setupUI()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
 
     tableView.register(
       SystemNotificationCell.self,

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatUIKit
 import NECommonKit
 import NIMSDK
 import UIKit
@@ -46,7 +47,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     return label
   }()
 
-  /// 分割线
+  /// 分隔线
   public lazy var bottomLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -85,7 +86,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
 
   open func configData(message: HistoryMessageModel?) {
     if message?.fullName?.count ?? 0 <= 0 {
-      message?.fullName = message?.imMessage?.senderId
+      message?.fullName = ChatMessageHelper.getSenderId(message?.imMessage)
     }
     titleLabel.text = message?.fullName
     timeLabel.text = message?.time
@@ -96,7 +97,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     } else {
       headView.setTitle(message?.shortName ?? "")
       headView.sd_setImage(with: nil, completed: nil)
-      headView.backgroundColor = UIColor.colorWithString(string: message?.imMessage?.senderId)
+      headView.backgroundColor = UIColor.colorWithString(string: ChatMessageHelper.getSenderId(message?.imMessage))
     }
   }
 

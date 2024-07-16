@@ -89,7 +89,7 @@ open class EmojiPageView: UIView {
   func reloadPage() {
     // reload时候记录上次位置
 //        guard let cPage = currentPage else {
-//            NEALog.errorLog(className, desc: "❌currentPage is nil")
+//            NEALog.errorLog(className, desc: "currentPage is nil")
 //            return
 //        }
     if currentPage >= pages.count {

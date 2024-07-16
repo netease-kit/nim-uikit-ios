@@ -18,7 +18,7 @@ public protocol ConversationViewModelDelegate: NSObjectProtocol {
 public typealias ConversationCallBack = (NSError?, Bool?) -> Void
 
 @objcMembers
-open class ConversationViewModel: NSObject, NEConversationListener, NETeamListener, NEChatListener, NEContactListener, NEIMKitClientListener {
+open class ConversationViewModel: NSObject, NEConversationListener, NETeamListener, NEChatListener, NEContactListener, NEIMKitClientListener, AIUserPinListener, AIUserChangeListener {
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
 
@@ -36,6 +36,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 置顶会话数据
   public var stickTopConversations = [NEConversationListModel]()
+
+  /// AI 数字人列表
+  public var aiUserListData = [NEAIUserModel]()
 
   /// 所有会话数据记录
   public var conversationDic = [String: NEConversationListModel]()
@@ -58,21 +61,25 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     super.init()
     NotificationCenter.default.addObserver(self, selector: #selector(atMessageChange), name: Notification.Name(AtMessageChangeNoti), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(deleteConversationNoti), name: NENotificationName.deleteConversationNotificationName, object: nil)
-    conversationRepo.addListener(self)
+    conversationRepo.addConversationListener(self)
     ChatRepo.shared.addChatListener(self)
     TeamRepo.shared.addTeamListener(self)
     ContactRepo.shared.addContactListener(self)
     IMKitClient.instance.addLoginListener(self)
+    NEAIUserPinManager.shared.addPinManagerListener(self)
+    NEAIUserManager.shared.addAIUserChangeListener(listener: self)
   }
 
   deinit {
     NEALog.infoLog(ModuleName + className(), desc: #function)
     NotificationCenter.default.removeObserver(self)
-    conversationRepo.removeListener(self)
+    conversationRepo.removeConversationListener(self)
     ChatRepo.shared.removeChatListener(self)
     TeamRepo.shared.removeTeamListener(self)
     ContactRepo.shared.removeContactListener(self)
     IMKitClient.instance.removeLoginListener(self)
+    NEAIUserPinManager.shared.removePinManagerListener(self)
+    NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
   }
 
   func atMessageChange() {
@@ -87,6 +94,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " deleteConversationNoti \(error?.localizedDescription ?? "") ")
       }
     }
+  }
+
+  open func getAIUserList() {
+    NEAIUserManager.shared.getAIUserList()
   }
 
   /// 分页获取会话列表
@@ -188,7 +199,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 处理置顶变更逻辑
   public func filterStickTopData(_ conversations: [V2NIMConversation]) {
+    // 记录置顶
     var changeTostickTopSet = Set<String>()
+    // 记录移除置顶
     var changeToUnStickTopDic = Set<String>()
     for conversation in conversations {
       if let model = conversationDic[conversation.conversationId] {
@@ -242,6 +255,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     filterStickTopData(conversations)
 
     for conversation in conversations {
+      if let manager = NEAtMessageManager.instance {
+        if conversation.unreadCount == 0, manager.isAtCurrentUser(conversationId: conversation.conversationId) {
+          NEAtMessageManager.instance?.clearAtRecord(conversation.conversationId)
+        }
+      }
+
       if checkDismissTeamNoti(conversation) {
         continue
       }
@@ -277,7 +296,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 检查会话是否包含解散通知的变更
   /// - Parameter conversation: 会话
   public func checkDismissTeamNoti(_ conversation: V2NIMConversation) -> Bool {
-    if IMKitConfigCenter.shared.dismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
       return false
     }
 
@@ -403,7 +422,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter team: 群信息
   public func onTeamDismissed(_ team: V2NIMTeam) {
     NEALog.infoLog(className(), desc: "onTeamDismissed team id : \(team.teamId) team name: \(team.name)")
-    if IMKitConfigCenter.shared.dismissTeamDeleteConversation {
+    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation {
       if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
         didDeleteConversation(cid)
       }
@@ -411,7 +430,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   private func didDeleteConversation(_ cid: String) {
-    if IMKitConfigCenter.shared.dismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
       return
     }
     conversationRepo.deleteConversation(cid) { [weak self] error in
@@ -452,6 +471,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         getConversationListByPage(completion)
         /// 回调置空
         callBack = nil
+
       } else {
         NEALog.infoLog(className(), desc: #function + " retrieveConversationDatas")
         retrieveConversationDatas()
@@ -501,14 +521,30 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     NEALog.infoLog(className(), desc: "onConversationSyncFailed : \(error.desc)")
   }
 
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
   public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    NEALog.infoLog(className(), desc: "onFriendInfoChanged : \(friendInfo.accountId ?? "")")
+    NEALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
     delegate?.reloadTableView()
   }
 
-  /// 用户信息变更回调
-  /// - Parameter users: 用户信息列表
-  public func onUserProfileChanged(_ users: [V2NIMUser]) {
+  // MARK: Pin Manager Listener
+
+  public func userInfoDidChange() {
+    NEALog.infoLog(className(), desc: #function + "" + "conversaion view model userInfoDidChange")
+    getAIUserList()
+  }
+
+  public func onAIUserChanged(aiUsers: [V2NIMAIUser]) {
+    aiUserListData.removeAll()
+    weak var weakSelf = self
+    for aiUser in aiUsers {
+      if NEAIUserPinManager.shared.checkoutUnPinAIUser(aiUser) == true {
+        let model = NEAIUserModel()
+        model.aiUser = aiUser
+        weakSelf?.aiUserListData.append(model)
+      }
+    }
     delegate?.reloadTableView()
   }
 }

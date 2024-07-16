@@ -28,7 +28,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     return button
   }()
 
-  /// 分割线
+  /// 分隔线
   public lazy var bottomLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +36,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     return view
   }()
 
-  public var bottomLineLeftConstraint: NSLayoutConstraint? // 分割线左边约束
+  public var bottomLineLeftConstraint: NSLayoutConstraint? // 分隔线左边约束
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

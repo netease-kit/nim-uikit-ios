@@ -43,6 +43,13 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     tableView
       .tableFooterView =
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
+    tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -124,6 +131,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     title = localizable("setting")
     weak var weakSelf = self
     viewModel.delegate = self
+    navigationView.moreButton.isHidden = true
     if let tid = teamId {
       viewModel.getCurrentMember(IMKitClient.instance.account(), tid) { member, error in
         if let currentMember = member {
@@ -284,7 +292,12 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     }
 
     param["limit"] = (viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
-    Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+
+    if IMKitConfigCenter.shared.enableAIUser {
+      Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
+    } else {
+      Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+    }
   }
 
   /// 退出/解散群聊

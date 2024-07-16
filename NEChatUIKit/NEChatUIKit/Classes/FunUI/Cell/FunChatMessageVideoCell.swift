@@ -121,6 +121,18 @@ open class FunChatMessageVideoCell: FunChatMessageImageCell {
     ])
   }
 
+  /// 根据消息发送方向决定元素的显隐
+  /// @param showRight    是否右侧显示（是否是发送的消息）
+  override open func showLeftOrRight(showRight: Bool) {
+    super.showLeftOrRight(showRight: showRight)
+    contentImageViewLeft.isHidden = showRight
+    timeViewLeft.isHidden = showRight
+    stateViewLeft.isHidden = showRight
+    contentImageViewRight.isHidden = !showRight
+    timeViewRight.isHidden = !showRight
+    stateViewRight.isHidden = !showRight
+  }
+
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
@@ -131,7 +143,7 @@ open class FunChatMessageVideoCell: FunChatMessageImageCell {
     if let videoObject = model.message?.attachment as? V2NIMMessageVideoAttachment {
       // 获取首帧
       let videoUrl = videoObject.url ?? ""
-      let thumbUrl = ResourceRepo.shared.videoThumbnailURL(videoUrl)
+      let thumbUrl = V2NIMStorageUtil.videoCoverUrl(videoUrl, offset: 0)
       contentImageView.sd_setImage(
         with: URL(string: thumbUrl),
         placeholderImage: nil,
@@ -164,8 +176,8 @@ open class FunChatMessageVideoCell: FunChatMessageImageCell {
     }
   }
 
-  override open func uploadProgress(byRight: Bool, _ progress: UInt) {
-    let stateView = byRight ? stateViewRight : stateViewLeft
+  override open func uploadProgress(_ progress: UInt) {
+    let stateView = stateViewLeft.isHidden ? stateViewRight : stateViewLeft
     stateView.setProgress(Float(progress) / 100)
   }
 }

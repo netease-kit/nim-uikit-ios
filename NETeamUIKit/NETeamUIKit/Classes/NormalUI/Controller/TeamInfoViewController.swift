@@ -14,9 +14,6 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
       SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,
       SettingCellType.SettingHeaderCell.rawValue: TeamSettingHeaderCell.self,
     ]
-    view.backgroundColor = .ne_lightBackgroundColor
-    navigationView.backgroundColor = .ne_lightBackgroundColor
-    navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
   }
 
   public required init?(coder: NSCoder) {
@@ -26,6 +23,8 @@ open class TeamInfoViewController: NEBaseTeamInfoViewController {
   override open func setupUI() {
     super.setupUI()
     view.backgroundColor = .ne_lightBackgroundColor
+    navigationView.backgroundColor = .ne_lightBackgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

@@ -24,6 +24,20 @@ public extension ContactRouter {
       nav?.pushViewController(contactSelectVC, animated: true)
     }
 
+    // 携带机器人的成员选择页面
+    Router.shared.register(ContactFusionSelectRouter) { param in
+      let nav = param["nav"] as? UINavigationController
+      let userFilters = param["filters"] as? Set<String>
+      let contactSelectedPageController = ContactSelectedPageController(filterUsers: userFilters)
+      if let limit = param["limit"] as? Int, limit > 0 {
+        contactSelectedPageController.limit = limit
+      }
+      if let uid = param["uid"] as? String {
+        contactSelectedPageController.userId = uid
+      }
+      nav?.pushViewController(contactSelectedPageController, animated: true)
+    }
+
     // 转发选择页面
     Router.shared.register(ForwardMultiSelectRouter) { param in
       let nav = param["nav"] as? UINavigationController
@@ -76,6 +90,13 @@ public extension ContactRouter {
     Router.shared.register(ContactBlackListRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
         let blackVC = BlackListViewController()
+        nav.pushViewController(blackVC, animated: true)
+      }
+    }
+
+    Router.shared.register(ContactAIUserListRouter) { param in
+      if let nav = param["nav"] as? UINavigationController {
+        let blackVC = AIUserController()
         nav.pushViewController(blackVC, animated: true)
       }
     }

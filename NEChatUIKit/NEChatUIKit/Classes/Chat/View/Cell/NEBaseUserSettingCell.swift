@@ -7,6 +7,16 @@
 open class NEBaseUserSettingCell: CornerCell {
   public var model: UserSettingCellModel?
 
+  public var subCornerType: CornerType {
+    get { cornerType }
+    set {
+      if cornerType != newValue {
+        cornerType = newValue
+        setNeedsDisplay()
+      }
+    }
+  }
+
   public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +44,7 @@ open class NEBaseUserSettingCell: CornerCell {
   open func configure(_ anyModel: Any) {
     if let m = anyModel as? UserSettingCellModel {
       model = m
-      cornerType = m.cornerType
+      subCornerType = m.cornerType
       titleLabel.text = m.cellName
     }
   }

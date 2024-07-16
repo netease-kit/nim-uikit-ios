@@ -9,8 +9,8 @@ import UIKit
 
 @objcMembers
 open class FunSelectUserViewController: NEBaseSelectUserViewController {
-  override init(sessionId: String, showSelf: Bool = true) {
-    super.init(sessionId: sessionId, showSelf: showSelf)
+  override init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
+    super.init(conversationId: conversationId, showSelf: showSelf, showTeamMembers: showTeamMembers)
     className = "FunSelectUserViewController"
   }
 

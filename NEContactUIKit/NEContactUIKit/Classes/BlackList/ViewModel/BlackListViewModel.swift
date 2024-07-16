@@ -15,7 +15,7 @@ public protocol BlackListViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-open class BlackListViewModel: NSObject, NEContactListener {
+open class BlackListViewModel: NSObject {
   var contactRepo = ContactRepo.shared
   public var blockList = [NEUserWithFriend]()
   public weak var delegate: BlackListViewModelDelegate?
@@ -26,10 +26,21 @@ open class BlackListViewModel: NSObject, NEContactListener {
     contactRepo.addContactListener(self)
   }
 
+  deinit {
+    contactRepo.removeContactListener(self)
+  }
+
   /// 获取黑名单列表
   func getBlackList() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    blockList = NEFriendUserCache.shared.getBlocklist().map(\.value)
+    if let blockList = NEFriendUserCache.shared.getBlocklist() {
+      NEFriendUserCache.shared.loadShowName(blockList) { users in
+        if let users = users {
+          self.blockList = users
+        }
+        self.delegate?.tableViewReload()
+      }
+    }
   }
 
   /// 移除黑名单
@@ -40,7 +51,7 @@ open class BlackListViewModel: NSObject, NEContactListener {
   func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
     contactRepo.removeBlockList(accountId: account) { error in
-      if let err = error as? NSError {
+      if let err = error {
         NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
         completion(err)
       } else {
@@ -57,9 +68,9 @@ open class BlackListViewModel: NSObject, NEContactListener {
   func addBlackList(users: [NEUserWithFriend], _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", users.count:\(users.count)")
 
-    for (i, user) in users.enumerated() {
+    for user in users {
       contactRepo.addBlockList(accountId: user.user?.accountId ?? "") { error in
-        if let err = error as? NSError {
+        if let err = error {
           NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
           completion(err)
         } else {
@@ -68,70 +79,56 @@ open class BlackListViewModel: NSObject, NEContactListener {
       }
     }
   }
+}
 
-  // MARK: - NEContactListener
+// MARK: - NEContactListener
 
-  /// 用户信息变更回调
-  /// - Parameter users: 用户列表
-  public func onUserProfileChanged(_ users: [V2NIMUser]) {
-    for user in users {
-      for (index, friendUser) in blockList.enumerated() {
-        if friendUser.user?.accountId == user.accountId {
-          friendUser.user = user
-          delegate?.tableViewReload([IndexPath(row: index, section: 0)])
-          break
-        }
-      }
-    }
-  }
-
-  /// 黑名单添加回调
-  /// - Parameter user: 用户信息
-  public func onBlockListAdded(_ user: V2NIMUser) {
-    guard let accountId = user.accountId else { return }
-
-    // 黑名单中已存在
-    if blockList.contains(where: { $0.user?.accountId == user.accountId }) {
-      return
-    }
-
-    let blockUser = NEFriendUserCache.shared.getFriendInfo(accountId) ?? NEUserWithFriend(user: user)
-    let index = IndexPath(row: blockList.count, section: 0)
-    blockList.append(blockUser)
-    delegate?.tableViewInsert([index])
-  }
-
-  /// 黑名单移除回调
-  /// - Parameter accountId: 好友 Id
+extension BlackListViewModel: NEContactListener {
+  /// 黑名单移除回调 （非好友）
+  /// - Parameter accountId: 移除黑名单用户账号ID
   public func onBlockListRemoved(_ accountId: String) {
     for (index, friendUser) in blockList.enumerated() {
+      // 移除黑名单
       if friendUser.user?.accountId == accountId {
         blockList.remove(at: index)
         delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
-        break
       }
     }
   }
 
-  /// 删除好友通知
-  /// 本端删除好友，多端同步
-  /// - Parameters:
-  ///   - accountId: 删除的好友账号ID
-  ///   - deletionType: 好友删除的类型
-  public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
-    if NEFriendUserCache.shared.isBlockAccount(accountId) {
-      onBlockListRemoved(accountId)
-    }
-  }
+  /// 好友信息缓存更新
+  /// - Parameter accountId: 用户 id
+  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    for contact in contacts {
+      // 添加黑名单
+      if changeType == .addBlock,
+         !blockList.contains(where: { $0.user?.accountId == contact.user?.accountId }) {
+        let index = IndexPath(row: blockList.count, section: 0)
+        blockList.append(contact)
+        delegate?.tableViewInsert([index])
+      }
 
-  /// 好友信息变更回调
-  /// - Parameter friendInfo: 好友信息
-  public func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    for (index, friendUser) in blockList.enumerated() {
-      if friendUser.user?.accountId == friendInfo.accountId {
-        friendUser.friend = friendInfo
-        delegate?.tableViewReload([IndexPath(row: index, section: 0)])
-        break
+      for (index, friendUser) in blockList.enumerated() {
+        // 用户信息更新
+        if changeType == .update,
+           friendUser.user?.accountId == contact.user?.accountId {
+          blockList[index] = contact
+          delegate?.tableViewReload([IndexPath(row: index, section: 0)])
+        }
+
+        // 移除黑名单
+        if changeType == .removeBlock,
+           friendUser.user?.accountId == contact.user?.accountId {
+          blockList.remove(at: index)
+          delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+        }
+
+        // 删除好友
+        if changeType == .deleteFriend,
+           friendUser.user?.accountId == contact.user?.accountId {
+          blockList.remove(at: index)
+          delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+        }
       }
     }
   }

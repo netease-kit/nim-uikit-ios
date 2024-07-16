@@ -3,26 +3,38 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import UIKit
-
-// protocol OperationCellDelegate: AnyObject {
-//    func didSelected(_ cell: OperationCell, _ model: OperationItem?)
-// }
 
 @objcMembers
 open class OperationCell: UICollectionViewCell {
   public var imageView = UIImageView()
   public var label = UILabel()
-//    public weak var delegate: OperationCellDelegate?
   public var model: OperationItem? {
     didSet {
-      imageView.image = UIImage.ne_imageNamed(name: model?.imageName)
+      if let imageName = model?.imageName,
+         !imageName.isEmpty,
+         let image = UIImage.ne_imageNamed(name: imageName) {
+        imageView.image = image
+      } else {
+        imageView.image = model?.image
+      }
+
       label.text = model?.text
     }
   }
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
+    commonUI()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    commonUI()
+  }
+
+  public func commonUI() {
     contentView.accessibilityIdentifier = "id.menuCell"
 
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -48,15 +60,5 @@ open class OperationCell: UICollectionViewCell {
       label.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0),
       label.heightAnchor.constraint(equalToConstant: 18),
     ])
-//        let tap = UITapGestureRecognizer(target: self, action: #selector(tapEvent))
-//        self.contentView.addGestureRecognizer(tap)
   }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-//    @objc func tapEvent(tap: UITapGestureRecognizer) {
-//        self.delegate?.didSelected(self, model)
-//    }
 }

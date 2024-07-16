@@ -31,6 +31,8 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 数据拉取标志
   var isLoadingData = false
 
+  /// 内容列表 顶部布局约束
+  public var tableViewTopAnchor: NSLayoutConstraint?
   /// 内容列表
   public lazy var tableView: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
@@ -41,6 +43,15 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     tableView.dataSource = self
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
+
+    if #available(iOS 11.0, *) {
+      tableView.estimatedRowHeight = 0
+      tableView.estimatedSectionHeaderHeight = 0
+      tableView.estimatedSectionFooterHeight = 0
+    }
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
+    }
     return tableView
   }()
 
@@ -72,6 +83,11 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   deinit {
     IMKitClient.instance.removeLoginListener(self)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tableViewTopAnchor?.constant = topConstant
   }
 
   override open func viewDidLoad() {
@@ -114,11 +130,12 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// UI 初始化
   func setupUI() {
     title = chatLocalizable("operation_pin")
-    navigationView.navTitle.text = chatLocalizable("operation_pin")
     navigationView.moreButton.isHidden = true
+
     view.addSubview(tableView)
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.navigationAndStatusHeight),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -232,7 +249,6 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       if let err = error {
         print(err.localizedDescription)
       } else {
-        weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.items.count ?? 0) > 0
         weakSelf?.showToast(chatLocalizable("cancel_pin_success"))
       }
     }
@@ -394,11 +410,12 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       return
     }
 
-    let indexs = indexs.filter { $0.row >= 0 && $0.row < viewModel.items.count }
+    let indexs = indexs.filter { $0.row >= 0 && $0.row < tableView.numberOfRows(inSection: 0) }
 
     if !indexs.isEmpty {
-      tableView.deleteData(indexs)
-      emptyView.isHidden = viewModel.items.count > 0
+      tableView.deleteData(indexs) { [weak self] _ in
+        self?.emptyView.isHidden = (self?.viewModel.items.count ?? 0) > 0
+      }
     }
   }
 

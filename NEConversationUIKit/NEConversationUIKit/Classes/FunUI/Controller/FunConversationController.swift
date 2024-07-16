@@ -24,6 +24,7 @@ open class FunConversationController: NEBaseConversationController {
     className = "FunConversationController"
     deleteButtonBackgroundColor = .funConversationdeleteActionColor
     cellRegisterDic = [0: FunConversationListCell.self]
+    stickTopCellRegisterDic = [0: FunStickTopCell.self]
     brokenNetworkViewHeight = 48
     brokenNetworkView.errorIconView.isHidden = false
     brokenNetworkView.backgroundColor = .funConversationNetworkBrokenBackgroundColor
@@ -86,6 +87,8 @@ open class FunConversationController: NEBaseConversationController {
 
     tableView.rowHeight = 72
     tableView.backgroundColor = .funConversationBackgroundColor
+
+    stickTopCollcetionView.frame = CGRect(x: 4, y: 0, width: view.frame.size.width - 8.0, height: 104)
   }
 
   override open func getPopListItems() -> [PopListItem] {
@@ -103,5 +106,36 @@ open class FunConversationController: NEBaseConversationController {
     createDicuss.image = UIImage.ne_imageNamed(name: "funCreateTeam")
 
     return items
+  }
+
+  /// 置顶cell大小
+  override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    CGSize(width: 72, height: 104)
+  }
+
+  /// 置顶显示隐藏(根据是否有置顶数据)
+  open func setupFunStickTopView() {
+    if viewModel.aiUserListData.count > 0 {
+      if let headerView = tableView.tableHeaderView {
+        if headerView.isKind(of: UICollectionView.self) == false {
+          NEALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
+          tableView.tableHeaderView = stickTopCollcetionView
+        }
+      } else {
+        NEALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
+        tableView.tableHeaderView = stickTopCollcetionView
+      }
+      stickTopCollcetionView.reloadData()
+    } else {
+      if tableView.tableHeaderView != nil {
+        tableView.tableHeaderView = nil
+      }
+    }
+  }
+
+  override open func reloadTableView() {
+    super.reloadTableView()
+    NEALog.infoLog(className(), desc: #function + " reloadTableView in fun conversation controller stick top count \(viewModel.stickTopConversations.count)")
+    setupFunStickTopView()
   }
 }

@@ -11,8 +11,6 @@ open class TeamHistoryMessageController: NEBaseTeamHistoryMessageController {
   override public init(teamId: String?) {
     super.init(teamId: teamId)
     tag = "TeamHistoryMessageController"
-    navigationView.backgroundColor = .white
-    navigationController?.navigationBar.backgroundColor = .white
   }
 
   public required init?(coder: NSCoder) {
@@ -21,6 +19,9 @@ open class TeamHistoryMessageController: NEBaseTeamHistoryMessageController {
 
   override open func setupSubviews() {
     super.setupSubviews()
+    navigationView.backgroundColor = .white
+    navigationController?.navigationBar.backgroundColor = .white
+
     NSLayoutConstraint.activate([
       searchTextField.topAnchor.constraint(
         equalTo: view.topAnchor,

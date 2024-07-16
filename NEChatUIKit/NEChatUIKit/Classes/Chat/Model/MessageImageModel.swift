@@ -19,7 +19,7 @@ open class MessageImageModel: MessageContentModel {
         urlString = path
       } else if let url = imageObject.url {
         if imageObject.ext?.lowercased() != ".gif" {
-          urlString = ResourceRepo.shared.imageThumbnailURL(url)
+          urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: 350)
         }
         urlString = url
       }

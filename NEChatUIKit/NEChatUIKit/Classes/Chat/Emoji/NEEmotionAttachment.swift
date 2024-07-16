@@ -11,7 +11,11 @@ open class NEEmotionAttachment: NSTextAttachment {
   public var emotion: NIMInputEmoticon? {
     set {
       _emotion = newValue
-      image = UIImage.ne_bundleImage(name: emotion?.fileName ?? "")
+      if NIMInputEmoticonManager.shared.isCustomEmojResource == false {
+        image = UIImage.ne_bundleImage(name: emotion?.fileName ?? "")
+      } else {
+        image = UIImage(named: emotion?.fileName ?? "")
+      }
     }
     get {
       _emotion

@@ -32,8 +32,10 @@ open class NEPinMessageModel: NSObject {
 
   private func modelFromMessage(message: V2NIMMessage) -> MessageModel {
     let model = ChatMessageHelper.modelFromMessage(message: message)
-    model.fullName = message.senderId
-    model.shortName = NEFriendUserCache.getShortName(message.senderId ?? "")
+    let uid = ChatMessageHelper.getSenderId(message)
+
+    model.fullName = uid ?? ""
+    model.shortName = NEFriendUserCache.getShortName(uid ?? "''")
     return model
   }
 

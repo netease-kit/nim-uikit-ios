@@ -4,13 +4,14 @@
 // found in the LICENSE file.
 
 import Foundation
+import NECommonUIKit
 
 extension UIAlertController {
   class func reconfimAlertView(title: String?, message: String?,
                                confirm: @escaping () -> Void) -> UIAlertController {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: chatLocalizable("cancel"), style: .cancel, handler: nil))
-    alert.addAction(UIAlertAction(title: chatLocalizable("ok"), style: .default) { action in
+    alert.addAction(UIAlertAction(title: commonLocalizable("ok"), style: .default) { action in
       confirm()
     })
     return alert
@@ -19,7 +20,7 @@ extension UIAlertController {
   class func singleAlertView(title: String?, message: String?,
                              confirm: @escaping () -> Void) -> UIAlertController {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: chatLocalizable("ok"), style: .default) { action in
+    alert.addAction(UIAlertAction(title: commonLocalizable("ok"), style: .default) { action in
       confirm()
     })
     return alert
