@@ -33,7 +33,7 @@ open class NEEmotionTool: NSObject {
   ///   - offset: 偏移量
   /// - Returns: 替换表情后的富文本
   class func getAttWithStr(str: String, font: UIFont,
-                           _ offset: CGPoint = CGPoint(x: 0, y: -4)) -> NSMutableAttributedString {
+                           _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
     let regularArr = getRegularArray(str: str)
     let emoticons = NIMInputEmoticonManager.shared
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons

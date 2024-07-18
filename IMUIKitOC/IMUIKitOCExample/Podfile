@@ -14,20 +14,20 @@ target 'IMUIKitOCExample' do
   pod 'NEChatKit', '10.2.1'
   
   # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
-#  pod 'NEChatUIKit', '10.2.1'
+  pod 'NEChatUIKit', '10.2.1'
   pod 'NEContactUIKit', '10.2.1'
   pod 'NEConversationUIKit', '10.2.1'
   pod 'NETeamUIKit', '10.2.1'
   
   #   扩展库-地理位置组件
-#  pod 'NEMapKit', '10.2.1'
+  pod 'NEMapKit', '10.2.1'
   
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-#      pod 'NEQChatUIKit', :path => '../NEQChatUIKit/NEQChatUIKit.podspec'
+  #    pod 'NEQChatUIKit', :path => '../NEQChatUIKit/NEQChatUIKit.podspec'
   #    pod 'NEContactUIKit', :path => '../NEContactUIKit/NEContactUIKit.podspec'
   #    pod 'NEConversationUIKit', :path => '../NEConversationUIKit/NEConversationUIKit.podspec'
   #    pod 'NETeamUIKit', :path => '../NETeamUIKit/NETeamUIKit.podspec'
-      pod 'NEChatUIKit', :path => '../../NEChatUIKit/NEChatUIKit.podspec'
+  #    pod 'NEChatUIKit', :path => '../NEChatUIKit/NEChatUIKit.podspec'
   
 end
 
