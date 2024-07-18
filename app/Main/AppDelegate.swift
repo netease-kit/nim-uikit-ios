@@ -43,6 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         let account = "<#account#>"
         let token = "<#token#>"
+        loadService()
         
         weak var weakSelf = self
         IMKitClient.instance.login(account, token, nil) { error in
