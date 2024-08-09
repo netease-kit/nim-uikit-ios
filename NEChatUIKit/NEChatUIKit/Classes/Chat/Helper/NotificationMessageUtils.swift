@@ -126,7 +126,6 @@ open class NotificationMessageUtils: NSObject {
           } else {
             text = fromName + chatLocalizable("pass") + toNamestext
           }
-
         case .transferOwner:
           text = fromName + chatLocalizable("transfer") + toFirstName
         case .addManager:
@@ -145,7 +144,6 @@ open class NotificationMessageUtils: NSObject {
           }
           // text = mute ? chatLocalizable("team_all_mute") : chatLocalizable("team_all_no_mute")
           text = "\(toNamestext) \(mute ? chatLocalizable("mute") : chatLocalizable("not_mute"))"
-
         default:
           text = chatLocalizable("unknown_system_message")
         }

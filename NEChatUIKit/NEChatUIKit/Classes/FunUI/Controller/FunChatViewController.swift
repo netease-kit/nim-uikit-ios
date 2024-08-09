@@ -103,20 +103,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   override open func expandMoreAction() {
-    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType)
-    let photo = NEMoreItemModel()
-    photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
-    photo.title = chatLocalizable("chat_photo")
-    photo.type = .photo
-    photo.customDelegate = self
-    photo.action = #selector(openPhoto)
-    items.insert(photo, at: 0)
+    let items = NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType)
     chatInputView.chatAddMoreView.configData(data: items)
-  }
-
-  func openPhoto() {
-    NELog.infoLog(className(), desc: "open photo")
-    willSelectItem(button: chatInputView.currentButton, index: showPhotoTag)
   }
 
   override open func showRtcCallAction() {

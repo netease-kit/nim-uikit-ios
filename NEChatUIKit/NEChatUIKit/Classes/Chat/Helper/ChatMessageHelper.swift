@@ -124,9 +124,8 @@ public class ChatMessageHelper: NSObject {
         if attach.customType == customRichTextType {
           return MessageRichTextModel(message: message)
         }
-        if attach.customType == customMultiForwardType {
-          return MessageCustomModel(message: message)
-        }
+
+        return MessageCustomModel(message: message)
       }
       fallthrough
     default:

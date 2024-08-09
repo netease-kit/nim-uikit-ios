@@ -53,6 +53,14 @@ open class NormalChatViewController: ChatViewController {
     }
   }
 
+  override open func expandMoreAction() {
+    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: viewmodel.session.sessionType)
+    if items.count > 0, items[0].type == .photo {
+      items.remove(at: 0)
+    }
+    chatInputView.chatAddMoreView.configData(data: items)
+  }
+
   override open func expandButtonDidClick() {
     print("expandButtonDidClick ")
     super.expandButtonDidClick()
