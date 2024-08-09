@@ -5,11 +5,11 @@
 import NEChatUIKit
 import NIMSDK
 import UIKit
+
 class CustomP2PChatViewController: P2PChatViewController {
-  let customMessageType = 20
   override func viewDidLoad() {
     // 自定义消息cell绑定需要放在 super.viewDidLoad() 之前
-    NEChatUIKitClient.instance.regsiterCustomCell(["\(customMessageType)": CustomChatCell.self])
+    NEChatUIKitClient.instance.regsiterCustomCell(["20": CustomChatCell.self])
 
     // 通过配置项实现自定义
     customByConfig()
@@ -238,7 +238,7 @@ class CustomP2PChatViewController: P2PChatViewController {
 
   func customBottomBar() {
     let subviews = chatInputView.stackView.subviews
-    subviews.forEach { view in
+    for view in subviews {
       view.removeFromSuperview()
       chatInputView.stackView.removeArrangedSubview(view)
     }
@@ -272,8 +272,10 @@ class CustomP2PChatViewController: P2PChatViewController {
   }
 
   @objc func sendCustomButton() {
-    let data = ["type": customMessageType]
-    let attachment = CustomAttachment(customType: customMessageType, cellHeight: 50, data: data)
+    // type 字段必填，用于识别和解析自定义消息
+    let data = ["type": 20]
+    let neAttach = NECustomAttachment(data: data)
+    let attachment = CustomAttachment(neAttach)
     let message = NIMMessage()
     let object = NIMCustomObject()
     object.attachment = attachment

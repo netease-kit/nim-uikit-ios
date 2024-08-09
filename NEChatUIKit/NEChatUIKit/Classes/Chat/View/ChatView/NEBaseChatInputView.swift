@@ -66,7 +66,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textView.translatesAutoresizingMaskIntoConstraints = false
     textView.backgroundColor = .white
     textView.returnKeyType = .send
-    textView.allowsEditingTextAttributes = true
     textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.dataDetectorTypes = []
@@ -247,7 +246,8 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                      replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: NEKitChatConfig.shared.ui.messageProperties.messageTextColor,
+                                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
 
     if chatInpuMode == .normal || chatInpuMode == .multipleSend, text == "\n" {
       guard var realText = getRealSendText(textView.attributedText) else {
@@ -268,6 +268,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
       mutaString.replaceCharacters(in: range, with: addString)
       textView.attributedText = mutaString
+      textView.accessibilityValue = text
       DispatchQueue.main.async {
         textView.selectedRange = NSMakeRange(range.location + addString.length, 0)
       }
@@ -279,8 +280,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       if let findRange = temRange {
         let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
         if mutableAttri.length >= findRange.location + findRange.length {
-          mutableAttri.removeAttribute(NSAttributedString.Key.foregroundColor, range: findRange)
-          mutableAttri.removeAttribute(NSAttributedString.Key.font, range: findRange)
           if range.length == 1 {
             mutableAttri.replaceCharacters(in: findRange, with: "")
           }

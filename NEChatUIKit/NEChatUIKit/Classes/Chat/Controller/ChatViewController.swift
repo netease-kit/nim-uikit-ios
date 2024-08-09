@@ -19,7 +19,7 @@ import WebKit
 open class ChatViewController: ChatBaseViewController, UINavigationControllerDelegate,
   ChatInputViewDelegate, ChatViewModelDelegate, NIMMediaManagerDelegate,
   MessageOperationViewDelegate, UITableViewDataSource,
-  UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, CLLocationManagerDelegate, UITextViewDelegate, ChatInputMultilineDelegate {
+  UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, CLLocationManagerDelegate, UITextViewDelegate, ChatInputMultilineDelegate, UIImagePickerControllerDelegate {
   private let tag = "ChatViewController"
   private let kCallKitDismissNoti = "kCallKitDismissNoti"
   private let kCallKitShowNoti = "kCallKitShowNoti"
@@ -927,6 +927,8 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
     } else if let type = cell.cellData?.type, type == .takePicture {
       isFile = false
       showTakePicture()
+    } else if let type = cell.cellData?.type, type == .photo {
+      willSelectItem(button: nil, index: 2)
     } else if let type = cell.cellData?.type, type == .file {
       isFile = true
       showFileAction()

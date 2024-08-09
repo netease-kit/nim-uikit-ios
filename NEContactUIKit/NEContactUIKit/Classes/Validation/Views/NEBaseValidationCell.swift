@@ -140,12 +140,10 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
         optionLabelContent = "邀请您加入群聊 \"\(teamName)\""
       case .teamInviteReject:
         optionLabelContent = "拒绝入群邀请 \"\(teamName)\""
-
       case .superTeamApply:
         optionLabelContent = "申请加入超大群"
       case .superTeamApplyReject:
         optionLabelContent = "拒绝加入超大群"
-
       case .superTeamInvite:
         optionLabelContent = "邀请您加入群聊 \"\(teamName)\""
       case .superTeamInviteReject:

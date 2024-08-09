@@ -109,10 +109,10 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   open func initProperty() {
     timeLabel.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
     timeLabel.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    timeLabel.backgroundColor = .clear
     timeLabel.textAlignment = .center
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     timeLabel.accessibilityIdentifier = "id.messageTipText"
-    timeLabel.backgroundColor = .white
 
     // avatar
     avatarImageLeft.backgroundColor = UIColor(hexString: "#537FF4")
@@ -586,23 +586,34 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     }
   }
 
+  /// 是否隐藏左侧控件
+  /// @param hide    是否隐藏
+  open func hideLeft(_ hide: Bool) {
+    avatarImageLeft.isHidden = hide
+    nameLabelLeft.isHidden = hide
+    bubbleImageLeft.isHidden = hide
+    pinImageLeft.isHidden = hide
+    pinLabelLeft.isHidden = hide
+    fullNameLabel.isHidden = hide
+  }
+
+  /// 是否隐藏右侧控件
+  /// @param hide    是否隐藏
+  open func hideRight(_ hide: Bool) {
+    avatarImageRight.isHidden = hide
+    nameLabelRight.isHidden = hide
+    bubbleImageRight.isHidden = hide
+    pinImageRight.isHidden = hide
+    pinLabelRight.isHidden = hide
+    activityView.isHidden = hide
+    readView.isHidden = hide
+  }
+
   /// 根据消息发送方向决定元素的显隐
   /// @param showRight    是否右侧显示（是否是发送的消息）
   open func showLeftOrRight(showRight: Bool) {
-    avatarImageLeft.isHidden = showRight
-    nameLabelLeft.isHidden = showRight
-    bubbleImageLeft.isHidden = showRight
-    pinImageLeft.isHidden = showRight
-    pinLabelLeft.isHidden = showRight
-    fullNameLabel.isHidden = showRight
-
-    avatarImageRight.isHidden = !showRight
-    nameLabelRight.isHidden = !showRight
-    bubbleImageRight.isHidden = !showRight
-    pinImageRight.isHidden = !showRight
-    pinLabelRight.isHidden = !showRight
-    activityView.isHidden = !showRight
-    readView.isHidden = !showRight
+    hideLeft(showRight)
+    hideRight(!showRight)
   }
 
   /// 更新标记状态

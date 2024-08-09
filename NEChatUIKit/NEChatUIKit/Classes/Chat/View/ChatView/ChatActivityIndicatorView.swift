@@ -32,7 +32,6 @@ open class ChatActivityIndicatorView: UIView {
         failBtn.isHidden = false
       case .successed:
         isHidden = true
-
       default:
         print("default")
       }

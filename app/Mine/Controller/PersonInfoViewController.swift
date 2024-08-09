@@ -11,7 +11,7 @@ import UIKit
 @objcMembers
 class PersonInfoViewController: NEBaseViewController, NIMUserManagerDelegate,
   UINavigationControllerDelegate, PersonInfoViewModelDelegate, UITableViewDelegate,
-  UITableViewDataSource {
+                                UITableViewDataSource, UIImagePickerControllerDelegate {
   public var cellClassDic = [
     SettingCellType.SettingSubtitleCell.rawValue: CustomTeamSettingSubtitleCell.self,
     SettingCellType.SettingHeaderCell.rawValue: CustomTeamSettingHeaderCell.self,

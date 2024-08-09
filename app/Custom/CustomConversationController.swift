@@ -117,9 +117,9 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     }
 
     /// 会话列表点击事件
-//    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
-//      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
-//    }
+    NEKitConversationConfig.shared.ui.itemClick = { model, indexPath in
+      self.showToast((model?.userInfo?.showName(true) ?? model?.teamInfo?.getShowName()) ?? "会话列表点击事件")
+    }
 
     /*
      布局自定义
@@ -197,7 +197,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
   public func onDataLoaded() {
     guard let conversationList = viewModel.conversationListArray else { return
     }
-    conversationList.forEach { model in
+    for model in conversationList {
       model.customType = 1
     }
     tableView.reloadData()

@@ -4,7 +4,8 @@
 
 import NEChatUIKit
 import UIKit
-class CustomChatCell: NEChatBaseCell {
+
+class CustomChatCell: NEBaseChatMessageCell {
   public var testLabel = UILabel()
 
   override func awakeFromNib() {
@@ -37,6 +38,12 @@ class CustomChatCell: NEChatBaseCell {
   }
 
   override func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    // 隐藏左侧控件
+    hideLeft(true)
+
+    // 隐藏右侧控件
+    hideRight(true)
+
     print("this is custom message")
     testLabel.text = "this is custom message"
   }
