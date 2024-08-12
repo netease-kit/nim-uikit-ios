@@ -103,6 +103,6 @@ public class MessageProperties: NSObject {
   public var titleBarRightRes: UIImage?
   // 标题栏右侧图标的点击事件
   public var titleBarRightClick: (() -> Void)?
-  // 设置会话界面背景色
+  // 设置聊天界面背景色
   public var chatViewBackground: UIColor?
 }

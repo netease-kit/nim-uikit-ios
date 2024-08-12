@@ -348,6 +348,7 @@ open class NEBaseContactsViewController: UIViewController, UITableViewDelegate, 
         Router.shared.use(ValidationMessageRouter,
                           parameters: ["nav": navigationController as Any],
                           closure: nil)
+
       case ContactBlackListRouter:
         Router.shared.use(ContactBlackListRouter,
                           parameters: ["nav": navigationController as Any],
