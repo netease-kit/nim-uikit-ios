@@ -33,6 +33,6 @@ Pod::Spec.new do |s|
   s.source_files = 'NEContactUIKit/Classes/**/*'
   s.resource = 'NEContactUIKit/Assets/**/*'
   s.dependency 'NEChatKit'
-  s.dependency 'NECommonUIKit'
+  s.dependency 'NECommonUIKit', '9.7.0'
   s.dependency 'MJRefresh'
 end

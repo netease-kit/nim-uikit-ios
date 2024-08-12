@@ -43,8 +43,7 @@ TODO: Add long description of the pod here.
   
   s.resource = 'NEChatUIKit/Assets/**/*'
   s.dependency 'NEChatKit'
-  s.dependency 'NECommonUIKit'
-  s.dependency 'NECommonKit'
+  s.dependency 'NECommonUIKit', '9.7.0'
   s.dependency 'MJRefresh'
   s.dependency 'SDWebImageWebPCoder'
   s.dependency 'SDWebImageSVGKitPlugin'
