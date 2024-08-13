@@ -38,7 +38,7 @@ TODO: Add long description of the pod here.
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
   
-  s.dependency 'NECommonUIKit'
+  s.dependency 'NECommonUIKit', '9.7.0'
   s.dependency 'NEChatKit'
   s.dependency 'MJRefresh'
 end

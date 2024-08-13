@@ -29,14 +29,12 @@ TODO: Add long description of the pod here.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '12.0'
-
+  s.static_framework = true
   s.source_files = 'NEMapKit/Classes/**/*'
 #  s.resource = 'NEMapKit/Assets/**/*'
   
   s.dependency 'AMap3DMap'
   s.dependency 'AMapSearch'
   s.dependency 'AMapLocation'
-  s.static_framework = true
-  s.dependency 'NEChatUIKit'
-  s.dependency 'NEChatKit'
+  s.dependency 'NEChatUIKit', '10.3.0'
 end

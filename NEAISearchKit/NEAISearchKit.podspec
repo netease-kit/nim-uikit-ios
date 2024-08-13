@@ -38,7 +38,7 @@ TODO: Add long description of the pod here.
   s.resource = 'NEAISearchKit/Assets/**/*'
 
   s.dependency 'NEChatKit'
-  s.dependency 'NECommonUIKit'
+  s.dependency 'NECommonUIKit', '9.7.0'
   s.dependency 'lottie-ios','4.4.0'
 
 end
