@@ -8,19 +8,19 @@ target 'app' do
 
   # 基础库
   pod 'NIMSDK_LITE','10.3.1-beta'
-  pod 'NEChatKit', '10.3.0'
+  pod 'NEChatKit', '10.3.1'
 
   # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
-  pod 'NEChatUIKit', '10.3.0'
-  pod 'NEContactUIKit', '10.3.0'
-  pod 'NEConversationUIKit', '10.3.0'
-  pod 'NETeamUIKit', '10.3.0'
+  pod 'NEChatUIKit', '10.3.1'
+  pod 'NEContactUIKit', '10.3.1'
+  pod 'NEConversationUIKit', '10.3.1'
+  pod 'NETeamUIKit', '10.3.1'
 
   # 扩展库 - 地理位置组件
-  pod 'NEMapKit', '10.3.0'
+  pod 'NEMapKit', '10.3.1'
   
   # 扩展库 - AI 划词搜索
-  pod 'NEAISearchKit', '1.0.0'
+  pod 'NEAISearchKit', '1.0.2'
 
   # 扩展库 - 呼叫组件
   pod 'NERtcCallKit/NOS_Special', '2.4.0'
