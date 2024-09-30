@@ -285,8 +285,9 @@ class CustomP2PChatViewController: P2PChatViewController {
   }
 
   @objc func sendCustomButton() {
-    // type 字段必须指定，且不可为 101、102（UIKit 内部已使用），否则解析为【未知消息体】
-    let dataDic: [String: Any] = ["type": customMessageType]
+    // type 自定义消息类型，该字段必须指定，且不可为 101、102（UIKit 内部已使用），否则解析为【未知消息体】
+    // customHeight 自定义消息的高度
+    let dataDic: [String: Any] = ["type": customMessageType, "customHeight": 100]
     let dataJson = NECommonUtil.getJSONStringFromDictionary(dataDic)
     let customMessage = MessageUtils.customMessage(text: "this is a custom message, create time:\(Date.timeIntervalSinceReferenceDate)",
                                                    rawAttachment: dataJson)

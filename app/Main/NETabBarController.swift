@@ -161,14 +161,33 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
     }
   }
 
+  // 设置通讯录未读显示状态
   func setUpContactBadgeValue() {
     ContactRepo.shared.getUnreadApplicationCount { [self] unreadCount, error in
       contactUnreadCount = unreadCount
+
+      // 显示红点
       if unreadCount > 0 {
         tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
       } else {
         tabBar.hideBadg(on: 1)
       }
+
+//            // 显示未读数
+//            setupContactBadge(unreadCount: unreadCount)
+    }
+  }
+
+  // 设置通讯录显示未读数
+  func setupContactBadge(unreadCount: Int) {
+    if unreadCount > 0 {
+      if unreadCount > 99 {
+        tabBar.setServerBadge(count: "99+")
+      } else {
+        tabBar.setServerBadge(count: "\(unreadCount)")
+      }
+    } else {
+      tabBar.setServerBadge(count: nil)
     }
   }
 
