@@ -274,16 +274,16 @@ class CustomP2PChatViewController: P2PChatViewController {
   @objc func sendCustomButton() {
     // type 字段必填，用于识别和解析自定义消息
     let data = ["type": 20]
-    let neAttach = NECustomAttachment(data: data)
+    let neAttach = NECustomAttachment(cellHeight: 50, data: data)
     let attachment = CustomAttachment(neAttach)
     let message = NIMMessage()
     let object = NIMCustomObject()
     object.attachment = attachment
     message.messageObject = object
 
-    NIMSDK.shared().chatManager.send(message, to: viewmodel.session) { error in
-      print("send custom message error : ", error?.localizedDescription as Any)
-    }
+      NIMSDK.shared().chatManager.send(message, to: viewmodel.session) { error in
+        print("send custom message error : ", error?.localizedDescription as Any)
+      }
   }
 
   // MARK: lazy load

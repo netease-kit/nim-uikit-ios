@@ -40,7 +40,12 @@ public class CustomAttachmentDecoder: NECustomAttachmentDecoder {
   override public func decodeCustomMessage(info: [String: Any]) -> CustomAttachment {
     // 自定义反序列化方法之前必须调用父类的反序列化方法
     let neCustomAttachment = super.decodeCustomMessage(info: info)
-    let customAttachment = CustomAttachment(neCustomAttachment)
+      let customAttachment = CustomAttachment(neCustomAttachment)
+    // 对自定义消息高度进行解析
+    if customAttachment.customType == 20 {
+      customAttachment.cellHeight = 50
+    }
+      
     customAttachment.goodsName = info["goodsName"] as? String ?? ""
     customAttachment.goodsURL = info["goodsURL"] as? String ?? ""
 
