@@ -44,7 +44,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
     super.viewWillAppear(animated)
 
     // 配置项：会话界面是否展示标题栏
-    if !NEKitChatConfig.shared.ui.messageProperties.showTitleBar {
+    if !ChatUIConfig.shared.messageProperties.showTitleBar {
       navigationController?.isNavigationBarHidden = true
       navigationView.removeFromSuperview()
       return
@@ -61,7 +61,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = NEKitChatConfig.shared.ui.messageProperties.chatViewBackground ?? .white
+    view.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackground ?? .white
 
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       topConstant = NEConstant.navigationAndStatusHeight

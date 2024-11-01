@@ -10,7 +10,7 @@ class NEBaseCollectionMessageRichTextCell: NEBaseCollectionMessageTextCell {
   /// 换行文本
   public lazy var collectionTitleLabel: UILabel = {
     let label = UILabel()
-    label.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
+    label.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true

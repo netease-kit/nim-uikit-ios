@@ -28,10 +28,10 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
   }
 
   override open func initSubviewsLayout() {
-    if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
+    if ContactUIConfig.shared.contactProperties.avatarType == .cycle {
       avatarImageView.layer.cornerRadius = 20.0
-    } else if NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius > 0 {
-      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
+    } else if ContactUIConfig.shared.contactProperties.avatarCornerRadius > 0 {
+      avatarImageView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
     } else {
       avatarImageView.layer.cornerRadius = 4.0 // Fun UI
     }
@@ -39,7 +39,7 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
 
   override open func setConfig() {
     super.setConfig()
-    titleLabel.font = .systemFont(ofSize: NEKitContactConfig.shared.ui.contactProperties.itemTitleSize > 0 ? NEKitContactConfig.shared.ui.contactProperties.itemTitleSize : 17)
+    titleLabel.font = .systemFont(ofSize: ContactUIConfig.shared.contactProperties.itemTitleSize > 0 ? ContactUIConfig.shared.contactProperties.itemTitleSize : 17)
   }
 
   override open func setModel(_ model: ContactInfo) {

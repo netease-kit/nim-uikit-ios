@@ -46,10 +46,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     nav.translatesAutoresizingMaskIntoConstraints = false
     nav.delegate = self
 
-    if let addImg = NEKitContactConfig.shared.ui.titleBarRightRes {
+    if let addImg = ContactUIConfig.shared.titleBarRightRes {
       nav.addBtn.setImage(addImg, for: .normal)
     }
-    if let searchImg = NEKitContactConfig.shared.ui.titleBarRight2Res {
+    if let searchImg = ContactUIConfig.shared.titleBarRight2Res {
       nav.searchBtn.setImage(searchImg, for: .normal)
     }
     return nav
@@ -166,6 +166,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
     loadData()
     viewModel.getAddApplicationUnreadCount(nil)
+
+    if let customController = ContactUIConfig.shared.customController {
+      customController(self)
+    }
   }
 
   override open func viewDidLoad() {
@@ -193,7 +197,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationView.isHidden = true
       topConstant = 0
-      if NEKitContactConfig.shared.ui.showTitleBar {
+      if ContactUIConfig.shared.showTitleBar {
         navigationController?.isNavigationBarHidden = false
       } else {
         navigationController?.isNavigationBarHidden = true
@@ -203,7 +207,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       }
     } else {
       navigationController?.isNavigationBarHidden = true
-      if NEKitContactConfig.shared.ui.showTitleBar {
+      if ContactUIConfig.shared.showTitleBar {
         navigationView.isHidden = false
         topConstant = NEConstant.navigationHeight
       } else {
@@ -254,10 +258,6 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     ])
     bodyBottomViewHeightAnchor = bodyBottomView.heightAnchor.constraint(equalToConstant: bodyBottomViewHeight)
     bodyBottomViewHeightAnchor?.isActive = true
-
-    if let customController = NEKitContactConfig.shared.ui.customController {
-      customController(self)
-    }
   }
 
   open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -357,8 +357,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
 
     if info.contactCellType == ContactCellType.ContactOthers.rawValue {
-      if let headerItemClick = NEKitContactConfig.shared.ui.headerItemClick {
-        headerItemClick(info, indexPath)
+      if let headerItemClick = ContactUIConfig.shared.headerItemClick {
+        headerItemClick(self, info, indexPath)
         return
       }
 
@@ -393,8 +393,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         }
       }
     } else {
-      if let friendItemClick = NEKitContactConfig.shared.ui.friendItemClick {
-        friendItemClick(info, indexPath)
+      if let friendItemClick = ContactUIConfig.shared.friendItemClick {
+        friendItemClick(self, info, indexPath)
         return
       }
 
@@ -445,16 +445,16 @@ extension NEBaseContactViewController {
   // MARK: TabNavigationViewDelegate
 
   open func searchAction() {
-    if let searchBlock = NEKitContactConfig.shared.ui.titleBarRight2Click {
-      searchBlock()
+    if let searchBlock = ContactUIConfig.shared.titleBarRight2Click {
+      searchBlock(self)
       return
     }
     searchContact()
   }
 
   open func didClickAddBtn() {
-    if let addBlock = NEKitContactConfig.shared.ui.titleBarRightClick {
-      addBlock()
+    if let addBlock = ContactUIConfig.shared.titleBarRightClick {
+      addBlock(self)
       return
     }
     goToFindFriend()

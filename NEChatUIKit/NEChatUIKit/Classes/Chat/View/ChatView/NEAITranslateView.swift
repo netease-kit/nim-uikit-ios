@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import Lottie
 import NECommonUIKit
 import UIKit
 
@@ -171,8 +170,8 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   }()
 
   /// 标题栏 loading 动画
-  public lazy var loadingAnimationView: LottieAnimationView = {
-    let view = LottieAnimationView(name: "ne_loading_data", bundle: coreLoader.bundle)
+  public lazy var loadingAnimationView: NELottieAnimationView = {
+    let view = NELottieAnimationView(name: "ne_loading_data", bundle: coreLoader.bundle)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.loopMode = .loop
     view.contentMode = .scaleAspectFill

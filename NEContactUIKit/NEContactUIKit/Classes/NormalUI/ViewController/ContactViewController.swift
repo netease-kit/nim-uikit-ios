@@ -11,7 +11,7 @@ open class ContactViewController: NEBaseContactViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
     var contactHeaders = [ContactHeadItem]()
-    if NEKitContactConfig.shared.ui.showHeader {
+    if ContactUIConfig.shared.showHeader {
       contactHeaders = [
         ContactHeadItem(
           name: localizable("validation_message"),
@@ -45,8 +45,8 @@ open class ContactViewController: NEBaseContactViewController {
         ))
       }
 
-      if let headerDataCallback = NEKitContactConfig.shared.ui.headerData {
-        headerDataCallback(contactHeaders)
+      if let headerDataCallback = ContactUIConfig.shared.headerData {
+        headerDataCallback(self, &contactHeaders)
       }
     }
     viewModel = ContactViewModel(contactHeaders: contactHeaders)
@@ -108,14 +108,14 @@ extension ContactViewController {
   override open func initSystemNav() {
     super.initSystemNav()
     let addItem = UIBarButtonItem(
-      image: NEKitContactConfig.shared.ui.titleBarRightRes ?? UIImage.ne_imageNamed(name: "add"),
+      image: ContactUIConfig.shared.titleBarRightRes ?? UIImage.ne_imageNamed(name: "add"),
       style: .plain,
       target: self,
       action: #selector(goToFindFriend)
     )
     addItem.tintColor = UIColor(hexString: "333333")
     let searchItem = UIBarButtonItem(
-      image: NEKitContactConfig.shared.ui.titleBarRight2Res ?? UIImage.ne_imageNamed(name: "contact_search"),
+      image: ContactUIConfig.shared.titleBarRight2Res ?? UIImage.ne_imageNamed(name: "contact_search"),
       style: .plain,
       target: self,
       action: #selector(searchContact)
@@ -124,25 +124,25 @@ extension ContactViewController {
     searchItem.tintColor = UIColor(hexString: "333333")
 
     navigationItem.rightBarButtonItems = [addItem, searchItem]
-    if !NEKitContactConfig.shared.ui.showTitleBarRight2Icon {
+    if !ContactUIConfig.shared.showTitleBarRight2Icon {
       navigationItem.rightBarButtonItems = [addItem]
       navigationView.searchBtn.isHidden = true
     }
-    if !NEKitContactConfig.shared.ui.showTitleBarRightIcon {
+    if !ContactUIConfig.shared.showTitleBarRightIcon {
       navigationItem.rightBarButtonItems = [searchItem]
       navigationView.addBtn.isHidden = true
     }
 
     let brandBarBtn = UIButton()
-    brandBarBtn.setTitle(NEKitContactConfig.shared.ui.title ?? localizable("contact"), for: .normal)
-    brandBarBtn.setTitleColor(NEKitContactConfig.shared.ui.titleColor ?? UIColor.black, for: .normal)
+    brandBarBtn.setTitle(ContactUIConfig.shared.title ?? localizable("contact"), for: .normal)
+    brandBarBtn.setTitleColor(ContactUIConfig.shared.titleColor ?? UIColor.black, for: .normal)
     brandBarBtn.titleLabel?.font = NEConstant.textFont("PingFangSC-Medium", 20)
     let brandBtn = UIBarButtonItem(customView: brandBarBtn)
     navigationItem.leftBarButtonItem = brandBtn
 
     navigationView.brandBtn.setImage(nil, for: .normal)
-    navigationView.brandBtn.setTitle(NEKitContactConfig.shared.ui.title ?? localizable("contact"), for: .normal)
-    navigationView.brandBtn.setTitleColor(NEKitContactConfig.shared.ui.titleColor ?? UIColor.black, for: .normal)
+    navigationView.brandBtn.setTitle(ContactUIConfig.shared.title ?? localizable("contact"), for: .normal)
+    navigationView.brandBtn.setTitleColor(ContactUIConfig.shared.titleColor ?? UIColor.black, for: .normal)
     navigationView.brandBtn.titleEdgeInsets = UIEdgeInsets.zero
   }
 }

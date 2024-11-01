@@ -26,7 +26,7 @@ open class NEBasePinMessageMultiForwardCell: NEBasePinMessageCell {
     super.setupUI()
 //    let image = UIImage.ne_imageNamed(name: "chat_message_receive")
 //    backViewLeft.image = image?
-//      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+//      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     backViewLeft.layer.cornerRadius = 8
     backViewLeft.layer.borderColor = multiForwardborderColor.cgColor
     backViewLeft.layer.borderWidth = 1

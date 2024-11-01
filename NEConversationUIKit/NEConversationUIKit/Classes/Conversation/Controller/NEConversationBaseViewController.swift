@@ -43,7 +43,7 @@ open class NEConversationBaseViewController: UIViewController, UIGestureRecogniz
     super.viewWillAppear(animated)
 
     // 配置项：会话界面是否展示标题栏
-    if !NEKitConversationConfig.shared.ui.showTitleBar {
+    if !ConversationUIConfig.shared.showTitleBar {
       navigationController?.isNavigationBarHidden = true
       navigationView.removeFromSuperview()
       return

@@ -14,13 +14,13 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     readView.borderLayer.strokeColor = UIColor.funChatThemeColor.cgColor
     readView.sectorLayer.fillColor = UIColor.funChatThemeColor.cgColor
 
-    var image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
+    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
     bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
 
-    image = NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
+    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
     bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
 
     selectedButton.setImage(.ne_imageNamed(name: "fun_select"), for: .selected)
   }
@@ -37,12 +37,12 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   }
 
   override open func initSubviewsLayout() {
-    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
+    if ChatUIConfig.shared.messageProperties.avatarType == .cycle {
       avatarImageRight.layer.cornerRadius = 21.0
       avatarImageLeft.layer.cornerRadius = 21.0
-    } else if NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+    } else if ChatUIConfig.shared.messageProperties.avatarCornerRadius > 0 {
+      avatarImageRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      avatarImageLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
     } else {
       avatarImageRight.layer.cornerRadius = 4
       avatarImageLeft.layer.cornerRadius = 4

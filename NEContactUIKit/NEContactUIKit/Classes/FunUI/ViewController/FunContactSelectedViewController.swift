@@ -44,7 +44,7 @@ open class FunContactSelectedViewController: NEBaseContactSelectedViewController
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
       ) as! ContactSectionView
-    sectionView.titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.indexTitleColor ?? .ne_greyText
+    sectionView.titleLabel.textColor = ContactUIConfig.shared.contactProperties.indexTitleColor ?? .ne_greyText
     sectionView.line.isHidden = true
     sectionView.titleLabel.text = viewModel.contacts[section].initial
     return sectionView

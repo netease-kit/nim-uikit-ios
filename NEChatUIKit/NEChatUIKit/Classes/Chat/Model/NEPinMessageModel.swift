@@ -41,8 +41,8 @@ open class NEPinMessageModel: NSObject {
 
   open func cellHeight(pinContentMaxW: CGFloat) -> CGFloat {
     var height = chatmodel.contentSize.height
-    let titleFont: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize, weight: .semibold)
-    let bodyFont: UIFont = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
+    let titleFont: UIFont = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize, weight: .semibold)
+    let bodyFont: UIFont = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     let maxSize = CGSize(width: pinContentMaxW, height: CGFloat.greatestFiniteMagnitude)
 
     if let textModel = chatmodel as? MessageTextModel {

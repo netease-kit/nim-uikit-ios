@@ -604,7 +604,7 @@ public class ChatMessageHelper: NSObject {
     }
 
     let text = message?.text ?? ""
-    let messageTextFont = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
 
     // 兼容老的表情消息，如果前面有表情而位置计算异常则回退回老的解析
     var notFound = false

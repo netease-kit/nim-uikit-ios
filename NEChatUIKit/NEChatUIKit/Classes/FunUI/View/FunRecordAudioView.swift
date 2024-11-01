@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-@_implementationOnly import Lottie
 import UIKit
 
 @objc
@@ -26,8 +25,8 @@ open class FunRecordAudioView: UIView {
 
   public var minRecordProgressWidth: CGFloat = 165.0
 
-  lazy var lottieView: LottieAnimationView = {
-    let lottie = LottieAnimationView(name: "fun_vioce_data", bundle: coreLoader.bundle)
+  lazy var lottieView: NELottieAnimationView = {
+    let lottie = NELottieAnimationView(name: "fun_vioce_data", bundle: coreLoader.bundle)
     lottie.translatesAutoresizingMaskIntoConstraints = false
     lottie.loopMode = .loop
     lottie.contentMode = .scaleToFill

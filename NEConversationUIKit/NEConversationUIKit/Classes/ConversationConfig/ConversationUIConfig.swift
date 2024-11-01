@@ -12,8 +12,11 @@ public enum NEConversationAvatarType: Int {
   case cycle // 圆形
 }
 
+/// 会话模块自定义配置
 @objcMembers
 public class ConversationUIConfig: NSObject {
+  public static let shared = ConversationUIConfig()
+
   /// 是否展示界面顶部的标题栏
   public var showTitleBar = true
 
@@ -51,26 +54,26 @@ public class ConversationUIConfig: NSObject {
   /// 会话列表 cell 左划置顶按钮背景颜色
   public var stickTopButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划置顶按钮点击事件
-  public var stickTopButtonClick: ((NEConversationListModel?, IndexPath) -> Void)?
+  public var stickTopButtonClick: ((NEBaseConversationController, NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表 cell 左划删除按钮文案内容
   public var deleteButtonTitle = localizable("delete")
   /// 会话列表 cell 左划删除按钮背景颜色
   public var deleteButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划删除按钮点击事件
-  public var deleteButtonClick: ((NEConversationListModel?, IndexPath) -> Void)?
+  public var deleteButtonClick: ((NEBaseConversationController, NEConversationListModel?, IndexPath) -> Void)?
 
   /// 标题栏左侧按钮点击事件
-  public var titleBarLeftClick: (() -> Void)?
+  public var titleBarLeftClick: ((NEBaseConversationController) -> Void)?
 
   /// 标题栏最右侧按钮点击事件
-  public var titleBarRightClick: (() -> Void)?
+  public var titleBarRightClick: ((NEBaseConversationController) -> Void)?
 
   /// 标题栏次最右侧按钮点击事件
-  public var titleBarRight2Click: (() -> Void)?
+  public var titleBarRight2Click: ((NEBaseConversationController) -> Void)?
 
   /// 会话列表点击事件
-  public var itemClick: ((NEConversationListModel?, IndexPath) -> Void)?
+  public var itemClick: ((NEBaseConversationController, NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表的视图控制器回调，回调中会返回会话列表的视图控制器
   public var customController: ((NEBaseConversationController) -> Void)?

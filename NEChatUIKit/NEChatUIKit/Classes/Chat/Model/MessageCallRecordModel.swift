@@ -69,7 +69,7 @@ open class MessageCallRecordModel: MessageContentModel {
 
       attributeStr?.addAttribute(NSAttributedString.Key.font, value: messageTextFont, range: NSMakeRange(0, attributeStr?.length ?? 0))
 
-      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: NEKitChatConfig.shared.ui.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: ChatUIConfig.shared.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
     let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)

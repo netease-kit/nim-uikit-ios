@@ -96,10 +96,12 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     let isSend = IMKitClient.instance.isMe(model.message?.senderId)
+
+    // 校验撤回消息可编辑时间
     if let time = model.message?.createTime {
       let date = Date()
       let currentTime = date.timeIntervalSince1970
-      if currentTime - time >= 60 * 2 {
+      if Int(currentTime - time) >= ChatUIConfig.shared.revokeEditTimeGap * 60 {
         model.timeOut = true
       }
     }

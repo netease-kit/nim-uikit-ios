@@ -20,7 +20,7 @@ open class FunContactViewController: NEBaseContactViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
     var contactHeaders = [ContactHeadItem]()
-    if NEKitContactConfig.shared.ui.showHeader {
+    if ContactUIConfig.shared.showHeader {
       contactHeaders = [
         ContactHeadItem(
           name: localizable("validation_message"),
@@ -54,8 +54,8 @@ open class FunContactViewController: NEBaseContactViewController {
         ))
       }
 
-      if let headerDataCallback = NEKitContactConfig.shared.ui.headerData {
-        headerDataCallback(contactHeaders)
+      if let headerDataCallback = ContactUIConfig.shared.headerData {
+        headerDataCallback(self, &contactHeaders)
       }
     }
     viewModel = ContactViewModel(contactHeaders: contactHeaders)
@@ -69,7 +69,8 @@ open class FunContactViewController: NEBaseContactViewController {
     super.init(coder: coder)
   }
 
-  deinit {
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
     if let searchViewGestures = searchView.gestureRecognizers {
       for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
@@ -157,7 +158,7 @@ extension FunContactViewController {
   override open func initSystemNav() {
     edgesForExtendedLayout = []
     let addItem = UIBarButtonItem(
-      image: NEKitContactConfig.shared.ui.titleBarRightRes ?? UIImage.ne_imageNamed(name: "funAdd"),
+      image: ContactUIConfig.shared.titleBarRightRes ?? UIImage.ne_imageNamed(name: "funAdd"),
       style: .plain,
       target: self,
       action: #selector(goToFindFriend)
@@ -167,7 +168,7 @@ extension FunContactViewController {
     navigationItem.rightBarButtonItems = [addItem]
     navigationView.addBtn.setImage(UIImage.ne_imageNamed(name: "funAdd"), for: .normal)
 
-    if !NEKitContactConfig.shared.ui.showTitleBarRightIcon {
+    if !ContactUIConfig.shared.showTitleBarRightIcon {
       navigationItem.rightBarButtonItems = []
       navigationView.addBtn.isHidden = true
     }

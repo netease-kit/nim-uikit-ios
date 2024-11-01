@@ -31,11 +31,6 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
     super.init(coder: coder)
   }
 
-  deinit {
-    NotificationCenter.default.removeObserver(self)
-    NETeamUserManager.shared.removeAllTeamInfo()
-  }
-
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     onCurrentPage = true

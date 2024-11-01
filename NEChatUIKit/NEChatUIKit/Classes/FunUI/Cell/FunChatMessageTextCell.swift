@@ -189,7 +189,7 @@ extension FunChatMessageTextCell: UITextViewDelegate {
 
   // textView 垂直居中
   func contentSizeToFit(_ contentLabel: UITextView, _ model: MessageTextModel) {
-    let messageTextFont = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+    let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
     let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
     let titleSize = NSAttributedString.getRealSize(contentLabel.attributedText, messageTextFont, messageMaxSize)
 

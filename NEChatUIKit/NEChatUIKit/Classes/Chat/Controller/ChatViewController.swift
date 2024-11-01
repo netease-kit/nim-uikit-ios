@@ -304,7 +304,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     isCurrentPage = true
     markNeedReadMsg()
 
-    if NEKitChatConfig.shared.ui.messageProperties.showTitleBar {
+    if ChatUIConfig.shared.messageProperties.showTitleBar {
       bodyTopViewTopConstant = topConstant
     }
 
@@ -366,13 +366,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       let param = ["sessionId": viewModel.conversationId]
       Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
 
+      NotificationCenter.default.removeObserver(self)
       NETeamUserManager.shared.removeAllTeamInfo()
     }
   }
 
   open func setMoreButton() {
-    if NEKitChatConfig.shared.ui.messageProperties.showTitleBarRightIcon {
-      let image = NEKitChatConfig.shared.ui.messageProperties.titleBarRightRes ?? UIImage.ne_imageNamed(name: "three_point")
+    if ChatUIConfig.shared.messageProperties.showTitleBarRightIcon {
+      let image = ChatUIConfig.shared.messageProperties.titleBarRightRes ?? UIImage.ne_imageNamed(name: "three_point")
       addRightAction(image, #selector(toSetting), self)
       navigationView.setMoreButtonImage(image)
     } else {
@@ -460,7 +461,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     expandMoreAction()
 
-    if let customController = NEKitChatConfig.shared.ui.customController {
+    if let customController = ChatUIConfig.shared.customController {
       customController(self)
     }
   }
@@ -609,8 +610,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     // 配置项自定义 items
-    if let chatPopMenu = NEKitChatConfig.shared.ui.chatPopMenu {
-      chatPopMenu(&items, model)
+    if let chatPopMenu = ChatUIConfig.shared.chatPopMenu {
+      chatPopMenu(self, &items, model)
     }
 
     // 供用户自定义 items
@@ -731,8 +732,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 设置按钮点击事件
   override open func toSetting() {
     // 自定义设置按钮点击事件
-    if let block = NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick {
-      block()
+    if let block = ChatUIConfig.shared.messageProperties.titleBarRightClick {
+      block(self)
       return
     }
 
@@ -1137,9 +1138,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func didSelectMoreCell(cell: NEInputMoreCell) {
-    if let delegate = cell.cellData?.customDelegate as? AnyObject, let action = cell.cellData?.action {
+    if let action = cell.cellData?.action {
       // 用户自定义更多面板按钮
-      _ = delegate.perform(action)
+      action(self, cell.cellData)
       return
     }
 
@@ -1534,8 +1535,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       if isFile == true {
         let imgSize_MB = Double(pngImage?.count ?? 0) / 1e6
         NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(imgSize_MB) MB")
-        if imgSize_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-          showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
+        if imgSize_MB > ChatUIConfig.shared.fileSizeLimit {
+          showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
         } else {
           viewModel.sendFileMessage(filePath: imageUrl.relativePath,
                                     displayName: imageName) { [weak self] message, error, progress in
@@ -1640,8 +1641,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         let fileAttributes = try FileManager.default.attributesOfItem(atPath: desPath)
         if let size_B = fileAttributes[FileAttributeKey.size] as? Double {
           let size_MB = size_B / 1e6
-          if size_MB > NEKitChatConfig.shared.ui.fileSizeLimit {
-            showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(NEKitChatConfig.shared.ui.fileSizeLimit)"))
+          if size_MB > ChatUIConfig.shared.fileSizeLimit {
+            showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
             try? FileManager.default.removeItem(atPath: desPath)
           } else {
             viewModel.sendFileMessage(filePath: desPath,
@@ -1692,17 +1693,30 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     controller.dismiss(animated: true)
   }
 
-  //    MARK: - ChatviewModelDelegate
+  //    MARK: - ChatViewModelDelegate
 
   /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
   /// 来源： 发送消息， 插入消息
-  /// - Parameter message: 消息
-  /// - Parameter completion: 是否继续发送消息
-  public func readySendMessage(_ message: V2NIMMessage, _ completion: @escaping (Bool) -> Void) {
-    if let block = NEKitChatConfig.shared.ui.onSendMessage {
-      completion(block(message, self))
+  /// - Parameter param: 消息参数，包含消息和发送参数
+  /// - Returns: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
+  public func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
+    if let block = ChatKitClient.shared.beforeSend {
+      let p = block(self, param)
+      return p
     } else {
-      completion(true)
+      return param
+    }
+  }
+
+  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
+  /// 来源： 发送消息， 插入消息
+  /// - Parameter param: 消息参数，包含消息和发送参数
+  /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
+  public func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
+    if let block = ChatKitClient.shared.beforeSendCompletion {
+      block(self, param, completion)
+    } else {
+      completion(param)
     }
   }
 
@@ -2152,8 +2166,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     removeOperationView()
 
     // 配置项拦截
-    if let popMenuClick = NEKitChatConfig.shared.ui.popMenuClick {
-      popMenuClick(item)
+    if let popMenuClick = ChatUIConfig.shared.popMenuClick {
+      popMenuClick(self, item)
       return
     }
 
@@ -2299,6 +2313,15 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       }
 
       if let message = weakSelf?.viewModel.operationModel?.message {
+        // 校验消息可撤回时间
+        let date = Date()
+        let currentTime = date.timeIntervalSince1970
+        let reTime = ChatUIConfig.shared.getReeditTimeGap()
+        if Int(currentTime - message.createTime) >= reTime * 60 {
+          weakSelf?.showToast(chatLocalizable("ravokable_time_expired"))
+          return
+        }
+
         if weakSelf?.viewModel.operationModel?.type == .text {
           weakSelf?.viewModel.operationModel?.isReedit = true
         }
@@ -2816,7 +2839,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 输入框【更多】按钮点击事件，子类重写
   @discardableResult
   open func expandMoreAction() -> [NEMoreItemModel] {
-    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: V2NIMConversationIdUtil.conversationType(viewModel.conversationId))
+    var items = NEChatUIKitClient.instance.getMoreActionData(sessionType: V2NIMConversationIdUtil.conversationType(viewModel.conversationId), self)
     if NEChatKitClient.instance.delegate == nil {
       items = items.filter { item in
         if item.type == .location {
@@ -3498,8 +3521,8 @@ extension ChatViewController: ChatBaseCellDelegate {
   }
 
   open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?, _ replyModel: MessageModel?) {
-    if let tapClick = NEKitChatConfig.shared.ui.messageItemClick {
-      tapClick(cell, model)
+    if let tapClick = ChatUIConfig.shared.messageItemClick {
+      tapClick(self, cell, model)
       return
     }
 

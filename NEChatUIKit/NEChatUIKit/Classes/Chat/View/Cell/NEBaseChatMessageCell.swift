@@ -91,7 +91,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   // 已读未读点击手势
   private var tapGesture: UITapGestureRecognizer?
 
-  public let messageTextFont = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+  public let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -112,12 +112,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func initProperty() {
-    timeLabel.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-    timeLabel.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    timeLabel.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
+    timeLabel.textColor = ChatUIConfig.shared.messageProperties.timeTextColor
     timeLabel.textAlignment = .center
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     timeLabel.accessibilityIdentifier = "id.messageTipText"
-    timeLabel.backgroundColor = .white
+    timeLabel.backgroundColor = .clear
 
     // avatar
     avatarImageLeft.backgroundColor = UIColor(hexString: "#537FF4")
@@ -137,13 +137,13 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     // name
     nameLabelLeft.textAlignment = .center
     nameLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    nameLabelLeft.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.userNickTextSize)
-    nameLabelLeft.textColor = NEKitChatConfig.shared.ui.messageProperties.userNickColor
+    nameLabelLeft.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
+    nameLabelLeft.textColor = ChatUIConfig.shared.messageProperties.userNickColor
 
     nameLabelRight.textAlignment = .center
     nameLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    nameLabelRight.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.userNickTextSize)
-    nameLabelRight.textColor = NEKitChatConfig.shared.ui.messageProperties.userNickColor
+    nameLabelRight.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
+    nameLabelRight.textColor = ChatUIConfig.shared.messageProperties.userNickColor
 
     // fullName
     fullNameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -152,17 +152,17 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     fullNameLabel.accessibilityIdentifier = "id.fullNameLabel"
 
     //        bubbleImage
-    bubbleImageLeft.backgroundColor = NEKitChatConfig.shared.ui.messageProperties.receiveMessageBg
-    var image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBg
+    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     bubbleImageLeft.translatesAutoresizingMaskIntoConstraints = false
     bubbleImageLeft.isUserInteractionEnabled = true
 
-    bubbleImageRight.backgroundColor = NEKitChatConfig.shared.ui.messageProperties.selfMessageBg
-    image = NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
+    bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBg
+    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
     bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     bubbleImageRight.translatesAutoresizingMaskIntoConstraints = false
     bubbleImageRight.isUserInteractionEnabled = true
 
@@ -376,12 +376,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func initSubviewsLayout() {
-    if NEKitChatConfig.shared.ui.messageProperties.avatarType == .cycle {
+    if ChatUIConfig.shared.messageProperties.avatarType == .cycle {
       avatarImageRight.layer.cornerRadius = 16.0
       avatarImageLeft.layer.cornerRadius = 16.0
-    } else if NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius
+    } else if ChatUIConfig.shared.messageProperties.avatarCornerRadius > 0 {
+      avatarImageRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      avatarImageLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
     } else {
       avatarImageRight.layer.cornerRadius = 16.0
       avatarImageLeft.layer.cornerRadius = 16.0
@@ -539,7 +539,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
           if receiptEnable,
              !model.isRevoked,
              SettingRepo.shared.getShowReadStatus(),
-             NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus == true {
+             ChatUIConfig.shared.messageProperties.showP2pMessageStatus == true {
             readView.isHidden = false
             if model.readCount == 1, model.unreadCount == 0 {
               readView.progress = 1
@@ -555,13 +555,13 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
         if receiptEnable,
            !model.isRevoked,
            SettingRepo.shared.getShowReadStatus(),
-           NEKitChatConfig.shared.ui.messageProperties.showTeamMessageStatus == true {
+           ChatUIConfig.shared.messageProperties.showTeamMessageStatus == true {
           readView.isHidden = false
           var total = NETeamUserManager.shared.getTeamInfo()?.memberCount ?? 0
           if model.readCount + model.unreadCount != 0 {
             total = model.readCount + model.unreadCount + 1
           }
-          if total >= NEKitChatConfig.shared.maxReadingNum {
+          if total >= ChatUIConfig.shared.maxReadingNum {
             readView.isHidden = true
             return
           }
@@ -617,8 +617,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
 
     pinLabel.isHidden = !model.isPined
     pinImage.isHidden = !model.isPined
-    contentView.backgroundColor = model.isPined ? NEKitChatConfig.shared.ui
-      .messageProperties.signalBgColor : .clear
+    contentView.backgroundColor = model.isPined ? ChatUIConfig.shared.messageProperties.signalBgColor : .clear
     if model.isPined {
       let pinText = model.message?.conversationType == .CONVERSATION_TYPE_P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
       if model.pinAccount == nil {

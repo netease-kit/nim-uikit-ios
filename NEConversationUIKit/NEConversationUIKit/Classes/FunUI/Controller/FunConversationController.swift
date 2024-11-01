@@ -43,7 +43,8 @@ open class FunConversationController: NEBaseConversationController {
     navigationView.titleBarBottomLine.isHidden = true
   }
 
-  deinit {
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
     if let searchViewGestures = searchView.gestureRecognizers {
       for gesture in searchViewGestures {
         searchView.removeGestureRecognizer(gesture)
@@ -62,7 +63,7 @@ open class FunConversationController: NEBaseConversationController {
     navigationItem.rightBarButtonItems = [addBarItem]
 
     navigationView.searchBtn.isHidden = true
-    if !NEKitConversationConfig.shared.ui.showTitleBarRightIcon {
+    if !ConversationUIConfig.shared.showTitleBarRightIcon {
       navigationItem.rightBarButtonItems = []
       navigationView.addBtn.isHidden = true
     }
