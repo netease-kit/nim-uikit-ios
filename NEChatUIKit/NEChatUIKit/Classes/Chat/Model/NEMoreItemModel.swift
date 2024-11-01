@@ -30,11 +30,8 @@ open class NEMoreItemModel: NSObject {
   // 对应的单元类型
   public var type: NEMoreActionType?
 
-  // 代理类
-  public weak var customDelegate: AnyObject?
-
   // 动态事件
-  public var action: Selector?
+  public var action: ((ChatViewController, NEMoreItemModel?) -> Void)?
 
   // 自定义图标
   public var customImage: UIImage?

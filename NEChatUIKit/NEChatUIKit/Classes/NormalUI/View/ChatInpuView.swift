@@ -57,8 +57,8 @@ open class ChatInputView: NEBaseChatInputView {
       items.append(button)
     }
 
-    if let chatInputBar = NEKitChatConfig.shared.ui.chatInputBar {
-      chatInputBar(&items)
+    if let chatInputBar = ChatUIConfig.shared.chatInputBar {
+      chatInputBar(parentContainerViewController() as? ChatViewController, &items)
     }
 
     stackView = UIStackView(arrangedSubviews: items)

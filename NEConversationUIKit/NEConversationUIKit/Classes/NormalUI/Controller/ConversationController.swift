@@ -62,12 +62,12 @@ open class ConversationController: NEBaseConversationController {
     spaceBarItem.width = NEConstant.screenInterval
 
     navigationItem.rightBarButtonItems = [addBarItem, spaceBarItem, searchBarItem]
-    if !NEKitConversationConfig.shared.ui.showTitleBarRight2Icon {
+    if !ConversationUIConfig.shared.showTitleBarRight2Icon {
       navigationView.searchBtn.isHidden = true
       navigationItem.rightBarButtonItems = [addBarItem]
     }
 
-    if !NEKitConversationConfig.shared.ui.showTitleBarRightIcon {
+    if !ConversationUIConfig.shared.showTitleBarRightIcon {
       navigationView.addBtn.isHidden = true
       navigationItem.rightBarButtonItems = [searchBarItem]
     }

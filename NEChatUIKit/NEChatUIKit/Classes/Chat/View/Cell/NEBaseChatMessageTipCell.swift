@@ -13,8 +13,8 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
   /// 时间
   public lazy var timeLabel: UILabel = {
     let label = UILabel()
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
+    label.textColor = ChatUIConfig.shared.messageProperties.timeTextColor
     label.textAlignment = .center
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.messageTipText"
@@ -24,8 +24,8 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
   /// 内容
   public lazy var contentLabel: UILabel = {
     let label = UILabel()
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.timeTextSize)
-    label.textColor = NEKitChatConfig.shared.ui.messageProperties.timeTextColor
+    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
+    label.textColor = ChatUIConfig.shared.messageProperties.timeTextColor
     label.textAlignment = .center
     label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false

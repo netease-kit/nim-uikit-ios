@@ -15,7 +15,7 @@ public class BirthdayDatePickerView: UIView {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
-    button.setTitleColor(UIColor.ne_blueText, for: .normal)
+    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     button.addTarget(self, action: #selector(removeFromSuperview), for: .touchUpInside)
     return button
@@ -25,7 +25,7 @@ public class BirthdayDatePickerView: UIView {
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitle(commonLocalizable("ok"), for: .normal)
-    button.setTitleColor(UIColor.ne_blueText, for: .normal)
+    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     button.addTarget(self, action: #selector(sureBtnClick), for: .touchUpInside)
     return button

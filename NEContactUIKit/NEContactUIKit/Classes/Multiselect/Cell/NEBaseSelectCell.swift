@@ -85,7 +85,7 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
 
   /// 设置文案字体字号
   open func setConfig() {
-    titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.itemTitleColor
+    titleLabel.textColor = ContactUIConfig.shared.contactProperties.itemTitleColor
     nameLabel.font = UIFont.systemFont(ofSize: 14.0)
     nameLabel.textColor = UIColor.white
   }

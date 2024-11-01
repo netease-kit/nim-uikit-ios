@@ -11,8 +11,11 @@ import UIKit
   case cycle // 圆形
 }
 
+/// 通讯录模块自定义配置
 @objcMembers
 public class ContactUIConfig: NSObject {
+  public static let shared = ContactUIConfig()
+
   // 标题栏文案
   public var title: String?
 
@@ -35,22 +38,22 @@ public class ContactUIConfig: NSObject {
   public var titleBarRight2Res: UIImage?
 
   /// 标题栏最右侧按钮点击事件
-  public var titleBarRightClick: (() -> Void)?
+  public var titleBarRightClick: ((NEBaseContactViewController) -> Void)?
 
   /// 标题栏次最右侧按钮点击事件
-  public var titleBarRight2Click: (() -> Void)?
+  public var titleBarRight2Click: ((NEBaseContactViewController) -> Void)?
 
   /// 是否在通讯录界面显示头部模块
   public var showHeader = true
 
   /// 通讯录列表头部模块的数据回调
-  public var headerData: (([ContactHeadItem]) -> Void)?
+  public var headerData: ((NEBaseContactViewController, inout [ContactHeadItem]) -> Void)?
 
   /// 通讯录列表头部模块 cell 点击事件
-  public var headerItemClick: ((ContactInfo, IndexPath) -> Void)?
+  public var headerItemClick: ((NEBaseContactViewController, ContactInfo, IndexPath) -> Void)?
 
   /// 通讯录列表好友 cell 点击事件
-  public var friendItemClick: ((ContactInfo, IndexPath) -> Void)?
+  public var friendItemClick: ((NEBaseContactViewController, ContactInfo, IndexPath) -> Void)?
 
   /// 通讯录好友列表的 UI 个性化定制
   public var contactProperties = ContactProperties()

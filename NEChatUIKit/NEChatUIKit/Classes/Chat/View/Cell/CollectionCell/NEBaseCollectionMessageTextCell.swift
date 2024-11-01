@@ -10,7 +10,7 @@ class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell {
   /// 内容文本
   public lazy var collectionContentLabel: UILabel = {
     let label = UILabel()
-    label.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
+    label.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true

@@ -14,38 +14,60 @@ import UIKit
   case cycle // 圆形
 }
 
+/// 消息模块自定义配置
 @objcMembers
 public class ChatUIConfig: NSObject {
+  public static let shared = ChatUIConfig()
+
   /// 消息页面的 UI 个性化定制
-  public var messageItemClick: ((UITableViewCell, MessageContentModel?) -> Void)?
+  public var messageItemClick: ((NEChatBaseViewController, UITableViewCell, MessageContentModel?) -> Void)?
 
   /// 消息页面的 UI 个性化定制
   public var messageProperties = MessageProperties()
 
   /// 文本输入框下方 tab 按钮定制
-  public var chatInputBar: ((inout [UIButton]) -> Void)?
+  public var chatInputBar: ((ChatViewController?, inout [UIButton]) -> Void)?
 
   /// 【更多】区域功能列表
-  public var chatInputMenu: ((inout [NEMoreItemModel]) -> Void)?
+  public var chatInputMenu: ((ChatViewController, inout [NEMoreItemModel]) -> Void)?
 
   /// 消息长按弹出菜单回调, 回调中会返回长按弹出菜单列表
-  public var chatPopMenu: ((inout [OperationItem], MessageContentModel?) -> Void)?
+  public var chatPopMenu: ((ChatViewController, inout [OperationItem], MessageContentModel?) -> Void)?
 
   /// 消息长按弹出菜单点击事件回调
-  public var popMenuClick: ((OperationItem) -> Void)?
+  public var popMenuClick: ((ChatViewController, OperationItem) -> Void)?
 
   /// 消息列表的视图控制器回调，回调中会返回消息列表的视图控制器
   public var customController: ((ChatViewController) -> Void)?
 
-  /// 消息列表发送消息时的视图控制器回调
-  /// 回调参数：消息体和消息列表的视图控制器
-  /// 返回值：是否继续发送消息
-  public var onSendMessage: ((V2NIMMessage, ChatViewController) -> Bool)?
+  /*
+   * 用户可自定义参数
+   */
 
-  /// 用户可自定义参数
-
-  // 发送文件大小限制(单位：MB)
+  /// 发送文件大小限制(单位：MB)
   public var fileSizeLimit: Double = 200
+
+  /// 群未读显示限制数，默认超过200人不显示已读未读进度
+  public var maxReadingNum = 200
+
+  /// 撤回消息可重新编辑时间 (单位：min)
+  public var revokeEditTimeGap: Int = 2
+
+  /// 消息可撤回时间 (单位：min)
+  private var revokeTimeGap: Int = 10080
+
+  /// 设置消息可撤回时间 (单位：min)
+  /// 周期为[2,  7*24*60] 分钟, 超过最大值， 修正为最大值， 最小值修正到2分钟
+  public func setRevokeTimeGap(_ time: Int) {
+    revokeTimeGap = max(time, 2) // >= 2 min
+    revokeTimeGap = min(revokeTimeGap, 10080) // <= 7 d
+  }
+
+  /// 获取消息可撤回时间 (单位：min)
+  /// 周期为[2,  7*24*60] 分钟
+  public func getReeditTimeGap() -> Int {
+    revokeTimeGap
+  }
 }
 
 /// 消息页面的 UI 个性化定制
@@ -109,7 +131,7 @@ public class MessageProperties: NSObject {
   // 设置标题栏右侧图标按钮展示图标
   public var titleBarRightRes: UIImage?
   // 标题栏右侧图标的点击事件
-  public var titleBarRightClick: (() -> Void)?
+  public var titleBarRightClick: ((ChatViewController) -> Void)?
   // 设置会话界面背景色
   public var chatViewBackground: UIColor?
 }

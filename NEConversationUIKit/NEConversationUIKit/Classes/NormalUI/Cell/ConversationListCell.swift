@@ -36,10 +36,10 @@ open class ConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
+    if ConversationUIConfig.shared.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 21.0
-    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius > 0 {
-      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
+    } else if ConversationUIConfig.shared.conversationProperties.avatarCornerRadius > 0 {
+      headImageView.layer.cornerRadius = ConversationUIConfig.shared.conversationProperties.avatarCornerRadius
     } else {
       headImageView.layer.cornerRadius = 21.0
     }
@@ -48,9 +48,9 @@ open class ConversationListCell: NEBaseConversationListCell {
   override open func configureData(_ sessionModel: NEConversationListModel?) {
     super.configureData(sessionModel)
     if sessionModel?.conversation?.stickTop == true {
-      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
     } else {
-      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemBackground ?? .white
     }
   }
 }

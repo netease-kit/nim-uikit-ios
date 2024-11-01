@@ -55,7 +55,7 @@ open class NEContactBaseViewController: UIViewController, UIGestureRecognizerDel
     super.viewWillAppear(animated)
 
     // 配置项：会话界面是否展示标题栏
-    if !NEKitContactConfig.shared.ui.showTitleBar {
+    if !ContactUIConfig.shared.showTitleBar {
       navigationController?.isNavigationBarHidden = true
       navigationView.removeFromSuperview()
       return

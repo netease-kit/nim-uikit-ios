@@ -17,7 +17,7 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     label.contentInset = .zero
     label.textContainer.lineFragmentPadding = 0.0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
+    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 
@@ -37,7 +37,7 @@ open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
     label.contentInset = .zero
     label.textContainer.lineFragmentPadding = 0.0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize, weight: .semibold)
+    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 

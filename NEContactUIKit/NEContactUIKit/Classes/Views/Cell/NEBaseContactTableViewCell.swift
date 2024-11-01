@@ -71,17 +71,17 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
   }
 
   open func initSubviewsLayout() {
-    if NEKitContactConfig.shared.ui.contactProperties.avatarType == .cycle {
+    if ContactUIConfig.shared.contactProperties.avatarType == .cycle {
       avatarImageView.layer.cornerRadius = 18.0
-    } else if NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius > 0 {
-      avatarImageView.layer.cornerRadius = NEKitContactConfig.shared.ui.contactProperties.avatarCornerRadius
+    } else if ContactUIConfig.shared.contactProperties.avatarCornerRadius > 0 {
+      avatarImageView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
     } else {
       avatarImageView.layer.cornerRadius = 18.0 // Normal UI
     }
   }
 
   open func setConfig() {
-    titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.itemTitleColor
+    titleLabel.textColor = ContactUIConfig.shared.contactProperties.itemTitleColor
     nameLabel.font = UIFont.systemFont(ofSize: 14.0)
     nameLabel.textColor = UIColor.white
   }

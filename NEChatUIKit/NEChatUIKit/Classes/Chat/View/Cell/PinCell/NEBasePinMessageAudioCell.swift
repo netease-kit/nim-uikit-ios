@@ -23,9 +23,9 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
   override open func setupUI() {
     super.setupUI()
 
-    let image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    let image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImage.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.isUserInteractionEnabled = true
     backView.addSubview(bubbleImage)
@@ -54,7 +54,7 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
       audioImageView.animationImages = [leftImage1, leftmage2, leftmage3]
     }
 
-    audioTimeLabel.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
+    audioTimeLabel.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     audioTimeLabel.textColor = UIColor.ne_darkText
     audioTimeLabel.textAlignment = .left
     audioTimeLabel.translatesAutoresizingMaskIntoConstraints = false

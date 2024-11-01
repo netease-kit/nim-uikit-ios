@@ -290,7 +290,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                      replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: NEKitChatConfig.shared.ui.messageProperties.messageTextColor,
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.messageTextColor,
                                  NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
 
     if chatInpuMode == .normal || chatInpuMode == .multipleSend, text == "\n" {

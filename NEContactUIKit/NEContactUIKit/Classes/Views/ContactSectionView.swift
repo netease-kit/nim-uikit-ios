@@ -23,7 +23,7 @@ open class ContactSectionView: UITableViewHeaderFooterView {
     contentView.backgroundColor = .white
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.backgroundColor = .white
-    titleLabel.textColor = NEKitContactConfig.shared.ui.contactProperties.indexTitleColor ?? UIColor.ne_emptyTitleColor
+    titleLabel.textColor = ContactUIConfig.shared.contactProperties.indexTitleColor ?? UIColor.ne_emptyTitleColor
     titleLabel.font = UIFont.systemFont(ofSize: 14.0)
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
@@ -34,7 +34,7 @@ open class ContactSectionView: UITableViewHeaderFooterView {
     ])
 
     line.translatesAutoresizingMaskIntoConstraints = false
-    line.backgroundColor = NEKitContactConfig.shared.ui.contactProperties.divideLineColor
+    line.backgroundColor = ContactUIConfig.shared.contactProperties.divideLineColor
     contentView.addSubview(line)
     NSLayoutConstraint.activate([
       line.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),

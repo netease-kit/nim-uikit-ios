@@ -30,7 +30,7 @@ open class FunConversationListCell: NEBaseConversationListCell {
       headImageView.heightAnchor.constraint(equalToConstant: 48),
     ])
 
-    titleLabel.font = .systemFont(ofSize: NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize > 0 ? NEKitConversationConfig.shared.ui.conversationProperties.itemTitleSize : 17)
+    titleLabel.font = .systemFont(ofSize: ConversationUIConfig.shared.conversationProperties.itemTitleSize > 0 ? ConversationUIConfig.shared.conversationProperties.itemTitleSize : 17)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: headImageView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: timeLabel.leftAnchor, constant: -5),
@@ -54,10 +54,10 @@ open class FunConversationListCell: NEBaseConversationListCell {
   }
 
   override func initSubviewsLayout() {
-    if NEKitConversationConfig.shared.ui.conversationProperties.avatarType == .cycle {
+    if ConversationUIConfig.shared.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 24.0
-    } else if NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius > 0 {
-      headImageView.layer.cornerRadius = NEKitConversationConfig.shared.ui.conversationProperties.avatarCornerRadius
+    } else if ConversationUIConfig.shared.conversationProperties.avatarCornerRadius > 0 {
+      headImageView.layer.cornerRadius = ConversationUIConfig.shared.conversationProperties.avatarCornerRadius
     } else {
       headImageView.layer.cornerRadius = 4.0
     }
@@ -68,9 +68,9 @@ open class FunConversationListCell: NEBaseConversationListCell {
     contentModel = sessionModel
 
     if sessionModel?.conversation?.stickTop == true {
-      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemStickTopBackground ?? .funConversationBackgroundColor
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? .funConversationBackgroundColor
     } else {
-      contentView.backgroundColor = NEKitConversationConfig.shared.ui.conversationProperties.itemBackground ?? .white
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemBackground ?? .white
     }
   }
 }

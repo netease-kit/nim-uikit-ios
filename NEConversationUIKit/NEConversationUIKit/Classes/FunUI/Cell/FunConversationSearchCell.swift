@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECommonKit
 import UIKit
 
 @objcMembers
@@ -33,6 +34,6 @@ open class FunConversationSearchCell: NEBaseConversationSearchCell {
   }
 
   override func getRangeTextColor() -> UIColor {
-    UIColor.funConversationThemeColor
+    UIColor.ne_funTheme
   }
 }

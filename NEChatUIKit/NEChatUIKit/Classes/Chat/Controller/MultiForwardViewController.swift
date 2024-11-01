@@ -236,8 +236,8 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
   // MARK: ChatBaseCellDelegate
 
   open func didTapMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?, _ replyModel: MessageModel?) {
-    if let tapClick = NEKitChatConfig.shared.ui.messageItemClick {
-      tapClick(cell, model)
+    if let tapClick = ChatUIConfig.shared.messageItemClick {
+      tapClick(self, cell, model)
       return
     }
 

@@ -58,7 +58,7 @@ open class NEChatUIKitClient: NSObject {
 
   /// 获取更多面板数据
   /// - Returns: 返回更多操作数据
-  open func getMoreActionData(sessionType: V2NIMConversationType) -> [NEMoreItemModel] {
+  open func getMoreActionData(sessionType: V2NIMConversationType, _ viewController: ChatViewController) -> [NEMoreItemModel] {
     var more = [NEMoreItemModel]()
     for model in moreAction {
       if model.type != .rtc {
@@ -68,8 +68,8 @@ open class NEChatUIKitClient: NSObject {
       }
     }
 
-    if let chatInputMenu = NEKitChatConfig.shared.ui.chatInputMenu {
-      chatInputMenu(&more)
+    if let chatInputMenu = ChatUIConfig.shared.chatInputMenu {
+      chatInputMenu(viewController, &more)
     }
 
     return more

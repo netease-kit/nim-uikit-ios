@@ -57,28 +57,28 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
     nav.brandBtn.addTarget(self, action: #selector(brandBtnClick), for: .touchUpInside)
 
-    if let brandTitle = NEKitConversationConfig.shared.ui.titleBarTitle {
+    if let brandTitle = ConversationUIConfig.shared.titleBarTitle {
       nav.brandBtn.setTitle(brandTitle, for: .normal)
     }
-    if let brandTitleColor = NEKitConversationConfig.shared.ui.titleBarTitleColor {
+    if let brandTitleColor = ConversationUIConfig.shared.titleBarTitleColor {
       nav.brandBtn.setTitleColor(brandTitleColor, for: .normal)
     }
-    if !NEKitConversationConfig.shared.ui.showTitleBarLeftIcon {
+    if !ConversationUIConfig.shared.showTitleBarLeftIcon {
       nav.brandBtn.setImage(nil, for: .normal)
       // 如果左侧图标为空，则左侧文案左对齐
       nav.brandBtn.layoutButtonImage(style: .left, space: 0)
     }
-    if let brandImg = NEKitConversationConfig.shared.ui.titleBarLeftRes {
+    if let brandImg = ConversationUIConfig.shared.titleBarLeftRes {
       nav.brandBtn.setImage(brandImg, for: .normal)
       if brandImg.size.width == 0, brandImg.size.height == 0 {
         // 如果左侧图标为空，则左侧文案左对齐
         nav.brandBtn.layoutButtonImage(style: .left, space: 0)
       }
     }
-    if let rightImg = NEKitConversationConfig.shared.ui.titleBarRightRes {
+    if let rightImg = ConversationUIConfig.shared.titleBarRightRes {
       nav.addBtn.setImage(rightImg, for: .normal)
     }
-    if let right2Img = NEKitConversationConfig.shared.ui.titleBarRight2Res {
+    if let right2Img = ConversationUIConfig.shared.titleBarRight2Res {
       nav.searchBtn.setImage(right2Img, for: .normal)
     }
     return nav
@@ -247,6 +247,10 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
         }
       }
     }
+
+    if let customController = ConversationUIConfig.shared.customController {
+      customController(self)
+    }
   }
 
   override open func viewDidLoad() {
@@ -275,7 +279,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationView.isHidden = true
       topConstant = 0
-      if NEKitConversationConfig.shared.ui.showTitleBar {
+      if ConversationUIConfig.shared.showTitleBar {
         navigationController?.isNavigationBarHidden = false
       } else {
         navigationController?.isNavigationBarHidden = true
@@ -285,7 +289,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
       }
     } else {
       navigationController?.isNavigationBarHidden = true
-      if NEKitConversationConfig.shared.ui.showTitleBar {
+      if ConversationUIConfig.shared.showTitleBar {
         navigationView.isHidden = false
         topConstant = NEConstant.navigationHeight
       } else {
@@ -357,10 +361,6 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     for (key, value) in stickTopCellRegisterDic {
       stickTopCollcetionView.register(value, forCellWithReuseIdentifier: "\(key)")
     }
-
-    if let customController = NEKitConversationConfig.shared.ui.customController {
-      customController(self)
-    }
   }
 
   open func initialConfig() {
@@ -419,13 +419,13 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 extension NEBaseConversationController: TabNavigationViewDelegate {
   /// 标题栏左侧按钮点击事件
   func brandBtnClick() {
-    NEKitConversationConfig.shared.ui.titleBarLeftClick?()
+    ConversationUIConfig.shared.titleBarLeftClick?(self)
   }
 
   /// 点击搜索会话
   open func searchAction() {
-    if let searchBlock = NEKitConversationConfig.shared.ui.titleBarRight2Click {
-      searchBlock()
+    if let searchBlock = ConversationUIConfig.shared.titleBarRight2Click {
+      searchBlock(self)
       return
     }
 
@@ -475,8 +475,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
   }
 
   open func didClickAddBtn() {
-    if let addBlock = NEKitConversationConfig.shared.ui.titleBarRightClick {
-      addBlock()
+    if let addBlock = ConversationUIConfig.shared.titleBarRightClick {
+      addBlock(self)
       return
     }
 
@@ -670,8 +670,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
-    if let didClick = NEKitConversationConfig.shared.ui.itemClick, let model = conversationModel {
-      didClick(model, indexPath)
+    if let didClick = ConversationUIConfig.shared.itemClick, let model = conversationModel {
+      didClick(self, model, indexPath)
       return
     }
 
@@ -686,19 +686,19 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     var rowActions = [UITableViewRowAction]()
     let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: NEKitConversationConfig.shared.ui.deleteButtonTitle) { action, indexPath in
+                                            title: ConversationUIConfig.shared.deleteButtonTitle) { action, indexPath in
       weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
 
     // 置顶和取消置顶
     let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? NEKitConversationConfig.shared.ui.stickTopButtonCancelTitle :
-                                           NEKitConversationConfig.shared.ui.stickTopButtonTitle) { action, indexPath in
+                                         title: isTop ? ConversationUIConfig.shared.stickTopButtonCancelTitle :
+                                           ConversationUIConfig.shared.stickTopButtonTitle) { action, indexPath in
       weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
-    deleteAction.backgroundColor = NEKitConversationConfig.shared.ui.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
-    topAction.backgroundColor = NEKitConversationConfig.shared.ui.stickTopButtonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
+    deleteAction.backgroundColor = ConversationUIConfig.shared.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
+    topAction.backgroundColor = ConversationUIConfig.shared.stickTopButtonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
     rowActions.append(deleteAction)
     rowActions.append(topAction)
 
@@ -743,8 +743,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
-    if let deleteButtonClick = NEKitConversationConfig.shared.ui.deleteButtonClick {
-      deleteButtonClick(conversationModel, indexPath)
+    if let deleteButtonClick = ConversationUIConfig.shared.deleteButtonClick {
+      deleteButtonClick(self, conversationModel, indexPath)
       return
     }
 
@@ -788,8 +788,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
-    if let stickTopButtonClick = NEKitConversationConfig.shared.ui.stickTopButtonClick {
-      stickTopButtonClick(conversationModel, indexPath)
+    if let stickTopButtonClick = ConversationUIConfig.shared.stickTopButtonClick {
+      stickTopButtonClick(self, conversationModel, indexPath)
       return
     }
 

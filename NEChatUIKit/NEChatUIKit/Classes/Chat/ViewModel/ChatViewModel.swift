@@ -15,8 +15,14 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
   /// 来源： 发送消息， 插入消息
   /// - Parameter message: 消息
-  /// - Parameter completion: 是否继续发送消息
-  @objc optional func readySendMessage(_ message: V2NIMMessage, _ completion: @escaping (Bool) -> Void)
+  /// - Parameter completion: 是否继续发送消息、要发送的消息、消息发送参数
+  @objc optional func beforeSend(_ param: MessageSendParams) -> MessageSendParams?
+
+  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
+  /// 来源： 发送消息， 插入消息
+  /// - Parameter message: 消息
+  /// - Parameter completion: 是否继续发送消息、要发送的消息、消息发送参数
+  @objc optional func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void)
 
   /// 消息发送中，此时消息已经发送
   /// - Parameters:
@@ -176,6 +182,7 @@ open class ChatViewModel: NSObject {
   /// 添加监听
   open func addListener() {
     chatRepo.addChatListener(self)
+    chatRepo.addMessageSendListener(self)
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.addAIListener(self)
@@ -184,6 +191,7 @@ open class ChatViewModel: NSObject {
 
   deinit {
     chatRepo.removeChatListener(self)
+    chatRepo.removeMessageSendListener(self)
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.removeAIListener(self)
@@ -2221,17 +2229,29 @@ open class ChatViewModel: NSObject {
   }
 }
 
+// MARK: - NEMessageListener
+
+extension ChatViewModel: NEMessageListener {
+  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
+  /// 来源： 发送消息， 插入消息
+  /// - Parameter param: 消息参数，包含消息和发送参数
+  /// - Returns: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
+  public func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
+    delegate?.beforeSend?(param)
+  }
+
+  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
+  /// 来源： 发送消息， 插入消息
+  /// - Parameter param: 消息参数，包含消息和发送参数
+  /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
+  public func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
+    delegate?.beforeSend?(param, completion)
+  }
+}
+
 // MARK: - NEChatListener
 
 extension ChatViewModel: NEChatListener {
-  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
-  /// 来源： 发送消息， 插入消息
-  /// - Parameter message: 消息
-  /// - Parameter completion: 是否继续发送消息
-  public func readySendMessage(_ message: V2NIMMessage, _ completion: @escaping (Bool) -> Void) {
-    delegate?.readySendMessage?(message, completion)
-  }
-
   /// 本端发送消息状态回调
   /// 来源： 发送消息， 插入消息
   /// - Parameter message: 消息

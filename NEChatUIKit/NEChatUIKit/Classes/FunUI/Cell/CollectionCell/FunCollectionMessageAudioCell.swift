@@ -31,8 +31,8 @@ class FunCollectionMessageAudioCell: NEBaseCollectionMessageAudioCell {
   override open func setupCommonUI() {
     super.setupCommonUI()
     setFunStyle()
-    let image = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "fun_pin_message_audio_bg")
+    let image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "fun_pin_message_audio_bg")
     bubbleImage.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
   }
 }

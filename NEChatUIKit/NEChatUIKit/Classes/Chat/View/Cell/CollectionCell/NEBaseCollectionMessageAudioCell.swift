@@ -37,9 +37,9 @@ class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
   override open func setupCommonUI() {
     super.setupCommonUI()
 
-    let receiveImage = NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    let receiveImage = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImage.image = receiveImage?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     backView.addSubview(bubbleImage)
     contentWidth = bubbleImage.widthAnchor.constraint(equalToConstant: chat_content_maxW)
@@ -60,7 +60,7 @@ class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
       audioImageView.heightAnchor.constraint(equalToConstant: 28),
     ])
 
-    audioTimeLabel.font = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.pinMessageTextSize)
+    audioTimeLabel.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     audioTimeLabel.textAlignment = .left
     audioTimeLabel.textColor = UIColor.ne_darkText
     audioTimeLabel.translatesAutoresizingMaskIntoConstraints = false

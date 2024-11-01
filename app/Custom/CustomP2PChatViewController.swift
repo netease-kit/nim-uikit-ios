@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NEChatUIKit
 import NIMSDK
 import UIKit
@@ -12,148 +13,13 @@ class CustomP2PChatViewController: P2PChatViewController {
     // 自定义消息cell绑定需要放在 super.viewDidLoad() 之前
     NEChatUIKitClient.instance.regsiterCustomCell(["\(customMessageType)": CustomChatCell.self])
 
-    // 通过配置项实现自定义，该方式不需要继承自 ChatViewController
-    customByConfig()
-
     // 通过重写实现自定义，该方式需要继承自 ChatViewController
-//    customByOverread()
+    customByOverread()
 
     super.viewDidLoad()
 
     // 自定义消息以及外部扩展 覆盖cell UI 样式示例
     customMessage()
-  }
-
-  /// 通过配置项实现 UI 自定义，该方式不需要继承自 ChatViewController
-  func customByConfig() {
-    NEKitChatConfig.shared.ui.messageProperties.avatarType = .rectangle
-    NEKitChatConfig.shared.ui.messageProperties.avatarCornerRadius = 8.0
-    NEKitChatConfig.shared.ui.messageProperties.signalBgColor = UIColor.ne_backcolor
-    NEKitChatConfig.shared.ui.messageProperties.selfMessageBg = UIColor.ne_greenText
-    NEKitChatConfig.shared.ui.messageProperties.receiveMessageBg = UIColor.ne_greenText
-    NEKitChatConfig.shared.ui.messageProperties.timeTextColor = UIColor.ne_redText
-    NEKitChatConfig.shared.ui.messageProperties.timeTextSize = 18
-    NEKitChatConfig.shared.ui.messageProperties.userNickColor = UIColor.ne_redText
-    NEKitChatConfig.shared.ui.messageProperties.userNickTextSize = 8.0
-    NEKitChatConfig.shared.ui.messageProperties.messageTextColor = UIColor.ne_redColor
-    NEKitChatConfig.shared.ui.messageProperties.messageTextSize = 12
-    NEKitChatConfig.shared.ui.messageProperties.rightBubbleBg = UIImage(named: "copy_right")
-    NEKitChatConfig.shared.ui.messageProperties.leftBubbleBg = UIImage(named: "copy_right")
-    NEKitChatConfig.shared.ui.messageProperties.showP2pMessageStatus = false
-    NEKitChatConfig.shared.ui.messageProperties.showTeamMessageStatus = false
-//    NEKitChatConfig.shared.ui.messageProperties.showTitleBar = false
-//    NEKitChatConfig.shared.ui.messageProperties.showTitleBarRightIcon = false
-    NEKitChatConfig.shared.ui.messageProperties.titleBarRightRes = UIImage(named: "copy_right")
-    NEKitChatConfig.shared.ui.messageProperties.titleBarRightClick = { [weak self] in
-      self?.showToast("标题栏右侧图标的点击事件")
-    }
-    NEKitChatConfig.shared.ui.messageProperties.chatViewBackground = UIColor.ne_redText
-
-    NEKitChatConfig.shared.ui.messageItemClick = { [weak self] cell, model in
-      self?.showToast("点击了消息: \(String(describing: model?.message?.text))")
-    }
-
-    /// 文本输入框下方 tab 按钮定制
-    NEKitChatConfig.shared.ui.chatInputBar = { [weak self] item in
-      // 修改
-      let takePicBtn = item[2]
-      takePicBtn.setImage(nil, for: .normal)
-      takePicBtn.setTitle("拍照", for: .normal)
-      takePicBtn.setTitleColor(.blue, for: .normal)
-      takePicBtn.removeTarget(takePicBtn.superview, action: nil, for: .allEvents)
-      takePicBtn.addTarget(self, action: #selector(self?.customClick), for: .touchUpInside)
-
-      // 新增
-      let button = UIButton(type: .custom)
-      button.setTitle("新增", for: .normal)
-      button.setTitleColor(.blue, for: .normal)
-      button.addTarget(self, action: #selector(self?.customClick), for: .touchUpInside)
-      item.append(button)
-    }
-
-    /// 【更多】区域功能列表自定义示例
-    NEKitChatConfig.shared.ui.chatInputMenu = { [weak self] menuList in
-      // 新增未知类型
-      let itemNew = NEMoreItemModel()
-      itemNew.customImage = UIImage(named: "mine_collection")
-      itemNew.customDelegate = self
-      itemNew.action = #selector(self?.customClick)
-      itemNew.title = "新增"
-      menuList.append(itemNew)
-
-      // 覆盖已有类型
-      // 遍历 menuList， 根据type 覆盖已有类型
-      for item in menuList {
-        if item.type == .rtc {
-          item.customImage = UIImage(named: "mine_setting")
-          item.customDelegate = self
-          item.action = #selector(self?.customClick)
-          item.type = .rtc
-          item.title = "覆盖"
-        }
-      }
-
-      // 移除已有类型
-      // 遍历 menuList， 根据type 移除已有类型
-      for (i, item) in menuList.enumerated() {
-        if item.type == .file {
-          menuList.remove(at: i)
-        }
-      }
-    }
-
-    /// 消息长按弹出菜单自定义
-    NEKitChatConfig.shared.ui.chatPopMenu = { menuList, model in
-      // 遍历 menuList， 根据 type 覆盖已有类型
-      // 将所有文本消息的【复制】替换成【粘贴】
-      if model?.type == .text {
-        for item in menuList {
-          if item.type == .copy {
-            item.text = "粘贴"
-          }
-        }
-      }
-    }
-
-    /// 消息长按弹出菜单点击事件回调，根据按钮类型进行区分
-    NEKitChatConfig.shared.ui.popMenuClick = { [weak self] item in
-      switch item.type {
-      case .copy:
-        // 更改【复制】类型按钮的点击事件
-        self?.customClick()
-      default:
-        break
-      }
-    }
-
-    /// 消息列表的视图控制器回调，回调中会返回消息列表的视图控制器
-    NEKitChatConfig.shared.ui.customController = { viewController in
-      // 更改导航栏背景色
-      viewController.navigationView.backgroundColor = .gray
-
-      // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
-      self.customTopView.button.setTitle("通过配置项添加", for: .normal)
-      viewController.bodyTopView.backgroundColor = .purple
-      viewController.bodyTopView.addSubview(self.customTopView)
-      viewController.bodyTopViewHeight = 80
-
-      // 底部bodyBottomView中添加自定义view（需要设置bodyBottomView的高度）
-      self.customBottomView.button.setTitle("通过配置项添加", for: .normal)
-      viewController.bodyBottomView.backgroundColor = .purple
-      viewController.bodyBottomView.addSubview(self.customBottomView)
-      viewController.bodyBottomViewHeight = 60
-    }
-
-    /// 消息列表发送消息时的视图控制器回调
-    /// 回调参数：消息体和消息列表的视图控制器
-    /// 返回值：是否继续发送消息
-    NEKitChatConfig.shared.ui.onSendMessage = { message, ViewController in
-      if let text = message.text, text.starts(with: "哈") {
-        ViewController.showToast(text)
-        return false
-      }
-      return true
-    }
   }
 
   /// 通过重写实现自定义布局(这种方式需要继承，从而拿到父类属性)
@@ -185,8 +51,9 @@ class CustomP2PChatViewController: P2PChatViewController {
     // 新增未知类型
     let itemNew = NEMoreItemModel()
     itemNew.customImage = UIImage(named: "mine_collection")
-    itemNew.customDelegate = self
-    itemNew.action = #selector(customClick)
+    itemNew.action = { viewController, item in
+      viewController.showToast("【更多】区域功能自定义点击事件")
+    }
     itemNew.title = "新增"
     NEChatUIKitClient.instance.moreAction.append(itemNew)
 
@@ -196,8 +63,9 @@ class CustomP2PChatViewController: P2PChatViewController {
       if item.type == .rtc {
         let itemReplace = NEChatUIKitClient.instance.moreAction[i]
         itemReplace.customImage = UIImage(named: "mine_setting")
-        itemReplace.customDelegate = self
-        itemReplace.action = #selector(customClick)
+        itemReplace.action = { viewController, item in
+          viewController.showToast("【更多】区域功能自定义点击事件")
+        }
         itemReplace.type = .rtc
         itemReplace.title = "覆盖"
       }
@@ -243,10 +111,6 @@ class CustomP2PChatViewController: P2PChatViewController {
     if model?.type == .rtcCallRecord {
       items.append(OperationItem.replayItem())
     }
-  }
-
-  @objc func customClick() {
-    showToast("自定义点击事件")
   }
 
   func customBottomBar() {

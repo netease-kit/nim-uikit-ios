@@ -18,7 +18,7 @@ open class ContactSelectedCell: NEBaseContactSelectedCell {
 
   override open func setConfig() {
     super.setConfig()
-    titleLabel.font = .systemFont(ofSize: NEKitContactConfig.shared.ui.contactProperties.itemTitleSize > 0 ? NEKitContactConfig.shared.ui.contactProperties.itemTitleSize : 14)
+    titleLabel.font = .systemFont(ofSize: ContactUIConfig.shared.contactProperties.itemTitleSize > 0 ? ContactUIConfig.shared.contactProperties.itemTitleSize : 14)
   }
 
   override open func setupCommonCircleHeader() {

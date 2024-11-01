@@ -32,7 +32,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive_fun")
     backViewLeft.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
 
     bubbleImageLeft.addSubview(backViewLeft)
     NSLayoutConstraint.activate([
@@ -103,7 +103,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     bubbleImageRight.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_send_fun")
     backViewRight.image = image?
-      .resizableImage(withCapInsets: NEKitChatConfig.shared.ui.messageProperties.backgroundImageCapInsets)
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
 
     bubbleImageRight.addSubview(backViewRight)
     NSLayoutConstraint.activate([

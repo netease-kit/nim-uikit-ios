@@ -76,13 +76,16 @@ open class MessageContentModel: NSObject, MessageModel {
     didSet {
       if isRevoked {
         type = .revoke
+
+        // 校验撤回消息可编辑时间
         if let time = message?.createTime {
           let date = Date()
           let currentTime = date.timeIntervalSince1970
-          if currentTime - time > 60 * 2 {
+          if Int(currentTime - time) > ChatUIConfig.shared.revokeEditTimeGap * 60 {
             timeOut = true
           }
         }
+
         // 只有文本消息，才计算可编辑按钮的宽度
         if let isSend = message?.isSelf, isSend, message?.messageType == .MESSAGE_TYPE_TEXT, timeOut == false {
           contentSize = CGSize(width: 218, height: chat_min_h)
@@ -121,7 +124,7 @@ open class MessageContentModel: NSObject, MessageModel {
     }
   }
 
-  public let messageTextFont = UIFont.systemFont(ofSize: NEKitChatConfig.shared.ui.messageProperties.messageTextSize)
+  public let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
   public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
 
   public required init(message: V2NIMMessage?) {
@@ -129,7 +132,7 @@ open class MessageContentModel: NSObject, MessageModel {
     if message?.conversationType == .CONVERSATION_TYPE_TEAM,
        let senderId = ChatMessageHelper.getSenderId(message),
        !IMKitClient.instance.isMe(senderId) {
-      fullNameHeight = NEKitChatConfig.shared.ui.messageProperties.showTeamMessageNick ? 20 : 0
+      fullNameHeight = ChatUIConfig.shared.messageProperties.showTeamMessageNick ? 20 : 0
     }
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
