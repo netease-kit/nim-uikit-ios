@@ -70,28 +70,8 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
       tableView.sectionHeaderTopPadding = 0.0
     }
 
-    tableView.mj_header = MJRefreshNormalHeader(
-      refreshingTarget: self,
-      refreshingAction: #selector(loadData)
-    )
     return tableView
   }()
-
-  /// 表格添加底部 loading
-  func addBottomLoadMore() {
-    let footer = MJRefreshAutoFooter(
-      refreshingTarget: self,
-      refreshingAction: #selector(loadMoreData)
-    )
-    footer.triggerAutomaticallyRefreshPercent = -10
-    tableView.mj_footer = footer
-  }
-
-  /// 表格移除底部 loading
-  func removeBottomLoadMore() {
-    tableView.mj_footer?.endRefreshingWithNoMoreData()
-    tableView.mj_footer = nil
-  }
 
   /// 加载数据
   func loadData() {
@@ -99,32 +79,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
       if let err = error {
         NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
       } else {
-        if finished {
-          self?.removeBottomLoadMore()
-        } else {
-          self?.addBottomLoadMore()
-        }
-
-        self?.tableView.mj_header?.endRefreshing()
         self?.emptyView.isHidden = (self?.viewModel.datas.count ?? 0) > 0
-        self?.tableView.reloadData()
-      }
-    }
-  }
-
-  /// 加载更多
-  func loadMoreData() {
-    viewModel.loadApplicationList(false) { [weak self] finished, error in
-      if let err = error {
-        NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadMoreApplicationList CALLBACK error: \(err.localizedDescription)")
-      } else {
-        if finished {
-          self?.removeBottomLoadMore()
-        } else {
-          self?.addBottomLoadMore()
-        }
-
-        self?.tableView.mj_footer?.endRefreshing()
         self?.tableView.reloadData()
       }
     }
@@ -205,13 +160,8 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
   ///   - notifiModel: 申请模型
   ///   - notiStatus: 处理状态
   public func changeValidationStatus(notifiModel: NENotification, notiStatus: NEHandleStatus) {
-    notifiModel.handleStatus = notiStatus
-    notifiModel.unReadCount = 0
-    for msg in notifiModel.msgList ?? [] {
-      msg.handleStatus = notiStatus
-    }
-
     DispatchQueue.main.async {
+      self.loadData()
       self.tableView.reloadData()
     }
   }

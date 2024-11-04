@@ -13,6 +13,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   var datas = [NENotification]()
   var dataRefresh: (() -> Void)?
   var offset: UInt = 0 // 查询的偏移量
+  var finished: Bool = false // 是否还有数据
   var pageMaxLimit: UInt = 100 // 查询的每页数量
 
   override init() {
@@ -32,14 +33,22 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
     let offset = firstLoad ? 0 : offset
     if firstLoad {
+      finished = false
       datas.removeAll()
     }
+
+    if finished {
+      completin(true, nil)
+      return
+    }
+
     getValidationMessage(offset) { [weak self] offset, finished, error in
       if let err = error {
         completin(finished, err)
       } else {
         self?.offset = offset
-        completin(finished, nil)
+        self?.finished = finished
+        self?.loadApplicationList(false, completin)
       }
     }
   }
@@ -140,7 +149,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   func setAddApplicationRead(_ completion: ((Bool, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.setAddApplicationRead { success, error in
-      completion?(success, error as? NSError)
+      completion?(success, error)
       DispatchQueue.main.async {
         NotificationCenter.default.post(name: NENotificationName.clearValidationUnreadCount, object: nil)
       }
