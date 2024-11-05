@@ -7,17 +7,17 @@ target 'app' do
   use_frameworks!
 
   # 基础库
-#  pod 'NIMSDK_LITE','10.4.0-beta'
-  pod 'NEChatKit', '10.4.0'
+#  pod 'NIMSDK_LITE','10.5.0'
+  pod 'NEChatKit', '10.4.1'
 
   # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
-  pod 'NEChatUIKit', '10.4.0'
-  pod 'NEContactUIKit', '10.4.0'
-  pod 'NEConversationUIKit', '10.4.0'
-  pod 'NETeamUIKit', '10.4.0'
+  pod 'NEChatUIKit', '10.4.1'
+  pod 'NEContactUIKit', '10.4.1'
+  pod 'NEConversationUIKit', '10.4.1'
+  pod 'NETeamUIKit', '10.4.1'
 
   # 扩展库 - 地理位置组件
-  pod 'NEMapKit', '10.4.0'
+  pod 'NEMapKit', '10.4.1'
   
   # 扩展库 - AI 划词搜索
   pod 'NEAISearchKit', '1.0.3'

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEConversationUIKit'
-  s.version          = '10.4.0'
+  s.version          = '10.4.1'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
