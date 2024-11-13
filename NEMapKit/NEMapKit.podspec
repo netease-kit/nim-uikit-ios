@@ -36,5 +36,5 @@ TODO: Add long description of the pod here.
   s.dependency 'AMap3DMap'
   s.dependency 'AMapSearch'
   s.dependency 'AMapLocation'
-  s.dependency 'NEChatUIKit', '10.4.0'
+  s.dependency 'NEChatUIKit', '10.4.1'
 end
