@@ -8,7 +8,7 @@ target 'app' do
 
   # 基础库
 #  pod 'NIMSDK_LITE','10.5.0'
-  pod 'NEChatKit', '10.4.1'
+  pod 'NEChatKit', '10.4.2'
 
   # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
   pod 'NEChatUIKit', '10.4.1'
