@@ -37,6 +37,6 @@ TODO: Add long description of the pod here.
   s.dependency 'AMapSearch'
   s.dependency 'AMapLocation'
   s.static_framework = true
-  s.dependency 'NEChatUIKit'
-  s.dependency 'NEChatKit'
+  s.dependency 'NEChatUIKit', '9.7.3'
+  s.dependency 'NEChatKit', '9.7.3'
 end

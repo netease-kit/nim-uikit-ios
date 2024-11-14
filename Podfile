@@ -6,17 +6,14 @@ target 'app' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   
-  #登录组件
-  pod 'YXLogin', '1.0.0'
-  
   #可选UI库
-  pod 'NEContactUIKit', '9.7.2'
-  pod 'NEConversationUIKit', '9.7.2'
-  pod 'NEChatUIKit', '9.7.2'
-  pod 'NETeamUIKit', '9.7.2'
+  pod 'NEContactUIKit', '9.7.3'
+  pod 'NEConversationUIKit', '9.7.3'
+  pod 'NEChatUIKit', '9.7.3'
+  pod 'NETeamUIKit', '9.7.3'
 
   #可选Kit库（和UIKit对应）
-  pod 'NEChatKit', '9.7.2'
+  pod 'NEChatKit', '9.7.3'
 
   #基础kit库
   pod 'NECommonUIKit', '9.7.1'
@@ -25,7 +22,7 @@ target 'app' do
   pod 'NECoreKit', '9.6.6'
 
   #扩展库
-  pod 'NEMapKit', '9.7.2'
+  pod 'NEMapKit', '9.7.3'
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
   pod 'NIMSDK_LITE','9.14.2'
