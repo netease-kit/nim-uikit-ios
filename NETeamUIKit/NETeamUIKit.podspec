@@ -36,7 +36,7 @@ TODO: Add long description of the pod here.
 
   s.source_files = 'NETeamUIKit/Classes/**/*'
   s.resource = 'NETeamUIKit/Assets/**/*'
-  s.dependency 'NECommonUIKit'
-  s.dependency 'NEChatKit'
+  s.dependency 'NECommonUIKit', '9.7.1'
+  s.dependency 'NEChatKit', '9.7.3'
 
 end

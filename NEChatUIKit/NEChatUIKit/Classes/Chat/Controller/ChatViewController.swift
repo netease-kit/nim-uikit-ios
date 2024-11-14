@@ -862,7 +862,7 @@ open class ChatViewController: ChatBaseViewController, UINavigationControllerDel
       return
     }
     let remoteExt = chatInputView.getRemoteExtension(attribute)
-    chatInputView.cleartAtCache()
+    chatInputView.clearAtCache()
     weak var weakSelf = self
     if viewmodel.isReplying, let msg = viewmodel.operationModel?.message {
       viewmodel.replyMessageWithoutThread(message: MessageUtils.textMessage(text: content, remoteExt: remoteExt), target: msg) { [weak self] error in
