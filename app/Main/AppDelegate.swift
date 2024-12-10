@@ -57,35 +57,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         NEAIUserManager.shared.setProvider(provider: self)
         
-        let account = "<#account#>"
-        let token = "<#token#>"
-        
         loadService()
         NEKeyboardManager.shared.enable = true
         NEKeyboardManager.shared.shouldResignOnTouchOutside = true
         
-        weak var weakSelf = self
-        IMKitClient.instance.login(account, token, nil) { error in
-            if let err = error {
-                NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-                UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
-                // 此处重新登录
-            }else {
-                NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
-                weakSelf?.initConfig()
-                weakSelf?.initializePage()
-            }
-        }
+        loginWithUI()
         
     }
     
     @objc func refreshRoot(){
         print("refresh root")
-        // 此处重新登录
+        loginWithUI()
     }
     
     @objc func refreshUIStyle(){
         initializePage(true)
+    }
+    
+    func loginWithUI(){
+        weak var weakSelf = self
+        let loginCtrl = NELoginViewController.init()
+        loginCtrl.successLogin = {
+            weakSelf?.initConfig()
+            weakSelf?.initializePage()
+        }
+        window?.rootViewController = NENavigationController.init(rootViewController: loginCtrl)
     }
     
     func initConfig() {
@@ -181,7 +177,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func loginWithAutoParseConfig(){
         
         guard let json = IMSDKConfigManager.instance.getConfig().customJson else {
-            // 此处重新登录
+            loginWithUI()
             return
         }
         
@@ -197,19 +193,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
             if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
                 NEAIUserManager.shared.setProvider(provider: self)
-                IMKitClient.instance.login(accountId, accountIdToken, nil) { error in
+                IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
                     if let err = error {
-                        NEALog.infoLog(self.className(), desc: "login IM error : \(err.localizedDescription)")
+                        NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
                         UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
-                        // 此处重新登录
+                        self?.loginWithUI()
                     } else {
-                        NEALog.infoLog(self.className(), desc: "login IM Success")
-                        self.initConfig()
-                        self.initializePage()
+                        NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+                        self?.initConfig()
+                        self?.initializePage()
                     }
                 }
             } else {
-                // 此处重新登录
+                loginWithUI()
             }
         } catch let error {
             NEALog.infoLog(self.className(), desc: "login poc IM error : \(error.localizedDescription)")
@@ -219,19 +215,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func loginWithCustomConfig(){
         if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
             NEAIUserManager.shared.setProvider(provider: self)
-            IMKitClient.instance.login(accountId, accountIdToken, nil) { error in
+            IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
                 if let err = error {
-                    NEALog.infoLog(self.className(), desc: "login IM error : \(err.localizedDescription)")
+                    NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
                     UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
-                    // 此处重新登录
+                    self?.loginWithUI()
                 } else {
-                    NEALog.infoLog(self.className(), desc: "login IM Success")
-                    self.initConfig()
-                    self.initializePage()
+                    NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+                    self?.initConfig()
+                    self?.initializePage()
                 }
             }
         } else {
-            // 此处重新登录
+            loginWithUI()
         }
     }
     
