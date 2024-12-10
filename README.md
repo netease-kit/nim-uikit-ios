@@ -55,4 +55,4 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 
 ## IM UIKit 集成
 
-具体的集成流程，请参见[快速集成 IM UIKit]([https://doc.yunxin.163.com/messaging-uikit/guide?platform=iOS](https://doc.yunxin.163.com/messaging-uikit/guide/DA0MjY3ODY?platform=iOS))。
+具体的集成流程，请参见[快速集成 IM UIKit](https://doc.yunxin.163.com/messaging-uikit/guide/DA0MjY3ODY?platform=iOS)。
