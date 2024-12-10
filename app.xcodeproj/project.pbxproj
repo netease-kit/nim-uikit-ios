@@ -40,6 +40,7 @@
 		180E81F32D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C22D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift */; };
 		180E81F42D07D9F600151DD8 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */; };
 		180E81F52D07D9F600151DD8 /* MeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CD2D07D9F600151DD8 /* MeViewModel.swift */; };
+		180E81F72D081DD400151DD8 /* NELoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81F62D081DD400151DD8 /* NELoginViewController.swift */; };
 		181EE5872B234C510043817F /* CustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57E2B234C510043817F /* CustomView.swift */; };
 		181EE5882B234C510043817F /* CustomP2PChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */; };
 		181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5822B234C510043817F /* CustomConversationController.swift */; };
@@ -117,6 +118,7 @@
 		180E81CE2D07D9F600151DD8 /* MineSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
 		180E81CF2D07D9F600151DD8 /* NodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
 		180E81D02D07D9F600151DD8 /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
+		180E81F62D081DD400151DD8 /* NELoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NELoginViewController.swift; sourceTree = "<group>"; };
 		181EE57E2B234C510043817F /* CustomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomView.swift; sourceTree = "<group>"; };
 		181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomP2PChatViewController.swift; sourceTree = "<group>"; };
 		181EE5822B234C510043817F /* CustomConversationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationController.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 		180E81B82D07D9F600151DD8 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				180E81F62D081DD400151DD8 /* NELoginViewController.swift */,
 				180E81AB2D07D9F600151DD8 /* IMSDKConfigViewController.swift */,
 				180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */,
 				180E81AD2D07D9F600151DD8 /* IntroduceBrandViewController.swift */,
@@ -491,6 +494,7 @@
 				180E81E42D07D9F600151DD8 /* NENodeViewController.swift in Sources */,
 				180E81E52D07D9F600151DD8 /* VersionCell.swift in Sources */,
 				180E81E62D07D9F600151DD8 /* MessageRemindViewController.swift in Sources */,
+				180E81F72D081DD400151DD8 /* NELoginViewController.swift in Sources */,
 				180E81E72D07D9F600151DD8 /* NEAboutWebViewController.swift in Sources */,
 				180E81E92D07D9F600151DD8 /* MeViewController.swift in Sources */,
 				180E81EA2D07D9F600151DD8 /* IMSDKConfigViewController.swift in Sources */,
