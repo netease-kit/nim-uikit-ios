@@ -101,7 +101,9 @@ public class NETeamUserManager: NSObject {
 
   /// 更新群成员信息
   /// - Parameter teamMember: 群成员信息
-  public func updateTeamMemberInfo(_ teamMember: V2NIMTeamMember?) {
+  /// - Parameter notify: 是否需要通知
+  public func updateTeamMemberInfo(_ teamMember: V2NIMTeamMember?,
+                                   _ notify: Bool = true) {
     guard let teamMember = teamMember, teamMember.teamId == tid else {
       return
     }
@@ -110,8 +112,10 @@ public class NETeamUserManager: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:\(accid)")
     teamMemberCache[accid] = teamMember
 
-    multiDelegate |> { delegate in
-      delegate.onTeamMemberUpdate?(accid)
+    if notify {
+      multiDelegate |> { delegate in
+        delegate.onTeamMemberUpdate?(accid)
+      }
     }
   }
 
@@ -236,8 +240,14 @@ public class NETeamUserManager: NSObject {
     return fullName
   }
 
-  //    获取群成员信息和用户信息
-  public func getTeamMembers(accountIds: [String], _ completion: @escaping () -> Void) {
+  /// 获取群成员信息和用户信息
+  /// - Parameters:
+  ///   - accountIds: 成员 id 列表
+  ///   - notify: 是否需要通知
+  ///   - completion: 完成回调
+  public func getTeamMembers(_ accountIds: [String],
+                             _ notify: Bool = true,
+                             _ completion: @escaping () -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: \(String(describing: tid))")
 
     var loadUserIds = Set<String>() // 需要查询用户信息的ID
@@ -277,7 +287,7 @@ public class NETeamUserManager: NSObject {
       TeamRepo.shared.getTeamMemberListByIds(tid, .TEAM_TYPE_NORMAL, Array(loadMemberIds)) { [weak self] teamMembers, error in
         for teamMember in teamMembers ?? [] {
           if teamMember.inTeam {
-            self?.updateTeamMemberInfo(teamMember)
+            self?.updateTeamMemberInfo(teamMember, notify)
           }
         }
 

@@ -163,7 +163,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
         } else if err.code == noPermissionCode {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
@@ -190,7 +190,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
         } else if err.code == noPermissionCode {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
@@ -217,7 +217,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
         } else if err.code == noPermissionCode {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
@@ -231,7 +231,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
   /// - Parameter model: 数据模型
   func updateInvitePermissionToEveryone(_ model: SettingCellModel) {
     if viewModel.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL {
-      showToast(localizable("failed_operation"))
+      showToast(commonLocalizable("failed_operation"))
       return
     }
     weak var weakSelf = self
@@ -248,7 +248,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
         } else if err.code == noPermissionCode {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
@@ -268,7 +268,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
@@ -311,7 +311,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
@@ -354,7 +354,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
@@ -373,7 +373,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
           } else if err.code == noPermissionCode {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
-            weakSelf?.showToast(localizable("failed_operation"))
+            weakSelf?.showToast(commonLocalizable("failed_operation"))
           }
         } else {
           model.subTitle = localizable("team_all")
@@ -398,7 +398,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
           } else if err.code == noPermissionCode {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
-            weakSelf?.showToast(localizable("failed_operation"))
+            weakSelf?.showToast(commonLocalizable("failed_operation"))
           }
         } else {
           model.subTitle = localizable("team_owner_and_manager")
@@ -423,7 +423,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
@@ -442,7 +442,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
           } else if err.code == noPermissionCode {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
-            weakSelf?.showToast(localizable("failed_operation"))
+            weakSelf?.showToast(commonLocalizable("failed_operation"))
           }
         } else {
           model.subTitle = localizable("team_all")
@@ -467,7 +467,7 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
           } else if err.code == noPermissionCode {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
-            weakSelf?.showToast(localizable("failed_operation"))
+            weakSelf?.showToast(commonLocalizable("failed_operation"))
           }
         } else {
           model.subTitle = localizable("team_owner_and_manager")

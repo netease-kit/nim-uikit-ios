@@ -10,8 +10,8 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
   func didStyleClick()
   func didClickCleanCache()
-  func didClickConfigTest()
   func didClickSDKConfig()
+  func didClickLanguage()
 }
 
 @objcMembers
@@ -20,8 +20,10 @@ public class MineSettingViewModel: NSObject {
   weak var delegate: MineSettingViewModelDelegate?
 
   public func getData() {
+    sectionData.removeAll()
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())
+    sectionData.append(getThreeSection())
   }
 
   private func getFirstSection() -> SettingSectionModel {
@@ -30,7 +32,7 @@ public class MineSettingViewModel: NSObject {
 
     // 消息提醒
     let remind = SettingCellModel()
-    remind.cellName = NSLocalizedString("message_remind", comment: "")
+    remind.cellName = localizable("message_remind")
     remind.type = SettingCellType.SettingArrowCell.rawValue
     remind.cellClick = {
       weakSelf?.delegate?.didMessageRemindClick()
@@ -39,7 +41,7 @@ public class MineSettingViewModel: NSObject {
 
     // 外观
     let style = SettingCellModel()
-    style.cellName = NSLocalizedString("style_selection", comment: "")
+    style.cellName = localizable("style_selection")
     style.type = SettingCellType.SettingArrowCell.rawValue
     style.cellClick = {
       weakSelf?.delegate?.didStyleClick()
@@ -54,26 +56,6 @@ public class MineSettingViewModel: NSObject {
 //        }
 //        model.cellModels.append(cleanCache)
 
-    #if DEBUG
-      let configTest = SettingCellModel()
-      configTest.cellName = "全局配置"
-      configTest.type = SettingCellType.SettingArrowCell.rawValue
-      configTest.cellClick = {
-        weakSelf?.delegate?.didClickConfigTest()
-      }
-      model.cellModels.append(configTest)
-    #endif
-
-    /*
-     let sdkConfigModel = SettingCellModel()
-     sdkConfigModel.cellName = "私有云环境配置"
-     sdkConfigModel.type = SettingCellType.SettingArrowCell.rawValue
-     sdkConfigModel.cellClick = {
-       weakSelf?.delegate?.didClickSDKConfig()
-     }
-     model.cellModels.append(sdkConfigModel)
-     */
-
     model.setCornerType()
     return model
   }
@@ -82,7 +64,7 @@ public class MineSettingViewModel: NSObject {
     let model = SettingSectionModel()
     // 听筒模式
     let receiverModel = SettingCellModel()
-    receiverModel.cellName = NSLocalizedString("receiver_mode", comment: "")
+    receiverModel.cellName = localizable("receiver_mode")
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
     receiverModel.switchOpen = SettingRepo.shared.getHandsetMode()
@@ -102,7 +84,7 @@ public class MineSettingViewModel: NSObject {
 
     // 删除好友是否同步删除备注
 //    let deleteFriend = SettingCellModel()
-//    deleteFriend.cellName = NSLocalizedString("delete_friend", comment: "")
+//    deleteFriend.cellName = localizable("delete_friend")
 //    deleteFriend.type = SettingCellType.SettingSwitchCell.rawValue
 //    deleteFriend.switchOpen = SettingRepo.shared.getDeleteFriendAlias()
 //
@@ -112,7 +94,7 @@ public class MineSettingViewModel: NSObject {
 
     // 消息已读未读功能
     let hasRead = SettingCellModel()
-    hasRead.cellName = NSLocalizedString("message_read_function", comment: "")
+    hasRead.cellName = localizable("message_read_function")
     hasRead.type = SettingCellType.SettingSwitchCell.rawValue
 //        hasRead.switchOpen = true
     hasRead.switchOpen = SettingRepo.shared.getShowReadStatus()
@@ -123,6 +105,30 @@ public class MineSettingViewModel: NSObject {
       receiverModel, // 听筒模式
       hasRead, // 消息已读未读功能
     ])
+    model.setCornerType()
+    return model
+  }
+
+  private func getThreeSection() -> SettingSectionModel {
+    let model = SettingSectionModel()
+    weak var weakSelf = self
+
+    let sdkConfigModel = SettingCellModel()
+    sdkConfigModel.cellName = "私有云环境配置"
+    sdkConfigModel.type = SettingCellType.SettingArrowCell.rawValue
+    sdkConfigModel.cellClick = {
+      weakSelf?.delegate?.didClickSDKConfig()
+    }
+    model.cellModels.append(sdkConfigModel)
+
+    let languageConfigModel = SettingCellModel()
+    languageConfigModel.cellName = localizable("app_language")
+    languageConfigModel.type = SettingCellType.SettingArrowCell.rawValue
+    languageConfigModel.cellClick = {
+      weakSelf?.delegate?.didClickLanguage()
+    }
+    model.cellModels.append(languageConfigModel)
+
     model.setCornerType()
     return model
   }

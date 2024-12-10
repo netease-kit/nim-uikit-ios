@@ -97,6 +97,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
 
     view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
     navigationView.setMoreButtonTitle(commonLocalizable("complete"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 60)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     if NEStyleManager.instance.isNormalStyle() {
@@ -129,18 +130,18 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
   func configTitle(editType: EditType) {
     switch editType {
     case .nickName:
-      title = NSLocalizedString("nickname", comment: "")
+      title = localizable("nickname")
       limitNumberCount = 15
     case .cellphone:
-      title = NSLocalizedString("phone", comment: "")
+      title = localizable("phone")
       limitNumberCount = 11
       textField.keyboardType = .phonePad
     case .email:
-      title = NSLocalizedString("email", comment: "")
+      title = localizable("email")
       limitNumberCount = 30
       textField.keyboardType = .emailAddress
     case .specialSign:
-      title = NSLocalizedString("individuality_sign", comment: "")
+      title = localizable("individuality_sign")
       limitNumberCount = 50
     }
   }
@@ -151,7 +152,7 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
       if let text = textField.text,
          text.utf16.count > limitNumberCount {
         textField.text = String(text.prefix(limitNumberCount))
-        showToast(String(format: NSLocalizedString("text_count_limit", comment: ""), limitNumberCount))
+        showToast(String(format: localizable("text_count_limit"), limitNumberCount))
       }
       return
     }

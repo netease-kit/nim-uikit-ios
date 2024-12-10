@@ -175,22 +175,4 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   public func tableViewReload() {
     tableView.reloadData()
   }
-
-  /// 重新加载单元格
-  /// - Parameter indexs: 单元格位置
-  public func tableViewReload(_ indexs: [IndexPath]) {
-    tableView.reloadData(indexs)
-  }
-
-  /// 删除单元格
-  /// - Parameter indexs: 单元格位置
-  public func tableViewDelete(_ indexs: [IndexPath]) {
-    tableView.deleteData(indexs)
-  }
-
-  /// 插入单元格
-  /// - Parameter indexs: 单元格位置
-  public func tableViewInsert(_ indexs: [IndexPath]) {
-    tableView.insertData(indexs)
-  }
 }

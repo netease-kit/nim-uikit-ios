@@ -168,13 +168,14 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
       let rightItem = UIBarButtonItem(customView: sureButton)
       navigationItem.rightBarButtonItem = rightItem
       sureButton.addTarget(self, action: #selector(sureClick(_:)), for: .touchUpInside)
-      sureButton.setTitle(localizable("alert_sure"), for: .normal)
+      sureButton.setTitle(commonLocalizable("sure"), for: .normal)
       sureButton.setTitleColor(.white, for: .normal)
       sureButton.layer.cornerRadius = 4
       sureButton.contentHorizontalAlignment = .center
       sureButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     } else {
-      navigationView.setMoreButtonTitle(localizable("alert_sure"))
+      navigationView.setMoreButtonTitle(commonLocalizable("sure"))
+      navigationView.setMoreButtonWidth(90)
       navigationView.moreButton.setTitleColor(.white, for: .normal)
       navigationView.moreButton.layer.cornerRadius = 4
       navigationView.moreButton.contentHorizontalAlignment = .center
@@ -195,7 +196,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     }
 
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(localizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       return
     }
 
@@ -376,7 +377,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     if selectArray.count > 0 {
       sureButton.setTitle("确定(\(selectArray.count))", for: .normal)
     } else {
-      sureButton.setTitle(localizable("alert_sure"), for: .normal)
+      sureButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
   }
 }

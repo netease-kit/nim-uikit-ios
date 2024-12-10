@@ -195,11 +195,11 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
             if err.code == protocolSendFailed {
               weakSelf?.showToast(commonLocalizable("network_error"))
             } else {
-              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+              weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
             }
           } else {
             if team?.isValidTeam == false {
-              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+              weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
               return
             }
             let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId)
@@ -220,11 +220,11 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
             if err.code == protocolSendFailed {
               weakSelf?.showToast(commonLocalizable("network_error"))
             } else {
-              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+              weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
             }
           } else {
             if team?.isValidTeam == false {
-              weakSelf?.showSingleAlert(title: localizable("leave_team"), message: localizable("leave_team_desc")) {}
+              weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
               return
             }
             let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId)

@@ -23,8 +23,10 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    for ges in label.gestureRecognizers ?? [] {
+      ges.isEnabled = false
+    }
+
     return label
   }()
 
@@ -43,8 +45,10 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    for ges in label.gestureRecognizers ?? [] {
+      ges.isEnabled = false
+    }
+
     return label
   }()
 
@@ -57,7 +61,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
+  override open func commonUI() {
+    super.commonUI()
     bubbleImageLeft.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
@@ -195,7 +200,7 @@ extension FunChatMessageTextCell: UITextViewDelegate {
 
     if model.contentSize.height == fun_chat_min_h {
       // 单行消息单独设置文本内边距
-      contentLabel.textContainerInset = UIEdgeInsets(top: model.offset / 2, left: 0, bottom: 0, right: 0)
+      contentLabel.textContainerInset = UIEdgeInsets(top: 4, left: 0, bottom: 0, right: 0)
       return
     }
 
@@ -207,5 +212,11 @@ extension FunChatMessageTextCell: UITextViewDelegate {
     } else {
       contentLabel.textContainerInset = .zero
     }
+  }
+
+  // 禁用长按图片突出显示
+  public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool {
+    selectAllRange()
+    return false
   }
 }

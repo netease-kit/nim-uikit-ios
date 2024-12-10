@@ -34,6 +34,7 @@ open class FunContactSelectedViewController: NEBaseContactSelectedViewController
   override open func setupNavRightItem() {
     super.setupNavRightItem()
     navigationView.setBackButtonTitle(localizable("close"))
+    navigationView.setBackButtonWidth(60)
     navigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.moreButton.backgroundColor = .funContactThemeColor
     sureButton.backgroundColor = .funContactThemeColor

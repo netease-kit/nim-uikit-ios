@@ -15,7 +15,8 @@ open class TeamIntroduceViewController: NEBaseTeamIntroduceViewController {
     navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
     addRightAction(localizable("save"), #selector(saveIntr), self)
-    navigationView.setBackButtonTitle(localizable("cancel"))
+    navigationView.setBackButtonTitle(commonLocalizable("cancel"))
+    navigationView.setBackButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
 
     backView.layer.cornerRadius = 8.0

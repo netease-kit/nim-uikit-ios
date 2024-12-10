@@ -25,7 +25,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
 
   var cellDatas = [UserSettingCellModel]()
 
-  var delegate: UserSettingViewModelDelegate?
+  weak var delegate: UserSettingViewModelDelegate?
 
   public var conversation: V2NIMConversation?
 

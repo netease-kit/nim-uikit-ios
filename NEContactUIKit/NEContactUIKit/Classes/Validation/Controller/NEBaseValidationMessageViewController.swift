@@ -20,13 +20,8 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
+    viewModel.delegate = self
     loadData()
-
-    weak var weakSelf = self
-    viewModel.dataRefresh = {
-      weakSelf?.emptyView.isHidden = (weakSelf?.viewModel.datas.count ?? 0) > 0
-      weakSelf?.tableView.reloadData()
-    }
 
     NotificationCenter.default.addObserver(self, selector: #selector(appEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
   }
@@ -46,7 +41,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   func appEnterBackground() {
     viewModel.setAddApplicationRead { [weak self] success, error in
       if success {
-        self?.loadData()
+        self?.tableviewReload()
       }
     }
   }
@@ -75,12 +70,11 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
 
   /// 加载数据
   func loadData() {
-    viewModel.loadApplicationList(true) { [weak self] finished, error in
+    viewModel.loadApplicationList(true) { [weak self] error in
       if let err = error {
         NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
       } else {
-        self?.emptyView.isHidden = (self?.viewModel.datas.count ?? 0) > 0
-        self?.tableView.reloadData()
+        self?.emptyView.isHidden = (self?.viewModel.friendAddApplications.count ?? 0) > 0
       }
     }
   }
@@ -100,6 +94,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     navigationItem.rightBarButtonItem = clearItem
 
     navigationView.setMoreButtonTitle(localizable("clear"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
   }
 
@@ -131,6 +126,8 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   override open func toSetting() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     viewModel.clearNotification()
+    emptyView.isHidden = viewModel.friendAddApplications.count > 0
+    tableView.reloadData()
   }
 
   open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -138,9 +135,11 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   }
 }
 
+// MARK: - UITableViewDelegate, UITableViewDataSource
+
 extension NEBaseValidationMessageViewController: UITableViewDelegate, UITableViewDataSource {
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewModel.datas.count
+    viewModel.friendAddApplications.count
   }
 
   open func tableView(_ tableView: UITableView,
@@ -154,43 +153,39 @@ extension NEBaseValidationMessageViewController: UITableViewDelegate, UITableVie
   }
 }
 
-extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate {
-  /// 处理好友申请
-  /// - Parameters:
-  ///   - notifiModel: 申请模型
-  ///   - notiStatus: 处理状态
-  public func changeValidationStatus(notifiModel: NENotification, notiStatus: NEHandleStatus) {
-    DispatchQueue.main.async {
-      self.loadData()
-      self.tableView.reloadData()
-    }
-  }
+// MARK: - ValidationMessageViewModelDelegate
 
+extension NEBaseValidationMessageViewController: ValidationMessageViewModelDelegate {
+  public func tableviewReload() {
+    tableView.reloadData()
+    emptyView.isHidden = viewModel.friendAddApplications.count > 0
+  }
+}
+
+// MARK: - SystemNotificationCellDelegate
+
+extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate {
   /// 同意好友申请
   /// - Parameter notifiModel: 申请模型
   open func onAccept(_ notifiModel: NENotification) {
     weak var weakSelf = self
-    guard let info = notifiModel.v2Notification else {
-      return
-    }
+    let info = notifiModel.v2Notification
 
     viewModel.agreeRequest(application: info) { error in
-      if let err = error as? NSError, err.code != friendAlreadyExist {
+      if let err = error as? NSError {
         NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
         switch err.code {
         case protocolSendFailed:
           weakSelf?.showToast(commonLocalizable("network_error"))
+        case friendAlreadyExist:
+          weakSelf?.viewModel.changeApplicationStatus(info, .FRIEND_ADD_APPLICATION_STATUS_AGREED)
+          weakSelf?.showToast(localizable("validate_processed"))
+          weakSelf?.tableviewReload()
         default:
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
-        weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
-        weakSelf?.viewModel.setAddApplicationRead(nil)
-
-        if let accid = info.applicantAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
-          Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
-                                                              "conversationId": conversationId as Any])
-        }
+        weakSelf?.tableviewReload()
       }
     }
   }
@@ -199,9 +194,7 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
   /// - Parameter notifiModel: 申请模型
   open func onRefuse(_ notifiModel: NENotification) {
     weak var weakSelf = self
-    guard let info = notifiModel.v2Notification else {
-      return
-    }
+    let info = notifiModel.v2Notification
 
     viewModel.refuseRequest(application: info) { error in
       if let err = error as? NSError {
@@ -210,14 +203,14 @@ extension NEBaseValidationMessageViewController: SystemNotificationCellDelegate 
         case protocolSendFailed:
           weakSelf?.showToast(commonLocalizable("network_error"))
         case friendAlreadyExist:
-          weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeOk)
+          weakSelf?.viewModel.changeApplicationStatus(info, .FRIEND_ADD_APPLICATION_STATUS_AGREED)
           weakSelf?.showToast(localizable("validate_processed"))
+          weakSelf?.tableviewReload()
         default:
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
-        weakSelf?.changeValidationStatus(notifiModel: notifiModel, notiStatus: .HandleTypeNo)
-        weakSelf?.viewModel.setAddApplicationRead(nil)
+        weakSelf?.tableviewReload()
       }
     }
   }

@@ -5,47 +5,42 @@
 
 //MAKR：common
 "add_friend"="Add Contacts";
-"create_discussion_group"="Create Temp Group";
+"create_discussion_group"="Create Temperature Group";
 "create_senior_group"="Create Group";
-"cancel_stickTop"="Cancel topping";
+"cancel_stickTop"="Remove from top";
 "stickTop"="Sticky on Top";
 "delete"="Delete";
 "friend"="Contact";
 "contact"="Contact";
 "group"="Group";
-"discussion_group"="Temp Group";
+"discussion_group"="Temperature Group";
 "senior_group"="Group";
-"cancel"="Cancel";
-"search_keyword"="Enter the key words";
-"user_not_exist"="Not Exist";
+"search_keyword"="Enter and search...";
+"user_not_exist"="User not found";
 "session_empty"="No Session";
-"hm"="HH:mm";
-"mdhm"="MM.dd HH:mm";
-"ymdhm"="yyyy.MM.dd HH:mm";
-"voice"="[aduio Message]";
-"picture"="[picture Message]";
-"video"="[Video Message]";
-"location"="[Geographic Loaction]";
-"notification"="[Tip Message]";
-"file"="[File Message]";
-"internet_phone"="[Audio_Chat]";
-"video_chat"="[Video_Chat]";
+
+"voice"="[Voice]";
+"picture"="[Photo]";
+"video"="[Video]";
+"location"="[Loaction]";
+"notification"="[Tip]";
+"tip"="[Reminder]";
+"file"="[File]";
+"internet_phone"="[Voice Call]";
+"video_chat"="[Video Call]";
 "custom"="[Custom Message]";
 "chat_history"="[Chat History]";
 "unknown"="[Unknown Message]";
 "appName"="CommsEase IM";
 
-"message_recalled"="message recalled";
+"message_recalled"="Message recalled";
 
 "you_were_mentioned"="[You were mentioned]";
 
+"security_warning"="For test only. Beware of money transfer, lottery winnings & strange call scams.";
+
 // error toast
-"network_error"="Network is not available, please check";
+"leave_team_desc"="You have been removed from the group chat or the group chat has been dissolved.";
 
-
-"tip"="[tip message]";
-"leave_team"="离开群聊";
-"leave_team_desc"="您已被移除群聊或群聊已解散";
-
-"ai_user_pin_top"="Pin to top";
+"ai_user_pin_top"="PIN";
 "ai_user_cancel_pin_top"="Remove Pin top";

@@ -5,7 +5,7 @@
 import UIKit
 
 @objcMembers
-open class FunChatMessageRichTextCell: FunChatMessageReplyCell {
+open class FunChatMessageRichTextCell: FunChatMessageTextCell {
   public lazy var titleLabelLeft: NEChatTextView = {
     let label = NEChatTextView()
     label.translatesAutoresizingMaskIntoConstraints = false

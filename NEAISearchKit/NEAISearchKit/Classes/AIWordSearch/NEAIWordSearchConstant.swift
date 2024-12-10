@@ -4,11 +4,10 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreKit
 
 let ModuleName = "NEAISearchKit"
 
-let coreLoader = CoreLoader<NEAISearchManager>()
+let coreLoader = CommonLoader<NEAISearchManager>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }

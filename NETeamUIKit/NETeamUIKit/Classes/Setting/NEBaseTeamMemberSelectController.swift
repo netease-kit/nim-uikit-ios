@@ -242,10 +242,11 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
   /// 选择成员变更回调，内部根据选择数量来做右上角状态变更
   func didChangeSelectMember() {
     if viewModel.selectDic.count > 0 {
-      let title = localizable("member_select_sure") + "(\(viewModel.selectDic.count))"
+      let title = commonLocalizable("sure") + "(\(viewModel.selectDic.count))"
       navigationView.moreButton.setTitle(title, for: .normal)
+      navigationView.setMoreButtonWidth(90)
     } else {
-      navigationView.moreButton.setTitle(localizable("member_select_sure"), for: .normal)
+      navigationView.moreButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
   }
 
@@ -260,7 +261,7 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
     print("sure click")
 
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      view.makeToast(localizable("network_error"))
+      view.makeToast(commonLocalizable("network_error"))
       return
     }
 

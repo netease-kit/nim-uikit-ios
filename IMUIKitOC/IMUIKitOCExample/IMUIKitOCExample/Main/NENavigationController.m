@@ -37,4 +37,12 @@
   [super pushViewController:viewController animated:animated];
 }
 
+- (NSArray<__kindof UIViewController *> *)popToViewController:(UIViewController *)viewController
+                                                     animated:(BOOL)animated {
+  if (self.childViewControllers.count > 0) {
+    viewController.hidesBottomBarWhenPushed = YES;
+  }
+  return [super popToViewController:viewController animated:animated];
+}
+
 @end

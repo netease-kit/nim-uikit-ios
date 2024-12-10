@@ -12,10 +12,7 @@ import NIMSDK
 import UIKit
 
 class MeViewController: UIViewController, UIGestureRecognizerDelegate {
-  private var mineData = [
-    [NSLocalizedString("setting", comment: ""): "mine_setting"],
-    [NSLocalizedString("about_yunxin", comment: ""): "about_yunxin"],
-  ]
+  private let viewModel = MeViewModel()
 
   private lazy var tableView: UITableView = {
     let tableView = UITableView(frame: .zero, style: .plain)
@@ -92,15 +89,6 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     return label
   }()
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
-    setupSubviews()
-    if IMKitConfigCenter.shared.enableCollectionMessage {
-      mineData.insert([NSLocalizedString("mine_collection", comment: ""): "mine_collection"], at: 1)
-    }
-  }
-
   override func viewWillAppear(_ animated: Bool) {
     navigationController?.setNavigationBarHidden(true, animated: false)
     updateUserInfo()
@@ -112,6 +100,29 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
         }
       }
     }
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
+
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+
+    setupSubviews()
+    viewModel.getData()
+  }
+
+  override func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      NotificationCenter.default.removeObserver(self)
+    }
+  }
+
+  @objc func changeLanguage() {
+    updateUserInfo()
+    viewModel.getData()
+    tableView.reloadData()
   }
 
   func setupSubviews() {
@@ -205,7 +216,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   func setupUserInfo(_ userFriend: NEUserWithFriend?) {
-    idLabel.text = "\(NSLocalizedString("account", comment: "")):\(userFriend?.user?.accountId ?? "")"
+    idLabel.text = "\(localizable("account")):\(userFriend?.user?.accountId ?? "")"
     nameLabel.text = userFriend?.showName()
     header.configHeadData(headUrl: userFriend?.user?.avatar,
                           name: userFriend?.showName() ?? "",
@@ -225,7 +236,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
 
 extension MeViewController: UITableViewDelegate, UITableViewDataSource {
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    mineData.count
+    viewModel.mineData.count
   }
 
   public func tableView(_ tableView: UITableView,
@@ -234,7 +245,7 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
       withIdentifier: "\(NSStringFromClass(MineTableViewCell.self))",
       for: indexPath
     ) as? MineTableViewCell {
-      let cellTitle = mineData[indexPath.row]
+      let cellTitle = viewModel.mineData[indexPath.row]
       cell.configCell(data: cellTitle)
       return cell
     }

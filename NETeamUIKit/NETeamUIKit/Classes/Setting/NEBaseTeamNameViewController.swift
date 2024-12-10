@@ -73,6 +73,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
   /// UI 控件初始化
   open func setupUI() {
     navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     view.addSubview(backView)
@@ -150,7 +151,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
   /// 保存群名称
   open func saveName() {
     guard let tid = team?.teamId else {
-      showToast(localizable("failed_operation"))
+      showToast(commonLocalizable("failed_operation"))
       return
     }
 
@@ -183,7 +184,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
             weakSelf?.showToast(localizable("no_permission_tip"))
             return
           }
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
@@ -195,7 +196,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
 
         weakSelf?.view.hideToastActivity()
         if error != nil {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }

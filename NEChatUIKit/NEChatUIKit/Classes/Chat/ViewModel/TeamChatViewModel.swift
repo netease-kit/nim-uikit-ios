@@ -62,7 +62,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                                   _ teamId: String?,
                                   _ completion: @escaping () -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(String(describing: teamId))")
-    NETeamUserManager.shared.getTeamMembers(accountIds: accountIds, completion)
+    NETeamUserManager.shared.getTeamMembers(accountIds, false, completion)
   }
 
   /// 加载置顶消息
@@ -217,7 +217,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
 
     guard let _ = topMessage?.messageClientId else {
-      let error = NSError(domain: chatLocalizable("failed_operation"), code: failedOperation)
+      let error = NSError(domain: commonLocalizable("failed_operation"), code: failedOperation)
       completion(error)
       return
     }
@@ -303,15 +303,18 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
   private func markReadInTeam(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
-
     var markMessages = [V2NIMMessage]()
     for message in messages {
-      if message.messageServerId != nil, !message.isSelf, message.messageConfig?.readReceiptEnabled == true {
+      if message.messageServerId != nil,
+         !message.isSelf, message.messageConfig?.readReceiptEnabled == true,
+         message.messageStatus.readReceiptSent == false {
         markMessages.append(message)
       }
     }
-    chatRepo.markTeamMessagesRead(messages: markMessages, completion)
+
+    if !markMessages.isEmpty {
+      chatRepo.markTeamMessagesRead(messages: markMessages, completion)
+    }
   }
 
   /// 重写获取消息已读未读回执

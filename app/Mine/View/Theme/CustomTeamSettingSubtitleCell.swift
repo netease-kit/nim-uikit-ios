@@ -27,7 +27,6 @@ class CustomTeamSettingSubtitleCell: TeamSettingSubtitleCell {
 
       NSLayoutConstraint.activate([
         titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
         titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ])
       titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)

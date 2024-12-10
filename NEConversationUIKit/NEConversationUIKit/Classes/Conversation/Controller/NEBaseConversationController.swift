@@ -26,7 +26,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   public var topConstant: CGFloat = 0
   public var popListView = NEBasePopListView()
 
-  public var delegate: NEBaseConversationControllerDelegate?
+  public weak var delegate: NEBaseConversationControllerDelegate?
 
   /// 是否取过数据
   public var isRequestedData = false
@@ -96,11 +96,19 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
 
+    view.addSubview(securityWarningView)
     view.addSubview(brokenNetworkView)
     view.addSubview(contentView)
 
     NSLayoutConstraint.activate([
-      brokenNetworkView.topAnchor.constraint(equalTo: view.topAnchor),
+      securityWarningView.topAnchor.constraint(equalTo: view.topAnchor),
+      securityWarningView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      securityWarningView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      securityWarningView.heightAnchor.constraint(equalToConstant: 56),
+    ])
+
+    NSLayoutConstraint.activate([
+      brokenNetworkView.topAnchor.constraint(equalTo: securityWarningView.bottomAnchor),
       brokenNetworkView.leftAnchor.constraint(equalTo: view.leftAnchor),
       brokenNetworkView.rightAnchor.constraint(equalTo: view.rightAnchor),
       brokenNetworkView.heightAnchor.constraint(equalToConstant: brokenNetworkViewHeight),
@@ -121,6 +129,12 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     let view = NEBrokenNetworkView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
+    return view
+  }()
+
+  public lazy var securityWarningView: NESecurityWarningView = {
+    let view = NESecurityWarningView()
+    view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
 
@@ -233,10 +247,10 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     NEChatDetectNetworkTool.shareInstance.netWorkReachability { [weak self] status in
       if status == .notReachable {
         self?.brokenNetworkView.isHidden = false
-        self?.contentViewTopAnchor?.constant = self?.brokenNetworkViewHeight ?? 36
+        self?.contentViewTopAnchor?.constant = (self?.brokenNetworkViewHeight ?? 36) + 56
       } else {
         self?.brokenNetworkView.isHidden = true
-        self?.contentViewTopAnchor?.constant = 0
+        self?.contentViewTopAnchor?.constant = 56
       }
     }
 
@@ -257,7 +271,6 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     super.viewDidLoad()
     showTitleBar()
     setupSubviews()
-    requestData()
     initialConfig()
   }
 
@@ -317,7 +330,6 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   }
 
   open func setupSubviews() {
-    initSystemNav()
     view.addSubview(navigationView)
     view.addSubview(bodyTopView)
     view.addSubview(bodyView)
@@ -686,15 +698,15 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     var rowActions = [UITableViewRowAction]()
     let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: ConversationUIConfig.shared.deleteButtonTitle) { action, indexPath in
+                                            title: ConversationUIConfig.shared.deleteButtonTitle ?? localizable("delete")) { action, indexPath in
       weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
 
     // 置顶和取消置顶
     let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
     let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? ConversationUIConfig.shared.stickTopButtonCancelTitle :
-                                           ConversationUIConfig.shared.stickTopButtonTitle) { action, indexPath in
+                                         title: isTop ? ConversationUIConfig.shared.stickTopButtonCancelTitle ?? localizable("cancel_stickTop") :
+                                           ConversationUIConfig.shared.stickTopButtonTitle ?? localizable("stickTop")) { action, indexPath in
       weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
     deleteAction.backgroundColor = ConversationUIConfig.shared.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
@@ -761,7 +773,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   /// pin 置顶
   open func pinToTopActionHandler(user: V2NIMUser, pinTop: Bool) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(localizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       return
     }
     if let accountId = user.accountId {
@@ -778,7 +790,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   /// 点击会话
   open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(localizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       return
     }
     var conversationModel: NEConversationListModel?

@@ -9,9 +9,6 @@ import NECoreKit
 
 public protocol BlackListViewModelDelegate: NSObjectProtocol {
   func tableViewReload()
-  func tableViewReload(_ indexs: [IndexPath])
-  func tableViewDelete(_ indexs: [IndexPath])
-  func tableViewInsert(_ indexs: [IndexPath])
 }
 
 @objcMembers
@@ -91,7 +88,7 @@ extension BlackListViewModel: NEContactListener {
       // 移除黑名单
       if friendUser.user?.accountId == accountId {
         blockList.remove(at: index)
-        delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+        delegate?.tableViewReload()
       }
     }
   }
@@ -103,9 +100,8 @@ extension BlackListViewModel: NEContactListener {
       // 添加黑名单
       if changeType == .addBlock,
          !blockList.contains(where: { $0.user?.accountId == contact.user?.accountId }) {
-        let index = IndexPath(row: blockList.count, section: 0)
         blockList.append(contact)
-        delegate?.tableViewInsert([index])
+        delegate?.tableViewReload()
       }
 
       for (index, friendUser) in blockList.enumerated() {
@@ -113,21 +109,21 @@ extension BlackListViewModel: NEContactListener {
         if changeType == .update,
            friendUser.user?.accountId == contact.user?.accountId {
           blockList[index] = contact
-          delegate?.tableViewReload([IndexPath(row: index, section: 0)])
+          delegate?.tableViewReload()
         }
 
         // 移除黑名单
         if changeType == .removeBlock,
            friendUser.user?.accountId == contact.user?.accountId {
           blockList.remove(at: index)
-          delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+          delegate?.tableViewReload()
         }
 
         // 删除好友
         if changeType == .deleteFriend,
            friendUser.user?.accountId == contact.user?.accountId {
           blockList.remove(at: index)
-          delegate?.tableViewDelete([IndexPath(row: index, section: 0)])
+          delegate?.tableViewReload()
         }
       }
     }

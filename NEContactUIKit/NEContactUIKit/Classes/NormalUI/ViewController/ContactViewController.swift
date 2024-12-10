@@ -10,6 +10,26 @@ import UIKit
 open class ContactViewController: NEBaseContactViewController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
+    cellRegisterDic = [
+      ContactCellType.ContactPerson.rawValue: ContactTableViewCell.self,
+      ContactCellType.ContactOthers.rawValue: ContactTableViewCell.self,
+    ]
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+    changeLanguage()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      NotificationCenter.default.removeObserver(self)
+    }
+  }
+
+  func changeLanguage() {
     var contactHeaders = [ContactHeadItem]()
     if ContactUIConfig.shared.showHeader {
       contactHeaders = [
@@ -50,14 +70,7 @@ open class ContactViewController: NEBaseContactViewController {
       }
     }
     viewModel = ContactViewModel(contactHeaders: contactHeaders)
-    cellRegisterDic = [
-      ContactCellType.ContactPerson.rawValue: ContactTableViewCell.self,
-      ContactCellType.ContactOthers.rawValue: ContactTableViewCell.self,
-    ]
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    initSystemNav()
   }
 
   override open func commonUI() {

@@ -48,16 +48,16 @@ public class ConversationUIConfig: NSObject {
   public var conversationProperties = ConversationProperties()
 
   /// 会话列表 cell 左划置顶按钮文案内容
-  public var stickTopButtonTitle = localizable("stickTop")
+  public var stickTopButtonTitle: String?
   /// 会话列表 cell 左划取消置顶按钮文案内容(会话置顶后生效)
-  public var stickTopButtonCancelTitle = localizable("cancel_stickTop")
+  public var stickTopButtonCancelTitle: String?
   /// 会话列表 cell 左划置顶按钮背景颜色
   public var stickTopButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划置顶按钮点击事件
   public var stickTopButtonClick: ((NEBaseConversationController, NEConversationListModel?, IndexPath) -> Void)?
 
   /// 会话列表 cell 左划删除按钮文案内容
-  public var deleteButtonTitle = localizable("delete")
+  public var deleteButtonTitle: String?
   /// 会话列表 cell 左划删除按钮背景颜色
   public var deleteButtonBackgroundColor: UIColor?
   /// 会话列表 cell 左划删除按钮点击事件

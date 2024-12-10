@@ -13,7 +13,7 @@ open class TeamMemberCell: NEBaseTeamMemberCell {
       removeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       removeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
       removeLabel.heightAnchor.constraint(equalToConstant: 22),
-      removeLabel.widthAnchor.constraint(equalToConstant: 40),
+      removeLabel.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
     ])
     removeLabel.textColor = .ne_redText
     removeLabel.clipsToBounds = true

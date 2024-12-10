@@ -32,8 +32,8 @@ open class MessageTextModel: MessageContentModel {
     }
 
     let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
-    textHeight = textSize.height
-    textWidth = textSize.width
+    textHeight = ceil(textSize.height)
+    textWidth = ceil(textSize.width)
     let contentSizeWidth = textWidth + chat_content_margin * 2
     let contentSizeHeight = textHeight + chat_content_margin * 2
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)

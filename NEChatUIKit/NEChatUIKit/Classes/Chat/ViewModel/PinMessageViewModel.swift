@@ -9,16 +9,13 @@ import UIKit
 @objc
 public protocol PinMessageViewModelDelegate: NSObjectProtocol {
   func tableViewReload(needLoad: Bool)
-  func tableViewReload(_ indexPaths: [IndexPath])
-  func tableViewDelete(_ indexPaths: [IndexPath])
-  func refreshModel(_ model: NEPinMessageModel)
 }
 
 @objcMembers
 open class PinMessageViewModel: NSObject, NEChatListener {
   public let chatRepo = ChatRepo.shared
   public var items = [NEPinMessageModel]()
-  public var delegate: PinMessageViewModelDelegate?
+  public weak var delegate: PinMessageViewModelDelegate?
   public var conversationId: String?
 
   override public init() {
@@ -73,7 +70,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     }
 
     let userIds = items.compactMap(\.message.senderId)
-    NETeamUserManager.shared.getTeamMembers(accountIds: userIds) {
+    NETeamUserManager.shared.getTeamMembers(userIds) {
       for item in items {
         if let senderId = ChatMessageHelper.getSenderId(item.chatmodel.message) {
           let name = NETeamUserManager.shared.getShowName(senderId)
@@ -194,20 +191,11 @@ open class PinMessageViewModel: NSObject, NEChatListener {
   }
 
   func onDeleteIndexPath(_ messageRefers: [V2NIMMessageRefer?]) {
-    var indexs = [IndexPath]()
-    for messageRefer in messageRefers {
-      for (i, model) in items.enumerated() {
-        if model.message.messageClientId == messageRefer?.messageClientId {
-          indexs.append(IndexPath(row: i, section: 0))
-        }
-      }
-    }
-
     for messageRefer in messageRefers {
       items.removeAll { $0.message.messageClientId == messageRefer?.messageClientId }
     }
 
-    delegate?.tableViewDelete(indexs)
+    delegate?.tableViewReload(needLoad: false)
   }
 
   // MARK: - NEChatListener

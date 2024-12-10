@@ -104,19 +104,14 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     backgroundViewLeft.backgroundColor = UIColor.white
     contentView.addSubview(backgroundViewLeft)
     bubbleImageLeft.isHidden = true
@@ -180,7 +175,8 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func commonUIRight() {
+  override open func commonUIRight() {
+    super.commonUIRight()
     backgroundViewRight.backgroundColor = UIColor.white
     contentView.addSubview(backgroundViewRight)
     bubbleImageRight.isHidden = true
@@ -265,7 +261,9 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
       if let lat = m.lat, let lng = m.lng {
         if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
           NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
-          mapImageView.sd_setImage(with: URL(string: url), placeholderImage: coreLoader.loadImage("chat_map_default"))
+          mapImageView.sd_setImage(with: URL(string: url),
+                                   placeholderImage: coreLoader.loadImage("map_placeholder_image"),
+                                   options: .retryFailed)
           emptyLabel.isHidden = true
           pointImage.isHidden = false
         } else {

@@ -33,7 +33,7 @@ open class SettingCellModel: NSObject {
   // 头像扩展字段
   public var defaultHeadData: String?
   // 自定义视图的icon
-  public var rightCustomViewIcon: String?
+  public var rightCustomViewIcon: UIImage?
   // 自定义视图的点击事件
   public var customViewClick: CellClick?
 

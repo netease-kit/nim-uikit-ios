@@ -10,7 +10,7 @@ import Foundation
 @_exported import NECoreIM2Kit
 @_exported import NECoreKit
 
-let coreLoader = CoreLoader<NEBaseTeamSettingViewController>()
+let coreLoader = CommonLoader<NEBaseTeamSettingViewController>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }

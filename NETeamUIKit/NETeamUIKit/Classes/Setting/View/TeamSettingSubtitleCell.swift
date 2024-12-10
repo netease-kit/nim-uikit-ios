@@ -37,7 +37,6 @@ open class TeamSettingSubtitleCell: NEBaseTeamSettingCell {
 
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
       titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
     ])
     titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)

@@ -80,6 +80,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
     title = localizable("modify_headImage")
     addRightAction(localizable("save"), #selector(savePhoto), self)
     navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(savePhoto))
 
     view.backgroundColor = .ne_lightBackgroundColor
@@ -185,7 +186,7 @@ open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionVie
           } else if error?.code == noPermissionOperationCode {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
-            weakSelf?.showToast(localizable("failed_operation"))
+            weakSelf?.showToast(commonLocalizable("failed_operation"))
           }
         } else {
           if let completion = weakSelf?.block {

@@ -7,11 +7,15 @@ import NEChatKit
 import NECoreIM2Kit
 import NECoreKit
 
+public protocol ValidationMessageViewModelDelegate: NSObjectProtocol {
+  func tableviewReload()
+}
+
 @objcMembers
 open class ValidationMessageViewModel: NSObject, NEContactListener {
   let contactRepo = ContactRepo.shared
-  var datas = [NENotification]()
-  var dataRefresh: (() -> Void)?
+  public weak var delegate: ValidationMessageViewModelDelegate?
+  var friendAddApplications = [NENotification]()
   var offset: UInt = 0 // 查询的偏移量
   var finished: Bool = false // 是否还有数据
   var pageMaxLimit: UInt = 100 // 查询的每页数量
@@ -27,38 +31,20 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
   /// 加载(更多)好友申请消息
   /// - Parameter firstLoad: 是否是首次加载
-  /// - Parameter completin: 完成回调，(是否还有数据，错误信息)
-  func loadApplicationList(_ firstLoad: Bool, _ completin: @escaping (Bool, Error?) -> Void) {
+  /// - Parameter completin: 完成回调
+  func loadApplicationList(_ firstLoad: Bool, _ completin: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     let offset = firstLoad ? 0 : offset
     if firstLoad {
       finished = false
-      datas.removeAll()
+      friendAddApplications.removeAll()
     }
 
     if finished {
-      completin(true, nil)
+      completin(nil)
       return
     }
-
-    getValidationMessage(offset) { [weak self] offset, finished, error in
-      if let err = error {
-        completin(finished, err)
-      } else {
-        self?.offset = offset
-        self?.finished = finished
-        self?.loadApplicationList(false, completin)
-      }
-    }
-  }
-
-  /// 分页查询好友验证消息
-  /// - Parameters:
-  ///   - offset: 偏移量
-  ///   - completin: 完成回调（验证消息列表，下一次偏移量，是否还有数据，错误信息）
-  func getValidationMessage(_ offset: UInt, _ completin: @escaping (UInt, Bool, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     let option = V2NIMFriendAddApplicationQueryOption()
     option.offset = offset
@@ -66,92 +52,128 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
     contactRepo.getAddApplicationList(option: option) { [weak self] result, error in
       if let err = error {
-        completin(0, false, err)
-      } else if let result = result, let infos = result.infos {
-        let dateNow = Date().timeIntervalSince1970
-        let group = DispatchGroup()
+        completin(err)
+      } else if let result = result {
+        self?.offset = result.offset
+        self?.finished = result.finished
 
-        for info in infos {
-          var noti = NENotification(info: info)
-
-          // 过期事件：7天（604800s）
-          if noti.handleStatus == .HandleTypePending,
-             dateNow - (noti.timestamp ?? 0) > 604_800 {
-            noti.handleStatus = .HandleTypeOutOfDate
-          }
-
-          // 查询用户信息
-          var uid: String?
-          // 自己申请添加别人，则存储操作者的信息
-          if noti.applicantAccid == IMKitClient.instance.account() {
-            uid = noti.operatorAccid
-          } else {
-            // 别人申请添加自己，则存储申请者的信息
-            uid = noti.applicantAccid
-          }
-
-          if let uid = uid {
-            group.enter()
-            self?.contactRepo.getUserWithFriend(accountIds: [uid]) { users, error in
-              noti.userInfo = users?.first
-              if var datas = self?.datas, self?.isExist(xNoti: &noti, list: &datas) == false {
-                self?.datas.append(noti)
-              }
-              group.leave()
-            }
+        for item in result.infos ?? [] {
+          self?.convertToValidationMessage(item) { _ in
           }
         }
 
-        group.notify(queue: .main) { [weak self] in
-          self?.datas.sort { xNoti1, xNoti2 in
-            (xNoti1.timestamp ?? 0) > (xNoti2.timestamp ?? 0)
-          }
-          completin(result.offset, result.finished, nil)
-        }
+        self?.loadApplicationList(false, completin)
       }
     }
   }
 
-  /// 判断该条申请是否已存在（是否可以聚合）
+  /// 转换（聚合）验证消息
   /// - Parameters:
-  ///   - xNoti: 申请
-  ///   - list: 聚合列表
-  /// - Returns: 是否已存在
-  func isExist(xNoti: inout NENotification, list: inout [NENotification]) -> Bool {
-    for loopList in list {
-      if xNoti.isEqualTo(noti: loopList) {
-        if loopList.msgList == nil {
-          loopList.msgList = [xNoti]
-        } else {
-          loopList.msgList!.append(xNoti)
+  ///   - item: 验证消息
+  ///   - move: 是否移动到最前
+  ///   - completin: 完成回调
+  func convertToValidationMessage(_ item: V2NIMFriendAddApplication,
+                                  _ move: Bool = false,
+                                  _ completin: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    var isExist = false
+    for (index, neItem) in friendAddApplications.enumerated() {
+      if neItem.isEqualTo(item) {
+        isExist = true
+        let indexPath = IndexPath(row: index, section: 0)
+
+        // 未读数
+        if item.read == false {
+          neItem.unreadCount += 1
         }
-        loopList.teamInfo = xNoti.teamInfo
-        loopList.userInfo = xNoti.userInfo
-        if let loopTime = loopList.timestamp,
-           let xNotiTime = xNoti.timestamp,
-           loopTime < xNotiTime {
-          loopList.timestamp = xNoti.timestamp
+
+        // 移动到最前
+        if move, index != 0 {
+          friendAddApplications.remove(at: index)
+          friendAddApplications.insert(neItem, at: 0)
         }
-        if !(xNoti.read ?? false) {
-          loopList.unReadCount += 1
-        }
-        return true
+        delegate?.tableviewReload()
+        break
       }
     }
-    if !(xNoti.read ?? false) {
-      xNoti.unReadCount += 1
+
+    if isExist {
+      completin(nil)
+      return
     }
-    return false
+
+    let friendAddApplication = NENotification(item)
+    var applicationAccid = friendAddApplication.v2Notification.applicantAccountId
+
+    // 申请添加他人为好友
+    if friendAddApplication.v2Notification.applicantAccountId == IMKitClient.instance.account() {
+      applicationAccid = friendAddApplication.v2Notification.recipientAccountId
+      // 同意
+      if friendAddApplication.v2Notification.status == .FRIEND_ADD_APPLICATION_STATUS_AGREED {
+        friendAddApplication.detail = localizable("agreed_request")
+      }
+
+      // 拒绝
+      if friendAddApplication.v2Notification.status == .FRIEND_ADD_APPLICATION_STATUS_REJECED {
+        friendAddApplication.detail = localizable("refused_request")
+      }
+    }
+
+    friendAddApplication.displayUserId = applicationAccid
+    let friendAddApplicationsCount = friendAddApplications.count
+    let insertIndex = move ? 0 : friendAddApplications.isEmpty ? 0 : friendAddApplicationsCount
+    friendAddApplications.insert(friendAddApplication, at: insertIndex)
+
+    if let accountId = applicationAccid {
+      contactRepo.getUserWithFriend(accountIds: [accountId]) { [weak self] users, error in
+        if let user = users?.first {
+          friendAddApplication.displayUserWithFriend = user
+          self?.delegate?.tableviewReload()
+        }
+      }
+    }
   }
 
   /// 设置所有好友申请已读
   /// - Parameter completion: 完成回调
   func setAddApplicationRead(_ completion: ((Bool, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    contactRepo.setAddApplicationRead { success, error in
-      completion?(success, error)
+    contactRepo.setAddApplicationRead { [weak self] success, error in
+      self?.friendAddApplications.forEach { application in
+        application.unreadCount = 0
+      }
+
       DispatchQueue.main.async {
         NotificationCenter.default.post(name: NENotificationName.clearValidationUnreadCount, object: nil)
+      }
+      completion?(success, error)
+    }
+  }
+
+  /// 接受/拒绝好友申请
+  /// - Parameters:
+  ///   - application: 申请添加好友的相关信息
+  ///   - status: 好友申请的处理状态
+  func changeApplicationStatus(_ application: V2NIMFriendAddApplication,
+                               _ status: V2NIMFriendAddApplicationStatus) {
+    var changedIndex = -1
+    for (index, item) in friendAddApplications.enumerated() {
+      if item.isEqualTo(application, false) {
+        item.handleStatus = status
+        item.unreadCount = 0
+        changedIndex = index
+        break
+      }
+    }
+
+    if changedIndex > -1 {
+      var index = changedIndex + 1
+      while index < friendAddApplications.count {
+        if friendAddApplications[index].isEqualTo(application, true) {
+          friendAddApplications.remove(at: index)
+        } else {
+          index += 1
+        }
       }
     }
   }
@@ -163,7 +185,18 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   func agreeRequest(application: V2NIMFriendAddApplication,
                     _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
-    contactRepo.acceptAddApplication(application: application, completion)
+    contactRepo.acceptAddApplication(application: application) { [weak self] error in
+      if let err = error {
+        print(err.localizedDescription)
+      } else {
+        if let accid = application.applicantAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
+          Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
+                                                              "conversationId": conversationId as Any])
+        }
+        self?.changeApplicationStatus(application, .FRIEND_ADD_APPLICATION_STATUS_AGREED)
+      }
+      completion(error)
+    }
   }
 
   /// 拒绝好友申请
@@ -173,65 +206,48 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   func refuseRequest(application: V2NIMFriendAddApplication,
                      _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
-    contactRepo.rejectAddApplication(application: application, completion)
+    contactRepo.rejectAddApplication(application: application) { [weak self] error in
+      if let err = error {
+        print(err.localizedDescription)
+      } else {
+        self?.changeApplicationStatus(application, .FRIEND_ADD_APPLICATION_STATUS_REJECED)
+      }
+      completion(error)
+    }
   }
 
   /// 清空好友申请通知
   func clearNotification() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.clearNotification()
-    datas.removeAll()
-    dataRefresh?()
+    friendAddApplications.removeAll()
   }
 
   // MARK: - NEContactListener
-
-  /// 好友添加申请变更
-  /// - Parameter application: 申请添加好友信息
-  func applicationChanged(_ application: V2NIMFriendAddApplication) {
-    var noti = NENotification(info: application)
-    let group = DispatchGroup()
-
-    // 查询用户信息
-    var uid: String?
-    // 自己申请添加别人，则存储操作者的信息
-    if noti.applicantAccid == IMKitClient.instance.account() {
-      uid = noti.operatorAccid
-    } else {
-      // 别人申请添加自己，则存储申请者的信息
-      uid = noti.applicantAccid
-    }
-
-    if let uid = uid {
-      group.enter()
-      contactRepo.getUserWithFriend(accountIds: [uid]) { [self] users, error in
-        noti.userInfo = users?.first
-        if !isExist(xNoti: &noti, list: &datas) {
-          datas.insert(noti, at: 0)
-        }
-        datas.sort { xNoti1, xNoti2 in
-          (xNoti1.timestamp ?? 0) > (xNoti2.timestamp ?? 0)
-        }
-        group.leave()
-      }
-    }
-
-    group.notify(queue: .main) { [weak self] in
-      self?.dataRefresh?()
-    }
-  }
 
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
   public func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    applicationChanged(application)
+    convertToValidationMessage(application, true) { error in
+      if let err = error {
+        print(err.localizedDescription)
+      }
+    }
   }
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
   public func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    applicationChanged(rejectionInfo)
+
+    for (index, item) in friendAddApplications.enumerated() {
+      if item.v2Notification.applicantAccountId == IMKitClient.instance.account(),
+         item.v2Notification.recipientAccountId == rejectionInfo.operatorAccountId {
+        item.handleStatus = .FRIEND_ADD_APPLICATION_STATUS_REJECED
+        item.unreadCount = 0
+      }
+    }
+    delegate?.tableviewReload()
   }
 }

@@ -118,13 +118,14 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
       let rightItem = UIBarButtonItem(customView: selectedSureButton)
       navigationItem.rightBarButtonItem = rightItem
       selectedSureButton.addTarget(self, action: #selector(selectSureClick(_:)), for: .touchUpInside)
-      selectedSureButton.setTitle(localizable("alert_sure"), for: .normal)
+      selectedSureButton.setTitle(commonLocalizable("sure"), for: .normal)
       selectedSureButton.setTitleColor(.white, for: .normal)
       selectedSureButton.layer.cornerRadius = 4
       selectedSureButton.contentHorizontalAlignment = .center
       selectedSureButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
     } else {
-      navigationView.setMoreButtonTitle(localizable("alert_sure"))
+      navigationView.setMoreButtonTitle(commonLocalizable("sure"))
+      navigationView.setMoreButtonWidth(90)
       navigationView.moreButton.setTitleColor(.white, for: .normal)
       navigationView.moreButton.layer.cornerRadius = 4
       navigationView.moreButton.contentHorizontalAlignment = .center
@@ -148,7 +149,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
     }
 
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(localizable("network_error"))
+      showToast(commonLocalizable("network_error"))
       return
     }
 
@@ -233,9 +234,9 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
   /// 选择用户变更统一处理
   open func didChangeSelectUser() {
     if selectArray.count > 0 {
-      selectedSureButton.setTitle("\(localizable("alert_sure"))(\(selectArray.count))", for: .normal)
+      selectedSureButton.setTitle("\(commonLocalizable("sure"))(\(selectArray.count))", for: .normal)
     } else {
-      selectedSureButton.setTitle(localizable("alert_sure"), for: .normal)
+      selectedSureButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
     if selectArray.count <= 0 {
       selectCollectionBackView.isHidden = true

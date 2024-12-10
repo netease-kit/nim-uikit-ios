@@ -13,19 +13,19 @@ public class IntroduceViewModel: NSObject {
 
   func getData() {
     let versionItem = SettingCellModel()
-    versionItem.cellName = NSLocalizedString("version", comment: "")
+    versionItem.cellName = localizable("version")
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     if let version = appVersion {
       versionItem.subTitle = "V\(version)"
     }
 
     let imVersionItem = SettingCellModel()
-    imVersionItem.cellName = "IM 版本"
+    imVersionItem.cellName = localizable("im_version")
     imVersionItem.subTitle = "\(NIMSDK.shared().sdkVersion())"
     imVersionItem.type = SettingCellType.SettingSubtitleCell.rawValue
 
     let introduceItem = SettingCellModel()
-    introduceItem.cellName = NSLocalizedString("product_intro", comment: "")
+    introduceItem.cellName = localizable("product_intro")
     sectionData.append(contentsOf: [versionItem, imVersionItem, introduceItem])
   }
 }

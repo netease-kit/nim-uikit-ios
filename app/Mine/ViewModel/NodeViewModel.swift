@@ -17,13 +17,13 @@ class NodeViewModel: NSObject {
     let model = SettingSectionModel()
     // 国内节点配置
     let home = SettingCellModel()
-    home.subTitle = NSLocalizedString("domestic_node", comment: "")
+    home.subTitle = localizable("domestic_node")
     home.rowHeight = 44.0
     home.switchOpen = SettingRepo.shared.getNodeValue() == true ? true : false
 
     // 海外节点配置
     let overseas = SettingCellModel()
-    overseas.subTitle = NSLocalizedString("overseas_node", comment: "")
+    overseas.subTitle = localizable("overseas_node")
     overseas.switchOpen = SettingRepo.shared.getNodeValue() == true ? false : true
     overseas.rowHeight = 44.0
 

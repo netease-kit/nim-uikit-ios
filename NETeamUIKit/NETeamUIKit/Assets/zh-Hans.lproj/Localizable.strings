@@ -10,7 +10,6 @@
 "team_no_speak"="群禁言";
 "invite_permission"="邀请他人权限";
 "modify_team_info_permission"="群资料修改权限";
-"agree"="是否需要被邀请者同意";
 "setting"="设置";
 "group_memmber"="群成员";
 "discuss_mebmer"="讨论组成员";
@@ -37,11 +36,9 @@
 "group_info"="群信息";
 "discuss_introduce"="讨论组介绍";
 "no_result"="暂无结果";
-"discuss_name"="讨论组名称";
 "dissolute_team_chat"="是否解散群聊？";
 "quit_team_chat"="是否退出群聊?";
 "quit_discuss_chat"="是否退出讨论组?";
-"cancel"="取消";
 "remind"="提示";
 "discuss_avatar"="讨论组头像";
 "discuss_name"="讨论组名称";
@@ -66,7 +63,6 @@
 "group_manager"="群管理员";
 "team_member_select"="人员选择";
 "search_member"="搜索成员";
-"member_select_sure"="确定";
 "member_empty_tip"="请选择成员";
 "team_member_remove"="移除";
 "confirm_delete_text"="确认要移除“%@”";
@@ -78,10 +74,9 @@
 "remove_manager_title"="是否移除";
 "remove_manager_tip"="移除后该成员将无管理权限";
 "max_managers_tip"="最多只能设置10个管理员";
-"network_error"="当前网络不可用，请检查你的网络设置";
 "no_permission_tip"="您暂无操作权限";
 "no_manager_member"="暂无群管理人员";
 "remove_member_tip"="移除后该成员将离开当前群聊";
 "member_select_no_member"="暂无成员";
 "remove_failed"="移除失败";
-"failed_operation"="操作失败";
+"requesting"="请求响应中...";

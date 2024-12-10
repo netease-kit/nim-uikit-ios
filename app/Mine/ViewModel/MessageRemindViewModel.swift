@@ -15,7 +15,6 @@ public class MessageRemindViewModel: NSObject {
 
   func getData() {
     sectionData.append(getFirstSection())
-    sectionData.append(getThirdSection())
   }
 
   private func getFirstSection() -> SettingSectionModel {
@@ -24,31 +23,23 @@ public class MessageRemindViewModel: NSObject {
 
     // 新消息通知
     let messageNotify = SettingCellModel()
-    messageNotify.cellName = NSLocalizedString("new_message_remind", comment: "")
+    messageNotify.cellName = localizable("new_message_remind")
     messageNotify.type = SettingCellType.SettingSwitchCell.rawValue
-    // TODO: 换V2
     messageNotify.switchOpen = settingRepo.getPushEnable()
     messageNotify.swichChange = { isOpen in
-//      let config = V2NIMDndConfig()
-//      config.dndOn = isOpen
-//      weakSelf?.repo.setDndConfig(config: config)
-      weakSelf?.settingRepo.setPushEnable(isOpen)
+      weakSelf?.settingRepo.setMessageNotify(isOpen) { error in
+        if let err = error {
+          print("设置失败: \(err)")
+          messageNotify.switchOpen = !isOpen
+        }
+      }
     }
-    model.cellModels.append(contentsOf: [
-      messageNotify, // 新消息通知
-    ])
-    model.setCornerType()
-    return model
-  }
+    model.cellModels.append(messageNotify)
 
-  private func getThirdSection() -> SettingSectionModel {
-    let model = SettingSectionModel()
-    weak var weakSelf = self
-
+    // 通知栏显示消息详情
     let messageDetailItem = SettingCellModel()
-    messageDetailItem.cellName = NSLocalizedString("display_message_detail", comment: "")
+    messageDetailItem.cellName = localizable("display_message_detail")
     messageDetailItem.type = SettingCellType.SettingSwitchCell.rawValue
-    // TODO: 换V2
     messageDetailItem.switchOpen = settingRepo.getPushDetailEnable()
     messageDetailItem.swichChange = { isOpen in
       weakSelf?.settingRepo.setPushShowDetail(isOpen) { error in
@@ -59,7 +50,7 @@ public class MessageRemindViewModel: NSObject {
       }
     }
 
-    model.cellModels.append(contentsOf: [messageDetailItem])
+    model.cellModels.append(messageDetailItem)
     model.setCornerType()
     return model
   }

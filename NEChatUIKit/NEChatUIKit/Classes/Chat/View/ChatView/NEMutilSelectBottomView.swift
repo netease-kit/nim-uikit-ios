@@ -39,8 +39,7 @@ open class NEMutilSelectBottomView: UIView {
     NSLayoutConstraint.activate([
       singleForwardLabel.topAnchor.constraint(equalTo: singleForwardButton.bottomAnchor, constant: 3),
       singleForwardLabel.centerXAnchor.constraint(equalTo: singleForwardButton.centerXAnchor),
-      singleForwardLabel.widthAnchor.constraint(equalToConstant: 48),
-      singleForwardLabel.heightAnchor.constraint(equalToConstant: 12),
+      singleForwardLabel.widthAnchor.constraint(equalToConstant: 68),
     ])
 
     // 合并转发
@@ -56,8 +55,7 @@ open class NEMutilSelectBottomView: UIView {
     NSLayoutConstraint.activate([
       multiForwardLabel.centerYAnchor.constraint(equalTo: singleForwardLabel.centerYAnchor),
       multiForwardLabel.centerXAnchor.constraint(equalTo: multiForwardButton.centerXAnchor),
-      multiForwardLabel.widthAnchor.constraint(equalToConstant: 48),
-      multiForwardLabel.heightAnchor.constraint(equalToConstant: 12),
+      multiForwardLabel.widthAnchor.constraint(equalToConstant: 68),
     ])
 
     // 删除
@@ -73,8 +71,7 @@ open class NEMutilSelectBottomView: UIView {
     NSLayoutConstraint.activate([
       deleteLabel.centerYAnchor.constraint(equalTo: singleForwardLabel.centerYAnchor),
       deleteLabel.centerXAnchor.constraint(equalTo: deleteButton.centerXAnchor),
-      deleteLabel.widthAnchor.constraint(equalToConstant: 48),
-      deleteLabel.heightAnchor.constraint(equalToConstant: 12),
+      deleteLabel.widthAnchor.constraint(equalToConstant: 68),
     ])
   }
 
@@ -94,6 +91,7 @@ open class NEMutilSelectBottomView: UIView {
     label.textColor = .ne_greyText
     label.font = .systemFont(ofSize: 11)
     label.textAlignment = .center
+    label.numberOfLines = NEAppLanguageUtil.getCurrentLanguage() == .english ? 2 : 1
     return label
   }()
 
@@ -113,6 +111,7 @@ open class NEMutilSelectBottomView: UIView {
     label.textColor = .ne_greyText
     label.font = .systemFont(ofSize: 11)
     label.textAlignment = .center
+    label.numberOfLines = NEAppLanguageUtil.getCurrentLanguage() == .english ? 2 : 1
     return label
   }()
 

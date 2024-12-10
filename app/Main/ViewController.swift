@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NECommonUIKit
+import UIKit
 
 class ViewController: UIViewController {
-  lazy var launchIcon: UIImageView = {
+  lazy var launchIconView: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.image = UIImage(named: "launchIcon")
@@ -17,27 +17,27 @@ class ViewController: UIViewController {
   lazy var launchIconLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = NSLocalizedString("appName", comment: "")
+    label.text = localizable("appName")
     label.font = UIFont.systemFont(ofSize: 24.0)
     label.textColor = UIColor(hexString: "333333")
     return label
   }()
 
   lazy var copyright: UIButton = {
-    let btn = UIButton()
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setImage(UIImage(named: "yunxin_brand"), for: .normal)
-    btn.setTitle(NSLocalizedString("brand_des", comment: ""), for: .normal)
-    btn.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
-    btn.setTitleColor(UIColor(hexString: "333333"), for: .normal)
-    btn.layoutButtonImage(style: .left, space: 5.0)
-    return btn
+    let button = UIButton()
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.setImage(UIImage(named: "yunxin_brand"), for: .normal)
+    button.setTitle(localizable("brand_des"), for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
+    button.setTitleColor(UIColor(hexString: "333333"), for: .normal)
+    button.layoutButtonImage(style: .left, space: 5.0)
+    return button
   }()
 
   lazy var slogan: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = NSLocalizedString("real_service", comment: "")
+    label.text = localizable("real_service")
     label.font = UIFont.systemFont(ofSize: 16.0)
     label.textColor = UIColor(hexString: "666666")
     return label
@@ -50,26 +50,26 @@ class ViewController: UIViewController {
   }
 
   func setupUI() {
-    view.addSubview(launchIcon)
+    view.addSubview(launchIconView)
     if #available(iOS 11.0, *) {
       NSLayoutConstraint.activate([
-        launchIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIcon.topAnchor.constraint(
+        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        launchIconView.topAnchor.constraint(
           equalTo: view.safeAreaLayoutGuide.topAnchor,
           constant: 145.0
         ),
       ])
     } else {
       NSLayoutConstraint.activate([
-        launchIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIcon.topAnchor.constraint(equalTo: view.topAnchor, constant: 145.0),
+        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        launchIconView.topAnchor.constraint(equalTo: view.topAnchor, constant: 145.0),
       ])
     }
 
     view.addSubview(launchIconLabel)
     NSLayoutConstraint.activate([
       launchIconLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      launchIconLabel.topAnchor.constraint(equalTo: launchIcon.bottomAnchor, constant: -12.0),
+      launchIconLabel.topAnchor.constraint(equalTo: launchIconView.bottomAnchor, constant: -12.0),
     ])
 
     view.addSubview(slogan)

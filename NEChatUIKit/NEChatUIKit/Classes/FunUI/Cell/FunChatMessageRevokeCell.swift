@@ -13,19 +13,14 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     revokeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelLeft.textColor = UIColor.ne_greyText
     revokeLabelLeft.textAlignment = .center
@@ -41,7 +36,8 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func commonUIRight() {
+  override open func commonUIRight() {
+    super.commonUIRight()
     revokeLabelRight.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelRight.textColor = UIColor.ne_greyText
     revokeLabelRight.textAlignment = .center
@@ -51,7 +47,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     revokeLabelRightXAnchor = revokeLabelRight.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0)
     revokeLabelRightXAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      revokeLabelRight.widthAnchor.constraint(equalToConstant: 120),
+      revokeLabelRight.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
       revokeLabelRight.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 6),
       revokeLabelRight.heightAnchor.constraint(equalToConstant: 16),
     ])

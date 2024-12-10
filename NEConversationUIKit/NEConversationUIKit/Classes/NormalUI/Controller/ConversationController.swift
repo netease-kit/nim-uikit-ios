@@ -51,6 +51,23 @@ open class ConversationController: NEBaseConversationController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .ne_navLineColor
+    changeLanguage()
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+  }
+
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      NotificationCenter.default.removeObserver(self)
+    }
+  }
+
+  func changeLanguage() {
+    requestData()
+    initSystemNav()
+    popListView = PopListView()
+    brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
+    securityWarningView.warningLabel.text = localizable("security_warning")
   }
 
   override func initSystemNav() {
@@ -71,12 +88,11 @@ open class ConversationController: NEBaseConversationController {
       navigationView.addBtn.isHidden = true
       navigationItem.rightBarButtonItems = [searchBarItem]
     }
+    navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
   }
 
   override open func setupSubviews() {
     super.setupSubviews()
-
-    popListView = PopListView()
 
     tableView.rowHeight = 62
     tableView.backgroundColor = .white

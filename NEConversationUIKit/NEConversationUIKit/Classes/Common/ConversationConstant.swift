@@ -4,11 +4,16 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreKit
+import NECommonKit
 
-let coreLoader = CoreLoader<NEBaseConversationController>()
+let coreLoader = CommonLoader<NEBaseConversationController>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }
 
 public let ModuleName = "NEConversationUIKit"
+
+extension UIColor {
+  static let securityWarningBg = UIColor(hexString: "#FFF5E1")
+  static let securityWarningTextColor = UIColor(hexString: "#EB9718")
+}

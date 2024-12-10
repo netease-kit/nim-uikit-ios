@@ -92,7 +92,6 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
 
   open func setupUILeft() {
     contentImageViewLeft.addSubview(stateViewLeft)
-    contentImageViewLeft.addCustomCorner(conrners: [.topLeft], radius: 8, backcolor: .white)
     NSLayoutConstraint.activate([
       stateViewLeft.centerXAnchor.constraint(equalTo: contentImageViewLeft.centerXAnchor),
       stateViewLeft.centerYAnchor.constraint(equalTo: contentImageViewLeft.centerYAnchor),
@@ -109,7 +108,6 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
 
   open func setupUIRight() {
     contentImageViewRight.addSubview(stateViewRight)
-    contentImageViewRight.addCustomCorner(conrners: [.topRight], radius: 8, backcolor: .white)
     NSLayoutConstraint.activate([
       stateViewRight.centerXAnchor.constraint(equalTo: contentImageViewRight.centerXAnchor),
       stateViewRight.centerYAnchor.constraint(equalTo: contentImageViewRight.centerYAnchor),
@@ -142,6 +140,15 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     let timeView = isSend ? timeViewRight : timeViewLeft
     let timeLabel = isSend ? timeLabelRight : timeLabelLeft
     let stateView = isSend ? stateViewRight : stateViewLeft
+    let bubble = isSend ? bubbleImageRight : bubbleImageLeft
+
+    if model.isReplay {
+      setBubbleImage()
+    } else {
+      bubble.image = nil
+    }
+    contentImageView.removeAllCustomCorner()
+    contentImageView.layer.cornerRadius = 8
 
     if let videoObject = model.message?.attachment as? V2NIMMessageVideoAttachment {
       // 获取首帧

@@ -46,7 +46,7 @@ open class FunChatInputView: NEBaseChatInputView {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.backgroundColor = UIColor.clear
     label.numberOfLines = 2
-    label.accessibilityIdentifier = "id.messageReplyInput"
+    label.accessibilityIdentifier = "id.replyContent"
     return label
   }()
 
@@ -55,7 +55,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
     button.setImage(coreLoader.loadImage("fun_chat_input_reply_clear"), for: .normal)
-    button.accessibilityIdentifier = "id.clear"
+    button.accessibilityIdentifier = "id.replyClose"
     return button
   }()
 

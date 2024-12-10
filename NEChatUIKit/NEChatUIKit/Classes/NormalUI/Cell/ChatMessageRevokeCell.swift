@@ -5,20 +5,12 @@
 
 import UIKit
 
-// protocol ChatRevokeRightCellDelegate: NEChatBaseCellDelegate  {
-//    func onReeditMessage(_ cell: UITableViewCell, _ model: MessageContentModel?)
-// }
-
-// typealias ReeditBlock = (_ cell: ChatRevokeRightCell, _ model: MessageContentModel?) -> ()
-
 @objcMembers
 open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
   public var revokeLabelLeft = UILabel()
   public var revokeLabelRight = UILabel()
   public var reeditButton = UIButton(type: .custom)
   public var reeditButtonW: NSLayoutConstraint?
-//    public var reeditBlock: ReeditBlock?
-//    public override var delegate: NEChatBaseCellDelegate?
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
@@ -28,12 +20,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
+  override open func commonUILeft() {
     revokeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelLeft.textColor = UIColor.ne_greyText
     revokeLabelLeft.font = UIFont.systemFont(ofSize: 16.0)
@@ -47,7 +34,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     ])
   }
 
-  open func commonUIRight() {
+  override open func commonUIRight() {
     revokeLabelRight.translatesAutoresizingMaskIntoConstraints = false
     revokeLabelRight.textColor = UIColor.ne_greyText
     revokeLabelRight.font = UIFont.systemFont(ofSize: 16.0)
@@ -55,7 +42,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     bubbleImageRight.addSubview(revokeLabelRight)
     NSLayoutConstraint.activate([
       revokeLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 16),
-      revokeLabelRight.widthAnchor.constraint(equalToConstant: 100),
+      revokeLabelRight.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 130 : 100),
       revokeLabelRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: 0),
       revokeLabelRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
     ])
@@ -112,11 +99,11 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
       reeditButtonW?.constant = 86
       reeditButton.isHidden = false
       reeditButton.setTitle(chatLocalizable("message_reedit"), for: .normal)
-      model.contentSize = CGSize(width: 218, height: chat_min_h)
+      model.contentSize = CGSize(width: NEAppLanguageUtil.getCurrentLanguage() == .english ? 248 : 218, height: chat_min_h)
     } else {
       reeditButtonW?.constant = 0
       reeditButton.isHidden = true
-      model.contentSize = CGSize(width: 130, height: chat_min_h)
+      model.contentSize = CGSize(width: NEAppLanguageUtil.getCurrentLanguage() == .english ? 160 : 130, height: chat_min_h)
     }
 
     super.setModel(model, isSend)

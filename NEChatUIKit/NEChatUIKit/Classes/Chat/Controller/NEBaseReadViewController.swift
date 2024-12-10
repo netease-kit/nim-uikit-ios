@@ -213,8 +213,8 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
           self?.showToast(err.localizedDescription)
         }
       } else {
-        self?.readButton.setTitle("已读 (" + "\(self?.viewModel.readUsers.count ?? 0)" + ")", for: .normal)
-        self?.unreadButton.setTitle("未读 (" + "\(self?.viewModel.unReadUsers.count ?? 0)" + ")", for: .normal)
+        self?.readButton.setTitle(chatLocalizable("read") + " (" + "\(self?.viewModel.readUsers.count ?? 0)" + ")", for: .normal)
+        self?.unreadButton.setTitle(chatLocalizable("unread") + " (" + "\(self?.viewModel.unReadUsers.count ?? 0)" + ")", for: .normal)
         self?.readTableView.reloadData()
         self?.emptyView.isHidden = self?.viewModel.readUsers.isEmpty == false
       }

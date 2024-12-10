@@ -25,11 +25,11 @@ open class TeamMembersController: NEBaseTeamMembersController {
         if isOwner(model.nimUser?.user?.accountId) {
           cell.ownerLabel.isHidden = false
           cell.ownerLabel.text = localizable("team_owner")
-          cell.ownerWidth?.constant = 40
+          cell.ownerWidth?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? 86 : 40
         } else if model.teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
           cell.ownerLabel.isHidden = false
           cell.ownerLabel.text = localizable("team_manager")
-          cell.ownerWidth?.constant = 52
+          cell.ownerWidth?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? 58 : 52
           if isOwner(IMKitClient.instance.account()) {
             isShowRemove = true
           }

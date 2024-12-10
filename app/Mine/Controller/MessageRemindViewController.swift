@@ -45,7 +45,7 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
 
   /// 导航栏配置
   func initialConfig() {
-    title = NSLocalizedString("message_remind", comment: "")
+    title = localizable("message_remind")
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
       navigationView.backgroundColor = .ne_backgroundColor

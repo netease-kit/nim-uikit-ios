@@ -12,7 +12,6 @@
 "about_yunxin"="关于云信";
 "want_to_logout"="确定要退出登录吗？";
 "person_info"="个人信息";
-"cancel"="取消";
 "setting_birthday_failure"="设置生日失败";
 "setting_head_failure"="修改头像失败";
 "setting_nickname_failure"="修改昵称失败";
@@ -22,17 +21,20 @@
 "change_phone_failure"="修改手机号失败";
 "change_email_failure"="修改邮箱失败";
 "change_sign_failure"="修改签名失败";
-"save"="完成";
 "birthday"="生日";
 "phone"="手机";
 "email"="邮箱";
 "sign_remind"="个性签名消息提醒";
 
+"complete"="完成";
+"save"="保存";
 "message_remind"="消息提醒";
 "style_selection"="外观";
+"app_language"="语言";
+"app_language_zh"="中文";
+"app_language_en"="English";
 "product_intro"="产品介绍";
 "receiver_mode"="听筒模式";
-"delete_friend"="删除好友是否同步删除备注";
 "message_read_function"="消息已读未读功能";
 "version"="版本号";
 "headImage"="头像";
@@ -44,14 +46,12 @@
 "new_message_remind"="新消息通知";
 "ring_mode"="响铃模式";
 "vibration_mode"="震动模式";
-"syn_receive_push"="PC/Web同步接收推送";
 "display_message_detail"="通知栏显示消息详情";
 "setting"="设置";
-"confirm"="确认";
-"cancel"="取消";
 "real_service"="真正稳定的IM云服务";
 "appName"="云信IM";
 "brand_des"="网易云信";
+"im_version"="IM 版本";
 "register_login"="注册/登录";
 "email_login"="邮箱登录";
 "node_select"="节点选择";
@@ -66,7 +66,8 @@
 "style_default"="基础皮肤";
 "style_fun"="通用皮肤";
 
-"change_normal_style"="是否切换基础版？";
-"change_fun_style"="是否切换娱乐版？";
-
 "mine_collection"="收藏";
+
+"anti_error"="存在不安全内容，请重新输入。";
+"privatized_configuration"="私有化配置";
+"login_by_account"="账号登录";

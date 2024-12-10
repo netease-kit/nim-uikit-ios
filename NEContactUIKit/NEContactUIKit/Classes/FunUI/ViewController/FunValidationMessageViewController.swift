@@ -49,7 +49,7 @@ open class FunValidationMessageViewController: NEBaseValidationMessageViewContro
 extension FunValidationMessageViewController {
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let noti = viewModel.datas[indexPath.row]
+    let noti = viewModel.friendAddApplications[indexPath.row]
     let reuseIdentifier = "\(FunSystemNotificationCell.self)"
     let cell = tableView.dequeueReusableCell(
       withIdentifier: reuseIdentifier,

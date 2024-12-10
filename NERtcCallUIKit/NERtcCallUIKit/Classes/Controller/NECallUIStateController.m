@@ -383,18 +383,18 @@ navigation
     [[NECallEngine sharedInstance] setupLocalView:self.bigVideoView.videoView];
     [[NECallEngine sharedInstance] setupRemoteView:self.smallVideoView.videoView];
     NSLog(@"show my big view");
-    self.smallVideoView.maskView.hidden = !self.mainController.isRemoteMute;
-    self.bigVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
-    self.bigVideoView.userID = NIMSDK.sharedSDK.loginManager.currentAccount;
+    self.smallVideoView.coverView.hidden = !self.mainController.isRemoteMute;
+    self.bigVideoView.coverView.hidden = !self.operationView.cameraBtn.selected;
+    self.bigVideoView.userID = [[NIMSDK sharedSDK].v2LoginService getLoginUser];
     self.smallVideoView.userID = self.callParam.remoteUserAccid;
   } else {
     [[NECallEngine sharedInstance] setupLocalView:self.smallVideoView.videoView];
     [[NECallEngine sharedInstance] setupRemoteView:self.bigVideoView.videoView];
     NSLog(@"show my small view");
-    self.bigVideoView.maskView.hidden = !self.mainController.isRemoteMute;
-    self.smallVideoView.maskView.hidden = !self.operationView.cameraBtn.selected;
+    self.bigVideoView.coverView.hidden = !self.mainController.isRemoteMute;
+    self.smallVideoView.coverView.hidden = !self.operationView.cameraBtn.selected;
     self.bigVideoView.userID = self.callParam.remoteUserAccid;
-    self.smallVideoView.userID = NIMSDK.sharedSDK.loginManager.currentAccount;
+    self.smallVideoView.userID = [[NIMSDK sharedSDK].v2LoginService getLoginUser];
   }
 }
 

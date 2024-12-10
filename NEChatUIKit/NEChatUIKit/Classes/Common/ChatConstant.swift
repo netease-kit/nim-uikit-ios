@@ -10,7 +10,7 @@ import NEChatKit
 @_exported import NECoreIM2Kit
 @_exported import NECoreKit
 
-let coreLoader = CoreLoader<NEChatBaseViewController>()
+let coreLoader = CommonLoader<NEChatBaseViewController>()
 func chatLocalizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }

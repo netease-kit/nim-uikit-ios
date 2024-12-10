@@ -14,7 +14,7 @@ public class BirthdayDatePickerView: UIView {
   lazy var cancelButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(NSLocalizedString("cancel", comment: ""), for: .normal)
+    button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
     button.addTarget(self, action: #selector(removeFromSuperview), for: .touchUpInside)

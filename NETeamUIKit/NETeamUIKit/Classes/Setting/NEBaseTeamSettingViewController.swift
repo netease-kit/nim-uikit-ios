@@ -279,24 +279,20 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
           filters.insert(accountId)
         }
       }
-    } else {
-      viewModel.teamInfoModel?.users.forEach { model in
-        if let uid = model.nimUser?.user?.accountId {
-          filters.insert(uid)
-        }
+
+      if filters.count > 0 {
+        param["filters"] = filters
       }
-    }
 
-    if filters.count > 0 {
-      param["filters"] = filters
-    }
+      param["limit"] = (viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
 
-    param["limit"] = (viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
-
-    if IMKitConfigCenter.shared.enableAIUser {
-      Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
+      if IMKitConfigCenter.shared.enableAIUser {
+        Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
+      } else {
+        Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+      }
     } else {
-      Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
+      showToast(localizable("requesting"))
     }
   }
 
@@ -476,7 +472,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
         } else if err.code == noPermissionInviteCode {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
-          weakSelf?.showToast(localizable("failed_operation"))
+          weakSelf?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         print("add users success : ", members as Any)
@@ -551,7 +547,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     if error.code == protocolSendFailed {
       showToast(commonLocalizable("network_error"))
     } else {
-      showToast(localizable("failed_operation"))
+      showToast(commonLocalizable("failed_operation"))
     }
   }
 
@@ -620,7 +616,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
@@ -693,7 +689,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       preferredStyle: .actionSheet
     )
 
-    let cancelActionButton = UIAlertAction(title: localizable("cancel"), style: .cancel) { _ in
+    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
       print("Cancel")
     }
     cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")

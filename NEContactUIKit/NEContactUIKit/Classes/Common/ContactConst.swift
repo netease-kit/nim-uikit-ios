@@ -5,7 +5,7 @@
 
 import CoreText
 import Foundation
-import NECoreKit
+import NECommonKit
 
 @objc
 public enum ContactCellType: Int {
@@ -16,7 +16,7 @@ public enum ContactCellType: Int {
 
 public typealias ContactsSelectCompletion = ([ContactInfo]) -> Void?
 
-let coreLoader = CoreLoader<NEContactBaseViewController>()
+let coreLoader = CommonLoader<NEContactBaseViewController>()
 func localizable(_ key: String) -> String {
   coreLoader.localizable(key)
 }

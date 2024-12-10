@@ -62,7 +62,7 @@ public class PersonInfoViewModel: NSObject {
     weak var weakSelf = self
     let headImageItem = SettingCellModel()
     headImageItem.type = SettingCellType.SettingHeaderCell.rawValue
-    headImageItem.cellName = NSLocalizedString("headImage", comment: "")
+    headImageItem.cellName = localizable("headImage")
     headImageItem.headerUrl = userInfo?.user?.avatar
     headImageItem.defaultHeadData = userInfo?.showName()
     headImageItem.subTitle = userInfo?.user?.accountId
@@ -74,7 +74,8 @@ public class PersonInfoViewModel: NSObject {
     // 昵称
     let nickNameItem = SettingCellModel()
     nickNameItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    nickNameItem.cellName = NSLocalizedString("nickname", comment: "")
+    nickNameItem.cellName = localizable("nickname")
+    nickNameItem.titleWidth = 90
     nickNameItem.subTitle = mineInfo.showName()
     nickNameItem.rowHeight = 46.0
     nickNameItem.cellClick = {
@@ -84,10 +85,11 @@ public class PersonInfoViewModel: NSObject {
     // 账号
     let accountItem = SettingCellModel()
     accountItem.type = SettingCellType.SettingSubtitleCustomCell.rawValue
-    accountItem.cellName = NSLocalizedString("account", comment: "")
+    accountItem.cellName = localizable("account")
+    accountItem.titleWidth = 60
     accountItem.subTitle = mineInfo.user?.accountId
     accountItem.rowHeight = 46.0
-    accountItem.rightCustomViewIcon = "copy_icon"
+    accountItem.rightCustomViewIcon = UIImage(named: "copy_icon")
     accountItem.customViewClick = {
       weakSelf?.delegate?.didCopyAccount(account: mineInfo.user?.accountId ?? "")
     }
@@ -95,15 +97,16 @@ public class PersonInfoViewModel: NSObject {
     // 性别
     let sexItem = SettingCellModel()
     sexItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    sexItem.cellName = NSLocalizedString("gender", comment: "")
-    var sex = NSLocalizedString("unknown", comment: "")
+    sexItem.cellName = localizable("gender")
+    sexItem.titleWidth = 60
+    var sex = localizable("unknown")
     switch mineInfo.user?.gender {
     case 1:
-      sex = NSLocalizedString("male", comment: "")
+      sex = localizable("male")
     case 2:
-      sex = NSLocalizedString("female", comment: "")
+      sex = localizable("female")
     default:
-      sex = NSLocalizedString("unknown", comment: "")
+      sex = localizable("unknown")
     }
     sexItem.subTitle = sex
     sexItem.rowHeight = 46.0
@@ -114,7 +117,8 @@ public class PersonInfoViewModel: NSObject {
     // 生日
     let birthdayItem = SettingCellModel()
     birthdayItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    birthdayItem.cellName = NSLocalizedString("birthday", comment: "")
+    birthdayItem.cellName = localizable("birthday")
+    birthdayItem.titleWidth = 80
     birthdayItem.subTitle = mineInfo.user?.birthday
     birthdayItem.rowHeight = 46.0
     birthdayItem.cellClick = {
@@ -124,7 +128,8 @@ public class PersonInfoViewModel: NSObject {
     // 手机
     let telephoneItem = SettingCellModel()
     telephoneItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    telephoneItem.cellName = NSLocalizedString("phone", comment: "")
+    telephoneItem.cellName = localizable("phone")
+    telephoneItem.titleWidth = 60
     telephoneItem.subTitle = mineInfo.user?.mobile
     telephoneItem.rowHeight = 46.0
     telephoneItem.cellClick = {
@@ -134,7 +139,8 @@ public class PersonInfoViewModel: NSObject {
     // 邮箱
     let emailItem = SettingCellModel()
     emailItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    emailItem.cellName = NSLocalizedString("email", comment: "")
+    emailItem.cellName = localizable("email")
+    emailItem.titleWidth = 60
     emailItem.subTitle = mineInfo.user?.email
     emailItem.rowHeight = 46.0
     emailItem.cellClick = {
@@ -162,10 +168,10 @@ public class PersonInfoViewModel: NSObject {
 
     let signItem = SettingCellModel()
     signItem.type = SettingCellType.SettingSubtitleCell.rawValue
-    signItem.cellName = NSLocalizedString("individuality_sign", comment: "")
+    signItem.cellName = localizable("individuality_sign")
     signItem.subTitle = mineInfo.user?.sign
     signItem.rowHeight = 46.0
-    signItem.titleWidth = 64
+    signItem.titleWidth = NEAppLanguageUtil.getCurrentLanguage() == .english ? 76.0 : 64
     weak var weakSelf = self
     signItem.cellClick = {
       weakSelf?.delegate?.didClickSign(sign: signItem.subTitle ?? "")

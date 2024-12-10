@@ -52,13 +52,14 @@ open class OperationCell: UICollectionViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.textAlignment = .center
+    label.numberOfLines = 2
     label.accessibilityIdentifier = "id.menuTitle"
     contentView.addSubview(label)
     NSLayoutConstraint.activate([
-      label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8),
+      label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 2 : 8),
       label.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 0),
       label.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 0),
-      label.heightAnchor.constraint(equalToConstant: 18),
+      label.heightAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 36 : 18),
     ])
   }
 }

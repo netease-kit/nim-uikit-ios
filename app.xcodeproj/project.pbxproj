@@ -7,43 +7,54 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		180E81D32D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BB2D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift */; };
+		180E81D42D07D9F600151DD8 /* CustomSettingCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B92D07D9F600151DD8 /* CustomSettingCellModel.swift */; };
+		180E81D52D07D9F600151DD8 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */; };
+		180E81D62D07D9F600151DD8 /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81AE2D07D9F600151DD8 /* LanguageViewController.swift */; };
+		180E81D72D07D9F600151DD8 /* CustomTeamSettingSubtitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C12D07D9F600151DD8 /* CustomTeamSettingSubtitleCell.swift */; };
+		180E81D82D07D9F600151DD8 /* CustomSettingTextviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BD2D07D9F600151DD8 /* CustomSettingTextviewCell.swift */; };
+		180E81D92D07D9F600151DD8 /* CustomTeamArrowSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BE2D07D9F600151DD8 /* CustomTeamArrowSettingCell.swift */; };
+		180E81DA2D07D9F600151DD8 /* CustomTeamSettingRightCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C02D07D9F600151DD8 /* CustomTeamSettingRightCustomCell.swift */; };
+		180E81DB2D07D9F600151DD8 /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C62D07D9F600151DD8 /* NodeSelectCell.swift */; };
+		180E81DC2D07D9F600151DD8 /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B12D07D9F600151DD8 /* MineSettingViewController.swift */; };
+		180E81DD2D07D9F600151DD8 /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */; };
+		180E81DE2D07D9F600151DD8 /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81AD2D07D9F600151DD8 /* IntroduceBrandViewController.swift */; };
+		180E81DF2D07D9F600151DD8 /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C52D07D9F600151DD8 /* MineTableViewCell.swift */; };
+		180E81E02D07D9F600151DD8 /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CE2D07D9F600151DD8 /* MineSettingViewModel.swift */; };
+		180E81E12D07D9F600151DD8 /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CC2D07D9F600151DD8 /* MessageRemindViewModel.swift */; };
+		180E81E22D07D9F600151DD8 /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CF2D07D9F600151DD8 /* NodeViewModel.swift */; };
+		180E81E32D07D9F600151DD8 /* PocLoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B62D07D9F600151DD8 /* PocLoginController.swift */; };
+		180E81E42D07D9F600151DD8 /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B42D07D9F600151DD8 /* NENodeViewController.swift */; };
+		180E81E52D07D9F600151DD8 /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C82D07D9F600151DD8 /* VersionCell.swift */; };
+		180E81E62D07D9F600151DD8 /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81AF2D07D9F600151DD8 /* MessageRemindViewController.swift */; };
+		180E81E72D07D9F600151DD8 /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B22D07D9F600151DD8 /* NEAboutWebViewController.swift */; };
+		180E81E92D07D9F600151DD8 /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B02D07D9F600151DD8 /* MeViewController.swift */; };
+		180E81EA2D07D9F600151DD8 /* IMSDKConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81AB2D07D9F600151DD8 /* IMSDKConfigViewController.swift */; };
+		180E81EB2D07D9F600151DD8 /* CustomSettingInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BC2D07D9F600151DD8 /* CustomSettingInputCell.swift */; };
+		180E81EC2D07D9F600151DD8 /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CA2D07D9F600151DD8 /* IntroduceViewModel.swift */; };
+		180E81ED2D07D9F600151DD8 /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81D02D07D9F600151DD8 /* PersonInfoViewModel.swift */; };
+		180E81EE2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BF2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift */; };
+		180E81F02D07D9F600151DD8 /* StyleSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */; };
+		180E81F12D07D9F600151DD8 /* StyleSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */; };
+		180E81F22D07D9F600151DD8 /* LanguageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CB2D07D9F600151DD8 /* LanguageViewModel.swift */; };
+		180E81F32D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C22D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift */; };
+		180E81F42D07D9F600151DD8 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */; };
+		180E81F52D07D9F600151DD8 /* MeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CD2D07D9F600151DD8 /* MeViewModel.swift */; };
 		181EE5872B234C510043817F /* CustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57E2B234C510043817F /* CustomView.swift */; };
 		181EE5882B234C510043817F /* CustomP2PChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */; };
 		181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5822B234C510043817F /* CustomConversationController.swift */; };
 		181EE58D2B234C510043817F /* CustomContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5842B234C510043817F /* CustomContactTableViewCell.swift */; };
 		181EE58E2B234C510043817F /* CustomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5852B234C510043817F /* CustomChatCell.swift */; };
 		181EE58F2B234C510043817F /* CustomConversationListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5862B234C510043817F /* CustomConversationListCell.swift */; };
-		181EE5EA2B234E540043817F /* NodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5CD2B234E540043817F /* NodeViewModel.swift */; };
-		181EE5EB2B234E540043817F /* MineSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5CE2B234E540043817F /* MineSettingViewModel.swift */; };
-		181EE5EC2B234E540043817F /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5CF2B234E540043817F /* PersonInfoViewModel.swift */; };
-		181EE5ED2B234E540043817F /* MessageRemindViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D02B234E540043817F /* MessageRemindViewModel.swift */; };
-		181EE5EE2B234E540043817F /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D12B234E540043817F /* IntroduceViewModel.swift */; };
-		181EE5EF2B234E540043817F /* MeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D32B234E540043817F /* MeViewController.swift */; };
-		181EE5F02B234E540043817F /* StyleSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D42B234E540043817F /* StyleSelectionViewController.swift */; };
-		181EE5F12B234E540043817F /* NEAboutWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D52B234E540043817F /* NEAboutWebViewController.swift */; };
-		181EE5F32B234E540043817F /* InputPersonInfoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D72B234E540043817F /* InputPersonInfoController.swift */; };
-		181EE5F42B234E540043817F /* MineSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D82B234E540043817F /* MineSettingViewController.swift */; };
-		181EE5F52B234E540043817F /* MessageRemindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5D92B234E540043817F /* MessageRemindViewController.swift */; };
-		181EE5F62B234E540043817F /* NENodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5DA2B234E540043817F /* NENodeViewController.swift */; };
-		181EE5F72B234E540043817F /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5DB2B234E540043817F /* PersonInfoViewController.swift */; };
-		181EE5F82B234E540043817F /* ConfigTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5DC2B234E540043817F /* ConfigTestViewController.swift */; };
-		181EE5F92B234E540043817F /* IntroduceBrandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5DD2B234E540043817F /* IntroduceBrandViewController.swift */; };
-		181EE5FA2B234E540043817F /* MineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5DF2B234E540043817F /* MineTableViewCell.swift */; };
-		181EE5FB2B234E540043817F /* StyleSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E02B234E540043817F /* StyleSelectionCell.swift */; };
-		181EE5FC2B234E540043817F /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E12B234E540043817F /* BirthdayDatePickerView.swift */; };
-		181EE5FD2B234E540043817F /* CustomTeamSettingRightCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E32B234E540043817F /* CustomTeamSettingRightCustomCell.swift */; };
-		181EE5FE2B234E540043817F /* CustomTeamSettingSubtitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E42B234E540043817F /* CustomTeamSettingSubtitleCell.swift */; };
-		181EE5FF2B234E540043817F /* CustomTeamArrowSettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E52B234E540043817F /* CustomTeamArrowSettingCell.swift */; };
-		181EE6002B234E540043817F /* CustomTeamSettingHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E62B234E540043817F /* CustomTeamSettingHeaderCell.swift */; };
-		181EE6012B234E540043817F /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E72B234E540043817F /* CustomTeamSettingSwitchCell.swift */; };
-		181EE6022B234E540043817F /* NodeSelectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E82B234E540043817F /* NodeSelectCell.swift */; };
-		181EE6032B234E540043817F /* VersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5E92B234E540043817F /* VersionCell.swift */; };
 		18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */; };
 		18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */; };
+		18CF8A3B2D01B312000CF406 /* CustomContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF8A392D01B312000CF406 /* CustomContactViewController.swift */; };
+		18CF8A3C2D01B312000CF406 /* CustomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF8A382D01B312000CF406 /* CustomConfig.swift */; };
+		18CF8A402D02ECA5000CF406 /* IMSDKConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF8A3E2D02ECA4000CF406 /* IMSDKConfigManager.swift */; };
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
 		4B3B9BE6277AFEE50091A74E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE4277AFEE50091A74E /* Main.storyboard */; };
 		4B3B9BEB277AFEE70091A74E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B3B9BE9277AFEE70091A74E /* LaunchScreen.storyboard */; };
-		962DCBBD1E7AEAFEF8DF27AE /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B974281E00A6C11F3A28F391 /* Pods_app.framework */; };
+		95EB96916EE991860F78EEB6 /* Pods_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F16039729C125EE6BBAA1AC /* Pods_app.framework */; };
 		DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC82A56ABFD0091318F /* Constant.swift */; };
 		DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DC92A56ABFD0091318F /* ViewController.swift */; };
 		DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD141DCB2A56ABFD0091318F /* NENavigationController.swift */; };
@@ -73,47 +84,57 @@
 		01B0A28E2816CF41009065C5 /* app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = app.entitlements; sourceTree = "<group>"; };
 		01C0FC0F27BE754400C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		01C0FC1027BE754500C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
+		180E81AB2D07D9F600151DD8 /* IMSDKConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMSDKConfigViewController.swift; sourceTree = "<group>"; };
+		180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
+		180E81AD2D07D9F600151DD8 /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
+		180E81AE2D07D9F600151DD8 /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
+		180E81AF2D07D9F600151DD8 /* MessageRemindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
+		180E81B02D07D9F600151DD8 /* MeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
+		180E81B12D07D9F600151DD8 /* MineSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
+		180E81B22D07D9F600151DD8 /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
+		180E81B42D07D9F600151DD8 /* NENodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
+		180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
+		180E81B62D07D9F600151DD8 /* PocLoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocLoginController.swift; sourceTree = "<group>"; };
+		180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSelectionViewController.swift; sourceTree = "<group>"; };
+		180E81B92D07D9F600151DD8 /* CustomSettingCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSettingCellModel.swift; sourceTree = "<group>"; };
+		180E81BB2D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowTitleCustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
+		180E81BC2D07D9F600151DD8 /* CustomSettingInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSettingInputCell.swift; sourceTree = "<group>"; };
+		180E81BD2D07D9F600151DD8 /* CustomSettingTextviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSettingTextviewCell.swift; sourceTree = "<group>"; };
+		180E81BE2D07D9F600151DD8 /* CustomTeamArrowSettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTeamArrowSettingCell.swift; sourceTree = "<group>"; };
+		180E81BF2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingHeaderCell.swift; sourceTree = "<group>"; };
+		180E81C02D07D9F600151DD8 /* CustomTeamSettingRightCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingRightCustomCell.swift; sourceTree = "<group>"; };
+		180E81C12D07D9F600151DD8 /* CustomTeamSettingSubtitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSubtitleCell.swift; sourceTree = "<group>"; };
+		180E81C22D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
+		180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
+		180E81C52D07D9F600151DD8 /* MineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
+		180E81C62D07D9F600151DD8 /* NodeSelectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
+		180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSelectionCell.swift; sourceTree = "<group>"; };
+		180E81C82D07D9F600151DD8 /* VersionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
+		180E81CA2D07D9F600151DD8 /* IntroduceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
+		180E81CB2D07D9F600151DD8 /* LanguageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewModel.swift; sourceTree = "<group>"; };
+		180E81CC2D07D9F600151DD8 /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
+		180E81CD2D07D9F600151DD8 /* MeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeViewModel.swift; sourceTree = "<group>"; };
+		180E81CE2D07D9F600151DD8 /* MineSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
+		180E81CF2D07D9F600151DD8 /* NodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
+		180E81D02D07D9F600151DD8 /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
 		181EE57E2B234C510043817F /* CustomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomView.swift; sourceTree = "<group>"; };
 		181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomP2PChatViewController.swift; sourceTree = "<group>"; };
 		181EE5822B234C510043817F /* CustomConversationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationController.swift; sourceTree = "<group>"; };
 		181EE5842B234C510043817F /* CustomContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactTableViewCell.swift; sourceTree = "<group>"; };
 		181EE5852B234C510043817F /* CustomChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomChatCell.swift; sourceTree = "<group>"; };
 		181EE5862B234C510043817F /* CustomConversationListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationListCell.swift; sourceTree = "<group>"; };
-		181EE5CD2B234E540043817F /* NodeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeViewModel.swift; sourceTree = "<group>"; };
-		181EE5CE2B234E540043817F /* MineSettingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewModel.swift; sourceTree = "<group>"; };
-		181EE5CF2B234E540043817F /* PersonInfoViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewModel.swift; sourceTree = "<group>"; };
-		181EE5D02B234E540043817F /* MessageRemindViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewModel.swift; sourceTree = "<group>"; };
-		181EE5D12B234E540043817F /* IntroduceViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
-		181EE5D32B234E540043817F /* MeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeViewController.swift; sourceTree = "<group>"; };
-		181EE5D42B234E540043817F /* StyleSelectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleSelectionViewController.swift; sourceTree = "<group>"; };
-		181EE5D52B234E540043817F /* NEAboutWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEAboutWebViewController.swift; sourceTree = "<group>"; };
-		181EE5D72B234E540043817F /* InputPersonInfoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
-		181EE5D82B234E540043817F /* MineSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
-		181EE5D92B234E540043817F /* MessageRemindViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRemindViewController.swift; sourceTree = "<group>"; };
-		181EE5DA2B234E540043817F /* NENodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
-		181EE5DB2B234E540043817F /* PersonInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
-		181EE5DC2B234E540043817F /* ConfigTestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigTestViewController.swift; sourceTree = "<group>"; };
-		181EE5DD2B234E540043817F /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
-		181EE5DF2B234E540043817F /* MineTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
-		181EE5E02B234E540043817F /* StyleSelectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleSelectionCell.swift; sourceTree = "<group>"; };
-		181EE5E12B234E540043817F /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
-		181EE5E32B234E540043817F /* CustomTeamSettingRightCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingRightCustomCell.swift; sourceTree = "<group>"; };
-		181EE5E42B234E540043817F /* CustomTeamSettingSubtitleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSubtitleCell.swift; sourceTree = "<group>"; };
-		181EE5E52B234E540043817F /* CustomTeamArrowSettingCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamArrowSettingCell.swift; sourceTree = "<group>"; };
-		181EE5E62B234E540043817F /* CustomTeamSettingHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingHeaderCell.swift; sourceTree = "<group>"; };
-		181EE5E72B234E540043817F /* CustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
-		181EE5E82B234E540043817F /* NodeSelectCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
-		181EE5E92B234E540043817F /* VersionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
 		18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFunChatViewController.swift; sourceTree = "<group>"; };
 		18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNormalChatViewController.swift; sourceTree = "<group>"; };
+		18CF8A382D01B312000CF406 /* CustomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomConfig.swift; sourceTree = "<group>"; };
+		18CF8A392D01B312000CF406 /* CustomContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomContactViewController.swift; sourceTree = "<group>"; };
+		18CF8A3E2D02ECA4000CF406 /* IMSDKConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMSDKConfigManager.swift; sourceTree = "<group>"; };
 		39E9E27628D87E9800A11820 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		39E9E27828D87EA000A11820 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B3B9BDB277AFEE50091A74E /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3B9BE5277AFEE50091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4B3B9BEA277AFEE70091A74E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
-		B974281E00A6C11F3A28F391 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F16039729C125EE6BBAA1AC /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FB336F5075CD69B99A5A5B8 /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
 		DD141DC82A56ABFD0091318F /* Constant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		DD141DC92A56ABFD0091318F /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DD141DCB2A56ABFD0091318F /* NENavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NENavigationController.swift; sourceTree = "<group>"; };
@@ -122,6 +143,7 @@
 		DD141DD02A56ABFD0091318F /* NETabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NETabBarController.swift; sourceTree = "<group>"; };
 		DD141DD12A56ABFD0091318F /* AppKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKey.swift; sourceTree = "<group>"; };
 		DDCE2A642A56BDB800E17751 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F332C2FB5517520CECC0A96D /* Pods-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.debug.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,16 +151,98 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				962DCBBD1E7AEAFEF8DF27AE /* Pods_app.framework in Frameworks */,
+				95EB96916EE991860F78EEB6 /* Pods_app.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		180E81B82D07D9F600151DD8 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				180E81AB2D07D9F600151DD8 /* IMSDKConfigViewController.swift */,
+				180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */,
+				180E81AD2D07D9F600151DD8 /* IntroduceBrandViewController.swift */,
+				180E81AE2D07D9F600151DD8 /* LanguageViewController.swift */,
+				180E81AF2D07D9F600151DD8 /* MessageRemindViewController.swift */,
+				180E81B02D07D9F600151DD8 /* MeViewController.swift */,
+				180E81B12D07D9F600151DD8 /* MineSettingViewController.swift */,
+				180E81B22D07D9F600151DD8 /* NEAboutWebViewController.swift */,
+				180E81B42D07D9F600151DD8 /* NENodeViewController.swift */,
+				180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */,
+				180E81B62D07D9F600151DD8 /* PocLoginController.swift */,
+				180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		180E81BA2D07D9F600151DD8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				180E81B92D07D9F600151DD8 /* CustomSettingCellModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		180E81C32D07D9F600151DD8 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				180E81BB2D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift */,
+				180E81BC2D07D9F600151DD8 /* CustomSettingInputCell.swift */,
+				180E81BD2D07D9F600151DD8 /* CustomSettingTextviewCell.swift */,
+				180E81BE2D07D9F600151DD8 /* CustomTeamArrowSettingCell.swift */,
+				180E81BF2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift */,
+				180E81C02D07D9F600151DD8 /* CustomTeamSettingRightCustomCell.swift */,
+				180E81C12D07D9F600151DD8 /* CustomTeamSettingSubtitleCell.swift */,
+				180E81C22D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		180E81C92D07D9F600151DD8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				180E81C32D07D9F600151DD8 /* Theme */,
+				180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */,
+				180E81C52D07D9F600151DD8 /* MineTableViewCell.swift */,
+				180E81C62D07D9F600151DD8 /* NodeSelectCell.swift */,
+				180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */,
+				180E81C82D07D9F600151DD8 /* VersionCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		180E81D12D07D9F600151DD8 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				180E81CA2D07D9F600151DD8 /* IntroduceViewModel.swift */,
+				180E81CB2D07D9F600151DD8 /* LanguageViewModel.swift */,
+				180E81CC2D07D9F600151DD8 /* MessageRemindViewModel.swift */,
+				180E81CD2D07D9F600151DD8 /* MeViewModel.swift */,
+				180E81CE2D07D9F600151DD8 /* MineSettingViewModel.swift */,
+				180E81CF2D07D9F600151DD8 /* NodeViewModel.swift */,
+				180E81D02D07D9F600151DD8 /* PersonInfoViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		180E81D22D07D9F600151DD8 /* Mine */ = {
+			isa = PBXGroup;
+			children = (
+				180E81B82D07D9F600151DD8 /* Controller */,
+				180E81BA2D07D9F600151DD8 /* Model */,
+				180E81C92D07D9F600151DD8 /* View */,
+				180E81D12D07D9F600151DD8 /* ViewModel */,
+			);
+			path = Mine;
+			sourceTree = "<group>";
+		};
 		181EE57D2B234C510043817F /* Custom */ = {
 			isa = PBXGroup;
 			children = (
+				18CF8A382D01B312000CF406 /* CustomConfig.swift */,
+				18CF8A392D01B312000CF406 /* CustomContactViewController.swift */,
 				18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */,
 				18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */,
 				181EE57E2B234C510043817F /* CustomView.swift */,
@@ -151,68 +255,20 @@
 			path = Custom;
 			sourceTree = "<group>";
 		};
-		181EE5CB2B234E540043817F /* Mine */ = {
+		18CF8A3F2D02ECA4000CF406 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
-				181EE5CC2B234E540043817F /* ViewModel */,
-				181EE5D22B234E540043817F /* Controller */,
-				181EE5DE2B234E540043817F /* View */,
+				18CF8A3E2D02ECA4000CF406 /* IMSDKConfigManager.swift */,
 			);
-			path = Mine;
+			path = Manager;
 			sourceTree = "<group>";
 		};
-		181EE5CC2B234E540043817F /* ViewModel */ = {
+		1C1908DF20E10D353E7ABBE6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				181EE5CD2B234E540043817F /* NodeViewModel.swift */,
-				181EE5CE2B234E540043817F /* MineSettingViewModel.swift */,
-				181EE5CF2B234E540043817F /* PersonInfoViewModel.swift */,
-				181EE5D02B234E540043817F /* MessageRemindViewModel.swift */,
-				181EE5D12B234E540043817F /* IntroduceViewModel.swift */,
+				4F16039729C125EE6BBAA1AC /* Pods_app.framework */,
 			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		181EE5D22B234E540043817F /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-				181EE5D32B234E540043817F /* MeViewController.swift */,
-				181EE5D42B234E540043817F /* StyleSelectionViewController.swift */,
-				181EE5D52B234E540043817F /* NEAboutWebViewController.swift */,
-				181EE5D72B234E540043817F /* InputPersonInfoController.swift */,
-				181EE5D82B234E540043817F /* MineSettingViewController.swift */,
-				181EE5D92B234E540043817F /* MessageRemindViewController.swift */,
-				181EE5DA2B234E540043817F /* NENodeViewController.swift */,
-				181EE5DB2B234E540043817F /* PersonInfoViewController.swift */,
-				181EE5DC2B234E540043817F /* ConfigTestViewController.swift */,
-				181EE5DD2B234E540043817F /* IntroduceBrandViewController.swift */,
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
-		181EE5DE2B234E540043817F /* View */ = {
-			isa = PBXGroup;
-			children = (
-				181EE5DF2B234E540043817F /* MineTableViewCell.swift */,
-				181EE5E02B234E540043817F /* StyleSelectionCell.swift */,
-				181EE5E12B234E540043817F /* BirthdayDatePickerView.swift */,
-				181EE5E22B234E540043817F /* Theme */,
-				181EE5E82B234E540043817F /* NodeSelectCell.swift */,
-				181EE5E92B234E540043817F /* VersionCell.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		181EE5E22B234E540043817F /* Theme */ = {
-			isa = PBXGroup;
-			children = (
-				181EE5E32B234E540043817F /* CustomTeamSettingRightCustomCell.swift */,
-				181EE5E42B234E540043817F /* CustomTeamSettingSubtitleCell.swift */,
-				181EE5E52B234E540043817F /* CustomTeamArrowSettingCell.swift */,
-				181EE5E62B234E540043817F /* CustomTeamSettingHeaderCell.swift */,
-				181EE5E72B234E540043817F /* CustomTeamSettingSwitchCell.swift */,
-			);
-			path = Theme;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		4B3B9BD2277AFEE50091A74E = {
@@ -221,7 +277,7 @@
 				4B3B9BDD277AFEE50091A74E /* app */,
 				4B3B9BDC277AFEE50091A74E /* Products */,
 				BF083551FB71DB2F668919FB /* Pods */,
-				C8F542C0762421B5D64218AA /* Frameworks */,
+				1C1908DF20E10D353E7ABBE6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -236,7 +292,8 @@
 		4B3B9BDD277AFEE50091A74E /* app */ = {
 			isa = PBXGroup;
 			children = (
-				181EE5CB2B234E540043817F /* Mine */,
+				180E81D22D07D9F600151DD8 /* Mine */,
+				18CF8A3F2D02ECA4000CF406 /* Manager */,
 				181EE57D2B234C510043817F /* Custom */,
 				DDCE2A642A56BDB800E17751 /* Assets.xcassets */,
 				DD141DC62A56ABFD0091318F /* Main */,
@@ -251,18 +308,10 @@
 		BF083551FB71DB2F668919FB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */,
-				7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */,
+				F332C2FB5517520CECC0A96D /* Pods-app.debug.xcconfig */,
+				6FB336F5075CD69B99A5A5B8 /* Pods-app.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		C8F542C0762421B5D64218AA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B974281E00A6C11F3A28F391 /* Pods_app.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		DD141DC62A56ABFD0091318F /* Main */ = {
@@ -286,13 +335,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B3B9BEF277AFEE70091A74E /* Build configuration list for PBXNativeTarget "app" */;
 			buildPhases = (
-				A560DA587DC897F27FDFE32F /* [CP] Check Pods Manifest.lock */,
+				4AEF8AC39052B921417FC761 /* [CP] Check Pods Manifest.lock */,
 				4B3B9BD7277AFEE50091A74E /* Sources */,
 				4B3B9BD8277AFEE50091A74E /* Frameworks */,
 				4B3B9BD9277AFEE50091A74E /* Resources */,
 				39722F9327998A14007BFC8B /* Embed Frameworks */,
-				264CA3266150FDF885781FE5 /* [CP] Embed Pods Frameworks */,
-				0707A69D252FA43BDDD73B34 /* [CP] Copy Pods Resources */,
+				CFB138DC8908FA678AE15683 /* [CP] Embed Pods Frameworks */,
+				DABAE299575A2119AA01296D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -354,41 +403,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0707A69D252FA43BDDD73B34 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		264CA3266150FDF885781FE5 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A560DA587DC897F27FDFE32F /* [CP] Check Pods Manifest.lock */ = {
+		4AEF8AC39052B921417FC761 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -410,6 +425,40 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		CFB138DC8908FA678AE15683 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DABAE299575A2119AA01296D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -417,45 +466,56 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				181EE5EA2B234E540043817F /* NodeViewModel.swift in Sources */,
-				181EE6032B234E540043817F /* VersionCell.swift in Sources */,
 				181EE58D2B234C510043817F /* CustomContactTableViewCell.swift in Sources */,
-				181EE5F82B234E540043817F /* ConfigTestViewController.swift in Sources */,
-				181EE5ED2B234E540043817F /* MessageRemindViewModel.swift in Sources */,
 				181EE5872B234C510043817F /* CustomView.swift in Sources */,
 				181EE58F2B234C510043817F /* CustomConversationListCell.swift in Sources */,
-				181EE5F32B234E540043817F /* InputPersonInfoController.swift in Sources */,
-				181EE5FC2B234E540043817F /* BirthdayDatePickerView.swift in Sources */,
 				181EE5882B234C510043817F /* CustomP2PChatViewController.swift in Sources */,
-				181EE5F12B234E540043817F /* NEAboutWebViewController.swift in Sources */,
 				181EE58E2B234C510043817F /* CustomChatCell.swift in Sources */,
-				181EE5F02B234E540043817F /* StyleSelectionViewController.swift in Sources */,
-				181EE5F42B234E540043817F /* MineSettingViewController.swift in Sources */,
+				180E81D32D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift in Sources */,
+				180E81D42D07D9F600151DD8 /* CustomSettingCellModel.swift in Sources */,
+				180E81D52D07D9F600151DD8 /* BirthdayDatePickerView.swift in Sources */,
+				180E81D62D07D9F600151DD8 /* LanguageViewController.swift in Sources */,
+				180E81D72D07D9F600151DD8 /* CustomTeamSettingSubtitleCell.swift in Sources */,
+				180E81D82D07D9F600151DD8 /* CustomSettingTextviewCell.swift in Sources */,
+				180E81D92D07D9F600151DD8 /* CustomTeamArrowSettingCell.swift in Sources */,
+				180E81DA2D07D9F600151DD8 /* CustomTeamSettingRightCustomCell.swift in Sources */,
+				180E81DB2D07D9F600151DD8 /* NodeSelectCell.swift in Sources */,
+				180E81DC2D07D9F600151DD8 /* MineSettingViewController.swift in Sources */,
+				180E81DD2D07D9F600151DD8 /* InputPersonInfoController.swift in Sources */,
+				180E81DE2D07D9F600151DD8 /* IntroduceBrandViewController.swift in Sources */,
+				180E81DF2D07D9F600151DD8 /* MineTableViewCell.swift in Sources */,
+				180E81E02D07D9F600151DD8 /* MineSettingViewModel.swift in Sources */,
+				180E81E12D07D9F600151DD8 /* MessageRemindViewModel.swift in Sources */,
+				180E81E22D07D9F600151DD8 /* NodeViewModel.swift in Sources */,
+				180E81E32D07D9F600151DD8 /* PocLoginController.swift in Sources */,
+				180E81E42D07D9F600151DD8 /* NENodeViewController.swift in Sources */,
+				180E81E52D07D9F600151DD8 /* VersionCell.swift in Sources */,
+				180E81E62D07D9F600151DD8 /* MessageRemindViewController.swift in Sources */,
+				180E81E72D07D9F600151DD8 /* NEAboutWebViewController.swift in Sources */,
+				180E81E92D07D9F600151DD8 /* MeViewController.swift in Sources */,
+				180E81EA2D07D9F600151DD8 /* IMSDKConfigViewController.swift in Sources */,
+				180E81EB2D07D9F600151DD8 /* CustomSettingInputCell.swift in Sources */,
+				180E81EC2D07D9F600151DD8 /* IntroduceViewModel.swift in Sources */,
+				180E81ED2D07D9F600151DD8 /* PersonInfoViewModel.swift in Sources */,
+				180E81EE2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift in Sources */,
+				180E81F02D07D9F600151DD8 /* StyleSelectionViewController.swift in Sources */,
+				180E81F12D07D9F600151DD8 /* StyleSelectionCell.swift in Sources */,
+				180E81F22D07D9F600151DD8 /* LanguageViewModel.swift in Sources */,
+				180E81F32D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift in Sources */,
+				180E81F42D07D9F600151DD8 /* PersonInfoViewController.swift in Sources */,
+				180E81F52D07D9F600151DD8 /* MeViewModel.swift in Sources */,
 				DD141DFD2A56ABFE0091318F /* ViewController.swift in Sources */,
 				DD141DFF2A56ABFE0091318F /* NENavigationController.swift in Sources */,
-				181EE5FF2B234E540043817F /* CustomTeamArrowSettingCell.swift in Sources */,
-				181EE6002B234E540043817F /* CustomTeamSettingHeaderCell.swift in Sources */,
 				DD141E032A56ABFE0091318F /* AppDelegate.swift in Sources */,
 				181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */,
-				181EE5F92B234E540043817F /* IntroduceBrandViewController.swift in Sources */,
-				181EE5F62B234E540043817F /* NENodeViewController.swift in Sources */,
-				181EE5FB2B234E540043817F /* StyleSelectionCell.swift in Sources */,
-				181EE5EB2B234E540043817F /* MineSettingViewModel.swift in Sources */,
 				DD141E052A56ABFE0091318F /* AppKey.swift in Sources */,
-				181EE5EF2B234E540043817F /* MeViewController.swift in Sources */,
-				181EE5FE2B234E540043817F /* CustomTeamSettingSubtitleCell.swift in Sources */,
-				181EE6022B234E540043817F /* NodeSelectCell.swift in Sources */,
+				18CF8A3B2D01B312000CF406 /* CustomContactViewController.swift in Sources */,
+				18CF8A3C2D01B312000CF406 /* CustomConfig.swift in Sources */,
 				DD141E012A56ABFE0091318F /* UIStyleManager.swift in Sources */,
-				181EE5EE2B234E540043817F /* IntroduceViewModel.swift in Sources */,
-				181EE5F72B234E540043817F /* PersonInfoViewController.swift in Sources */,
+				18CF8A402D02ECA5000CF406 /* IMSDKConfigManager.swift in Sources */,
 				DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */,
 				DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */,
-				181EE6012B234E540043817F /* CustomTeamSettingSwitchCell.swift in Sources */,
 				18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */,
-				181EE5F52B234E540043817F /* MessageRemindViewController.swift in Sources */,
-				181EE5FD2B234E540043817F /* CustomTeamSettingRightCustomCell.swift in Sources */,
-				181EE5FA2B234E540043817F /* MineTableViewCell.swift in Sources */,
-				181EE5EC2B234E540043817F /* PersonInfoViewModel.swift in Sources */,
 				18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -617,7 +677,7 @@
 		};
 		4B3B9BF0277AFEE70091A74E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 16DC7E2FA55766E184C10FEA /* Pods-app.debug.xcconfig */;
+			baseConfigurationReference = F332C2FB5517520CECC0A96D /* Pods-app.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -666,7 +726,7 @@
 		};
 		4B3B9BF1277AFEE70091A74E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B8E90D94B6F032B6A80C9FE /* Pods-app.release.xcconfig */;
+			baseConfigurationReference = 6FB336F5075CD69B99A5A5B8 /* Pods-app.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

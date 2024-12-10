@@ -74,6 +74,10 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
         // 未找到用户信息信息记录
         var noFindUserSet = Set<String>()
         for message in messages ?? [] {
+          if let createtime = message.imMessage?.createTime {
+            message.time = String
+              .stringFromDate(date: Date(timeIntervalSince1970: createtime))
+          }
           if let uid = ChatMessageHelper.getSenderId(message.imMessage) {
             if let member = infoDic[uid] {
               message.avatar = member.nimUser?.user?.avatar

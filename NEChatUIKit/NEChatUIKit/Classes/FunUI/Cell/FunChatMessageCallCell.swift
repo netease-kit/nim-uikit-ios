@@ -17,12 +17,8 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     contentLabelLeft.translatesAutoresizingMaskIntoConstraints = false
     contentLabelLeft.isEnabled = false
     contentLabelLeft.numberOfLines = 0
@@ -39,7 +35,8 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func commonUIRight() {
+  override open func commonUIRight() {
+    super.commonUIRight()
     contentLabelRight.translatesAutoresizingMaskIntoConstraints = false
     contentLabelRight.isEnabled = false
     contentLabelRight.numberOfLines = 0

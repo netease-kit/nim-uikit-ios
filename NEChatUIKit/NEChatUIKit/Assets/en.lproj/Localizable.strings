@@ -4,29 +4,23 @@
 // found in the LICENSE file.
 
 //MAKR：message
-"send_picture"="get a picture";
-"send_voice"="get a audio";
-"send_video"="get a video";
-"send_location"="get a location";
-"send_video"="get a file";
-"press_speak"="Hold to talk";
-"send_after_let_go"="Release to send, Slide to the blank area to cancel";
-"record_too_short"="Time is too short";
+"press_speak"="Hold to Talk";
+"record_faild"="Whoops! Please retry.";
+"send_after_let_go"="Release to send";
+"record_too_short"="Message too short";
 "no_microphone_permission"="no micro permission";
 "choose"="select";
-"select_from_album"="album";
-"select_from_icloud"="icloud";
-"editing"="typing";
-"downloading"="downloading...";
-"read"="read";
-"unread"="unread";
+"select_from_icloud"="iCloud";
+"editing"="Typing";
+"downloading"="Downloading...";
+"read"="Read by";
+"unread"="Unread by";
 
 
 //MARK: tips
 //MARK: team
 "invite"="Invite";
-"humans"="member";
-"enter"="enter";
+"enter"="join";
 "unknown_system_message"="Unknown message";
 "You"="you";
 "discussion_group"="group";
@@ -35,150 +29,144 @@
 "dissolve"="dissolved";
 "kick"="将 ";
 "out"="remove";
-"has_updated" = "update";
+"has_updated" = "update ";
 "to" = "to ";
-"only_team_owner" = "Group owners and administrators";
+"only_team_owner" = "Owner & Admin";
 "everyone" = "Everyone";
 
 "team_name" = "Group Name";
-"team_intro" = "Group Introduction";
+"team_intro" = "Description";
 "team_anouncement" = "Notice";
 "team_avatar" = "Group Avatar";
-"team_join_mode" = "join mode";
-"team_be_invited_mode" = "invite mode";
+"team_join_mode" = "Join Mode";
+"team_permission" = "Team Permisson";
+"team_be_invited_mode" = "Invite Mode";
 "team_be_invited_permission" = "Invite Permission";
 "team_be_invited_author" = "BeInvite Permission";
-"team_update_info_permission" = "Update info permission";
+"team_update_info_permission" = "Update Info Permission";
 "team_update_client_custom"="Update Permission";
 "team_at_permission"="@All Permission update to ";
-"team_top_permission"="Top message permission update to ";
+"team_top_permission"="Top Message Permission update to ";
 
-"team_custom_info" = "custom info";
+"team_custom_info" = "Custom Info";
 "not_mute" = "unmute";
-"mute" = "mute";
+"mute" = "Mute";
 "team_has_been_removed" = "This group is disbanded";
 "team_has_been_quit" = "You have been removed";
 "team_has_quit" = "Group chat has exited";
 "join"="joined";
-"pass"="Passed";
+"pass"="passed";
 "leave"="quit";
 "transfer"="Transferred the group leader identity to";
 "added_manager"="add to be Group administrator";
 "removed_manager"="Group administrator identity revoked";
 "accept"="Accept the group invitation from";
-"team_mute"=" Group owner set muting";
-"team_all_mute"="Mute all";
-"team_all_no_mute"="Unmute";
+"team_mute"="Mute";
+"team_all_mute"="Mute everyone";
+"team_all_no_mute"="Unmute all";
 
-"pin_text_P2P"="pinned this message";
-"pin_text_team"="pinned this message";
+"pin_text"="Pinned by ";
 
-"top_message"="top message";
-"untop_message"="untop message";
+"top_message"="Top Message";
+"untop_message"="Untop Message";
 
-"chat_setting"="chat setting";
-"session_set_top"="sticky to top";
-"message_remind"="open notification";
+"chat_setting"="Settings";
+"session_set_top"="Sticky on Top";
+"message_remind"="Notification";
 
 "open_soon"="Not open";
-"no_permission_tip"="No permission";
+"no_permission_tip"="No Permission";
 
 //MARK: operation
-"operation_copy"="copy";
-"operation_replay"="reply";
-"operation_forward"="forward";
-"operation_pin"="pin";
-"operation_cancel_pin"="unpin";
-"operation_delete_collection"="delete collection";
-"operation_select"="multi-select";
-"operation_collection"="collection";
-"operation_top"="top";
-"operation_untop"="untop";
-"operation_delete"="delete";
-"operation_recall"="recall";
-"withdrew_message" = "withdrew this message";
-"message_reedit" = "reedit";
-"message_revoke_confirm" = "Wether to recall this message";
-"message_delete_confirm"="Wether to delete this message";
-"collection_delete_confirm"="Wether to delete this collection";
-"delete_collection_success"="delete success";
+"operation_copy"="Copy";
+"operation_replay"="Reply";
+"operation_forward"="Forward";
+"operation_pin"="Pin";
+"operation_cancel_pin"="Unpin";
+"operation_delete_collection"="Delete Favorite";
+"operation_select"="multi-Select";
+"operation_collection"="Favorite";
+"operation_top"="Top";
+"operation_untop"="Untop";
+"operation_delete"="Delete";
+"operation_recall"="Recall";
+"operation_to_text"="Convert to Text";
+"operation_to_text_failed"="Convert to Text Failed";
+"withdrew_message" = " withdrew this message";
+"message_reedit" = "Edit";
+"message_revoke_confirm" = "Whether to recall this message";
+"message_delete_confirm"="Whether to delete this message";
+"collection_delete_confirm"="Remove from favorite?";
+"delete_collection_success"="Deleted";
 
 
 //MARK: toast
-"collection_success"="Favorite";
+"collection_success"="Bookmarked";
 "no_permession"="No Permission";
-"msg_reply"="reply";
-"msg_image"="picture message";
-"msg_audio"="audio message";
-"msg_video"="video message";
-"msg_file"="file message";
-"msg_location"="location message";
-"msg_rtc_audio"="audio call message";
-"msg_rtc_video"="video call message";
-"msg_rtc_call"="RTC call message";
-"msg_custom"="custom message";
-"msg_unknown"="Unknown message type";
-"message_read"="Reading Status";
-"message_all_unread"="all unread";
-"user_select"="notification";
-"user_select_all"="all";
+"msg_image"="[Photo]";
+"msg_audio"="[Voice]";
+"msg_video"="[Video]";
+"msg_file"="[File]";
+"msg_location"="[Location]";
+"msg_rtc_audio"="[Voice Call]";
+"msg_rtc_video"="[Video Call]";
+"msg_rtc_call"="[Call]";
+"msg_custom"="[Custom Message]";
+"msg_unknown"="[Unknown Message]";
+"message_read"="Read Status";
+"message_all_unread"="Unread by all members";
+"user_select"="Select Notification";
+"user_select_all"="All";
 
-"contact_user"="Forward to contacts";
+"contact_user"="Forward to friend";
 "team"="Forward to group";
-"cancel"="cancel";
-"send_to"="send to";
-"send"="send";
+"send_to"="Send to";
+"send"="Send";
 "session_record"="session record";
 
-"collection_message"=" collection message";
-
-
-"mdhm"="MM.dd HH:mm";
-"ymdhm"="yyyy.MM.dd HH:mm";
+"collection_message"=" Favorite Message";
 
 "chat_takePicture"="Camera";
 "chat_photo"="Album";
-"chat_rtc"="Audio and video call";
+"chat_rtc"="Call";
 "chat_location"="Location";
 "chat_file"="File";
-"gaode_map"="高德 Map";
-"tencent_map"="腾讯 Map";
+"gaode_map"="Gaode Map";
+"tencent_map"="Tencent Map";
 "search_place"="Search Location";
-"search_cancel"="cancel";
-"distance_inner"="内";
-"search_result_empty"="Not found";
+"distance_inner"="inside";
+"search_result_empty"="Not Found";
 "no_map_plugin"="Map module not integrated";
 "location_not_auth"="The geographic location is not authorized. Please open it in the settings";
-"fileSize_over_limit"="Oops！File size limit over %@M.";
+"fileSize_over_limit"="File size exceeded %@MB.";
 
-"message_recalled"="message recalled";
+"message_recalled"="Message recalled";
 
-"video_call"="Video call";
-"audio_call"="Audio call";
+"video_call"="Video Call";
+"audio_call"="Voice Call";
 
-"call_complete"="Talk time";
-"call_canceled"="Call cancellation";
-"call_rejected"="Rejected";
-"call_timeout"="Unanswered";
-"call_busy"="The busy line is not answered";
+"call_complete"="Call";
+"call_canceled"="Canceled";
+"call_rejected"="Declined";
+"call_timeout"="Time Out";
+"call_busy"="Line busy";
 
-"editable_time_expired"="Editable time has expired";
-"ravokable_time_expired"="Ravokable time has expired";
-"ravoked_failed"="Ravoked failed";
-"message_not_found"="This message is gone";
+"editable_time_expired"="Time Out";
+"ravokable_time_expired"="Recall time expired";
+"ravoked_failed"="Message not recalled";
+"message_not_found"="The message was removed.";
 
 "unkonw_pin_message"="unkonw message type";
 "pin_jump_detail"="jump to details";
 "cancel_pin_success"="Unpin";
-"no_pin_message"="No pin message";
-"no_collection_message"="No collection message";
+"no_pin_message"="Pin Message Empty";
+"no_collection_message"="No Favorite Message";
 
 "you_were_mentioned"="[You were mentioned]";
 // MARK: error toast
-"failed_operation"="Failed Operation";
 "team_not_exist"="team not exist";
 "unpin_failed"="Unpin failed";
-"pin_limit_exceeded"="The number of pin has reached the upper limit";
+"pin_limit_exceeded"="Number of pin reaches the limit.";
 
 "fun_hold_to_talk"="Hold to talk";
 
@@ -191,42 +179,42 @@
 // MARK: Fun UI
 "fun_chat_input_placeholder"="Enter what you want to say...";
 
-"no_location"="Please select the location you want to send";
+"no_location"="No location information";
 
 // 多选
-"select_multi"="select_multi";
-"select_per_item"="select_per_item";
-"chat_history"="chat history";
+"select_multi"="Combin forward";
+"select_per_item"="One-by-one forward";
+"chat_history"="Chat History";
 "chat_history_by"="`s messages";
-"leave_message"="leave message";
-"exist_invalid"="There are messages cannot be forwarded. Can it be removed and sent?";
+"leave_message"="Leave a message";
+"exist_invalid"="Some messages can\'t be forwarded. Remove them before retry?";
 "forward_failed"="Eror, forwarding failed";
-"multiForward_open_failed"="Failed to obtain information";
+"multiForward_open_failed"="Information not retrieved.";
 "file_check_failed"="File verification failed";
 "per_item_forward_limit"="Forward one by one to limit %d messages";
 "selete_messages_limit"="Delete limits %d messages";
-"multiForward_forward_limit"="Combined forwarding limits %d messages";
-"exception_description"="Exception description";
+"multiForward_forward_limit"="Combin forwarding limits %d messages";
+"exception_description"="Exception details";
 
-"multiple_line_placleholder"="Please enter title";
+"multiple_line_placleholder"="Enter title";
 "null_message_not_support"="Empty messages are not allowed to be sent";
 
-"black_list_tip"="Opposite has blocked you and the message cannot be sent.";
-"disable_stranger_call"="Cannot make audio or video calls to someone who is not in your friends list.";
+"black_list_tip"="You are blocked. Message not sent.";
+"disable_stranger_call"="Not a contact, call failed.";
 
 "chat_collection_p2p_tip"="From Chat with %@";
 
 "chat_collection_team_tip"="From %@ ";
 
 "collection_limit"="The number of favorites has reached the limit value";
-"language_title"="Translate input content into";
+"language_title"="Translate to";
 
 "translate_use"="Use";
 "translate_sure"="AI Translate";
 "ai_translating"="AI Translating...";
-"translate_default"="Translate as";
-"format_not_supported"="This format is not supported.";
+"translate_default"="Translate to";
+"format_not_supported"="Invalid Type";
 "chat_translate"="Translate";
-"ai_user_pin_top"="Pin to top";
-"request_exception" = "Request Exception";
-"ai_request_ing" = "Model request responsing";
+"ai_user_pin_top"="PIN";
+"request_exception" = "AI error";
+"ai_request_ing" = "Thinking…";

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEAISearchKit'
-  s.version          = '1.0.3'
+  s.version          = '1.0.4'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -38,7 +38,6 @@ TODO: Add long description of the pod here.
   s.resource = 'NEAISearchKit/Assets/**/*'
 
   s.dependency 'NEChatKit'
-  s.dependency 'NECommonUIKit', '9.7.3'
-  s.dependency 'lottie-ios','4.4.0'
+  s.dependency 'NECommonUIKit', '9.7.4'
 
 end

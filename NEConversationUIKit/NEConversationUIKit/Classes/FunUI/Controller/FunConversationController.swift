@@ -41,15 +41,29 @@ open class FunConversationController: NEBaseConversationController {
     view.backgroundColor = .funConversationBackgroundColor
     navigationView.backgroundColor = .funConversationBackgroundColor
     navigationView.titleBarBottomLine.isHidden = true
+    changeLanguage()
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
 
   override open func didMove(toParent parent: UIViewController?) {
     super.didMove(toParent: parent)
-    if let searchViewGestures = searchView.gestureRecognizers {
-      for gesture in searchViewGestures {
-        searchView.removeGestureRecognizer(gesture)
+    if parent == nil {
+      if let searchViewGestures = searchView.gestureRecognizers {
+        for gesture in searchViewGestures {
+          searchView.removeGestureRecognizer(gesture)
+        }
       }
+      NotificationCenter.default.removeObserver(self)
     }
+  }
+
+  func changeLanguage() {
+    requestData()
+    initSystemNav()
+    popListView = FunPopListView()
+    searchView.searchButton.setTitle(commonLocalizable("search"), for: .normal)
+    brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
+    securityWarningView.warningLabel.text = localizable("security_warning")
   }
 
   override func initSystemNav() {
@@ -62,6 +76,7 @@ open class FunConversationController: NEBaseConversationController {
 
     navigationItem.rightBarButtonItems = [addBarItem]
 
+    navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
     navigationView.searchBtn.isHidden = true
     if !ConversationUIConfig.shared.showTitleBarRightIcon {
       navigationItem.rightBarButtonItems = []
@@ -83,8 +98,6 @@ open class FunConversationController: NEBaseConversationController {
       searchView.rightAnchor.constraint(equalTo: bodyTopView.rightAnchor, constant: -8),
       searchView.heightAnchor.constraint(equalToConstant: 36),
     ])
-
-    popListView = FunPopListView()
 
     tableView.rowHeight = 72
     tableView.backgroundColor = .funConversationBackgroundColor

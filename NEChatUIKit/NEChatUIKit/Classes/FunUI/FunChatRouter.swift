@@ -56,8 +56,14 @@ public extension ChatRouter {
       let groupVC = FunTeamChatViewController(conversationId: conversationId, anchor: anchor)
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
-          nav?.viewControllers[i] = groupVC
-          nav?.popToViewController(groupVC, animated: true)
+          if vc.isKind(of: FunTeamChatViewController.self) {
+            (vc as? ChatViewController)?.viewModel.anchor = anchor
+            (vc as? ChatViewController)?.loadData()
+            nav?.popToViewController(vc, animated: true)
+          } else {
+            nav?.viewControllers[i] = groupVC
+            nav?.popToViewController(groupVC, animated: true)
+          }
           return
         }
       }

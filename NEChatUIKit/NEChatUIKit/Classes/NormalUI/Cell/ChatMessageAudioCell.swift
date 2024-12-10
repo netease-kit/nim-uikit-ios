@@ -10,48 +10,54 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   public var messageId: String?
   public var isPlaying: Bool = false
 
-  public var audioImageViewLeft = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
-  public var timeLabelLeft = UILabel()
+  public lazy var audioImageViewLeft: UIImageView = {
+    let view = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
+    view.contentMode = .center
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.accessibilityIdentifier = "id.animation"
+    return view
+  }()
 
-  public var audioImageViewRight = UIImageView(image: UIImage.ne_imageNamed(name: "audio_play"))
-  public var timeLabelRight = UILabel()
+  public lazy var timeLabelLeft: UILabel = {
+    let label = UILabel()
+    label.font = UIFont.systemFont(ofSize: 14)
+    label.textColor = UIColor.ne_darkText
+    label.textAlignment = .left
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.time"
+    return label
+  }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
-  }
+  public lazy var contentLabelLeft: UILabel = {
+    let label = UILabel()
+    label.isHidden = true
+    label.font = messageTextFont
+    label.textColor = UIColor.ne_darkText
+    label.textAlignment = .justified
+    label.numberOfLines = 0
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.voiceToText"
+    return label
+  }()
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
+  public lazy var backViewLeft: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
-    audioImageViewLeft.contentMode = .center
-    audioImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
-    audioImageViewLeft.accessibilityIdentifier = "id.animation"
-    bubbleImageLeft.addSubview(audioImageViewLeft)
+    view.addSubview(audioImageViewLeft)
     NSLayoutConstraint.activate([
-      audioImageViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 16),
-      audioImageViewLeft.centerYAnchor.constraint(equalTo: bubbleImageLeft.centerYAnchor),
+      audioImageViewLeft.leftAnchor.constraint(equalTo: view.leftAnchor, constant: chat_cell_margin),
+      audioImageViewLeft.topAnchor.constraint(equalTo: view.topAnchor, constant: 6),
       audioImageViewLeft.widthAnchor.constraint(equalToConstant: 28),
       audioImageViewLeft.heightAnchor.constraint(equalToConstant: 28),
     ])
 
-    timeLabelLeft.font = UIFont.systemFont(ofSize: 14)
-    timeLabelLeft.textColor = UIColor.ne_darkText
-    timeLabelLeft.textAlignment = .left
-    timeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    timeLabelLeft.accessibilityIdentifier = "id.time"
-    bubbleImageLeft.addSubview(timeLabelLeft)
+    view.addSubview(timeLabelLeft)
     NSLayoutConstraint.activate([
       timeLabelLeft.leftAnchor.constraint(equalTo: audioImageViewLeft.rightAnchor, constant: 12),
-      timeLabelLeft.centerYAnchor.constraint(equalTo: bubbleImageLeft.centerYAnchor),
-      timeLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -12),
+      timeLabelLeft.centerYAnchor.constraint(equalTo: audioImageViewLeft.centerYAnchor),
+      timeLabelLeft.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
       timeLabelLeft.heightAnchor.constraint(equalToConstant: 28),
     ])
     audioImageViewLeft.animationDuration = 1
@@ -60,29 +66,63 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
        let leftmage3 = UIImage.ne_imageNamed(name: "left_play_3") {
       audioImageViewLeft.animationImages = [leftImage1, leftmage2, leftmage3]
     }
-  }
 
-  open func commonUIRight() {
-    audioImageViewRight.contentMode = .center
-    audioImageViewRight.translatesAutoresizingMaskIntoConstraints = false
-    audioImageViewRight.accessibilityIdentifier = "id.animation"
-    bubbleImageRight.addSubview(audioImageViewRight)
+    view.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
-      audioImageViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -16),
-      audioImageViewRight.centerYAnchor.constraint(equalTo: bubbleImageRight.centerYAnchor),
+      contentLabelLeft.leftAnchor.constraint(equalTo: view.leftAnchor, constant: chat_cell_margin),
+      contentLabelLeft.topAnchor.constraint(equalTo: audioImageViewLeft.bottomAnchor, constant: 4),
+      contentLabelLeft.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -chat_cell_margin),
+    ])
+    return view
+  }()
+
+  public lazy var audioImageViewRight: UIImageView = {
+    let view = UIImageView(image: UIImage.ne_imageNamed(name: "audio_play"))
+    view.contentMode = .center
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.accessibilityIdentifier = "id.animation"
+    return view
+  }()
+
+  public lazy var timeLabelRight: UILabel = {
+    let label = UILabel()
+    label.font = UIFont.systemFont(ofSize: 14)
+    label.textColor = UIColor.ne_darkText
+    label.textAlignment = .right
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.time"
+    return label
+  }()
+
+  public lazy var contentLabelRight: UILabel = {
+    let label = UILabel()
+    label.isHidden = true
+    label.font = messageTextFont
+    label.textColor = UIColor.ne_darkText
+    label.textAlignment = .justified
+    label.numberOfLines = 0
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.accessibilityIdentifier = "id.voiceToText"
+    return label
+  }()
+
+  public lazy var backViewRight: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .clear
+
+    view.addSubview(audioImageViewRight)
+    NSLayoutConstraint.activate([
+      audioImageViewRight.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -chat_cell_margin),
+      audioImageViewRight.topAnchor.constraint(equalTo: view.topAnchor, constant: 6),
       audioImageViewRight.widthAnchor.constraint(equalToConstant: 28),
       audioImageViewRight.heightAnchor.constraint(equalToConstant: 28),
     ])
 
-    timeLabelRight.font = UIFont.systemFont(ofSize: 14)
-    timeLabelRight.textColor = UIColor.ne_darkText
-    timeLabelRight.textAlignment = .right
-    timeLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    timeLabelRight.accessibilityIdentifier = "id.time"
-    bubbleImageRight.addSubview(timeLabelRight)
+    view.addSubview(timeLabelRight)
     NSLayoutConstraint.activate([
       timeLabelRight.rightAnchor.constraint(equalTo: audioImageViewRight.leftAnchor, constant: -12),
-      timeLabelRight.centerYAnchor.constraint(equalTo: bubbleImageRight.centerYAnchor),
+      timeLabelRight.centerYAnchor.constraint(equalTo: audioImageViewRight.centerYAnchor),
       timeLabelRight.heightAnchor.constraint(equalToConstant: 28),
     ])
 
@@ -92,6 +132,44 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
        let image3 = UIImage.ne_imageNamed(name: "play_3") {
       audioImageViewRight.animationImages = [image1, image2, image3]
     }
+
+    view.addSubview(contentLabelRight)
+    NSLayoutConstraint.activate([
+      contentLabelRight.leftAnchor.constraint(equalTo: view.leftAnchor, constant: chat_cell_margin),
+      contentLabelRight.topAnchor.constraint(equalTo: audioImageViewRight.bottomAnchor, constant: 4),
+      contentLabelRight.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -chat_cell_margin),
+    ])
+    return view
+  }()
+
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func commonUILeft() {
+    super.commonUILeft()
+    bubbleImageLeft.addSubview(backViewLeft)
+    NSLayoutConstraint.activate([
+      backViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 0),
+      backViewLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: 0),
+      backViewLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: 0),
+      backViewLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 0),
+    ])
+  }
+
+  override open func commonUIRight() {
+    super.commonUIRight()
+    bubbleImageRight.addSubview(backViewRight)
+    NSLayoutConstraint.activate([
+      backViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 0),
+      backViewRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: 0),
+      backViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: 0),
+      backViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
+    ])
   }
 
   open func startAnimation(byRight: Bool) {
@@ -128,15 +206,30 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
-    super.setModel(model, isSend)
     if let m = model as? MessageAudioModel {
-      if isSend {
-        timeLabelRight.text = "\(m.duration)" + "s"
-      } else {
-        timeLabelLeft.text = "\(m.duration)" + "s"
-      }
+      contentModel = m
+      let timeLabel = isSend ? timeLabelRight : timeLabelLeft
+
+      timeLabel.text = "\(m.duration)" + "s"
       m.isPlaying ? startAnimation(byRight: isSend) : stopAnimation(byRight: isSend)
       messageId = m.message?.messageClientId
+
+      contentLabelRight.isHidden = true
+      contentLabelLeft.isHidden = true
+      if let text = m.text {
+        let contentLabel = isSend ? contentLabelRight : contentLabelLeft
+        contentLabel.text = text
+        contentLabel.isHidden = false
+        let textSize = String.getRealSize(text, messageTextFont, CGSize(width: max(chat_text_maxW, m.audioWidth) - chat_cell_margin * 2, height: CGFloat.greatestFiniteMagnitude))
+        let contentWidth = max(m.audioWidth, ceil(textSize.width) + chat_cell_margin * 2)
+        let contentHeight = chat_min_h + ceil(textSize.height) + chat_content_margin
+        model.contentSize = CGSize(width: contentWidth, height: contentHeight)
+        model.height = model.contentSize.height + chat_content_margin * 2 + model.fullNameHeight + chat_pin_height
+        if let time = model.timeContent, !time.isEmpty {
+          model.height += chat_timeCellH
+        }
+      }
     }
+    super.setModel(model, isSend)
   }
 }

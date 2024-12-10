@@ -12,7 +12,7 @@
 
 "ai_word_search" = "AI Word Search";
 "ai_word_searching" = "AI Word Searching";
-"input_more_button" = "Additional information";
+"input_more_button" = "Add More";
 "input_more_placeholder" = "Please provide more information.";
 "not_supported" = "Not supported";
 "request_exception" = "Request Exception";

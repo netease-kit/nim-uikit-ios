@@ -300,7 +300,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     let canceButton = UIButton()
     canceButton.translatesAutoresizingMaskIntoConstraints = false
     canceButton.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
-    canceButton.setTitle(chatLocalizable("cancel"), for: .normal)
+    canceButton.setTitle(commonLocalizable("cancel"), for: .normal)
     canceButton.setTitleColor(.ne_greyText, for: .normal)
     canceButton.accessibilityIdentifier = "id.forwardCancelBtn"
 
