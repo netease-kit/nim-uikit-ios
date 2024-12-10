@@ -20,7 +20,7 @@ public class MineTableViewCell: UITableViewCell {
     nameLabel.translatesAutoresizingMaskIntoConstraints = false
     nameLabel.textColor = UIColor.ne_darkText
     nameLabel.font = UIFont.systemFont(ofSize: 16.0)
-    nameLabel.text = NSLocalizedString("setting", comment: "")
+    nameLabel.text = localizable("setting")
     nameLabel.accessibilityIdentifier = "id.titleLabel"
     return nameLabel
   }()

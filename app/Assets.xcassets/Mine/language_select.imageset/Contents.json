@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "qchat_tabbar_icon@2x.png",
+      "filename" : "language_select@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "qchat_tabbar_icon@3x.png",
+      "filename" : "language_select@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

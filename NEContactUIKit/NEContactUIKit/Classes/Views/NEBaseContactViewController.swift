@@ -15,7 +15,7 @@ public protocol NEBaseContactViewControllerDelegate {
 /// 通讯录页面 - 基类
 @objcMembers
 open class NEBaseContactViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TabNavigationViewDelegate, ContactViewModelDelegate {
-  public var delegate: NEBaseContactViewControllerDelegate?
+  public weak var delegate: NEBaseContactViewControllerDelegate?
 
   // custom ui cell
   public var cellRegisterDic = [Int: NEBaseContactTableViewCell.Type]()
@@ -222,7 +222,6 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   /// UI初始化
   open func commonUI() {
-    initSystemNav()
     view.addSubview(navigationView)
     view.addSubview(bodyTopView)
     view.addSubview(bodyView)
@@ -413,10 +412,6 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   public func reloadTableView() {
     didRefreshTable()
-  }
-
-  public func reloadTableView(_ index: IndexPath) {
-    tableView.reloadData([index])
   }
 }
 

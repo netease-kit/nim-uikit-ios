@@ -53,7 +53,7 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    title = NSLocalizedString("style_selection", comment: "")
+    title = localizable("style_selection")
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
@@ -71,12 +71,12 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
     styleData.append(contentsOf: [
       StyleCellModel(styleName: "default",
                      styleImageName: "style_normal",
-                     styleTitle: NSLocalizedString("style_default", comment: ""),
+                     styleTitle: localizable("style_default"),
                      selected: NEStyleManager.instance.isNormalStyle(),
                      selectedImageName: "clicked_normal"),
       StyleCellModel(styleName: "fun",
                      styleImageName: "style_fun",
-                     styleTitle: NSLocalizedString("style_fun", comment: ""),
+                     styleTitle: localizable("style_fun"),
                      selected: !NEStyleManager.instance.isNormalStyle(),
                      selectedImageName: "clicked_fun"),
     ])

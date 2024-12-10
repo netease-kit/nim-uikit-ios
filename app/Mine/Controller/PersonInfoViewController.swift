@@ -59,7 +59,7 @@ public class PersonInfoViewController: NEBaseViewController,
   }
 
   func initialConfig() {
-    title = NSLocalizedString("person_info", comment: "")
+    title = localizable("person_info")
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
@@ -107,7 +107,7 @@ public class PersonInfoViewController: NEBaseViewController,
     second.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
     second.accessibilityIdentifier = "id.action2"
 
-    let cancel = UIAlertAction(title: NSLocalizedString("cancel", comment: ""),
+    let cancel = UIAlertAction(title: commonLocalizable("cancel"),
                                style: .cancel)
 
     cancel.setValue(UIColor(hexString: "0x333333"), forKey: "_titleTextColor")
@@ -142,7 +142,7 @@ public class PersonInfoViewController: NEBaseViewController,
             if err.code == protocolSendFailed {
               self?.showToast(commonLocalizable("network_error"))
             } else {
-              self?.showToast(NSLocalizedString("setting_birthday_failure", comment: ""))
+              self?.showToast(localizable("setting_birthday_failure"))
             }
           }
         }
@@ -184,7 +184,7 @@ public class PersonInfoViewController: NEBaseViewController,
           if error == nil {
             self?.viewModel.updateSelfAvatar(urlString ?? "") { [weak self] error in
               if error != nil {
-                self?.showToast(NSLocalizedString("setting_head_failure", comment: ""))
+                self?.showToast(localizable("setting_head_failure"))
               }
             }
           } else {
@@ -218,10 +218,10 @@ public class PersonInfoViewController: NEBaseViewController,
       weakSelf?.viewModel.updateSelfNickName(editText) { [weak self] error in
         if let err = error {
           if err.code == antiErrorCode {
-            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            self?.showToastInWindow(localizable("anti_error"))
             return
           }
-          self?.showToastInWindow(NSLocalizedString("setting_nickname_failure", comment: ""))
+          self?.showToastInWindow(localizable("setting_nickname_failure"))
         } else {
           self?.navigationController?.popViewController(animated: true)
         }
@@ -240,24 +240,24 @@ public class PersonInfoViewController: NEBaseViewController,
       weakSelf?.viewModel.updateSelfSex(gender) { [weak self] error in
         if let err = error {
           if err.code == antiErrorCode {
-            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            self?.showToastInWindow(localizable("anti_error"))
             return
           }
           if error?.code == protocolSendFailed {
             self?.showToast(commonLocalizable("network_error"))
           } else {
-            self?.showToast(NSLocalizedString("change_gender_failure", comment: ""))
+            self?.showToast(localizable("change_gender_failure"))
           }
         }
       }
     }
     if NEStyleManager.instance.isNormalStyle() {
-      showAlert(firstContent: NSLocalizedString("male", comment: ""),
-                secondContent: NSLocalizedString("female", comment: ""),
+      showAlert(firstContent: localizable("male"),
+                secondContent: localizable("female"),
                 selectValue: block)
     } else {
-      showCustomAlert(firstContent: NSLocalizedString("male", comment: ""),
-                      secondContent: NSLocalizedString("female", comment: ""),
+      showCustomAlert(firstContent: localizable("male"),
+                      secondContent: localizable("female"),
                       selectValue: block)
     }
   }
@@ -280,10 +280,10 @@ public class PersonInfoViewController: NEBaseViewController,
       weakSelf?.viewModel.updateSelfMobile(editText) { [weak self] error in
         if let err = error {
           if err.code == antiErrorCode {
-            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            self?.showToastInWindow(localizable("anti_error"))
             return
           }
-          self?.showToastInWindow(NSLocalizedString("change_phone_failure", comment: ""))
+          self?.showToastInWindow(localizable("change_phone_failure"))
         } else {
           self?.navigationController?.popViewController(animated: true)
         }
@@ -305,17 +305,17 @@ public class PersonInfoViewController: NEBaseViewController,
     ctrl.callBack = { editText in
 
       if editText.count > 0, weakSelf?.isValidEmail(editText) == false {
-        weakSelf?.showToastInWindow(NSLocalizedString("change_email_failure", comment: ""))
+        weakSelf?.showToastInWindow(localizable("change_email_failure"))
         return
       }
 
       weakSelf?.viewModel.updateSelfEmail(editText) { [weak self] error in
         if let err = error {
           if err.code == antiErrorCode {
-            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            self?.showToastInWindow(localizable("anti_error"))
             return
           }
-          self?.showToastInWindow(NSLocalizedString("change_email_failure", comment: ""))
+          self?.showToastInWindow(localizable("change_email_failure"))
         } else {
           self?.navigationController?.popViewController(animated: true)
         }
@@ -333,10 +333,10 @@ public class PersonInfoViewController: NEBaseViewController,
       weakSelf?.viewModel.updateSelfSign(editText) { [weak self] error in
         if let err = error {
           if err.code == antiErrorCode {
-            self?.showToastInWindow(NSLocalizedString("anti_error", comment: ""))
+            self?.showToastInWindow(localizable("anti_error"))
             return
           }
-          self?.showToastInWindow(NSLocalizedString("change_sign_failure", comment: ""))
+          self?.showToastInWindow(localizable("change_sign_failure"))
         } else {
           self?.navigationController?.popViewController(animated: true)
         }

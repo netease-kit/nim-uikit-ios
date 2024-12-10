@@ -73,46 +73,30 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
   }
 
   open func confige(_ model: NENotification) {
-    var optionLabelContent = ""
-
     // 设置头像
-    if let headerUrl = model.userInfo?.user?.avatar, !headerUrl.isEmpty {
+    if let headerUrl = model.displayUserWithFriend?.user?.avatar, !headerUrl.isEmpty {
       avatarImageView.sd_setImage(with: URL(string: headerUrl), completed: nil)
-      nameLabel.text = ""
-      avatarImageView.backgroundColor = .clear
-    } else if let teamUrl = model.teamInfo?.avatarUrl, !teamUrl.isEmpty {
-      avatarImageView.sd_setImage(with: URL(string: teamUrl), completed: nil)
       nameLabel.text = ""
       avatarImageView.backgroundColor = .clear
     } else {
       // 无头像设置其name
-      showNameOnCircleHeader(model.userInfo?.showName() ?? "")
+      showNameOnCircleHeader(model.displayUserWithFriend?.showName() ?? model.displayUserId ?? "")
       avatarImageView.sd_setImage(with: URL(string: ""), completed: nil)
-      avatarImageView.backgroundColor = UIColor.colorWithString(string: model.userInfo?.user?.accountId)
+      avatarImageView.backgroundColor = UIColor.colorWithString(string: model.displayUserWithFriend?.user?.accountId)
     }
 
     // 设置未读状态（未读数角标+底色）
     redAngleView.isHidden = true
     contentView.backgroundColor = .white
-    if model.unReadCount > 0 {
+    if model.unreadCount > 0 {
       contentView.backgroundColor = UIColor(hexString: "0xF3F5F7")
-      if model.unReadCount > 1 {
+      if model.unreadCount > 1 {
         redAngleView.isHidden = false
-        redAngleView.text = model.unReadCount > 99 ? "99+" : "\(model.unReadCount)"
+        redAngleView.text = model.unreadCount > 99 ? "99+" : "\(model.unreadCount)"
       }
     }
 
-    if model.applicantAccid != IMKitClient.instance.account() {
-      optionLabelContent = localizable("add_request")
-    } else {
-      if model.handleStatus == .HandleTypeNo {
-        optionLabelContent = localizable("refused_request")
-      } else if model.handleStatus == .HandleTypeOk {
-        optionLabelContent = localizable("agreed_request")
-      }
-    }
-
-    titleLabel.text = model.userInfo?.showName()
-    optionLabel.text = optionLabelContent
+    titleLabel.text = model.displayUserWithFriend?.showName() ?? model.displayUserId
+    optionLabel.text = model.detail
   }
 }

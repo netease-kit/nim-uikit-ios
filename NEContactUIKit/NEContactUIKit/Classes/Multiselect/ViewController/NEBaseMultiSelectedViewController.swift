@@ -45,7 +45,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-      cancelButton.widthAnchor.constraint(equalToConstant: 40),
+      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
       cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
@@ -94,7 +94,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.cancel"
-    button.setTitle(localizable("alert_cancel"), for: .normal)
+    button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.setTitleColor(.ne_greyText, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
     button.addTarget(self, action: #selector(cancelButtonClick), for: .touchUpInside)

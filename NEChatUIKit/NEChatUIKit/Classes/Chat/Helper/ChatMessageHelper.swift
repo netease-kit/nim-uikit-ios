@@ -88,8 +88,6 @@ public class ChatMessageHelper: NSObject {
         isFun ? FunChatMessageVideoCell.self : ChatMessageVideoCell.self,
       "\(MessageType.file.rawValue)":
         isFun ? FunChatMessageFileCell.self : ChatMessageFileCell.self,
-      "\(MessageType.reply.rawValue)":
-        isFun ? FunChatMessageReplyCell.self : ChatMessageReplyCell.self,
       "\(MessageType.location.rawValue)":
         isFun ? FunChatMessageLocationCell.self : ChatMessageLocationCell.self,
       "\(MessageType.time.rawValue)":
@@ -228,7 +226,7 @@ public class ChatMessageHelper: NSObject {
           accIds.append(senderId)
         }
 
-        NETeamUserManager.shared.getTeamMembers(accountIds: accIds) {
+        NETeamUserManager.shared.getTeamMembers(accIds, false) {
           completion(MessageTipsModel(message: message))
         }
       } else {
@@ -477,8 +475,8 @@ public class ChatMessageHelper: NSObject {
   /// 获取消息的客户端本地扩展信息（转换为[String: Any]）
   /// - Parameter message: 消息
   /// - Returns: 客户端本地扩展信息
-  public static func getMessageLocalExtension(message: V2NIMMessage) -> [String: Any]? {
-    guard let localExtension = message.localExtension else { return nil }
+  public static func getMessageServerExtension(message: V2NIMMessage) -> [String: Any]? {
+    guard let localExtension = message.serverExtension else { return nil }
 
     if let localExt = getDictionaryFromJSONString(localExtension) as? [String: Any] {
       return localExt
@@ -492,7 +490,7 @@ public class ChatMessageHelper: NSObject {
   public static func isRevokeMessage(message: V2NIMMessage?) -> Bool {
     guard let message = message else { return false }
 
-    if let localExt = getMessageLocalExtension(message: message),
+    if let localExt = getMessageServerExtension(message: message),
        let isRevoke = localExt[revokeLocalMessage] as? Bool, isRevoke == true {
       return true
     }
@@ -505,7 +503,7 @@ public class ChatMessageHelper: NSObject {
   public static func getRevokeMessageContent(message: V2NIMMessage?) -> String? {
     guard let message = message else { return nil }
 
-    if let localExt = getMessageLocalExtension(message: message) {
+    if let localExt = getMessageServerExtension(message: message) {
       if let content = localExt[revokeLocalMessageContent] as? String {
         return content
       }
@@ -566,10 +564,11 @@ public class ChatMessageHelper: NSObject {
     refer.messageServerId = params?["idServer"] as? String
     refer.senderId = params?["from"] as? String
     refer.createTime = TimeInterval(Double(params?["time"] as? Int ?? 0) / 1000.0)
-    if let conversationId = params?["to"] as? String {
-      refer.conversationId = conversationId
-      refer.receiverId = V2NIMConversationIdUtil.conversationTargetId(conversationId)
-      refer.conversationType = V2NIMConversationIdUtil.conversationType(conversationId)
+    refer.conversationId = params?["to"] as? String
+    refer.receiverId = params?["receiverId"] as? String
+    if let scene = params?["scene"] as? Int,
+       let type = V2NIMConversationType(rawValue: scene) {
+      refer.conversationType = type
     }
 
     return refer

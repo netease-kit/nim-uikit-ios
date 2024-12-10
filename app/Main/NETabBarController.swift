@@ -10,6 +10,9 @@ import NIMSDK
 import UIKit
 
 class NETabBarController: UITabBarController, NEConversationListener, NEContactListener {
+  private var chat = NEBaseConversationController()
+  private var contactVC = NEBaseContactViewController()
+  private var meVC = MeViewController()
   private var sessionUnreadCount = 0
   private var contactUnreadCount = 0
 
@@ -36,20 +39,28 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
     ConversationRepo.shared.addConversationListener(self)
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+  }
+
+  @objc func changeLanguage() {
+    chat.tabBarItem.title = localizable("message")
+    contactVC.tabBarItem.title = localizable("contact")
+    meVC.tabBarItem.title = localizable("mine")
   }
 
   deinit {
     ConversationRepo.shared.removeConversationListener(self)
     ContactRepo.shared.removeContactListener(self)
+    NotificationCenter.default.removeObserver(self)
   }
 
   func setUpControllers() {
     if NEStyleManager.instance.isNormalStyle() {
       // chat
-      let chat = ConversationController()
+      chat = ConversationController()
       chat.viewModel.syncFinished = isChangeUIType
       chat.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("message", comment: ""),
+        title: localizable("message"),
         image: UIImage(named: "chat"),
         selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
       )
@@ -57,9 +68,9 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let chatNav = NENavigationController(rootViewController: chat)
 
       // Contacts
-      let contactVC = ContactViewController()
+      contactVC = ContactViewController()
       contactVC.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("contact", comment: ""),
+        title: localizable("contact"),
         image: UIImage(named: "contact"),
         selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
       )
@@ -67,9 +78,8 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let contactsNav = NENavigationController(rootViewController: contactVC)
 
       // Me
-      let meVC = MeViewController()
       meVC.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("mine", comment: ""),
+        title: localizable("mine"),
         image: UIImage(named: "person"),
         selectedImage: UIImage(named: "personSelect")?.withRenderingMode(.alwaysOriginal)
       )
@@ -97,10 +107,10 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       }
     } else {
       // chat
-      let chat = FunConversationController()
+      chat = FunConversationController()
       chat.viewModel.syncFinished = isChangeUIType
       chat.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("message", comment: ""),
+        title: localizable("message"),
         image: UIImage(named: "funChat"),
         selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
       )
@@ -108,9 +118,9 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let chatNav = NENavigationController(rootViewController: chat)
 
       // Contacts
-      let contactVC = FunContactViewController()
+      contactVC = FunContactViewController()
       contactVC.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("contact", comment: ""),
+        title: localizable("contact"),
         image: UIImage(named: "funContact"),
         selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
       )
@@ -118,9 +128,8 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       let contactsNav = NENavigationController(rootViewController: contactVC)
 
       // Me
-      let meVC = MeViewController()
       meVC.tabBarItem = UITabBarItem(
-        title: NSLocalizedString("mine", comment: ""),
+        title: localizable("mine"),
         image: UIImage(named: "funPerson"),
         selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
       )

@@ -23,7 +23,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
   private lazy var headLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.text = NSLocalizedString("brand_des", comment: "")
+    label.text = localizable("brand_des")
     label.font = UIFont.systemFont(ofSize: 20.0)
     label.textColor = UIColor(hexString: "333333")
     label.accessibilityIdentifier = "id.aboutApp"

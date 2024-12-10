@@ -108,12 +108,12 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
     super.confige(model)
     notifModel = model
 
-    if model.handleStatus != .HandleTypePending {
+    if model.handleStatus != .FRIEND_ADD_APPLICATION_STATUS_INIT {
       agreeButton.isHidden = true
       rejectButton.isHidden = true
       titleLabelRightMargin?.constant = -90
 
-      if model.applicantAccid == IMKitClient.instance.account() {
+      if model.v2Notification.applicantAccountId == IMKitClient.instance.account() {
         // 自己申请的，不展示结果
         resultLabel.isHidden = true
         resultImage.isHidden = true
@@ -122,13 +122,13 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
         resultImage.isHidden = false
 
         switch model.handleStatus {
-        case .HandleTypeOk:
+        case .FRIEND_ADD_APPLICATION_STATUS_AGREED, .FRIEND_ADD_APPLICATION_STATUS_DIRECT_ADD:
           resultLabel.text = localizable("agreed")
           resultImage.image = UIImage.ne_imageNamed(name: "finishFlag")
-        case .HandleTypeNo:
+        case .FRIEND_ADD_APPLICATION_STATUS_REJECED:
           resultLabel.text = localizable("refused")
           resultImage.image = UIImage.ne_imageNamed(name: "refused")
-        case .HandleTypeOutOfDate:
+        case .FRIEND_ADD_APPLICATION_STATUS_EXPIRED:
           resultLabel.text = localizable("expired")
           resultImage.image = UIImage.ne_imageNamed(name: "refused")
         default:

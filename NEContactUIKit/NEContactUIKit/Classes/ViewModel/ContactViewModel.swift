@@ -10,7 +10,6 @@ import UIKit
 
 public protocol ContactViewModelDelegate: NSObjectProtocol {
   func reloadTableView()
-  func reloadTableView(_ index: IndexPath)
 }
 
 @objcMembers

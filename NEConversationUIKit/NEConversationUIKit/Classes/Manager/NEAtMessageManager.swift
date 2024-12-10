@@ -159,7 +159,9 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     var temDic = getMessageDic()
 
     for message in messages {
-      if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
+      if let serverExtension = message.serverExtension,
+         let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension),
+         let dic = remoteExt[yxAitMsg] as? [String: Any] {
         if dic[atAllKey] != nil, message.senderId != currentAccid {
           weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
           isExistAtMessage = true
@@ -204,7 +206,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
           option.strictMode = false
           ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
             messages?.forEach { message in
-              if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: AnyObject] {
+              if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: Any] {
                 if dic[atAllKey] != nil, message.isSelf == false {
                   weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
                   isExistAtMessage = true
@@ -342,7 +344,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
     semaphore.wait()
 
-    if compareTimestap > 0, message.createTime > compareTimestap {
+    if message.createTime > compareTimestap {
       if let atMeRecord = record[message.conversationId ?? ""] {
         let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
         if lastTime < message.createTime {

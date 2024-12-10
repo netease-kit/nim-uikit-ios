@@ -298,7 +298,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       actions.append(forwardAction)
     }
 
-    let cancelAction = UIAlertAction(title: chatLocalizable("cancel"), style: .cancel) { _ in }
+    let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in }
     actions.append(cancelAction)
 
     showActionSheet(actions)
@@ -381,42 +381,6 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       loadData()
     }
     tableView.reloadData()
-  }
-
-  /// 刷新数据
-  /// - Parameter model: 标记数据模型
-  public func refreshModel(_ model: NEPinMessageModel) {
-    var index = -1
-    for (i, item) in viewModel.items.enumerated() {
-      if item == model {
-        viewModel.items[i] = model
-        index = i
-        break
-      }
-    }
-
-    if index < 0 || index >= tableView.numberOfRows(inSection: 0) {
-      return
-    }
-    tableViewReload([IndexPath(row: index, section: 0)])
-  }
-
-  public func tableViewReload(_ indexs: [IndexPath]) {
-    tableView.reloadData(indexs)
-  }
-
-  public func tableViewDelete(_ indexs: [IndexPath]) {
-    if isLoadingData {
-      return
-    }
-
-    let indexs = indexs.filter { $0.row >= 0 && $0.row < tableView.numberOfRows(inSection: 0) }
-
-    if !indexs.isEmpty {
-      tableView.deleteData(indexs) { [weak self] _ in
-        self?.emptyView.isHidden = (self?.viewModel.items.count ?? 0) > 0
-      }
-    }
   }
 
   open func didClickMore(_ model: NEPinMessageModel?) {

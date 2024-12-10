@@ -22,7 +22,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
+    view.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackground ?? .funChatBackgroundColor // 换肤颜色提取
 
     normalInputHeight = 90
     brokenNetworkViewHeight = 48
@@ -291,7 +291,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
           }
         }
       } else {
-        var text = chatLocalizable("msg_reply")
+        var text = chatLocalizable("operation_replay")
         if let uid = ChatMessageHelper.getSenderId(message) {
           var showName = NETeamUserManager.shared.getShowName(uid, false)
           if V2NIMConversationIdUtil.conversationType(viewModel.conversationId) != .CONVERSATION_TYPE_P2P,
@@ -327,9 +327,9 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     if let contentModel = model as? MessageContentModel {
       if contentModel.type == .revoke {
         if let time = contentModel.timeContent, !time.isEmpty {
-          return 28 + chat_timeCellH
+          return chat_min_h + chat_timeCellH
         }
-        return 28
+        return chat_min_h
       }
     }
 
@@ -349,7 +349,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       model.offset = CGFloat(subHeight)
     }
 
-    if model.type == .reply {
+    if model.isReplay {
       model.offset += 44 + chat_content_margin
     }
 

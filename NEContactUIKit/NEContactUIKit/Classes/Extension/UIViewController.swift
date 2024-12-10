@@ -8,8 +8,8 @@ import Foundation
 extension UIViewController {
   typealias AlertCallBack = () -> Void
   func showAlert(title: String = localizable("alert_tip"), message: String?,
-                 sureText: String = localizable("alert_sure"),
-                 cancelText: String = localizable("alert_cancel"),
+                 sureText: String = commonLocalizable("sure"),
+                 cancelText: String = commonLocalizable("cancel"),
                  _ sureBack: @escaping AlertCallBack, cancelBack: AlertCallBack? = nil) {
     let alertController = UIAlertController(
       title: title,

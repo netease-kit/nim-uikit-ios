@@ -318,6 +318,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         textView.selectedRange = NSMakeRange(range.location + addString.length, 0)
       }
       delegate?.textViewDidChange()
+      textView.font = UIFont.systemFont(ofSize: 16)
       return false
     }
 
@@ -328,13 +329,22 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         if mutableAttri.length >= findRange.location + findRange.length {
           if range.length == 1 {
             mutableAttri.replaceCharacters(in: findRange, with: "")
+          } else if range.location >= findRange.location,
+                    range.location <= findRange.location + findRange.length {
+            mutableAttri.replaceCharacters(in: NSRange(location: range.location + 1, length: range.length - 1), with: "")
           }
+
           if mutableAttri.length <= 0 {
             textView.attributedText = nil
           } else {
             textView.attributedText = mutableAttri
           }
-          textView.selectedRange = NSMakeRange(findRange.location, 0)
+
+          if range.length == 1 {
+            textView.selectedRange = NSMakeRange(findRange.location, 0)
+          } else {
+            textView.selectedRange = NSMakeRange(range.location + 1, 0)
+          }
         }
         return false
       }
@@ -401,6 +411,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       mutaAttribute.insert(attribute, at: range.location)
       textView.attributedText = mutaAttribute
       textView.selectedRange = NSMakeRange(range.location + attribute.length, 0)
+      textView.font = UIFont.systemFont(ofSize: 16)
     }
   }
 

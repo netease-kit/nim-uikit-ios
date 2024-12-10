@@ -41,3 +41,6 @@ public let chat_pin_height: CGFloat = 16.0
 
 // 群聊气泡上方用户名label高度，p2p无此展示，高度为0
 public let chat_full_name_height: CGFloat = 16.0
+
+// 语音消息最大宽度
+public let audio_max_width = kScreenWidth <= 325 ? 230 : 265.0

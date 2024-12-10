@@ -3,7 +3,6 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import Lottie
 import NECommonKit
 import NECommonUIKit
 import NECoreIM2Kit
@@ -15,8 +14,8 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   var searchText: String?
   public var margin: CGFloat = 16
   public var titleBarBottomLineHeight: CGFloat = 1.0
-  public var backButtonWidth: CGFloat = 33
-  public var moreButtonWidth: CGFloat = 85
+  public var backButtonWidth: CGFloat = NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 33
+  public var moreButtonWidth: CGFloat = NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 85
   public var themeColor: UIColor = .ne_normalTheme
 
   // 父视图添加单击手势，点击背景区域 dismiss
@@ -264,8 +263,8 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   }()
 
   /// 标题栏 loading 动画
-  public lazy var loadingView: LottieAnimationView = {
-    let view = LottieAnimationView(name: "ne_loading_data", bundle: coreLoader.bundle)
+  public lazy var loadingView: NELottieAnimationView = {
+    let view = NELottieAnimationView(name: "ne_loading_data", bundle: coreLoader.bundle)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.loopMode = .loop
     view.contentMode = .scaleAspectFill
@@ -406,7 +405,7 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     NSLayoutConstraint.activate([
       placeHolderLabel.leftAnchor.constraint(equalTo: textView.leftAnchor, constant: 6),
       placeHolderLabel.topAnchor.constraint(equalTo: textView.topAnchor, constant: 8),
-      placeHolderLabel.widthAnchor.constraint(equalToConstant: 150),
+      placeHolderLabel.rightAnchor.constraint(equalTo: textView.rightAnchor, constant: -6),
       placeHolderLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
 

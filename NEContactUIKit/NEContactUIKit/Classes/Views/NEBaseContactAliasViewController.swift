@@ -59,6 +59,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
     view.backgroundColor = .ne_lightBackgroundColor
 
     navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveAlias))
     navigationView.backgroundColor = .ne_lightBackgroundColor
 

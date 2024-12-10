@@ -104,4 +104,13 @@ public extension OperationItem {
     item.type = .recall
     return item
   }
+
+  /// 语音转文字
+  static func audioToTextItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_to_text")
+    item.imageName = "op_toText"
+    item.type = .voiceToText
+    return item
+  }
 }

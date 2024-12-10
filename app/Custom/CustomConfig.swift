@@ -353,7 +353,7 @@ public class CustomConfig {
   }
 
   @objc func customClick(_ button: UIButton) {
-    button.viewContainingController()?.showToast("文本输入框下方 tab 按钮自定义点击事件")
+    button.neViewContainingController()?.showToast("文本输入框下方 tab 按钮自定义点击事件")
   }
 
   // MARK: lazy load

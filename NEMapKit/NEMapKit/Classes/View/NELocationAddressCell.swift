@@ -109,7 +109,7 @@ open class NELocationAddressCell: UITableViewCell {
         let kilometer = model.distance / 1000
         distanceStr = "\(kilometer)km"
       }
-      subTitleLabel.text = "\(distanceStr)\(mapLocalizable("distance_inner"))|\(model.address)"
+      subTitleLabel.text = "\(distanceStr) \(mapLocalizable("distance_inner"))|\(model.address)"
     } else {
       subTitleLabel.text = model.address
     }

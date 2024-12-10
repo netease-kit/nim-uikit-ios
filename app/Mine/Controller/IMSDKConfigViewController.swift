@@ -10,7 +10,7 @@ import UIKit
 
 class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
   public var cellClassDic =
-    [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self, SettingCellType.SettingArrowCell.rawValue: CustomTeamArrowSettingCell.self, SettingCellType.SettingSubtitleCell.rawValue: CustomSettingInputCell.self, SettingCellType.SettingSubtitleCustomCell.rawValue: CustomSettingTextviewCell.self]
+    [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self, SettingCellType.SettingArrowCell.rawValue: ArrowTitleCustomTeamSettingSwitchCell.self, SettingCellType.SettingSubtitleCell.rawValue: CustomSettingInputCell.self, SettingCellType.SettingSubtitleCustomCell.rawValue: CustomSettingTextviewCell.self]
 
   var sectionData = [SettingSectionModel]()
 
@@ -90,17 +90,37 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let usePrivateConfigModel = SettingCellModel()
     usePrivateConfigModel.cellName = "私有化环境配置生效"
     usePrivateConfigModel.type = SettingCellType.SettingSwitchCell.rawValue
+    weak var weakSelf = self
+    usePrivateConfigModel.switchOpen = configModel.enableCustomConfig.boolValue
     usePrivateConfigModel.swichChange = { isOpen in
+      weakSelf?.configModel.enableCustomConfig = NSNumber(booleanLiteral: isOpen)
     }
     oneSectionModel.cellModels.append(usePrivateConfigModel)
     oneSectionModel.setCornerType()
 
-    sectionData.append(twoSectionModel)
-
     let configType = SettingCellModel()
     configType.cellName = "配置方式"
+    configType.subTitle = "手动填写"
     configType.type = SettingCellType.SettingArrowCell.rawValue
     twoSectionModel.cellModels.append(configType)
+
+    let appKey = CustomSettingCellModel()
+    appKey.cellName = "AppKey"
+    appKey.type = SettingCellType.SettingSubtitleCell.rawValue
+    appKey.inputKey = #keyPath(NIMSDKOption.appKey)
+    if let appKeyValue = configModel.configMap[appKey.inputKey] as? String {
+      appKey.customInputText = appKeyValue
+    }
+    twoSectionModel.cellModels.append(appKey)
+
+    let module = CustomSettingCellModel()
+    module.cellName = "Module"
+    module.type = SettingCellType.SettingSubtitleCell.rawValue
+    module.inputKey = #keyPath(NIMServerSetting.module)
+    if let moduleValue = configModel.configMap[module.inputKey] as? String {
+      module.customInputText = moduleValue
+    }
+    twoSectionModel.cellModels.append(module)
 
     let linkModel = CustomSettingCellModel()
     linkModel.cellName = "服务器Link地址"
@@ -160,6 +180,7 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
 
     let autoconfigType = CustomSettingCellModel()
     autoconfigType.cellName = "配置方式"
+    autoconfigType.subTitle = "一键自动解析"
     autoconfigType.type = SettingCellType.SettingArrowCell.rawValue
     autoconfigType.rowHeight = 49.0
     customSectionModel.cellModels.append(autoconfigType)
@@ -172,26 +193,27 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     customSectionModel.cellModels.append(autoConfig)
 
     customSectionModel.setCornerType()
+
+    sectionData.append(customSectionModel)
   }
 
   func didSave() {
-    for sectionModel in sectionData {
-      for model in sectionModel.cellModels {
-        if let customModel = model as? CustomSettingCellModel, customModel.inputKey.count > 0 {
-          if let customText = customModel.customInputText, customText.count > 0 {
-            configModel.configMap[customModel.inputKey] = customText
-          } else {
-            configModel.configMap.removeValue(forKey: customModel.inputKey)
-          }
+    for model in twoSectionModel.cellModels {
+      if let customModel = model as? CustomSettingCellModel, customModel.inputKey.count > 0 {
+        if let customText = customModel.customInputText, customText.count > 0 {
+          configModel.configMap[customModel.inputKey] = customText
+        } else {
+          configModel.configMap.removeObject(forKey: customModel.inputKey)
         }
       }
     }
+
     if let custom = autoConfig.customInputText, custom.count > 0 {
       configModel.customJson = custom
     } else {
       configModel.customJson = nil
     }
-    UIApplication.shared.keyWindow?.ne_makeToast("保存成功")
+    UIApplication.shared.keyWindow?.ne_makeToast("保存成功，请重新启动应用登录")
     IMSDKConfigManager.instance.saveConfig(model: configModel)
     navigationController?.popViewController(animated: true)
   }
@@ -284,20 +306,47 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     sectionData.count
   }
 
-  public func changeParseModel() {
-    if isCustomJsonParse == false {
-      if sectionData.count == 2 {
-        sectionData.remove(at: 1)
-        sectionData.append(customSectionModel)
-      }
-    } else {
-      if sectionData.count == 2 {
-        sectionData.remove(at: 1)
-        sectionData.append(twoSectionModel)
-      }
+  func autoParse() {
+    if sectionData.count == 2 {
+      sectionData.remove(at: 1)
+      sectionData.append(customSectionModel)
     }
+    isCustomJsonParse = true
     contentTableView.reloadData()
-    isCustomJsonParse = !isCustomJsonParse
+  }
+
+  func customParse() {
+    if sectionData.count == 2 {
+      sectionData.remove(at: 1)
+      sectionData.append(twoSectionModel)
+    }
+    isCustomJsonParse = false
+    contentTableView.reloadData()
+  }
+
+  public func changeParseModel() {
+    if NEStyleManager.instance.isNormalStyle() {
+      let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+      let autoAction = UIAlertAction(title: "一键自动解析", style: .default) { [weak self] _ in
+        self?.autoParse()
+      }
+      let customAction = UIAlertAction(title: "手动填写", style: .default) { [weak self] _ in
+        self?.customParse()
+      }
+      let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel, handler: nil)
+      actionSheet.addAction(autoAction)
+      actionSheet.addAction(customAction)
+      actionSheet.addAction(cancelAction)
+      present(actionSheet, animated: true, completion: nil)
+    } else {
+      let neAutoAction = NECustomAlertAction(title: "一键自动解析") { [weak self] in
+        self?.autoParse()
+      }
+      let neCustomAction = NECustomAlertAction(title: "手动填写") { [weak self] in
+        self?.customParse()
+      }
+      showCustomActionSheet([neAutoAction, neCustomAction])
+    }
   }
 
   public func getFooterView() -> UIView {
@@ -306,10 +355,10 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     back.frame = CGRectMake(0, 0, view.frame.width, 60)
     let button = ExpandButton()
     back.addSubview(button)
-    button.setTitle("保存", for: .normal)
+    button.setTitle(localizable("save"), for: .normal)
     button.setTitleColor(.white, for: .normal)
     if NEStyleManager.instance.isNormalStyle() {
-      button.backgroundColor = UIColor.ne_blueText
+      button.backgroundColor = UIColor.ne_normalTheme
       button.frame = CGRectMake(20, 10, view.frame.width - 40, 40)
     } else {
       button.frame = CGRectMake(0, 10, view.frame.width, 40)
@@ -318,14 +367,4 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     button.addTarget(self, action: #selector(didSave), for: .touchUpInside)
     return back
   }
-
-  /*
-   // MARK: - Navigation
-
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       // Get the new view controller using segue.destination.
-       // Pass the selected object to the new view controller.
-   }
-   */
 }

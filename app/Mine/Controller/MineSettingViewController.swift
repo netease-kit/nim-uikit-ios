@@ -27,7 +27,6 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     tableView.delegate = self
     tableView.separatorColor = .clear
     tableView.separatorStyle = .none
-    tableView.tableFooterView = getFooterView()
     tableView.keyboardDismissMode = .onDrag
 
     if #available(iOS 11.0, *) {
@@ -46,14 +45,31 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+
     viewModel.delegate = self
-    viewModel.getData()
-    setupSubviews()
     initialConfig()
+    setupSubviews()
+    changeLanguage()
+  }
+
+  override func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      NotificationCenter.default.removeObserver(self)
+    }
+  }
+
+  @objc func changeLanguage() {
+    viewModel.getData()
+    title = localizable("setting")
+    tableView.tableFooterView = getFooterView()
+    tableView.reloadData()
   }
 
   func initialConfig() {
-    title = NSLocalizedString("setting", comment: "")
+    title = localizable("setting")
 
     if NEStyleManager.instance.isNormalStyle() {
       view.backgroundColor = .ne_backgroundColor
@@ -92,7 +108,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
     logoutButton.setTitle(title, for: .normal)
     logoutButton.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
-    logoutButton.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
+    logoutButton.setTitle(localizable("logout"), for: .normal)
     logoutButton.accessibilityIdentifier = "id.logout"
     if NEStyleManager.instance.isNormalStyle() {
       logoutButton.layer.cornerRadius = 8.0
@@ -118,20 +134,18 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
                 if error != nil {
                     NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
                     weakSelf?.view.makeToast(error?.localizedDescription)
-                    NEALog.errorLog(
-                        weakSelf?.tag ?? "",
-                        desc: "CALLBACK logout SUCCESS = \(error!)"
-                    )
                 } else {
                     NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
                     NotificationCenter.default.post(
                         name: Notification.Name("logout"),
                         object: nil
                     )
-                    NEALog.infoLog(
-                        weakSelf?.tag ?? "",
-                        desc: "CALLBACK logout SUCCESS"
-                    )
+                    
+                    let config = IMSDKConfigManager.instance.getConfig()
+                    config.accountId = nil
+                    config.accountIdToken = nil
+                    IMSDKConfigManager.instance.saveConfig(model: config)
+                    
                     NEFriendUserCache.shared.removeAllFriendInfo()
                 }
             }
@@ -215,12 +229,14 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
 
   func didClickCleanCache() {}
 
-  func didClickConfigTest() {
-    let configTestVC = ConfigTestViewController()
-    navigationController?.pushViewController(configTestVC, animated: true)
-  }
 
   func didClickSDKConfig() {
-    
+    let configController = IMSDKConfigViewController()
+    navigationController?.pushViewController(configController, animated: true)
+  }
+
+  func didClickLanguage() {
+    let configController = LanguageViewController()
+    navigationController?.pushViewController(configController, animated: true)
   }
 }

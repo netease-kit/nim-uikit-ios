@@ -177,8 +177,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
     if let time = useTime {
       timeLabel
-        .text =
-        dealTime(time: time)
+        .text = String.stringFromTimeInterval(time: time)
       if let text = timeLabel.text {
         let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
         let attibutes = [NSAttributedString.Key.font: timeLabel.font]
@@ -196,30 +195,6 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
 
     return 0
-  }
-
-  func dealTime(time: TimeInterval) -> String {
-    if time <= 0 {
-      return ""
-    }
-
-    let targetDate = Date(timeIntervalSince1970: time)
-    let fmt = DateFormatter()
-
-    if targetDate.isToday() {
-      fmt.dateFormat = localizable("hm")
-      return fmt.string(from: targetDate)
-
-    } else {
-      if targetDate.isThisYear() {
-        fmt.dateFormat = localizable("mdhm")
-        return fmt.string(from: targetDate)
-
-      } else {
-        fmt.dateFormat = localizable("ymdhm")
-        return fmt.string(from: targetDate)
-      }
-    }
   }
 
   open func contentForConversation(lastMessage: V2NIMLastMessage) -> String {

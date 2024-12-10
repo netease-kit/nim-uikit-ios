@@ -57,13 +57,12 @@ open class MessageContentModel: NSObject, MessageModel {
   public var replyText: String?
   public var replyedModel: MessageModel? {
     didSet {
-      if let reply = replyedModel as? MessageContentModel, reply.isReplay == true {
+      if let reply = replyedModel as? MessageContentModel {
         if type == .tip {
-          replyedModel?.isReplay = false
           return
         }
 
-        type = .reply
+        isReplay = true
         replyText = ReplyMessageUtil.textForReplyModel(model: reply)
         // height 计算移至 getMessageModel(model:)
       }

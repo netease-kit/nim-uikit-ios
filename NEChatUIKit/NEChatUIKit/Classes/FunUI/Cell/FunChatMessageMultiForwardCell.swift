@@ -45,7 +45,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     backViewLeft.addSubview(titleLabelLeft1)
     NSLayoutConstraint.activate([
       titleLabelLeft1.leftAnchor.constraint(equalTo: backViewLeft.leftAnchor, constant: 12 + funMargin),
-      titleLabelLeft1.rightAnchor.constraint(lessThanOrEqualTo: backViewLeft.rightAnchor, constant: -102),
+      titleLabelLeft1.rightAnchor.constraint(lessThanOrEqualTo: backViewLeft.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -114 : -102),
       titleLabelLeft1.topAnchor.constraint(equalTo: backViewLeft.topAnchor, constant: 12),
       titleLabelLeft1.heightAnchor.constraint(equalToConstant: 22),
     ])
@@ -55,7 +55,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
       titleLabelLeft2.leftAnchor.constraint(equalTo: titleLabelLeft1.rightAnchor),
       titleLabelLeft2.centerYAnchor.constraint(equalTo: titleLabelLeft1.centerYAnchor),
       titleLabelLeft2.heightAnchor.constraint(equalToConstant: 22),
-      titleLabelLeft2.widthAnchor.constraint(equalToConstant: 88),
+      titleLabelLeft2.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 88),
     ])
 
     backViewLeft.addSubview(contentLabelLeft1)
@@ -86,7 +86,6 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     NSLayoutConstraint.activate([
       contentHistoryLeft.leftAnchor.constraint(equalTo: titleLabelLeft1.leftAnchor),
       contentHistoryLeft.bottomAnchor.constraint(equalTo: backViewLeft.bottomAnchor, constant: -8),
-      contentHistoryLeft.widthAnchor.constraint(equalToConstant: 60),
       contentHistoryLeft.heightAnchor.constraint(equalToConstant: 14),
     ])
 
@@ -116,7 +115,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     backViewRight.addSubview(titleLabelRight1)
     NSLayoutConstraint.activate([
       titleLabelRight1.leftAnchor.constraint(equalTo: backViewRight.leftAnchor, constant: 12),
-      titleLabelRight1.rightAnchor.constraint(lessThanOrEqualTo: backViewRight.rightAnchor, constant: -102),
+      titleLabelRight1.rightAnchor.constraint(lessThanOrEqualTo: backViewRight.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -114 : -102),
       titleLabelRight1.topAnchor.constraint(equalTo: backViewRight.topAnchor, constant: 12),
       titleLabelRight1.heightAnchor.constraint(equalToConstant: 22),
     ])
@@ -126,7 +125,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
       titleLabelRight2.leftAnchor.constraint(equalTo: titleLabelRight1.rightAnchor),
       titleLabelRight2.centerYAnchor.constraint(equalTo: titleLabelRight1.centerYAnchor),
       titleLabelRight2.heightAnchor.constraint(equalToConstant: 22),
-      titleLabelRight2.widthAnchor.constraint(equalToConstant: 88),
+      titleLabelRight2.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 88),
     ])
 
     backViewRight.addSubview(contentLabelRight1)
@@ -157,7 +156,6 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     NSLayoutConstraint.activate([
       contentHistoryRight.leftAnchor.constraint(equalTo: titleLabelRight1.leftAnchor),
       contentHistoryRight.bottomAnchor.constraint(equalTo: backViewRight.bottomAnchor, constant: -8),
-      contentHistoryRight.widthAnchor.constraint(equalToConstant: 60),
       contentHistoryRight.heightAnchor.constraint(equalToConstant: 14),
     ])
 
@@ -311,6 +309,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     label.font = .systemFont(ofSize: 12)
     label.textColor = .ne_lightText
     label.text = chatLocalizable("chat_history")
+    label.textAlignment = .left
     label.accessibilityIdentifier = "id.contentHistoryLeft"
     return label
   }()
@@ -373,6 +372,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     label.font = .systemFont(ofSize: 12)
     label.textColor = .ne_lightText
     label.text = chatLocalizable("chat_history")
+    label.textAlignment = .left
     label.accessibilityIdentifier = "id.contentHistoryRight"
     return label
   }()

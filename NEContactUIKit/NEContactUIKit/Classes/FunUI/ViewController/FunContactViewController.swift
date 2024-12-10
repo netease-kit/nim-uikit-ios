@@ -19,6 +19,31 @@ open class FunContactViewController: NEBaseContactViewController {
 
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
+    cellRegisterDic = [
+      ContactCellType.ContactPerson.rawValue: FunContactTableViewCell.self,
+      ContactCellType.ContactOthers.rawValue: FunContactTableViewCell.self,
+    ]
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+    changeLanguage()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      if let searchViewGestures = searchView.gestureRecognizers {
+        for gesture in searchViewGestures {
+          searchView.removeGestureRecognizer(gesture)
+        }
+      }
+      NotificationCenter.default.removeObserver(self)
+    }
+  }
+
+  func changeLanguage() {
     var contactHeaders = [ContactHeadItem]()
     if ContactUIConfig.shared.showHeader {
       contactHeaders = [
@@ -59,23 +84,9 @@ open class FunContactViewController: NEBaseContactViewController {
       }
     }
     viewModel = ContactViewModel(contactHeaders: contactHeaders)
-    cellRegisterDic = [
-      ContactCellType.ContactPerson.rawValue: FunContactTableViewCell.self,
-      ContactCellType.ContactOthers.rawValue: FunContactTableViewCell.self,
-    ]
-  }
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
-    if let searchViewGestures = searchView.gestureRecognizers {
-      for gesture in searchViewGestures {
-        searchView.removeGestureRecognizer(gesture)
-      }
-    }
+    searchView.searchButton.setTitle(commonLocalizable("search"), for: .normal)
+    initSystemNav()
   }
 
   override open func commonUI() {

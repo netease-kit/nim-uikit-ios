@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(strong, nonatomic) NSString *userID;
 @property(strong, nonatomic) UIView *videoView;
 @property(strong, nonatomic) UILabel *titleLabel;
-@property(strong, nonatomic) UIView *maskView;
+@property(strong, nonatomic) UIView *coverView;  // 原 maskView
 @property(strong, nonatomic) UIImageView *imageView;
 
 @end

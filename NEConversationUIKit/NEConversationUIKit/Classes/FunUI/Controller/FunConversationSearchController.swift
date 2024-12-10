@@ -11,12 +11,12 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
   lazy var cancelButton: UIButton = {
     let cancelButton = UIButton()
     cancelButton.translatesAutoresizingMaskIntoConstraints = false
-    cancelButton.setTitle(localizable("cancel"), for: .normal)
+    cancelButton.setTitle(commonLocalizable("cancel"), for: .normal)
     cancelButton.setTitleColor(.ne_greyText, for: .normal)
     cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
     cancelButton.titleLabel?.adjustsFontSizeToFitWidth = true
     cancelButton.contentHorizontalAlignment = .center
-    cancelButton.accessibilityIdentifier = "id.cancelBtn"
+    cancelButton.accessibilityIdentifier = "id.backArrow"
     return cancelButton
   }()
 

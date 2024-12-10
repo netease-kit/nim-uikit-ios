@@ -10,7 +10,7 @@ extension UIAlertController {
   class func reconfimAlertView(title: String?, message: String?,
                                confirm: @escaping () -> Void) -> UIAlertController {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: chatLocalizable("cancel"), style: .cancel, handler: nil))
+    alert.addAction(UIAlertAction(title: commonLocalizable("cancel"), style: .cancel, handler: nil))
     alert.addAction(UIAlertAction(title: commonLocalizable("ok"), style: .default) { action in
       confirm()
     })

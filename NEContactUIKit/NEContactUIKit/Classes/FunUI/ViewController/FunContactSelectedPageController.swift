@@ -57,6 +57,7 @@ open class FunContactSelectedPageController: NEBaseContactSelectedPageController
   override open func setupNavSureItem() {
     super.setupNavSureItem()
     navigationView.setBackButtonTitle(localizable("close"))
+    navigationView.setBackButtonWidth(60)
     navigationView.backButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.moreButton.backgroundColor = .funContactThemeColor
     selectedSureButton.backgroundColor = .funContactThemeColor

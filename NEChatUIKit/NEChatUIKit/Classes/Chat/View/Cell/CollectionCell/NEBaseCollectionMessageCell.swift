@@ -20,7 +20,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
 
   public var collectionModel: CollectionMessageModel?
 
-  public var delegate: CollectionMessageCellDelegate?
+  public weak var delegate: CollectionMessageCellDelegate?
 
   public var contentGesture: UITapGestureRecognizer?
 
@@ -187,9 +187,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
                               name: model.chatmodel.fullName ?? "",
                               uid: ChatMessageHelper.getSenderId(model.chatmodel.message) ?? "")
     nameLabel.text = model.chatmodel.fullName
-    if let time = model.collection?.updateTime {
-      timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: time))
-    } else if let time = model.message?.createTime {
+    if let time = model.collection?.updateTime ?? model.message?.createTime {
       timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: time))
     }
 

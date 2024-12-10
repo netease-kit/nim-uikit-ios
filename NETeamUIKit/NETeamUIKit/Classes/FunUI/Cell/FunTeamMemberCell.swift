@@ -26,7 +26,7 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
     contentView.addSubview(ownerLabel)
     ownerWidth = ownerLabel.widthAnchor.constraint(equalToConstant: 48.0)
     NSLayoutConstraint.activate([
-      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -55),
+      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -76 : -56),
       ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ownerLabel.heightAnchor.constraint(equalToConstant: 25.0),
       ownerWidth!,
@@ -36,7 +36,7 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
       nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -115),
+      nameLabel.rightAnchor.constraint(equalTo: ownerLabel.leftAnchor, constant: -14),
     ])
     setOwnerStyle()
 
@@ -62,7 +62,7 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
     ownerLabel.textColor = UIColor.funTeamThemeColor
     ownerLabel.backgroundColor = UIColor.funTeamThemeColor.withAlphaComponent(0.1)
     ownerLabel.layer.borderColor = UIColor.funTeamThemeColor.cgColor
-    ownerWidth?.constant = 48
+    ownerWidth?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 48
   }
 
   func setManagerStyle() {

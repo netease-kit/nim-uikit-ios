@@ -36,6 +36,20 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
 
   override open func setupSubviews() {
     super.setupSubviews()
+
+    let cancelButton = UIButton()
+    cancelButton.translatesAutoresizingMaskIntoConstraints = false
+    cancelButton.setTitle(commonLocalizable("cancel"), for: .normal)
+    cancelButton.setTitleColor(.ne_greyText, for: .normal)
+    cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
+
+    view.addSubview(cancelButton)
+    NSLayoutConstraint.activate([
+      cancelButton.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
+      cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
+      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
+    ])
+
     let leftImageView = UIImageView(image: coreLoader.loadImage("funSearch"))
     searchTextField.leftView = leftImageView
     searchTextField.font = UIFont.systemFont(ofSize: 16)
@@ -45,21 +59,8 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
     NSLayoutConstraint.activate([
       searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.statusBarHeight + 12),
       searchTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
-      searchTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -72),
+      searchTextField.rightAnchor.constraint(equalTo: cancelButton.leftAnchor, constant: -8),
       searchTextField.heightAnchor.constraint(equalToConstant: 36),
-    ])
-
-    let cancelButton = UIButton()
-    cancelButton.translatesAutoresizingMaskIntoConstraints = false
-    cancelButton.setTitle(localizable("cancel"), for: .normal)
-    cancelButton.setTitleColor(.ne_greyText, for: .normal)
-    cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
-
-    view.addSubview(cancelButton)
-    NSLayoutConstraint.activate([
-      cancelButton.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
-      cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      cancelButton.widthAnchor.constraint(equalToConstant: 40),
     ])
 
     tableView.backgroundColor = .funTeamBackgroundColor

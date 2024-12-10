@@ -223,7 +223,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
     weakSelf?.viewModel.removeCollection(collection) { error in
       if error != nil {
-        weakSelf?.showToast(chatLocalizable("failed_operation"))
+        weakSelf?.showToast(commonLocalizable("failed_operation"))
       } else {
         weakSelf?.viewModel.collectionDatas.removeAll(where: { model in
           if model.collection?.collectionId == collection.collectionId {
@@ -363,7 +363,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       actions.append(forwardAction)
     }
 
-    let cancelAction = UIAlertAction(title: chatLocalizable("cancel"), style: .cancel) { _ in }
+    let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in }
     actions.append(cancelAction)
 
     showActionSheet(actions)

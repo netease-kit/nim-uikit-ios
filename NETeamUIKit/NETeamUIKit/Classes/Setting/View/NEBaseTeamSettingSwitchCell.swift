@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamSettingSwitchCell: NEBaseTeamSettingCell {
-  public var tSwitch: UISwitch = {
+  public lazy var tSwitch: UISwitch = {
     let q = UISwitch()
     q.translatesAutoresizingMaskIntoConstraints = false
     q.accessibilityIdentifier = "id.tSwitch"

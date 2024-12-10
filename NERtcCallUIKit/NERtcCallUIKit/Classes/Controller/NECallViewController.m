@@ -148,7 +148,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
               });
             }
             weakSelf.videoCallingController.bigVideoView.userID =
-                NIMSDK.sharedSDK.loginManager.currentAccount;
+                [[NIMSDK sharedSDK].v2LoginService getLoginUser];
           }
 
           if (error) {
@@ -540,7 +540,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
     [[NECallEngine sharedInstance] muteLocalVideo:button.selected];
   }
   [self changeDefaultImage:button.selected];
-  [self cameraAvailble:!button.selected userId:NIMSDK.sharedSDK.loginManager.currentAccount];
+  [self cameraAvailble:!button.selected userId:[[NIMSDK sharedSDK].v2LoginService getLoginUser]];
 }
 
 - (void)hangupBtnClick:(UIButton *)button {
@@ -881,10 +881,10 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
 
 - (void)cameraAvailble:(BOOL)available userId:(NSString *)userId {
   if ([self.videoInCallController.bigVideoView.userID isEqualToString:userId]) {
-    self.videoInCallController.bigVideoView.maskView.hidden = available;
+    self.videoInCallController.bigVideoView.coverView.hidden = available;
   }
   if ([self.videoInCallController.smallVideoView.userID isEqualToString:userId]) {
-    self.videoInCallController.smallVideoView.maskView.hidden = available;
+    self.videoInCallController.smallVideoView.coverView.hidden = available;
   }
 
   if (self.showMyBigView) {
@@ -894,7 +894,7 @@ NSString *const kCallKitShowNoti = @"kCallKitShowNoti";
   }
   if ([userId isEqualToString:self.callParam.remoteUserAccid] && self.isSmallWindow == YES &&
       self.callParam.callType == NECallTypeVideo) {
-    self.maskView.hidden = available;
+    self.coverView.hidden = available;
   }
 }
 

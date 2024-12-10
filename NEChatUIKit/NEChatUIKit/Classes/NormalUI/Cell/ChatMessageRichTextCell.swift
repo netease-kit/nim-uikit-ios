@@ -6,7 +6,7 @@
 import UIKit
 
 @objcMembers
-open class ChatMessageRichTextCell: ChatMessageReplyCell {
+open class ChatMessageRichTextCell: ChatMessageTextCell {
   public lazy var titleLabelLeft: NEChatTextView = {
     let label = NEChatTextView()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -47,32 +47,34 @@ open class ChatMessageRichTextCell: ChatMessageReplyCell {
     return label
   }()
 
-  public var replyLabelLeftHeightAnchor: NSLayoutConstraint?
-  public var replyLabelRightHeightAnchor: NSLayoutConstraint?
-  public var titleLabelLeftTopAnchor: NSLayoutConstraint?
   public var titleLabelLeftHeightAnchor: NSLayoutConstraint?
-  public var titleLabelRightTopAnchor: NSLayoutConstraint?
   public var titleLabelRightHeightAnchor: NSLayoutConstraint?
   public var contentLabelLeftHeightAnchor: NSLayoutConstraint?
   public var contentLabelRightHeightAnchor: NSLayoutConstraint?
 
-  override open func commonUI() {
-    /// left
-    bubbleImageLeft.addSubview(replyLabelLeft)
-    replyLabelLeftHeightAnchor = replyLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
-    replyLabelLeftHeightAnchor?.isActive = true
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func commonUILeft() {
+    bubbleImageLeft.addSubview(replyViewLeft)
+    replyViewLeftHeightAnchor = replyViewLeft.heightAnchor.constraint(equalToConstant: replyViewHeight)
+    replyViewLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      replyLabelLeft.leadingAnchor.constraint(equalTo: bubbleImageLeft.leadingAnchor, constant: chat_content_margin),
-      replyLabelLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: chat_content_margin),
-      replyLabelLeft.trailingAnchor.constraint(equalTo: bubbleImageLeft.trailingAnchor, constant: -chat_content_margin),
+      replyViewLeft.leadingAnchor.constraint(equalTo: bubbleImageLeft.leadingAnchor, constant: chat_content_margin),
+      replyViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: 0),
+      replyViewLeft.trailingAnchor.constraint(equalTo: bubbleImageLeft.trailingAnchor, constant: -chat_content_margin),
     ])
 
     bubbleImageLeft.addSubview(titleLabelLeft)
-    titleLabelLeftTopAnchor = titleLabelLeft.topAnchor.constraint(equalTo: replyLabelLeft.bottomAnchor, constant: chat_content_margin)
-    titleLabelLeftTopAnchor?.isActive = true
     titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
+      titleLabelLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: chat_content_margin),
       titleLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
       titleLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: chat_content_margin),
     ])
@@ -85,23 +87,23 @@ open class ChatMessageRichTextCell: ChatMessageReplyCell {
       contentLabelLeft.leftAnchor.constraint(equalTo: titleLabelLeft.leftAnchor, constant: 0),
       contentLabelLeft.topAnchor.constraint(equalTo: titleLabelLeft.bottomAnchor, constant: chat_content_margin),
     ])
+  }
 
-    /// right
-    bubbleImageRight.addSubview(replyLabelRight)
-    replyLabelRightHeightAnchor = replyLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
-    replyLabelRightHeightAnchor?.isActive = true
+  override open func commonUIRight() {
+    bubbleImageRight.addSubview(replyViewRight)
+    replyViewRightHeightAnchor = replyViewRight.heightAnchor.constraint(equalToConstant: replyViewHeight)
+    replyViewRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      replyLabelRight.leadingAnchor.constraint(equalTo: bubbleImageRight.leadingAnchor, constant: chat_content_margin),
-      replyLabelRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: chat_content_margin),
-      replyLabelRight.trailingAnchor.constraint(equalTo: bubbleImageRight.trailingAnchor, constant: -chat_content_margin),
+      replyViewRight.leadingAnchor.constraint(equalTo: bubbleImageRight.leadingAnchor, constant: chat_content_margin),
+      replyViewRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: 0),
+      replyViewRight.trailingAnchor.constraint(equalTo: bubbleImageRight.trailingAnchor, constant: -chat_content_margin),
     ])
 
     bubbleImageRight.addSubview(titleLabelRight)
-    titleLabelRightTopAnchor = titleLabelRight.topAnchor.constraint(equalTo: replyLabelRight.bottomAnchor, constant: chat_content_margin)
-    titleLabelRightTopAnchor?.isActive = true
     titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
+      titleLabelRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: chat_content_margin),
       titleLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin),
       titleLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: chat_content_margin),
     ])
@@ -171,19 +173,9 @@ open class ChatMessageRichTextCell: ChatMessageReplyCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
-    let replyLabelHeightAnchor = isSend ? replyLabelRightHeightAnchor : replyLabelLeftHeightAnchor
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
-    let titleLabelTopAnchor = isSend ? titleLabelRightTopAnchor : titleLabelLeftTopAnchor
     let titleLabelHeightAnchor = isSend ? titleLabelRightHeightAnchor : titleLabelLeftHeightAnchor
     let contentLabelHeightAnchor = isSend ? contentLabelRightHeightAnchor : contentLabelLeftHeightAnchor
-
-    if model.replyText == nil || model.replyText!.isEmpty {
-      replyLabelHeightAnchor?.constant = 0
-      titleLabelTopAnchor?.constant = 0
-    } else {
-      replyLabelHeightAnchor?.constant = 16
-      titleLabelTopAnchor?.constant = chat_content_margin
-    }
 
     if let m = model as? MessageTextModel {
       contentLabelHeightAnchor?.constant = m.textHeight

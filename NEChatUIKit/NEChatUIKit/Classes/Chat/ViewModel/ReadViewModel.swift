@@ -38,7 +38,7 @@ open class ReadViewModel: NSObject {
       // 加载用户信息
       let loadUserIds = readReceiptDetail.readAccountList + readReceiptDetail.unreadAccountList
       group.enter()
-      NETeamUserManager.shared.getTeamMembers(accountIds: loadUserIds) {
+      NETeamUserManager.shared.getTeamMembers(loadUserIds) {
         // 已读用户
         for userId in readReceiptDetail.readAccountList {
           let memberInfo = NETeamMemberInfoModel()

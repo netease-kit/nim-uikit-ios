@@ -84,7 +84,7 @@ open class P2PChatViewModel: ChatViewModel {
       msg1.createTime > msg2.createTime
     }
     for message in messages {
-      if !message.isSelf {
+      if !message.isSelf, message.messageStatus.readReceiptSent == false {
         chatRepo.markP2PMessageRead(message: message, completion)
         return
       }

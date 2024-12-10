@@ -12,19 +12,14 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
   public let contentImageViewRight = UIImageView()
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
-    commonUIRight()
-    commonUILeft()
-  }
-
-  open func commonUILeft() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     contentImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
     contentImageViewLeft.contentMode = .scaleAspectFill
     contentImageViewLeft.clipsToBounds = true
@@ -40,7 +35,8 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func commonUIRight() {
+  override open func commonUIRight() {
+    super.commonUIRight()
     contentImageViewRight.translatesAutoresizingMaskIntoConstraints = false
     contentImageViewRight.contentMode = .scaleAspectFill
     contentImageViewRight.clipsToBounds = true

@@ -8,6 +8,6 @@ class TeamManagerMemberCell: TeamMemberCell {
   override func setupUI() {
     super.setupUI()
     ownerLabel.isHidden = true
-    nameLabelRightMargin?.constant = -65
+    nameLabelRightMargin?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? -100 : -65
   }
 }

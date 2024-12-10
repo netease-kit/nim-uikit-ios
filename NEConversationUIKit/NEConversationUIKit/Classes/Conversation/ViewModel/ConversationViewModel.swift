@@ -350,13 +350,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     let messageNew = V2NIMMessageCreator.createTextMessage(localizable("message_recalled"))
     messageNew.messageConfig?.unreadEnabled = true
 
-    if let ext = messageRevoke.serverExtension {
-      messageNew.localExtension = ext
-    } else {
-      var muta = [String: Any]()
-      muta[revokeLocalMessage] = true
-      messageNew.localExtension = NECommonUtil.getJSONStringFromDictionary(muta)
+    var muta = [String: Any]()
+    if let ext = NECommonUtil.getDictionaryFromJSONString(messageRevoke.serverExtension ?? "") as? [String: Any] {
+      muta = ext
     }
+    muta[revokeLocalMessage] = true
+    messageNew.serverExtension = NECommonUtil.getJSONStringFromDictionary(muta)
 
     ChatRepo.shared.insertMessageToLocal(message: messageNew,
                                          conversationId: messageRevoke.messageRefer?.conversationId ?? "",

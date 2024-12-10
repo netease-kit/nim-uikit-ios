@@ -68,18 +68,18 @@
   [self.view addGestureRecognizer:self.panGesture];
   self.view.clipsToBounds = YES;
 
-  [self.view addSubview:self.maskView];
+  [self.view addSubview:self.coverView];
   [NSLayoutConstraint activateConstraints:@[
-    [self.maskView.topAnchor constraintEqualToAnchor:self.recoveryView.topAnchor],
-    [self.maskView.leftAnchor constraintEqualToAnchor:self.recoveryView.leftAnchor],
-    [self.maskView.rightAnchor constraintEqualToAnchor:self.recoveryView.rightAnchor],
-    [self.maskView.bottomAnchor constraintEqualToAnchor:self.recoveryView.bottomAnchor]
+    [self.coverView.topAnchor constraintEqualToAnchor:self.recoveryView.topAnchor],
+    [self.coverView.leftAnchor constraintEqualToAnchor:self.recoveryView.leftAnchor],
+    [self.coverView.rightAnchor constraintEqualToAnchor:self.recoveryView.rightAnchor],
+    [self.coverView.bottomAnchor constraintEqualToAnchor:self.recoveryView.bottomAnchor]
   ]];
 
-  [self.maskView addSubview:self.remoteHeaderImage];
+  [self.coverView addSubview:self.remoteHeaderImage];
   [NSLayoutConstraint activateConstraints:@[
-    [self.remoteHeaderImage.centerXAnchor constraintEqualToAnchor:self.maskView.centerXAnchor],
-    [self.remoteHeaderImage.centerYAnchor constraintEqualToAnchor:self.maskView.centerYAnchor],
+    [self.remoteHeaderImage.centerXAnchor constraintEqualToAnchor:self.coverView.centerXAnchor],
+    [self.remoteHeaderImage.centerYAnchor constraintEqualToAnchor:self.coverView.centerYAnchor],
     [self.remoteHeaderImage.widthAnchor constraintEqualToConstant:42],
     [self.remoteHeaderImage.heightAnchor constraintEqualToConstant:42]
   ]];
@@ -151,7 +151,7 @@
     self.audioSmallView.hidden = YES;
     self.view.layer.cornerRadius = 0;
     if (self.isRemoteMute == YES) {
-      self.maskView.hidden = NO;
+      self.coverView.hidden = NO;
     }
   } else {
     self.audioSmallView.hidden = NO;
@@ -166,7 +166,7 @@
   self.panGesture.enabled = NO;
   self.isSmallWindow = NO;
   self.view.layer.cornerRadius = 0;
-  self.maskView.hidden = YES;
+  self.coverView.hidden = YES;
 }
 
 - (void)handlePan:(UIPanGestureRecognizer *)gesture {
@@ -279,11 +279,11 @@
 
 #pragma mark - lazy init
 
-- (UIView *)maskView {
-  if (_maskView == nil) {
+- (UIView *)coverView {
+  if (_coverView == nil) {
     // 实现一个渐变颜色的UIView
-    _maskView = [[UIView alloc] init];
-    _maskView.translatesAutoresizingMaskIntoConstraints = NO;
+    _coverView = [[UIView alloc] init];
+    _coverView.translatesAutoresizingMaskIntoConstraints = NO;
     CAGradientLayer *gradientLayer = [CAGradientLayer layer];
     gradientLayer.colors = @[
       (__bridge id)[NECallKitUtil colorWithHexString:@"#232529"].CGColor,
@@ -293,14 +293,14 @@
     gradientLayer.startPoint = CGPointMake(0, 0);
     gradientLayer.endPoint = CGPointMake(0, 1);
     gradientLayer.frame = CGRectMake(0, 0, 90, 160);
-    [_maskView.layer addSublayer:gradientLayer];
-    _maskView.hidden = YES;
+    [_coverView.layer addSublayer:gradientLayer];
+    _coverView.hidden = YES;
     // 添加点击手势
     UITapGestureRecognizer *tap =
         [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(changeToNormal)];
-    [_maskView addGestureRecognizer:tap];
+    [_coverView addGestureRecognizer:tap];
   }
-  return _maskView;
+  return _coverView;
 }
 
 - (UIImageView *)remoteHeaderImage {

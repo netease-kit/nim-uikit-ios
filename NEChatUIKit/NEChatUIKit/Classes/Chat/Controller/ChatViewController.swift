@@ -291,12 +291,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     viewModel.delegate = nil
   }
 
-  deinit {
-    NEALog.infoLog(className(), desc: "deinit")
-    viewModel.clearUnreadCount()
-    removeListener()
-  }
-
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     NEKeyboardManager.shared.enable = false
@@ -327,7 +321,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     addObseve()
     weak var weakSelf = self
     getSessionInfo(sessionId: viewModel.sessionId) {
-      weakSelf?.loadData()
+      DispatchQueue.main.async {
+        weakSelf?.loadData()
+      }
     }
     Router.shared.register(NERouterUrl.LocationSearchResult) { result in
       if let model = ChatLocaitonModel.yx_model(with: result) {
@@ -347,9 +343,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     NEKeyboardManager.shared.shouldResignOnTouchOutside = true
     isCurrentPage = false
     removeOperationView()
-    if audioPlayer?.isPlaying == true {
-      audioPlayer?.stop()
-    }
+    stopPlay()
 
     chatInputView.textView.resignFirstResponder()
     chatInputView.titleField.resignFirstResponder()
@@ -366,8 +360,13 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       let param = ["sessionId": viewModel.conversationId]
       Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
 
+      // 移除监听
       NotificationCenter.default.removeObserver(self)
       NETeamUserManager.shared.removeAllTeamInfo()
+      removeListener()
+
+      // 清空未读
+      viewModel.clearUnreadCount()
     }
   }
 
@@ -468,7 +467,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // MARK: - 子类可重写方法
 
-  public func onTeamMemberChange(team: V2NIMTeam) {}
+  open func onTeamMemberChange(team: V2NIMTeam) {}
 
   override open func backEvent() {
     super.backEvent()
@@ -630,8 +629,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     // 计算宽高
+    let itemH = NEAppLanguageUtil.getCurrentLanguage() == .english ? 62.0 : 56.0
     let w = items.count <= 5 ? 60.0 * Double(items.count) + 16.0 : 60.0 * 5 + 16.0
-    let h = items.count <= 5 ? 56.0 + 16.0 : 56.0 * 2 + 16.0
+    let h = items.count <= 5 ? itemH + 16.0 : itemH * 2 + 16.0
 
     let rectInTableView = tableView.rectForRow(at: index)
     let rectInView = tableView.convert(rectInTableView, to: view)
@@ -776,7 +776,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // MARK: - private 方法
 
-  func loadData() {
+  open func loadData() {
     weak var weakSelf = self
 
     // 多端登录清空未读数
@@ -900,7 +900,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
           desc: #function + "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
         )
 
-        self?.viewModel.clearUnreadCount()
         if error == nil {
           self?.needMarkReadMsgs = [V2NIMMessage]()
         }
@@ -1012,7 +1011,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   //    MARK: - ChatInputViewDelegate
 
-  public func didTranslateResult(_ content: String) {
+  open func didTranslateResult(_ content: String) {
     translateLanguageView.setTranslateContent(content)
   }
 
@@ -1203,7 +1202,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       self?.useToCallViewRouter(1)
     }
 
-    let cancelAction = UIAlertAction(title: chatLocalizable("cancel"), style: .cancel) { _ in
+    let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
     }
 
     showActionSheet([videoCallAction, audioCallAction, cancelAction])
@@ -1330,7 +1329,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     return true
   }
 
-  public func textViewDidChange() {
+  open func textViewDidChange() {
     translateLanguageView.changeToIdleState()
   }
 
@@ -1369,11 +1368,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         // 相册
         isFile = false
         goPhotoAlbumWithVideo(self) { [weak self] in
-          if self?.audioPlayer?.isPlaying == true {
-            self?.audioPlayer?.stop()
-            self?.playingCell?.stopAnimation(byRight: self?.playingModel?.message?.isSelf ?? true)
-            self?.playingModel?.isPlaying = false
-          }
+          self?.stopPlay()
         }
       } else if index == 3 {
         // 更多
@@ -1394,11 +1389,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     let camera = UIAlertAction(title: commonLocalizable("take_picture"), style: .default) { action in
       self.takePhoto()
     }
-    let photo = UIAlertAction(title: chatLocalizable("select_from_album"), style: .default) { action in
+    let photo = UIAlertAction(title: commonLocalizable("select_from_album"), style: .default) { action in
       self.willSelectImage()
     }
 
-    let cancel = UIAlertAction(title: chatLocalizable("cancel"), style: .cancel) { action in
+    let cancel = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { action in
     }
 
     alert.addAction(camera)
@@ -1532,12 +1527,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         return
       }
 
-      if isFile == true {
-        let imgSize_MB = Double(pngImage?.count ?? 0) / 1e6
-        NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(imgSize_MB) MB")
-        if imgSize_MB > ChatUIConfig.shared.fileSizeLimit {
-          showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
-        } else {
+      let imgSize_MB = Double(pngImage?.count ?? 0) / 1e6
+      NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(imgSize_MB) MB")
+      if imgSize_MB > ChatUIConfig.shared.fileSizeLimit {
+        showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
+      } else {
+        if isFile == true {
           viewModel.sendFileMessage(filePath: imageUrl.relativePath,
                                     displayName: imageName) { [weak self] message, error, progress in
             NEALog.infoLog(
@@ -1550,53 +1545,53 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
               self?.setModelProgress(message, progress)
             }
           }
-        }
-      } else {
-        if let url = info[.referenceURL] as? URL {
-          if url.absoluteString.hasSuffix("ext=GIF") == true {
-            // GIF 需要特殊处理
-            let imageAsset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset
-            let options = PHImageRequestOptions()
-            options.version = .current
-            guard let asset = imageAsset else {
-              return
-            }
-            weak var weakSelf = self
-            PHImageManager.default().requestImageData(for: asset, options: options) { imageData, dataUTI, orientation, info in
-              if let data = imageData {
-                let tempDirectoryURL = FileManager.default.temporaryDirectory
-                let uniqueString = UUID().uuidString
-                let temUrl = tempDirectoryURL.appendingPathComponent(uniqueString + ".gif")
-                print("tem url path : ", temUrl.path)
-                do {
-                  try data.write(to: temUrl)
-                  DispatchQueue.main.async {
-                    weakSelf?.viewModel.sendImageMessage(path: temUrl.path, name: imageName, width: imageWidth, height: imageHeight) { error in
-                      NEALog.infoLog(
-                        ModuleName + " " + ChatViewController.className(),
-                        desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
-                      )
-                      weakSelf?.showErrorToast(error)
+        } else {
+          if let url = info[.referenceURL] as? URL {
+            if url.absoluteString.hasSuffix("ext=GIF") == true {
+              // GIF 需要特殊处理
+              let imageAsset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset
+              let options = PHImageRequestOptions()
+              options.version = .current
+              guard let asset = imageAsset else {
+                return
+              }
+              weak var weakSelf = self
+              PHImageManager.default().requestImageData(for: asset, options: options) { imageData, dataUTI, orientation, info in
+                if let data = imageData {
+                  let tempDirectoryURL = FileManager.default.temporaryDirectory
+                  let uniqueString = UUID().uuidString
+                  let temUrl = tempDirectoryURL.appendingPathComponent(uniqueString + ".gif")
+                  print("tem url path : ", temUrl.path)
+                  do {
+                    try data.write(to: temUrl)
+                    DispatchQueue.main.async {
+                      weakSelf?.viewModel.sendImageMessage(path: temUrl.path, name: imageName, width: imageWidth, height: imageHeight) { error in
+                        NEALog.infoLog(
+                          ModuleName + " " + ChatViewController.className(),
+                          desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+                        )
+                        weakSelf?.showErrorToast(error)
+                      }
                     }
+                  } catch {
+                    NEALog.infoLog(ModuleName, desc: #function + "write tem gif data error : \(error.localizedDescription)")
                   }
-                } catch {
-                  NEALog.infoLog(ModuleName, desc: #function + "write tem gif data error : \(error.localizedDescription)")
                 }
               }
+              return
             }
-            return
           }
-        }
 
-        viewModel.sendImageMessage(path: imageUrl.relativePath, name: imageName, width: imageWidth, height: imageHeight) { [weak self] error in
-          NEALog.infoLog(
-            ModuleName + " " + ChatViewController.className(),
-            desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
-          )
-          self?.showErrorToast(error)
-          // 删除临时保存的图片
-          if needDelete {
-            try? FileManager.default.removeItem(at: imageUrl)
+          viewModel.sendImageMessage(path: imageUrl.relativePath, name: imageName, width: imageWidth, height: imageHeight) { [weak self] error in
+            NEALog.infoLog(
+              ModuleName + " " + ChatViewController.className(),
+              desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+            )
+            self?.showErrorToast(error)
+            // 删除临时保存的图片
+            if needDelete {
+              try? FileManager.default.removeItem(at: imageUrl)
+            }
           }
         }
       }
@@ -1699,7 +1694,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 来源： 发送消息， 插入消息
   /// - Parameter param: 消息参数，包含消息和发送参数
   /// - Returns: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  public func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
+  open func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
     if let block = ChatKitClient.shared.beforeSend {
       let p = block(self, param)
       return p
@@ -1712,7 +1707,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 来源： 发送消息， 插入消息
   /// - Parameter param: 消息参数，包含消息和发送参数
   /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  public func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
+  open func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
     if let block = ChatKitClient.shared.beforeSendCompletion {
       block(self, param, completion)
     } else {
@@ -1725,20 +1720,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func onRecvMessages(_ messages: [V2NIMMessage], _ indexs: [IndexPath]) {
     removeOperationView()
     insertRows(indexs)
-
-    // 如果当前页面是活跃状态，发送已读回执
-    if isCurrentPage,
-       UIApplication.shared.applicationState == .active {
-      // 发送已读回执
-      viewModel.markRead(messages: messages) { error in
-        NEALog.infoLog(
-          ModuleName + " " + ChatViewController.className(),
-          desc: #function + "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
-        )
-      }
-    } else {
-      needMarkReadMsgs += messages
-    }
   }
 
   /// 消息即将发送
@@ -1749,7 +1730,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 消息发送成功
   /// - Parameter message: 消息
-  public func sendSuccess(_ message: V2NIMMessage, _ index: IndexPath) {
+  open func sendSuccess(_ message: V2NIMMessage, _ index: IndexPath) {
     tableViewReloadIndexs([index])
 
     // 提示【大模型请求响应中...】
@@ -1758,7 +1739,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  public func onLoadMoreWithMessage(_ indexs: [IndexPath]) {
+  open func onLoadMoreWithMessage(_ indexs: [IndexPath]) {
     tableViewReloadIndexs(indexs)
   }
 
@@ -1825,7 +1806,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  public func onMessagePinStatusChange(_ message: V2NIMMessage?, atIndexs: [IndexPath]) {
+  open func onMessageStatusChange(_ message: V2NIMMessage?, atIndexs: [IndexPath]) {
     tableViewReloadIndexs(atIndexs) { [weak self] in
       for index in atIndexs {
         if let numberOfRows = self?.tableView.numberOfRows(inSection: 0), index.row == numberOfRows - 1 {
@@ -1878,7 +1859,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameter url: 置顶消息 图片缩略图/视频首帧 地址
   /// - Parameter isVideo: 置顶消息是否是视频消息
   /// - Parameter hideClose: 是否隐藏移除置顶按钮
-  public func setTopValue(name: String?, content: String?, url: String?, isVideo: Bool, hideClose: Bool) {
+  open func setTopValue(name: String?, content: String?, url: String?, isVideo: Bool, hideClose: Bool) {
     if let content = content {
       contentView.addSubview(topMessageView)
       NSLayoutConstraint.activate([
@@ -1895,7 +1876,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 更新置顶消息中的发送者昵称
   /// - Parameter name: 发送者昵称
-  public func updateTopName(name: String?) {
+  open func updateTopName(name: String?) {
     topMessageView.updateTopName(name: name)
   }
 
@@ -1907,7 +1888,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // record audio
   open func startRecord() {
-    let dur = 60.0
+    let dur = 59.6 // 60 - 0.4, SDK 录制时间无法精确，设置最长60s，实际录制时间为60.2s左右，超过60s语音转文字时会超长
     if NEAuthManager.hasAudioAuthoriztion() {
       NIMSDK.shared().mediaManager.record(forDuration: dur)
     } else {
@@ -1927,7 +1908,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func moveInView() {}
 
   open func endRecord(insideView: Bool) {
-    print("[record] stop:\(insideView)")
+    print("\(Date().timeIntervalSince1970) [record] stop:\(insideView)")
     if insideView {
       //            send
       NIMSDK.shared().mediaManager.stopRecord()
@@ -1995,24 +1976,22 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func stopPlay() {
-    if audioPlayer?.isPlaying == true {
-      audioPlayer?.stop()
-    }
-
+    audioPlayer?.stop()
+    audioPlayer = nil
     playingCell?.stopAnimation(byRight: playingModel?.message?.isSelf ?? true)
-    playingModel?.isPlaying = false
+    playingModel = nil
   }
 
   //    MARK: - NIMMediaManagerDelegate
 
   //  record
   open func recordAudio(_ filePath: String?, didBeganWithError error: Error?) {
-    print("[record] sdk Began error:\(error?.localizedDescription ?? "")")
+    print("\(Date().timeIntervalSince1970) [record] sdk Began error:\(error?.localizedDescription ?? "")")
     stopPlay()
   }
 
   open func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
-    print("[record] sdk Completed error:\(error?.localizedDescription ?? "")")
+    print("\(Date().timeIntervalSince1970) [record] sdk Completed error:\(error?.localizedDescription ?? "")")
     chatInputView.stopRecordAnimation()
     guard let fp = filePath else {
       showErrorToast(error)
@@ -2038,7 +2017,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     print("[record] sdk cancel")
   }
 
-  open func recordAudioProgress(_ currentTime: TimeInterval) {}
+  open func recordAudioProgress(_ currentTime: TimeInterval) {
+    print("\(Date().timeIntervalSince1970) [record] sdk Progress：\(currentTime)")
+  }
 
   open func recordAudioInterruptionBegin() {}
 
@@ -2196,6 +2177,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       untopMessage()
     case .collection:
       toCollectMessage()
+    case .voiceToText:
+      voiceToText()
     default:
       if let onClick = item.onClick {
         onClick(self)
@@ -2278,7 +2261,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
           }
         }
       } else {
-        var text = chatLocalizable("msg_reply")
+        var text = chatLocalizable("operation_replay")
         if let uid = ChatMessageHelper.getSenderId(message) {
           var showName = NETeamUserManager.shared.getShowName(uid, false)
           if V2NIMConversationIdUtil.conversationType(viewModel.conversationId) != .CONVERSATION_TYPE_P2P,
@@ -2519,10 +2502,29 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         if error?.code == collectionLimitCode {
           self?.showToast(chatLocalizable("collection_limit"))
         } else {
-          self?.showToast(chatLocalizable("failed_operation"))
+          self?.showToast(commonLocalizable("failed_operation"))
         }
       } else {
         self?.showToast(chatLocalizable("collection_success"))
+      }
+    }
+  }
+
+  /// 语音消息转文字
+  open func voiceToText() {
+    // 校验网络
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+
+    guard let operationModel = viewModel.operationModel else {
+      return
+    }
+
+    viewModel.voiceToText(operationModel) { [weak self] text, error in
+      if error != nil || text == nil || text?.isEmpty == true {
+        self?.showToast(chatLocalizable("operation_to_text_failed"))
       }
     }
   }
@@ -2546,7 +2548,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         } else if err.code == noPermissionOperationCode {
           self?.view.makeToast(chatLocalizable("no_permission_tip"), position: .center)
         } else if err.code == failedOperation {
-          self?.view.makeToast(chatLocalizable("failed_operation"), position: .center)
+          self?.view.makeToast(commonLocalizable("failed_operation"), position: .center)
         } else {
           self?.view.makeToast(error?.localizedDescription, position: .center)
         }
@@ -2562,7 +2564,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       viewModel.selectedMessages = [msg]
     }
 
-    navigationView.setMoreButtonTitle(chatLocalizable("cancel"))
+    navigationView.setMoreButtonTitle(commonLocalizable("cancel"))
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(cancelMutilSelect))
     setInputView(edit: false)
@@ -2604,32 +2607,23 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     guard indexPath.row < viewModel.messages.count else { return NEBaseChatMessageCell() }
     let model = viewModel.messages[indexPath.row]
     var reuseId = "\(NEBaseChatMessageCell.self)"
-    if model.replyedModel?.isReplay == true,
-       model.isRevoked == false {
-      if model.customType == customRichTextType {
+    let key = "\(model.type.rawValue)"
+    if model.type == .custom {
+      if model.customType == customMultiForwardType {
+        reuseId = "\(MessageType.multiForward.rawValue)"
+      } else if model.customType == customRichTextType {
         reuseId = "\(MessageType.richText.rawValue)"
-      } else {
-        reuseId = "\(MessageType.reply.rawValue)"
-      }
-    } else {
-      let key = "\(model.type.rawValue)"
-      if model.type == .custom {
-        if model.customType == customMultiForwardType {
-          reuseId = "\(MessageType.multiForward.rawValue)"
-        } else if model.customType == customRichTextType {
-          reuseId = "\(MessageType.richText.rawValue)"
-        } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(model.customType)"] != nil {
-          reuseId = "\(model.customType)"
-        } else {
-          reuseId = "\(NEBaseChatMessageCell.self)"
-        }
-      } else if model.type == .notification || model.type == .tip {
-        reuseId = "\(MessageType.time.rawValue)"
-      } else if cellRegisterDic[key] != nil {
-        reuseId = key
+      } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(model.customType)"] != nil {
+        reuseId = "\(model.customType)"
       } else {
         reuseId = "\(NEBaseChatMessageCell.self)"
       }
+    } else if model.type == .notification || model.type == .tip {
+      reuseId = "\(MessageType.time.rawValue)"
+    } else if cellRegisterDic[key] != nil {
+      reuseId = key
+    } else {
+      reuseId = "\(NEBaseChatMessageCell.self)"
     }
 
     var isSend = model.message?.isSelf ?? false
@@ -2649,11 +2643,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
       // 语音消息播放状态
       if let audioCell = cell as? ChatAudioCellProtocol,
-         let m = model as? MessageAudioModel,
-         m.message?.messageClientId == playingModel?.message?.messageClientId {
-        if audioPlayer?.isPlaying == true {
+         let m = model as? MessageAudioModel {
+        if audioPlayer?.isPlaying == true,
+           m.message?.messageClientId == playingModel?.message?.messageClientId {
           playingCell = audioCell
           m.isPlaying = true
+        }
+        if m.isPlaying == false {
+          audioCell.stopAnimation(byRight: isSend)
         }
       }
 
@@ -2719,7 +2716,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     0
   }
 
-  public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     // 无更多消息
     if viewModel.messages.count < viewModel.messagPageNum {
       return
@@ -2891,6 +2888,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - replyIndex: 被回复消息的下标
   open func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     switch model?.type {
+    case .text:
+      if replyIndex != nil {
+        showTextViewController(model)
+      }
     case .audio:
       didTapAudioMessage(cell, model)
     case .image:
@@ -2906,11 +2907,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     case .custom:
       didTapCustomMessage(model, replyIndex)
     default:
-      if (replyIndex ?? -1) > -1, model?.type == .text || model?.type == .reply {
-        showTextViewController(model)
-      } else {
-        print(#function + "message did tap, type:\(String(describing: model?.type.rawValue))")
-      }
+      print(#function + "message did tap, type:\(String(describing: model?.type.rawValue))")
     }
   }
 
@@ -3179,12 +3176,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // MARK: - NEBaseTranslateLanguageView Delegate
 
-  public func didUseTranslate(_ content: String) {
+  open func didUseTranslate(_ content: String) {
     chatInputView.textView.text = content
   }
 
   /// 开始翻译回调
-  public func didStartClick() {
+  open func didStartClick() {
     if let contentString = chatInputView.getRealSendText(chatInputView.textView.attributedText) {
       viewModel.translateLanguage(contentString, targetLanguage: translateLanguageView.currentLanguage) { [weak self] error in
         if error != nil {
@@ -3202,21 +3199,21 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  public func didChangeViewHeight(_ translateView: NEAITranslateView, _ changeHeight: CGFloat) {
+  open func didChangeViewHeight(_ translateView: NEAITranslateView, _ changeHeight: CGFloat) {
     translateLanguageViewHeightAnchor?.constant = changeHeight
   }
 
-  public func didSwitchLanguageClick(_ currentLanguage: String?) {
+  open func didSwitchLanguageClick(_ currentLanguage: String?) {
     print("translateLanguageViewDidClickSwitchLanguage ", currentLanguage as Any)
   }
 
-  public func didCloseClick(_ view: NEAITranslateView) {
+  open func didCloseClick(_ view: NEAITranslateView) {
     translateLanguageViewHeightAnchor?.constant = 0
   }
 
   // MARK: - Select Language Delegate
 
-  public func didSelectLanguage(_ language: String?, _ controller: UIViewController?) {
+  open func didSelectLanguage(_ language: String?, _ controller: UIViewController?) {
     if let currentLanguage = language {
       translateLanguageView.currentLanguage = currentLanguage
     }
@@ -3227,7 +3224,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
 extension ChatViewController: TopMessageViewDelegate {
   /// 点击置顶消息视图中的关闭按钮
-  public func didClickCloseButton() {
+  open func didClickCloseButton() {
     // 校验网络
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
@@ -3244,7 +3241,7 @@ extension ChatViewController: TopMessageViewDelegate {
   }
 
   /// 点击置顶消息视图
-  public func didTapTopMessageView() {
+  open func didTapTopMessageView() {
     // 校验网络
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
@@ -3271,7 +3268,7 @@ extension ChatViewController: TopMessageViewDelegate {
 }
 
 extension ChatViewController: UIViewControllerTransitioningDelegate {
-  public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+  open func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
     CustomPresentationController(presentedViewController: presented, presenting: presenting)
   }
 }
@@ -3289,10 +3286,11 @@ extension ChatViewController: NEMutilSelectBottomViewDelegate {
           if msg.messageClientId == model.message?.messageClientId {
             let indexPath = IndexPath(row: row, section: 0)
             let model = viewModel.messages[indexPath.row]
-            if !model.isRevoked,
-               let cell = tableView.cellForRow(at: indexPath) as? NEBaseChatMessageCell {
+            if !model.isRevoked {
               model.isSelected = !model.isSelected
-              cell.selectedButton.isSelected = model.isSelected
+              if let cell = tableView.cellForRow(at: indexPath) as? NEBaseChatMessageCell {
+                cell.selectedButton.isSelected = model.isSelected
+              }
             }
           }
         }
@@ -3533,7 +3531,8 @@ extension ChatViewController: ChatBaseCellDelegate {
       return
     }
 
-    if var replyModel = replyModel as? MessageContentModel {
+    if model?.type == .text,
+       var replyModel = replyModel as? MessageContentModel {
       var index = -1
       for (i, m) in viewModel.messages.enumerated() {
         if replyModel.message?.messageClientId == m.message?.messageClientId {
@@ -3617,7 +3616,16 @@ extension ChatViewController: ChatBaseCellDelegate {
         tableViewReload()
         return
       }
-      if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""), remoteExt[keyReplyMsgKey] != nil {
+
+      var extensionStr = ""
+      if let serverExt = message.serverExtension, !serverExt.isEmpty {
+        extensionStr = serverExt
+      } else if let localExt = message.localExtension, !localExt.isEmpty {
+        extensionStr = localExt
+      }
+
+      if let remoteExt = getDictionaryFromJSONString(extensionStr),
+         remoteExt[keyReplyMsgKey] != nil {
         viewModel.operationModel = model
         showReplyMessageView(isReEdit: true)
       } else {
@@ -3635,7 +3643,7 @@ extension ChatViewController: ChatBaseCellDelegate {
       attributeStr = NSMutableAttributedString(string: text)
       attributeStr?.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)], range: NSMakeRange(0, text.utf16.count))
 
-      if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""),
+      if let remoteExt = getDictionaryFromJSONString(extensionStr),
          let dic = remoteExt[yxAtMsg] as? [String: AnyObject] {
         for (key, value) in dic {
           if let contentDic = value as? [String: AnyObject] {
@@ -3705,9 +3713,27 @@ extension ChatViewController: ChatBaseCellDelegate {
   /// - Parameters:
   ///   - cell: 所处位置的 cell
   ///   - model: 消息模型
-  public func didTextViewLoseFocus(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+  open func didTextViewLoseFocus(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     if viewModel.operationModel == model {
       removeOperationView()
+    }
+  }
+
+  open func messageWillShow(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    if let message = model?.message {
+      // 如果当前页面是活跃状态，发送已读回执
+      if isCurrentPage,
+         UIApplication.shared.applicationState == .active {
+        // 发送已读回执
+        viewModel.markRead(messages: [message]) { error in
+          NEALog.infoLog(
+            ModuleName + " " + ChatViewController.className(),
+            desc: #function + "CALLBACK markRead " + (error?.localizedDescription ?? "no error")
+          )
+        }
+      } else {
+        needMarkReadMsgs.append(message)
+      }
     }
   }
 
@@ -3793,12 +3819,12 @@ extension ChatViewController: ChatBaseCellDelegate {
 
 extension ChatViewController: AVAudioPlayerDelegate {
   /// 声音播放完成回调
-  public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+  open func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
     stopPlay()
   }
 
   /// 声音解码失败回调
-  public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
+  open func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
     stopPlay()
   }
 }
@@ -3811,7 +3837,7 @@ extension ChatViewController: NEIMKitClientListener {
   ///   - type: 同步的数据类型
   ///   - state: 同步状态
   ///   - error: 错误信息
-  public func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
     if type == .DATA_SYNC_TYPE_MAIN, state == .DATA_SYNC_STATE_COMPLETED {
       getSessionInfo(sessionId: viewModel.sessionId) {
         print("getSessionInfo again")
@@ -3821,7 +3847,7 @@ extension ChatViewController: NEIMKitClientListener {
 
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  public func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
       for model in viewModel.messages {

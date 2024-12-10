@@ -6,13 +6,12 @@
 "open_push"="Please open the push in the setting";
 "message"="Message";
 "qchat"="QChat";
-"contact"="Contact";
+"contact"="Contacts";
 "mine"="Me";
 "logout"="Log out";
 "about_yunxin"="About CommsEase";
 "want_to_logout"="Sure to log out?";
 "person_info"="My Proflie";
-"cancel"="Cancel";
 "setting_birthday_failure"="Set birthday Failed";
 "setting_head_failure"="Set Avatar Failed";
 "setting_nickname_failure"="Set Nick Name Failed";
@@ -22,17 +21,20 @@
 "change_phone_failure"="Set mobile Failed";
 "change_email_failure"="Set e-mail Failed";
 "change_sign_failure"="Set What's up Failed";
-"save"="Save";
 "birthday"="Birthday";
 "phone"="Mobile";
 "email"="E-mail";
 "sign_remind"="sign remind";
 
+"complete"="Complete";
+"save"="Save";
 "message_remind"="Notification";
 "style_selection"="Skin";
-"product_intro"="Product introduction";
+"app_language"="Language";
+"app_language_zh"="中文";
+"app_language_en"="English";
+"product_intro"="Product Introduction";
 "receiver_mode"="Handset Mode";
-"delete_friend"="删除好友是否同步删除备注";//功能移除可删除
 "message_read_function"="Read/Unread";
 "version"="Version";
 "headImage"="Avatar";
@@ -44,14 +46,12 @@
 "new_message_remind"="message notification";
 "ring_mode"="Ring mode";
 "vibration_mode"="Vibration mode";
-"syn_receive_push"="PC/Web同步接收推送";//功能移除可删除
 "display_message_detail"="displays the details in notification bar";
 "setting"="Setting";
-"confirm"="yes";
-"cancel"="cancel";
 "real_service"="Truly Stable IM Product";
 "appName"="CommsEase IM";
 "brand_des"="CommsEase";
+"im_version"="IM Version";
 "register_login"="register/login";
 "email_login"="Email Login";
 "node_select"="Select Node";
@@ -66,7 +66,9 @@
 "style_default"="Base Skin";
 "style_fun"="Common Skin";
 
-"change_normal_style"="是否切换基础版？";
-"change_fun_style"="是否切换娱乐版？";
-
 "mine_collection"="Collection";
+
+"anti_error"="Unsafe content detected. Please rephrase.";
+
+"privatized_configuration"="Privatized configuration";
+"login_by_account"="login";

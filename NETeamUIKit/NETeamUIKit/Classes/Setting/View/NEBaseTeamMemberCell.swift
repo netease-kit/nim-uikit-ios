@@ -91,7 +91,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
       headerView.heightAnchor.constraint(equalToConstant: 42),
     ])
 
-    nameLabelRightMargin = nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -116)
+    nameLabelRightMargin = nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -170 : -116)
     contentView.addSubview(nameLabel)
     NSLayoutConstraint.activate([
       nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
@@ -102,7 +102,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     ownerWidth = ownerLabel.widthAnchor.constraint(equalToConstant: 48.0)
     contentView.addSubview(ownerLabel)
     NSLayoutConstraint.activate([
-      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -70),
+      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -90 : -70),
       ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ownerLabel.heightAnchor.constraint(equalToConstant: 22.0),
       ownerWidth!,
@@ -112,7 +112,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
   func configure(_ model: NETeamMemberInfoModel) {
     // 更新用户信息
     if let userId = model.nimUser?.user?.accountId, let user = NEFriendUserCache.shared.getFriendInfo(userId) {
-//      model.nimUser = user
+      model.nimUser = user
     }
     currentModel = model
     if let url = model.nimUser?.user?.avatar, !url.isEmpty {

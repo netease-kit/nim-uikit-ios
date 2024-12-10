@@ -41,7 +41,7 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
   }
 
   func setupUI() {
-    title = NSLocalizedString("node_select", comment: "")
+    title = localizable("node_select")
     navigationView.backgroundColor = .ne_lightBackgroundColor
 
     view.addSubview(tableView)
@@ -60,15 +60,15 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
 
   private func showAlert(_ isDomestic: Bool) {
     let alertController = UIAlertController(
-      title: NSLocalizedString("change_node", comment: ""),
-      message: NSLocalizedString("restart_take_effect", comment: ""),
+      title: localizable("change_node"),
+      message: localizable("restart_take_effect"),
       preferredStyle: .alert
     )
 
-    let cancelAction = UIAlertAction(title: NSLocalizedString("cancel", comment: ""), style: .default) { action in
+    let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .default) { action in
     }
     alertController.addAction(cancelAction)
-    let sureAction = UIAlertAction(title: NSLocalizedString("restart", comment: ""), style: .default) { action in
+    let sureAction = UIAlertAction(title: localizable("restart"), style: .default) { action in
       // 设置节点
       SettingRepo.shared.setNodeValue(isDomestic)
       exit(0)

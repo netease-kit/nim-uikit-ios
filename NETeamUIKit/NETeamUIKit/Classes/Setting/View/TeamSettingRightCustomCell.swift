@@ -9,9 +9,9 @@ import UIKit
 open class TeamSettingRightCustomCell: TeamSettingSubtitleCell {
   override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
-    if let icon = model?.rightCustomViewIcon, icon.count > 0 {
+    if let icon = model?.rightCustomViewIcon {
       customRightView.isHidden = false
-      customRightView.setImage(coreLoader.loadImage(icon), for: .normal)
+      customRightView.setImage(icon, for: .normal)
       arrowView.isHidden = true
     } else {
       customRightView.isHidden = true

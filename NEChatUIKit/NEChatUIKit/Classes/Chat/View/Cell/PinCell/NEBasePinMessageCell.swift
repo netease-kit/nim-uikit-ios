@@ -21,7 +21,7 @@ open class NEBasePinMessageCell: UITableViewCell {
 
   public var pinModel: NEPinMessageModel?
 
-  public var delegate: PinMessageCellDelegate?
+  public weak var delegate: PinMessageCellDelegate?
 
   public var contentGesture: UITapGestureRecognizer?
 

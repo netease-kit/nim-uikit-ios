@@ -26,7 +26,7 @@ class NEAboutWebViewController: NEBaseViewController {
   }
 
   func setUpSubViews() {
-    title = NSLocalizedString("product_intro", comment: "")
+    title = localizable("product_intro")
     navigationView.backgroundColor = .white
     navigationView.moreButton.isHidden = true
     navigationController?.navigationBar.backgroundColor = .white

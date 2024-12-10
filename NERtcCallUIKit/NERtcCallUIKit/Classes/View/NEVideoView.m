@@ -15,12 +15,12 @@
       [self.videoView.topAnchor constraintEqualToAnchor:self.topAnchor],
       [self.videoView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
     ]];
-    [self addSubview:self.maskView];
+    [self addSubview:self.coverView];
     [NSLayoutConstraint activateConstraints:@[
-      [self.maskView.leftAnchor constraintEqualToAnchor:self.leftAnchor],
-      [self.maskView.rightAnchor constraintEqualToAnchor:self.rightAnchor],
-      [self.maskView.topAnchor constraintEqualToAnchor:self.topAnchor],
-      [self.maskView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
+      [self.coverView.leftAnchor constraintEqualToAnchor:self.leftAnchor],
+      [self.coverView.rightAnchor constraintEqualToAnchor:self.rightAnchor],
+      [self.coverView.topAnchor constraintEqualToAnchor:self.topAnchor],
+      [self.coverView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
     ]];
     [self addSubview:self.titleLabel];
     [NSLayoutConstraint activateConstraints:@[
@@ -46,14 +46,14 @@
   }
   return _videoView;
 }
-- (UIView *)maskView {
-  if (!_maskView) {
-    _maskView = [[UIView alloc] init];
-    _maskView.backgroundColor = [UIColor darkGrayColor];
-    _maskView.hidden = YES;
-    _maskView.translatesAutoresizingMaskIntoConstraints = NO;
+- (UIView *)coverView {
+  if (!_coverView) {
+    _coverView = [[UIView alloc] init];
+    _coverView.backgroundColor = [UIColor darkGrayColor];
+    _coverView.hidden = YES;
+    _coverView.translatesAutoresizingMaskIntoConstraints = NO;
   }
-  return _maskView;
+  return _coverView;
 }
 
 - (UILabel *)titleLabel {

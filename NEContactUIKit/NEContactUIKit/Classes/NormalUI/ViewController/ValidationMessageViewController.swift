@@ -50,7 +50,7 @@ open class ValidationMessageViewController: NEBaseValidationMessageViewControlle
 extension ValidationMessageViewController {
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let noti = viewModel.datas[indexPath.row]
+    let noti = viewModel.friendAddApplications[indexPath.row]
     let reuseIdentifier = "\(SystemNotificationCell.self)"
     let cell = tableView.dequeueReusableCell(
       withIdentifier: reuseIdentifier,

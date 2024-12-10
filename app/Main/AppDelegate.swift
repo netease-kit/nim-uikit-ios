@@ -31,6 +31,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     
     func setupInit(){
+        if IMSDKConfigManager.instance.getConfig().enableCustomConfig.boolValue {
+            // 开启自定义配置，使用自定义配置
+//            NIMSDK.shared().serverSetting = NIMServerSetting()
+            
+            if IMSDKConfigManager.instance.getConfig().customJson?.count ?? 0 > 0 {
+                loginWithAutoParseConfig()
+                return
+            }else if let appkey = IMSDKConfigManager.instance.getConfig().configMap[#keyPath(NIMSDKOption.appKey)] as? String {
+                let option = NIMSDKOption()
+                option.v2 = true
+                option.appKey = appkey
+                IMKitClient.instance.setupIM(option)
+                loginWithCustomConfig()
+                return
+            }
+        }
         
         // 初始化NIMSDK
         let option = NIMSDKOption()
@@ -43,13 +59,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         let account = "<#account#>"
         let token = "<#token#>"
+        
         loadService()
+        NEKeyboardManager.shared.enable = true
+        NEKeyboardManager.shared.shouldResignOnTouchOutside = true
         
         weak var weakSelf = self
         IMKitClient.instance.login(account, token, nil) { error in
             if let err = error {
-                print("login error in app : ", err.localizedDescription)
+                NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
+                UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+                // 此处重新登录
             }else {
+                NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
                 weakSelf?.initConfig()
                 weakSelf?.initializePage()
             }
@@ -59,22 +81,168 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     @objc func refreshRoot(){
         print("refresh root")
-        //loginWithUI()
+        // 此处重新登录
     }
     
     @objc func refreshUIStyle(){
-        initializePage()
+        initializePage(true)
+    }
+    
+    func initConfig() {
+        //地图组件初始化
+        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
+        
+        //呼叫组件初始化
+        let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+        NECallEngine.sharedInstance().setup(setupConfig)
+        NECallEngine.sharedInstance().setTimeout(30)
+        
+        let uiConfig = NECallUIKitConfig()
+        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+    }
+    
+    func initializePage(_ isLoginInit: Bool = false) {
+        loadService()
+        let tab = NETabBarController(isLoginInit)
+        self.window?.rootViewController = tab
+    }
+    
+    //    regist router
+    func loadService() {
+        ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
+        if NEStyleManager.instance.isNormalStyle() == false {
+            registerFunCustom()
+        }else {
+            registerNormalCustom()
+        }
+
+        Router.shared.register(MeSettingRouter) { param in
+            if let nav = param["nav"] as? UINavigationController {
+                let me = PersonInfoViewController()
+                nav.pushViewController(me, animated: true)
+            }
+        }
+    }
+    
+    
+    /// 注册娱乐版自定义内容
+    func registerFunCustom(){
+        Router.shared.register(PushP2pChatVCRouter) { param in
+            print("param:\(param)")
+            let nav = param["nav"] as? UINavigationController
+            guard let conversationId = param["conversationId"] as? String else {
+                return
+            }
+            let anchor = param["anchor"] as? V2NIMMessage
+            let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
+            
+            for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                if vc.isKind(of: ChatViewController.self) {
+                    nav?.viewControllers[i] = p2pChatVC
+                    nav?.popToViewController(p2pChatVC, animated: true)
+                    return
+                }
+            }
+            
+            if let remove = param["removeUserVC"] as? Bool, remove {
+                nav?.viewControllers.removeLast()
+            }
+            
+            nav?.pushViewController(p2pChatVC, animated: true)
+        }
+    }
+    
+    /// 注册通用版自定义内容
+    func registerNormalCustom(){
+        Router.shared.register(PushP2pChatVCRouter) { param in
+            print("param:\(param)")
+            let nav = param["nav"] as? UINavigationController
+            guard let conversationId = param["conversationId"] as? String else {
+                return
+            }
+            let anchor = param["anchor"] as? V2NIMMessage
+            let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
+            
+            for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
+                if vc.isKind(of: ChatViewController.self) {
+                    nav?.viewControllers[i] = p2pChatVC
+                    nav?.popToViewController(p2pChatVC, animated: true)
+                    return
+                }
+            }
+            if let remove = param["removeUserVC"] as? Bool, remove {
+                nav?.viewControllers.removeLast()
+            }
+            
+            nav?.pushViewController(p2pChatVC, animated: true)
+        }
+    }
+    
+    func loginWithAutoParseConfig(){
+        
+        guard let json = IMSDKConfigManager.instance.getConfig().customJson else {
+            // 此处重新登录
+            return
+        }
+        
+        let jsonData = json.data(using: .utf8) ?? Data()
+        do {
+            let dict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) as? [String: Any]
+            let option = NIMSDKOption()
+            option.v2 = true
+            if let appkey = dict?["appkey"] as? String {
+                option.v2 = true
+                option.appKey = appkey
+                IMKitClient.instance.setupIM(option)
+            }
+            if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
+                NEAIUserManager.shared.setProvider(provider: self)
+                IMKitClient.instance.login(accountId, accountIdToken, nil) { error in
+                    if let err = error {
+                        NEALog.infoLog(self.className(), desc: "login IM error : \(err.localizedDescription)")
+                        UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+                        // 此处重新登录
+                    } else {
+                        NEALog.infoLog(self.className(), desc: "login IM Success")
+                        self.initConfig()
+                        self.initializePage()
+                    }
+                }
+            } else {
+                // 此处重新登录
+            }
+        } catch let error {
+            NEALog.infoLog(self.className(), desc: "login poc IM error : \(error.localizedDescription)")
+        }
+    }
+    
+    func loginWithCustomConfig(){
+        if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
+            NEAIUserManager.shared.setProvider(provider: self)
+            IMKitClient.instance.login(accountId, accountIdToken, nil) { error in
+                if let err = error {
+                    NEALog.infoLog(self.className(), desc: "login IM error : \(err.localizedDescription)")
+                    UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+                    // 此处重新登录
+                } else {
+                    NEALog.infoLog(self.className(), desc: "login IM Success")
+                    self.initConfig()
+                    self.initializePage()
+                }
+            }
+        } else {
+            // 此处重新登录
+        }
     }
     
     func registerAPNS(){
         if #available(iOS 10.0, *) {
             let center = UNUserNotificationCenter.current()
             center.delegate = self
-            
             center.requestAuthorization(options: [.badge, .sound, .alert]) { grant, error in
                 if grant == false {
                     DispatchQueue.main.async {
-                        UIApplication.shared.keyWindow?.makeToast(NSLocalizedString("open_push", comment: ""))
+                        UIApplication.shared.keyWindow?.makeToast(localizable("open_push"))
                     }
                 }
             }
@@ -98,92 +266,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NEALog.infoLog("app delegate : ", desc: error.localizedDescription)
     }
     
-    func initializePage() {
-        self.window?.rootViewController = NETabBarController(true)
-    }
-    
-    func initConfig() {
-        //地图组件初始化
-        NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
-        
-        //呼叫组件初始化
-        let setupConfig = NESetupConfig(appkey: AppKey.appKey)
-        NECallEngine.sharedInstance().setup(setupConfig)
-        NECallEngine.sharedInstance().setTimeout(30)
-        
-        let uiConfig = NECallUIKitConfig()
-        NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
-    }
-    
-    //    regist router
-    func loadService() {
-        
-        ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
-        
-        // 自定义示例
-        customVerification()
-        
-        Router.shared.register(MeSettingRouter) { param in
-            if let nav = param["nav"] as? UINavigationController {
-                let me = PersonInfoViewController()
-                nav.pushViewController(me, animated: true)
-            }
-        }
-    }
-    
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return .portrait
-    }
-    
-    func customVerification(){
-        if NEStyleManager.instance.isNormalStyle() {
-            Router.shared.register(PushP2pChatVCRouter) { param in
-                print("param:\(param)")
-                let nav = param["nav"] as? UINavigationController
-                guard let conversationId = param["conversationId"] as? String else {
-                    return
-                }
-                let anchor = param["anchor"] as? V2NIMMessage
-                let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
-                
-                for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-                    if vc.isKind(of: ChatViewController.self) {
-                        nav?.viewControllers[i] = p2pChatVC
-                        nav?.popToViewController(p2pChatVC, animated: true)
-                        return
-                    }
-                }
-                if let remove = param["removeUserVC"] as? Bool, remove {
-                    nav?.viewControllers.removeLast()
-                }
-                
-                nav?.pushViewController(p2pChatVC, animated: true)
-            }
-        } else {
-            Router.shared.register(PushP2pChatVCRouter) { param in
-                print("param:\(param)")
-                let nav = param["nav"] as? UINavigationController
-                guard let conversationId = param["conversationId"] as? String else {
-                    return
-                }
-                let anchor = param["anchor"] as? V2NIMMessage
-                let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
-                
-                for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-                    if vc.isKind(of: ChatViewController.self) {
-                        nav?.viewControllers[i] = p2pChatVC
-                        nav?.popToViewController(p2pChatVC, animated: true)
-                        return
-                    }
-                }
-                
-                if let remove = param["removeUserVC"] as? Bool, remove {
-                    nav?.viewControllers.removeLast()
-                }
-                
-                nav?.pushViewController(p2pChatVC, animated: true)
-            }
-        }
     }
 }
 

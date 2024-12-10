@@ -8,12 +8,13 @@
 #import "AppKey.h"
 #import "NETabbarController.h"
 
+#import <NEChatKit/NEChatKit-Swift.h>
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
 #import <NEConversationUIKit/NEConversationUIKit-Swift.h>
-#import <NETeamUIKit/NETeamUIKit-Swift.h>
 #import <NECoreIM2Kit/NECoreIM2Kit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
+#import <NETeamUIKit/NETeamUIKit-Swift.h>
 // #import <NEQChatUIKit/NEQChatUIKit-Swift.h>
 #import "CustomRouterViewController.h"
 #import "IMUIKitOCExample-Swift.h"
@@ -90,7 +91,6 @@
   if (user.imToken && user.imAccid) {
     [[IMKitClient instance] login:user.imAccid :user.imToken : nil :^(NSError * _Nullable error) {
             if (!error) {
-                [ChatRouter setupInit];
                 [self setupTabbar];
                 //登录圈组模块，如不需要圈组功能则不用登录
 //                QChatLoginParam *parama = [[QChatLoginParam alloc]init:user.imAccid :user.imToken];
@@ -123,10 +123,7 @@
 
 // 注册路由
 - (void)registerRouter {
-  [ChatRouter register];
-  [ConversationRouter register];
-  [ContactRouter register];
-  [TeamRouter register];
+  [ChatKitClient.shared setupInitWithIsFun:NO];
 
   // 聊天页面自定义面板示例
   /*

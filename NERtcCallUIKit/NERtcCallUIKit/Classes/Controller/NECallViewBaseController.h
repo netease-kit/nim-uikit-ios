@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) UIView *recoveryView;
 
 ///  远端关闭视频视图
-@property(nonatomic, strong) UIView *maskView;
+@property(nonatomic, strong) UIView *coverView;
 
 /// 视频小窗模式下，远端关闭摄像头状态下的头像
 @property(nonatomic, strong) UIImageView *remoteHeaderImage;

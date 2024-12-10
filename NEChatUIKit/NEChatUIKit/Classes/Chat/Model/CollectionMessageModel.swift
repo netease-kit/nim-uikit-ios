@@ -61,7 +61,7 @@ open class CollectionMessageModel: NSObject {
 
     height += 124
 
-    if chatmodel.replyedModel?.isReplay == true {
+    if chatmodel.isReplay == true {
       height += 12
     }
 

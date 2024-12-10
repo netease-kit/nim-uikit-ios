@@ -15,18 +15,15 @@
 "group"="群聊";
 "discussion_group"="讨论组";
 "senior_group"="高级群";
-"cancel"="取消";
 "search_keyword"="请输入你要搜索的关键字";
 "user_not_exist"="该用户不存在";
 "session_empty"="暂无会话";
-"hm"="HH:mm";
-"mdhm"="MM月dd日 HH:mm";
-"ymdhm"="yyyy年MM月dd日 HH:mm";
 "voice"="[语音消息]";
 "picture"="[图片消息]";
 "video"="[视频消息]";
 "location"="[地理位置]";
 "notification"="[通知消息]";
+"tip"="[提醒消息]";
 "file"="[文件消息]";
 "internet_phone"="[语音通话]";
 "video_chat"="[视频通话]";
@@ -39,13 +36,12 @@
 
 "you_were_mentioned"="[有人@我]";
 
+"security_warning"="仅用于体验云信IM 产品功能，请勿轻信汇款、中奖等涉及钱款的信息，勿轻易拨打陌生电话，谨防上当受骗。";
+
 
 // error toast
-"network_error"="当前网络不可用，请检查你的网络设置";
 
-"tip"="[提醒消息]";
-"leave_team"="离开群聊";
-"leave_team_desc"="您已被移除群聊或群聊已解散";
+"leave_team_desc"="您已被移出群聊或该群聊已被解散";
 
 "ai_user_pin_top"="PIN置顶";
 "ai_user_cancel_pin_top"="取消PIN置顶";

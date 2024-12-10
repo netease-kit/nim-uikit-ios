@@ -175,29 +175,24 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     model.inMultiForward = true
     model.isPined = false
     var reuseId = ""
-    if model.replyedModel?.isReplay == true,
-       model.isRevoked == false {
-      reuseId = "\(MessageType.reply.rawValue)"
-    } else {
-      let key = "\(model.type.rawValue)"
-      if model.type == .custom {
-        let customType = model.customType
-        if customType == customMultiForwardType {
-          reuseId = "\(MessageType.multiForward.rawValue)"
-        } else if customType == customRichTextType {
-          reuseId = "\(MessageType.richText.rawValue)"
-        } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
-          reuseId = "\(customType)"
-        } else {
-          reuseId = "\(NEBaseChatMessageCell.self)"
-        }
-      } else if model.type == .notification || model.type == .tip {
-        reuseId = "\(MessageType.time.rawValue)"
-      } else if cellRegisterDic[key] != nil {
-        reuseId = key
+    let key = "\(model.type.rawValue)"
+    if model.type == .custom {
+      let customType = model.customType
+      if customType == customMultiForwardType {
+        reuseId = "\(MessageType.multiForward.rawValue)"
+      } else if customType == customRichTextType {
+        reuseId = "\(MessageType.richText.rawValue)"
+      } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
+        reuseId = "\(customType)"
       } else {
         reuseId = "\(NEBaseChatMessageCell.self)"
       }
+    } else if model.type == .notification || model.type == .tip {
+      reuseId = "\(MessageType.time.rawValue)"
+    } else if cellRegisterDic[key] != nil {
+      reuseId = key
+    } else {
+      reuseId = "\(NEBaseChatMessageCell.self)"
     }
 
     let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath)

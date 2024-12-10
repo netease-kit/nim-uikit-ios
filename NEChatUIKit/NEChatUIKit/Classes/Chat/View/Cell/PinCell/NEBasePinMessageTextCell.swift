@@ -69,7 +69,7 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
     super.configure(item)
     if let model = item.chatmodel as? MessageTextModel {
       contentLabel.attributedText = model.attributeStr
-      if model.replyedModel?.isReplay == true {
+      if model.isReplay == true {
         replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: model.replyText ?? "",
                                                                 font: replyLabel.font,
                                                                 color: replyLabel.textColor)

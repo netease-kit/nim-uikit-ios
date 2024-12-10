@@ -30,7 +30,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   public var themeColor: UIColor = .ne_normalTheme // 主题颜色
   public var titleText = localizable("select") // 标题文案
-  public var sureButtonText = localizable("alert_sure") // 确定按钮文案
+  public var sureButtonText = commonLocalizable("sure") // 确定按钮文案
 
   init(filterUsers: Set<String>? = nil) {
     super.init(nibName: nil, bundle: nil)
@@ -98,7 +98,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-      cancelButton.widthAnchor.constraint(equalToConstant: 40),
+      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
       cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
@@ -121,7 +121,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     NSLayoutConstraint.activate([
       multiSelectButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       multiSelectButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-      multiSelectButton.widthAnchor.constraint(equalToConstant: 40),
+      multiSelectButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 40),
       multiSelectButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
@@ -130,7 +130,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     NSLayoutConstraint.activate([
       sureButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       sureButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-      sureButton.widthAnchor.constraint(equalToConstant: 76),
+      sureButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 76),
       sureButton.heightAnchor.constraint(equalToConstant: 32),
     ])
   }
@@ -286,7 +286,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     NSLayoutConstraint.activate([
       recentLabel.leftAnchor.constraint(equalTo: view.leftAnchor),
       recentLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
-      recentLabel.widthAnchor.constraint(equalToConstant: 50),
+      recentLabel.rightAnchor.constraint(equalTo: view.rightAnchor),
       recentLabel.heightAnchor.constraint(equalToConstant: 14),
     ])
 
@@ -391,9 +391,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     let button = ExpandButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.cancel"
-    button.setTitle(localizable("alert_cancel"), for: .normal)
+    button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.setTitleColor(.ne_greyText, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
+    button.titleLabel?.textAlignment = .left
     button.addTarget(self, action: #selector(cancelButtonAction), for: .touchUpInside)
     return button
   }()

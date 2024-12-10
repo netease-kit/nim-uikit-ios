@@ -70,6 +70,40 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     return view
   }()
 
+  public lazy var backViewLeft: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .white
+    view.layer.cornerRadius = 8
+    view.layer.borderColor = UIColor.ne_borderColor.cgColor
+    view.layer.borderWidth = 1
+
+    view.addSubview(imgViewLeft)
+    NSLayoutConstraint.activate([
+      imgViewLeft.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+      imgViewLeft.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      imgViewLeft.widthAnchor.constraint(equalToConstant: 32),
+      imgViewLeft.heightAnchor.constraint(equalToConstant: 32),
+    ])
+
+    imgViewLeft.addSubview(stateViewLeft)
+    NSLayoutConstraint.activate([
+      stateViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.leftAnchor, constant: 0),
+      stateViewLeft.topAnchor.constraint(equalTo: imgViewLeft.topAnchor, constant: 0),
+      stateViewLeft.widthAnchor.constraint(equalToConstant: 32),
+      stateViewLeft.heightAnchor.constraint(equalToConstant: 32),
+    ])
+
+    view.addSubview(labelViewLeft)
+    NSLayoutConstraint.activate([
+      labelViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.rightAnchor, constant: 15),
+      labelViewLeft.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+      labelViewLeft.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
+      labelViewLeft.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+    ])
+    return view
+  }()
+
   public lazy var imgViewRight: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -129,63 +163,18 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     return view
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupUI()
-  }
+  public lazy var backViewRight: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .white
+    view.layer.cornerRadius = 8
+    view.layer.borderColor = UIColor.ne_borderColor.cgColor
+    view.layer.borderWidth = 1
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  open func setupUI() {
-    setupUIRight()
-    setupUILeft()
-  }
-
-  open func setupUILeft() {
-    bubbleImageLeft.image = nil
-    bubbleImageLeft.backgroundColor = .white
-    bubbleImageLeft.layer.cornerRadius = 8
-    bubbleImageLeft.layer.borderColor = UIColor.ne_borderColor.cgColor
-    bubbleImageLeft.layer.borderWidth = 1
-
-    bubbleImageLeft.addSubview(imgViewLeft)
+    view.addSubview(imgViewRight)
     NSLayoutConstraint.activate([
-      imgViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 10),
-      imgViewLeft.centerYAnchor.constraint(equalTo: bubbleImageLeft.centerYAnchor),
-      imgViewLeft.widthAnchor.constraint(equalToConstant: 32),
-      imgViewLeft.heightAnchor.constraint(equalToConstant: 32),
-    ])
-
-    imgViewLeft.addSubview(stateViewLeft)
-    NSLayoutConstraint.activate([
-      stateViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.leftAnchor, constant: 0),
-      stateViewLeft.topAnchor.constraint(equalTo: imgViewLeft.topAnchor, constant: 0),
-      stateViewLeft.widthAnchor.constraint(equalToConstant: 32),
-      stateViewLeft.heightAnchor.constraint(equalToConstant: 32),
-    ])
-
-    bubbleImageLeft.addSubview(labelViewLeft)
-    NSLayoutConstraint.activate([
-      labelViewLeft.leftAnchor.constraint(equalTo: imgViewLeft.rightAnchor, constant: 15),
-      labelViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: 10),
-      labelViewLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -10),
-      labelViewLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 0),
-    ])
-  }
-
-  open func setupUIRight() {
-    bubbleImageRight.image = nil
-    bubbleImageRight.backgroundColor = .white
-    bubbleImageRight.layer.cornerRadius = 8
-    bubbleImageRight.layer.borderColor = UIColor.ne_borderColor.cgColor
-    bubbleImageRight.layer.borderWidth = 1
-
-    bubbleImageRight.addSubview(imgViewRight)
-    NSLayoutConstraint.activate([
-      imgViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 10),
-      imgViewRight.centerYAnchor.constraint(equalTo: bubbleImageRight.centerYAnchor),
+      imgViewRight.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+      imgViewRight.centerYAnchor.constraint(equalTo: view.centerYAnchor),
       imgViewRight.widthAnchor.constraint(equalToConstant: 32),
       imgViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
@@ -198,24 +187,50 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
       stateViewRight.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    bubbleImageRight.addSubview(labelViewRight)
+    view.addSubview(labelViewRight)
     NSLayoutConstraint.activate([
       labelViewRight.leftAnchor.constraint(equalTo: imgViewRight.rightAnchor, constant: 15),
-      labelViewRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: 10),
-      labelViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -10),
-      labelViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
+      labelViewRight.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+      labelViewRight.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
+      labelViewRight.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+    ])
+    return view
+  }()
+
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override open func commonUILeft() {
+    super.commonUILeft()
+    bubbleImageLeft.addSubview(backViewLeft)
+    NSLayoutConstraint.activate([
+      backViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 0),
+      backViewLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: 0),
+      backViewLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: 0),
+      backViewLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 0),
+    ])
+  }
+
+  override open func commonUIRight() {
+    super.commonUIRight()
+    bubbleImageRight.addSubview(backViewRight)
+    NSLayoutConstraint.activate([
+      backViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 0),
+      backViewRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: 0),
+      backViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: 0),
+      backViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
     ])
   }
 
   override open func showLeftOrRight(showRight: Bool) {
     super.showLeftOrRight(showRight: showRight)
-    imgViewLeft.isHidden = showRight
-    stateViewLeft.isHidden = showRight
-    labelViewLeft.isHidden = showRight
-
-    imgViewRight.isHidden = !showRight
-    stateViewRight.isHidden = !showRight
-    labelViewRight.isHidden = !showRight
+    backViewLeft.isHidden = showRight
+    backViewRight.isHidden = !showRight
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
@@ -225,8 +240,15 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let sizeLabel = isSend ? sizeLabelRight : sizeLabelLeft
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
+    let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
     bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
+
+    if model.isReplay {
+      setBubbleImage()
+    } else {
+      bubble.image = nil
+    }
 
     if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
       if let fileModel = model as? MessageFileModel {

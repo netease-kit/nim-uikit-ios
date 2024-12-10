@@ -24,7 +24,7 @@ open class NEBasePopListView: UIView {
   public let popView = UIView()
 
   public var buttonHeight: CGFloat = 32.0
-  public var popViewWidth: CGFloat = 122.0
+  public var popViewWidth: CGFloat = NEAppLanguageUtil.getCurrentLanguage() == .english ? 180.0 : 122.0
   public var popViewHeight: CGFloat = 0
   public var popViewRadius: CGFloat = 8.0
   public var topConstant: CGFloat = 0

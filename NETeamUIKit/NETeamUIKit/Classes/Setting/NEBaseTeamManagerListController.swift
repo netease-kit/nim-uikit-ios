@@ -126,7 +126,7 @@ open class NEBaseTeamManagerListController: NEBaseViewController, UITableViewDel
       }
       viewmodel.addTeamManager(tid, uids) { [weak self] error in
         if error != nil {
-          self?.view.makeToast(localizable("failed_operation"))
+          self?.view.makeToast(commonLocalizable("failed_operation"))
         } else {
           self?.viewmodel.managers.insert(contentsOf: managers, at: 0)
           self?.sortAndReloadData()

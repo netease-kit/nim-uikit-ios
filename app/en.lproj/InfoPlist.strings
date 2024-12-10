@@ -8,3 +8,6 @@
 "NSPhotoLibraryUsageDescription"="Can't use album before agree";
 "NSMicrophoneUsageDescription"="Can't use microphone before agree";
 "CFBundleDisplayName"="CommsEase IM";
+"NSLocationWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";
+"NSLocationAlwaysUsageDescription"="App需要您的同意,才能在使用期间访问位置";
+"NSLocationAlwaysAndWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";

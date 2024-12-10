@@ -26,6 +26,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     textField.textAlignment = .right
     textField.borderStyle = .roundedRect
     textField.textAlignment = .left
+    textField.delegate = self
     return textField
   }()
 
@@ -87,6 +88,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     super.configure(anyModel)
     if let model = anyModel as? CustomSettingCellModel {
       inputTextField.placeholder = model.placeholder
+      inputTextField.text = model.customInputText
       titleLabel.text = model.cellName
       subCornerType = model.cornerType
       dataModel = model

@@ -25,8 +25,10 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    for ges in label.gestureRecognizers ?? [] {
+      ges.isEnabled = false
+    }
+
     return label
   }()
 
@@ -45,34 +47,39 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    for ges in label.gestureRecognizers ?? [] {
+      ges.isEnabled = false
+    }
+
     return label
   }()
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  open func commonUI() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     bubbleImageLeft.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
       contentLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: chat_content_margin),
-      contentLabelLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: chat_content_margin),
+      contentLabelLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: chat_content_margin),
       contentLabelLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: -chat_content_margin),
     ])
+  }
 
+  override open func commonUIRight() {
+    super.commonUIRight()
     bubbleImageRight.addSubview(contentLabelRight)
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin),
       contentLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: chat_content_margin),
-      contentLabelRight.topAnchor.constraint(equalTo: bubbleImageRight.topAnchor, constant: chat_content_margin),
+      contentLabelRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: chat_content_margin),
       contentLabelRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: -chat_content_margin),
     ])
   }
@@ -204,5 +211,11 @@ extension ChatMessageTextCell: UITextViewDelegate {
     } else {
       contentLabel.textContainerInset = .zero
     }
+  }
+
+  // 禁用长按图片突出显示
+  public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool {
+    selectAllRange()
+    return false
   }
 }

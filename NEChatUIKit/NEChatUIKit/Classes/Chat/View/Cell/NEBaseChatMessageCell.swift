@@ -37,6 +37,9 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 
   // 划词选中失去焦点
   @objc optional func didTextViewLoseFocus(_ cell: UITableViewCell, _ model: MessageContentModel?)
+
+  // 消息即将展示
+  @objc optional func messageWillShow(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 @objc
@@ -111,6 +114,18 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     }
   }
 
+  open func setBubbleImage() {
+    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBg
+    bubbleImageLeft.image = image?
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+
+    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
+    bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBg
+    bubbleImageRight.image = image?
+      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+  }
+
   open func initProperty() {
     timeLabel.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
     timeLabel.textColor = ChatUIConfig.shared.messageProperties.timeTextColor
@@ -152,17 +167,10 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     fullNameLabel.accessibilityIdentifier = "id.fullNameLabel"
 
     //        bubbleImage
-    bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBg
-    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
-    bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    setBubbleImage()
     bubbleImageLeft.translatesAutoresizingMaskIntoConstraints = false
     bubbleImageLeft.isUserInteractionEnabled = true
 
-    bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBg
-    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
-    bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
     bubbleImageRight.translatesAutoresizingMaskIntoConstraints = false
     bubbleImageRight.isUserInteractionEnabled = true
 
@@ -581,6 +589,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     } else {
       readView.isHidden = true
     }
+
+    delegate?.messageWillShow?(self, model)
   }
 
   /// 根据消息发送方向决定元素的显隐
@@ -619,13 +629,13 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     pinImage.isHidden = !model.isPined
     contentView.backgroundColor = model.isPined ? ChatUIConfig.shared.messageProperties.signalBgColor : .clear
     if model.isPined {
-      let pinText = model.message?.conversationType == .CONVERSATION_TYPE_P2P ? chatLocalizable("pin_text_P2P") : chatLocalizable("pin_text_team")
+      let pinText = chatLocalizable("pin_text")
       if model.pinAccount == nil {
-        pinLabel.text = chatLocalizable("You") + " " + pinText
+        pinLabel.text = pinText + chatLocalizable("You")
       } else if let account = model.pinAccount, account == IMKitClient.instance.account() {
-        pinLabel.text = chatLocalizable("You") + " " + pinText
+        pinLabel.text = pinText + chatLocalizable("You")
       } else if let text = model.pinShowName {
-        pinLabel.text = text + pinText
+        pinLabel.text = pinText + text
       }
 
       pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")
