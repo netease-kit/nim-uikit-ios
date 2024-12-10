@@ -3,7 +3,7 @@
 
 IM UIKit 简化了基于 NIM SDK 的应用开发过程。它不仅能助您快速实现 UI 功能，也支持调用 NIM SDK 相应的接口实现即时通讯业务逻辑和数据处理。因此，您在使用 IM UIKit 时仅需关注自身业务。
 
-im-uikit-uniapp 界面效果如下图所示：
+IM UIKit 界面效果如下图所示：
 
 <img src="https://yx-web-nosdn.netease.im/common/7ffe6a8afe28b48405b41fb3313d1fa2/uniapp.png" width="800" height="550" />
 <br>
@@ -50,9 +50,9 @@ IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展�
 ![im-demo.png](https://yx-web-nosdn.netease.im/common/a1a63e6b32886e7e35af1b4ea974af44/imuikitios.png)
 
 
-详见[IM UIKit介绍](https://doc.yunxin.163.com/messaging-uikit/concept/zc3MDc4Nzk?platform=iOS)。
+详见[IM UIKit介绍](https://doc.yunxin.163.com/messaging-uikit/concept/TI3NTgyNDA?platform=client)。
 
 
 ## IM UIKit 集成
 
-具体的集成流程，请参见[快速集成 IM UIKit](https://doc.yunxin.163.com/messaging-uikit/guide?platform=iOS)。
+具体的集成流程，请参见[快速集成 IM UIKit](https://doc.yunxin.163.com/messaging-uikit/guide/DA0MjY3ODY?platform=iOS)。
