@@ -20,7 +20,7 @@ open class NETranslateLanguageManager: NSObject {
 
 //  var translationAIUser: V2NIMAIUser?
 
-//  public func getTranslationAIUser(_ completion: @escaping (V2NIMAIUser?) -> Void) {
+//  open func getTranslationAIUser(_ completion: @escaping (V2NIMAIUser?) -> Void) {
 //    if translateAIUserAccountId.count <= 0 {
 //      completion(nil)
 //    }

@@ -31,17 +31,17 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
     IMKitClient.instance.removeLoginListener(self)
   }
 
-  public func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIMLoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
-  public func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
+  open func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
     clearCache()
   }
 
-  public func clearCache() {
+  open func clearCache() {
     blackListMessageIds.removeAll()
     recordAudioMessagePaths.removeAll()
     revokeMessageIds.removeAll()
@@ -49,7 +49,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   }
 
   // 是否已经发送过对应消息的提示
-  public func isMessageSended(messageId: String) -> Bool {
+  open func isMessageSended(messageId: String) -> Bool {
     if sendingMessageIds.contains(messageId) {
       return true
     }
@@ -61,7 +61,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   }
 
   // 是否已经发送过黑名单消息的提示
-  public func isBlackTipSended(messageId: String) -> Bool {
+  open func isBlackTipSended(messageId: String) -> Bool {
     if blackListMessageIds.contains(messageId) {
       return true
     }
@@ -73,7 +73,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   }
 
   // 移除黑名单消息提示去重 id
-  public func removeBlackTipSendedId(messageId: String?) {
+  open func removeBlackTipSendedId(messageId: String?) {
     guard let messageId = messageId else {
       return
     }
@@ -84,7 +84,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   }
 
   // 是否已经发过对应路径的音频消息，防止重复发送
-  public func isRecordAudioSended(path: String) -> Bool {
+  open func isRecordAudioSended(path: String) -> Bool {
     if recordAudioMessagePaths.contains(path) {
       return true
     }
@@ -95,7 +95,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
   }
 
   // 是否已经保存过此撤回消息，防止重复保存本地撤回记录
-  public func isRevokeMessageSaved(messageId: String) -> Bool {
+  open func isRevokeMessageSaved(messageId: String) -> Bool {
     if revokeMessageIds.contains(messageId) {
       return true
     }

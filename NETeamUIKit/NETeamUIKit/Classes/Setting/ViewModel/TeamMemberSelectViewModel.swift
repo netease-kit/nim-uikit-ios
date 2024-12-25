@@ -30,7 +30,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
   /// 管理员account id 存放
   var managerSet = Set<String>()
 
-  override init() {
+  override public init() {
     super.init()
     teamRepo.addTeamListener(self)
     NETeamMemberCache.shared.addTeamCacheListener(self)
@@ -223,26 +223,26 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
 
   /// 群成员离开回调
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员被踢回调
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入回调
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 

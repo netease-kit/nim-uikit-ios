@@ -97,11 +97,10 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     tableView.dataSource = self
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -486,7 +485,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 extension NEBaseContactUserViewController: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if contact.user?.accountId == uid {
         user = contact

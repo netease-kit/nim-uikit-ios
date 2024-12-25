@@ -14,7 +14,7 @@ open class AIUserViewModel: NSObject {
   var searchDatas = [NEAIUserModel]()
 
   /// 获取数字人
-  public func getAIUsers(_ completion: @escaping (NSError?) -> Void) {
+  open func getAIUsers(_ completion: @escaping (NSError?) -> Void) {
     AIRepo.shared.getAIUserList { [weak self] users, error in
       users?.forEach { aiUser in
         let model = NEAIUserModel()

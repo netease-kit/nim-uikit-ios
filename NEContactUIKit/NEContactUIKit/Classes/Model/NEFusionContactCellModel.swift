@@ -17,7 +17,7 @@ open class NEFusionContactCellModel: NSObject {
   public var aiUser: V2NIMAIUser?
 
   /// 获取accid
-  public func getAccountId() -> String {
+  open func getAccountId() -> String {
     if let aiAccountId = aiUser?.accountId {
       return aiAccountId
     } else if let uid = user?.user?.accountId {
@@ -27,7 +27,7 @@ open class NEFusionContactCellModel: NSObject {
   }
 
   /// 获取显示名称
-  public func getShowName() -> String {
+  open func getShowName() -> String {
     if let name = user?.showName() {
       if name.count > 0 {
         return name

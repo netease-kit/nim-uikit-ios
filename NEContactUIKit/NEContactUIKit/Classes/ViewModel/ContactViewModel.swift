@@ -32,7 +32,7 @@ open class ContactViewModel: NSObject {
   }
 
   var refresh: RefreshBlock?
-  init(contactHeaders: [ContactHeadItem]?) {
+  public init(contactHeaders: [ContactHeadItem]?) {
     super.init()
     NEALog.infoLog(
       ModuleName + " " + className(),
@@ -226,7 +226,7 @@ open class ContactViewModel: NSObject {
 extension ContactViewModel: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,
          !NEFriendUserCache.shared.isBlockAccount(accid) {
@@ -258,7 +258,7 @@ extension ContactViewModel: NEContactListener {
 
   /// 好友添加回调
   /// - Parameter friendInfo: 好友信息
-  public func onFriendAdded(_ friendInfo: V2NIMFriend) {
+  open func onFriendAdded(_ friendInfo: V2NIMFriend) {
     loadData { [weak self] _, _ in
       self?.delegate?.reloadTableView()
     }
@@ -269,7 +269,7 @@ extension ContactViewModel: NEContactListener {
   /// - Parameters:
   ///   - accountId: 删除的好友账号ID
   ///   - deletionType: 好友删除的类型
-  public func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+  open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
     if NEFriendUserCache.shared.isBlockAccount(accountId) {
       return
     }
@@ -279,26 +279,26 @@ extension ContactViewModel: NEContactListener {
 
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
-  public func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+  open func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
     getAddApplicationUnreadCount(nil)
   }
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
-  public func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+  open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
     getAddApplicationUnreadCount(nil)
   }
 
   /// 黑名单添加回调
   /// - Parameter user: 用户信息
-  public func onBlockListAdded(_ user: V2NIMUser) {
+  open func onBlockListAdded(_ user: V2NIMUser) {
     guard let accountId = user.accountId else { return }
     removeFromContacts(accountId)
   }
 
   /// 黑名单移除回调
   /// - Parameter accountId: 用户 Id
-  public func onBlockListRemoved(_ accountId: String) {
+  open func onBlockListRemoved(_ accountId: String) {
     NEFriendUserCache.shared.removeBlockAccount(accountId)
     if NEFriendUserCache.shared.isFriend(accountId) {
       loadData { [weak self] _, _ in
@@ -312,7 +312,7 @@ extension ContactViewModel: NEContactListener {
 
 extension ContactViewModel: NEEventListener {
   /// 订阅在线状态
-  public func subscribeOnlineStatus() {
+  open func subscribeOnlineStatus() {
     var subscribeList: [String] = []
     for section in contacts {
       for contact in section.contacts {
@@ -330,7 +330,7 @@ extension ContactViewModel: NEEventListener {
   }
 
   /// 取消订阅
-  public func unsubscribeOnlineStatus() {
+  open func unsubscribeOnlineStatus() {
     var subscribeList: [String] = []
     for section in contacts {
       for contact in section.contacts {
@@ -345,7 +345,7 @@ extension ContactViewModel: NEEventListener {
     }
   }
 
-  public func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
+  open func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
     NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
     for e in event {
       print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")

@@ -63,11 +63,10 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
     tableView.separatorStyle = .none
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -191,7 +190,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
 
   /// 外部触发反选操作
   /// - Parameter model: 数据模型
-  public func unselectModel(_ model: NEFusionContactCellModel) {
+  open func unselectModel(_ model: NEFusionContactCellModel) {
     for memberModel in viewModel.memberDatas {
       if memberModel.getAccountId() == model.getAccountId() {
         memberModel.selected = false

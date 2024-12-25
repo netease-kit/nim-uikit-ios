@@ -95,11 +95,10 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
     tableView.separatorStyle = .none
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -118,11 +117,10 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
     tableView.isHidden = true
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -142,7 +140,7 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
     return view
   }()
 
-  init(message: V2NIMMessage, teamId: String) {
+  public init(message: V2NIMMessage, teamId: String) {
     self.message = message
     self.teamId = teamId
     super.init(nibName: nil, bundle: nil)

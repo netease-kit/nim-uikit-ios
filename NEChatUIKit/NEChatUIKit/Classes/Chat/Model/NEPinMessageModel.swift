@@ -16,7 +16,7 @@ open class NEPinMessageModel: NSObject {
   var repo = ChatRepo.shared
   var pinFileModel: PinMessageFileModel?
 
-  init(message: V2NIMMessage, item: V2NIMMessagePin) {
+  public init(message: V2NIMMessage, item: V2NIMMessagePin) {
     self.message = message
     conversationId = item.messageRefer?.conversationId
     self.item = item

@@ -36,7 +36,7 @@ open class NEBasePopListView: UIView {
     }
   }
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       topConstant = 10

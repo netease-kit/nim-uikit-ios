@@ -14,7 +14,7 @@ open class NEBaseTeamSettingSwitchCell: NEBaseTeamSettingCell {
     return q
   }()
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     setupUI()

@@ -9,7 +9,7 @@ import UIKit
 open class TextWithDetailTextCell: ContactBaseTextCell {
   public var detailTitleLabel = UILabel()
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     detailTitleLabel.translatesAutoresizingMaskIntoConstraints = false
     detailTitleLabel.font = UIFont.systemFont(ofSize: 12)

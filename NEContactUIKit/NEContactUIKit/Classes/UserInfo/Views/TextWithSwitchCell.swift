@@ -10,7 +10,7 @@ public typealias ValueChangeBlock = (_ title: String?, _ value: Bool) -> Void
 open class TextWithSwitchCell: ContactBaseTextCell {
   public var block: ValueChangeBlock?
   public var switchButton = UISwitch()
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     switchButton.translatesAutoresizingMaskIntoConstraints = false
     switchButton.onTintColor = UIColor(hexString: "#337EFF")

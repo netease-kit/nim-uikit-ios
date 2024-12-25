@@ -25,7 +25,7 @@ class CollectionMessageViewModel: NSObject {
 
   /// 加载收藏数据
   /// - Parameter completion: 完成回调
-  public func loadData(_ completion: @escaping (NSError?, Bool) -> Void) {
+  open func loadData(_ completion: @escaping (NSError?, Bool) -> Void) {
     let option = V2NIMCollectionOption()
 
     if let model = collectionDatas.last, let anchor = model.collection {

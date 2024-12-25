@@ -10,7 +10,7 @@ import UIKit
 
 @objcMembers
 open class ReadViewController: NEBaseReadViewController {
-  override init(message: V2NIMMessage, teamId: String) {
+  override public init(message: V2NIMMessage, teamId: String) {
     super.init(message: message, teamId: teamId)
   }
 

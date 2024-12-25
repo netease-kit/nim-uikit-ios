@@ -30,10 +30,10 @@ open class TeamAvatarViewModel: NSObject {
   /// - Parameter teamId : 群组ID
   /// - Parameter antispamConfig: 反垃圾配置
   /// - Parameter completion: 完成后的回调
-  public func updateTeamAvatar(_ url: String,
-                               _ teamId: String,
-                               _ antispamConfig: V2NIMAntispamConfig?,
-                               _ completion: @escaping (NSError?) -> Void) {
+  open func updateTeamAvatar(_ url: String,
+                             _ teamId: String,
+                             _ antispamConfig: V2NIMAntispamConfig?,
+                             _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", url:\(url)")
     teamRepo.updateTeamIcon(teamId, .TEAM_TYPE_NORMAL, url) { error in
       completion(error)
@@ -43,8 +43,8 @@ open class TeamAvatarViewModel: NSObject {
   /// 创建文件上传任务
   ///  - Parameter filePath  文件路径
   ///  - Parameter sceneName 场景名
-  public func createTask(_ filePath: String,
-                         _ sceneName: String? = nil) -> V2NIMUploadFileTask {
+  open func createTask(_ filePath: String,
+                       _ sceneName: String? = nil) -> V2NIMUploadFileTask {
     ResourceRepo.shared.createUploadFileTask(filePath, sceneName)
   }
 
@@ -52,9 +52,9 @@ open class TeamAvatarViewModel: NSObject {
   ///   - Parameter filepath: 上传文件路径
   ///   - Parameter progress: 进度回调
   ///   - Parameter completion: 完成回调
-  public func uploadImageFile(_ fileTask: V2NIMUploadFileTask,
-                              _ progress: ((Float) -> Void)?,
-                              _ completion: ((String?, NSError?) -> Void)?) {
+  open func uploadImageFile(_ fileTask: V2NIMUploadFileTask,
+                            _ progress: ((Float) -> Void)?,
+                            _ completion: ((String?, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", taskId:\(fileTask.taskId)")
     ResourceRepo.shared.upload(fileTask, progress, completion)
   }

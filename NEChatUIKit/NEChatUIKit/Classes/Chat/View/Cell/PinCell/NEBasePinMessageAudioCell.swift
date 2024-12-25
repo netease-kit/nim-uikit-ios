@@ -12,7 +12,7 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
 
   public var isPlaying = false
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 

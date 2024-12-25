@@ -50,7 +50,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitleColor(.white, for: .normal)
-    button.setTitle(mapLocalizable("cancel"), for: .normal)
+    button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
     button.addTarget(self, action: #selector(cancelBtnClick), for: .touchUpInside)
     return button
@@ -60,7 +60,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   lazy var searchCancelButton: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(mapLocalizable("search_cancel"), for: .normal)
+    button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.setTitleColor(UIColor.ne_emptyTitleColor, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
     button.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)

@@ -75,7 +75,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
     // Configure the view for the selected state
   }
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 
@@ -148,7 +148,10 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
       }
 
       var imageName = "file_unknown"
-      let suffix = (fileObject.name as NSString).pathExtension.lowercased()
+      var suffix = (fileObject.name as NSString).pathExtension.lowercased()
+      if suffix.isEmpty, let ext = fileObject.ext {
+        suffix = ext[(ext.index(after: ext.startIndex)) ..< ext.endIndex].lowercased()
+      }
       switch suffix {
       case file_doc_support:
         imageName = "file_doc"
@@ -162,7 +165,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
         imageName = "file_txt"
       case file_audio_support:
         imageName = "file_audio"
-      case file_vedio_support:
+      case file_video_support:
         imageName = "file_vedio"
       case file_zip_support:
         imageName = "file_zip"
@@ -180,16 +183,16 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
       titleLabel.text = fileObject.name
 
       let size_B = Double(fileObject.size)
-      var size_str = String(format: "%.1f B", size_B)
+      var size_str = String(format: "%.2f B", size_B)
       if size_B > 1e3 {
         let size_KB = size_B / 1e3
-        size_str = String(format: "%.1f KB", size_KB)
+        size_str = String(format: "%.2f KB", size_KB)
         if size_KB > 1e3 {
           let size_MB = size_KB / 1e3
-          size_str = String(format: "%.1f MB", size_MB)
+          size_str = String(format: "%.2f MB", size_MB)
           if size_MB > 1e3 {
             let size_GB = size_KB / 1e6
-            size_str = String(format: "%.1f GB", size_GB)
+            size_str = String(format: "%.2f GB", size_GB)
           }
         }
       }

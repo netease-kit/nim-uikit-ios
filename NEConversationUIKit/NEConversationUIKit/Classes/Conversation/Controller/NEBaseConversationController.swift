@@ -184,11 +184,10 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -601,7 +600,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
 }
 
 extension NEBaseConversationController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-  public func numberOfSections(in collectionView: UICollectionView) -> Int {
+  open func numberOfSections(in collectionView: UICollectionView) -> Int {
     1
   }
 
@@ -643,7 +642,7 @@ extension NEBaseConversationController: UICollectionViewDelegate, UICollectionVi
 }
 
 extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSource {
-  public func numberOfSections(in tableView: UITableView) -> Int {
+  open func numberOfSections(in tableView: UITableView) -> Int {
     2
   }
 
@@ -970,7 +969,7 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
   }
 
   /// 由于数据变更可能导致底部有更多数据，此方法重新使列表加载更多能力开启
-  public func loadMoreStateChange(_ finish: Bool) {
+  open func loadMoreStateChange(_ finish: Bool) {
     if finish {
       tableView.mj_footer = nil
     } else {

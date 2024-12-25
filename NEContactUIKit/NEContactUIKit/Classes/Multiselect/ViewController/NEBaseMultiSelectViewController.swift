@@ -32,7 +32,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   public var titleText = localizable("select") // 标题文案
   public var sureButtonText = commonLocalizable("sure") // 确定按钮文案
 
-  init(filterUsers: Set<String>? = nil) {
+  public init(filterUsers: Set<String>? = nil) {
     super.init(nibName: nil, bundle: nil)
     self.filterUsers = filterUsers
   }
@@ -500,11 +500,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.separatorStyle = .none
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -523,11 +522,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.isHidden = true
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -546,11 +544,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     tableView.isHidden = true
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -836,7 +833,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 监听滚动
   /// - Parameter scrollView: 滚动视图
-  public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+  open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     // 滚动时收起搜索键盘
     view.endEditing(true)
   }
@@ -967,7 +964,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 extension NEBaseMultiSelectViewController: NEBaseMultiSelectedViewControllerDelegate {
   /// 移除按钮点击事件
   /// - Parameter model: 数据模型
-  public func removeButtonAction(_ model: MultiSelectModel?) {
+  open func removeButtonAction(_ model: MultiSelectModel?) {
     if let m = model {
       didUnselectContact(m)
     }

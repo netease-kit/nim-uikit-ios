@@ -20,7 +20,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   var finished: Bool = false // 是否还有数据
   var pageMaxLimit: UInt = 100 // 查询的每页数量
 
-  override init() {
+  override public init() {
     super.init()
     contactRepo.addContactListener(self)
   }
@@ -227,7 +227,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
-  public func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+  open func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     convertToValidationMessage(application, true) { error in
       if let err = error {
@@ -238,7 +238,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
-  public func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+  open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     for (index, item) in friendAddApplications.enumerated() {

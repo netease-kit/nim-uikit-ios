@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamAvatarViewController: NEBaseViewController, UICollectionViewDelegate,
+open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectionViewDelegate,
   UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
   public typealias SaveCompletion = () -> Void
   public var block: SaveCompletion?

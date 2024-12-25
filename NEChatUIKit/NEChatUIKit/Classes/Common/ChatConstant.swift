@@ -63,9 +63,9 @@ public let ModuleName = "NEChatUIKit" // module 模块名称，用于日志输�
 // 支持的音频格式
 public let file_audio_support: [String] = ["mp3", "aac", "wav", "wma", "flac"]
 // 支持的视频格式
-public let file_vedio_support: [String] = ["mp4", "avi", "wmv", "mpeg", "m4v", "mov", "asf", "flv", "f4v", "rmvb", "rm", "3gp"]
+public let file_video_support: [String] = ["mp4", "avi", "wmv", "mpeg", "m4v", "mov", "asf", "flv", "f4v", "rmvb", "rm", "3gp"]
 // 支持的图片格式
-public let file_img_support: [String] = ["jpg", "jpeg", "png", "tiff", "heic"]
+public let file_img_support: [String] = ["jpg", "jpeg", "png", "tiff", "heic", "gif"]
 // 支持的表格格式
 public let file_xls_support: [String] = ["xls", "xlsx", "csv"]
 // 支持的文档格式

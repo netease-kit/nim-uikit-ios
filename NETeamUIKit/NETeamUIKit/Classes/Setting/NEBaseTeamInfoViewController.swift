@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelegate,
+open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDelegate,
   UITableViewDataSource, NETeamInfoDelegate {
   public let viewModel = TeamInfoViewModel()
 
@@ -26,18 +26,17 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     tableView.sectionHeaderHeight = 0
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
     return tableView
   }()
 
-  init(team: V2NIMTeam?) {
+  public init(team: V2NIMTeam?) {
     super.init(nibName: nil, bundle: nil)
     self.team = team
   }
@@ -100,7 +99,7 @@ open class NEBaseTeamInfoViewController: NEBaseViewController, UITableViewDelega
     return model.rowHeight
   }
 
-  public func teamInfoDidUpdate(_ t: V2NIMTeam) {
+  open func teamInfoDidUpdate(_ t: V2NIMTeam) {
     team = t
     contentTableView.reloadData()
   }

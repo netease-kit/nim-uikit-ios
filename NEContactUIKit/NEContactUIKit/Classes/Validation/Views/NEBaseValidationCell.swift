@@ -24,7 +24,7 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
   public var titleLabelRightMargin: NSLayoutConstraint?
   let line = UIView()
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setupUI()
   }

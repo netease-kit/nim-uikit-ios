@@ -35,18 +35,18 @@ public class NEP2PChatUserCache: NSObject {
 
   /// 添加代理
   /// - Parameter listener: 代理
-  public func addListener(_ listener: NEP2PChatUserCacheListener) {
+  open func addListener(_ listener: NEP2PChatUserCacheListener) {
     multiDelegate.addDelegate(listener)
   }
 
   /// 移除代理
   /// - Parameter listener: 代理
-  public func removeListener(_ listener: NEP2PChatUserCacheListener) {
+  open func removeListener(_ listener: NEP2PChatUserCacheListener) {
     multiDelegate.removeDelegate(listener)
   }
 
   // 添加（更新）非好友信息
-  public func updateUserInfo(_ user: V2NIMUser?) {
+  open func updateUserInfo(_ user: V2NIMUser?) {
     guard let accid = user?.accountId else { return }
     noUserCache[accid]?.user = user
 
@@ -56,31 +56,31 @@ public class NEP2PChatUserCache: NSObject {
   }
 
   // 添加（更新）非好友信息
-  public func updateUserInfo(_ user: NEUserWithFriend?) {
+  open func updateUserInfo(_ user: NEUserWithFriend?) {
     guard let accid = user?.user?.accountId else { return }
     noUserCache[accid] = user
   }
 
   /// 获取缓存的非好友信息
-  public func getUserInfo(_ accountId: String) -> NEUserWithFriend? {
+  open func getUserInfo(_ accountId: String) -> NEUserWithFriend? {
     noUserCache[accountId]
   }
 
   /// 删除非好友信息缓存
-  public func removeUserInfo(_ accountId: String) {
+  open func removeUserInfo(_ accountId: String) {
     if let _ = noUserCache[accountId] {
       noUserCache.removeValue(forKey: accountId)
     }
   }
 
   /// 删除所有非好友信息缓存
-  public func removeAllUserInfo() {
+  open func removeAllUserInfo() {
     noUserCache.removeAll()
   }
 
   /// 获取缓存用户名字，p2p： 备注 > 昵称 > ID
-  public func getShowName(_ userId: String,
-                          _ showAlias: Bool = true) -> String {
+  open func getShowName(_ userId: String,
+                        _ showAlias: Bool = true) -> String {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId: " + userId)
     let user = getUserInfo(userId)
     return user?.showName(showAlias) ?? userId
@@ -92,7 +92,7 @@ public class NEP2PChatUserCache: NSObject {
 extension NEP2PChatUserCache: NEContactListener {
   /// 用户信息变更回调
   /// - Parameter users: 用户列表
-  public func onUserProfileChanged(_ users: [V2NIMUser]) {
+  open func onUserProfileChanged(_ users: [V2NIMUser]) {
     for user in users {
       guard let accid = user.accountId else { break }
 

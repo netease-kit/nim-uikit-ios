@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextFieldDelegate,
+open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextFieldDelegate,
   UITableViewDelegate, UITableViewDataSource {
   public let viewModel = TeamHistoryMessageViewModel()
 
@@ -34,11 +34,10 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
     tableView.sectionFooterHeight = 0
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -172,7 +171,7 @@ open class NEBaseTeamHistoryMessageController: NEBaseViewController, UITextField
   }
 
   /// 监听键盘搜索按钮点击
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+  open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
       return false

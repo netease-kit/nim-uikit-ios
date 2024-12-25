@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource, TeamManagerViewModelDelegate {
+open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDelegate, UITableViewDataSource, TeamManagerViewModelDelegate {
   public let viewModel = TeamManagerViewModel()
 
   /// UI样式注册(用户可以自定义)
@@ -29,11 +29,10 @@ open class NEBaseTeamManagerController: NEBaseViewController, UITableViewDelegat
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }

@@ -65,11 +65,10 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     tableView.contentInset = .init(top: -10, left: 0, bottom: 0, right: 0)
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -78,7 +77,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
 
   var tableViewTopAnchor: NSLayoutConstraint?
 
-  init(filterUsers: Set<String>? = nil) {
+  public init(filterUsers: Set<String>? = nil) {
     super.init(nibName: nil, bundle: nil)
     self.filterUsers = filterUsers
   }

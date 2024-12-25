@@ -31,7 +31,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
   /// 在线状态记录
   var onLineEventDic = [String: NIMSubscribeEvent]()
 
-  override init() {
+  override public init() {
     super.init()
     teamRepo.addTeamListener(self)
     ConversationRepo.shared.addConversationListener(self)
@@ -138,7 +138,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
 
   /// 判断离开用户是不是当前搜索展示用户
   /// - Parameter teamMembers: 群成员信息
-  public func removeSearchData(_ teamMembers: [V2NIMTeamMember]) {
+  open func removeSearchData(_ teamMembers: [V2NIMTeamMember]) {
     if searchDatas.count <= 0 {
       return
     }

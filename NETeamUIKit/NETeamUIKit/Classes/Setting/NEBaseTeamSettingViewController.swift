@@ -9,7 +9,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionViewDelegate,
+open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollectionViewDelegate,
   UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITableViewDataSource,
   UITableViewDelegate, TeamSettingViewModelDelegate {
   /// 数据管理类
@@ -45,11 +45,10 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -189,7 +188,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   }
 
   /// 获取群设置数据
-  public func requestSettingData(_ tid: String, _ member: V2NIMTeamMember) {
+  open func requestSettingData(_ tid: String, _ member: V2NIMTeamMember) {
     weak var weakSelf = self
     viewModel.getTeamWithMembers(tid) { error in
       NEALog.infoLog(
@@ -228,7 +227,7 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
   }
 
   /// 有数据返回之后重新刷新UI
-  public func resetupUI() {
+  open func resetupUI() {
     reloadSectionData()
     contentTableView.tableHeaderView = getHeaderView()
     contentTableView.tableFooterView = getFooterView()
@@ -536,14 +535,14 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     }
   }
 
-  public func didClickMark() {
+  open func didClickMark() {
     if let tid = teamId {
       let conversationId = V2NIMConversationIdUtil.teamConversationId(tid)
       Router.shared.use(PushPinMessageVCRouter, parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any], closure: nil)
     }
   }
 
-  public func didError(_ error: NSError) {
+  open func didError(_ error: NSError) {
     if error.code == protocolSendFailed {
       showToast(commonLocalizable("network_error"))
     } else {
@@ -551,12 +550,12 @@ open class NEBaseTeamSettingViewController: NEBaseViewController, UICollectionVi
     }
   }
 
-  public func didShowNoNetworkToast() {
+  open func didShowNoNetworkToast() {
     showToast(commonLocalizable("network_error"))
   }
 
   /// 通知页面刷新回调
-  public func didNeedRefreshUI() {
+  open func didNeedRefreshUI() {
     reloadSectionData()
     contentTableView.reloadData()
     refreshMemberCount()

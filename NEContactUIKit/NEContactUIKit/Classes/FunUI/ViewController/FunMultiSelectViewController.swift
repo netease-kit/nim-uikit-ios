@@ -12,7 +12,7 @@ import UIKit
 /// 转发 - 选择页面 - 通用版
 @objcMembers
 open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
-  override init(filterUsers: Set<String>? = nil) {
+  override public init(filterUsers: Set<String>? = nil) {
     super.init(filterUsers: filterUsers)
     themeColor = .funContactThemeColor
     titleText = localizable("select")
@@ -106,7 +106,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
   // MARK: - UIScrollViewDelegate
 
   /// 重写 tableView 开始滚动事件，更新搜索框 leftView 位置
-  override public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+  override open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     super.scrollViewWillBeginDragging(scrollView)
     setSearchTextFieldLeftView()
   }

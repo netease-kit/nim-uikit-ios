@@ -132,28 +132,28 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
 
   ///  群成员离开
   ///  - Parameter teamMembers: 群成员
-  public func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员被踢
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
-  public func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {}
+  open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {}
 
   /// 群信息更新
   /// - Parameter team: 群对象
@@ -348,7 +348,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
 extension TeamManagerListViewModel: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       for memberInfo in managers {
         if memberInfo.teamMember?.accountId == contact.user?.accountId {

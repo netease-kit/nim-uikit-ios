@@ -21,7 +21,7 @@ open class MessageOperationView: UIView, UICollectionViewDataSource, UICollectio
     }
   }
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     let layout = UICollectionViewFlowLayout()
     layout.itemSize = CGSize(width: 60, height: 56)
     layout.minimumLineSpacing = 0

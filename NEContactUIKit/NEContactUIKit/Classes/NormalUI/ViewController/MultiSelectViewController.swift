@@ -11,7 +11,7 @@ import UIKit
 /// 转发 - 选择页面 - 协同版
 @objcMembers
 open class MultiSelectViewController: NEBaseMultiSelectViewController {
-  override init(filterUsers: Set<String>? = nil) {
+  override public init(filterUsers: Set<String>? = nil) {
     super.init(filterUsers: filterUsers)
 
     searchTextField.backgroundColor = .searchTextFeildBackColor

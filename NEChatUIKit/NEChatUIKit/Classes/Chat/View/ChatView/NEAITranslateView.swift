@@ -298,7 +298,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   }
 
   /// 控件内容高度
-  public func getCurrentHeight() -> CGFloat {
+  open func getCurrentHeight() -> CGFloat {
     70
   }
 
@@ -315,7 +315,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
 
   // MARK: - growing text view delegate
 
-  public func growingTextView(_ growingTextView: NEGrowingTextView, didChangeHeight height: CGFloat, difference: CGFloat) {
+  open func growingTextView(_ growingTextView: NEGrowingTextView, didChangeHeight height: CGFloat, difference: CGFloat) {
     if frame.height < 1 {
       // 首次加载 不需要回调，此时回调将导致外部显示异常
       return
@@ -324,7 +324,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
     delegate?.didChangeViewHeight?(self, 52 + height)
   }
 
-  public func didStart() {
+  open func didStart() {
     if translateState == .Use {
       if let text = showTranslateContentText.text {
         delegate?.didUseTranslate?(text)
@@ -352,7 +352,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
     }
   }
 
-  public func setTranslateContent(_ content: String) {
+  open func setTranslateContent(_ content: String) {
     if translateState == .Translating {
       showTranslateContentText.text = content
       changeToUseState()
@@ -361,7 +361,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
 
   /// 恢复默认状态
   /// - Parameter isClearText: 是否清空输入框
-  public func changeToIdleState(_ isClearText: Bool = false) {
+  open func changeToIdleState(_ isClearText: Bool = false) {
     translateState = .Idle
     if isClearText {
       showTranslateContentText.text = ""
@@ -372,7 +372,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   }
 
   /// 进入处理中状态
-  public func changeToTranslatingState() {
+  open func changeToTranslatingState() {
     translateState = .Translating
     statusLabel.attributedText = processingString
     loadingAnimationView.isHidden = false
@@ -380,7 +380,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   }
 
   /// 进入翻译完成状态(等待使用)
-  public func changeToUseState() {
+  open func changeToUseState() {
     translateState = .Use
     statusLabel.attributedText = useAttributeString
     loadingAnimationView.isHidden = true

@@ -22,11 +22,11 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// 当前成员的群成员对象类
   public var teamMember: V2NIMTeamMember?
 
-  override init(conversationId: String) {
+  override public init(conversationId: String) {
     super.init(conversationId: conversationId)
   }
 
-  override init(conversationId: String, anchor: V2NIMMessage?) {
+  override public init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
   }
 
@@ -278,7 +278,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   }
 
   /// 获取自己的群成员信息
-  public func getTeamMember(_ completion: @escaping () -> Void) {
+  open func getTeamMember(_ completion: @escaping () -> Void) {
     if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account()) {
       self.teamMember = teamMember
       completion()
@@ -372,7 +372,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   // MARK: - NETeamListener
 
-  public func onTeamDismissed(_ team: V2NIMTeam) {
+  open func onTeamDismissed(_ team: V2NIMTeam) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + (team.teamId))
     if sessionId == team.teamId {
       if let delegate = delegate as? TeamChatViewModelDelegate {
@@ -387,7 +387,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 extension TeamChatViewModel: NETeamChatUserCacheListener {
   /// 群信息更新
   /// - Parameter teamId: 群 id
-  public func onTeamInfoUpdate(_ teamId: String) {
+  open func onTeamInfoUpdate(_ teamId: String) {
     guard let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == sessionId else { return }
 
     self.team = team
@@ -400,7 +400,7 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
 
   /// 群成员更新
   /// - Parameter accountId: 用户 id
-  public func onTeamMemberUpdate(_ accountId: String) {
+  open func onTeamMemberUpdate(_ accountId: String) {
     guard let teamMember = NETeamUserManager.shared.getTeamMemberInfo(accountId) else { return }
 
     if self.teamMember == nil || accountId == self.teamMember?.accountId {
@@ -421,7 +421,7 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
 extension TeamChatViewModel: NEIMKitClientListener {
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  public func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
     // 断网重连后，重新拉取群信息、自己的群成员信息
     if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
       getTeamInfo(teamId: sessionId) { [weak self] error, team in

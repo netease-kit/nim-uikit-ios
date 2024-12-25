@@ -12,7 +12,7 @@ open class ContactHeadItem {
   public var color = UIColor(hexString: "#60CFA7")
   public var router: String
 
-  init(name: String, imageName: String?, router: String, color: UIColor) {
+  public init(name: String, imageName: String?, router: String, color: UIColor) {
     self.name = name
     self.imageName = imageName
     self.router = router

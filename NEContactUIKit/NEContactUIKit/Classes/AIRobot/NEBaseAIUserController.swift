@@ -8,7 +8,7 @@ import NECoreKit
 import UIKit
 
 @objcMembers
-open class NEBaseAIUserController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
+open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource {
   let viewModel = AIUserViewModel()
 
   /// 输入框
@@ -42,11 +42,10 @@ open class NEBaseAIUserController: NEBaseViewController, UITableViewDelegate, UI
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -159,7 +158,7 @@ open class NEBaseAIUserController: NEBaseViewController, UITableViewDelegate, UI
     0
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let info = viewModel.datas[indexPath.row]
     Router.shared.use(
       ContactUserInfoPageRouter,

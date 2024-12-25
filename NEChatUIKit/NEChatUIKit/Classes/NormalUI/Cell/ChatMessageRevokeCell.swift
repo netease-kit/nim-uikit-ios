@@ -7,8 +7,26 @@ import UIKit
 
 @objcMembers
 open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
-  public var revokeLabelLeft = UILabel()
-  public var revokeLabelRight = UILabel()
+  public lazy var revokeLabelLeft: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = chatLocalizable("message_recalled")
+    label.textColor = UIColor.ne_greyText
+    label.font = UIFont.systemFont(ofSize: 16.0)
+    label.accessibilityIdentifier = "id.messageText"
+    return label
+  }()
+
+  public lazy var revokeLabelRight: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.text = chatLocalizable("message_recalled")
+    label.textColor = UIColor.ne_greyText
+    label.font = UIFont.systemFont(ofSize: 16.0)
+    label.accessibilityIdentifier = "id.messageText"
+    return label
+  }()
+
   public var reeditButton = UIButton(type: .custom)
   public var reeditButtonW: NSLayoutConstraint?
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -21,10 +39,6 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
   }
 
   override open func commonUILeft() {
-    revokeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    revokeLabelLeft.textColor = UIColor.ne_greyText
-    revokeLabelLeft.font = UIFont.systemFont(ofSize: 16.0)
-    revokeLabelLeft.accessibilityIdentifier = "id.messageText"
     bubbleImageLeft.addSubview(revokeLabelLeft)
     NSLayoutConstraint.activate([
       revokeLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 16),
@@ -35,10 +49,6 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
   }
 
   override open func commonUIRight() {
-    revokeLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    revokeLabelRight.textColor = UIColor.ne_greyText
-    revokeLabelRight.font = UIFont.systemFont(ofSize: 16.0)
-    revokeLabelRight.accessibilityIdentifier = "id.messageText"
     bubbleImageRight.addSubview(revokeLabelRight)
     NSLayoutConstraint.activate([
       revokeLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 16),
@@ -107,8 +117,6 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     }
 
     super.setModel(model, isSend)
-    let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
-    revokeLabel.text = chatLocalizable("message_recalled")
   }
 
   func reeditEvent(button: UIButton) {

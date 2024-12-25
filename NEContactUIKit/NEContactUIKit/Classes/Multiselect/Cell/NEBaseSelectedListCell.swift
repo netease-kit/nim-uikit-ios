@@ -25,6 +25,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(UIImage.ne_imageNamed(name: "remove"), for: .normal)
     button.addTarget(self, action: #selector(removeButtonAction), for: .touchUpInside)
+    button.accessibilityIdentifier = "id.remove"
     return button
   }()
 
@@ -38,7 +39,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
 
   public var bottomLineLeftConstraint: NSLayoutConstraint? // 分隔线左边约束
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 

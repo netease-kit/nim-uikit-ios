@@ -36,7 +36,7 @@ open class NEBaseTeamSettingCell: CornerCell {
     return imageView
   }()
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     contentView.backgroundColor = .clear

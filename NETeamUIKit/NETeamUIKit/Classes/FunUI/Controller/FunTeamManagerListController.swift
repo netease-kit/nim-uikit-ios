@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class FunTeamManagerListController: NEBaseTeamManagerListController {
-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     // key 值 为 tableview section 对应的值
     cellClassDic = [0: FunTeamArrowSettingCell.self, 1: FunTeamManagerMemberCell.self]

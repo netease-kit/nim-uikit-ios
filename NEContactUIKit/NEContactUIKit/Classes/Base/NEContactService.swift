@@ -15,13 +15,13 @@ public class NEContactService: NSObject, ChatServiceDelegate {
 
   /// 注册 NEContactUIKit 初始化协议
   /// - Parameter params: 初始化参数
-  public func setupInit(_ params: [String: Any]?) {
+  open func setupInit(_ params: [String: Any]?) {
     registerRouter(params)
   }
 
   /// 注册路由
   /// - Parameter param: 参数
-  public func registerRouter(_ param: [String: Any]?) {
+  open func registerRouter(_ param: [String: Any]?) {
     if let isFun = param?["isFun"] as? Bool, isFun {
       ContactRouter.registerFun()
     } else {

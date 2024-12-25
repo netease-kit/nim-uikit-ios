@@ -63,7 +63,7 @@
 "team_mute"="当前群主设置为禁言";
 "team_all_mute"="群禁言已开启";
 "team_all_no_mute"="群禁言已关闭";
-"pin_text"="标记了这条信息";
+"pin_text"="%@标记了这条信息";
 "top_message"="置顶了一条消息";
 "untop_message"="移除了置顶消息";
 "chat_setting"="聊天设置";

@@ -24,7 +24,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
   var className = "SelectUserViewController"
   var isShowAtAll = true
 
-  init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
+  public init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
     self.conversationId = conversationId
     self.showSelf = showSelf
     self.showTeamMembers = showTeamMembers
@@ -55,22 +55,12 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     button.addTarget(self, action: #selector(btnEvent), for: .touchUpInside)
     view.addSubview(button)
 
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        button.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
-        button.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-        button.widthAnchor.constraint(equalToConstant: 50),
-        button.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    } else {
-      // Fallback on earlier versions
-      NSLayoutConstraint.activate([
-        button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-        button.topAnchor.constraint(equalTo: view.topAnchor),
-        button.widthAnchor.constraint(equalToConstant: 50),
-        button.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+      button.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      button.widthAnchor.constraint(equalToConstant: 50),
+      button.heightAnchor.constraint(equalToConstant: 50),
+    ])
 
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -95,35 +85,22 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     tableView.separatorStyle = .none
     tableView.tableFooterView = UIView()
     tableView.keyboardDismissMode = .onDrag
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
 
     view.addSubview(tableView)
-
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-        tableView.topAnchor.constraint(equalTo: label.bottomAnchor),
-        tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-        tableView.bottomAnchor
-          .constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
-      ])
-    } else {
-      // Fallback on earlier versions
-      NSLayoutConstraint.activate([
-        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        tableView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 0),
-        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      tableView.topAnchor.constraint(equalTo: label.bottomAnchor),
+      tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      tableView.bottomAnchor
+        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+    ])
   }
 
   func loadData() {

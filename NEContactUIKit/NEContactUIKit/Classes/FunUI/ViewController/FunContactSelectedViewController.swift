@@ -9,7 +9,7 @@ import UIKit
 /// 人员选择页面 - 通用版
 @objcMembers
 open class FunContactSelectedViewController: NEBaseContactSelectedViewController {
-  override init(filterUsers: Set<String>? = nil) {
+  override public init(filterUsers: Set<String>? = nil) {
     super.init(filterUsers: filterUsers)
     customCells = [ContactCellType.ContactPerson.rawValue: FunContactSelectedCell.self]
     view.backgroundColor = .funContactBackgroundColor

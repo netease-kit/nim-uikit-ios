@@ -246,7 +246,7 @@ open class EmojiPageView: UIView {
 }
 
 extension EmojiPageView: UIScrollViewDelegate {
-  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+  open func scrollViewDidScroll(_ scrollView: UIScrollView) {
     let width = scrollView.bounds.size.width
     let offsetX = scrollView.contentOffset.x
     let page = Int(abs(offsetX / width))
@@ -261,7 +261,7 @@ extension EmojiPageView: UIScrollViewDelegate {
     pageViewDelegate?.pageViewDidScroll?(self)
   }
 
-  public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+  open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
     pageViewDelegate?.pageViewScrollEnd?(
       self,
       currentIndex: currentPage,

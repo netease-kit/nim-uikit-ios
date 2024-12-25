@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEConversationUIKit'
-  s.version          = '10.5.0'
+  s.version          = '10.5.1'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -38,7 +38,7 @@ TODO: Add long description of the pod here.
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
   
-  s.dependency 'NECommonUIKit', '9.7.4'
+  s.dependency 'NECommonUIKit'
   s.dependency 'NEChatKit'
   s.dependency 'MJRefresh'
 end

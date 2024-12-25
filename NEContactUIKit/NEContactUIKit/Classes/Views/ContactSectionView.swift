@@ -10,7 +10,7 @@ open class ContactSectionView: UITableViewHeaderFooterView {
   public var titleLabel = UILabel()
   var line = UIView()
 
-  override init(reuseIdentifier: String?) {
+  override public init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     commonUI()
   }

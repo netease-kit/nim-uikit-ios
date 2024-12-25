@@ -118,7 +118,7 @@ open class P2PChatViewController: NormalChatViewController {
 extension P2PChatViewController: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId, contact.user?.accountId == viewModel.sessionId {
         // 好友添加，则从 NEP2PChatUserCache 中移除信息缓存
@@ -142,7 +142,7 @@ extension P2PChatViewController: NEContactListener {
 extension P2PChatViewController: NEP2PChatUserCacheListener {
   /// 非好友单聊信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onUserInfoUpdate(_ accountId: String) {
+  open func onUserInfoUpdate(_ accountId: String) {
     onUserOrFriendInfoChanged(accountId)
   }
 }

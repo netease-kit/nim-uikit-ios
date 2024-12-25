@@ -30,8 +30,8 @@ open class TeamIntroduceViewModel: NSObject {
   /// - Parameter  teamId: 群组ID
   /// - Parameter  introduce: 群介绍
   /// - Parameter  completion: 完成后的回调
-  public func updateTeamIntroduce(_ teamId: String, _ introduce: String,
-                                  _ completion: @escaping (NSError?) -> Void) {
+  open func updateTeamIntroduce(_ teamId: String, _ introduce: String,
+                                _ completion: @escaping (NSError?) -> Void) {
     teamRepo.updateTeamIntroduce(teamId, .TEAM_TYPE_NORMAL, introduce) { error in
       completion(error)
     }
