@@ -8,19 +8,19 @@ import NEChatUIKit
 class NEStyleManager {
   static let instance = NEStyleManager()
   let userDefault = UserDefaults.standard
-  public func isNormalStyle() -> Bool {
+  open func isNormalStyle() -> Bool {
     if let style = userDefault.object(forKey: IMUIKit_Style_Key) as? NSNumber, style.intValue == 2 {
       return false
     }
     return true
   }
 
-  public func setNormalStyle() {
+  open func setNormalStyle() {
     userDefault.set(NSNumber(integerLiteral: 1), forKey: IMUIKit_Style_Key)
     userDefault.synchronize()
   }
 
-  public func setFunStyle() {
+  open func setFunStyle() {
     userDefault.set(NSNumber(integerLiteral: 2), forKey: IMUIKit_Style_Key)
     userDefault.synchronize()
   }

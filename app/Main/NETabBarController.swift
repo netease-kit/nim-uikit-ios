@@ -204,7 +204,7 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
     setUpSessionBadgeValue()
   }
 
-  @objc public func clearValidationUnreadCount() {
+  @objc open func clearValidationUnreadCount() {
     setUpContactBadgeValue()
   }
 }

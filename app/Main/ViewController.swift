@@ -51,20 +51,11 @@ class ViewController: UIViewController {
 
   func setupUI() {
     view.addSubview(launchIconView)
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIconView.topAnchor.constraint(
-          equalTo: view.safeAreaLayoutGuide.topAnchor,
-          constant: 145.0
-        ),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        launchIconView.topAnchor.constraint(equalTo: view.topAnchor, constant: 145.0),
-      ])
-    }
+
+    NSLayoutConstraint.activate([
+      launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      launchIconView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 145.0),
+    ])
 
     view.addSubview(launchIconLabel)
     NSLayoutConstraint.activate([
@@ -80,19 +71,10 @@ class ViewController: UIViewController {
     ])
 
     view.addSubview(copyright)
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        copyright.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        copyright.bottomAnchor.constraint(
-          equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-          constant: -48
-        ),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        copyright.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        copyright.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -48),
-      ])
-    }
+
+    NSLayoutConstraint.activate([
+      copyright.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      copyright.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -48),
+    ])
   }
 }

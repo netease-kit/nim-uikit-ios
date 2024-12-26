@@ -16,7 +16,7 @@ class NEAboutWebViewController: NEBaseViewController {
     setUpSubViews()
   }
 
-  init(url: String) {
+  public init(url: String) {
     super.init(nibName: nil, bundle: nil)
     loadUrl = url
   }

@@ -12,7 +12,7 @@ public class CustomConfig {
   public static let shared = CustomConfig()
 
   /// 通过配置项实现 UI 自定义，该方式不需要继承自 ChatViewController
-  public func configChatUIKit() {
+  open func configChatUIKit() {
     ChatUIConfig.shared.messageProperties.avatarType = .cycle
     ChatUIConfig.shared.messageProperties.avatarCornerRadius = 8.0
     ChatUIConfig.shared.messageProperties.signalBgColor = UIColor.yellow
@@ -151,7 +151,7 @@ public class CustomConfig {
   }
 
   /// 通过配置项实现自定义，该方式不需要继承自 ContactViewController
-  public func configContactUIKit() {
+  open func configContactUIKit() {
     /*
      UI 属性自定义
      */

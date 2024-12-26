@@ -9,7 +9,7 @@ import UIKit
 class NodeViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
 
-  public func getData() {
+  open func getData() {
     sectionData.append(getSection())
   }
 

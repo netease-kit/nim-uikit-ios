@@ -24,7 +24,7 @@ public class CustomContactViewController: ContactViewController, NEBaseContactVi
     super.init(coder: coder)
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     // 通过重写实现自定义，该方式需要继承自 ChatViewController
     //      customByOverread()
 
@@ -45,19 +45,19 @@ public class CustomContactViewController: ContactViewController, NEBaseContactVi
   }
 
   // 通过继承方式重写次最右侧按钮点击事件, 这种方式会覆盖配置项中的点击事件
-  override public func searchAction() {
+  override open func searchAction() {
     bodyTopViewHeight = 80
     bodyBottomViewHeight = 80
   }
 
   // 通过继承方式重写最右侧按钮点击事件, 这种方式会覆盖配置项中的点击事件
-  override public func didClickAddBtn() {
+  override open func didClickAddBtn() {
     bodyTopViewHeight = 0
     bodyBottomViewHeight = 0
   }
 
   //  父类加载完数据后会调用此方法，可在此对数据进行二次处理
-  public func onDataLoaded() {
+  open func onDataLoaded() {
     for info in viewModel.contacts[1].contacts {
       info.contactCellType = ContactCellType.ContactCutom.rawValue
     }

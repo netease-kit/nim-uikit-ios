@@ -30,13 +30,13 @@ class IMSDKConfigManager: NSObject {
   }
 
   /// 保存私有化配置
-  public func saveConfig(model: IMSDKConfigModel) {
+  open func saveConfig(model: IMSDKConfigModel) {
     configModel = model
     saveObjectToDisk(model, fileName: filename)
   }
 
   /// 获取私有化配置
-  public func getConfig() -> IMSDKConfigModel {
+  open func getConfig() -> IMSDKConfigModel {
     configModel ?? IMSDKConfigModel()
   }
 

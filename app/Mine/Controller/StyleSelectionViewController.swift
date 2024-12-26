@@ -15,7 +15,7 @@ open class StyleCellModel: NSObject {
   public var selected: Bool = false
   public var selectedImageName: String
 
-  init(styleName: String, styleImageName: String, styleTitle: String, selected: Bool, selectedImageName: String) {
+  public init(styleName: String, styleImageName: String, styleTitle: String, selected: Bool, selectedImageName: String) {
     self.styleName = styleName
     self.styleImageName = styleImageName
     self.styleTitle = styleTitle
@@ -99,25 +99,25 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
     }
   }
 
-  public func numberOfSections(in collectionView: UICollectionView) -> Int {
+  open func numberOfSections(in collectionView: UICollectionView) -> Int {
     sectionCount
   }
 
-  public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+  open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     if section == sectionCount - 1 {
       return styleData.count - itemsInSection * (sectionCount - 1)
     }
     return itemsInSection
   }
 
-  public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(StyleSelectionCell.self)", for: indexPath) as? StyleSelectionCell
     let itemModel = styleData[indexPath.section * itemsInSection + indexPath.row]
     cell?.configData(model: itemModel)
     return cell ?? UICollectionViewCell()
   }
 
-  public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+  open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     if indexPath.row == 0 {
       if NEStyleManager.instance.isNormalStyle() == false {
         NEStyleManager.instance.setNormalStyle()
