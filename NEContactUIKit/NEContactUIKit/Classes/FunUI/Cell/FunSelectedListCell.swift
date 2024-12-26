@@ -10,7 +10,7 @@ import UIKit
 @objcMembers
 open class FunSelectedListCell: NEBaseSelectedListCell {
   /// 重写初始化方法
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 

@@ -9,7 +9,7 @@ import UIKit
 open class TextWithRightArrowCell: ContactBaseTextCell {
   public var arrowImageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     arrowImageView.translatesAutoresizingMaskIntoConstraints = false
     arrowImageView.contentMode = .center

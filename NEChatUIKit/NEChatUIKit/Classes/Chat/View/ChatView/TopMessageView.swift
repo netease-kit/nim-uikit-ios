@@ -70,7 +70,7 @@ open class TopMessageView: UIView {
     return button
   }()
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = .white
     layer.cornerRadius = 8
@@ -121,7 +121,7 @@ open class TopMessageView: UIView {
   /// - Parameter url: 置顶消息 图片缩略图/视频首帧 地址
   /// - Parameter isVideo: 置顶消息是否是视频消息
   /// - Parameter hideClose: 是否隐藏移除置顶按钮
-  public func setTopContent(name: String?, content: String?, url: String?, isVideo: Bool, hideClose: Bool) {
+  open func setTopContent(name: String?, content: String?, url: String?, isVideo: Bool, hideClose: Bool) {
     self.content = content
     updateTopName(name: name)
 
@@ -140,7 +140,7 @@ open class TopMessageView: UIView {
 
   /// 设置（更新）置顶消息发送者昵称
   /// - Parameter content: 发送者昵称
-  public func updateTopName(name: String?) {
+  open func updateTopName(name: String?) {
     var text = ""
 
     if let fullName = name, !fullName.isEmpty {

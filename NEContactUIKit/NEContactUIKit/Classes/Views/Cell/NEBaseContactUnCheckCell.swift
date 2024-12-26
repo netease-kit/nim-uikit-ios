@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class NEBaseContactUnCheckCell: UICollectionViewCell {
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     setupUI()
   }

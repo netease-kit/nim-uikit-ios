@@ -26,11 +26,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     tableView.mj_footer = MJRefreshAutoFooter(refreshingTarget: self, refreshingAction: #selector(loadMoreData))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -145,11 +144,11 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
   }
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewModel.collectionDatas.count
   }
 
-  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     if indexPath.row >= viewModel.collectionDatas.count {
       return UITableViewCell()
     }
@@ -400,7 +399,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 跳转视频播放器
   /// - Parameter model: 收藏对象
-  public func showVideoView(_ model: CollectionMessageModel?) {
+  open func showVideoView(_ model: CollectionMessageModel?) {
     if let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
       stopPlay()
       let player = VideoPlayerViewController()
@@ -421,7 +420,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 跳转地图详情页
   /// - Parameter model: 收藏对象
-  public func showMapDetail(_ model: CollectionMessageModel?) {
+  open func showMapDetail(_ model: CollectionMessageModel?) {
     if let title = model?.message?.text, let locationObject = model?.message?.attachment as? V2NIMMessageLocationAttachment {
       let lng = locationObject.longitude
 
@@ -450,7 +449,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 跳转文件查看器
   /// - Parameter model: 收藏对象
-  public func showFileDetail(_ model: CollectionMessageModel?) {
+  open func showFileDetail(_ model: CollectionMessageModel?) {
     if let object = model?.message?.attachment as? V2NIMMessageFileAttachment {
       // 判断是否是文件对象
       guard let fileModel = model?.fileModel as? CollectionFileModel else {
@@ -726,12 +725,12 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
 extension NEBaseCollectionMessageController: AVAudioPlayerDelegate {
   /// 声音播放完成回调
-  public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+  open func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
     stopPlay()
   }
 
   /// 声音解码失败回调
-  public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
+  open func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
     stopPlay()
   }
 }

@@ -58,14 +58,14 @@ public class ChatUIConfig: NSObject {
 
   /// 设置消息可撤回时间 (单位：min)
   /// 周期为[2,  7*24*60] 分钟, 超过最大值， 修正为最大值， 最小值修正到2分钟
-  public func setRevokeTimeGap(_ time: Int) {
+  open func setRevokeTimeGap(_ time: Int) {
     revokeTimeGap = max(time, 2) // >= 2 min
     revokeTimeGap = min(revokeTimeGap, 10080) // <= 7 d
   }
 
   /// 获取消息可撤回时间 (单位：min)
   /// 周期为[2,  7*24*60] 分钟
-  public func getReeditTimeGap() -> Int {
+  open func getReeditTimeGap() -> Int {
     revokeTimeGap
   }
 }

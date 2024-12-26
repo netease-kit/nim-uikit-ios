@@ -14,7 +14,7 @@ open class NEChatUIKitClient: NSObject {
   private var customRegisterDic = [String: UITableViewCell.Type]()
   public var moreAction = [NEMoreItemModel]()
 
-  override init() {
+  override public init() {
     let photo = NEMoreItemModel()
     photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
     photo.title = chatLocalizable("chat_photo")

@@ -202,13 +202,13 @@ open class PinMessageViewModel: NSObject, NEChatListener {
 
   /// 收到消息撤回回调
   /// - Parameter revokeNotifications: 消息撤回通知数据
-  public func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
     delegate?.tableViewReload(needLoad: true)
   }
 
   /// 消息pin状态回调通知
   /// - Parameter pinNotification: 消息pin状态变化通知数据
-  public func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
+  open func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
     switch pinNotification.pinState {
     case .MESSAGE_PIN_STEATE_NOT_PINNED:
       let messageRefer = pinNotification.pin?.messageRefer
@@ -224,7 +224,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
 
   /// 消息被删除通知
   /// - Parameter messageDeletedNotification: 被删除的消息列表
-  public func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
+  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
     let messageRefers = messageDeletedNotification.map(\.messageRefer)
     onDeleteIndexPath(messageRefers)
   }

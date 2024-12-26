@@ -56,11 +56,10 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -156,7 +155,7 @@ extension NEBaseValidationMessageViewController: UITableViewDelegate, UITableVie
 // MARK: - ValidationMessageViewModelDelegate
 
 extension NEBaseValidationMessageViewController: ValidationMessageViewModelDelegate {
-  public func tableviewReload() {
+  open func tableviewReload() {
     tableView.reloadData()
     emptyView.isHidden = viewModel.friendAddApplications.count > 0
   }

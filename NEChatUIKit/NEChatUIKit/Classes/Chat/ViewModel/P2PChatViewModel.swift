@@ -11,12 +11,12 @@ import NIMSDK
 @objcMembers
 open class P2PChatViewModel: ChatViewModel {
   /// 重写初始化方法
-  override init(conversationId: String) {
+  override public init(conversationId: String) {
     super.init(conversationId: conversationId)
   }
 
   /// 重写初始化方法
-  override init(conversationId: String, anchor: V2NIMMessage?) {
+  override public init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId, anchor: anchor)
   }
 
@@ -173,7 +173,7 @@ extension P2PChatViewModel: NENotiListener {
   /// 收到自定义系统通知回调
   /// 用于展示对方输入状态
   /// - Parameter customNotifications: 自定义系统通知
-  public func onReceiveCustomNotifications(_ customNotifications: [V2NIMCustomNotification]) {
+  open func onReceiveCustomNotifications(_ customNotifications: [V2NIMCustomNotification]) {
     NEALog.infoLog(
       ModuleName + " " + className(),
       desc: #function + ", customNotifications.count:\(customNotifications.count)"

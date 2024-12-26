@@ -19,7 +19,7 @@ open class MultiSelectViewModel: ContactViewModel {
   public var sessions = [MultiSelectModel]() // 当前展示列表
 
   /// 初始化
-  init() {
+  public init() {
     super.init(contactHeaders: nil)
   }
 

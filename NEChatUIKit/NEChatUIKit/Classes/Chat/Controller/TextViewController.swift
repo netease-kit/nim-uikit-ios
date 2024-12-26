@@ -65,7 +65,7 @@ open class TextViewController: NEChatBaseViewController {
   var contentLabelTopAnchor: NSLayoutConstraint?
   var contentLabelLeftAnchor: NSLayoutConstraint?
 
-  init(title: String?, body: NSAttributedString?) {
+  public init(title: String?, body: NSAttributedString?) {
     super.init(nibName: nil, bundle: nil)
     contentMaxWidth = kScreenWidth - leftRightMargin * 2
     if let title = title {
@@ -101,21 +101,12 @@ open class TextViewController: NEChatBaseViewController {
 
   open func setupUI() {
     view.addSubview(scrollView)
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -0),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
-        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -0),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+      scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+      scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+      scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -0),
+    ])
 
     titleLabel.preferredMaxLayoutWidth = contentMaxWidth
     bodyLabel.preferredMaxLayoutWidth = contentMaxWidth

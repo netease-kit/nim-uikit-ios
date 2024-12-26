@@ -62,7 +62,7 @@ class NEBaseCollectionMessageLocationCell: NEBaseCollectionMessageCell {
   }
 
   /// 初始化的生命周期
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 

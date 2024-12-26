@@ -184,7 +184,7 @@ extension FunChatMessageTextCell: UITextViewDelegate {
 
   /// 选中范围变更
   /// - Parameter textView: textview
-  public func textViewDidChangeSelection(_ textView: UITextView) {
+  open func textViewDidChangeSelection(_ textView: UITextView) {
     if textView.selectedRange.length == 0 {
       delegate?.didTextViewLoseFocus?(self, contentModel)
     } else {
@@ -215,7 +215,7 @@ extension FunChatMessageTextCell: UITextViewDelegate {
   }
 
   // 禁用长按图片突出显示
-  public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool {
+  open func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool {
     selectAllRange()
     return false
   }

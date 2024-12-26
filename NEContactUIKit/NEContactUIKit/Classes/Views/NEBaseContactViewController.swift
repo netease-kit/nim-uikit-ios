@@ -113,11 +113,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -410,7 +409,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     emptyView.isHidden = viewModel.getFriendSections().count > 0
   }
 
-  public func reloadTableView() {
+  open func reloadTableView() {
     didRefreshTable()
   }
 }

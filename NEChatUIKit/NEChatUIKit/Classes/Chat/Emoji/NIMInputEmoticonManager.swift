@@ -80,7 +80,7 @@ open class NIMInputEmoticonManager: NSObject {
     preloadEmoticonResource()
   }
 
-  public func setCustomEmojConfig(_ array: NSArray) {
+  open func setCustomEmojConfig(_ array: NSArray) {
     var catalogs = [NIMInputEmoticonCatalog]()
     for dict in array {
       if let convertDict = dict as? NSDictionary {

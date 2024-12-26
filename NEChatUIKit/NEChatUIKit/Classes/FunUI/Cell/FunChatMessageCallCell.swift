@@ -8,7 +8,7 @@ import UIKit
 open class FunChatMessageCallCell: FunChatMessageBaseCell {
   public let contentLabelLeft = UILabel()
   public let contentLabelRight = UILabel()
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     commonUI()
   }

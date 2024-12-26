@@ -24,23 +24,12 @@ open class FunSelectLanguageViewController: NEBaseSelectLanguageViewController {
     funBackButton.setImage(UIImage.ne_imageNamed(name: "arrowDown"), for: .normal)
     funBackButton.addTarget(self, action: #selector(cancelClick), for: .touchUpInside)
     view.addSubview(funBackButton)
-
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        funBackButton.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
-        funBackButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-        funBackButton.widthAnchor.constraint(equalToConstant: 50),
-        funBackButton.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    } else {
-      // Fallback on earlier versions
-      NSLayoutConstraint.activate([
-        funBackButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-        funBackButton.topAnchor.constraint(equalTo: view.topAnchor),
-        funBackButton.widthAnchor.constraint(equalToConstant: 50),
-        funBackButton.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      funBackButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+      funBackButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      funBackButton.widthAnchor.constraint(equalToConstant: 50),
+      funBackButton.heightAnchor.constraint(equalToConstant: 50),
+    ])
 
     let funNavTitleLabel = UILabel()
     funNavTitleLabel.translatesAutoresizingMaskIntoConstraints = false

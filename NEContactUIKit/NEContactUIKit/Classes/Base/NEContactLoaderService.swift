@@ -15,7 +15,7 @@ public class NEContactLoaderService: NSObject {
 
   /// 初始化方法
   /// 此方法会在模块被加载时调用
-  public func setupInit() {
+  open func setupInit() {
     ChatKitClient.shared.registerInit(NEContactService.shared)
   }
 }

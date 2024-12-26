@@ -22,7 +22,7 @@ open class ReadViewModel: NSObject {
   ///   - message: 群消息
   ///   - teamId: 群 id
   ///   - completion: 完成回调
-  public func getTeamMessageReceiptDetail(_ message: V2NIMMessage, _ teamId: String, _ completion: @escaping (Error?) -> Void) {
+  open func getTeamMessageReceiptDetail(_ message: V2NIMMessage, _ teamId: String, _ completion: @escaping (Error?) -> Void) {
     chatRepo.getTeamMessageReceiptDetail(message: message, memberAccountIds: []) { [weak self] readReceiptDetail, error in
       guard let readReceiptDetail = readReceiptDetail else {
         completion(error)

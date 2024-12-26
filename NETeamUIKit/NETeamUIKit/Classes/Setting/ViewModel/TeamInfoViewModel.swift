@@ -67,7 +67,7 @@ open class TeamInfoViewModel: NSObject, NETeamListener {
 
   /// 群信息更新
   /// - Parameter team: 群
-  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
     if let teamId = v2Team?.teamId, teamId == team.teamId {
       getData(team)
       delegate?.teamInfoDidUpdate(team)

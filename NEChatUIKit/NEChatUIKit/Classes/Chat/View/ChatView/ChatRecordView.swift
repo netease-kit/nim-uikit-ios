@@ -20,7 +20,7 @@ open class ChatRecordView: UIView, UIGestureRecognizerDelegate {
   var tipLabel = UILabel()
   public weak var delegate: ChatRecordViewDelegate?
   private var outView = false
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }

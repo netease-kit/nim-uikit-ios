@@ -9,7 +9,7 @@ open class MessageAtCacheModel: NSObject {
   public var atModel: MessageAtInfoModel
   public var accid: String
   public var text: String?
-  init(atModel: MessageAtInfoModel, accid: String) {
+  public init(atModel: MessageAtInfoModel, accid: String) {
     self.atModel = atModel
     self.accid = accid
   }

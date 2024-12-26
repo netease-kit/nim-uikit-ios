@@ -25,22 +25,12 @@ open class SelectLanguageViewController: NEBaseSelectLanguageViewController {
     backButton.titleLabel?.textColor = .ne_greyText
     backButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0)
     view.addSubview(backButton)
-
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        backButton.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 16),
-        backButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-        backButton.widthAnchor.constraint(equalToConstant: 50),
-        backButton.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-        backButton.topAnchor.constraint(equalTo: view.topAnchor),
-        backButton.widthAnchor.constraint(equalToConstant: 50),
-        backButton.heightAnchor.constraint(equalToConstant: 50),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+      backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      backButton.widthAnchor.constraint(equalToConstant: 50),
+      backButton.heightAnchor.constraint(equalToConstant: 50),
+    ])
 
     let navTitleLabel = UILabel()
     navTitleLabel.translatesAutoresizingMaskIntoConstraints = false

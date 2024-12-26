@@ -152,13 +152,13 @@ open class ChatViewModel: NSObject {
   /// 数字人请求成功code
   public var aiUserRequestSuccess = 200
 
-  override init() {
+  override public init() {
     conversationId = ""
     sessionId = ""
     super.init()
   }
 
-  init(conversationId: String) {
+  public init(conversationId: String) {
     NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     self.conversationId = conversationId
     sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
@@ -167,7 +167,7 @@ open class ChatViewModel: NSObject {
     addListener()
   }
 
-  init(conversationId: String, anchor: V2NIMMessage?) {
+  public init(conversationId: String, anchor: V2NIMMessage?) {
     NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     self.conversationId = conversationId
     self.anchor = anchor
@@ -199,7 +199,7 @@ open class ChatViewModel: NSObject {
   }
 
   /// 清空当前会话的未读数
-  public func clearUnreadCount() {
+  open func clearUnreadCount() {
     ConversationRepo.shared.clearUnreadCountByIds([conversationId]) { result, error in
       NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
     }
@@ -216,6 +216,7 @@ open class ChatViewModel: NSObject {
     // 记录可信时间戳
     if anchor == nil {
       messages.removeAll()
+      delegate?.tableViewReload()
       isHistoryChat = false
 
       getHistoryMessage(order: .QUERY_DIRECTION_DESC, message: nil) { [weak self] error, count, models in
@@ -254,6 +255,8 @@ open class ChatViewModel: NSObject {
 
       if !hasLoad {
         messages.removeAll()
+        delegate?.tableViewReload()
+
         group.enter()
         getHistoryMessage(order: .QUERY_DIRECTION_DESC, message: anchor) { [weak self] error, value, models in
           moreEnd = value
@@ -921,6 +924,11 @@ open class ChatViewModel: NSObject {
   ///   - videoURL: 视频文件路径
   ///   - completion: 完成回调
   func convertVideoToMP4(videoURL: URL, completion: @escaping (URL?, Error?) -> Void) {
+    if videoURL.pathExtension.lowercased() == "mp4" {
+      completion(videoURL, nil)
+      return
+    }
+
     let outputFileName = NIMKitFileLocationHelper.genFilename(withExt: "mp4")
     guard let outputPath = NIMKitFileLocationHelper.filepath(forVideo: outputFileName) else {
       return
@@ -936,7 +944,7 @@ open class ChatViewModel: NSObject {
         if session?.status == AVAssetExportSession.Status.completed {
           completion(outputUrl, nil)
         } else {
-          completion(nil, nil)
+          completion(videoURL, nil)
         }
       }
     }
@@ -2266,7 +2274,7 @@ extension ChatViewModel: NEMessageListener {
   /// 来源： 发送消息， 插入消息
   /// - Parameter param: 消息参数，包含消息和发送参数
   /// - Returns: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  public func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
+  open func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
     delegate?.beforeSend?(param)
   }
 
@@ -2274,7 +2282,7 @@ extension ChatViewModel: NEMessageListener {
   /// 来源： 发送消息， 插入消息
   /// - Parameter param: 消息参数，包含消息和发送参数
   /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  public func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
+  open func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
     delegate?.beforeSend?(param, completion)
   }
 }
@@ -2285,7 +2293,7 @@ extension ChatViewModel: NEChatListener {
   /// 本端发送消息状态回调
   /// 来源： 发送消息， 插入消息
   /// - Parameter message: 消息
-  public func onSendMessage(_ message: V2NIMMessage) {
+  open func onSendMessage(_ message: V2NIMMessage) {
     switch message.sendingState {
     case .MESSAGE_SENDING_STATE_SENDING:
       sendingMsg(message)
@@ -2302,13 +2310,13 @@ extension ChatViewModel: NEChatListener {
   /// - Parameters:
   ///   - message: 消息
   ///   - error: 错误信息
-  public func sendMessageFailed(_ message: V2NIMMessage, _ error: NSError) {
+  open func sendMessageFailed(_ message: V2NIMMessage, _ error: NSError) {
     sendMsgFailed(message, error)
   }
 
   /// 收到消息
   /// - Parameter messages: 消息列表
-  public func onReceiveMessages(_ messages: [V2NIMMessage]) {
+  open func onReceiveMessages(_ messages: [V2NIMMessage]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
 
     for msg in messages {
@@ -2346,7 +2354,7 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息撤回回调
   /// - Parameter revokeNotifications: 撤回通知
-  public func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", revokeNotifications.count: \(revokeNotifications.count)")
     for revokeNoti in revokeNotifications {
       if revokeNoti.messageRefer?.conversationId != conversationId {
@@ -2363,7 +2371,7 @@ extension ChatViewModel: NEChatListener {
       }
 
       for model in messages {
-        if let msg = model.message, msg.messageClientId == revokeNoti.messageRefer?.messageClientId {
+        if let msg = model.message, msg.messageClientId == revokeNoti.messageRefer?.messageClientId, !model.isRevoked {
           msg.localExtension = revokeNoti.serverExtension
           revokeMessageUpdateUI(msg)
           break
@@ -2374,7 +2382,7 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息删除成功回调。当本地端或多端同步删除消息成功时会触发该回调。
   /// - Parameter messageDeletedNotification: 删除通知
-  public func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
+  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageDeletedNotification.count: \(messageDeletedNotification.count)")
 
     var deleteMessages = [V2NIMMessage]()
@@ -2404,13 +2412,13 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息清空成功回调。当本地端或多端同步清空消息成功时会触发该回调。
   /// - Parameter clearHistoryNotification: 清空通知
-  public func onClearHistoryNotifications(_ clearHistoryNotification: [V2NIMClearHistoryNotification]) {
+  open func onClearHistoryNotifications(_ clearHistoryNotification: [V2NIMClearHistoryNotification]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", clearHistoryNotification.count: \(clearHistoryNotification.count)")
   }
 
   /// 消息pin状态回调通知
   /// - Parameter pinNotification: 消息pin状态变化通知数据
-  public func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
+  open func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId:\(String(describing: pinNotification.pin?.messageRefer?.messageClientId)), pinStatus:\(pinNotification.pinState.rawValue)")
     if pinNotification.pinState == .MESSAGE_PIN_STEATE_PINNED {
       // 置顶
@@ -2461,13 +2469,13 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息评论状态回调
   /// - Parameter notification: 快捷评论通知数据
-  public func onMessageQuickCommentNotification(_ notification: V2NIMMessageQuickCommentNotification) {
+  open func onMessageQuickCommentNotification(_ notification: V2NIMMessageQuickCommentNotification) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", quickComment.index: \(notification.quickComment.index)")
   }
 
   /// 收到点对点已读回执
   /// - Parameter readReceipts: 已读回执
-  public func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIMP2PMessageReadReceipt]) {
+  open func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIMP2PMessageReadReceipt]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
     var reloadIndexPaths: [IndexPath] = []
     for readReceipt in readReceipts {
@@ -2500,7 +2508,7 @@ extension ChatViewModel: NEChatListener {
 
   /// 收到群已读回执
   /// - Parameter readReceipts: 已读回执
-  public func onReceiveTeamMessageReadReceipts(_ readReceipts: [V2NIMTeamMessageReadReceipt]) {
+  open func onReceiveTeamMessageReadReceipts(_ readReceipts: [V2NIMTeamMessageReadReceipt]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
     var reloadIndexPaths: [IndexPath] = []
     for readReceipt in readReceipts {
@@ -2531,7 +2539,7 @@ extension ChatViewModel: NEChatListener {
 // MARK: AI Listener
 
 extension ChatViewModel: V2NIMAIListener {
-  public func onProxyAIModelCall(_ data: V2NIMAIModelCallResult) {
+  open func onProxyAIModelCall(_ data: V2NIMAIModelCallResult) {
     if data.code == aiUserRequestSuccess {
       if data.requestId == translationlanguageRquestId {
         delegate?.didTranslateResult?(data.content.msg)
@@ -2543,7 +2551,7 @@ extension ChatViewModel: V2NIMAIListener {
   /// 翻译
   /// - Parameter 需要翻译文本
   /// - Parameter 目标语言
-  public func translateLanguage(_ sourceText: String, targetLanguage: String, _ completion: @escaping (NSError?) -> Void) {
+  open func translateLanguage(_ sourceText: String, targetLanguage: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(className(), desc: #function + " ai translate source : \(sourceText)")
 
     let request = V2NIMProxyAIModelCallParams()

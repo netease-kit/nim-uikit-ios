@@ -35,7 +35,7 @@ open class MessageVideoModel: MessageImageModel {
   /// 设置（视频、文件）消息模型（上传、下载）进度
   /// - Parameters:
   ///   - progress:（上传、下载）进度
-  public func setModelProgress(_ progress: UInt) {
+  open func setModelProgress(_ progress: UInt) {
     if progress == 100 {
       state = .Success
     } else {

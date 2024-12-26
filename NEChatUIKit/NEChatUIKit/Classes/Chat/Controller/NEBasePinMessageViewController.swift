@@ -44,11 +44,10 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -381,6 +380,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       loadData()
     }
     tableView.reloadData()
+    emptyView.isHidden = viewModel.items.count > 0
   }
 
   open func didClickMore(_ model: NEPinMessageModel?) {
@@ -414,7 +414,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   /// 跳转视频播放器
   /// - Parameter model: 标记对象
-  public func toVideoView(_ model: NEPinMessageModel?) {
+  open func toVideoView(_ model: NEPinMessageModel?) {
     if let object = model?.message.attachment as? V2NIMMessageVideoAttachment {
       stopPlay()
       let player = VideoPlayerViewController()
@@ -435,7 +435,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   /// 跳转地图详情页
   /// - Parameter model: 标记对象
-  public func toMapDetail(_ model: NEPinMessageModel?) {
+  open func toMapDetail(_ model: NEPinMessageModel?) {
     if let title = model?.message.text, let locationObject = model?.message.attachment as? V2NIMMessageLocationAttachment {
       let lng = locationObject.longitude
 
@@ -464,7 +464,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   /// 跳转文件查看器
   /// - Parameter model: 标记对象
-  public func toFileDetail(_ model: NEPinMessageModel?) {
+  open func toFileDetail(_ model: NEPinMessageModel?) {
     if let object = model?.message.attachment as? V2NIMMessageFileAttachment {
       // 判断是否是文件对象
       guard let fileModel = model?.pinFileModel as? PinMessageFileModel else {
@@ -724,7 +724,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   // MARK: - NEIMKitClientListener
 
-  public func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }
@@ -743,12 +743,12 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
 extension NEBasePinMessageViewController: AVAudioPlayerDelegate {
   /// 声音播放完成回调
-  public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+  open func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
     stopPlay()
   }
 
   /// 声音解码失败回调
-  public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
+  open func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
     stopPlay()
   }
 }

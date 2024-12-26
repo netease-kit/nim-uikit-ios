@@ -65,7 +65,7 @@
 "team_all_mute"="Mute everyone";
 "team_all_no_mute"="Unmute all";
 
-"pin_text"="Pinned by ";
+"pin_text"="Pinned by %@";
 
 "top_message"="Top Message";
 "untop_message"="Untop Message";

@@ -35,8 +35,8 @@ public class NENotification: NSObject {
   }
 
   // 是否是同一申请
-  public func isEqualTo(_ noti: V2NIMFriendAddApplication,
-                        _ compareStatus: Bool = true) -> Bool {
+  open func isEqualTo(_ noti: V2NIMFriendAddApplication,
+                      _ compareStatus: Bool = true) -> Bool {
     if v2Notification.applicantAccountId == noti.applicantAccountId,
        v2Notification.recipientAccountId == noti.recipientAccountId {
       if compareStatus {

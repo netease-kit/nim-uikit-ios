@@ -157,6 +157,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     textFeild.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
     textFeild.leftViewMode = .always
     textFeild.font = .systemFont(ofSize: 14)
+    textFeild.accessibilityIdentifier = "id.messageInput"
     return textFeild
   }()
 

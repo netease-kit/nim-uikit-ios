@@ -8,7 +8,7 @@ import UIKit
 @objcMembers
 open class ChatSectionView: UITableViewHeaderFooterView {
   public var titleLabel = UILabel()
-  override init(reuseIdentifier: String?) {
+  override public init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     commonUI()
   }

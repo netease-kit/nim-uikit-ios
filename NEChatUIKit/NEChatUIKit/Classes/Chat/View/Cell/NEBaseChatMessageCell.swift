@@ -629,13 +629,13 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     pinImage.isHidden = !model.isPined
     contentView.backgroundColor = model.isPined ? ChatUIConfig.shared.messageProperties.signalBgColor : .clear
     if model.isPined {
-      let pinText = chatLocalizable("pin_text")
+      let pinText = String(format: chatLocalizable("pin_text"), chatLocalizable("You"))
       if model.pinAccount == nil {
-        pinLabel.text = pinText + chatLocalizable("You")
+        pinLabel.text = pinText
       } else if let account = model.pinAccount, account == IMKitClient.instance.account() {
-        pinLabel.text = pinText + chatLocalizable("You")
+        pinLabel.text = pinText
       } else if let text = model.pinShowName {
-        pinLabel.text = pinText + text
+        pinLabel.text = String(format: chatLocalizable("pin_text"), text)
       }
 
       pinImage.image = UIImage.ne_imageNamed(name: "msg_pin")

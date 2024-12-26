@@ -169,7 +169,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public var multipleLineViewHeight: NSLayoutConstraint?
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }
@@ -416,7 +416,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }
 
   /// 点击富文本图片
-  public func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+  open func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
     textView.becomeFirstResponder()
 
     var offset = characterRange.location

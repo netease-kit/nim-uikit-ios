@@ -21,7 +21,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
   public var tableViewTopAnchor: NSLayoutConstraint? // tableView的top约束
   public weak var delegate: NEBaseMultiSelectedViewControllerDelegate?
 
-  init(selectedArray: [MultiSelectModel] = [MultiSelectModel]()) {
+  public init(selectedArray: [MultiSelectModel] = [MultiSelectModel]()) {
     self.selectedArray = selectedArray
     super.init(nibName: nil, bundle: nil)
   }
@@ -109,11 +109,10 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     tableView.dataSource = self
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -141,7 +140,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     return cell
   }
 
-  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     62
   }
 

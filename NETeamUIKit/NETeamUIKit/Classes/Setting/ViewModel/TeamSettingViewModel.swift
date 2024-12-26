@@ -365,9 +365,9 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// - Parameter teamId:  群id
   /// - Parameter queryType:  查询类型
   /// - Parameter completion:  完成后的回调
-  public func getAllTeamMemberInfos(_ teamId: String,
-                                    _ queryType: V2NIMTeamMemberRoleQueryType,
-                                    _ completion: @escaping (NSError?) -> Void) {
+  open func getAllTeamMemberInfos(_ teamId: String,
+                                  _ queryType: V2NIMTeamMemberRoleQueryType,
+                                  _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
     if NETeamMemberCache.shared.getTeamMemberCache(teamId) != nil {
       NETeamMemberCache.shared.endTimer()
@@ -433,7 +433,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   }
 
   /// 根据成员信息获取用户信息
-  public func getUserInfo(_ members: [V2NIMTeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
+  open func getUserInfo(_ members: [V2NIMTeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
     var accids = [String]()
     var memberModels = [NETeamMemberInfoModel]()
     for member in members {
@@ -471,7 +471,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// 解散群聊
   /// - Parameter teamId : 群id
   /// - Parameter completion: 完成回调
-  public func dismissTeam(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
+  open func dismissTeam(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     teamRepo.dismissTeam(teamId, .TEAM_TYPE_NORMAL, completion)
   }
@@ -600,7 +600,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
 
   /// 群信息更改回调
   /// - Parameter team: 群信息类
-  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
     if let tid = teamInfoModel?.team?.teamId, tid == team.teamId {
       teamInfoModel?.team = team
       getData()
@@ -610,25 +610,25 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
 
   /// 群成员离开回调
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员被踢回调
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入回调
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群信息同步完成回调
-  public func onTeamSyncFinished() {
+  open func onTeamSyncFinished() {
     NEALog.infoLog(className(), desc: #function + " team setting viewmo model onTeamSyncFinished ")
     if let tid = teamInfoModel?.team?.teamId {
       weak var weakSelf = self
@@ -645,7 +645,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
     weak var weakSelf = self
     for member in teamMembers {
       if let currentTid = teamInfoModel?.team?.teamId, currentTid == member.teamId, member.accountId == IMKitClient.instance.account() {
@@ -660,7 +660,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// 离开群回调
   /// - Parameter teamMembers: 群成员
   /// - Parameter team: 群信息
-  public func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {}
+  open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {}
 
   /// 群成员变更统一处理
   /// - Parameter teamMembers: 群成员
@@ -703,7 +703,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
 
   /// 会话变更
   /// - Parameter conversations: 会话
-  public func onConversationChanged(_ conversations: [V2NIMConversation]) {
+  open func onConversationChanged(_ conversations: [V2NIMConversation]) {
     if let currentConversation = conversation {
       for changeConversation in conversations {
         if currentConversation.conversationId == changeConversation.conversationId {

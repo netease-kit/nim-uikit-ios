@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegate {
+open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDelegate {
   /// 群对象
   public var team: V2NIMTeam?
   /// 修改类型
@@ -240,7 +240,7 @@ open class NEBaseTeamNameViewController: NEBaseViewController, UITextViewDelegat
   /// - Parameter textView: 文本控件对象
   /// - Parameter range: 变更范围
   /// - Parameter text:  变更内容
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     if !text.isEmpty {
       let finalStr = (textView.text as NSString).replacingCharacters(in: range, with: text)
       if finalStr.utf16.count > textLimit {

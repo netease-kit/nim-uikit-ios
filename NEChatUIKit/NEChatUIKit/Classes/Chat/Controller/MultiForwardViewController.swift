@@ -34,11 +34,10 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     tableView.backgroundColor = .clear
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -102,21 +101,12 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     }
 
     view.addSubview(tableView)
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-        tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+    ])
 
     view.addSubview(brokenNetworkView)
     NSLayoutConstraint.activate([
@@ -370,17 +360,17 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
 
   // MARK: ChatBaseCellDelegate ignore protocol
 
-  public func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didLongPressMessageView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didTapReeditButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didTapReadView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 
-  public func didTapSelectButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
+  open func didTapSelectButton(_ cell: UITableViewCell, _ model: MessageContentModel?) {}
 }

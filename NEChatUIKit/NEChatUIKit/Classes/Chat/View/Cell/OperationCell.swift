@@ -34,7 +34,7 @@ open class OperationCell: UICollectionViewCell {
     commonUI()
   }
 
-  public func commonUI() {
+  open func commonUI() {
     contentView.accessibilityIdentifier = "id.menuCell"
 
     imageView.translatesAutoresizingMaskIntoConstraints = false

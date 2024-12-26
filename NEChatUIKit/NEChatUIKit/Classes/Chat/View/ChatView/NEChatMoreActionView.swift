@@ -50,7 +50,7 @@ open class NEChatMoreActionView: UIView {
     return collcetionView
   }()
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     addSubview(collcetionView)
     setupConstraints()

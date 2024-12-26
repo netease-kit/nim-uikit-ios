@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class FunTeamInfoViewController: NEBaseTeamInfoViewController {
-  override init(team: V2NIMTeam?) {
+  override public init(team: V2NIMTeam?) {
     super.init(team: team)
     registerCellDic = [
       SettingCellType.SettingArrowCell.rawValue: FunTeamArrowSettingCell.self,

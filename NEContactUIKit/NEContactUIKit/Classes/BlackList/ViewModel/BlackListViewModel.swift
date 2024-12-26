@@ -17,7 +17,7 @@ open class BlackListViewModel: NSObject {
   public var blockList = [NEUserWithFriend]()
   public weak var delegate: BlackListViewModelDelegate?
 
-  override init() {
+  override public init() {
     super.init()
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.addContactListener(self)
@@ -83,7 +83,7 @@ open class BlackListViewModel: NSObject {
 extension BlackListViewModel: NEContactListener {
   /// 黑名单移除回调 （非好友）
   /// - Parameter accountId: 移除黑名单用户账号ID
-  public func onBlockListRemoved(_ accountId: String) {
+  open func onBlockListRemoved(_ accountId: String) {
     for (index, friendUser) in blockList.enumerated() {
       // 移除黑名单
       if friendUser.user?.accountId == accountId {
@@ -95,7 +95,7 @@ extension BlackListViewModel: NEContactListener {
 
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       // 添加黑名单
       if changeType == .addBlock,

@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class ChatTextArrowCell: ChatTextCell {
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     rightStyle = .indicate
   }

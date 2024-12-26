@@ -134,7 +134,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
 
   /// 群信息更新回调
   /// - Parameter team: 群
-  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
     if let model = teamDic[team.teamId] {
       model.team = team
     } else {
@@ -145,19 +145,19 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
   /// 加入群回调
   /// - Parameters:
   ///   - team: 群
-  public func onTeamJoined(_ team: V2NIMTeam) {
+  open func onTeamJoined(_ team: V2NIMTeam) {
     addTeam(team)
   }
 
   /// 创建群回调
   /// - Parameter team: 群
-  public func onTeamCreated(_ team: V2NIMTeam) {
+  open func onTeamCreated(_ team: V2NIMTeam) {
     addTeam(team)
   }
 
   /// 群解散回调
   /// - Parameter team: 群
-  public func onTeamDismissed(_ team: V2NIMTeam) {
+  open func onTeamDismissed(_ team: V2NIMTeam) {
     removeTeam(team)
   }
 
@@ -165,7 +165,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
   /// - Parameters:
   ///   - team: 群
   ///   - isKicked: 是否被踢
-  public func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {
+  open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {
     removeTeam(team)
   }
 
@@ -184,7 +184,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
   }
 
   /// 群数据同步完成回调
-  public func onTeamSyncFinished() {
+  open func onTeamSyncFinished() {
     NEALog.infoLog(className(), desc: #function + ", onTeamSyncFinished get search data")
     weak var weakSelf = self
     getSearchData(true) {
@@ -198,7 +198,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
 extension ConversationSearchViewModel: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     guard changeType == .update else {
       return
     }

@@ -63,7 +63,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     return view
   }()
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
   }

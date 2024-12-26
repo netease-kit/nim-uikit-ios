@@ -10,7 +10,7 @@ import UIKit
 /// 转发多选-已选页面-协同版
 @objcMembers
 open class MultiSelectedViewController: NEBaseMultiSelectedViewController {
-  override init(selectedArray: [MultiSelectModel] = [MultiSelectModel]()) {
+  override public init(selectedArray: [MultiSelectModel] = [MultiSelectModel]()) {
     super.init(selectedArray: selectedArray)
   }
 

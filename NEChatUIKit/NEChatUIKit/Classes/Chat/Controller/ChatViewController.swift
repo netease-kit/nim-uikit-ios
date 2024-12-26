@@ -180,12 +180,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       refreshingAction: #selector(loadMoreData)
     )
     tableView.keyboardDismissMode = .onDrag
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -1423,8 +1421,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     present(imagePickerVC, animated: true)
   }
 
-  open func sendMediaMessage(didFinishPickingMediaWithInfo info: [UIImagePickerController
-      .InfoKey: Any]) {
+  open func sendMediaMessage(_ info: [UIImagePickerController.InfoKey: Any]) {
     var imageName = "IMG_0001"
     var imageWidth: Int32 = 0
     var imageHeight: Int32 = 0
@@ -1432,22 +1429,23 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     // 获取展示名称
     if isFile == true,
-       let imgUrl = info[.referenceURL] as? URL {
-      let fetchRes = PHAsset.fetchAssets(withALAssetURLs: [imgUrl], options: nil)
-      let asset = fetchRes.firstObject
-      if let fileName = asset?.value(forKey: "filename") as? String {
+       let asset = info[.phAsset] as? PHAsset {
+      if let fileName = asset.value(forKey: "filename") as? String {
         imageName = fileName
       }
+    } else if let url = info[.imageURL] as? URL {
+      imageName = url.lastPathComponent
+    } else if let url = info[.mediaURL] as? URL {
+      imageName = url.lastPathComponent
+    } else if let url = info[.referenceURL] as? URL {
+      imageName = url.lastPathComponent
     }
 
     // 获取图片宽高、视频时长
-    // phAsset 不一定有
-    if #available(iOS 11.0, *) {
-      if let phAsset = info[.phAsset] as? PHAsset {
-        imageWidth = Int32(phAsset.pixelWidth)
-        imageHeight = Int32(phAsset.pixelHeight)
-        videoDuration = Int32(phAsset.duration * 1000)
-      }
+    if let phAsset = info[.phAsset] as? PHAsset {
+      imageWidth = Int32(phAsset.pixelWidth)
+      imageHeight = Int32(phAsset.pixelHeight)
+      videoDuration = Int32(phAsset.duration * 1000)
     }
 
     // video
@@ -1467,131 +1465,79 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         imageHeight = Int32(abs(correctedSize.height))
       }
 
-      weak var weakSelf = self
+      copyFileToSend(url: videoUrl,
+                     displayName: imageName,
+                     isFile: isFile ?? true,
+                     width: imageWidth,
+                     height: imageHeight,
+                     duration: videoDuration)
+      return
+    }
+
+    var imageUrl = info[.imageURL] as? URL
+    var image = (info[.originalImage] as? UIImage)
+    image = image?.fixOrientation()
+
+    // 获取图片宽度
+    if let width = image?.size.width {
+      imageWidth = Int32(width)
+    }
+
+    // 获取图片高度度
+    if let height = image?.size.height {
+      imageHeight = Int32(height)
+    }
+
+    let pngImage = image?.pngData()
+    var needDelete = false
+
+    // 无url则临时保存到本地，发送成功后删除临时文件
+    if imageUrl == nil {
+      if let data = pngImage, let path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
+        let url = URL(fileURLWithPath: path + "\(imageName).png")
+        do {
+          try data.write(to: url)
+          imageUrl = url
+          needDelete = true
+        } catch {
+          showToast(commonLocalizable("failed_operation"))
+        }
+      }
+    }
+
+    guard let imageUrl = imageUrl else {
+      showToast(commonLocalizable("failed_operation"))
+      return
+    }
+
+    let imgSize_MB = Double(pngImage?.count ?? 0) / 1e6
+    NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(imgSize_MB) MB")
+    if imgSize_MB > ChatUIConfig.shared.fileSizeLimit {
+      showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
+    } else {
       if isFile == true {
-        copyFileToSend(url: videoUrl, displayName: imageName)
-      } else {
-        viewModel.sendVideoMessage(url: videoUrl,
-                                   name: imageName,
-                                   width: imageWidth,
-                                   height: imageHeight,
-                                   duration: videoDuration) { [weak self] message, error, progress in
+        viewModel.sendFileMessage(filePath: imageUrl.relativePath,
+                                  displayName: imageName) { [weak self] message, error, progress in
           NEALog.infoLog(
             ModuleName + " " + ChatViewController.className(),
-            desc: #function + "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
+            desc: #function + "CALLBACK sendFileMessage" + (error?.localizedDescription ?? "no error")
           )
-          weakSelf?.showErrorToast(error)
+          self?.showErrorToast(error)
 
           if progress > 0, progress <= 100 {
             self?.setModelProgress(message, progress)
           }
         }
-      }
-      return
-    }
-
-    if #available(iOS 11.0, *) {
-      var imageUrl = info[.imageURL] as? URL
-      var image = info[.originalImage] as? UIImage
-      image = image?.fixOrientation()
-
-      // 获取图片宽度
-      if let width = image?.size.width {
-        imageWidth = Int32(width)
-      }
-
-      // 获取图片高度度
-      if let height = image?.size.height {
-        imageHeight = Int32(height)
-      }
-
-      let pngImage = image?.pngData()
-      var needDelete = false
-
-      // 无url则临时保存到本地，发送成功后删除临时文件
-      if imageUrl == nil {
-        if let data = pngImage, let path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
-          let url = URL(fileURLWithPath: path + "\(imageName).png")
-          do {
-            try data.write(to: url)
-            imageUrl = url
-            needDelete = true
-          } catch {
-            showToast(chatLocalizable("image_is_nil"))
-          }
-        }
-      }
-
-      guard let imageUrl = imageUrl else {
-        showToast(chatLocalizable("image_is_nil"))
-        return
-      }
-
-      let imgSize_MB = Double(pngImage?.count ?? 0) / 1e6
-      NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(imgSize_MB) MB")
-      if imgSize_MB > ChatUIConfig.shared.fileSizeLimit {
-        showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
       } else {
-        if isFile == true {
-          viewModel.sendFileMessage(filePath: imageUrl.relativePath,
-                                    displayName: imageName) { [weak self] message, error, progress in
-            NEALog.infoLog(
-              ModuleName + " " + ChatViewController.className(),
-              desc: #function + "CALLBACK sendFileMessage" + (error?.localizedDescription ?? "no error")
-            )
-            self?.showErrorToast(error)
-
-            if progress > 0, progress <= 100 {
-              self?.setModelProgress(message, progress)
-            }
-          }
-        } else {
-          if let url = info[.referenceURL] as? URL {
-            if url.absoluteString.hasSuffix("ext=GIF") == true {
-              // GIF 需要特殊处理
-              let imageAsset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset
-              let options = PHImageRequestOptions()
-              options.version = .current
-              guard let asset = imageAsset else {
-                return
-              }
-              weak var weakSelf = self
-              PHImageManager.default().requestImageData(for: asset, options: options) { imageData, dataUTI, orientation, info in
-                if let data = imageData {
-                  let tempDirectoryURL = FileManager.default.temporaryDirectory
-                  let uniqueString = UUID().uuidString
-                  let temUrl = tempDirectoryURL.appendingPathComponent(uniqueString + ".gif")
-                  print("tem url path : ", temUrl.path)
-                  do {
-                    try data.write(to: temUrl)
-                    DispatchQueue.main.async {
-                      weakSelf?.viewModel.sendImageMessage(path: temUrl.path, name: imageName, width: imageWidth, height: imageHeight) { error in
-                        NEALog.infoLog(
-                          ModuleName + " " + ChatViewController.className(),
-                          desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
-                        )
-                        weakSelf?.showErrorToast(error)
-                      }
-                    }
-                  } catch {
-                    NEALog.infoLog(ModuleName, desc: #function + "write tem gif data error : \(error.localizedDescription)")
-                  }
-                }
-              }
-              return
-            }
-          }
-
-          viewModel.sendImageMessage(path: imageUrl.relativePath, name: imageName, width: imageWidth, height: imageHeight) { [weak self] error in
-            NEALog.infoLog(
-              ModuleName + " " + ChatViewController.className(),
-              desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
-            )
-            self?.showErrorToast(error)
-            // 删除临时保存的图片
-            if needDelete {
-              try? FileManager.default.removeItem(at: imageUrl)
-            }
+        viewModel.sendImageMessage(path: imageUrl.relativePath, name: imageName, width: imageWidth, height: imageHeight) { [weak self] error in
+          NEALog.infoLog(
+            ModuleName + " " + ChatViewController.className(),
+            desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+          )
+          self?.showErrorToast(error)
+          // 删除临时保存的图片
+          if needDelete {
+            try? FileManager.default.removeItem(at: imageUrl)
           }
         }
       }
@@ -1605,7 +1551,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
                                     .InfoKey: Any]) {
     weak var weakSelf = self
     picker.dismiss(animated: true, completion: {
-      weakSelf?.sendMediaMessage(didFinishPickingMediaWithInfo: info)
+      weakSelf?.sendMediaMessage(info)
     })
   }
 
@@ -1619,7 +1565,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameters:
   ///   - url: 原始路径
   ///   - displayName: 显示名称
-  func copyFileToSend(url: URL, displayName: String) {
+  func copyFileToSend(url: URL,
+                      displayName: String,
+                      isFile: Bool = true,
+                      width: Int32 = 0,
+                      height: Int32 = 0,
+                      duration: Int32 = 0) {
     let desPath = NSTemporaryDirectory() + "\(url.lastPathComponent)"
     let dirUrl = URL(fileURLWithPath: desPath)
     if !FileManager.default.fileExists(atPath: desPath) {
@@ -1640,16 +1591,36 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
             showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
             try? FileManager.default.removeItem(atPath: desPath)
           } else {
-            viewModel.sendFileMessage(filePath: desPath,
-                                      displayName: displayName) { [weak self] message, error, progress in
-              NEALog.infoLog(
-                ModuleName + " " + ChatViewController.className(),
-                desc: #function + "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
-              )
-              self?.showErrorToast(error)
+            weak var weakSelf = self
+            if isFile == true {
+              viewModel.sendFileMessage(filePath: desPath,
+                                        displayName: displayName) { [weak self] message, error, progress in
+                NEALog.infoLog(
+                  ModuleName + " " + ChatViewController.className(),
+                  desc: #function + "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
+                )
+                self?.showErrorToast(error)
 
-              if progress > 0, progress <= 100 {
-                self?.setModelProgress(message, progress)
+                if progress > 0, progress <= 100 {
+                  self?.setModelProgress(message, progress)
+                }
+              }
+            } else {
+              guard let desPath = URL(string: desPath) else { return }
+              viewModel.sendVideoMessage(url: desPath,
+                                         name: displayName,
+                                         width: width,
+                                         height: height,
+                                         duration: duration) { [weak self] message, error, progress in
+                NEALog.infoLog(
+                  ModuleName + " " + ChatViewController.className(),
+                  desc: #function + "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
+                )
+                weakSelf?.showErrorToast(error)
+
+                if progress > 0, progress <= 100 {
+                  self?.setModelProgress(message, progress)
+                }
               }
             }
           }

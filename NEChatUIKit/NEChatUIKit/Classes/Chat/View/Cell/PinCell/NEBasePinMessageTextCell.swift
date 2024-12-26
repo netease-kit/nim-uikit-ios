@@ -30,7 +30,7 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
     // Configure the view for the selected state
   }
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
   }
 

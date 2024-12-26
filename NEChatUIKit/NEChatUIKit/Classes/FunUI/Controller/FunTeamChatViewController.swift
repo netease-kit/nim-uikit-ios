@@ -25,6 +25,8 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
   public init(sessionId: String) {
     let conversationId = V2NIMConversationIdUtil.teamConversationId(sessionId) ?? ""
     super.init(conversationId: conversationId)
+    viewModel = TeamChatViewModel(conversationId: conversationId, anchor: nil)
+    viewModel.delegate = self
   }
 
   public required init?(coder: NSCoder) {
@@ -213,13 +215,13 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
 
   /// 群聊更新回调
   /// - Parameter team: 群聊
-  public func onTeamUpdate(team: V2NIMTeam) {
+  open func onTeamUpdate(team: V2NIMTeam) {
     updateTeamInfo(team: team)
   }
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  public func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember]) {
     if let team = NETeamUserManager.shared.getTeamInfo() {
       setMute(team: team)
     }

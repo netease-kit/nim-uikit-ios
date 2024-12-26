@@ -38,7 +38,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   }
 
   /// 设置从上一个页面传入的成员
-  public func setupCache() {
+  open func setupCache() {
     teamInfoModel?.users.forEach { member in
       if let accountId = member.teamMember?.accountId {
         memberModelCacheDic[accountId] = member
@@ -122,7 +122,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   }
 
   /// 获取消息对应的用户信息
-  public func bindMessageUserInfo(_ messages: [HistoryMessageModel], _ infoDic: [String: NETeamMemberInfoModel]) {
+  open func bindMessageUserInfo(_ messages: [HistoryMessageModel], _ infoDic: [String: NETeamMemberInfoModel]) {
     for message in messages {
       if let uid = ChatMessageHelper.getSenderId(message.imMessage) {
         if let member = infoDic[uid] {
@@ -135,7 +135,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   }
 
   /// 获取群信息
-  public func getTeamInfo(_ teamId: String?, _ completion: @escaping (V2NIMTeam?, NSError?) -> Void) {
+  open func getTeamInfo(_ teamId: String?, _ completion: @escaping (V2NIMTeam?, NSError?) -> Void) {
     guard let tid = teamId else {
       return
     }
@@ -148,7 +148,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   /// - Parameter teamId: 群id
   /// - Parameter accounts: 群成员id列表
   /// - Parameter completion: 完成回调
-  public func getSearchMessageMembers(_ teamId: String, _ accounts: [String], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
+  open func getSearchMessageMembers(_ teamId: String, _ accounts: [String], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
     weak var weakSelf = self
     teamRepo.getTeamMemberListByIds(teamId, .TEAM_TYPE_NORMAL, accounts) { members, error in
       if let err = error {
@@ -172,7 +172,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   /// 根据成员信息获取用户信息
   /// - Parameter members: 群成员列表
   /// - Parameter completion: 完成回调
-  public func getUsersInfo(_ members: [V2NIMTeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
+  open func getUsersInfo(_ members: [V2NIMTeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
     var memberModels = [NETeamMemberInfoModel]()
     var accids = [String]()
 
@@ -210,7 +210,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
 
   /// 群成员变更回调
   /// - parameter teamMembers: 群成员信息对象列表
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
     guard let currentTeamId = teamInfoModel?.team?.teamId else {
       return
     }
@@ -232,7 +232,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
 extension TeamHistoryMessageViewModel: NEContactListener {
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,
          memberModelCacheDic[accid] != nil {

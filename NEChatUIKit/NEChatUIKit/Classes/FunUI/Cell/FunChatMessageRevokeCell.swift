@@ -6,8 +6,27 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
-  public var revokeLabelLeft = UILabel()
-  public var revokeLabelRight = UILabel()
+  public lazy var revokeLabelLeft: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textColor = UIColor.ne_greyText
+    label.textAlignment = .center
+    label.lineBreakMode = .byTruncatingMiddle
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.accessibilityIdentifier = "id.messageText"
+    return label
+  }()
+
+  public lazy var revokeLabelRight: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.textColor = UIColor.ne_greyText
+    label.textAlignment = .center
+    label.font = UIFont.systemFont(ofSize: 14.0)
+    label.accessibilityIdentifier = "id.messageText"
+    return label
+  }()
+
   public var reeditButton = UIButton(type: .custom)
   var revokeLabelRightXAnchor: NSLayoutConstraint?
 
@@ -21,12 +40,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
 
   override open func commonUILeft() {
     super.commonUILeft()
-    revokeLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    revokeLabelLeft.textColor = UIColor.ne_greyText
-    revokeLabelLeft.textAlignment = .center
-    revokeLabelLeft.lineBreakMode = .byTruncatingMiddle
-    revokeLabelLeft.font = UIFont.systemFont(ofSize: 14.0)
-    revokeLabelLeft.accessibilityIdentifier = "id.messageText"
     contentView.addSubview(revokeLabelLeft)
     NSLayoutConstraint.activate([
       revokeLabelLeft.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
@@ -38,11 +51,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
 
   override open func commonUIRight() {
     super.commonUIRight()
-    revokeLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    revokeLabelRight.textColor = UIColor.ne_greyText
-    revokeLabelRight.textAlignment = .center
-    revokeLabelRight.font = UIFont.systemFont(ofSize: 14.0)
-    revokeLabelRight.accessibilityIdentifier = "id.messageText"
     contentView.addSubview(revokeLabelRight)
     revokeLabelRightXAnchor = revokeLabelRight.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0)
     revokeLabelRightXAnchor?.isActive = true

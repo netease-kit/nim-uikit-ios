@@ -66,7 +66,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     return label
   }()
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setupSubviews()
   }
@@ -106,7 +106,7 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
   /// - Parameter maxWidth: 最大宽度
   /// - Parameter importantText: 关键字段
   /// - Parameter fullText: 全文本
-  public func truncateTextForLabel(_ label: UILabel, _ maxWidth: CGFloat, _ importantText: String, _ fullText: String) {
+  open func truncateTextForLabel(_ label: UILabel, _ maxWidth: CGFloat, _ importantText: String, _ fullText: String) {
     guard let font = label.font else {
       return
     }

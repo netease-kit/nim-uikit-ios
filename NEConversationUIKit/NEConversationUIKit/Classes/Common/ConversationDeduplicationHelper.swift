@@ -24,22 +24,22 @@ public class ConversationDeduplicationHelper: NSObject, NEIMKitClientListener {
     IMKitClient.instance.removeLoginListener(self)
   }
 
-  public func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIMLoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
-  public func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
+  open func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
     clearCache()
   }
 
-  public func clearCache() {
+  open func clearCache() {
     revokeMessageIds.removeAll()
   }
 
   // 是否已经保存过此撤回消息，防止重复保存本地撤回记录
-  public func isRevokeMessageSaved(messageId: String) -> Bool {
+  open func isRevokeMessageSaved(messageId: String) -> Bool {
     if revokeMessageIds.contains(messageId) {
       return true
     }

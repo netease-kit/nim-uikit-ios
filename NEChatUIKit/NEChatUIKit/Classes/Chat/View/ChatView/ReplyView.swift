@@ -11,7 +11,7 @@ open class ReplyView: UIView {
   var line = UIView()
   var textLabel = UILabel()
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = UIColor(hexString: "#EFF1F2")
     closeButton.setImage(UIImage.ne_imageNamed(name: "close"), for: .normal)

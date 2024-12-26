@@ -8,7 +8,7 @@ import UIKit
 public typealias NESelectTeamMemberBlock = ([NETeamMemberInfoModel]) -> Void
 
 @objcMembers
-open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, TeamMemberSelectViewModelDelegate {
+open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, TeamMemberSelectViewModelDelegate {
   public var selectMemberBlock: NESelectTeamMemberBlock?
 
   let viewModel = TeamMemberSelectViewModel()
@@ -48,11 +48,10 @@ open class NEBaseTeamMemberSelectController: NEBaseViewController, UITableViewDe
       UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 12))
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }

@@ -52,7 +52,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 登录状态变更
   /// - Parameter status: 登录状态
-  public func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIMLoginStatus) {
     if status == .LOGIN_STATUS_LOGINED {
       NEALog.infoLog(className(), desc: "login ok")
       currentAccid = IMKitClient.instance.account()
@@ -69,7 +69,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// - Parameter type: 同步类型
   /// - Parameter state: 同步状态
   /// - Parameter error: 错误信息
-  public func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
     if state == .DATA_SYNC_STATE_COMPLETED {
       if currentAccid.count <= 0 {
         currentAccid = IMKitClient.instance.account()
@@ -441,7 +441,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 撤回消息回调
   /// - Parameter revokeNotifications:  撤回通知
-  public func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
     var messageRefers = [V2NIMMessageRefer]()
     for notification in revokeNotifications {
       if let messageRefer = notification.messageRefer {
@@ -504,7 +504,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 收到消息回调
   /// - Parameter messages: 消息列表
-  public func onReceiveMessages(_ messages: [V2NIMMessage]) {
+  open func onReceiveMessages(_ messages: [V2NIMMessage]) {
     filterAtMessage(messages: messages)
   }
 }

@@ -309,19 +309,19 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 群成员离开
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入
   /// - Parameter operatorAccountId: 操作者
   /// - Parameter teamMembers: 群成员
-  public func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群信息更新
-  public func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
     updateTeamInfo(team.teamId)
   }
 
@@ -329,8 +329,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   ///  - Parameter  teamId :        群组ID
   ///  - Parameter  mode :          群信息修改权限
   ///  - Parameter  completion:     完成后的回调
-  public func updateTeamInfoPrivilege(_ teamId: String, _ mode: V2NIMTeamUpdateInfoMode,
-                                      _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
+  open func updateTeamInfoPrivilege(_ teamId: String, _ mode: V2NIMTeamUpdateInfoMode,
+                                    _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
     teamRepo.updateTeamInfoMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
@@ -341,8 +341,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   ///  - Parameter  teamId:      群组ID
   ///  - Parameter  mode:  邀请模式
   ///  - Parameter  completion:  完成后的回调
-  public func updateInviteMode(_ teamId: String, _ mode: V2NIMTeamInviteMode,
-                               _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
+  open func updateInviteMode(_ teamId: String, _ mode: V2NIMTeamInviteMode,
+                             _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
     teamRepo.updateInviteMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
@@ -367,7 +367,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     }
   }
 
-  public func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
     print("team manage onTeamMemberInfoUpdated")
     onTeamMemberChanged(teamMembers)
   }

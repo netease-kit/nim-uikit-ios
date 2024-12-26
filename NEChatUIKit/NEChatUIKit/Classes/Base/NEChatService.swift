@@ -19,13 +19,13 @@ public class NEChatService: NSObject, ChatServiceDelegate, NEChatEmojProtocol {
 
   /// 注册 NEChatUIKit 初始化协议
   /// - Parameter params: 初始化参数
-  public func setupInit(_ params: [String: Any]?) {
+  open func setupInit(_ params: [String: Any]?) {
     registerRouter(params)
   }
 
   /// 注册路由
   /// - Parameter param: 参数
-  public func registerRouter(_ param: [String: Any]?) {
+  open func registerRouter(_ param: [String: Any]?) {
     if let isFun = param?["isFun"] as? Bool, isFun {
       ChatRouter.registerFun()
     } else {
@@ -42,7 +42,7 @@ public class NEChatService: NSObject, ChatServiceDelegate, NEChatEmojProtocol {
     NEChatKitClient.instance.addEmojDelegate(self)
   }
 
-  public func getEmojAttributeString(_ content: String, _ font: CGFloat) -> NSAttributedString? {
+  open func getEmojAttributeString(_ content: String, _ font: CGFloat) -> NSAttributedString? {
     let attributeStr = NEEmotionTool.getAttWithStr(
       str: content,
       font: UIFont.systemFont(ofSize: font)

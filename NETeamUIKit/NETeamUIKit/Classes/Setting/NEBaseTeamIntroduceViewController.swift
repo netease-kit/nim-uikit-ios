@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDelegate {
+open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextViewDelegate {
   public var team: V2NIMTeam?
   public let textLimit = 100
   public let backView = UIView()
@@ -166,7 +166,7 @@ open class NEBaseTeamIntroduceViewController: NEBaseViewController, UITextViewDe
   /// - Parameter textView: 文本控件对象
   /// - Parameter range: 变更范围
   /// - Parameter text:  变更内容
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
     if !text.isEmpty {
       let finalStr = (textView.text as NSString).replacingCharacters(in: range, with: text)
       if finalStr.utf16.count > textLimit {

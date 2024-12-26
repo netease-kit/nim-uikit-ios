@@ -16,7 +16,7 @@ import NECoreIM2Kit
 open class ContactSection {
   public var initial: String
   public var contacts: Array = [ContactInfo]()
-  init(initial: String, contacts: [ContactInfo]) {
+  public init(initial: String, contacts: [ContactInfo]) {
     self.initial = initial
     self.contacts = contacts
   }

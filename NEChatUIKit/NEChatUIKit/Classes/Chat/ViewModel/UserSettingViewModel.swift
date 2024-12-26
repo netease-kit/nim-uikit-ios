@@ -215,7 +215,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
 
   /// 会话变更回调
   /// - Parameter conversations: 会话列表
-  public func onConversationChanged(_ conversations: [V2NIMConversation]) {
+  open func onConversationChanged(_ conversations: [V2NIMConversation]) {
     for changeConversation in conversations {
       if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
         conversation = changeConversation
@@ -226,7 +226,7 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
     }
   }
 
-  public func userInfoDidChange() {
+  open func userInfoDidChange() {
     getSectionDatas()
     delegate?.didNeedRefreshUI()
   }
