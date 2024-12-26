@@ -19,7 +19,7 @@ public class MineSettingViewModel: NSObject {
   var sectionData = [SettingSectionModel]()
   weak var delegate: MineSettingViewModelDelegate?
 
-  public func getData() {
+  open func getData() {
     sectionData.removeAll()
     sectionData.append(getFirstSection())
     sectionData.append(getSecondSection())

@@ -9,7 +9,7 @@ import UIKit
 class MeViewModel: NSObject {
   public var mineData: [[String: String]] = []
 
-  public func getData() {
+  open func getData() {
     mineData = [
       [localizable("setting"): "mine_setting"],
       [localizable("about_yunxin"): "about_yunxin"],

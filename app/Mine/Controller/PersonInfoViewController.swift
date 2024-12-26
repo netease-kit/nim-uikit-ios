@@ -31,11 +31,10 @@ public class PersonInfoViewController: NEBaseViewController,
     tableView.separatorStyle = .none
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -48,7 +47,7 @@ public class PersonInfoViewController: NEBaseViewController,
     return picker
   }()
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     ContactRepo.shared.addContactListener(self)
     initialConfig()
@@ -158,15 +157,15 @@ public class PersonInfoViewController: NEBaseViewController,
 
   // MARK: UIImagePickerControllerDelegate
 
-  public func imagePickerController(_ picker: UIImagePickerController,
-                                    didFinishPickingMediaWithInfo info: [UIImagePickerController
-                                      .InfoKey: Any]) {
+  open func imagePickerController(_ picker: UIImagePickerController,
+                                  didFinishPickingMediaWithInfo info: [UIImagePickerController
+                                    .InfoKey: Any]) {
     let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
     uploadHeadImage(image: image)
     dismiss(animated: true, completion: nil)
   }
 
-  public func uploadHeadImage(image: UIImage) {
+  open func uploadHeadImage(image: UIImage) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
@@ -352,7 +351,7 @@ public class PersonInfoViewController: NEBaseViewController,
 
   // MARK: UITableViewDelegate, UITableViewDataSource
 
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
       return model.cellModels.count
@@ -360,11 +359,11 @@ public class PersonInfoViewController: NEBaseViewController,
     return 0
   }
 
-  public func numberOfSections(in tableView: UITableView) -> Int {
+  open func numberOfSections(in tableView: UITableView) -> Int {
     viewModel.sectionData.count
   }
 
-  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(model.type)",
@@ -376,19 +375,19 @@ public class PersonInfoViewController: NEBaseViewController,
     return UITableViewCell()
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     if let block = model.cellClick {
       block()
     }
   }
 
-  public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
     return model.rowHeight
   }
 
-  public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+  open func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     if section == 0 {
       return 0
     }
@@ -401,7 +400,7 @@ public class PersonInfoViewController: NEBaseViewController,
     return 0
   }
 
-  public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+  open func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let headerView = UIView()
     headerView.backgroundColor = .ne_lightBackgroundColor
     return headerView
@@ -411,7 +410,7 @@ public class PersonInfoViewController: NEBaseViewController,
 
   /// 好友信息缓存更新
   /// - Parameter accountId: 用户 id
-  public func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if contact.user?.accountId == IMKitClient.instance.account() {
         viewModel.userInfo = contact

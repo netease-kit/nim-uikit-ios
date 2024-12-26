@@ -41,11 +41,10 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
     tableView.register(VersionCell.self, forCellReuseIdentifier: "VersionCell")
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }

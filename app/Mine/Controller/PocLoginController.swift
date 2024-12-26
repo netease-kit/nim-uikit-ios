@@ -10,7 +10,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-public class PocLoginController: UIViewController {
+public class PocLoginController: NEBaseViewController {
   // 成功回调
   public var loginSuccess: (() -> Void)?
 
@@ -20,10 +20,10 @@ public class PocLoginController: UIViewController {
   // 登录状态记录
   var isLogining = false
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
-
-    view.backgroundColor = .white
+    view.backgroundColor = navigationView.backgroundColor
+    navigationView.moreButton.isHidden = true
 
     // 设置用户名输入框
     usernameTextField.placeholder = "用户名"
@@ -40,7 +40,7 @@ public class PocLoginController: UIViewController {
 
     // 布局
     NSLayoutConstraint.activate([
-      usernameTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+      usernameTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topConstant),
       usernameTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       usernameTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       usernameTextField.heightAnchor.constraint(equalToConstant: 40),

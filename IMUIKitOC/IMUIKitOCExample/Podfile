@@ -22,7 +22,7 @@ target 'IMUIKitOCExample' do
   pod 'NEMapKit', '10.5.1'
   
   # 扩展库 - AI 划词搜索
-  pod 'NEAISearchKit', '1.0.4'
+  pod 'NEAISearchKit', '1.0.5'
 
   # 扩展库 - 呼叫组件
   pod 'NERtcCallKit/NOS_Special', '3.1.0'

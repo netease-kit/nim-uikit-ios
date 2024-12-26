@@ -64,7 +64,7 @@ public class BirthdayDatePickerView: UIView {
     return pickerBackView
   }()
 
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     backgroundColor = UIColor(white: 0, alpha: 0.25)
     let tap = UITapGestureRecognizer(target: self, action: #selector(pickerBackViewClicked))

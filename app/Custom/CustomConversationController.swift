@@ -18,7 +18,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     super.init(coder: coder)
   }
 
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     // 通过重写实现自定义，该方式需要继承自 ChatViewController
 //      customByOverread()
 
@@ -76,7 +76,7 @@ open class CustomConversationController: ConversationController, NEBaseConversat
   }
 
   //  可自行处理数据
-  public func onDataLoaded() {
+  open func onDataLoaded() {
     for model in viewModel.conversationListData {
       model.customType = 1
     }

@@ -25,11 +25,10 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     tableView.sectionHeaderHeight = 12.0
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -58,8 +57,10 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     setupUI()
   }
 
-  public func setupUI() {
+  open func setupUI() {
+    view.backgroundColor = navigationView.backgroundColor
     navigationView.moreButton.isHidden = true
+
     view.addSubview(contentTableView)
     NSLayoutConstraint.activate([
       contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -73,8 +74,6 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     for (key, value) in cellClassDic {
       contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
-    view.backgroundColor = navigationView.backgroundColor
-    navigationView.moreButton.isHidden = true
   }
 
   let twoSectionModel = SettingSectionModel()
@@ -324,7 +323,7 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     contentTableView.reloadData()
   }
 
-  public func changeParseModel() {
+  open func changeParseModel() {
     if NEStyleManager.instance.isNormalStyle() {
       let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
       let autoAction = UIAlertAction(title: "一键自动解析", style: .default) { [weak self] _ in
@@ -349,7 +348,7 @@ class IMSDKConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     }
   }
 
-  public func getFooterView() -> UIView {
+  open func getFooterView() -> UIView {
     let back = UIView()
     back.backgroundColor = .clear
     back.frame = CGRectMake(0, 0, view.frame.width, 60)
