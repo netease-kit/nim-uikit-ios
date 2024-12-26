@@ -13,7 +13,7 @@ class CustomSettingCellModel: SettingCellModel {
   /// 输入内容对应SDK配置字段的key，便于自动解析映射
   public var inputKey = ""
 
-  override init() {
+  override public init() {
     super.init()
     rowHeight = 100
   }

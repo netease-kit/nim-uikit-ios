@@ -19,11 +19,11 @@ target 'app' do
   pod 'NEMapKit', '10.5.1'
   
   # 扩展库 - AI 划词搜索
-  pod 'NEAISearchKit', '1.0.4'
+ pod 'NEAISearchKit', '1.0.5'
 
   # 扩展库 - 呼叫组件
   pod 'NERtcCallKit/NOS_Special', '3.1.0'
-  pod 'NERtcCallUIKit/NOS_Special', '3.1.0'
+ pod 'NERtcCallUIKit/NOS_Special', '3.1.0'
 
   # 扩展库，依次为 RTC 音视频基础组件、RTC 音视频神经网络组件（使用背景虚化功能需要集成）、RTC 音视频背景分割组件（使用背景虚化功能需要集成）
   pod 'NERtcSDK/RtcBasic', '5.6.33'
@@ -32,13 +32,13 @@ target 'app' do
 
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
-#   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
-#   pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
-#   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
-#   pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
-#   pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
-#   pod 'NEAISearchKit', :path => 'NEAISearchKit/NEAISearchKit.podspec'
-#   pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
+#    pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
+#    pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
+#    pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
+#    pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
+#    pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
+#    pod 'NEAISearchKit', :path => 'NEAISearchKit/NEAISearchKit.podspec'
+#    pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
 
 
 end

@@ -34,7 +34,7 @@ class NodeSelectCell: CornerCell {
     // Configure the view for the selected state
   }
 
-  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     setupUI()
@@ -44,7 +44,7 @@ class NodeSelectCell: CornerCell {
     super.init(coder: coder)
   }
 
-  public func configure(_ cellModel: SettingCellModel) {
+  open func configure(_ cellModel: SettingCellModel) {
     cornerType = cellModel.cornerType
     stateImageView.isHighlighted = cellModel.switchOpen ? true : false
     titleLabel.text = cellModel.subTitle

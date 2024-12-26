@@ -6,7 +6,7 @@
 import UIKit
 
 class NENavigationController: UINavigationController {
-  override public func viewDidLoad() {
+  override open func viewDidLoad() {
     super.viewDidLoad()
     setUpNavigation()
   }
@@ -22,7 +22,7 @@ class NENavigationController: UINavigationController {
     }
   }
 
-  override public func pushViewController(_ viewController: UIViewController, animated: Bool) {
+  override open func pushViewController(_ viewController: UIViewController, animated: Bool) {
     if children.count > 0 {
       viewController.hidesBottomBarWhenPushed = true
       if children.count > 1 {
