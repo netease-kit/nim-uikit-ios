@@ -352,6 +352,26 @@ public class CustomConfig {
     }
   }
 
+  /// 通过布局自定义实现顶部警告
+  open func loadSecurityWarningView() {
+    ConversationUIConfig.shared.customController = { [weak self] viewController in
+      guard let self = self else {
+        return
+      }
+
+      // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
+      self.securityWarningView.warningLabel.text = localizable("security_warning")
+      viewController.bodyTopView.addSubview(self.securityWarningView)
+      NSLayoutConstraint.activate([
+        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor),
+        self.securityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
+        self.securityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
+        self.securityWarningView.heightAnchor.constraint(equalToConstant: 56),
+      ])
+      viewController.bodyTopViewHeight = 56
+    }
+  }
+
   @objc func customClick(_ button: UIButton) {
     button.neViewContainingController()?.showToast("文本输入框下方 tab 按钮自定义点击事件")
   }
@@ -367,6 +387,12 @@ public class CustomConfig {
   public lazy var customBottomView: CustomView = {
     let view = CustomView(frame: CGRect(x: 0, y: 10, width: NEConstant.screenWidth, height: 40))
     view.backgroundColor = .green
+    return view
+  }()
+
+  public lazy var securityWarningView: NESecurityWarningView = {
+    let view = NESecurityWarningView()
+    view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
 }

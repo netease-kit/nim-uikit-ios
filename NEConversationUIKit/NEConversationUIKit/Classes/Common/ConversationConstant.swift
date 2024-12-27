@@ -12,8 +12,3 @@ func localizable(_ key: String) -> String {
 }
 
 public let ModuleName = "NEConversationUIKit"
-
-extension UIColor {
-  static let securityWarningBg = UIColor(hexString: "#FFF5E1")
-  static let securityWarningTextColor = UIColor(hexString: "#EB9718")
-}

@@ -63,7 +63,6 @@ open class FunConversationController: NEBaseConversationController {
     popListView = FunPopListView()
     searchView.searchButton.setTitle(commonLocalizable("search"), for: .normal)
     brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
-    securityWarningView.warningLabel.text = localizable("security_warning")
   }
 
   override func initSystemNav() {
