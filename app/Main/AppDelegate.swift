@@ -103,8 +103,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.window?.rootViewController = tab
     }
     
-    //    regist router
+    // regist router
     func loadService() {
+        // 注册路由
         ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
         if NEStyleManager.instance.isNormalStyle() == false {
             registerFunCustom()
@@ -112,6 +113,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             registerNormalCustom()
         }
 
+        // 会话列表顶部插入警告内容
+        CustomConfig.shared.loadSecurityWarningView()
+        
+        // 注册【个人信息】页面
         Router.shared.register(MeSettingRouter) { param in
             if let nav = param["nav"] as? UINavigationController {
                 let me = PersonInfoViewController()
