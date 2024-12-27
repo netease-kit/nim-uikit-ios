@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import UIKit
 
 open class NESecurityWarningView: UIView {
   override public init(frame: CGRect) {
@@ -27,7 +28,7 @@ open class NESecurityWarningView: UIView {
   public lazy var backView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = .securityWarningBg
+    view.backgroundColor = UIColor(hexString: "#FFF5E1")
 
     view.addSubview(warningLabel)
     NSLayoutConstraint.activate([
@@ -42,7 +43,7 @@ open class NESecurityWarningView: UIView {
   public lazy var warningLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = .securityWarningTextColor
+    label.textColor = UIColor(hexString: "#EB9718")
     label.font = .systemFont(ofSize: 14)
     label.text = localizable("security_warning")
     label.textAlignment = .justified

@@ -67,7 +67,6 @@ open class ConversationController: NEBaseConversationController {
     initSystemNav()
     popListView = PopListView()
     brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
-    securityWarningView.warningLabel.text = localizable("security_warning")
   }
 
   override func initSystemNav() {

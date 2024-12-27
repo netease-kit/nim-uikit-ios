@@ -96,19 +96,11 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
 
-    view.addSubview(securityWarningView)
     view.addSubview(brokenNetworkView)
     view.addSubview(contentView)
 
     NSLayoutConstraint.activate([
-      securityWarningView.topAnchor.constraint(equalTo: view.topAnchor),
-      securityWarningView.leftAnchor.constraint(equalTo: view.leftAnchor),
-      securityWarningView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      securityWarningView.heightAnchor.constraint(equalToConstant: 56),
-    ])
-
-    NSLayoutConstraint.activate([
-      brokenNetworkView.topAnchor.constraint(equalTo: securityWarningView.bottomAnchor),
+      brokenNetworkView.topAnchor.constraint(equalTo: view.topAnchor),
       brokenNetworkView.leftAnchor.constraint(equalTo: view.leftAnchor),
       brokenNetworkView.rightAnchor.constraint(equalTo: view.rightAnchor),
       brokenNetworkView.heightAnchor.constraint(equalToConstant: brokenNetworkViewHeight),
@@ -129,12 +121,6 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     let view = NEBrokenNetworkView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
-    return view
-  }()
-
-  public lazy var securityWarningView: NESecurityWarningView = {
-    let view = NESecurityWarningView()
-    view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
 
@@ -246,10 +232,10 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     NEChatDetectNetworkTool.shareInstance.netWorkReachability { [weak self] status in
       if status == .notReachable {
         self?.brokenNetworkView.isHidden = false
-        self?.contentViewTopAnchor?.constant = (self?.brokenNetworkViewHeight ?? 36) + 56
+        self?.contentViewTopAnchor?.constant = (self?.brokenNetworkViewHeight ?? 36)
       } else {
         self?.brokenNetworkView.isHidden = true
-        self?.contentViewTopAnchor?.constant = 56
+        self?.contentViewTopAnchor?.constant = 0
       }
     }
 
