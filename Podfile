@@ -7,19 +7,19 @@ target 'app' do
   use_frameworks!
 
   # 基础库
-  pod 'NEChatKit', '10.5.1'
+  pod 'NEChatKit', '10.5.2'
 
   # UI 组件，依次为通讯录组件、会话列表组件、会话（聊天）组件、群相关设置组件
-  pod 'NEChatUIKit', '10.5.1'
-  pod 'NEContactUIKit', '10.5.1'
-  pod 'NEConversationUIKit', '10.5.1'
-  pod 'NETeamUIKit', '10.5.1'
+  pod 'NEChatUIKit', '10.5.2'
+  pod 'NEContactUIKit', '10.5.2'
+  pod 'NEConversationUIKit', '10.5.2'
+  pod 'NETeamUIKit', '10.5.2'
 
   # 扩展库 - 地理位置组件
-  pod 'NEMapKit', '10.5.1'
+  pod 'NEMapKit', '10.5.2'
   
   # 扩展库 - AI 划词搜索
- pod 'NEAISearchKit', '1.0.5'
+ pod 'NEAISearchKit', '10.5.2'
 
   # 扩展库 - 呼叫组件
   pod 'NERtcCallKit/NOS_Special', '3.1.0'
