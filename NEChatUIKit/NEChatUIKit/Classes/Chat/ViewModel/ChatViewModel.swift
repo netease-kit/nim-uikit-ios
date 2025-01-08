@@ -341,42 +341,40 @@ open class ChatViewModel: NSObject {
       self?.getMessageReceipts(messages: messageArray) { reloadIndexs, error in
         group.enter()
         self?.chatRepo.getPinnedMessageList(conversationId: conversationId) { [weak self] pinList, error in
-          if let pinList = pinList {
-            var userIds = pinList.map(\.operatorId)
+          var userIds = pinList?.map(\.operatorId) ?? []
 
-            // 群聊需要获取群昵称
-            userIds += self?.messages.compactMap { $0.message?.senderId } ?? []
-            group.enter()
-            self?.loadShowName(userIds, self?.sessionId) { [weak self] in
+          // 群聊需要获取群昵称
+          userIds += self?.messages.compactMap { $0.message?.senderId } ?? []
+          group.enter()
+          self?.loadShowName(userIds, self?.sessionId) { [weak self] in
 
-              // 获取头像昵称
-              for model in self?.messages ?? [] {
-                if let uid = ChatMessageHelper.getSenderId(model.message),
-                   let fullName = self?.getShowName(uid) {
-                  let userFriend = ChatMessageHelper.getUserFromCache(uid)
-                  model.avatar = userFriend?.user?.avatar
-                  model.fullName = fullName
-                  model.shortName = NEFriendUserCache.getShortName(userFriend?.showName() ?? "")
-                }
+            // 获取头像昵称
+            for model in self?.messages ?? [] {
+              if let uid = ChatMessageHelper.getSenderId(model.message),
+                 let fullName = self?.getShowName(uid) {
+                let userFriend = ChatMessageHelper.getUserFromCache(uid)
+                model.avatar = userFriend?.user?.avatar
+                model.fullName = fullName
+                model.shortName = NEFriendUserCache.getShortName(userFriend?.showName() ?? "")
+              }
 
-                for pin in pinList {
-                  if model.message?.messageClientId == pin.messageRefer?.messageClientId {
-                    model.isPined = true
-                    model.pinAccount = pin.operatorId
-                    model.pinShowName = self?.getShowName(pin.operatorId)
-                    break
-                  }
-                }
-
-                group.enter()
-                self?.loadReply(model) {
-                  group.leave()
+              for pin in pinList ?? [] {
+                if model.message?.messageClientId == pin.messageRefer?.messageClientId {
+                  model.isPined = true
+                  model.pinAccount = pin.operatorId
+                  model.pinShowName = self?.getShowName(pin.operatorId)
+                  break
                 }
               }
-              group.leave()
+
+              group.enter()
+              self?.loadReply(model) {
+                group.leave()
+              }
             }
             group.leave()
           }
+          group.leave()
         }
         group.leave()
       }
