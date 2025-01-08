@@ -37,8 +37,6 @@
 
 "you_were_mentioned"="[You were mentioned]";
 
-"security_warning"="For test only. Beware of money transfer, lottery winnings & strange call scams.";
-
 // error toast
 "leave_team_desc"="You have been removed from the group chat or the group chat has been dissolved.";
 

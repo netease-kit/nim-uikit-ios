@@ -36,9 +36,6 @@
 
 "you_were_mentioned"="[有人@我]";
 
-"security_warning"="仅用于体验云信IM 产品功能，请勿轻信汇款、中奖等涉及钱款的信息，勿轻易拨打陌生电话，谨防上当受骗。";
-
-
 // error toast
 
 "leave_team_desc"="您已被移出群聊或该群聊已被解散";
