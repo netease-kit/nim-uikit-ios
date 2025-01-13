@@ -75,7 +75,12 @@ open class FunConversationController: NEBaseConversationController {
 
     navigationItem.rightBarButtonItems = [addBarItem]
 
-    navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+    if let brandTitle = ConversationUIConfig.shared.titleBarTitle {
+      navigationView.brandBtn.setTitle(brandTitle, for: .normal)
+    } else {
+      navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+    }
+
     navigationView.searchBtn.isHidden = true
     if !ConversationUIConfig.shared.showTitleBarRightIcon {
       navigationItem.rightBarButtonItems = []

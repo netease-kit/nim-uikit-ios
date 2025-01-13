@@ -24,6 +24,10 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// - Parameter completion: 是否继续发送消息、要发送的消息、消息发送参数
   @objc optional func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void)
 
+  /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
+  /// - Parameter completion: sendMessage 接口调用回调
+  @objc optional func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt)
+
   /// 消息发送中，此时消息已经发送
   /// - Parameters:
   ///   - message: 消息
@@ -308,7 +312,7 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - model: 消息体
   ///   - completion: 完成回调
-  func loadReply(_ model: MessageModel, _ completion: @escaping () -> Void) {
+  open func loadReply(_ model: MessageModel, _ completion: @escaping () -> Void) {
     if model.replyedModel != nil,
        model.replyedModel?.message?.messageServerId == nil ||
        model.replyedModel?.message?.messageServerId?.isEmpty == true,
@@ -329,7 +333,7 @@ open class ChatViewModel: NSObject {
 
   /// 加载消息的更多信息（回复、标记、发送者信息）
   /// - Parameter messageArray: 消息列表
-  func loadMoreWithMessage(_ messageArray: [V2NIMMessage]) {
+  open func loadMoreWithMessage(_ messageArray: [V2NIMMessage]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     let group = DispatchGroup()
 
@@ -394,7 +398,7 @@ open class ChatViewModel: NSObject {
 
   /// 更新消息发送者的信息
   /// - Parameter accid: 发送者 accid
-  func updateMessageInfo(_ accid: String?) {
+  open func updateMessageInfo(_ accid: String?) {
     guard let accid = accid else { return }
 
     let showName = getShowName(accid)
@@ -428,7 +432,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter newModel: 新消息模型
   /// - Returns: 插入位置
   @discardableResult
-  func insertToMessages(_ newModel: MessageModel) -> Int {
+  open func insertToMessages(_ newModel: MessageModel) -> Int {
     var index = -1
 
     // 无消息时直接尾插
@@ -673,7 +677,7 @@ open class ChatViewModel: NSObject {
   ///   - aiUserAccid: 数字人 id
   ///   - message: 消息
   /// - Returns: 消息发送参数
-  func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+  open func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
     var aiUserAccid = aiUserAccid
     var needMessgaes = false // 是否需要上下文
     if NEAIUserManager.shared.isAIUser(sessionId) {
@@ -720,9 +724,9 @@ open class ChatViewModel: NSObject {
   ///   - replyMessage: 被回复的消息
   ///   - message: 回复的消息
   /// - Returns: 消息发送参数
-  func getReplyMessageParams(_ aiUserAccid: String? = nil,
-                             _ replyMessage: V2NIMMessage,
-                             _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+  open func getReplyMessageParams(_ aiUserAccid: String? = nil,
+                                  _ replyMessage: V2NIMMessage,
+                                  _ message: V2NIMMessage) -> V2NIMSendMessageParams {
     let params = chatRepo.getSendMessageParams()
     if let aiAccid = aiUserAccid {
       let aiConfig = V2NIMMessageAIConfigParams()
@@ -769,8 +773,8 @@ open class ChatViewModel: NSObject {
   ///   - aiUserAccid: 数字人 id
   ///   - forwordMessage: 转发的消息
   /// - Returns: 消息发送参数
-  func getForwardMessageParams(_ aiUserAccid: String? = nil,
-                               _ forwordMessage: V2NIMMessage) -> V2NIMSendMessageParams {
+  open func getForwardMessageParams(_ aiUserAccid: String? = nil,
+                                    _ forwordMessage: V2NIMMessage) -> V2NIMSendMessageParams {
     let params = chatRepo.getSendMessageParams()
     if let aiAccid = aiUserAccid {
       let aiConfig = V2NIMMessageAIConfigParams()
@@ -921,7 +925,7 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - videoURL: 视频文件路径
   ///   - completion: 完成回调
-  func convertVideoToMP4(videoURL: URL, completion: @escaping (URL?, Error?) -> Void) {
+  open func convertVideoToMP4(videoURL: URL, completion: @escaping (URL?, Error?) -> Void) {
     if videoURL.pathExtension.lowercased() == "mp4" {
       completion(videoURL, nil)
       return
@@ -1432,7 +1436,7 @@ open class ChatViewModel: NSObject {
   }
 
   /// 消息列表添加时间
-  private func addTimeForHistoryMessage() {
+  open func addTimeForHistoryMessage() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     for (i, model) in messages.enumerated() {
       if i == 0, let createTime = model.message?.createTime {
@@ -1606,7 +1610,7 @@ open class ChatViewModel: NSObject {
   }
 
   @discardableResult
-  func deleteMessageModel(_ message: V2NIMMessage) -> (deleteIndexs: [Int], reloadIndexs: [Int]) {
+  open func deleteMessageModel(_ message: V2NIMMessage) -> (deleteIndexs: [Int], reloadIndexs: [Int]) {
     var deleteIndexs = [Int]()
     var reloadIndexs = [Int]()
     var index = -1
@@ -1652,7 +1656,7 @@ open class ChatViewModel: NSObject {
 
   /// 删除消息更新UI
   /// - Parameter message: 消息
-  func deleteMessageUpdateUI(_ messages: [V2NIMMessage]) {
+  open func deleteMessageUpdateUI(_ messages: [V2NIMMessage]) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages count: \(messages.count)")
     var deleteIndexs = Set<Int>()
     var reloadIndexs = Set<Int>()
@@ -1676,7 +1680,7 @@ open class ChatViewModel: NSObject {
 
   /// 撤回消息更新UI
   /// - Parameter message: 消息
-  func revokeMessageUpdateUI(_ message: V2NIMMessage) {
+  open func revokeMessageUpdateUI(_ message: V2NIMMessage) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     var index = -1
     var indexs = [IndexPath]()
@@ -2090,7 +2094,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter message: 消息
   /// - Returns: 消息下标
   @discardableResult
-  private func removeLocalPinMessage(_ message: V2NIMMessage) -> Int {
+  open func removeLocalPinMessage(_ message: V2NIMMessage) -> Int {
     var index = -1
 
     for (i, model) in messages.enumerated() {
@@ -2146,7 +2150,7 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - error: 错误信息
-  @nonobjc open func sendMsgSuccess(_ message: V2NIMMessage) {
+  open func sendMsgSuccess(_ message: V2NIMMessage) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
 
     if message.conversationId != conversationId {
@@ -2232,7 +2236,7 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - fromIndex: 原始位置
   ///   - toIndex: 新位置
-  func exchangeMessageModel(_ fromIndex: Int, _ toIndex: Int) {
+  open func exchangeMessageModel(_ fromIndex: Int, _ toIndex: Int) {
     let resendModel = messages[fromIndex]
     // 更新旧位置下一条消息的时间
     if fromIndex + 1 < messages.count {
@@ -2257,7 +2261,7 @@ open class ChatViewModel: NSObject {
   /// 数字人回复的消息错误码映射
   /// - Parameter error: 错误信息
   /// - Parameter message: 消息
-  func setErrorText(_ message: V2NIMMessage?) {
+  open func setErrorText(_ message: V2NIMMessage?) {
     guard let message = message else { return }
     if let content = ChatMessageHelper.getAIErrorMsage(message.messageStatus.errorCode) {
       message.text = content
@@ -2282,6 +2286,12 @@ extension ChatViewModel: NEMessageListener {
   /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
   open func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
     delegate?.beforeSend?(param, completion)
+  }
+
+  /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
+  /// - Parameter completion: sendMessage 接口调用回调
+  open func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt) {
+    delegate?.sendMessageCallback?(result, error, progress)
   }
 }
 

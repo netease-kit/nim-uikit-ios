@@ -148,6 +148,14 @@ public class CustomConfig {
         completion(param)
       }))
     }
+
+    /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
+    /// - Parameter completion: sendMessage 接口调用回调
+    ChatKitClient.shared.sendMessageCallback = { viewController, result, error, progress in
+      if let antispamResult = result?.antispamResult {
+        viewController.showToast("反垃圾结果：\(antispamResult)")
+      }
+    }
   }
 
   /// 通过配置项实现自定义，该方式不需要继承自 ContactViewController
