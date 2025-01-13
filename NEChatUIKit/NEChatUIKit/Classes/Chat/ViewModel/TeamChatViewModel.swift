@@ -136,7 +136,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   /// 校验置顶消息权限
   /// - Returns: 是否具有置顶消息权限
-  func hasTopMessagePremission() -> Bool {
+  open func hasTopMessagePremission() -> Bool {
     // 讨论组所有人都有权限
     if team?.isDisscuss() == true {
       return true
@@ -302,7 +302,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  private func markReadInTeam(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
+  open func markReadInTeam(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
     var markMessages = [V2NIMMessage]()
     for message in messages {
       if message.messageServerId != nil,
@@ -331,7 +331,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  func getTeamMessageReceipts(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
+  open func getTeamMessageReceipts(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     let sendMessages = messages.filter { msg in
       msg.messageServerId != nil && msg.isSelf && msg.messageType != .MESSAGE_TYPE_NOTIFICATION && msg.messageType != .MESSAGE_TYPE_TIP

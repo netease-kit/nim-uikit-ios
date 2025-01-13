@@ -77,7 +77,7 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  private func markReadInP2P(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
+  open func markReadInP2P(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
 
     let messages = messages.sorted { msg1, msg2 in
@@ -106,7 +106,7 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  func getP2PMessageReceipt(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
+  open func getP2PMessageReceipt(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     chatRepo.getP2PMessageReceipt(conversationId: conversationId) { readReceipt, error in
       if let readReceipt = readReceipt {
@@ -155,7 +155,7 @@ open class P2PChatViewModel: ChatViewModel {
 
   /// 发送输入状态
   /// - Parameter typing: 输入状态: 1-正在输入, 0-结束输入
-  func setTypingCustom(_ typing: Int) {
+  open func setTypingCustom(_ typing: Int) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", typing: \(typing)")
     let content = getJSONStringFromDictionary(["typing": typing])
     let param = V2NIMSendCustomNotificationParams()

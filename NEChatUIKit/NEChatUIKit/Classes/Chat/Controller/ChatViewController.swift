@@ -1686,6 +1686,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
+  /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
+  /// - Parameter completion: sendMessage 接口调用回调
+  open func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt) {
+    if let block = ChatKitClient.shared.sendMessageCallback {
+      block(self, result, error, progress)
+    }
+  }
+
   /// 收到消息
   /// - Parameter messages: 消息列表
   open func onRecvMessages(_ messages: [V2NIMMessage], _ indexs: [IndexPath]) {

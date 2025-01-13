@@ -6,38 +6,24 @@
 # To learn more about a Podspec see https://guides.cocoapods.org/syntax/podspec.html
 #
 
-Pod::Spec.new do |s|
-  s.name             = 'NEAISearchKit'
-  s.version          = '10.5.2'
-  s.summary          = 'Netease XKit'
+# 配置内容详见：../PodConfigs/config_podspec.rb
+require_relative "../PodConfigs/config_podspec.rb"
 
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
+Pod::Spec.new do |spec|
+  spec.name         = 'NEAISearchKit'
+  spec.version      = YXConfig.imuikit_version
+  spec.summary      = 'Netease XKit'
+  spec.homepage         = YXConfig.homepage
+  spec.license          = YXConfig.license
+  spec.author           = YXConfig.author
+  spec.ios.deployment_target = YXConfig.deployment_target
+  spec.swift_version = YXConfig.swift_version
+  spec.source           = { :git => '', :tag => spec.version.to_s }
+  spec.source_files = 'NEAISearchKit/Classes/**/*'
+  spec.resource = 'NEAISearchKit/Assets/**/*'
+  YXConfig.pod_target_xcconfig(spec)
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
-
-  s.homepage         = 'http://netease.im'
-  s.license          = { :'type' => 'Copyright', :'text' => ' Copyright 2022 Netease '}
-  s.author           = 'yunxin engineering department'
-  s.source           = { :git => 'https://github.com/netease/NEKitGroupUI.git', :tag => s.version.to_s }
-
-  s.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-      'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
-    }
-  
-  s.ios.deployment_target = '12.0'
-  s.swift_version = '5.0'
-
-  s.source_files = 'NEAISearchKit/Classes/**/*'
-  s.resource = 'NEAISearchKit/Assets/**/*'
-
-  s.dependency 'NEChatKit'
-  s.dependency 'NECommonUIKit'
+  spec.dependency 'NEChatKit'
+  spec.dependency 'NECommonUIKit'
 
 end

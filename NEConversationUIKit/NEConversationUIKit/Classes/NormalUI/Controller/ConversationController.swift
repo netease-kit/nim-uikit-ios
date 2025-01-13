@@ -87,7 +87,12 @@ open class ConversationController: NEBaseConversationController {
       navigationView.addBtn.isHidden = true
       navigationItem.rightBarButtonItems = [searchBarItem]
     }
-    navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+
+    if let brandTitle = ConversationUIConfig.shared.titleBarTitle {
+      navigationView.brandBtn.setTitle(brandTitle, for: .normal)
+    } else {
+      navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+    }
   }
 
   override open func setupSubviews() {
