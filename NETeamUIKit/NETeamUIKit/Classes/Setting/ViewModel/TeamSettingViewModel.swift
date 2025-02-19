@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEChatUIKit
 import NECoreIM2Kit
 import NIMSDK
 import UIKit
@@ -20,7 +21,7 @@ public protocol TeamSettingViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListener {
+open class TeamSettingViewModel: NSObject, NETeamListener {
   /// 分区区域数据
   public var sectionData = [SettingSectionModel]()
 
@@ -40,9 +41,10 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// 群类型
   public var teamSettingType: TeamSettingType = .Discuss
   /// 群对应的会话信息
-  public var conversation: V2NIMConversation?
+  public var conversation: V2NIMBaseConversation?
   /// 会话API单例
   public var conversationRepo = ConversationRepo.shared
+  public var localConversationRepo = LocalConversationRepo.shared
   /// 是否获取过群设置数据
   public var isRequestSettingData = false
 
@@ -52,8 +54,16 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
-    conversationRepo.addConversationListener(self)
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.addLocalConversationListener(self)
+    } else {
+      conversationRepo.addConversationListener(self)
+    }
     NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
+
+    let teamInfo = NETeamInfoModel()
+    teamInfo.team = NETeamUserManager.shared.getTeamInfo()
+    teamInfoModel = teamInfo
   }
 
   /// 点击消息发送者头像
@@ -62,7 +72,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
-      if NETeamMemberCache.shared.isCurrentMember(accid) {
+      if NETeamUserManager.shared.isCurrentMember(accid) {
         var isDidFind = false
         teamInfoModel?.users.forEach { model in
           if let accountId = model.nimUser?.user?.accountId, accountId == accid {
@@ -79,8 +89,11 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
 
   func clear() {
     teamRepo.removeTeamListener(self)
-    conversationRepo.removeConversationListener(self)
-    NETeamMemberCache.shared.trigerTimer()
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.removeLocalConversationListener(self)
+    } else {
+      conversationRepo.removeConversationListener(self)
+    }
   }
 
   func getData() {
@@ -113,12 +126,6 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
 
     let model = SettingSectionModel()
-
-    guard let tid = teamInfoModel?.team?.teamId else {
-      NEALog.infoLog(ModuleName + " " + className, desc: #function + " teamId is nil")
-      return model
-    }
-
     weak var weakSelf = self
 
     // 标记 置顶 昵称
@@ -142,9 +149,11 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     remind.cellName = localizable("message_remind")
     remind.type = SettingCellType.SettingSwitchCell.rawValue
 
-    let mode = teamRepo.getTeamMuteStatus(tid)
-    if mode == .TEAM_MESSAGE_MUTE_MODE_OFF {
-      remind.switchOpen = true
+    if let tid = weakSelf?.teamInfoModel?.team?.teamId {
+      let mode = teamRepo.getTeamMuteStatus(tid)
+      if mode == .TEAM_MESSAGE_MUTE_MODE_OFF {
+        remind.switchOpen = true
+      }
     }
 
     remind.swichChange = { isOpen in
@@ -194,27 +203,26 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
         weakSelf?.delegate?.didNeedRefreshUI()
         return
       }
-      if isOpen {
-        if let teamId = weakSelf?.teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
-          weakSelf?.conversationRepo.setStickTop(conversationId, true) { error in
-            NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + "addStickTop error : \(error?.localizedDescription ?? "") ")
+
+      if let teamId = weakSelf?.teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
+        if IMKitConfigCenter.shared.enableLocalConversation {
+          weakSelf?.localConversationRepo.setStickTop(conversationId, isOpen) { error in
+            NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + (isOpen ? "addStickTop" : "removeStickTop") + " error : \(error?.localizedDescription ?? "") ")
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
-              setTop.switchOpen = true
+              setTop.switchOpen = isOpen
             }
           }
-        }
-      } else {
-        if let teamId = weakSelf?.teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
-          weakSelf?.conversationRepo.setStickTop(conversationId, false) { error in
-            NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + "removeStickTop error : \(error?.localizedDescription ?? "") ")
+        } else {
+          weakSelf?.conversationRepo.setStickTop(conversationId, isOpen) { error in
+            NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + (isOpen ? "addStickTop" : "removeStickTop") + " error : \(error?.localizedDescription ?? "") ")
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
-              setTop.switchOpen = false
+              setTop.switchOpen = isOpen
             }
           }
         }
@@ -369,22 +377,9 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
                                   _ queryType: V2NIMTeamMemberRoleQueryType,
                                   _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
-    if NETeamMemberCache.shared.getTeamMemberCache(teamId) != nil {
-      NETeamMemberCache.shared.endTimer()
+    if NETeamUserManager.shared.getAllTeamMemberModels() != nil {
       NEALog.infoLog(className(), desc: "load team member from cache success.")
       completion(nil)
-      return
-    }
-    weak var weakSelf = self
-    NETeamMemberCache.shared.getAllTeamMemberInfos(teamId, queryType) { error, teamInfo in
-      if let err = error {
-        completion(err)
-      } else {
-        if let members = teamInfo?.users {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
-          NETeamMemberCache.shared.setCacheMembers(teamId, members)
-        }
-      }
     }
   }
 
@@ -393,35 +388,74 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     weak var weakSelf = self
     if let cid = V2NIMConversationIdUtil.teamConversationId(teamId) {
-      conversationRepo.getConversation(cid) { conversation, error in
-        if error == nil {
-          weakSelf?.conversation = conversation
-        }
-        weakSelf?.teamRepo.getTeamInfo(teamId) { team, error in
-          if let err = error {
-            completion(err, false)
-          } else {
-            let teamInfo = NETeamInfoModel()
-            teamInfo.team = team
-            weakSelf?.teamInfoModel = teamInfo
-            let option = V2NIMTeamMemberQueryOption()
-            option.nextToken = ""
-            option.limit = 20
-            option.direction = .QUERY_DIRECTION_ASC
-            option.onlyChatBanned = false
-            option.roleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL
+      if IMKitConfigCenter.shared.enableLocalConversation {
+        localConversationRepo.getConversation(cid) { conversation, error in
+          if error == nil {
+            weakSelf?.conversation = conversation
+          }
+          weakSelf?.teamRepo.getTeamInfo(teamId) { team, error in
+            if let err = error {
+              completion(err, false)
+            } else {
+              let teamInfo = NETeamInfoModel()
+              teamInfo.team = team
+              weakSelf?.teamInfoModel = teamInfo
+              let option = V2NIMTeamMemberQueryOption()
+              option.nextToken = ""
+              option.limit = 20
+              option.direction = .QUERY_DIRECTION_ASC
+              option.onlyChatBanned = false
+              option.roleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL
 
-            weakSelf?.teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { result, error in
-              if let members = result?.memberList {
-                weakSelf?.getUserInfo(members) { error, models in
+              weakSelf?.teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { result, error in
+                if let members = result?.memberList {
+                  weakSelf?.getUserInfo(members) { error, models in
 
-                  if let err = error {
-                    completion(err, result?.finished)
-                  } else {
-                    if let users = models {
-                      weakSelf?.teamInfoModel?.users = users
+                    if let err = error {
+                      completion(err, result?.finished)
+                    } else {
+                      if let users = models {
+                        weakSelf?.teamInfoModel?.users = users
+                      }
+                      completion(nil, result?.finished)
                     }
-                    completion(nil, result?.finished)
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        conversationRepo.getConversation(cid) { conversation, error in
+          if error == nil {
+            weakSelf?.conversation = conversation
+          }
+          weakSelf?.teamRepo.getTeamInfo(teamId) { team, error in
+            if let err = error {
+              completion(err, false)
+            } else {
+              let teamInfo = NETeamInfoModel()
+              teamInfo.team = team
+              weakSelf?.teamInfoModel = teamInfo
+              let option = V2NIMTeamMemberQueryOption()
+              option.nextToken = ""
+              option.limit = 20
+              option.direction = .QUERY_DIRECTION_ASC
+              option.onlyChatBanned = false
+              option.roleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL
+
+              weakSelf?.teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { result, error in
+                if let members = result?.memberList {
+                  weakSelf?.getUserInfo(members) { error, models in
+
+                    if let err = error {
+                      completion(err, result?.finished)
+                    } else {
+                      if let users = models {
+                        weakSelf?.teamInfoModel?.users = users
+                      }
+                      completion(nil, result?.finished)
+                    }
                   }
                 }
               }
@@ -490,8 +524,14 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
     -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     if let teamId = teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
-      conversationRepo.setStickTop(conversationId, true) { error in
-        completion(error)
+      if IMKitConfigCenter.shared.enableLocalConversation {
+        localConversationRepo.setStickTop(conversationId, true) { error in
+          completion(error)
+        }
+      } else {
+        conversationRepo.setStickTop(conversationId, true) { error in
+          completion(error)
+        }
       }
     }
   }
@@ -517,13 +557,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
   /// 判断是不是创建者
   func isOwner() -> Bool {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
-
-    if let accid = teamInfoModel?.team?.ownerAccountId {
-      if IMKitClient.instance.isMe(accid) {
-        return true
-      }
-    }
-    return false
+    return NETeamUserManager.shared.isOwner(IMKitClient.instance.account())
   }
 
   /// 是不是管理员
@@ -700,10 +734,33 @@ open class TeamSettingViewModel: NSObject, NETeamListener, NEConversationListene
       completion(error, members)
     }
   }
+}
 
+// MARK: - NEConversationListener
+
+extension TeamSettingViewModel: NEConversationListener {
   /// 会话变更
   /// - Parameter conversations: 会话
   open func onConversationChanged(_ conversations: [V2NIMConversation]) {
+    if let currentConversation = conversation {
+      for changeConversation in conversations {
+        if currentConversation.conversationId == changeConversation.conversationId {
+          conversation = changeConversation
+          getData()
+          delegate?.didNeedRefreshUI()
+          break
+        }
+      }
+    }
+  }
+}
+
+// MARK: - NELocalConversationListener
+
+extension TeamSettingViewModel: NELocalConversationListener {
+  /// 会话变更
+  /// - Parameter conversations: 会话
+  public func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
     if let currentConversation = conversation {
       for changeConversation in conversations {
         if currentConversation.conversationId == changeConversation.conversationId {

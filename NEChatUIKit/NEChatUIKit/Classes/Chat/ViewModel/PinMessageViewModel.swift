@@ -182,7 +182,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
                      _ progress: ((UInt) -> Void)?,
                      _ completion: ((String?, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
-    ResourceRepo.shared.downLoad(urlString, filePath, progress, completion)
+    ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
   open func getHandSetEnable() -> Bool {

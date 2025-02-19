@@ -6,11 +6,12 @@ import NEChatKit
 import NECommonKit
 import NEContactUIKit
 import NEConversationUIKit
+import NELocalConversationUIKit
 import NIMSDK
 import UIKit
 
-class NETabBarController: UITabBarController, NEConversationListener, NEContactListener {
-  private var chat = NEBaseConversationController()
+class NETabBarController: UITabBarController, NEContactListener {
+  private var chat = UIViewController()
   private var contactVC = NEBaseContactViewController()
   private var meVC = MeViewController()
   private var sessionUnreadCount = 0
@@ -36,7 +37,12 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
     setUpControllers()
     setUpSessionBadgeValue()
     setUpContactBadgeValue()
-    ConversationRepo.shared.addConversationListener(self)
+
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      LocalConversationRepo.shared.addLocalConversationListener(self)
+    } else {
+      ConversationRepo.shared.addConversationListener(self)
+    }
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
@@ -49,7 +55,12 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
   }
 
   deinit {
-    ConversationRepo.shared.removeConversationListener(self)
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      LocalConversationRepo.shared.removeLocalConversationListener(self)
+    } else {
+      LocalConversationRepo.shared.removeLocalConversationListener(self)
+    }
+
     ContactRepo.shared.removeContactListener(self)
     NotificationCenter.default.removeObserver(self)
   }
@@ -57,8 +68,14 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
   func setUpControllers() {
     if NEStyleManager.instance.isNormalStyle() {
       // chat
-      chat = ConversationController()
-      chat.viewModel.syncFinished = isChangeUIType
+      if IMKitConfigCenter.shared.enableLocalConversation {
+        chat = LocalConversationController()
+        (chat as? LocalConversationController)?.viewModel.syncFinished = isChangeUIType
+      } else {
+        chat = ConversationController()
+        (chat as? ConversationController)?.viewModel.syncFinished = isChangeUIType
+      }
+
       chat.tabBarItem = UITabBarItem(
         title: localizable("message"),
         image: UIImage(named: "chat"),
@@ -107,8 +124,14 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
       }
     } else {
       // chat
-      chat = FunConversationController()
-      chat.viewModel.syncFinished = isChangeUIType
+      if IMKitConfigCenter.shared.enableLocalConversation {
+        chat = FunLocalConversationController()
+        (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
+      } else {
+        chat = FunConversationController()
+        (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
+      }
+
       chat.tabBarItem = UITabBarItem(
         title: localizable("message"),
         image: UIImage(named: "funChat"),
@@ -162,7 +185,12 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
   }
 
   func setUpSessionBadgeValue() {
-    sessionUnreadCount = ConversationRepo.shared.getTotalUnreadCount()
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      sessionUnreadCount = LocalConversationRepo.shared.getTotalUnreadCount()
+    } else {
+      sessionUnreadCount = ConversationRepo.shared.getTotalUnreadCount()
+    }
+
     if sessionUnreadCount > 0 {
       tabBar.showBadgOn(index: 0, tabbarItemNums: 3)
     } else {
@@ -211,7 +239,7 @@ class NETabBarController: UITabBarController, NEConversationListener, NEContactL
 
 // MARK: - V2NIMConversationListener
 
-extension NETabBarController {
+extension NETabBarController: NEConversationListener {
   func onConversationChanged(_ conversations: [V2NIMConversation]) {
     refreshSessionBadge()
   }
@@ -225,6 +253,26 @@ extension NETabBarController {
   }
 
   func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+    setUpContactBadgeValue()
+  }
+}
+
+// MARK: - NELocalConversationListener
+
+extension NETabBarController: NELocalConversationListener {
+  func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
+    refreshSessionBadge()
+  }
+
+  func onLocalConversationCreated(_ conversation: V2NIMLocalConversation) {
+    refreshSessionBadge()
+  }
+
+  func onLocalConversationDeleted(_ conversationIds: [String]) {
+    refreshSessionBadge()
+  }
+
+  func onLocalFriendAddApplication(_ application: V2NIMFriendAddApplication) {
     setUpContactBadgeValue()
   }
 }

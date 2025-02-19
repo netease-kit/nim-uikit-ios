@@ -14,6 +14,7 @@ import NEChatUIKit
 import NEMapKit
 import NERtcCallKit
 import NERtcCallUIKit
+import PushKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -28,7 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         registerAPNS()
         return true
     }
-    
     
     func setupInit(){
         if IMSDKConfigManager.instance.getConfig().enableCustomConfig.boolValue {
@@ -52,17 +52,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let option = NIMSDKOption()
         option.v2 = true
         option.appKey = AppKey.appKey
-        option.apnsCername = AppKey.pushCerName
+        option.apnsCername = AppKey.apnsCername
+        option.pkCername = AppKey.pkCerName
         IMKitClient.instance.setupIM(option)
         
         NEAIUserManager.shared.setProvider(provider: self)
-        
-        loadService()
         NEKeyboardManager.shared.enable = true
         NEKeyboardManager.shared.shouldResignOnTouchOutside = true
         
+        loadService()
         loginWithUI()
-        
     }
     
     @objc func refreshRoot(){
@@ -95,6 +94,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         let uiConfig = NECallUIKitConfig()
         NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+        
+        let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
+        pushRegistry.delegate = self
+        pushRegistry.desiredPushTypes = [PKPushType.voIP]
     }
     
     func initializePage(_ isLoginInit: Bool = false) {
@@ -269,6 +272,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return .portrait
+    }
+}
+
+extension AppDelegate: PKPushRegistryDelegate {
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        if pushCredentials.token.isEmpty {
+            print("voip token isEmpty")
+            return
+        }
+        
+        NIMSDK.shared().updatePushKitToken(pushCredentials.token)
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        // 判断是否是云信发的payload
+        if payload.dictionaryPayload["nim"] == nil {
+            print("not found nim payload")
+            return
+        }
+        
+        let param = NECallSystemIncomingCallParam()
+        param.payload = payload.dictionaryPayload
+        
+        if #available(iOS 17.4, *) {
+            NECallEngine.sharedInstance().reportIncomingCall(with: param) { error, callInfo in
+                if let err = error {
+                    print("lck accept failed \(err.localizedDescription)")
+                }
+            } hangupCompletion: { error in
+                if let err = error {
+                    print("lck hangup error \(err.localizedDescription)")
+                }
+            }
+        }
+
+        completion();
     }
 }
 

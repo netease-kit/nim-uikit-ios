@@ -21,6 +21,7 @@ public typealias ConversationCallBack = (NSError?, Bool?) -> Void
 open class ConversationViewModel: NSObject, NEConversationListener, NETeamListener, NEChatListener, NEContactListener, NEIMKitClientListener, AIUserPinListener, AIUserChangeListener {
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
+  private var networkBroken = false // 网络断开标志
 
   /// 会话API单例
   public let conversationRepo = ConversationRepo.shared
@@ -97,7 +98,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func getAIUserList() {
-    NEAIUserManager.shared.getAIUserList()
+    if IMKitConfigCenter.shared.enableAIUser {
+      NEAIUserManager.shared.getAIUserList()
+    }
   }
 
   /// 分页获取会话列表
@@ -112,8 +115,8 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       completion(nil, false)
       return
     }
+
     isRequesting = true
-    print("did getConversationList")
     conversationRepo.getConversationList(offset, page) { [weak self] conversations, offset, finished, error in
       if error == nil {
         if let set = offset {
@@ -296,7 +299,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 检查会话是否包含解散通知的变更
   /// - Parameter conversation: 会话
   open func checkDismissTeamNoti(_ conversation: V2NIMConversation) -> Bool {
-    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return false
     }
 
@@ -348,7 +351,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   open func saveRevokeMessage(_ messageRevoke: V2NIMMessageRevokeNotification,
                               _ completion: @escaping (NSError?) -> Void) {
     let messageNew = V2NIMMessageCreator.createTextMessage(localizable("message_recalled"))
-    messageNew.messageConfig?.unreadEnabled = true
+    messageNew.messageConfig?.unreadEnabled = false
 
     var muta = [String: Any]()
     if let ext = NECommonUtil.getDictionaryFromJSONString(messageRevoke.serverExtension ?? "") as? [String: Any] {
@@ -421,7 +424,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter team: 群信息
   open func onTeamDismissed(_ team: V2NIMTeam) {
     NEALog.infoLog(className(), desc: "onTeamDismissed team id : \(team.teamId) team name: \(team.name)")
-    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation {
+    if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation {
       if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
         didDeleteConversation(cid)
       }
@@ -429,7 +432,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   private func didDeleteConversation(_ cid: String) {
-    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return
     }
     conversationRepo.deleteConversation(cid) { [weak self] error in
@@ -456,25 +459,35 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   open func onConversationSyncFinished() {
     NEALog.infoLog(className(), desc: "onConversationSyncFinished")
-    delegate?.reloadTableView()
+    /// 设置同步完成标识
+    syncFinished = true
+
+    if let completion = callBack {
+      NEALog.infoLog(className(), desc: "onConversationSyncFinished getConversationListByPage")
+      /// 取数据
+
+      getConversationListByPage(completion)
+      /// 回调置空
+      callBack = nil
+    }
   }
 
-  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
-    if type == .DATA_SYNC_TYPE_MAIN, state == .DATA_SYNC_STATE_COMPLETED {
-      /// 设置同步完成标识
-      syncFinished = true
+  /// 登录连接状态回调
+  /// - Parameter status: 连接状态
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+    if status == .CONNECT_STATUS_WAITING {
+      networkBroken = true
+    }
 
-      if let completion = callBack {
-        NEALog.infoLog(className(), desc: "onConversationSyncFinished getConversationListByPage")
-        /// 取数据
-        getConversationListByPage(completion)
-        /// 回调置空
-        callBack = nil
-
-      } else {
-        NEALog.infoLog(className(), desc: #function + " retrieveConversationDatas")
-        retrieveConversationDatas()
-      }
+    if status == .CONNECT_STATUS_CONNECTED, networkBroken {
+      networkBroken = false
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: DispatchWorkItem(block: { [weak self] in
+        // 断网重连后不会重发标记回调，需要手动拉取
+        if self?.callBack == nil {
+          NEALog.infoLog(self?.className() ?? "", desc: #function + " retrieveConversationDatas")
+          self?.retrieveConversationDatas()
+        }
+      }))
     }
   }
 
@@ -535,6 +548,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func onAIUserChanged(aiUsers: [V2NIMAIUser]) {
+    if !IMKitConfigCenter.shared.enableAIUser {
+      return
+    }
+
     aiUserListData.removeAll()
     weak var weakSelf = self
     for aiUser in aiUsers {

@@ -9,6 +9,7 @@ import UIKit
 @objcMembers
 open class MultiSelectViewModel: ContactViewModel {
   public var conversationRepo = ConversationRepo.shared
+  public var localConversationRepo = LocalConversationRepo.shared
   public var teamRepo = TeamRepo.shared
   public var settingRepo = SettingRepo.shared
 
@@ -134,6 +135,42 @@ open class MultiSelectViewModel: ContactViewModel {
   ///   - filters: 需要过滤的会话id列表
   ///   - completion: 完成回调
   func getConversationList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.getConversationList(0, conversationLimit) { [weak self] conversations, offset, finished, error in
+        if let error = error {
+          NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
+        } else if var conversations = conversations {
+          // 过滤
+          if let filterConvs = filters {
+            conversations = conversations.filter { !filterConvs.contains($0.conversationId) }
+          }
+
+          for conversation in conversations {
+            let model = MultiSelectModel()
+
+            // 校验好友是否已存在
+            if let model = self?.findFriend(conversation.conversationId) {
+              self?.conversationList.append(model)
+              continue
+            }
+
+            // 校验群聊是否已存在
+            if let model = self?.findTeam(conversation.conversationId) {
+              self?.conversationList.append(model)
+              continue
+            }
+
+            model.conversationId = conversation.conversationId
+            model.name = conversation.name
+            model.avatar = conversation.avatar
+            self?.conversationList.append(model)
+          }
+        }
+        completion(error)
+      }
+      return
+    }
+
     conversationRepo.getConversationList(0, conversationLimit) { [weak self] conversations, offset, finished, error in
       if let error = error {
         NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)

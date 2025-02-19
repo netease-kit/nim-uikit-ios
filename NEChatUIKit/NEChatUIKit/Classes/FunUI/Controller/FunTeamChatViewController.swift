@@ -71,7 +71,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
       if let vm = self?.viewModel as? TeamChatViewModel {
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
-            if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == true, team.isValidTeam == false {
+            if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == true, team.isValidTeam == false {
               self?.showSingleAlert(message: coreLoader.localizable("team_not_exist")) {
                 NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()

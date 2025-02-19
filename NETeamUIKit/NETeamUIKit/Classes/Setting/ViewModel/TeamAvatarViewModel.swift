@@ -56,6 +56,6 @@ open class TeamAvatarViewModel: NSObject {
                             _ progress: ((Float) -> Void)?,
                             _ completion: ((String?, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", taskId:\(fileTask.taskId)")
-    ResourceRepo.shared.upload(fileTask, progress, completion)
+    ResourceRepo.shared.uploadFile(fileTask, progress, completion)
   }
 }

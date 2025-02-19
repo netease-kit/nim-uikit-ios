@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEChatUIKit
 import NIMSDK
 import UIKit
 
@@ -44,7 +45,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
-      if NETeamMemberCache.shared.isCurrentMember(accid) {
+      if NETeamUserManager.shared.isCurrentMember(accid) {
         var isDidFind = false
         for model in managers {
           if let accountId = model.nimUser?.user?.accountId, accountId == accid {

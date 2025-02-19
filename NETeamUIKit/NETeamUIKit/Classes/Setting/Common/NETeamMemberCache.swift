@@ -6,11 +6,13 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
+// 废弃，使用 NEChatUIKit 中的 NETeamChatUserCacheListener
 @objc public protocol NETeamMemberCacheListener: NSObjectProtocol {
   /// 缓存变更回调协议
   @objc optional func memberCacheDidChange()
 }
 
+// 废弃，使用 NEChatUIKit 中的 NETeamUserManager
 @objc
 @objcMembers
 open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, NEContactListener {

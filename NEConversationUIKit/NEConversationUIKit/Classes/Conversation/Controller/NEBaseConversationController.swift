@@ -680,12 +680,14 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   open func tableView(_ tableView: UITableView,
                       editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
     weak var weakSelf = self
-
     var rowActions = [UITableViewRowAction]()
+
+    // 删除会话
     let deleteAction = UITableViewRowAction(style: .destructive,
                                             title: ConversationUIConfig.shared.deleteButtonTitle ?? localizable("delete")) { action, indexPath in
       weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
     }
+    deleteAction.backgroundColor = ConversationUIConfig.shared.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
 
     // 置顶和取消置顶
     let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
@@ -694,8 +696,8 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
                                            ConversationUIConfig.shared.stickTopButtonTitle ?? localizable("stickTop")) { action, indexPath in
       weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
-    deleteAction.backgroundColor = ConversationUIConfig.shared.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
     topAction.backgroundColor = ConversationUIConfig.shared.stickTopButtonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
+
     rowActions.append(deleteAction)
     rowActions.append(topAction)
 
@@ -733,10 +735,10 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     var conversationModel: NEConversationListModel?
 
-    if indexPath.section == 0 {
+    if indexPath.section == 0, indexPath.row < viewModel.stickTopConversations.count {
       conversationModel = viewModel.stickTopConversations[indexPath.row]
 
-    } else if indexPath.section == 1 {
+    } else if indexPath.section == 1, indexPath.row < viewModel.conversationListData.count {
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
@@ -748,10 +750,12 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     if let conversation = conversationModel?.conversation {
       viewModel.deleteConversation(conversation) { [weak self] error in
         if let err = error {
-          self?.view.ne_makeToast(err.localizedDescription)
+          self?.showToast(err.localizedDescription)
         }
         self?.reloadTableView()
       }
+    } else {
+      reloadTableView()
     }
   }
 

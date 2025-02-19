@@ -68,10 +68,11 @@ public class MineSettingViewModel: NSObject {
     receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
 //        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
     receiverModel.switchOpen = SettingRepo.shared.getHandsetMode()
-
     receiverModel.swichChange = { isOpen in
       SettingRepo.shared.setHandsetMode(isOpen)
     }
+    model.cellModels.append(receiverModel)
+
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
 //        filterNotify.cellName = "过滤通知"
@@ -81,6 +82,7 @@ public class MineSettingViewModel: NSObject {
 //        filterNotify.swichChange = { isOpen in
 //
 //        }
+//      model.cellModels.append(filterNotify)
 
     // 删除好友是否同步删除备注
 //    let deleteFriend = SettingCellModel()
@@ -91,6 +93,7 @@ public class MineSettingViewModel: NSObject {
 //    deleteFriend.swichChange = { isOpen in
 //      SettingRepo.shared.setDeleteFriendAlias(isOpen)
 //    }
+//      model.cellModels.append(deleteFriend)
 
     // 消息已读未读功能
     let hasRead = SettingCellModel()
@@ -101,10 +104,23 @@ public class MineSettingViewModel: NSObject {
     hasRead.swichChange = { isOpen in
       SettingRepo.shared.setShowReadStatus(isOpen)
     }
-    model.cellModels.append(contentsOf: [
-      receiverModel, // 听筒模式
-      hasRead, // 消息已读未读功能
-    ])
+    model.cellModels.append(hasRead)
+
+    // 本地会话
+    let localConversationModel = SettingCellModel()
+    localConversationModel.cellName = localizable("local_conversation")
+    localConversationModel.type = SettingCellType.SettingSwitchCell.rawValue
+    localConversationModel.switchOpen = IMKitConfigCenter.shared.enableLocalConversation
+    localConversationModel.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableLocalConversation = isOpen
+      UserDefaults.standard.set(isOpen, forKey: "enableLocalConversation")
+      NotificationCenter.default.post(
+        name: Notification.Name(CHANGE_UI),
+        object: nil
+      )
+    }
+    model.cellModels.append(localConversationModel)
+
     model.setCornerType()
     return model
   }
