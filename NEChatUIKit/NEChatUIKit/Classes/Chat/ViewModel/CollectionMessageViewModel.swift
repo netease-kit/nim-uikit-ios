@@ -21,7 +21,7 @@ class CollectionMessageViewModel: NSObject {
   public var lastClickAuidoMessageId: String?
 
   /// 每页大小限制
-  public var pageSize: Int32 = 100
+  public var pageSize: Int = 100
 
   /// 加载收藏数据
   /// - Parameter completion: 完成回调
@@ -189,7 +189,7 @@ class CollectionMessageViewModel: NSObject {
                          _ progress: ((UInt) -> Void)?,
                          _ completion: ((String?, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
-    ResourceRepo.shared.downLoad(urlString, filePath, progress, completion)
+    ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
   /// 删除收藏

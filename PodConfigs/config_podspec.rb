@@ -2,7 +2,7 @@
 
 module YXConfig
   def self.imuikit_version
-    "10.5.3"
+    "10.6.0"
   end
 
   def self.deployment_target

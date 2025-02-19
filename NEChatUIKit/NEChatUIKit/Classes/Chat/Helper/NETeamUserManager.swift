@@ -149,6 +149,16 @@ public class NETeamUserManager: NSObject {
     teamMemberCache[accountId]
   }
 
+  /// 判断是否是当前群成员
+  open func isCurrentMember(_ accountId: String) -> Bool {
+    teamMemberCache[accountId] != nil
+  }
+
+  /// 判断是否是当前群主
+  open func isOwner(_ accountId: String) -> Bool {
+    currentTeam?.ownerAccountId == accountId
+  }
+
   /// 获取缓存的所有群成员信息
   open func getAllTeamMembers() -> [V2NIMTeamMember]? {
     if haveLoadAllMembers {
@@ -336,7 +346,7 @@ public class NETeamUserManager: NSObject {
     NEALog.infoLog(className(), desc: #function + " teamId : \(teamId)")
     let option = V2NIMTeamMemberQueryOption()
     option.direction = .QUERY_DIRECTION_ASC
-    option.limit = 1000
+    option.limit = 2000
     option.onlyChatBanned = false
     option.roleQueryType = queryType
     if let token = nextToken {

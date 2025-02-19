@@ -91,10 +91,15 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     super.setupUI()
     view.backgroundColor = .funTeamBackgroundColor
     teamHeaderView.layer.cornerRadius = 4.0
-    addButton.setImage(coreLoader.loadImage("fun_add"), for: .normal)
     navigationController?.navigationBar.backgroundColor = .white
     navigationView.backgroundColor = .white
     navigationView.titleBarBottomLine.isHidden = false
+
+    addButton.setImage(coreLoader.loadImage("fun_add"), for: .normal)
+    addButtonWidth = addButton.widthAnchor.constraint(equalToConstant: 36)
+    addButtonWidth?.isActive = true
+    addButtonLeftMargin = addButton.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16.0)
+    addButtonLeftMargin?.isActive = true
   }
 
   /// 获取顶部
@@ -176,17 +181,17 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     memberCountLabel.text = "\(viewModel.teamInfoModel?.team?.memberCount ?? 0)"
 
     cornerView.addSubview(addButton)
-    addButtonWidth = addButton.widthAnchor.constraint(equalToConstant: 36)
-    addButtonWidth?.isActive = true
-    addButtonLeftMargin = addButton.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16.0)
     NSLayoutConstraint.activate([
-      addButtonLeftMargin!,
       addButton.topAnchor.constraint(equalTo: memberListButton.bottomAnchor, constant: 0),
     ])
     addButton.addTarget(self, action: #selector(addUser), for: .touchUpInside)
 
-    if viewModel.isNormalTeam() == false, viewModel.isOwner() == false,
-       let inviteMode = viewModel.teamInfoModel?.team?.inviteMode, let member = viewModel.memberInTeam, inviteMode == .TEAM_INVITE_MODE_MANAGER, member.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
+    if viewModel.isNormalTeam() == false,
+       viewModel.isOwner() == false,
+       let inviteMode = viewModel.teamInfoModel?.team?.inviteMode,
+       let member = viewModel.memberInTeam,
+       inviteMode == .TEAM_INVITE_MODE_MANAGER,
+       member.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
       addButtonWidth?.constant = 0
       addButton.isHidden = true
     }

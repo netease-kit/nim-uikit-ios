@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEChatUIKit
 import NECoreIM2Kit
 import NIMSDK
 import UIKit
@@ -11,7 +12,7 @@ protocol TeamMembersViewModelDelegate: NSObject {
   func didNeedRefreshUI()
 }
 
-class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NETeamMemberCacheListener, NEEventListener {
+class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NEEventListener {
   /// 是否正在请求数据
   public var isRequest = false
   /// 群id
@@ -34,19 +35,45 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
-    ConversationRepo.shared.addConversationListener(self)
-    NETeamMemberCache.shared.addTeamCacheListener(self)
+    NETeamUserManager.shared.addListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.addListener(self)
     }
+    NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
-    ConversationRepo.shared.removeConversationListener(self)
-    NETeamMemberCache.shared.removeTeamCacheListener(self)
+    NETeamUserManager.shared.removeListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.removeListener(self)
+    }
+  }
+
+  /// 点击群成员头像
+  /// 拉取最新用户信息后刷新群成员信息
+  /// - Parameter noti: 通知对象
+  @objc func didTapHeader(_ noti: Notification) {
+    if let user = noti.object as? NEUserWithFriend,
+       let accid = user.user?.accountId {
+      if NETeamUserManager.shared.isCurrentMember(accid) {
+        var isDidFind = false
+        for model in datas {
+          if let accountId = model.nimUser?.user?.accountId, accountId == accid {
+            model.nimUser = user
+            isDidFind = true
+          }
+        }
+        for model in searchDatas {
+          if let accountId = model.nimUser?.user?.accountId, accountId == accid {
+            model.nimUser = user
+            isDidFind = true
+          }
+        }
+        if isDidFind == true {
+          delegate?.didNeedRefreshUI()
+        }
+      }
     }
   }
 
@@ -112,18 +139,16 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
 
   /// 移除成员数据(UI数据源)
   /// - Parameter model: 成员数据
-  func removeModel(_ model: NETeamMemberInfoModel?) {
-    guard let rmModel = model else {
-      return
-    }
+  func removeModel(_ rmUids: [String]) {
     datas.removeAll(where: { model in
-      if let rmUid = rmModel.nimUser?.user?.accountId, let uid = model.nimUser?.user?.accountId {
-        if rmUid == uid {
+      if let uid = model.nimUser?.user?.accountId {
+        if rmUids.contains(uid) {
           return true
         }
       }
       return false
     })
+    delegate?.didNeedRefreshUI()
   }
 
   /// 群成员信息更新
@@ -134,6 +159,8 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     removeSearchData(teamMembers)
+    let uids = teamMembers.map(\.accountId)
+    removeModel(uids)
   }
 
   /// 判断离开用户是不是当前搜索展示用户
@@ -158,6 +185,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
       }
       return false
     }
+    delegate?.didNeedRefreshUI()
   }
 
   /// 群成员加入
@@ -169,6 +197,8 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     removeSearchData(teamMembers)
+    let uids = teamMembers.map(\.accountId)
+    removeModel(uids)
   }
 
   /// 群成员信息更新统一处理方法
@@ -200,36 +230,35 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
   /// - Parameter completion: 完成回调
   func getTeamInfo(_ teamId: String, _ completion: @escaping (NETeamInfoModel?, NSError?) -> Void) {
     weak var weakSelf = self
+
+    if let team = NETeamUserManager.shared.getTeamInfo(),
+       let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
+      let model = NETeamInfoModel()
+      model.team = team
+      model.users = teamMembers
+      weakSelf?.setShowDatas(model.users)
+      weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+      completion(model, nil)
+      return
+    }
+
     if isRequest == true {
       return
     }
     isRequest = true
 
-    getMemberInfo(teamId) { error in
-      if let err = error {
-        weakSelf?.isRequest = false
-        completion(nil, err)
+    NETeamUserManager.shared.getAllTeamMembers(teamId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { _ in
+      weakSelf?.isRequest = false
+      let team = NETeamUserManager.shared.getTeamInfo()
+      if let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
+        let model = NETeamInfoModel()
+        model.team = team
+        model.users = teamMembers
+        weakSelf?.setShowDatas(model.users)
+        weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+        completion(model, nil)
       } else {
-        weakSelf?.teamRepo.getTeamInfo(teamId) { team, error in
-          if let err = error {
-            weakSelf?.isRequest = false
-            completion(nil, err)
-          } else {
-            let model = NETeamInfoModel()
-            model.team = team
-            weakSelf?.getTeamMembers(model, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { error, teamInfo in
-              weakSelf?.isRequest = false
-              if let err = error {
-                completion(nil, err)
-              } else {
-                if let datas = teamInfo?.users {
-                  weakSelf?.setShowDatas(datas)
-                }
-                completion(teamInfo, error)
-              }
-            }
-          }
-        }
+        completion(nil, nil)
       }
     }
   }
@@ -242,30 +271,10 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
                               _ queryType: V2NIMTeamMemberRoleQueryType,
                               _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
-    guard let teamId = teamInfo.team?.teamId else {
-      return
-    }
-
-    weak var weakSelf = self
-
-    if let members = NETeamMemberCache.shared.getTeamMemberCache(teamId), teamInfo.team?.memberCount == members.count {
+    if let members = NETeamUserManager.shared.getAllTeamMemberModels(), teamInfo.team?.memberCount == members.count {
       teamInfo.users = members
       completion(nil, teamInfo)
-      NEALog.infoLog(weakSelf?.className() ?? "", desc: "load team member from cache success.")
-      return
-    }
-
-    NETeamMemberCache.shared.getAllTeamMemberInfos(teamId, queryType) { error, teamInfo in
-      if let err = error {
-        NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
-        completion(err, nil)
-      } else {
-        if let members = teamInfo?.users, members.count > 0 {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
-          NETeamMemberCache.shared.setCacheMembers(teamId, members)
-        }
-        completion(error, teamInfo)
-      }
+      NEALog.infoLog(className(), desc: "load team member from cache success.")
     }
   }
 
@@ -309,15 +318,14 @@ class TeamMembersViewModel: NSObject, NETeamListener, NEConversationListener, NE
     delegate?.didNeedRefreshUI()
   }
 
-  /// 缓存数据变更回调
-  func memberCacheDidChange() {
+  func onTeamMemberUpdate(_ accountId: String) {
     NEALog.infoLog(className(), desc: #function + " memberCacheDidChange")
     guard let tid = teamId else {
       return
     }
 
     weak var weakSelf = self
-    if let members = NETeamMemberCache.shared.getTeamMemberCache(tid) {
+    if let members = NETeamUserManager.shared.getAllTeamMemberModels() {
       getMemberInfo(tid) { error in
         if error == nil {
           weakSelf?.setShowDatas(members)

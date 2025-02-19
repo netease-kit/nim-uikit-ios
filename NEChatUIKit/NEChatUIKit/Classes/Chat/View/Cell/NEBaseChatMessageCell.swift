@@ -166,7 +166,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     fullNameLabel.textColor = UIColor.ne_lightText
     fullNameLabel.accessibilityIdentifier = "id.fullNameLabel"
 
-    //        bubbleImage
+    // bubbleImage
     setBubbleImage()
     bubbleImageLeft.translatesAutoresizingMaskIntoConstraints = false
     bubbleImageLeft.isUserInteractionEnabled = true

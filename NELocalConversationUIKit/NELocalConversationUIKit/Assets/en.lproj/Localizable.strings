@@ -1,0 +1,44 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+//MAKR：common
+"add_friend"="Add Contacts";
+"create_discussion_group"="Create Temperature Group";
+"create_senior_group"="Create Group";
+"cancel_stickTop"="Remove from top";
+"stickTop"="Sticky on Top";
+"delete"="Delete";
+"friend"="Contact";
+"contact"="Contact";
+"group"="Group";
+"discussion_group"="Temperature Group";
+"senior_group"="Group";
+"search_keyword"="Enter and search...";
+"user_not_exist"="User not found";
+"session_empty"="No Session";
+
+"voice"="[Voice]";
+"picture"="[Photo]";
+"video"="[Video]";
+"location"="[Loaction]";
+"notification"="[Tip]";
+"tip"="[Reminder]";
+"file"="[File]";
+"internet_phone"="[Voice Call]";
+"video_chat"="[Video Call]";
+"custom"="[Custom Message]";
+"chat_history"="[Chat History]";
+"unknown"="[Unknown Message]";
+"appName"="CommsEase IM";
+
+"message_recalled"="Message recalled";
+
+"you_were_mentioned"="[You were mentioned]";
+
+// error toast
+"leave_team_desc"="You have been removed from the group chat or the group chat has been dissolved.";
+
+"ai_user_pin_top"="PIN";
+"ai_user_cancel_pin_top"="Remove Pin top";

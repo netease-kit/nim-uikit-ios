@@ -22,8 +22,16 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    label.addGestureRecognizer(singleTap)
+
+    let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    doubleTap.numberOfTapsRequired = 2
+    label.addGestureRecognizer(doubleTap)
+
+    let longTap = UILongPressGestureRecognizer(target: self, action: #selector(selectAllRange))
+    label.addGestureRecognizer(longTap)
+
     return label
   }()
 
@@ -42,8 +50,16 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 
-    let tap = UITapGestureRecognizer(target: nil, action: nil)
-    label.addGestureRecognizer(tap)
+    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    label.addGestureRecognizer(singleTap)
+
+    let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    doubleTap.numberOfTapsRequired = 2
+    label.addGestureRecognizer(doubleTap)
+
+    let longTap = UILongPressGestureRecognizer(target: self, action: #selector(selectAllRange))
+    label.addGestureRecognizer(longTap)
+
     return label
   }()
 
@@ -135,8 +151,16 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
   override open func selectAllRange() {
     super.selectAllRange()
     if let model = contentModel as? MessageTextModel, model.attributeStr == nil {
-      titleLabelLeft.selectAll(nil)
-      titleLabelRight.selectAll(nil)
+      let titleLabel = titleLabelLeft.isHidden ? titleLabelRight : titleLabelLeft
+
+      // 选中所有
+      let length = titleLabel.text.utf16.count
+      let range = NSRange(location: 0, length: length)
+      titleLabel.selectedRange = range
+      contentModel?.selectRange = range
+
+      delegate?.didLongPressMessageView(self, contentModel)
+      titleLabel.becomeFirstResponder()
     }
   }
 
@@ -156,16 +180,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
   /// - Parameter longPress: 长按手势
   override open func longPress(longPress: UILongPressGestureRecognizer) {
     if let model = contentModel as? MessageTextModel, model.attributeStr == nil {
-      let titleLabel = titleLabelLeft.isHidden ? titleLabelRight : titleLabelLeft
-
-      // 选中所有
-      let length = titleLabel.text.utf16.count
-      let range = NSRange(location: 0, length: length)
-      titleLabel.selectedRange = range
-      contentModel?.selectRange = range
-
-      delegate?.didLongPressMessageView(self, contentModel)
-      titleLabel.becomeFirstResponder()
+      selectAllRange()
     } else {
       super.longPress(longPress: longPress)
     }
@@ -203,22 +218,6 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     let titleLabel = titleLabelLeft.isHidden ? titleLabelRight : titleLabelLeft
     let range = titleLabel.selectedRange
     contentModel?.selectRange = range
-
-    if range.location == lastRange?.location || range.location + range.length == (lastRange?.location ?? 0) + (lastRange?.length ?? 0) {
-      lastRange = range
-    } else {
-      contentModel?.selectRange = nil
-    }
-
-    // 首次全选
-    if contentModel?.selectRange == nil || range.length == 0 {
-      let length = titleLabel.text.utf16.count
-      let range = NSRange(location: 0, length: length)
-      titleLabel.selectedRange = range
-      contentModel?.selectRange = range
-      lastRange = range
-    }
-
     delegate?.didLongPressMessageView(self, contentModel)
 
     if (contentModel?.selectRange?.length ?? 0) > 0 {

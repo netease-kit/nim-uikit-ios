@@ -217,10 +217,15 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   }
 
   /// 清空好友申请通知
-  func clearNotification() {
+  func clearNotification(_ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    contactRepo.clearNotification()
-    friendAddApplications.removeAll()
+    contactRepo.clearNotification { [weak self] error in
+      if let err = error {
+        print(err.localizedDescription)
+      }
+      self?.friendAddApplications.removeAll()
+      completion(error)
+    }
   }
 
   // MARK: - NEContactListener

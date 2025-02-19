@@ -15,10 +15,11 @@ protocol UserSettingViewModelDelegate: NSObjectProtocol {
 }
 
 @objcMembers
-open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinListener {
+open class UserSettingViewModel: NSObject, AIUserPinListener {
   var chatRepo = ChatRepo.shared
   var contactRepo = ContactRepo.shared
   var conversationRepo = ConversationRepo.shared
+  var localConversationRepo = LocalConversationRepo.shared
   var settingRepo = SettingRepo.shared
 
   var userInfo: NEUserWithFriend?
@@ -27,18 +28,28 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
 
   weak var delegate: UserSettingViewModelDelegate?
 
-  public var conversation: V2NIMConversation?
+  public var conversation: V2NIMBaseConversation?
 
   override public init() {
     super.init()
-    conversationRepo.addConversationListener(self)
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.addLocalConversationListener(self)
+    } else {
+      conversationRepo.addConversationListener(self)
+    }
+
     if IMKitConfigCenter.shared.enableAIUser {
       NEAIUserPinManager.shared.addPinManagerListener(self)
     }
   }
 
   deinit {
-    conversationRepo.removeConversationListener(self)
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.removeLocalConversationListener(self)
+    } else {
+      conversationRepo.removeConversationListener(self)
+    }
+
     if IMKitConfigCenter.shared.enableAIUser {
       NEAIUserPinManager.shared.removePinManagerListener(self)
     }
@@ -52,11 +63,20 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
   func getConversation(_ userId: String, _ completion: @escaping (NSError?) -> Void) {
     if let cid = V2NIMConversationIdUtil.p2pConversationId(userId) {
       weak var weakSelf = self
-      conversationRepo.getConversation(cid) { conversation, error in
-        if conversation != nil {
-          weakSelf?.conversation = conversation
+      if IMKitConfigCenter.shared.enableLocalConversation {
+        localConversationRepo.getConversation(cid) { conversation, error in
+          if conversation != nil {
+            weakSelf?.conversation = conversation
+          }
+          completion(error)
         }
-        completion(error)
+      } else {
+        conversationRepo.getConversation(cid) { conversation, error in
+          if conversation != nil {
+            weakSelf?.conversation = conversation
+          }
+          completion(error)
+        }
       }
     }
   }
@@ -127,26 +147,26 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
         weakSelf?.delegate?.didNeedRefreshUI()
         return
       }
+
       if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
-        if isOpen {
-          weakSelf?.conversationRepo.setStickTop(cid, true) { error in
-            print("add stick : ", error as Any)
+        if IMKitConfigCenter.shared.enableLocalConversation {
+          weakSelf?.localConversationRepo.setStickTop(cid, isOpen) { error in
+            print(isOpen ? "add stick : " : "remote stick : ", error as Any)
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
-              setTop.switchOpen = false
+              setTop.switchOpen = !isOpen
             }
           }
-
         } else {
-          weakSelf?.conversationRepo.setStickTop(cid, false) { error in
-            print("remote stick : ", error as Any)
+          weakSelf?.conversationRepo.setStickTop(cid, isOpen) { error in
+            print(isOpen ? "add stick : " : "remote stick : ", error as Any)
             if let err = error {
               weakSelf?.delegate?.didNeedRefreshUI()
               weakSelf?.delegate?.didError(err)
             } else {
-              setTop.switchOpen = true
+              setTop.switchOpen = !isOpen
             }
           }
         }
@@ -213,6 +233,15 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
     }
   }
 
+  open func userInfoDidChange() {
+    getSectionDatas()
+    delegate?.didNeedRefreshUI()
+  }
+}
+
+// MARK: - NEConversationListener
+
+extension UserSettingViewModel: NEConversationListener {
   /// 会话变更回调
   /// - Parameter conversations: 会话列表
   open func onConversationChanged(_ conversations: [V2NIMConversation]) {
@@ -225,9 +254,21 @@ open class UserSettingViewModel: NSObject, NEConversationListener, AIUserPinList
       }
     }
   }
+}
 
-  open func userInfoDidChange() {
-    getSectionDatas()
-    delegate?.didNeedRefreshUI()
+// MARK: - NELocalConversationListener
+
+extension UserSettingViewModel: NELocalConversationListener {
+  /// 会话变更回调
+  /// - Parameter conversations: 会话列表
+  public func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
+    for changeConversation in conversations {
+      if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
+        conversation = changeConversation
+        getSectionDatas()
+        delegate?.didNeedRefreshUI()
+        continue
+      }
+    }
   }
 }

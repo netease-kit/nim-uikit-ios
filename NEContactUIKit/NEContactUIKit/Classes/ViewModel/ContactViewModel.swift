@@ -12,6 +12,8 @@ public protocol ContactViewModelDelegate: NSObjectProtocol {
   func reloadTableView()
 }
 
+public typealias ContactCallBack = ([ContactSection]?, NSError?) -> Void
+
 @objcMembers
 open class ContactViewModel: NSObject {
   typealias RefreshBlock = () -> Void
@@ -24,6 +26,14 @@ open class ContactViewModel: NSObject {
 
   /// 在线状态记录
   public var onlineStatusDic = [String: NIMSubscribeEvent]()
+
+  /// 是否同步完成
+  public var syncFinished = false
+
+  /// 回调
+  public var callBack: ContactCallBack?
+  /// 过滤列表
+  public var filters: Set<String>?
 
   var unreadCount = 0 {
     didSet {
@@ -45,6 +55,7 @@ open class ContactViewModel: NSObject {
     }
 
     contactRepo.addContactListener(self)
+    IMKitClient.instance.addLoginListener(self)
 
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.addListener(self)
@@ -53,6 +64,7 @@ open class ContactViewModel: NSObject {
 
   deinit {
     contactRepo.removeContactListener(self)
+    IMKitClient.instance.removeLoginListener(self)
     if IMKitConfigCenter.shared.onlineStatusEnable {
       EventSubscribeRepo.shared.removeListener(self)
     }
@@ -60,6 +72,11 @@ open class ContactViewModel: NSObject {
 
   func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+
+    if NEFriendUserCache.shared.isRequesting {
+      return
+    }
+
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
       if let users = contacts {
@@ -88,6 +105,13 @@ open class ContactViewModel: NSObject {
       let friends = NEFriendUserCache.shared.getFriendListNotInBlocklist().map(\.value)
       let contactList = formatData(friends, filters)
       completion(contactList, nil)
+      return
+    }
+
+    if !syncFinished {
+      callBack = completion
+      self.filters = filters
+      completion(nil, nil)
       return
     }
 
@@ -190,7 +214,7 @@ open class ContactViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.getUnreadApplicationCount { [weak self] count, error in
       self?.unreadCount = count
-      completion?(count, error as? NSError)
+      completion?(count, error)
     }
   }
 
@@ -218,6 +242,30 @@ open class ContactViewModel: NSObject {
     indexs.append("#")
 
     return indexs
+  }
+}
+
+// MARK: - NEIMKitClientListener
+
+extension ContactViewModel: NEIMKitClientListener {
+  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+    if type == .DATA_SYNC_TYPE_MAIN, state == .DATA_SYNC_STATE_COMPLETED {
+      /// 设置同步完成标识
+      syncFinished = true
+
+      if !NEFriendUserCache.shared.isRequesting,
+         let completion = callBack {
+        NEALog.infoLog(className(), desc: "onDataSync getContactList")
+
+        /// 取数据
+        getContactList(filters, completion)
+
+        /// 回调置空
+        callBack = nil
+        /// 过滤器置空
+        filters = nil
+      }
+    }
   }
 }
 

@@ -6,6 +6,7 @@ import Foundation
 import NEChatUIKit
 import NEContactUIKit
 import NEConversationUIKit
+import NELocalConversationUIKit
 
 /// 自定义配置项示例类
 public class CustomConfig {
@@ -362,6 +363,7 @@ public class CustomConfig {
 
   /// 通过布局自定义实现顶部警告
   open func loadSecurityWarningView() {
+    // 云端会话
     ConversationUIConfig.shared.customController = { [weak self] viewController in
       guard let self = self else {
         return
@@ -371,12 +373,30 @@ public class CustomConfig {
       self.securityWarningView.warningLabel.text = localizable("security_warning")
       viewController.bodyTopView.addSubview(self.securityWarningView)
       NSLayoutConstraint.activate([
-        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor),
+        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: NEStyleManager.instance.isNormalStyle() ? 0 : 60),
         self.securityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
         self.securityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
         self.securityWarningView.heightAnchor.constraint(equalToConstant: 56),
       ])
-      viewController.bodyTopViewHeight = 56
+      viewController.bodyTopViewHeight = NEStyleManager.instance.isNormalStyle() ? 56 : 60 + 56
+    }
+
+    // 本地会话
+    LocalConversationUIConfig.shared.customController = { [weak self] viewController in
+      guard let self = self else {
+        return
+      }
+
+      // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
+      self.securityWarningView.warningLabel.text = localizable("security_warning")
+      viewController.bodyTopView.addSubview(self.securityWarningView)
+      NSLayoutConstraint.activate([
+        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: NEStyleManager.instance.isNormalStyle() ? 0 : 60),
+        self.securityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
+        self.securityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
+        self.securityWarningView.heightAnchor.constraint(equalToConstant: 56),
+      ])
+      viewController.bodyTopViewHeight = NEStyleManager.instance.isNormalStyle() ? 56 : 60 + 56
     }
   }
 

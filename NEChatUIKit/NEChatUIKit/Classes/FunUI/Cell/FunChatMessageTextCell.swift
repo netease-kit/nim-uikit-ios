@@ -6,7 +6,7 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageTextCell: FunChatMessageBaseCell {
-  var lastRange: NSRange? // 上一次的文本选中范围
+  var isLongPress: Bool = false
 
   public lazy var contentLabelLeft: NEChatTextView = {
     let label = NEChatTextView()
@@ -23,9 +23,15 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    for ges in label.gestureRecognizers ?? [] {
-      ges.isEnabled = false
-    }
+    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    label.addGestureRecognizer(singleTap)
+
+    let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    doubleTap.numberOfTapsRequired = 2
+    label.addGestureRecognizer(doubleTap)
+
+    let longTap = UILongPressGestureRecognizer(target: self, action: #selector(selectAllRange))
+    label.addGestureRecognizer(longTap)
 
     return label
   }()
@@ -45,9 +51,15 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageText"
 
-    for ges in label.gestureRecognizers ?? [] {
-      ges.isEnabled = false
-    }
+    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    label.addGestureRecognizer(singleTap)
+
+    let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
+    doubleTap.numberOfTapsRequired = 2
+    label.addGestureRecognizer(doubleTap)
+
+    let longTap = UILongPressGestureRecognizer(target: self, action: #selector(selectAllRange))
+    label.addGestureRecognizer(longTap)
 
     return label
   }()
@@ -60,6 +72,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
+
+  func tapFunc() {}
 
   override open func commonUI() {
     super.commonUI()
@@ -94,8 +108,16 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
   /// 选中所有文本
   override open func selectAllRange() {
-    contentLabelLeft.selectAll(nil)
-    contentLabelRight.selectAll(nil)
+    let contentLabel = contentLabelLeft.isHidden ? contentLabelRight : contentLabelLeft
+
+    // 选中所有
+    let length = contentLabel.text.utf16.count
+    let range = NSRange(location: 0, length: length)
+    contentLabel.selectedRange = range
+    contentModel?.selectRange = range
+
+    delegate?.didLongPressMessageView(self, contentModel)
+    contentLabel.becomeFirstResponder()
   }
 
   /// 设置是否允许多选
@@ -116,16 +138,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   /// 文本类消息长按默认选中所有文本
   /// - Parameter longPress: 长按手势
   override open func longPress(longPress: UILongPressGestureRecognizer) {
-    let contentLabel = contentLabelLeft.isHidden ? contentLabelRight : contentLabelLeft
-
-    // 选中所有
-    let length = contentLabel.text.utf16.count
-    let range = NSRange(location: 0, length: length)
-    contentLabel.selectedRange = range
-    contentModel?.selectRange = range
-
-    delegate?.didLongPressMessageView(self, contentModel)
-    contentLabel.becomeFirstResponder()
+    isLongPress = true
+    selectAllRange()
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
@@ -152,22 +166,6 @@ extension FunChatMessageTextCell: UITextViewDelegate {
     let contentLabel = contentLabelLeft.isHidden ? contentLabelRight : contentLabelLeft
     let range = contentLabel.selectedRange
     contentModel?.selectRange = range
-
-    if range.location == lastRange?.location || range.location + range.length == (lastRange?.location ?? 0) + (lastRange?.length ?? 0) {
-      lastRange = range
-    } else {
-      contentModel?.selectRange = nil
-    }
-
-    // 首次全选
-    if contentModel?.selectRange == nil || range.length == 0 {
-      let length = contentLabel.text.utf16.count
-      let range = NSRange(location: 0, length: length)
-      contentLabel.selectedRange = range
-      contentModel?.selectRange = range
-      lastRange = range
-    }
-
     delegate?.didLongPressMessageView(self, contentModel)
 
     if (contentModel?.selectRange?.length ?? 0) > 0 {
@@ -185,8 +183,16 @@ extension FunChatMessageTextCell: UITextViewDelegate {
   /// 选中范围变更
   /// - Parameter textView: textview
   open func textViewDidChangeSelection(_ textView: UITextView) {
-    if textView.selectedRange.length == 0 {
+    if isLongPress,
+       contentModel?.selectRange == nil {
+      selectAllRange()
+      return
+    }
+
+    if textView.selectedRange.length == 0 || contentModel?.selectRange == nil {
+      contentModel?.selectRange = nil
       delegate?.didTextViewLoseFocus?(self, contentModel)
+      isLongPress = false
     } else {
       selectText()
     }

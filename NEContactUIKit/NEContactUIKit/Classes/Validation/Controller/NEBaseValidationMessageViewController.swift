@@ -124,9 +124,10 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   /// 清空好友申请
   override open func toSetting() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    viewModel.clearNotification()
-    emptyView.isHidden = viewModel.friendAddApplications.count > 0
-    tableView.reloadData()
+    viewModel.clearNotification { [weak self] error in
+      self?.emptyView.isHidden = (self?.viewModel.friendAddApplications.count ?? 0) > 0
+      self?.tableView.reloadData()
+    }
   }
 
   open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {

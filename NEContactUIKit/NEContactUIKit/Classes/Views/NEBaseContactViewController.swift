@@ -184,7 +184,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: UIApplication.didEnterBackgroundNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NENotificationName.friendCacheInit, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
   }
 
   /// 清除未读数
@@ -274,14 +274,6 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         self?.delegate?.onDataLoaded()
         self?.didRefreshTable()
       }
-    }
-  }
-
-  /// 重新加载数据
-  func reloadData() {
-    // 从缓存中取
-    if !NEFriendUserCache.shared.isEmpty() {
-      loadData()
     }
   }
 

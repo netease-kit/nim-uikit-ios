@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonUIKit
 import NECoreIM2Kit
 import UIKit
@@ -89,13 +90,15 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-
-    // Do any additional setup after loading the view.
     setupFusionContactSelectedUI()
+    loadData()
+
+    NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
   }
 
   /// UI 初始化
   open func setupFusionContactSelectedUI() {
+    view.backgroundColor = .white
     view.addSubview(fusionContactTableView)
     NSLayoutConstraint.activate([
       fusionContactTableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -115,7 +118,11 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
       fusionEmptyView.leftAnchor.constraint(equalTo: fusionContactTableView.leftAnchor),
       fusionEmptyView.rightAnchor.constraint(equalTo: fusionContactTableView.rightAnchor),
     ])
+  }
 
+  open func setupFusionContactUI() {}
+
+  open func loadData() {
     weak var weakSelf = self
     if fusionType == .FusionContactTypeUser {
       viewModel.loadMemberDatas(filterSet) { error in
@@ -123,9 +130,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
           weakSelf?.view.makeToast(err.localizedDescription)
         } else {
           weakSelf?.fusionContactTableView.reloadData()
-          if weakSelf?.viewModel.memberDatas.count ?? 0 <= 0 {
-            weakSelf?.fusionEmptyView.isHidden = false
-          }
+          weakSelf?.fusionEmptyView.isHidden = (weakSelf?.viewModel.memberDatas.count ?? 0) > 0
         }
       }
     } else if fusionType == .FusionContactTypeAIUser {
@@ -136,11 +141,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
         fusionEmptyView.isHidden = false
       }
     }
-
-    view.backgroundColor = .white
   }
-
-  open func setupFusionContactUI() {}
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewModel.memberDatas.count

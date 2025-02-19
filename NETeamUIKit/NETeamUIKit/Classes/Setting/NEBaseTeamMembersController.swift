@@ -315,10 +315,10 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
                 }
                 return false
               })
-              weakSelf?.viewModel.removeModel(model)
+              weakSelf?.viewModel.removeModel([uid])
               weakSelf?.didNeedRefreshUI()
             } else {
-              weakSelf?.viewModel.removeModel(model)
+              weakSelf?.viewModel.removeModel([uid])
               weakSelf?.didNeedRefreshUI()
             }
           }

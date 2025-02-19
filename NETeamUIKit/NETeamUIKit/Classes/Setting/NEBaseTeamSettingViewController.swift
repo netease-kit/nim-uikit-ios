@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatUIKit
 import NECommonUIKit
 import NECoreIM2Kit
 import NIMSDK
@@ -22,10 +23,13 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   public var addButtonLeftMargin: NSLayoutConstraint?
 
   /// 群类型
-  public var teamSettingType: TeamSettingType = .Discuss
+  public var teamSettingType: TeamSettingType = .Senior
 
   /// 是否是高级群扩展的讨论组
   public var isSeniorDiscuss = false
+
+  /// 是否正在请求数据
+  var isRequestingData = false
 
   var className = "TeamSettingViewController"
 
@@ -126,12 +130,16 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-
     title = localizable("setting")
     weak var weakSelf = self
     viewModel.delegate = self
     navigationView.moreButton.isHidden = true
+    setupUI()
     if let tid = teamId {
+      if NETeamUserManager.shared.getTeamInfo() == nil {
+        NETeamUserManager.shared.loadData(tid)
+      }
+
       viewModel.getCurrentMember(IMKitClient.instance.account(), tid) { member, error in
         if let currentMember = member {
           weakSelf?.requestSettingData(tid, currentMember)
@@ -144,7 +152,6 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     } else {
       showToast("team id is nil")
     }
-    setupUI()
   }
 
   open func reloadSectionData() {}
@@ -155,6 +162,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   /// 初始化
   open func setupUI() {
+    viewModel.getData()
     view.backgroundColor = .ne_lightBackgroundColor
     view.addSubview(contentTableView)
     NSLayoutConstraint.activate([
@@ -169,6 +177,8 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     if let pan = navigationController?.interactivePopGestureRecognizer {
       contentTableView.panGestureRecognizer.require(toFail: pan)
     }
+
+    resetupUI()
   }
 
   /// 设置群设置顶部视图展示内容
@@ -176,6 +186,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     if let url = viewModel.teamInfoModel?.team?.avatar, !url.isEmpty {
       print("icon url : ", url)
       teamHeaderView.sd_setImage(with: URL(string: url), completed: nil)
+      teamHeaderView.backgroundColor = .clear
     } else {
       if let tid = teamId {
         if let name = viewModel.teamInfoModel?.team?.getShowName() {
@@ -229,11 +240,11 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   /// 有数据返回之后重新刷新UI
   open func resetupUI() {
     reloadSectionData()
+    checkoutAddShowOrHide()
     contentTableView.tableHeaderView = getHeaderView()
     contentTableView.tableFooterView = getFooterView()
     contentTableView.reloadData()
     didRefreshUserinfoCollection()
-    checkoutAddShowOrHide()
   }
 
   open func getHeaderView() -> UIView {
@@ -256,6 +267,11 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   open func setupUserInfoCollection(_ cornerView: UIView) {}
 
   open func addUser() {
+    if isRequestingData {
+      return
+    }
+    isRequestingData = true
+
     weak var weakSelf = self
     Router.shared.register(ContactSelectedUsersRouter) { param in
       print("addUser weak self ", weakSelf as Any)
@@ -272,26 +288,27 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     var param = [String: Any]()
     param["nav"] = navigationController as Any
     var filters = Set<String>()
-    if let tid = teamId, let models = NETeamMemberCache.shared.getTeamMemberCache(tid) {
-      for model in models {
-        if let accountId = model.teamMember?.accountId {
-          filters.insert(accountId)
+
+    showToast(localizable("requesting"))
+    NETeamUserManager.shared.getAllTeamMembers(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { [weak self] _ in
+      self?.isRequestingData = false
+      if let models = NETeamUserManager.shared.getAllTeamMembers() {
+        for model in models {
+          filters.insert(model.accountId)
+        }
+
+        if filters.count > 0 {
+          param["filters"] = filters
+        }
+
+        param["limit"] = (self?.viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
+
+        if IMKitConfigCenter.shared.enableAIUser {
+          Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
+        } else {
+          Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
         }
       }
-
-      if filters.count > 0 {
-        param["filters"] = filters
-      }
-
-      param["limit"] = (viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
-
-      if IMKitConfigCenter.shared.enableAIUser {
-        Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
-      } else {
-        Router.shared.use(ContactUserSelectRouter, parameters: param, closure: nil)
-      }
-    } else {
-      showToast(localizable("requesting"))
     }
   }
 
@@ -556,12 +573,12 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   /// 通知页面刷新回调
   open func didNeedRefreshUI() {
+    setTeamHeaderInfo()
+    refreshMemberCount()
+    checkoutAddShowOrHide()
     reloadSectionData()
     contentTableView.reloadData()
-    refreshMemberCount()
     didRefreshUserinfoCollection()
-    checkoutAddShowOrHide()
-    setTeamHeaderInfo()
   }
 
   open func didClickTeamManage() {}

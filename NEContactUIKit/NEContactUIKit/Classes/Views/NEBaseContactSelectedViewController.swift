@@ -98,12 +98,9 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     emptyView.setText(localizable("no_friend"))
     setupUI()
     setupNavRightItem()
+    loadData()
 
-    weak var weakSelf = self
-    viewModel.loadData(filterUsers) { error, userSectionCount in
-      weakSelf?.emptyView.isHidden = userSectionCount > 0
-      weakSelf?.tableView.reloadData()
-    }
+    NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
   }
 
   open func setupUI() {
@@ -144,13 +141,11 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
     )
 
-    for (key, value) in customCells {
-      if value is ContactCellDataProtrol.Type {
-        tableView.register(
-          value,
-          forCellReuseIdentifier: "\(NSStringFromClass(value))"
-        )
-      }
+    for (_, value) in customCells {
+      tableView.register(
+        value,
+        forCellReuseIdentifier: "\(NSStringFromClass(value))"
+      )
     }
 
     view.addSubview(emptyView)
@@ -160,6 +155,14 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
       emptyView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
       emptyView.rightAnchor.constraint(equalTo: tableView.rightAnchor),
     ])
+  }
+
+  open func loadData() {
+    weak var weakSelf = self
+    viewModel.loadData(filterUsers) { error, userSectionCount in
+      weakSelf?.emptyView.isHidden = userSectionCount > 0
+      weakSelf?.tableView.reloadData()
+    }
   }
 
   open func setupNavRightItem() {

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEChatUIKit
 import NECoreIM2Kit
 import NIMSDK
 import UIKit
@@ -12,7 +13,7 @@ public protocol TeamMemberSelectViewModelDelegate: NSObject {
 }
 
 @objcMembers
-class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheListener {
+class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener {
   /// 群API单例
   let teamRepo = TeamRepo.shared
   /// 选中成员数据
@@ -33,13 +34,13 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
-    NETeamMemberCache.shared.addTeamCacheListener(self)
+    NETeamUserManager.shared.addListener(self)
     NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
-    NETeamMemberCache.shared.removeTeamCacheListener(self)
+    NETeamUserManager.shared.removeListener(self)
   }
 
   // 点击消息发送者头像
@@ -48,7 +49,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
   func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
-      if NETeamMemberCache.shared.isCurrentMember(accid) {
+      if NETeamUserManager.shared.isCurrentMember(accid) {
         var isDidFind = false
         for model in showDatas {
           if let accountId = model.member?.nimUser?.user?.accountId, accountId == accid {
@@ -79,7 +80,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
       } else {
         let teamInfo = NETeamInfoModel()
         teamInfo.team = team
-        if var members = NETeamMemberCache.shared.getTeamMemberCache(teamId), team?.memberCount == members.count {
+        if var members = NETeamUserManager.shared.getAllTeamMemberModels(), team?.memberCount == members.count {
           members.removeAll { model in
             if let account = model.nimUser?.user?.accountId {
               if NEAIUserManager.shared.isAIUser(account) {
@@ -107,9 +108,6 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
               if let members = ms {
                 weakSelf?.splitSelectMembers(members, teamInfo, 150) { error, model in
                   if var users = model?.users, users.count > 0 {
-                    NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
-                    NETeamMemberCache.shared.setCacheMembers(teamId, users)
-
                     users.removeAll { model in
                       if let account = model.nimUser?.user?.accountId {
                         if NEAIUserManager.shared.isAIUser(account) {
@@ -178,8 +176,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
     }
   }
 
-  /// 数据缓存变更
-  func memberCacheDidChange() {
+  func onTeamMemberUpdate(_ accountId: String) {
     if let tid = teamInfoModel?.team?.teamId {
       print("memberCacheDidChange tid \(tid)")
       weak var weakSelf = self
@@ -282,7 +279,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
 
     weak var weakSelf = self
 
-    if let members = NETeamMemberCache.shared.getTeamMemberCache(teamId) {
+    if let members = NETeamUserManager.shared.getAllTeamMemberModels() {
       teamInfo.users = members
       completion(nil, teamInfo)
       NEALog.infoLog(weakSelf?.className() ?? "", desc: "load team member from cache success.")
@@ -298,10 +295,6 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamMemberCacheList
       } else {
         if let members = ms {
           weakSelf?.splitSelectMembers(members, teamInfo, 150) { error, model in
-            if let users = model?.users, users.count > 0 {
-              NEALog.infoLog(weakSelf?.className() ?? "", desc: "set team member cache success.")
-              NETeamMemberCache.shared.setCacheMembers(teamId, users)
-            }
             completion(error, model)
           }
         } else {

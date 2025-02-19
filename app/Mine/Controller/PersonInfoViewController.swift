@@ -179,7 +179,7 @@ public class PersonInfoViewController: NEBaseViewController,
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         let fileTask = ResourceRepo.shared.createUploadFileTask(filePath)
-        ResourceRepo.shared.upload(fileTask, nil) { [weak self] urlString, error in
+        ResourceRepo.shared.uploadFile(fileTask, nil) { [weak self] urlString, error in
           if error == nil {
             self?.viewModel.updateSelfAvatar(urlString ?? "") { [weak self] error in
               if error != nil {

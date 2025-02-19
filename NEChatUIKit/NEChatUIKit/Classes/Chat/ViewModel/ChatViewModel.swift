@@ -136,6 +136,8 @@ open class ChatViewModel: NSObject {
 
   public let chatRepo = ChatRepo.shared
   public let contactRepo = ContactRepo.shared
+  public let conversationRepo = ConversationRepo.shared
+  public let localConversationRepo = LocalConversationRepo.shared
   public var operationModel: MessageContentModel?
   public var topMessage: V2NIMMessage? // 置顶消息
   public var isReplying = false
@@ -204,10 +206,21 @@ open class ChatViewModel: NSObject {
 
   /// 清空当前会话的未读数
   open func clearUnreadCount() {
-    ConversationRepo.shared.clearUnreadCountByIds([conversationId]) { result, error in
+    // 本地会话
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.clearUnreadCountByIds([conversationId]) { result, error in
+        NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
+      }
+      localConversationRepo.markConversationRead(conversationId) { result, error in
+        NEALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
+      }
+      return
+    }
+
+    conversationRepo.clearUnreadCountByIds([conversationId]) { result, error in
       NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
     }
-    ConversationRepo.shared.markConversationRead(conversationId) { result, error in
+    conversationRepo.markConversationRead(conversationId) { result, error in
       NEALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
     }
   }
@@ -1029,7 +1042,16 @@ open class ChatViewModel: NSObject {
         }
       }
     }
-    ConversationRepo.shared.createConversation(conversationId) { [weak self] conversation, error in
+
+    // 本地会话
+    if IMKitConfigCenter.shared.enableLocalConversation {
+      localConversationRepo.createConversation(conversationId) { [weak self] conversation, error in
+        NEALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
+      }
+      return
+    }
+
+    conversationRepo.createConversation(conversationId) { [weak self] conversation, error in
       NEALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
     }
   }
@@ -1742,7 +1764,7 @@ open class ChatViewModel: NSObject {
                      _ progress: ((UInt) -> Void)?,
                      _ completion: ((String?, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: " + urlString)
-    ResourceRepo.shared.downLoad(urlString, filePath, progress, completion)
+    ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
   /// 转发消息
@@ -1871,7 +1893,7 @@ open class ChatViewModel: NSObject {
         }
 
         let fileTask = ResourceRepo.shared.createUploadFileTask(filePath)
-        ResourceRepo.shared.upload(fileTask, nil) { [weak self] url, error in
+        ResourceRepo.shared.uploadFile(fileTask, nil) { [weak self] url, error in
           if let err = error {
             completion(err)
           } else if let url = url, let filePath = URL(string: filePath) {

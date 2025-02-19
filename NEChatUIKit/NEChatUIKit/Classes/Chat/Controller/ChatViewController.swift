@@ -865,6 +865,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
 
+    NotificationCenter.default.addObserver(self, selector: #selector(reLoadMoreWithMessage), name: NENotificationName.friendCacheInit, object: nil)
+
     let tap = UITapGestureRecognizer(target: self, action: #selector(viewTap))
     tap.delegate = self
     tap.cancelsTouchesInView = false
@@ -3693,9 +3695,7 @@ extension ChatViewController: ChatBaseCellDelegate {
   ///   - cell: 所处位置的 cell
   ///   - model: 消息模型
   open func didTextViewLoseFocus(_ cell: UITableViewCell, _ model: MessageContentModel?) {
-    if viewModel.operationModel == model {
-      removeOperationView()
-    }
+    removeOperationView()
   }
 
   open func messageWillShow(_ cell: UITableViewCell, _ model: MessageContentModel?) {
@@ -3766,7 +3766,7 @@ extension ChatViewController: ChatBaseCellDelegate {
 
   /// 显示被离开群弹框
   open func showLeaveTeamAlert() {
-    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return
     }
     showSingleAlert(message: chatLocalizable("team_has_been_quit")) { [weak self] in
@@ -3776,7 +3776,7 @@ extension ChatViewController: ChatBaseCellDelegate {
 
   /// 显示群被解散弹框
   open func showDismissTeamAlert() {
-    if IMKitConfigCenter.shared.enabledismissTeamDeleteConversation == false {
+    if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return
     }
 
@@ -3824,6 +3824,12 @@ extension ChatViewController: NEIMKitClientListener {
     }
   }
 
+  /// 加载消息的更多信息（回复、标记、发送者信息）
+  open func reLoadMoreWithMessage() {
+    let messages = viewModel.messages.compactMap(\.message)
+    viewModel.loadMoreWithMessage(messages)
+  }
+
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
   open func onConnectStatus(_ status: V2NIMConnectStatus) {
@@ -3838,10 +3844,7 @@ extension ChatViewController: NEIMKitClientListener {
       networkBroken = false
       DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: DispatchWorkItem(block: { [weak self] in
         // 断网重连后不会重发标记回调，需要手动拉取
-        if let models = self?.viewModel.messages {
-          let messages = models.compactMap(\.message)
-          self?.viewModel.loadMoreWithMessage(messages)
-        }
+        self?.reLoadMoreWithMessage()
       }))
     }
   }
