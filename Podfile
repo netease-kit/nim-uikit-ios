@@ -26,9 +26,10 @@ target 'app' do
   
   #呼叫组件，音视频通话能力，需要开通 音视频2.0，可选，聊天一面会根据依赖初始化自动显示音视频通话入口
   pod 'NIMSDK_LITE','9.14.2'
-  pod 'NERtcCallKit/NOS_Special', '2.2.0'
-  pod 'NERtcCallUIKit/NOS_Special', '2.2.0'
   pod 'NERtcSDK', '5.5.2'
+  pod 'NERtcCallKit/NOS_Special', '2.2.0'
+  pod 'NERtcCallUIKit/NOS_Special', '2.2.0' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
+  
 
 
   # # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖
@@ -37,7 +38,6 @@ target 'app' do
 #   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
 #   pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
 #   pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
-#   pod 'NERtcCallUIKit', :path => 'NERtcCallUIKit/NERtcCallUIKit.podspec'
 
 
 end
