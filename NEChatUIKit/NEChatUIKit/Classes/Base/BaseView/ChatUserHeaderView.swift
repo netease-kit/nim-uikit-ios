@@ -24,7 +24,7 @@ open class ChatUserHeaderView: UIImageView {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     isUserInteractionEnabled = true
     clipsToBounds = false
     addSubview(titleLabel)

@@ -26,7 +26,7 @@ open class TextWithRightArrowCell: ContactBaseTextCell {
     super.init(coder: coder)
   }
 
-  override func setModel(model: UserItem) {
+  override open func setModel(model: UserItem) {
     super.setModel(model: model)
 //        self.detailTitleLabel.text = model.detailTitle
   }

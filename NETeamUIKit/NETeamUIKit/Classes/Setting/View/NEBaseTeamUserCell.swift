@@ -56,7 +56,7 @@ open class NEBaseTeamUserCell: UICollectionViewCell {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     contentView.addSubview(userHeaderView)
   }
 }

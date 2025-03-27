@@ -31,7 +31,7 @@ open class ChatUnfoldCell: ChatCornerCell {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     contentView.addSubview(contentLabel)
     NSLayoutConstraint.activate([
       contentLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -45,11 +45,11 @@ open class ChatUnfoldCell: ChatCornerCell {
     ])
   }
 
-  func changeToArrowUp() {
+  open func changeToArrowUp() {
     arrowImageView.image = UIImage.ne_imageNamed(name: "arrowUp")
   }
 
-  func changeToArrowDown() {
+  open func changeToArrowDown() {
     arrowImageView.image = UIImage.ne_imageNamed(name: "arrowDown")
   }
 }

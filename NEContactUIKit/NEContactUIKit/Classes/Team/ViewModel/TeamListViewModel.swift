@@ -22,7 +22,7 @@ open class TeamListViewModel: NSObject, NETeamListener {
     teamRepo.removeTeamListener(self)
   }
 
-  func getTeamList(_ completion: @escaping ([NETeam]?, Error?) -> Void) {
+  open func getTeamList(_ completion: @escaping ([NETeam]?, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     teamRepo.getTeamList { [weak self] teams, error in
       if let error = error {

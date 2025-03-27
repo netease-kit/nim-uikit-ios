@@ -17,7 +17,7 @@ open class FunValidationMessageViewController: NEBaseValidationMessageViewContro
     super.init(coder: coder)
   }
 
-  override func initNav() {
+  override open func initNav() {
     super.initNav()
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),

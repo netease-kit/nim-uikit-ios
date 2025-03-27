@@ -54,7 +54,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
   }
 
   /// 设置搜索框 leftView
-  func setSearchTextFieldLeftView() {
+  open func setSearchTextFieldLeftView() {
     if !searchTextField.isFirstResponder, searchTextField.text?.isEmpty == true {
       let leftImageView = UIImageView(image: UIImage.ne_imageNamed(name: "funSearch"))
       searchTextField.leftView = leftImageView
@@ -67,7 +67,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
   }
 
   /// 监听搜索框开始编辑
-  func searchTextFieldBeginEdit() {
+  open func searchTextFieldBeginEdit() {
     setSearchTextFieldLeftView()
   }
 
@@ -126,7 +126,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
   }
 
   /// 重写【完成】按钮设置
-  override func refreshSelectCount() {
+  override open func refreshSelectCount() {
     super.refreshSelectCount()
     sureButton.backgroundColor = selectedArray.count > 0 ? .funContactThemeColor : .funContactThemeDisableColor
   }

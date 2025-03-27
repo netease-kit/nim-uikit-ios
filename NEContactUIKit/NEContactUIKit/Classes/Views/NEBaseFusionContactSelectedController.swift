@@ -7,12 +7,14 @@ import NECommonUIKit
 import NECoreIM2Kit
 import UIKit
 
-@objc public enum FusionContactType: NSInteger {
+@objc
+public enum FusionContactType: NSInteger {
   case FusionContactTypeUser
   case FusionContactTypeAIUser
 }
 
-@objc public protocol FusionContactSelectedDelegate: NSObjectProtocol {
+@objc
+public protocol FusionContactSelectedDelegate: NSObjectProtocol {
   /// 选择成员列表回调
   /// - Parameter model: 成员model
   @objc func didSelectedUser(_ model: NEFusionContactCellModel) -> Bool
@@ -180,7 +182,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
     }
   }
 
-  func getCellModelUser(_ cellModel: NEFusionContactCellModel) -> V2NIMUser? {
+  open func getCellModelUser(_ cellModel: NEFusionContactCellModel) -> V2NIMUser? {
     if fusionType == .FusionContactTypeUser {
       return cellModel.user?.user
     } else if fusionType == .FusionContactTypeAIUser {

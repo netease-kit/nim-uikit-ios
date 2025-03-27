@@ -36,7 +36,8 @@
 "product_intro"="Product Introduction";
 "receiver_mode"="Handset Mode";
 "message_read_function"="Read/Unread";
-"local_conversation"="Local Conversation Mode";
+"cloud_conversation"="Cloud Conversation Mode";
+"restart_tips"="Restart effective, whether to exit?";
 "version"="Version";
 "headImage"="Avatar";
 "nickname"="Nick Name";
@@ -61,6 +62,7 @@
 "domestic_node"="China";
 "overseas_node"="Singapore";
 "restart"="OK";
+"exit"="Exit";
 "text_count_limit"="limit %d characters";
 
 // style

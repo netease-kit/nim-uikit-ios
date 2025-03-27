@@ -12,7 +12,7 @@ open class FindFriendViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "FindFriendViewModel"
 
-  func searchFriend(_ text: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
+  open func searchFriend(_ text: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
 
     contactRepo.getUserWithFriend(accountIds: [text]) { userFriends, error in

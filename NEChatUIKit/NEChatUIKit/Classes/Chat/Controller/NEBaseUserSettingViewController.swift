@@ -289,16 +289,16 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
     }
   }
 
-  func didNeedRefreshUI() {
+  public func didNeedRefreshUI() {
     didLoadData()
     contentTable.reloadData()
   }
 
-  func didError(_ error: Error) {
+  public func didError(_ error: Error) {
     showToast(error.localizedDescription)
   }
 
-  func didShowErrorMsg(_ msg: String) {
+  public func didShowErrorMsg(_ msg: String) {
     showToast(msg)
   }
 

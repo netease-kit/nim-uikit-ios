@@ -24,7 +24,7 @@ open class ChatHeaderView: UIView {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     clipsToBounds = false
     addSubview(titleLabel)
     NSLayoutConstraint.activate([

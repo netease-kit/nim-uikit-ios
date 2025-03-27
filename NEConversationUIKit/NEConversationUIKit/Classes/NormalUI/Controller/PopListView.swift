@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class PopListView: NEBasePopListView {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
       shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant - 10),

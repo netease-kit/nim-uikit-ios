@@ -35,7 +35,7 @@ open class ConversationListCell: NEBaseConversationListCell {
     ])
   }
 
-  override func initSubviewsLayout() {
+  override open func initSubviewsLayout() {
     if ConversationUIConfig.shared.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 21.0
     } else if ConversationUIConfig.shared.conversationProperties.avatarCornerRadius > 0 {

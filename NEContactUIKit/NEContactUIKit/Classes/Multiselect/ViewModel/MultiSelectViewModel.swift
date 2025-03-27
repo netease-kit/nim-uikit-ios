@@ -28,7 +28,7 @@ open class MultiSelectViewModel: ContactViewModel {
   /// - Parameters:
   ///   - filters: 需要过滤的会话id列表
   ///   - completion: 完成回调
-  func loadAllData(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+  open func loadAllData(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     // 加载群聊
     loadData(2, filters) { [weak self] error in
       if let err = error {
@@ -56,7 +56,7 @@ open class MultiSelectViewModel: ContactViewModel {
   ///   - index: 0 - 最近会话；1 - 我的好友；2 - 我的群聊
   ///   - filters: 需要过滤的会话id列表
   ///   - completion: 完成回调
-  func loadData(_ index: Int, _ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+  open func loadData(_ index: Int, _ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     sessions.removeAll()
     if index == 0 {
       if conversationList.isEmpty {
@@ -99,7 +99,7 @@ open class MultiSelectViewModel: ContactViewModel {
 
   /// 加载最近转发
   /// - Returns: 最近转发列表
-  func loadRecentForward() -> [MultiSelectModel] {
+  open func loadRecentForward() -> [MultiSelectModel] {
     var recentSessions = [MultiSelectModel]()
 
     var recentList = settingRepo.getRecentForward() ?? []
@@ -134,8 +134,8 @@ open class MultiSelectViewModel: ContactViewModel {
   /// - Parameters:
   ///   - filters: 需要过滤的会话id列表
   ///   - completion: 完成回调
-  func getConversationList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
-    if IMKitConfigCenter.shared.enableLocalConversation {
+  open func getConversationList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.getConversationList(0, conversationLimit) { [weak self] conversations, offset, finished, error in
         if let error = error {
           NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
@@ -209,7 +209,7 @@ open class MultiSelectViewModel: ContactViewModel {
   /// - Parameters:
   ///   - filters: 需要过滤的好友id列表
   ///   - completion: 完成回调
-  func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+  open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
     getContactList(filters) { [weak self] result, error in
@@ -231,7 +231,7 @@ open class MultiSelectViewModel: ContactViewModel {
   /// - Parameters:
   ///   - filters: 需要过滤的群id列表
   ///   - completion: 完成回调
-  func getTeamList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+  open func getTeamList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     teamRepo.getTeamList { [weak self] teams, error in
       if let error = error {
         NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
@@ -263,7 +263,7 @@ open class MultiSelectViewModel: ContactViewModel {
   /// 在好友缓存中查找该会话
   /// - Parameter conversationId: 会话id
   /// - Returns: 存在则返回该回话，不存在返回 nil
-  func findFriend(_ conversationId: String?) -> MultiSelectModel? {
+  open func findFriend(_ conversationId: String?) -> MultiSelectModel? {
     for conv in contactList {
       if conv.conversationId == conversationId {
         return conv
@@ -275,7 +275,7 @@ open class MultiSelectViewModel: ContactViewModel {
   /// 在群聊缓存中查找该会话
   /// - Parameter conversationId: 会话id
   /// - Returns: 存在则返回该回话，不存在返回 nil
-  func findTeam(_ conversationId: String?) -> MultiSelectModel? {
+  open func findTeam(_ conversationId: String?) -> MultiSelectModel? {
     for conv in teamList {
       if conv.conversationId == conversationId {
         return conv
@@ -284,7 +284,7 @@ open class MultiSelectViewModel: ContactViewModel {
     return nil
   }
 
-  func searchText(_ text: String) {
+  open func searchText(_ text: String) {
     if text.isEmpty {
       return
     }

@@ -26,7 +26,7 @@ open class NEBaseRecentSelectCell: NEBaseSelectedCell {
   }()
 
   /// 重写布局方法
-  override func setupUI() {
+  override open func setupUI() {
     contentView.addSubview(avatarImageView)
     avatarImageView.layer.cornerRadius = 18
     avatarImageView.titleLabel.font = UIFont.systemFont(ofSize: 16.0)
@@ -56,7 +56,7 @@ open class NEBaseRecentSelectCell: NEBaseSelectedCell {
 
   /// 设置头像宽高
   /// - Parameter height: 宽高
-  func setAvatarWH(_ height: CGFloat) {
+  open func setAvatarWH(_ height: CGFloat) {
     avatarImageView.layer.cornerRadius = height / 2
     avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: height)
     avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: height)
@@ -64,13 +64,13 @@ open class NEBaseRecentSelectCell: NEBaseSelectedCell {
 
   /// 设置选中状态显隐
   /// - Parameter isShow: 是否显示
-  func showSelect(_ isShow: Bool) {
+  open func showSelect(_ isShow: Bool) {
     selectImageView.isHidden = !isShow
   }
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（MultiSelectModel）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? MultiSelectModel else { return }
 
     super.configure(model)

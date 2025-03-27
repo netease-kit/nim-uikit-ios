@@ -69,7 +69,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     loadData()
   }
 
-  func initNav() {
+  open func initNav() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -94,7 +94,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   }
 
   /// UI 初始化
-  func commonUI() {
+  open func commonUI() {
     title = localizable("blacklist")
     initNav()
 
@@ -108,7 +108,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     ])
   }
 
-  func loadData() {
+  open func loadData() {
     viewModel.getBlackList()
     tableView.reloadData()
   }
@@ -140,7 +140,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     }
   }
 
-  func addBlackUsers(users: [NEUserWithFriend]) {
+  open func addBlackUsers(users: [NEUserWithFriend]) {
     viewModel.addBlackList(users: users) { [weak self] error in
       if let err = error {
         self?.showToast(err.localizedDescription)
@@ -150,7 +150,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
 
   // MARK: BlackListCellDelegate
 
-  func removeUser(account: String?, index: Int) {
+  open func removeUser(account: String?, index: Int) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))

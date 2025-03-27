@@ -6,7 +6,7 @@ import UIKit
 
 @objcMembers
 open class FusionContactUnCheckCell: ContactUnCheckCell {
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     if let cellModel = model as? NEFusionContactCellModel {
       if cellModel.user != nil {
         avatarImageView.configHeadData(

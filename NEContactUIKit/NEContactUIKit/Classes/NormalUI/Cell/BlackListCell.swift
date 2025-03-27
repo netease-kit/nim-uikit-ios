@@ -14,7 +14,7 @@ open class BlackListCell: NEBaseBlackListCell {
     return view
   }()
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     avatarImageView.layer.cornerRadius = 21
 

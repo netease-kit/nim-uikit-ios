@@ -62,14 +62,14 @@ open class ConversationController: NEBaseConversationController {
     }
   }
 
-  func changeLanguage() {
+  open func changeLanguage() {
     requestData()
     initSystemNav()
     popListView = PopListView()
     brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
   }
 
-  override func initSystemNav() {
+  override open func initSystemNav() {
     super.initSystemNav()
 
     let searchBarItem = UIBarButtonItem(customView: searchBarButton)

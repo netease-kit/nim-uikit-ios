@@ -8,6 +8,7 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
+@objc
 public protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didClickChangeNick()
   func didChangeInviteModeClick(_ model: SettingCellModel)
@@ -54,7 +55,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.addLocalConversationListener(self)
     } else {
       conversationRepo.addConversationListener(self)
@@ -89,7 +90,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
 
   func clear() {
     teamRepo.removeTeamListener(self)
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.removeLocalConversationListener(self)
     } else {
       conversationRepo.removeConversationListener(self)
@@ -110,7 +111,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   // 头像 成员列表
-  private func getOneSection() -> SettingSectionModel {
+  open func getOneSection() -> SettingSectionModel {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     let model = SettingSectionModel()
     let cellModel = SettingCellModel()
@@ -122,7 +123,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   // 标记 历史记录 消息提醒
-  private func getTwoSection() -> SettingSectionModel {
+  open func getTwoSection() -> SettingSectionModel {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
 
     let model = SettingSectionModel()
@@ -205,7 +206,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
       }
 
       if let teamId = weakSelf?.teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
-        if IMKitConfigCenter.shared.enableLocalConversation {
+        if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
           weakSelf?.localConversationRepo.setStickTop(conversationId, isOpen) { error in
             NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + (isOpen ? "addStickTop" : "removeStickTop") + " error : \(error?.localizedDescription ?? "") ")
             if let err = error {
@@ -251,7 +252,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   // 群昵称 群禁言
-  private func getThreeSection() -> SettingSectionModel {
+  open func getThreeSection() -> SettingSectionModel {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     let model = SettingSectionModel()
     weak var weakSelf = self
@@ -309,7 +310,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   // 邀请 修改群信息
-  private func getFourSection() -> SettingSectionModel {
+  open func getFourSection() -> SettingSectionModel {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     weak var weakSelf = self
     let model = SettingSectionModel()
@@ -354,7 +355,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   /// 获取群(内部获取群成员)
   /// - Parameter teamId: 群id
   /// - Parameter completion: 回调
-  func getTeamWithMembers(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
+  open func getTeamWithMembers(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     weak var weakSelf = self
     if isRequestSettingData == true {
@@ -384,11 +385,11 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   /// 获取群信息(只获取第一页群成员)
-  func getTeamInfoWithSomeMembers(_ teamId: String, _ completion: @escaping (NSError?, Bool?) -> Void) {
+  open func getTeamInfoWithSomeMembers(_ teamId: String, _ completion: @escaping (NSError?, Bool?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId:\(teamId)")
     weak var weakSelf = self
     if let cid = V2NIMConversationIdUtil.teamConversationId(teamId) {
-      if IMKitConfigCenter.shared.enableLocalConversation {
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
         localConversationRepo.getConversation(cid) { conversation, error in
           if error == nil {
             weakSelf?.conversation = conversation
@@ -524,7 +525,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     if let teamId = teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
-      if IMKitConfigCenter.shared.enableLocalConversation {
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
         localConversationRepo.setStickTop(conversationId, true) { error in
           completion(error)
         }
@@ -540,7 +541,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   /// - Parameter userId: 用户id
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getCurrentMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
+  open func getCurrentMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId:\(userId)")
     if let tid = teamId {
       teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, userId) { [weak self] member, error in
@@ -555,13 +556,13 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   /// 判断是不是创建者
-  func isOwner() -> Bool {
+  open func isOwner() -> Bool {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     return NETeamUserManager.shared.isOwner(IMKitClient.instance.account())
   }
 
   /// 是不是管理员
-  func isManager() -> Bool {
+  open func isManager() -> Bool {
     if let currentTeamMebmer = memberInTeam {
       if currentTeamMebmer.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
         return true
@@ -570,7 +571,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     return false
   }
 
-  private func sampleMemberId(arr: [NETeamMemberInfoModel], owner: String) -> String? {
+  open func sampleMemberId(arr: [NETeamMemberInfoModel], owner: String) -> String? {
     let sortArr = arr.sorted { model1, model2 in
       (model1.teamMember?.joinTime ?? 0) < (model2.teamMember?.joinTime ?? 0)
     }
@@ -587,7 +588,7 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
 
   /// 移交群主
   /// - Parameter completion: 完成回调
-  func transferTeamOwner(_ completion: @escaping (Error?) -> Void) {
+  open func transferTeamOwner(_ completion: @escaping (Error?) -> Void) {
     if isOwner() == false {
       completion(NSError(domain: "imuikit", code: -1, userInfo: [NSLocalizedDescriptionKey: "not team manager"]))
       return

@@ -6,7 +6,8 @@
 import NECommonUIKit
 import UIKit
 
-protocol TeamMemberCellDelegate: NSObject {
+@objc
+public protocol TeamMemberCellDelegate: NSObjectProtocol {
   func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int)
 }
 
@@ -109,7 +110,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     ])
   }
 
-  func configure(_ model: NETeamMemberInfoModel) {
+  open func configure(_ model: NETeamMemberInfoModel) {
     // 更新用户信息
     if let userId = model.nimUser?.user?.accountId, let user = NEFriendUserCache.shared.getFriendInfo(userId) {
       model.nimUser = user
@@ -126,7 +127,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     nameLabel.text = model.atNameInTeam()
   }
 
-  func setupRemoveButton() {
+  open func setupRemoveButton() {
     contentView.addSubview(removeButton)
     NSLayoutConstraint.activate([
       removeButton.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -137,7 +138,7 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     removeButton.addTarget(self, action: #selector(didClickRemove), for: .touchUpInside)
   }
 
-  func didClickRemove() {
+  open func didClickRemove() {
     delegate?.didClickRemoveButton(currentModel, index)
   }
 }

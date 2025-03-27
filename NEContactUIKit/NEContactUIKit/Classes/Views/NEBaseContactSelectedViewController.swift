@@ -345,7 +345,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     CGSize(width: 46, height: collectionBackViewHeight)
   }
 
-  func didSelectContact(_ contact: ContactInfo) {
+  open func didSelectContact(_ contact: ContactInfo) {
     contact.isSelected = true
     if selectArray.contains(where: { c in
       contact === c
@@ -361,7 +361,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     refreshSelectCount()
   }
 
-  func didUnselectContact(_ contact: ContactInfo) {
+  open func didUnselectContact(_ contact: ContactInfo) {
     contact.isSelected = false
     selectArray.removeAll { c in
       contact === c
@@ -375,7 +375,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     refreshSelectCount()
   }
 
-  func refreshSelectCount() {
+  open func refreshSelectCount() {
     if selectArray.count > 0 {
       sureButton.setTitle("确定(\(selectArray.count))", for: .normal)
     } else {

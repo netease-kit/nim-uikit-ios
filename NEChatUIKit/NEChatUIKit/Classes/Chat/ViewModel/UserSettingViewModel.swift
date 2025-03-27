@@ -8,7 +8,8 @@ import NECommonUIKit
 import NECoreIM2Kit
 import NIMSDK
 
-protocol UserSettingViewModelDelegate: NSObjectProtocol {
+@objc
+public protocol UserSettingViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
   func didError(_ error: Error)
   func didShowErrorMsg(_ msg: String)
@@ -32,7 +33,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
 
   override public init() {
     super.init()
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.addLocalConversationListener(self)
     } else {
       conversationRepo.addConversationListener(self)
@@ -44,7 +45,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   }
 
   deinit {
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.removeLocalConversationListener(self)
     } else {
       conversationRepo.removeConversationListener(self)
@@ -63,7 +64,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   func getConversation(_ userId: String, _ completion: @escaping (NSError?) -> Void) {
     if let cid = V2NIMConversationIdUtil.p2pConversationId(userId) {
       weak var weakSelf = self
-      if IMKitConfigCenter.shared.enableLocalConversation {
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
         localConversationRepo.getConversation(cid) { conversation, error in
           if conversation != nil {
             weakSelf?.conversation = conversation
@@ -149,7 +150,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
       }
 
       if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
-        if IMKitConfigCenter.shared.enableLocalConversation {
+        if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
           weakSelf?.localConversationRepo.setStickTop(cid, isOpen) { error in
             print(isOpen ? "add stick : " : "remote stick : ", error as Any)
             if let err = error {

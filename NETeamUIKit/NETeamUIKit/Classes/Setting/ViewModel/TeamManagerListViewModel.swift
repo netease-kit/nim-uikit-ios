@@ -7,7 +7,8 @@ import NEChatUIKit
 import NIMSDK
 import UIKit
 
-public protocol TeamManagerListViewModelDelegate: NSObject {
+@objc
+public protocol TeamManagerListViewModelDelegate: NSObjectProtocol {
   func didNeedReloadData()
 }
 
@@ -42,7 +43,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// 点击消息发送者头像
   /// 拉取最新用户信息后刷新消息发送者信息
   /// - Parameter noti: 通知对象
-  func didTapHeader(_ noti: Notification) {
+  open func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
       if NETeamUserManager.shared.isCurrentMember(accid) {
@@ -82,7 +83,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// 获当前登录用户的群成员信息
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getCurrentUserTeamMember(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
+  open func getCurrentUserTeamMember(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     weak var weakSelf = self
     teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
       weakSelf?.currentMember = member
@@ -120,7 +121,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   }
 
   /// 刷新数据
-  func refreshData() {
+  open func refreshData() {
     guard let tid = teamId else {
       return
     }
@@ -183,7 +184,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// 获取群信息(包含管理员)
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getTeamInfo(_ teamId: String, _ completion: @escaping (NETeamInfoModel?, NSError?) -> Void) {
+  open func getTeamInfo(_ teamId: String, _ completion: @escaping (NETeamInfoModel?, NSError?) -> Void) {
     weak var weakSelf = self
     if isRequest == true {
       return
@@ -229,9 +230,9 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// - Parameter teamModel：群信息对象
   /// - Parameter queryType:  查询类型
   /// - Parameter completion:  完成后的回调
-  private func getTeamManagers(_ teamInfo: NETeamInfoModel,
-                               _ queryType: V2NIMTeamMemberRoleQueryType,
-                               _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func getTeamManagers(_ teamInfo: NETeamInfoModel,
+                            _ queryType: V2NIMTeamMemberRoleQueryType,
+                            _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
     guard let teamId = teamInfo.team?.teamId else {
       return
@@ -261,10 +262,10 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// - Parameter model :           群信息
   /// - Parameter maxSizeByPage:    单页最大查询数量
   /// - Parameter completion:       完成后的回调
-  private func splitTeamManagers(_ members: [V2NIMTeamMember],
-                                 _ model: NETeamInfoModel,
-                                 _ maxSizeByPage: Int = 150,
-                                 _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func splitTeamManagers(_ members: [V2NIMTeamMember],
+                              _ model: NETeamInfoModel,
+                              _ maxSizeByPage: Int = 150,
+                              _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
     var remaind = [[V2NIMTeamMember]]()
     remaind.append(contentsOf: members.chunk(maxSizeByPage))
@@ -275,9 +276,9 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   ///   - Parameter remainUserIds: 用户集合
   ///   - Parameter model： 群信息
   ///   - Parameter completion: 成功回调
-  private func fetchManagersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
-                                 _ model: NETeamInfoModel,
-                                 _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func fetchManagersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
+                              _ model: NETeamInfoModel,
+                              _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       completion(nil, model)
@@ -313,7 +314,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   /// - Parameter teamId:  群ID
   /// - Parameter nextToken: 下一页标识
   /// - Parameter completion:  完成回调
-  private func getAllTeamManagerInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
+  open func getAllTeamManagerInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
     let option = V2NIMTeamMemberQueryOption()
     option.limit = 100
     option.direction = .QUERY_DIRECTION_ASC

@@ -49,7 +49,7 @@ open class NEBasePopListView: UIView {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     backgroundColor = .clear
 
     shadowView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,7 +109,7 @@ open class NEBasePopListView: UIView {
     }
   }
 
-  func itemClick(_ sender: UIButton) {
+  open func itemClick(_ sender: UIButton) {
     print("item click")
     let index = sender.tag
     let item = itemDatas[index]

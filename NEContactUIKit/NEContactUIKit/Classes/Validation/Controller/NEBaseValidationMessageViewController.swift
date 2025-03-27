@@ -38,7 +38,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   }
 
   /// 进入后台，清空未读
-  func appEnterBackground() {
+  open func appEnterBackground() {
     viewModel.setAddApplicationRead { [weak self] success, error in
       if success {
         self?.tableviewReload()
@@ -68,7 +68,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
   }()
 
   /// 加载数据
-  func loadData() {
+  open func loadData() {
     viewModel.loadApplicationList(true) { [weak self] error in
       if let err = error {
         NEALog.errorLog(ModuleName + " " + NEBaseValidationMessageViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
@@ -78,7 +78,7 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     }
   }
 
-  func initNav() {
+  open func initNav() {
     let clearItem = UIBarButtonItem(
       title: localizable("clear"),
       style: .done,

@@ -53,7 +53,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     super.init(coder: coder)
   }
 
-  func commonUI() {
+  open func commonUI() {
     selectionStyle = .none
 
     contentView.addSubview(avatarImageView)

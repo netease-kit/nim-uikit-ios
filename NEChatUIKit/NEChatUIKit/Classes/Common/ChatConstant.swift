@@ -43,7 +43,8 @@ func ~= <T: Equatable>(caseList: [T], caseOne: T) -> Bool {
   caseList.contains(caseOne)
 }
 
-@objc public protocol ViewModelDelegate: NSObjectProtocol {
+@objc
+public protocol ViewModelDelegate: NSObjectProtocol {
   func dataDidChange()
   func dataDidError(_ error: Error)
   @objc optional func dataNoMore()

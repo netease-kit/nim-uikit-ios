@@ -8,7 +8,8 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
-protocol TeamMembersViewModelDelegate: NSObject {
+@objc
+public protocol TeamMembersViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
 }
 
@@ -53,7 +54,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 点击群成员头像
   /// 拉取最新用户信息后刷新群成员信息
   /// - Parameter noti: 通知对象
-  @objc func didTapHeader(_ noti: Notification) {
+  @objc open func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
       if NETeamUserManager.shared.isCurrentMember(accid) {
@@ -80,7 +81,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 获取群成员信息
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getMemberInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
+  open func getMemberInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     weak var weakSelf = self
     teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
       weakSelf?.currentMember = member
@@ -91,7 +92,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 移除群成员
   /// - Parameter teamdId: 群id
   /// - Parameter uids: 用户id
-  func removeTeamMember(_ teamdId: String, _ uids: [String], _ completion: @escaping (NSError?) -> Void) {
+  open func removeTeamMember(_ teamdId: String, _ uids: [String], _ completion: @escaping (NSError?) -> Void) {
     teamRepo.removeTeamMembers(teamdId, .TEAM_TYPE_NORMAL, uids) { error in
       completion(error as NSError?)
     }
@@ -99,7 +100,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 设置成员数据
   /// - Parameter memberDatas: 成员数据
-  func setShowDatas(_ memberDatas: [NETeamMemberInfoModel]?) {
+  open func setShowDatas(_ memberDatas: [NETeamMemberInfoModel]?) {
     var owner: NETeamMemberInfoModel?
     var managers = [NETeamMemberInfoModel]()
     var normalMembers = [NETeamMemberInfoModel]()
@@ -139,7 +140,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 移除成员数据(UI数据源)
   /// - Parameter model: 成员数据
-  func removeModel(_ rmUids: [String]) {
+  open func removeModel(_ rmUids: [String]) {
     datas.removeAll(where: { model in
       if let uid = model.nimUser?.user?.accountId {
         if rmUids.contains(uid) {
@@ -203,7 +204,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 群成员信息更新统一处理方法
   /// - Parameter teamMembers: 群成员信息
-  func changeMembers(_ teamMembers: [V2NIMTeamMember]) {
+  open func changeMembers(_ teamMembers: [V2NIMTeamMember]) {
     guard let tid = teamId else {
       return
     }
@@ -228,7 +229,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 获取群信息(包含群成员)
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getTeamInfo(_ teamId: String, _ completion: @escaping (NETeamInfoModel?, NSError?) -> Void) {
+  open func getTeamInfo(_ teamId: String, _ completion: @escaping (NETeamInfoModel?, NSError?) -> Void) {
     weak var weakSelf = self
 
     if let team = NETeamUserManager.shared.getTeamInfo(),
@@ -267,9 +268,9 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// - Parameter queryType:  查询类型
   /// - Parameter teamModel：群信息对象
   /// - Parameter completion:  完成后的回调
-  private func getTeamMembers(_ teamInfo: NETeamInfoModel,
-                              _ queryType: V2NIMTeamMemberRoleQueryType,
-                              _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func getTeamMembers(_ teamInfo: NETeamInfoModel,
+                           _ queryType: V2NIMTeamMemberRoleQueryType,
+                           _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
     if let members = NETeamUserManager.shared.getAllTeamMemberModels(), teamInfo.team?.memberCount == members.count {
       teamInfo.users = members
@@ -280,7 +281,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 订阅群成员在线状态
   ///  - Parameter members:  成员列表
-  func subcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
+  open func subcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
     var accounts = [String]()
     for model in members {
       if let accountId = model.teamMember?.accountId {
@@ -293,7 +294,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   }
 
   /// 取消订阅群成员
-  func unSubcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
+  open func unSubcribeMembers(_ members: [NETeamMemberInfoModel], _ completion: @escaping (NSError?) -> Void) {
     var accounts = [String]()
     for model in members {
       if let accountId = model.teamMember?.accountId {
@@ -307,7 +308,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 订阅状态变更回调
   /// - Parameter event: 订阅事件
-  func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
+  open func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
     NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
     for e in event {
       print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")
@@ -318,7 +319,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
     delegate?.didNeedRefreshUI()
   }
 
-  func onTeamMemberUpdate(_ accountId: String) {
+  open func onTeamMemberUpdate(_ accountId: String) {
     NEALog.infoLog(className(), desc: #function + " memberCacheDidChange")
     guard let tid = teamId else {
       return

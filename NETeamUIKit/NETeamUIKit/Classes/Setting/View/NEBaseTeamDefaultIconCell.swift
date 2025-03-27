@@ -43,7 +43,7 @@ open class NEBaseTeamDefaultIconCell: UICollectionViewCell {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     contentView.addSubview(selectBackView)
     contentView.addSubview(iconImageView)
   }

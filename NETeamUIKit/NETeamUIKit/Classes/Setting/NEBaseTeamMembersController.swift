@@ -191,7 +191,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     ])
   }
 
-  func addObserver() {
+  open func addObserver() {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(textChange),
@@ -200,7 +200,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     )
   }
 
-  func isOwner(_ userId: String?) -> Bool {
+  open func isOwner(_ userId: String?) -> Bool {
     if isSenior == false {
       return false
     }
@@ -210,7 +210,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     return false
   }
 
-  func textChange() {
+  open func textChange() {
     viewModel.searchDatas.removeAll()
     if let text = searchTextField.text, text.count > 0 {
       for model in viewModel.datas {
@@ -226,7 +226,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     didNeedRefreshUI()
   }
 
-  func getRealModel(_ index: Int) -> NETeamMemberInfoModel? {
+  open func getRealModel(_ index: Int) -> NETeamMemberInfoModel? {
     if let text = searchTextField.text, text.count > 0 {
       return viewModel.searchDatas[index]
     }
@@ -289,7 +289,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
   /// 移除群成员
   /// - Parameter model: 成员信息
   /// - Parameter index: 成员索引
-  func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
+  open func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
     print("did click remove button")
     weak var weakSelf = self
     showAlert(title: localizable("remove_manager_title"), message: localizable("remove_member_tip")) {
@@ -327,7 +327,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     }
   }
 
-  func didNeedRefreshUI() {
+  open func didNeedRefreshUI() {
     if let text = searchTextField.text, text.count > 0 {
       emptyView.isHidden = viewModel.searchDatas.count > 0
     }

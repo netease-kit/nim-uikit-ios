@@ -51,7 +51,7 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
     navigationView.moreButton.isHidden = true
   }
 
-  func initNav() {
+  open func initNav() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -65,7 +65,7 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
     navigationView.moreButton.isHidden = true
   }
 
-  func commonUI() {
+  open func commonUI() {
     title = localizable("my_teams")
     initNav()
 
@@ -88,7 +88,7 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
     ])
   }
 
-  func loadData() {
+  open func loadData() {
     viewModel.getTeamList { [weak self] teams, error in
       if let err = error {
         print("getTeamList error: \(err)")

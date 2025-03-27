@@ -97,7 +97,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     commonUI(showDetail: false)
   }
 
-  func commonUI(showDetail: Bool) {
+  open func commonUI(showDetail: Bool) {
     NSLayoutConstraint.deactivate(labelConstraints)
     var titleConstraint = [NSLayoutConstraint]()
     var detailConstraint = [NSLayoutConstraint]()

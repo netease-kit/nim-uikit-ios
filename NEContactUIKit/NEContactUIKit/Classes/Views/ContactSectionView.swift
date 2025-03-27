@@ -19,7 +19,7 @@ open class ContactSectionView: UITableViewHeaderFooterView {
     super.init(coder: coder)
   }
 
-  func commonUI() {
+  open func commonUI() {
     contentView.backgroundColor = .white
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.backgroundColor = .white

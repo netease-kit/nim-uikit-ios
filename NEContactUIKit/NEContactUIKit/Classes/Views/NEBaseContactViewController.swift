@@ -8,7 +8,8 @@ import NECoreKit
 import UIKit
 
 @objc
-public protocol NEBaseContactViewControllerDelegate {
+public
+protocol NEBaseContactViewControllerDelegate: NSObjectProtocol {
   func onDataLoaded()
 }
 
@@ -188,7 +189,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   /// 清除未读数
-  func clearValidationUnreadCount() {
+  open func clearValidationUnreadCount() {
     viewModel.unreadCount = 0
   }
 
@@ -396,7 +397,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     }
   }
 
-  func didRefreshTable() {
+  open func didRefreshTable() {
     tableView.reloadData()
     emptyView.isHidden = viewModel.getFriendSections().count > 0
   }

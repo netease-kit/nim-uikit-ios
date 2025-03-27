@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class ContactUnCheckCell: NEBaseContactUnCheckCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     avatarImageView.layer.cornerRadius = 18
     NSLayoutConstraint.activate([
@@ -18,7 +18,7 @@ open class ContactUnCheckCell: NEBaseContactUnCheckCell {
     ])
   }
 
-  func setAvatarWH(_ height: CGFloat) {
+  open func setAvatarWH(_ height: CGFloat) {
     avatarImageView.layer.cornerRadius = height / 2
     avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: height)
     avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: height)
@@ -26,7 +26,7 @@ open class ContactUnCheckCell: NEBaseContactUnCheckCell {
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（ContactInfo）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? ContactInfo else { return }
 
     avatarImageView.configHeadData(

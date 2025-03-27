@@ -13,6 +13,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override public init(conversationId: String) {
     super.init(conversationId: conversationId)
+    normalInputHeight = 90
+    brokenNetworkViewHeight = 48
     cellRegisterDic = ChatMessageHelper.getChatCellRegisterDic(isFun: true)
   }
 
@@ -24,8 +26,6 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     super.viewDidLoad()
     view.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackground ?? .funChatBackgroundColor // 换肤颜色提取
 
-    normalInputHeight = 90
-    brokenNetworkViewHeight = 48
     navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
 
     topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
@@ -59,12 +59,12 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   /// 获取@列表视图控制器 - 通用版
-  override func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
+  override open func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
     FunSelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
   /// 获取文本详情页视图控制器 - 通用版
-  override func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
+  override open func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = super.getTextViewController(title: title, body: body)
     textViewController.view.backgroundColor = .funChatBackgroundColor
     return textViewController
@@ -136,7 +136,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     showCustomActionSheet([videoCallAction, audioCallAction])
   }
 
-  override func getUserSettingViewController() -> NEBaseUserSettingViewController {
+  override open func getUserSettingViewController() -> NEBaseUserSettingViewController {
     FunUserSettingViewController(userId: viewModel.sessionId)
   }
 
@@ -251,7 +251,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     }
   }
 
-  func getFunInputView() -> FunChatInputView? {
+  open func getFunInputView() -> FunChatInputView? {
     if let funInput = chatInputView as? FunChatInputView {
       return funInput
     }
@@ -393,7 +393,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     }
   }
 
-  func setInputValue() {
+  open func setInputValue() {
     if chatInputView.chatInpuMode == .normal {
       normalInputHeight = 90
     } else if chatInputView.chatInpuMode == .multipleSend {

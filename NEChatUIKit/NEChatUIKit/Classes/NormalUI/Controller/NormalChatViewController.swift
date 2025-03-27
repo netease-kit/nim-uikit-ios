@@ -46,7 +46,7 @@ open class NormalChatViewController: ChatViewController {
   }
 
   /// 获取@列表视图控制器 - 协同版
-  override func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
+  override open func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
     SelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 

@@ -7,7 +7,8 @@ import NEChatKit
 import NECommonUIKit
 import UIKit
 
-public protocol TopMessageViewDelegate: AnyObject {
+@objc
+public protocol TopMessageViewDelegate: NSObjectProtocol {
   func didClickCloseButton()
   func didTapTopMessageView()
 }

@@ -43,7 +43,7 @@ open class FunContactViewController: NEBaseContactViewController {
     }
   }
 
-  func changeLanguage() {
+  open func changeLanguage() {
     var contactHeaders = [ContactHeadItem]()
     if ContactUIConfig.shared.showHeader {
       contactHeaders = [

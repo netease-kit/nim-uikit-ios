@@ -8,14 +8,14 @@ import UIKit
 @objcMembers
 open class RecentSelectCell: NEBaseRecentSelectCell {
   /// 重写布局方法
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     setAvatarWH(36)
   }
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（MultiSelectModel）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? MultiSelectModel else { return }
 
     super.configure(model)

@@ -69,7 +69,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     }
   }
 
-  override func backEvent() {
+  override open func backEvent() {
     super.backEvent()
   }
 

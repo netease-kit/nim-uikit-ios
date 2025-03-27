@@ -54,7 +54,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
     setupUI()
   }
 
-  func setupUI() {
+  open func setupUI() {
     title = localizable("noteName")
     view.backgroundColor = .ne_lightBackgroundColor
 
@@ -70,7 +70,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
     }
   }
 
-  func saveAlias() {
+  open func saveAlias() {
     if let text = aliasInput.text,
        text.count > 0,
        text.trimmingCharacters(in: .whitespaces).isEmpty {

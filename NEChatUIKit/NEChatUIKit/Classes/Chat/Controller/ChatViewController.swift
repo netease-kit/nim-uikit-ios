@@ -506,7 +506,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   open func setOperationItems(items: inout [OperationItem], model: MessageContentModel?) {}
 
-  func removeOperationView(_ cellEndEditing: Bool = true) {
+  open func removeOperationView(_ cellEndEditing: Bool = true) {
     if operationView.isHidden == false {
       operationView.isHidden = true
     }
@@ -703,11 +703,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     title = titleContent
   }
 
-  func timeoutEndEditing() {
+  open func timeoutEndEditing() {
     remoteUserEndEditing()
   }
 
-  func trigerEndTimer() {
+  open func trigerEndTimer() {
     if let t = timer, t.isValid == true {
       t.invalidate()
       timer = nil
@@ -723,7 +723,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // MARK: - objc 方法
 
-  func getUserSettingViewController() -> NEBaseUserSettingViewController {
+  open func getUserSettingViewController() -> NEBaseUserSettingViewController {
     UserSettingViewController(userId: viewModel.sessionId)
   }
 
@@ -816,7 +816,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  func loadMoreData() {
+  open func loadMoreData() {
     weak var weakSelf = self
     viewModel.dropDownRemoteRefresh { error, count, messages in
       NEALog.infoLog(
@@ -836,9 +836,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  func loadFartherToNowData() {}
+  open func loadFartherToNowData() {}
 
-  func loadCloserToNowData() {
+  open func loadCloserToNowData() {
     weak var weakSelf = self
     viewModel.pullRemoteRefresh { error, count, datas in
       NEALog.infoLog(
@@ -854,7 +854,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  func addObseve() {
+  open func addObseve() {
     NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
 
@@ -892,7 +892,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     viewModel.isHistoryChat = false // 转为普通聊天页面
   }
 
-  func markNeedReadMsg() {
+  open func markNeedReadMsg() {
     if isCurrentPage, needMarkReadMsgs.count > 0 {
       viewModel.markRead(messages: needMarkReadMsgs) { [weak self] error in
         NEALog.infoLog(
@@ -907,11 +907,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  func appEnterBackground() {
+  open func appEnterBackground() {
     isCurrentPage = false
   }
 
-  func appEnterForegournd() {
+  open func appEnterForegournd() {
     isCurrentPage = true
     markNeedReadMsg()
   }
@@ -968,7 +968,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     layoutInputViewWithAnimation(offset: 0, animationDuration)
   }
 
-  private func scrollTableViewToBottom() {
+  open func scrollTableViewToBottom() {
     NEALog.infoLog(className(), desc: "self.viewModel.messages.count\(viewModel.messages.count)")
     NEALog.infoLog(className(), desc: "self.tableView.numberOfRows(inSection: 0)\(tableView.numberOfRows(inSection: 0))")
 
@@ -1083,7 +1083,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  func sendContentText(text: String?, attribute: NSAttributedString?) {
+  open func sendContentText(text: String?, attribute: NSAttributedString?) {
     guard let removeSpace = text?.trimmingCharacters(in: .whitespaces), removeSpace.count > 0 else {
       chatInputView.titleField.text = nil
       view.makeToast(chatLocalizable("null_message_not_support"), position: .center)
@@ -1221,7 +1221,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 跳转音视频呼叫页面
   /// - Parameter type: 呼叫类型，1 - 音频；2 - 视频
-  func useToCallViewRouter(_ type: Int) {
+  open func useToCallViewRouter(_ type: Int) {
     // 校验配置项
     if !IMKitConfigCenter.shared.enableOnlyFriendCall,
        !NEFriendUserCache.shared.isFriend(viewModel.sessionId) {
@@ -1242,7 +1242,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     Router.shared.use(CallViewRouter, parameters: param)
   }
 
-  func didToSearchLocationView() {
+  open func didToSearchLocationView() {
     var params = [String: Any]()
     params["type"] = NEMapType.search.rawValue
     params["nav"] = navigationController
@@ -1567,12 +1567,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameters:
   ///   - url: 原始路径
   ///   - displayName: 显示名称
-  func copyFileToSend(url: URL,
-                      displayName: String,
-                      isFile: Bool = true,
-                      width: Int32 = 0,
-                      height: Int32 = 0,
-                      duration: Int32 = 0) {
+  open func copyFileToSend(url: URL,
+                           displayName: String,
+                           isFile: Bool = true,
+                           width: Int32 = 0,
+                           height: Int32 = 0,
+                           duration: Int32 = 0) {
     let desPath = NSTemporaryDirectory() + "\(url.lastPathComponent)"
     let dirUrl = URL(fileURLWithPath: desPath)
     if !FileManager.default.fileExists(atPath: desPath) {
@@ -1901,7 +1901,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   // MARK: - audio play
 
-  func startPlaying(audioMessage: V2NIMMessage?, isSend: Bool) {
+  open func startPlaying(audioMessage: V2NIMMessage?, isSend: Bool) {
     guard let message = audioMessage, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
       return
     }
@@ -1938,7 +1938,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
-  private func startPlay(cell: ChatAudioCellProtocol?, model: MessageAudioModel?) {
+  open func startPlay(cell: ChatAudioCellProtocol?, model: MessageAudioModel?) {
     guard let isSend = model?.message?.isSelf else {
       return
     }
@@ -2006,12 +2006,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   //    MARK: - Private Method
 
-  private func recordDuration(filePath: String) -> Float64 {
+  open func recordDuration(filePath: String) -> Float64 {
     let avAsset = AVURLAsset(url: URL(fileURLWithPath: filePath))
     return CMTimeGetSeconds(avAsset.duration)
   }
 
-  private func insertRows(_ indexs: [IndexPath]) {
+  open func insertRows(_ indexs: [IndexPath]) {
     if !hasFirstLoadData {
       return
     }
@@ -2084,11 +2084,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   /// 获取@列表视图控制器 - 基类
-  func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
+  open func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
     NEBaseSelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
-  private func showUserSelectVC(showTeamMembers: Bool) {
+  open func showUserSelectVC(showTeamMembers: Bool) {
     let selectVC = getUserSelectVC(showTeamMembers: showTeamMembers)
     selectVC.modalPresentationStyle = .formSheet
     selectVC.selectedBlock = { [weak self] index, model in
@@ -2554,7 +2554,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   /// 取消多选
-  func cancelMutilSelect() {
+  open func cancelMutilSelect() {
     isMutilSelect = false
     viewModel.selectedMessages.removeAll()
     for model in viewModel.messages {
@@ -2571,7 +2571,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 设置输入框样式
   /// - Parameter edit: 是否显示输入框
-  func setInputView(edit: Bool) {
+  open func setInputView(edit: Bool) {
     chatInputView.isHidden = !edit
     mutilSelectBottomView.isHidden = edit
     bottomViewTopAnchor?.constant = edit ? -normalInputHeight : -100
@@ -2791,7 +2791,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 //    }
 
   /// 获取文本详情页视图控制器
-  func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
+  open func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = TextViewController(title: title, body: body)
     textViewController.view.backgroundColor = .white
     return textViewController
@@ -2897,7 +2897,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - cell: 消息所在单元格
   ///   - model: 消息模型
   ///   - replyIndex: 被回复消息的下标
-  func didTapAudioMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?) {
+  open func didTapAudioMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?) {
     guard let audioObject = model?.message?.attachment as? V2NIMMessageAudioAttachment else {
       return
     }
@@ -2923,7 +2923,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameters:
   ///   - model: 消息模型
   ///   - replyIndex: 被回复消息的下标
-  func didTapImageMessage(_ model: MessageContentModel?, _ replyIndex: Int? = nil) {
+  open func didTapImageMessage(_ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     guard let imageObject = model?.message?.attachment as? V2NIMMessageImageAttachment else {
       return
     }
@@ -2956,7 +2956,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - cell: 消息所在单元格
   ///   - model: 消息模型
   ///   - replyIndex: 被回复消息的下标
-  func didTapVideoMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
+  open func didTapVideoMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     guard let object = model?.message?.attachment as? V2NIMMessageVideoAttachment else {
       return
     }
@@ -2998,7 +2998,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - cell: 消息所在单元格
   ///   - model: 消息模型
   ///   - replyIndex: 被回复消息的下标
-  func didTapFileMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
+  open func didTapFileMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     guard let object = model?.message?.attachment as? V2NIMMessageFileAttachment else {
       return
     }
@@ -3031,7 +3031,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 单击音视频消息
   /// - Parameter model: 消息模型
-  func didTapCallMessage(_ model: MessageContentModel?) {
+  open func didTapCallMessage(_ model: MessageContentModel?) {
     guard let attachment = model?.message?.attachment as? V2NIMMessageCallAttachment else {
       return
     }
@@ -3042,7 +3042,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 单击地理位置消息
   /// - Parameters:
   ///   - model: 消息模型
-  func didTapLocationMessage(_ model: MessageContentModel?) {
+  open func didTapLocationMessage(_ model: MessageContentModel?) {
     if let locationModel = model as? MessageLocationModel,
        let lat = locationModel.lat,
        let lng = locationModel.lng {
@@ -3062,7 +3062,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - cell: 消息所在单元格
   ///   - model: 消息模型
   ///   - replyIndex: 被回复消息的下标
-  func didTapCustomMessage(_ model: MessageContentModel?, _ replyIndex: Int? = nil) {
+  open func didTapCustomMessage(_ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     guard let customType = model?.customType else {
       return
     }
@@ -3089,7 +3089,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - model: 消息模型
   ///   - url: 远端下载链接
   ///   - path: 本地保存路径
-  func downloadFile(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ url: String?, _ path: String) {
+  open func downloadFile(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ url: String?, _ path: String) {
     // 判断是否是视频或者文件对象
     guard let urlString = url, var fileModel = model as? MessageVideoModel else {
       NEALog.infoLog(ModuleName + " " + className(), desc: #function + "MessageFileModel not exit")
@@ -3135,7 +3135,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameters:
   ///   - message: 消息
   ///   - progress:（上传、下载）进度
-  func setModelProgress(_ message: V2NIMMessage?, _ progress: UInt) {
+  open func setModelProgress(_ message: V2NIMMessage?, _ progress: UInt) {
     for (i, model) in viewModel.messages.enumerated() {
       if model.message?.messageClientId == message?.messageClientId,
          let model = model as? MessageVideoModel {
@@ -3259,7 +3259,7 @@ extension ChatViewController: UIViewControllerTransitioningDelegate {
 extension ChatViewController: NEMutilSelectBottomViewDelegate {
   /// 移除不可转发的消息
   /// - Parameters invalidMessages: 不可转发的消息
-  func filterSelectedMessage(invalidMessages: [V2NIMMessage]) {
+  open func filterSelectedMessage(invalidMessages: [V2NIMMessage]) {
     // 取消勾选
     for msg in viewModel.selectedMessages {
       if invalidMessages.contains(msg) {
@@ -3476,7 +3476,7 @@ extension ChatViewController: ChatBaseCellDelegate {
   /// 点击消息发送者头像
   /// 拉取最新用户信息后刷新消息发送者信息
   /// - Parameter noti: 通知对象
-  func didTapHeader(_ noti: Notification) {
+  open func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
       if NEFriendUserCache.shared.isFriend(accid) {

@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class TeamTableViewCell: NEBaseTeamTableViewCell {
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     avatarImageView.layer.cornerRadius = 21
 

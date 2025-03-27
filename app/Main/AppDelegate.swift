@@ -20,7 +20,6 @@ import PushKit
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     public var window: UIWindow?
     
-    private var tabbarCtrl = UITabBarController()
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window?.backgroundColor = .white
         setupInit()
@@ -48,14 +47,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
         
-        // 初始化NIMSDK
+        // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
         let option = NIMSDKOption()
-        option.v2 = true
         option.appKey = AppKey.appKey
         option.apnsCername = AppKey.apnsCername
         option.pkCername = AppKey.pkCerName
-        IMKitClient.instance.setupIM(option)
-        
+
+      	// 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
+      	let v2Option = V2NIMSDKOption()
+      	v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
+
+      	// 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
+      	IMKitClient.instance.setupIM2(option, v2Option)
+
         NEAIUserManager.shared.setProvider(provider: self)
         NEKeyboardManager.shared.enable = true
         NEKeyboardManager.shared.shouldResignOnTouchOutside = true

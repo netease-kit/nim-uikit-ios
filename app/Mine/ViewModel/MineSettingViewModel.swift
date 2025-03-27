@@ -5,6 +5,7 @@
 
 import Foundation
 import NETeamUIKit
+import NIMSDK
 
 public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
@@ -12,6 +13,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didClickCleanCache()
   func didClickSDKConfig()
   func didClickLanguage()
+  func didChangeConversationType(_ cancel: @escaping (Bool) -> Void)
 }
 
 @objcMembers
@@ -62,6 +64,8 @@ public class MineSettingViewModel: NSObject {
 
   private func getSecondSection() -> SettingSectionModel {
     let model = SettingSectionModel()
+    weak var weakSelf = self
+
     // 听筒模式
     let receiverModel = SettingCellModel()
     receiverModel.cellName = localizable("receiver_mode")
@@ -106,20 +110,21 @@ public class MineSettingViewModel: NSObject {
     }
     model.cellModels.append(hasRead)
 
-    // 本地会话
-    let localConversationModel = SettingCellModel()
-    localConversationModel.cellName = localizable("local_conversation")
-    localConversationModel.type = SettingCellType.SettingSwitchCell.rawValue
-    localConversationModel.switchOpen = IMKitConfigCenter.shared.enableLocalConversation
-    localConversationModel.swichChange = { isOpen in
-      IMKitConfigCenter.shared.enableLocalConversation = isOpen
-      UserDefaults.standard.set(isOpen, forKey: "enableLocalConversation")
-      NotificationCenter.default.post(
-        name: Notification.Name(CHANGE_UI),
-        object: nil
-      )
+    // 云端会话
+    let cloudConversationModel = SettingCellModel()
+    cloudConversationModel.cellName = localizable("cloud_conversation")
+    cloudConversationModel.type = SettingCellType.SettingSwitchCell.rawValue
+    cloudConversationModel.switchOpen = (NIMSDK.shared().v2Option?.enableV2CloudConversation) ?? false
+    cloudConversationModel.swichChange = { isOpen in
+      weakSelf?.delegate?.didChangeConversationType { cancel in
+        if cancel {
+          cloudConversationModel.switchOpen = !isOpen
+        } else {
+          UserDefaults.standard.set(isOpen, forKey: keyEnableCloudConversation)
+        }
+      }
     }
-    model.cellModels.append(localConversationModel)
+    model.cellModels.append(cloudConversationModel)
 
     model.setCornerType()
     return model

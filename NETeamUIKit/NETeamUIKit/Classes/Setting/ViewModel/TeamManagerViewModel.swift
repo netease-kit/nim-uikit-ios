@@ -7,6 +7,7 @@ import NECommonKit
 import NIMSDK
 import UIKit
 
+@objc
 public protocol TeamManagerViewModelDelegate: NSObjectProtocol {
   /// 邀请权限变更回调
   /// - Parameter model: 设置数据模型
@@ -69,7 +70,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// - Parameter userId: 用户id
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getCurrentUserTeamMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
+  open func getCurrentUserTeamMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
     if let tid = teamId {
       teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, userId) { [weak self] member, error in
         if let currentMember = member {
@@ -249,7 +250,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   }
 
   /// 获取at权限值
-  func getTeamAtAllPermissionValue() -> String {
+  open func getTeamAtAllPermissionValue() -> String {
     if let custom = teamInfoModel?.team?.serverExtension {
       if let dic = NECommonUtil.getDictionaryFromJSONString(custom) as? [String: Any] {
         if let value = dic[keyAllowAtAll] as? String {
@@ -263,7 +264,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   }
 
   /// 获取置顶消息权限值
-  func getTeamTopMessagePermissionValue() -> String {
+  open func getTeamTopMessagePermissionValue() -> String {
     if let custom = teamInfoModel?.team?.serverExtension {
       if let dic = NECommonUtil.getDictionaryFromJSONString(custom) as? [String: Any] {
         if let value = dic[keyAllowTopMessage] as? String {
@@ -351,7 +352,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 群信息更新
   /// - Parameter teamId: 群id
-  private func updateTeamInfo(_ teamId: String) {
+  open func updateTeamInfo(_ teamId: String) {
     guard let tid = teamInfoModel?.team?.teamId else {
       return
     }
@@ -397,7 +398,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// - Parameter teamId:  群ID
   /// - Parameter nextToken: 下一页标识
   /// - Parameter completion:  完成回调
-  private func getAllTeamManagers(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
+  open func getAllTeamManagers(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
     let option = V2NIMTeamMemberQueryOption()
     option.limit = 100
     option.direction = .QUERY_DIRECTION_ASC

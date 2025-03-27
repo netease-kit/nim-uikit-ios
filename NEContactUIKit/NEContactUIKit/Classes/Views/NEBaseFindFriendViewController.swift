@@ -127,7 +127,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
     return true
   }
 
-  func textFieldChange() {
+  open func textFieldChange() {
     if let text = searchInput.text, text.count <= 0 {
       emptyView.isHidden = true
     }

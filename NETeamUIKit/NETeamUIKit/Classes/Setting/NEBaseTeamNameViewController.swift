@@ -205,13 +205,13 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
   }
 
   /// 清除文本
-  func clearText() {
+  open func clearText() {
     figureTextCount("")
   }
 
   /// 计算显示数量
   /// - Parameter text: 文本内容
-  func figureTextCount(_ text: String) {
+  open func figureTextCount(_ text: String) {
     textInputView.text = text
     countLabel.text = "\(text.utf16.count)/\(textLimit)"
     clearButton.isHidden = !getEditablePermission() || text.utf16.count <= 0

@@ -30,7 +30,7 @@ open class TextWithSwitchCell: ContactBaseTextCell {
     super.init(coder: coder)
   }
 
-  func valueChanged(switchBtn: UISwitch) {
+  open func valueChanged(switchBtn: UISwitch) {
     print("switchBtn:\(switchBtn.isOn)")
     if let block = block {
       block(titleLabel.text, switchBtn.isOn)

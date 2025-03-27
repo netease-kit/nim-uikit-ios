@@ -37,7 +37,7 @@ open class FusionContactSelectedViewModel: NSObject {
 
   /// 获取成员数据
   /// - Parameter filters: 过滤器
-  func loadMemberDatas(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
+  open func loadMemberDatas(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     if !NEFriendUserCache.shared.isEmpty() {
@@ -95,7 +95,7 @@ open class FusionContactSelectedViewModel: NSObject {
   }
 
   /// 获取数字人数据
-  func loadAIUserData(_ filters: Set<String>? = nil) {
+  open func loadAIUserData(_ filters: Set<String>? = nil) {
     let aiUsers = NEAIUserManager.shared.getAllAIUsers()
     for aiUser in aiUsers {
       if let accountId = aiUser.accountId {

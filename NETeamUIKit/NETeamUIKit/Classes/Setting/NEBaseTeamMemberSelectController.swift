@@ -239,7 +239,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
   }
 
   /// 选择成员变更回调，内部根据选择数量来做右上角状态变更
-  func didChangeSelectMember() {
+  open func didChangeSelectMember() {
     if viewModel.selectDic.count > 0 {
       let title = commonLocalizable("sure") + "(\(viewModel.selectDic.count))"
       navigationView.moreButton.setTitle(title, for: .normal)

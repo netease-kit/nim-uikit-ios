@@ -90,7 +90,7 @@ open class NEBaseContactViewCell: UITableViewCell {
     leftConstraint?.isActive = true
   }
 
-  func showNameOnCircleHeader(_ name: String) {
+  open func showNameOnCircleHeader(_ name: String) {
     nameLabel.text = name
       .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
   }

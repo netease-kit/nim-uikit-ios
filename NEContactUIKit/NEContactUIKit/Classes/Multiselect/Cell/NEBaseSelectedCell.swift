@@ -9,7 +9,7 @@ import UIKit
 @objcMembers
 open class NEBaseSelectedCell: NEBaseContactUnCheckCell {
   /// 重写布局方法
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     avatarImageView.layer.cornerRadius = 16
     avatarImageView.titleLabel.font = UIFont.systemFont(ofSize: 12.0)
@@ -23,7 +23,7 @@ open class NEBaseSelectedCell: NEBaseContactUnCheckCell {
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（MultiSelectModel）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? MultiSelectModel else { return }
 
     avatarImageView.configHeadData(

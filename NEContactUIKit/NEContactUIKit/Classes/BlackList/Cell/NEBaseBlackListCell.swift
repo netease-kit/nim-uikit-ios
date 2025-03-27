@@ -6,7 +6,7 @@ import NECoreIM2Kit
 import UIKit
 
 @objc
-protocol BlackListCellDelegate: AnyObject {
+public protocol BlackListCellDelegate: NSObjectProtocol {
   func removeUser(account: String?, index: Int)
 }
 
@@ -32,7 +32,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     super.init(coder: coder)
   }
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     button.layer.borderWidth = 1
     button.layer.cornerRadius = 4
@@ -62,7 +62,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     contentView.updateLayoutConstraint(firstItem: titleLabel, seconedItem: contentView, attribute: .right, constant: -80)
   }
 
-  func buttonEvent(sender: UIButton) {
+  open func buttonEvent(sender: UIButton) {
     delegate?.removeUser(account: model?.user?.accountId, index: index)
   }
 

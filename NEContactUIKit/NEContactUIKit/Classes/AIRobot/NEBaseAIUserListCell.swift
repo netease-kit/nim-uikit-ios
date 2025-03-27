@@ -60,7 +60,7 @@ open class NEBaseAIUserListCell: UITableViewCell {
   }
 
   /// 数据源与UI绑定
-  func configure(_ model: NEAIUserModel) {
+  open func configure(_ model: NEAIUserModel) {
     currentModel = model
     if let url = model.aiUser?.avatar, !url.isEmpty {
       aiUserHeaderView.sd_setImage(with: URL(string: url), completed: nil)

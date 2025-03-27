@@ -157,7 +157,7 @@ open class NotificationMessageUtils: NSObject {
   private class func textOfUpdateTeam(fromName: String,
                                       teamName: String,
                                       content: V2NIMMessageNotificationAttachment) -> String {
-    var text = fromName + chatLocalizable("has_updated") + teamName
+    let text = fromName + chatLocalizable("has_updated") + teamName
 
     guard let updatedTeamInfo = content.updatedTeamInfo else { return text }
 

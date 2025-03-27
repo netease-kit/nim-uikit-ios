@@ -14,7 +14,8 @@ public enum TranslateState: Int {
   case Use
 }
 
-@objc public protocol NETranslateViewDelegate: AnyObject {
+@objc
+public protocol NETranslateViewDelegate: NSObjectProtocol {
   /// 切换语言
   func didSwitchLanguageClick(_ currentLanguage: String?)
   /// 关闭

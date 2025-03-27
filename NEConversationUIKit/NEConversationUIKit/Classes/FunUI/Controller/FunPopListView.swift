@@ -17,7 +17,7 @@ open class FunPopListView: NEBasePopListView {
     return view
   }()
 
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
       shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),

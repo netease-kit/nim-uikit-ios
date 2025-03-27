@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct UserItem {
+public struct UserItem {
   var title = ""
   var detailTitle: String?
   var value = false

@@ -9,7 +9,7 @@ import UIKit
 @objcMembers
 open class FunSelectedCell: NEBaseSelectedCell {
   /// 重写布局方法
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     avatarImageView.layer.cornerRadius = 4
   }

@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class TeamListViewController: NEBaseTeamListViewController {
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white

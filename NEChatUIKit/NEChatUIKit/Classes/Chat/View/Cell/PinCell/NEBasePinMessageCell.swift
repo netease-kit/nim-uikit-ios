@@ -8,7 +8,7 @@ import NIMSDK
 import UIKit
 
 @objc
-public protocol PinMessageCellDelegate {
+public protocol PinMessageCellDelegate: NSObjectProtocol {
   func didClickMore(_ model: NEPinMessageModel?)
   func didClickContent(_ model: NEPinMessageModel?, _ cell: NEBasePinMessageCell)
 }

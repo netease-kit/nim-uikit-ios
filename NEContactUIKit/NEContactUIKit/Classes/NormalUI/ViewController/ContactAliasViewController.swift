@@ -17,7 +17,7 @@ open class ContactAliasViewController: NEBaseContactAliasViewController {
     }
   }
 
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     aliasInput.layer.cornerRadius = 8
 

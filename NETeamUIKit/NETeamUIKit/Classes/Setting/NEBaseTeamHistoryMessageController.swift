@@ -129,7 +129,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
   }
 
   /// 搜索历史消息
-  func toSearchHistory() {
+  open func toSearchHistory() {
     guard let searchText = searchTextField.text else {
       return
     }
@@ -181,7 +181,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
   }
 
   /// 监听键盘内容变化
-  func searchTextChanged() {
+  open func searchTextChanged() {
     if searchTextField.text?.isEmpty == true {
       toSearchHistory()
     }

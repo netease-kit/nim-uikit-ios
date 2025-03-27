@@ -29,7 +29,8 @@ public let atRangeOffset = 1
 public let atSegmentsKey = "segments"
 public let atTextKey = "text"
 
-public protocol ChatInputMultilineDelegate: NSObject {
+@objc
+public protocol ChatInputMultilineDelegate: NSObjectProtocol {
   func expandButtonDidClick()
   func didHideMultipleButtonClick()
 }
