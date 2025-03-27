@@ -10,235 +10,248 @@ import NIMSDK
 import UIKit
 
 class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
-    private var viewModel = MineSettingViewModel()
-    public var cellClassDic = [
-        SettingCellType.SettingArrowCell.rawValue: CustomTeamArrowSettingCell.self,
-        SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self,
-    ]
-    private var tag = "MineSettingViewController"
-    private let userDefault = UserDefaults.standard
-    
-    /// 设置列表
-    lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .clear
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.separatorColor = .clear
-        tableView.separatorStyle = .none
-        tableView.keyboardDismissMode = .onDrag
-        
-        tableView.estimatedRowHeight = 0
-        tableView.estimatedSectionHeaderHeight = 0
-        tableView.estimatedSectionFooterHeight = 0
-        
-        if #available(iOS 15.0, *) {
-            tableView.sectionHeaderTopPadding = 0.0
-        }
-        return tableView
-    }()
-    
-    /// 退出登录按钮
-    let logoutButton = UIButton()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
-        
-        viewModel.delegate = self
-        initialConfig()
-        setupSubviews()
-        changeLanguage()
+  private var viewModel = MineSettingViewModel()
+  public var cellClassDic = [
+    SettingCellType.SettingArrowCell.rawValue: CustomTeamArrowSettingCell.self,
+    SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self,
+  ]
+  private var tag = "MineSettingViewController"
+  private let userDefault = UserDefaults.standard
+
+  /// 设置列表
+  lazy var tableView: UITableView = {
+    let tableView = UITableView()
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.backgroundColor = .clear
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.separatorColor = .clear
+    tableView.separatorStyle = .none
+    tableView.keyboardDismissMode = .onDrag
+
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
+    if #available(iOS 15.0, *) {
+      tableView.sectionHeaderTopPadding = 0.0
     }
-    
-    override func didMove(toParent parent: UIViewController?) {
-        super.didMove(toParent: parent)
-        if parent == nil {
-            NotificationCenter.default.removeObserver(self)
-        }
+    return tableView
+  }()
+
+  /// 退出登录按钮
+  let logoutButton = UIButton()
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
+
+    viewModel.delegate = self
+    initialConfig()
+    setupSubviews()
+    changeLanguage()
+  }
+
+  override func didMove(toParent parent: UIViewController?) {
+    super.didMove(toParent: parent)
+    if parent == nil {
+      NotificationCenter.default.removeObserver(self)
     }
-    
-    @objc func changeLanguage() {
-        viewModel.getData()
-        title = localizable("setting")
-        tableView.tableFooterView = getFooterView()
-        tableView.reloadData()
+  }
+
+  @objc func changeLanguage() {
+    viewModel.getData()
+    title = localizable("setting")
+    tableView.tableFooterView = getFooterView()
+    tableView.reloadData()
+  }
+
+  func initialConfig() {
+    title = localizable("setting")
+
+    if NEStyleManager.instance.isNormalStyle() {
+      view.backgroundColor = .ne_backgroundColor
+      navigationView.backgroundColor = .ne_backgroundColor
+      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+    } else {
+      view.backgroundColor = .funChatBackgroundColor
     }
-    
-    func initialConfig() {
-        title = localizable("setting")
-        
-        if NEStyleManager.instance.isNormalStyle() {
-            view.backgroundColor = .ne_backgroundColor
-            navigationView.backgroundColor = .ne_backgroundColor
-            navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+  }
+
+  func setupSubviews() {
+    view.addSubview(tableView)
+    if NEStyleManager.instance.isNormalStyle() {
+      topConstant += 12
+    }
+    NSLayoutConstraint.activate([
+      tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+      tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+      tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
+
+    for (key, value) in cellClassDic {
+      tableView.register(value, forCellReuseIdentifier: "\(key)")
+    }
+
+    navigationView.moreButton.isHidden = true
+  }
+
+  func getFooterView() -> UIView? {
+    let footerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 64.0))
+    footerView.addSubview(logoutButton)
+    logoutButton.backgroundColor = .white
+    logoutButton.clipsToBounds = true
+    logoutButton.setTitleColor(UIColor(hexString: "0xE6605C"), for: .normal)
+    logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+    logoutButton.setTitle(title, for: .normal)
+    logoutButton.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
+    logoutButton.setTitle(localizable("logout"), for: .normal)
+    logoutButton.accessibilityIdentifier = "id.logout"
+    if NEStyleManager.instance.isNormalStyle() {
+      logoutButton.layer.cornerRadius = 8.0
+      logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
+    } else {
+      logoutButton.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        logoutButton.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
+        logoutButton.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
+        logoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
+        logoutButton.heightAnchor.constraint(equalToConstant: 40),
+      ])
+    }
+
+    return footerView
+  }
+
+  @objc func loginOutAction() {
+    weak var weakSelf = self
+    logoutButton.isEnabled = false
+
+    showAlert(message: localizable("want_to_logout")) {
+      IMKitClient.instance.logoutIM { error in
+        weakSelf?.logoutButton.isEnabled = true
+        if error != nil {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
+          weakSelf?.view.makeToast(error?.localizedDescription)
         } else {
-            view.backgroundColor = .funChatBackgroundColor
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
+          NotificationCenter.default.post(
+            name: Notification.Name("logout"),
+            object: nil
+          )
+
+          let config = IMSDKConfigManager.instance.getConfig()
+          config.accountId = nil
+          config.accountIdToken = nil
+          IMSDKConfigManager.instance.saveConfig(model: config)
+
+          NEFriendUserCache.shared.removeAllFriendInfo()
         }
+      }
     }
-    
-    func setupSubviews() {
-        view.addSubview(tableView)
-        if NEStyleManager.instance.isNormalStyle() {
-            topConstant += 12
-        }
-        NSLayoutConstraint.activate([
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        
-        for (key, value) in cellClassDic {
-            tableView.register(value, forCellReuseIdentifier: "\(key)")
-        }
-        
-        navigationView.moreButton.isHidden = true
+  }
+
+  // MARK: UITableViewDataSource, UITableViewDelegate
+
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      return model.cellModels.count
     }
-    
-    func getFooterView() -> UIView? {
-        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 64.0))
-        footerView.addSubview(logoutButton)
-        logoutButton.backgroundColor = .white
-        logoutButton.clipsToBounds = true
-        logoutButton.setTitleColor(UIColor(hexString: "0xE6605C"), for: .normal)
-        logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        logoutButton.setTitle(title, for: .normal)
-        logoutButton.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
-        logoutButton.setTitle(localizable("logout"), for: .normal)
-        logoutButton.accessibilityIdentifier = "id.logout"
-        if NEStyleManager.instance.isNormalStyle() {
-            logoutButton.layer.cornerRadius = 8.0
-            logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
-        } else {
-            logoutButton.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                logoutButton.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
-                logoutButton.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
-                logoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
-                logoutButton.heightAnchor.constraint(equalToConstant: 40),
-            ])
-        }
-        
-        return footerView
+    return 0
+  }
+
+  func numberOfSections(in tableView: UITableView) -> Int {
+    viewModel.sectionData.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let cell = tableView.dequeueReusableCell(
+      withIdentifier: "\(model.type)",
+      for: indexPath
+    ) as? NEBaseTeamSettingCell {
+      cell.configure(model)
+      cell.accessibilityIdentifier = "id.\(model.cellName ?? "config\(indexPath.section)\(indexPath.row)")"
+      return cell
     }
-    
-    @objc func loginOutAction() {
-        weak var weakSelf = self
-        logoutButton.isEnabled = false
-        
-        showAlert(message: localizable("want_to_logout")) {
-            IMKitClient.instance.logoutIM { error in
-                weakSelf?.logoutButton.isEnabled = true
-                if error != nil {
-                    NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
-                    weakSelf?.view.makeToast(error?.localizedDescription)
-                } else {
-                    NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
-                    NotificationCenter.default.post(
-                        name: Notification.Name("logout"),
-                        object: nil
-                    )
-                    
-                    let config = IMSDKConfigManager.instance.getConfig()
-                    config.accountId = nil
-                    config.accountIdToken = nil
-                    IMSDKConfigManager.instance.saveConfig(model: config)
-                    
-                    NEFriendUserCache.shared.removeAllFriendInfo()
-                }
-            }
-        }
+    return UITableViewCell()
+  }
+
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    if let block = model.cellClick {
+      block()
     }
-    
-    // MARK: UITableViewDataSource, UITableViewDelegate
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if viewModel.sectionData.count > section {
-            let model = viewModel.sectionData[section]
-            return model.cellModels.count
-        }
-        return 0
+  }
+
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
+    return model.rowHeight
+  }
+
+  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    if section == 0 {
+      return 0
     }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        viewModel.sectionData.count
+    if viewModel.sectionData.count > section {
+      let model = viewModel.sectionData[section]
+      if model.cellModels.count > 0 {
+        return 12.0
+      }
     }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-        if let cell = tableView.dequeueReusableCell(
-            withIdentifier: "\(model.type)",
-            for: indexPath
-        ) as? NEBaseTeamSettingCell {
-            cell.configure(model)
-            return cell
-        }
-        return UITableViewCell()
+    return 0
+  }
+
+  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let headerView = UIView()
+    headerView.backgroundColor = .clear
+    return headerView
+  }
+
+  func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    if section == viewModel.sectionData.count - 1 {
+      return 12.0
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-        if let block = model.cellClick {
-            block()
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let model = viewModel.sectionData[indexPath.section].cellModels[indexPath.row]
-        return model.rowHeight
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 {
-            return 0
-        }
-        if viewModel.sectionData.count > section {
-            let model = viewModel.sectionData[section]
-            if model.cellModels.count > 0 {
-                return 12.0
-            }
-        }
-        return 0
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        headerView.backgroundColor = .clear
-        return headerView
-    }
-    
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if section == viewModel.sectionData.count - 1 {
-            return 12.0
-        }
-        return 0
-    }
+    return 0
+  }
 }
 
 extension MineSettingViewController: MineSettingViewModelDelegate {
-    func didMessageRemindClick() {
-        let messageRemindCtrl = MessageRemindViewController()
-        navigationController?.pushViewController(messageRemindCtrl, animated: true)
+  func didMessageRemindClick() {
+    let messageRemindCtrl = MessageRemindViewController()
+    navigationController?.pushViewController(messageRemindCtrl, animated: true)
+  }
+
+  func didStyleClick() {
+    let styleSelectionCtrl = StyleSelectionViewController()
+    navigationController?.pushViewController(styleSelectionCtrl, animated: true)
+  }
+
+  func didClickCleanCache() {}
+
+  func didClickSDKConfig() {
+    let configController = IMSDKConfigViewController()
+    navigationController?.pushViewController(configController, animated: true)
+  }
+
+  func didClickLanguage() {
+    let configController = LanguageViewController()
+    navigationController?.pushViewController(configController, animated: true)
+  }
+
+  func didChangeConversationType(_ cancel: @escaping (Bool) -> Void) {
+    weak var weakSelf = self
+    showAlert(message: localizable("restart_tips"),
+              sureText: localizable("exit"),
+              sureTextColor: UIColor(hexString: "0xE6605C")) {
+      cancel(false)
+      exit(0)
+    } cancelBack: {
+      cancel(true)
+      weakSelf?.tableView.reloadData()
     }
-    
-    func didStyleClick() {
-        let styleSelectionCtrl = StyleSelectionViewController()
-        navigationController?.pushViewController(styleSelectionCtrl, animated: true)
-    }
-    
-    func didClickCleanCache() {}
-    
-    
-    func didClickSDKConfig() {
-        let configController = IMSDKConfigViewController()
-        navigationController?.pushViewController(configController, animated: true)
-    }
-    
-    func didClickLanguage() {
-        let configController = LanguageViewController()
-        navigationController?.pushViewController(configController, animated: true)
-    }
+  }
 }

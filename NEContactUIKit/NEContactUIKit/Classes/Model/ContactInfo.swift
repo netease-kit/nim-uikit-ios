@@ -15,7 +15,7 @@ import UIKit
  */
 @objcMembers
 open class ContactInfo: NSObject {
-  func getRowHeight() -> CGFloat? {
+  open func getRowHeight() -> CGFloat? {
     nil
   }
 

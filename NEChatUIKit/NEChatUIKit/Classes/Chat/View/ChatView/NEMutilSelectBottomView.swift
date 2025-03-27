@@ -5,6 +5,7 @@
 import Foundation
 import UIKit
 
+@objc
 public protocol NEMutilSelectBottomViewDelegate: NSObjectProtocol {
   func didClickSingleForwardButton()
   func didClickMultiForwardButton()

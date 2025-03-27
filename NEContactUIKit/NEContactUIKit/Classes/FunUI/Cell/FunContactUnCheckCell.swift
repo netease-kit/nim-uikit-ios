@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class FunContactUnCheckCell: NEBaseContactUnCheckCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     avatarImageView.layer.cornerRadius = 4
     NSLayoutConstraint.activate([
@@ -20,7 +20,7 @@ open class FunContactUnCheckCell: NEBaseContactUnCheckCell {
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（ContactInfo）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? ContactInfo else { return }
 
     avatarImageView.configHeadData(

@@ -83,7 +83,7 @@ open class NEBaseConversationSearchCell: TextBaseCell {
     }
   }
 
-  func getRangeTextColor() -> UIColor {
+  open func getRangeTextColor() -> UIColor {
     UIColor.ne_normalTheme
   }
 }

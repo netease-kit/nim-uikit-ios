@@ -147,7 +147,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
   /// 更新编辑群信息权限为任意群成员可以发at消息
   /// - Parameter model: 数据模型
-  func updateEditTeamInfoPermissionToEveryone(_ model: SettingCellModel) {
+  open func updateEditTeamInfoPermissionToEveryone(_ model: SettingCellModel) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateTeamInfoPrivilege(weakSelf?.viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_ALL) { error, team in
@@ -174,7 +174,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
   /// 更新编辑群信权限为管理员可发送权限
   /// - Parameter model: 数据模型
-  func updateEditTeamInfoPermissionToManager(_ model: SettingCellModel) {
+  open func updateEditTeamInfoPermissionToManager(_ model: SettingCellModel) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateTeamInfoPrivilege(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_MANAGER) { error, team in
@@ -201,7 +201,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
   /// 更新邀请模式为管理员可邀请
   /// - Parameter model: 数据模型
-  func updateInvitePermissionToManager(_ model: SettingCellModel) {
+  open func updateInvitePermissionToManager(_ model: SettingCellModel) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateInviteMode(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_INVITE_MODE_MANAGER) { error, team in
@@ -228,7 +228,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
   /// 更新邀请人权限为所有人
   /// - Parameter model: 数据模型
-  func updateInvitePermissionToEveryone(_ model: SettingCellModel) {
+  open func updateInvitePermissionToEveryone(_ model: SettingCellModel) {
     if viewModel.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL {
       showToast(commonLocalizable("failed_operation"))
       return

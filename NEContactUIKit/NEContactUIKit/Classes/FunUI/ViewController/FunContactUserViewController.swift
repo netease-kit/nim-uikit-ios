@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class FunContactUserViewController: NEBaseContactUserViewController {
-  func initFun() {
+  open func initFun() {
     className = "FunContactUserViewController"
     headerView = FunUserInfoHeaderView()
   }

@@ -18,7 +18,7 @@ open class BlackListViewController: NEBaseBlackListViewController {
     super.init(coder: coder)
   }
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     navigationView.backgroundColor = .white
     navigationController?.navigationBar.backgroundColor = .white

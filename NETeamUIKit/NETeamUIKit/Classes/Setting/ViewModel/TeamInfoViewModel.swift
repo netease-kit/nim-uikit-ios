@@ -7,7 +7,8 @@ import NECoreIM2Kit
 import NIMSDK
 
 /// 群信息变更回调协议
-@objc public protocol NETeamInfoDelegate: NSObjectProtocol {
+@objc
+public protocol NETeamInfoDelegate: NSObjectProtocol {
   /// 群信息变更
   func teamInfoDidUpdate(_ team: V2NIMTeam)
 }
@@ -33,7 +34,7 @@ open class TeamInfoViewModel: NSObject, NETeamListener {
 
   /// 获取群信息
   /// - Parameter team: 群
-  func getData(_ team: V2NIMTeam?) {
+  open func getData(_ team: V2NIMTeam?) {
     v2Team = team
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(team?.teamId ?? "nil")")
     cellDatas.removeAll()

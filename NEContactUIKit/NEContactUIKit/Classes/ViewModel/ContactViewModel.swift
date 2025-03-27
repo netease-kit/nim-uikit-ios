@@ -8,6 +8,7 @@ import NECoreIM2Kit
 import NECoreKit
 import UIKit
 
+@objc
 public protocol ContactViewModelDelegate: NSObjectProtocol {
   func reloadTableView()
 }
@@ -70,7 +71,7 @@ open class ContactViewModel: NSObject {
     }
   }
 
-  func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
+  open func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     if NEFriendUserCache.shared.isRequesting {
@@ -97,7 +98,7 @@ open class ContactViewModel: NSObject {
     }
   }
 
-  func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
+  open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
     // 优选从缓存中取
@@ -128,7 +129,7 @@ open class ContactViewModel: NSObject {
   ///   - friends: 好友列表
   ///   - filters: 过滤列表
   /// - Returns: 格式化后的好友列表
-  func formatData(_ friends: [NEUserWithFriend]?, _ filters: Set<String>? = nil) -> [ContactSection] {
+  open func formatData(_ friends: [NEUserWithFriend]?, _ filters: Set<String>? = nil) -> [ContactSection] {
     var contactList: [ContactSection] = []
     if var users = friends {
       initalDict = [String: [ContactInfo]]()
@@ -205,12 +206,12 @@ open class ContactViewModel: NSObject {
 
   /// 返回好友列表
   /// - Returns: 不包含顶部预设数据（验证消息、黑名单、我的群聊）的好友列表
-  func getFriendSections() -> [ContactSection] {
+  open func getFriendSections() -> [ContactSection] {
     let friendSections = contacts.filter { $0.initial != "" }
     return friendSections
   }
 
-  func getAddApplicationUnreadCount(_ completion: ((Int, NSError?) -> Void)?) {
+  open func getAddApplicationUnreadCount(_ completion: ((Int, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.getUnreadApplicationCount { [weak self] count, error in
       self?.unreadCount = count
@@ -218,7 +219,7 @@ open class ContactViewModel: NSObject {
     }
   }
 
-  func headerSection(headerItem: [ContactHeadItem]?) -> ContactSection? {
+  open func headerSection(headerItem: [ContactHeadItem]?) -> ContactSection? {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", headerItem.count: \(headerItem?.count ?? 0)")
     guard let header = headerItem else {
       return nil
@@ -235,7 +236,7 @@ open class ContactViewModel: NSObject {
     return ContactSection(initial: "", contacts: infos)
   }
 
-  func getIndexs(contactSections: [ContactSection]?) -> [String]? {
+  open func getIndexs(contactSections: [ContactSection]?) -> [String]? {
     // ["A"..."Z", "#"]
     let idx = UnicodeScalar("A").value ... UnicodeScalar("Z").value
     var indexs = (idx.map { String(UnicodeScalar($0)!) })
@@ -287,7 +288,7 @@ extension ContactViewModel: NEContactListener {
 
   /// 从通讯录中移除
   /// - Parameter accountId: 好友 Id
-  func removeFromContacts(_ accountId: String) {
+  open func removeFromContacts(_ accountId: String) {
     for (title, section) in contacts.enumerated() {
       for (i, contact) in section.contacts.enumerated() {
         if contact.user?.user?.accountId == accountId {

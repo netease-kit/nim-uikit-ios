@@ -33,7 +33,7 @@ open class FunConversationSearchCell: NEBaseConversationSearchCell {
     ])
   }
 
-  override func getRangeTextColor() -> UIColor {
+  override open func getRangeTextColor() -> UIColor {
     UIColor.ne_funTheme
   }
 }

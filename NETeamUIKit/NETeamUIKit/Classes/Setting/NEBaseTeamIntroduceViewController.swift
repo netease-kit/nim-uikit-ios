@@ -108,7 +108,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   }
 
   /// 保存简介
-  func saveIntr() {
+  open func saveIntr() {
     textView.resignFirstResponder()
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
@@ -141,14 +141,14 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   }
 
   /// 计算当前输入字数
-  func figureTextCount(_ text: String) {
+  open func figureTextCount(_ text: String) {
     textView.text = text
     countLabel.text = "\(text.utf16.count)/\(textLimit)"
     clearButton.isHidden = !getPermission() || text.utf16.count <= 0
   }
 
   /// 清空输入
-  func clearText() {
+  open func clearText() {
     figureTextCount("")
   }
 

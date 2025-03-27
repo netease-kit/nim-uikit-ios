@@ -8,7 +8,7 @@ import UIKit
 
 @objcMembers
 open class TeamDefaultIconCell: NEBaseTeamDefaultIconCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
       selectBackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),

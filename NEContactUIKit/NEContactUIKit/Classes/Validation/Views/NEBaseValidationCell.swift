@@ -7,7 +7,8 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
-public protocol SystemNotificationCellDelegate: AnyObject {
+@objc
+public protocol SystemNotificationCellDelegate: NSObjectProtocol {
   func onAccept(_ notifiModel: NENotification)
   func onRefuse(_ notifiModel: NENotification)
 }

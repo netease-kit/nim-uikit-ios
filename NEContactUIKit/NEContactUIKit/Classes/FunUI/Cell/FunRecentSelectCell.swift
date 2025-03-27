@@ -8,7 +8,7 @@ import UIKit
 @objcMembers
 open class FunRecentSelectCell: NEBaseRecentSelectCell {
   /// 重写布局方法
-  override func setupUI() {
+  override open func setupUI() {
     avatarImageView.layer.cornerRadius = 4
     contentView.addSubview(avatarImageView)
     NSLayoutConstraint.activate([
@@ -39,7 +39,7 @@ open class FunRecentSelectCell: NEBaseRecentSelectCell {
 
   /// 重写控件赋值方法
   /// - Parameter model: 数据模型（MultiSelectModel）
-  override func configure(_ model: Any) {
+  override open func configure(_ model: Any) {
     guard let model = model as? MultiSelectModel else { return }
 
     super.configure(model)

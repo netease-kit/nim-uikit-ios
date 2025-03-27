@@ -7,7 +7,7 @@ import NECommonUIKit
 import UIKit
 
 @objc
-public protocol CollectionMessageCellDelegate {
+public protocol CollectionMessageCellDelegate: NSObjectProtocol {
   func didClickMore(_ model: CollectionMessageModel?)
   func didClickContent(_ model: CollectionMessageModel?, _ cell: NEBaseCollectionMessageCell)
 }

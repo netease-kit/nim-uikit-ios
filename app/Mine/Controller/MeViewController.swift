@@ -27,11 +27,10 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     tableView.rowHeight = 52
     tableView.keyboardDismissMode = .onDrag
 
-    if #available(iOS 11.0, *) {
-      tableView.estimatedRowHeight = 0
-      tableView.estimatedSectionHeaderHeight = 0
-      tableView.estimatedSectionFooterHeight = 0
-    }
+    tableView.estimatedRowHeight = 0
+    tableView.estimatedSectionHeaderHeight = 0
+    tableView.estimatedSectionFooterHeight = 0
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0.0
     }
@@ -128,25 +127,16 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   func setupSubviews() {
     // 顶部视图
     view.addSubview(header)
-    if #available(iOS 11.0, *) {
-      NSLayoutConstraint.activate([
-        header.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-        header.topAnchor.constraint(
-          equalTo: self.view.safeAreaLayoutGuide.topAnchor,
-          constant: 32
-        ),
-        header.widthAnchor.constraint(equalToConstant: 60),
-        header.heightAnchor.constraint(equalToConstant: 60),
-      ])
-    } else {
-      // Fallback on earlier versions
-      NSLayoutConstraint.activate([
-        header.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-        header.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
-        header.widthAnchor.constraint(equalToConstant: 60),
-        header.heightAnchor.constraint(equalToConstant: 60),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      header.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+      header.topAnchor.constraint(
+        equalTo: view.safeAreaLayoutGuide.topAnchor,
+        constant: 32
+      ),
+      header.widthAnchor.constraint(equalToConstant: 60),
+      header.heightAnchor.constraint(equalToConstant: 60),
+    ])
+
     header.clipsToBounds = true
     if NEStyleManager.instance.isNormalStyle() {
       header.layer.cornerRadius = 30
@@ -235,24 +225,25 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
 }
 
 extension MeViewController: UITableViewDelegate, UITableViewDataSource {
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewModel.mineData.count
   }
 
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  open func tableView(_ tableView: UITableView,
+                      cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     if let cell = tableView.dequeueReusableCell(
       withIdentifier: "\(NSStringFromClass(MineTableViewCell.self))",
       for: indexPath
     ) as? MineTableViewCell {
       let cellTitle = viewModel.mineData[indexPath.row]
       cell.configCell(data: cellTitle)
+      cell.accessibilityIdentifier = "id.\(cellTitle)"
       return cell
     }
     return MineTableViewCell()
   }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if IMKitConfigCenter.shared.enableCollectionMessage {
       if indexPath.row == 0 {
         let ctrl = MineSettingViewController()
@@ -280,7 +271,7 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
     }
   }
 
-  public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let navigationController = navigationController,
        navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
        gestureRecognizer == navigationController.interactivePopGestureRecognizer,

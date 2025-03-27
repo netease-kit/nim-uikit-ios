@@ -13,7 +13,7 @@ open class ContactUserViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "ContactUserViewModel"
 
-  func addFriend(_ account: String, _ completion: @escaping (Error?) -> Void) {
+  open func addFriend(_ account: String, _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
     let params = V2NIMFriendAddParams()
     params.addMode = .FRIEND_MODE_TYPE_APPLAY

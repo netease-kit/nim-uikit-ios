@@ -75,7 +75,7 @@ open class NETeamBaseViewController: UIViewController, UIGestureRecognizerDelega
     }
   }
 
-  private func setupBackUI() {
+  open func setupBackUI() {
     let image = coreLoader.loadImage("backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -105,7 +105,7 @@ open class NETeamBaseViewController: UIViewController, UIGestureRecognizerDelega
     view.addGestureRecognizer(gestureRecognizer)
   }
 
-  func swipeDismiss(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
+  open func swipeDismiss(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
     if gestureRecognizer.state == .ended {
       navigationController?.dismiss(animated: true, completion: nil)
     }

@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers
 open class FunTeamListViewController: NEBaseTeamListViewController {
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     tableView.register(
       FunTeamTableViewCell.self,

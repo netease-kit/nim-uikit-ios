@@ -7,6 +7,7 @@ import NEChatKit
 import NECoreIM2Kit
 import NECoreKit
 
+@objc
 public protocol ValidationMessageViewModelDelegate: NSObjectProtocol {
   func tableviewReload()
 }
@@ -32,7 +33,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   /// 加载(更多)好友申请消息
   /// - Parameter firstLoad: 是否是首次加载
   /// - Parameter completin: 完成回调
-  func loadApplicationList(_ firstLoad: Bool, _ completin: @escaping (Error?) -> Void) {
+  open func loadApplicationList(_ firstLoad: Bool, _ completin: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     let offset = firstLoad ? 0 : offset
@@ -72,15 +73,14 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   ///   - item: 验证消息
   ///   - move: 是否移动到最前
   ///   - completin: 完成回调
-  func convertToValidationMessage(_ item: V2NIMFriendAddApplication,
-                                  _ move: Bool = false,
-                                  _ completin: @escaping (Error?) -> Void) {
+  open func convertToValidationMessage(_ item: V2NIMFriendAddApplication,
+                                       _ move: Bool = false,
+                                       _ completin: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     var isExist = false
     for (index, neItem) in friendAddApplications.enumerated() {
       if neItem.isEqualTo(item) {
         isExist = true
-        let indexPath = IndexPath(row: index, section: 0)
 
         // 未读数
         if item.read == false {
@@ -136,7 +136,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
 
   /// 设置所有好友申请已读
   /// - Parameter completion: 完成回调
-  func setAddApplicationRead(_ completion: ((Bool, NSError?) -> Void)?) {
+  open func setAddApplicationRead(_ completion: ((Bool, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.setAddApplicationRead { [weak self] success, error in
       self?.friendAddApplications.forEach { application in
@@ -154,8 +154,8 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 申请添加好友的相关信息
   ///   - status: 好友申请的处理状态
-  func changeApplicationStatus(_ application: V2NIMFriendAddApplication,
-                               _ status: V2NIMFriendAddApplicationStatus) {
+  open func changeApplicationStatus(_ application: V2NIMFriendAddApplication,
+                                    _ status: V2NIMFriendAddApplicationStatus) {
     var changedIndex = -1
     for (index, item) in friendAddApplications.enumerated() {
       if item.isEqualTo(application, false) {
@@ -182,8 +182,8 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 好友申请
   ///   - completion: 完成回调
-  func agreeRequest(application: V2NIMFriendAddApplication,
-                    _ completion: @escaping (Error?) -> Void) {
+  open func agreeRequest(application: V2NIMFriendAddApplication,
+                         _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
     contactRepo.acceptAddApplication(application: application) { [weak self] error in
       if let err = error {
@@ -203,8 +203,8 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 好友申请
   ///   - completion: 完成回调
-  func refuseRequest(application: V2NIMFriendAddApplication,
-                     _ completion: @escaping (Error?) -> Void) {
+  open func refuseRequest(application: V2NIMFriendAddApplication,
+                          _ completion: @escaping (Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
     contactRepo.rejectAddApplication(application: application) { [weak self] error in
       if let err = error {
@@ -217,7 +217,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   }
 
   /// 清空好友申请通知
-  func clearNotification(_ completion: @escaping (NSError?) -> Void) {
+  open func clearNotification(_ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.clearNotification { [weak self] error in
       if let err = error {
@@ -246,7 +246,7 @@ open class ValidationMessageViewModel: NSObject, NEContactListener {
   open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
-    for (index, item) in friendAddApplications.enumerated() {
+    for item in friendAddApplications {
       if item.v2Notification.applicantAccountId == IMKitClient.instance.account(),
          item.v2Notification.recipientAccountId == rejectionInfo.operatorAccountId {
         item.handleStatus = .FRIEND_ADD_APPLICATION_STATUS_REJECED

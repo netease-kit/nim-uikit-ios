@@ -476,7 +476,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   }
 
   /// 添加好友
-  func didAddUser(_ accids: [String], _ tid: String) {
+  open func didAddUser(_ accids: [String], _ tid: String) {
     weak var weakSelf = self
     view.makeToastActivity(.center)
 
@@ -498,7 +498,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   }
 
   /// 解散群聊
-  func dismissTeam() {
+  open func dismissTeam() {
     if let tid = teamId {
       weak var weakSelf = self
       view.makeToastActivity(.center)
@@ -518,14 +518,14 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   }
 
   /// 刷新群成员个数
-  func refreshMemberCount() {
+  open func refreshMemberCount() {
     if let count = viewModel.teamInfoModel?.team?.memberCount {
       memberCountLabel.text = "\(count)"
     }
   }
 
   /// 离开群聊
-  func leaveTeam() {
+  open func leaveTeam() {
     if let tid = teamId {
       view.makeToastActivity(.center)
       viewModel.leaveTeam(tid) { [weak self] error in
@@ -585,7 +585,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   open func checkoutAddShowOrHide() {}
 
-  func updateInviteModeOwnerAction(_ model: SettingCellModel) {
+  open func updateInviteModeOwnerAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_MANAGER) { error, team in
@@ -604,7 +604,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     }
   }
 
-  func updateInviteModeAllAction(_ model: SettingCellModel) {
+  open func updateInviteModeAllAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_ALL) { error, team in
@@ -656,7 +656,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     navigationController?.present(actionSheetController, animated: true, completion: nil)
   }
 
-  func updateTeamInfoOwnerAction(_ model: SettingCellModel) {
+  open func updateTeamInfoOwnerAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo
@@ -676,7 +676,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
       }
   }
 
-  func updateTeamInfoAllAction(_ model: SettingCellModel) {
+  open func updateTeamInfoAllAction(_ model: SettingCellModel) {
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo

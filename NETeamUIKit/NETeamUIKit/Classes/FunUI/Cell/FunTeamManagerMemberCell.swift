@@ -5,18 +5,7 @@
 import UIKit
 
 class FunTeamManagerMemberCell: FunTeamMemberCell {
-  override func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     ownerLabel.isHidden = true
   }

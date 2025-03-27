@@ -41,7 +41,7 @@ open class ContactBaseTextCell: UITableViewCell {
     super.init(coder: coder)
   }
 
-  func setModel(model: UserItem) {
+  open func setModel(model: UserItem) {
     titleLabel.text = model.title
   }
 }

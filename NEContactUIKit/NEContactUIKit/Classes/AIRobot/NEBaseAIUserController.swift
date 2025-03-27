@@ -167,7 +167,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
     )
   }
 
-  func isLastAIUser(_ index: Int) -> Bool {
+  open func isLastAIUser(_ index: Int) -> Bool {
     if let text = searchAIUserTextField.text, text.count > 0 {
       if viewModel.searchDatas.count - 1 == index {
         return true
@@ -181,7 +181,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
 
   /// 判断该当前是搜索列表还是内容列表
   /// - Parameter index: 列表索引
-  func getRealAIUserModel(_ index: Int) -> NEAIUserModel? {
+  open func getRealAIUserModel(_ index: Int) -> NEAIUserModel? {
     if let text = searchAIUserTextField.text, text.count > 0 {
       return viewModel.searchDatas[index]
     }
@@ -189,7 +189,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   }
 
   /// 添加输入框变更监听
-  func addTextFiledObserver() {
+  open func addTextFiledObserver() {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(textChange),
@@ -199,7 +199,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   }
 
   /// 输入变更
-  func textChange() {
+  open func textChange() {
     viewModel.searchDatas.removeAll()
     if let text = searchAIUserTextField.text, text.count > 0 {
       for model in viewModel.datas {

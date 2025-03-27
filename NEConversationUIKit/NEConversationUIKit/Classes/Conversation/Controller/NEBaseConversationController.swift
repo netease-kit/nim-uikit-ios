@@ -9,7 +9,7 @@ import NECommonKit
 import NIMSDK
 
 @objc
-public protocol NEBaseConversationControllerDelegate {
+public protocol NEBaseConversationControllerDelegate: NSObjectProtocol {
   func onDataLoaded()
 }
 
@@ -20,8 +20,8 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   public var deleteButtonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
 
   public var brokenNetworkViewHeight = 36.0
-  private var bodyTopViewHeightAnchor: NSLayoutConstraint?
-  private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
+  public var bodyTopViewHeightAnchor: NSLayoutConstraint?
+  public var bodyBottomViewHeightAnchor: NSLayoutConstraint?
   public var contentViewTopAnchor: NSLayoutConstraint?
   public var topConstant: CGFloat = 0
   public var popListView = NEBasePopListView()
@@ -193,7 +193,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   }()
 
   /// 置顶内容展示列表
-  lazy var stickTopCollcetionView: UICollectionView = {
+  public lazy var stickTopCollcetionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 0
@@ -300,7 +300,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     }
   }
 
-  func initSystemNav() {
+  open func initSystemNav() {
     edgesForExtendedLayout = []
 
     let brandBarBtn = UIButton()
@@ -364,7 +364,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     viewModel.delegate = self
   }
 
-  func loadMoreData() {
+  open func loadMoreData() {
     viewModel.getConversationListByPage { [weak self] error, finishied in
       self?.isRequestedData = true
       if let end = finishied, end == true {
@@ -380,7 +380,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     }
   }
 
-  func requestData() {
+  open func requestData() {
     viewModel.getConversationListByPage { [weak self] error, finished in
       self?.viewModel.getAIUserList()
 
@@ -415,7 +415,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
 extension NEBaseConversationController: TabNavigationViewDelegate {
   /// 标题栏左侧按钮点击事件
-  func brandBtnClick() {
+  open func brandBtnClick() {
     ConversationUIConfig.shared.titleBarLeftClick?(self)
   }
 
@@ -820,7 +820,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
   /// 非置顶变为置顶
   ///  - Parameter conversation: 会话
-  private func moveNormalConversationToTop(conversation: V2NIMConversation) {
+  open func moveNormalConversationToTop(conversation: V2NIMConversation) {
     var addModel: NEConversationListModel?
     viewModel.conversationListData.removeAll(where: { model in
       if model.conversation?.conversationId == conversation.conversationId {
@@ -836,7 +836,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
   /// 置顶变为非置顶
   ///  - Parameter conversation: 会话
-  private func moveTopToNormalConversation(conversation: V2NIMConversation) {
+  open func moveTopToNormalConversation(conversation: V2NIMConversation) {
     var addModel: NEConversationListModel?
     viewModel.stickTopConversations.removeAll(where: { model in
       if model.conversation?.conversationId == conversation.conversationId {
@@ -855,10 +855,10 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   /// - Parameter indexPath: 索引
   /// - Parameter isTop: 置顶
   /// - Parameter completion: 完成回调
-  func onTopRecentAtIndexPath(conversation: V2NIMConversation, indexPath: IndexPath,
-                              isTop: Bool,
-                              _ completion: @escaping (NSError?)
-                                -> Void) {
+  open func onTopRecentAtIndexPath(conversation: V2NIMConversation, indexPath: IndexPath,
+                                   isTop: Bool,
+                                   _ completion: @escaping (NSError?)
+                                     -> Void) {
     weak var weakSelf = self
     if isTop == true {
       viewModel.removeStickTop(conversation: conversation) { error in

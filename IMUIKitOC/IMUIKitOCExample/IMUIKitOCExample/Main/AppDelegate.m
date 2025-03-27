@@ -42,10 +42,15 @@
 }
 
 - (void)setupInit {
-  // 初始化NIMSDK
+  // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
   NIMSDKOption *option = [NIMSDKOption optionWithAppKey:AppKey];
-  option.v2 = YES;
-  [[IMKitClient instance] setupIM:option];
+
+  // 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
+  V2NIMSDKOption *v2Option = [[V2NIMSDKOption alloc] init];
+  v2Option.enableV2CloudConversation = false;
+
+  // 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
+  [IMKitClient.instance setupIM2:option :v2Option];
 
   // 统一登录组件
   YXConfig *config = [[YXConfig alloc] init];

@@ -9,7 +9,8 @@ import NECoreIM2Kit
 import NIMSDK
 
 @objc
-public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
+public
+protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
   @objc optional func onTeamRemoved(team: V2NIMTeam)
   @objc optional func onTeamUpdate(team: V2NIMTeam)
   @objc optional func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember])

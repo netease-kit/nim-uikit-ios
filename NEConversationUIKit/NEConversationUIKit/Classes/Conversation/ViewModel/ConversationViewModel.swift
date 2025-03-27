@@ -83,12 +83,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
   }
 
-  func atMessageChange() {
+  open func atMessageChange() {
     NEALog.infoLog(className(), desc: "atMessageChange")
     delegate?.reloadTableView()
   }
 
-  func deleteConversationNoti(_ noti: NSNotification) {
+  open func deleteConversationNoti(_ noti: NSNotification) {
     if let conversationId = noti.object as? String {
       weak var weakSelf = self
       conversationRepo.deleteConversation(conversationId) { error in
@@ -431,7 +431,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
   }
 
-  private func didDeleteConversation(_ cid: String) {
+  open func didDeleteConversation(_ cid: String) {
     if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return
     }

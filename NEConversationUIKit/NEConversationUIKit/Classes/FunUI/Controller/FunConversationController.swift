@@ -57,7 +57,7 @@ open class FunConversationController: NEBaseConversationController {
     }
   }
 
-  func changeLanguage() {
+  open func changeLanguage() {
     requestData()
     initSystemNav()
     popListView = FunPopListView()
@@ -65,7 +65,7 @@ open class FunConversationController: NEBaseConversationController {
     brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
   }
 
-  override func initSystemNav() {
+  override open func initSystemNav() {
     super.initSystemNav()
     let addBarButton = UIButton()
     addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"

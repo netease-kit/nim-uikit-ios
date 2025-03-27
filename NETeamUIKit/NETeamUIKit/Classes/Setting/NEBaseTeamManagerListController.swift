@@ -134,7 +134,7 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
     }
   }
 
-  func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
+  open func didClickRemoveButton(_ model: NETeamMemberInfoModel?, _ index: Int) {
     print("did click remove button")
     weak var weakSelf = self
     // let content = String(format: localizable("confirm_delete_text"), model?.atNameInTeam() ?? "") + localizable("question_mark")

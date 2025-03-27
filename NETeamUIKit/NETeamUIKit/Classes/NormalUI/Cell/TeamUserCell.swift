@@ -11,7 +11,7 @@ import UIKit
 
 @objcMembers
 open class TeamUserCell: NEBaseTeamUserCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     userHeaderView.layer.cornerRadius = 16.0
     NSLayoutConstraint.activate([

@@ -38,7 +38,7 @@ class NETabBarController: UITabBarController, NEContactListener {
     setUpSessionBadgeValue()
     setUpContactBadgeValue()
 
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       LocalConversationRepo.shared.addLocalConversationListener(self)
     } else {
       ConversationRepo.shared.addConversationListener(self)
@@ -55,7 +55,7 @@ class NETabBarController: UITabBarController, NEContactListener {
   }
 
   deinit {
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       LocalConversationRepo.shared.removeLocalConversationListener(self)
     } else {
       LocalConversationRepo.shared.removeLocalConversationListener(self)
@@ -68,7 +68,7 @@ class NETabBarController: UITabBarController, NEContactListener {
   func setUpControllers() {
     if NEStyleManager.instance.isNormalStyle() {
       // chat
-      if IMKitConfigCenter.shared.enableLocalConversation {
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
         chat = LocalConversationController()
         (chat as? LocalConversationController)?.viewModel.syncFinished = isChangeUIType
       } else {
@@ -124,7 +124,7 @@ class NETabBarController: UITabBarController, NEContactListener {
       }
     } else {
       // chat
-      if IMKitConfigCenter.shared.enableLocalConversation {
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
         chat = FunLocalConversationController()
         (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
       } else {
@@ -185,7 +185,7 @@ class NETabBarController: UITabBarController, NEContactListener {
   }
 
   func setUpSessionBadgeValue() {
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       sessionUnreadCount = LocalConversationRepo.shared.getTotalUnreadCount()
     } else {
       sessionUnreadCount = ConversationRepo.shared.getTotalUnreadCount()

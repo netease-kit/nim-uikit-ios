@@ -43,7 +43,7 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 }
 
 @objc
-protocol ChatAudioCellProtocol {
+public protocol ChatAudioCellProtocol: NSObjectProtocol {
   var isPlaying: Bool { get set }
   var messageId: String? { get set }
   func startAnimation(byRight: Bool)

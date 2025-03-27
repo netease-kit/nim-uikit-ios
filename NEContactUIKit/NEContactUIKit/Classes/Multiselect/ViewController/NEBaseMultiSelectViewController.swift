@@ -58,7 +58,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 加载所有数据
-  func loadAllData() {
+  open func loadAllData() {
     viewModel.loadAllData(filterUsers) { [weak self] error in
       self?.setEmptyViewText(self?.searchText)
 
@@ -79,7 +79,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 加载数据（根据下标）
   /// - Parameter index: tab 下标
-  func loadData(_ index: Int = 0) {
+  open func loadData(_ index: Int = 0) {
     viewModel.loadData(index, filterUsers) { [weak self] error in
       self?.viewModel.searchText(self?.searchText ?? "")
       self?.setEmptyViewText(self?.searchText)
@@ -89,7 +89,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 设置标题
-  func setupTitle() {
+  open func setupTitle() {
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
 
@@ -622,7 +622,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 搜索文案变动
   /// - Parameter textfield: 搜索框
-  func searchTextFieldChange(textfield: SearchTextField) {
+  open func searchTextFieldChange(textfield: SearchTextField) {
     guard let searchText = textfield.text else {
       return
     }
@@ -682,7 +682,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 取消按钮点击事件
   /// - Parameter button: 按钮
-  func cancelButtonAction() {
+  open func cancelButtonAction() {
     dismiss(animated: true, completion: nil)
   }
 
@@ -694,7 +694,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 已选视图点击事件
-  func selectedCollectionViewAction() {
+  open func selectedCollectionViewAction() {
     let selectedVC = getMultiSelectedViewController(selectedArray)
     selectedVC.delegate = self
     present(selectedVC, animated: true)
@@ -702,7 +702,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// tab 点击事件
   /// - Parameter index: tab 下标
-  func setTabButtonLine(_ index: Int) {
+  open func setTabButtonLine(_ index: Int) {
     tabIndex = index
     selectedLineLeftAnchor?.constant = recentButton.width * CGFloat(index)
 
@@ -732,7 +732,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 设置空白占位图文案
   /// - Parameter text: 搜索文案
-  func setEmptyViewText(_ text: String?) {
+  open func setEmptyViewText(_ text: String?) {
     if let searchText = searchText, !searchText.isEmpty {
       let att = NSMutableAttributedString(string: String(format: commonLocalizable("no_search_result"), searchText))
       let range = att.mutableString.range(of: searchText)
@@ -752,7 +752,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 最近会话 tab 点击事件
-  func recentButtonAction() {
+  open func recentButtonAction() {
     if tabIndex == 0 {
       return
     }
@@ -761,7 +761,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 我的好友 tab 点击事件
-  func friendButtonAction() {
+  open func friendButtonAction() {
     if tabIndex == 1 {
       return
     }
@@ -770,7 +770,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 我的群聊 tab 点击事件
-  func teamButtonAction() {
+  open func teamButtonAction() {
     if tabIndex == 2 {
       return
     }
@@ -906,7 +906,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 选中事件
   /// - Parameter model: 数据模型
-  func didSelectContact(_ model: MultiSelectModel) {
+  open func didSelectContact(_ model: MultiSelectModel) {
     model.isSelected = true
     if selectedArray.contains(where: { c in
       model === c
@@ -933,7 +933,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 取消选中事件
   /// - Parameter model: 数据模型
-  func didUnselectContact(_ model: MultiSelectModel) {
+  open func didUnselectContact(_ model: MultiSelectModel) {
     model.isSelected = false
     selectedArray.removeAll { c in
       model === c
@@ -950,7 +950,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 刷新（确定按钮）已选人数
-  func refreshSelectCount() {
+  open func refreshSelectCount() {
     if selectedArray.count > 0 {
       sureButton.isEnabled = true
       sureButton.setTitle(sureButtonText + "(\(selectedArray.count))", for: .normal)

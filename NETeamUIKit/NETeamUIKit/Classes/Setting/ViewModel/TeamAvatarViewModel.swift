@@ -15,7 +15,7 @@ open class TeamAvatarViewModel: NSObject {
 
   /// 获取当前用户群信息
   /// - Parameter teamId 群id
-  func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
+  open func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
     if let tid = teamId {
       let currentUserAccid = IMKitClient.instance.account()
       teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, currentUserAccid) { member, error in

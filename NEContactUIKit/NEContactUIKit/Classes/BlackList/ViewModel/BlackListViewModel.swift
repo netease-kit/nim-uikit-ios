@@ -7,6 +7,7 @@ import NEChatKit
 import NECoreIM2Kit
 import NECoreKit
 
+@objc
 public protocol BlackListViewModelDelegate: NSObjectProtocol {
   func tableViewReload()
 }
@@ -28,7 +29,7 @@ open class BlackListViewModel: NSObject {
   }
 
   /// 获取黑名单列表
-  func getBlackList() {
+  open func getBlackList() {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     if let blockList = NEFriendUserCache.shared.getBlocklist() {
       NEFriendUserCache.shared.loadShowName(blockList) { users in
@@ -45,7 +46,7 @@ open class BlackListViewModel: NSObject {
   ///   - account: 好友 Id
   ///   - index: 该用户在表格中的位置
   ///   - completion: 回调
-  func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
+  open func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
     contactRepo.removeBlockList(accountId: account) { error in
       if let err = error {
@@ -62,7 +63,7 @@ open class BlackListViewModel: NSObject {
   /// - Parameters:
   ///   - users: 好友列表
   ///   - completion: 回调
-  func addBlackList(users: [NEUserWithFriend], _ completion: @escaping (NSError?) -> Void) {
+  open func addBlackList(users: [NEUserWithFriend], _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", users.count:\(users.count)")
 
     for user in users {

@@ -20,8 +20,9 @@ open class MessageImageModel: MessageContentModel {
       } else if let url = imageObject.url {
         if imageObject.ext?.lowercased() != ".gif" {
           urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: 350)
+        } else {
+          urlString = url
         }
-        urlString = url
       }
       contentSize = ChatMessageHelper.getSizeWithMaxSize(
         chat_pic_size,

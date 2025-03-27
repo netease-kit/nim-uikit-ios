@@ -189,7 +189,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
   }
 
-  func timestampDescriptionForRecentSession(recentSession: NIMRecentSession) -> TimeInterval {
+  open func timestampDescriptionForRecentSession(recentSession: NIMRecentSession) -> TimeInterval {
     if let lastMessage = recentSession.lastMessage {
       return lastMessage.timestamp
     }

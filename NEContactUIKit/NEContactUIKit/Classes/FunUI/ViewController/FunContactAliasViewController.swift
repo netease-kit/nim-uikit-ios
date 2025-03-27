@@ -8,7 +8,7 @@ import UIKit
 
 @objcMembers
 open class FunContactAliasViewController: NEBaseContactAliasViewController {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     let clearItem = UIBarButtonItem(
       title: localizable("save"),

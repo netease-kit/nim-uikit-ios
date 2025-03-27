@@ -6,7 +6,8 @@
 import NECoreIM2Kit
 import UIKit
 
-@objc public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
+@objc
+public protocol InputEmoticonTabViewDelegate: NSObjectProtocol {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
 }
 

@@ -5,7 +5,7 @@
 
 import Foundation
 
-protocol ContactDataProtrol {
+public protocol ContactDataProtrol: NSObjectProtocol {
   func getName() -> String
   func getRowHeight() -> CGFloat?
 }

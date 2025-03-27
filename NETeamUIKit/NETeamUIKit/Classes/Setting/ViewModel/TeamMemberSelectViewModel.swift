@@ -8,7 +8,8 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
-public protocol TeamMemberSelectViewModelDelegate: NSObject {
+@objc
+public protocol TeamMemberSelectViewModelDelegate: NSObjectProtocol {
   func didNeedRefresh()
 }
 
@@ -46,7 +47,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   // 点击消息发送者头像
   /// 拉取最新用户信息后刷新消息发送者信息
   /// - Parameter noti: 通知对象
-  func didTapHeader(_ noti: Notification) {
+  open func didTapHeader(_ noti: Notification) {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
       if NETeamUserManager.shared.isCurrentMember(accid) {
@@ -67,7 +68,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 群信息(包含群成员)
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  func getTeamInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
+  open func getTeamInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     if isRequest == true {
       return
     }
@@ -135,7 +136,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   }
 
   /// 获取选择器数据
-  func getData() {
+  open func getData() {
     var temFilters = Set<String>()
     for (key, _) in selectDic {
       temFilters.insert(key)
@@ -176,7 +177,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
     }
   }
 
-  func onTeamMemberUpdate(_ accountId: String) {
+  open func onTeamMemberUpdate(_ accountId: String) {
     if let tid = teamInfoModel?.team?.teamId {
       print("memberCacheDidChange tid \(tid)")
       weak var weakSelf = self
@@ -192,20 +193,20 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
 
   /// 搜索所有数据
   /// - Parameter searchText: 搜索关键字
-  func searchAllData(_ searchText: String) -> [NESelectTeamMember] {
+  open func searchAllData(_ searchText: String) -> [NESelectTeamMember] {
     let result = datas.filter { findContainStr(searchText, $0) }
     return result
   }
 
   /// 所有展示数据
   /// - Parameter searchText: 搜索关键字
-  func searchShowData(_ searchText: String) -> [NESelectTeamMember] {
+  open func searchShowData(_ searchText: String) -> [NESelectTeamMember] {
     let result = showDatas.filter { findContainStr(searchText, $0) }
     return result
   }
 
   /// 判断选择器对象是否包含搜索字段
-  func findContainStr(_ text: String, _ selectModel: NESelectTeamMember) -> Bool {
+  open func findContainStr(_ text: String, _ selectModel: NESelectTeamMember) -> Bool {
     if let uid = selectModel.member?.nimUser?.user?.accountId, uid.contains(text) {
       return true
     } else if let nick = selectModel.member?.nimUser?.user?.name, nick.contains(text) {
@@ -269,9 +270,9 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// - Parameter queryType:  查询类型
   /// - Parameter teamModel：群信息对象
   /// - Parameter completion:  完成后的回调
-  private func getTeamMembers(_ teamInfo: NETeamInfoModel,
-                              _ queryType: V2NIMTeamMemberRoleQueryType,
-                              _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func getTeamMembers(_ teamInfo: NETeamInfoModel,
+                           _ queryType: V2NIMTeamMemberRoleQueryType,
+                           _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
     guard let teamId = teamInfo.team?.teamId else {
       return
@@ -309,10 +310,10 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// - Parameter model :           群信息
   /// - Parameter maxSizeByPage:    单页最大查询数量
   /// - Parameter completion:       完成后的回调
-  private func splitSelectMembers(_ members: [V2NIMTeamMember],
-                                  _ model: NETeamInfoModel,
-                                  _ maxSizeByPage: Int = 150,
-                                  _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func splitSelectMembers(_ members: [V2NIMTeamMember],
+                               _ model: NETeamInfoModel,
+                               _ maxSizeByPage: Int = 150,
+                               _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
     var remaind = [[V2NIMTeamMember]]()
     remaind.append(contentsOf: members.chunk(maxSizeByPage))
@@ -323,9 +324,9 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   ///   - Parameter remainUserIds: 用户集合
   ///   - Parameter model： 群信息
   ///   - Parameter completion: 成功回调
-  private func fetchSelectUsersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
-                                    _ model: NETeamInfoModel,
-                                    _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
+  open func fetchSelectUsersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
+                                 _ model: NETeamInfoModel,
+                                 _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       completion(nil, model)
@@ -360,7 +361,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 获取群成员
   /// - Parameter teamId:  群ID
   /// - Parameter completion:  完成回调
-  private func getSelectMemberInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
+  open func getSelectMemberInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
     let option = V2NIMTeamMemberQueryOption()
     option.limit = 1000
     option.onlyChatBanned = false

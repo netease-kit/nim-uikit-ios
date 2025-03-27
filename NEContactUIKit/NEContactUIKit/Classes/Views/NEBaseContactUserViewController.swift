@@ -146,7 +146,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     ])
   }
 
-  func loadData() {
+  open func loadData() {
     guard let uid = user?.user?.accountId ?? uid else { return }
 
     // 数字人信息从缓存中取
@@ -339,7 +339,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     NEBaseContactAliasViewController()
   }
 
-  func toEditRemarks() {
+  open func toEditRemarks() {
     let remark = getContactAliasViewController()
     remark.user = user
     remark.completion = { [weak self] u in
@@ -351,11 +351,11 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     print("edit remarks")
   }
 
-  func allowNotify(allow: Bool) {
+  open func allowNotify(allow: Bool) {
     print("edit remarks")
   }
 
-  func blackList(isBlack: Bool, completion: @escaping () -> Void) {
+  open func blackList(isBlack: Bool, completion: @escaping () -> Void) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
       completion()
@@ -386,7 +386,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
   }
 
-  func chat(user: NEUserWithFriend?) {
+  open func chat(user: NEUserWithFriend?) {
     guard let accid = self.user?.user?.accountId else {
       return
     }
@@ -399,7 +399,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     )
   }
 
-  func deleteFriendAction(user: NEUserWithFriend?) {
+  open func deleteFriendAction(user: NEUserWithFriend?) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
@@ -450,7 +450,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     present(alertController, animated: true, completion: nil)
   }
 
-  func addFriend() {
+  open func addFriend() {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))

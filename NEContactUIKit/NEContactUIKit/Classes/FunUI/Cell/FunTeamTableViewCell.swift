@@ -14,7 +14,7 @@ open class FunTeamTableViewCell: NEBaseTeamTableViewCell {
     return view
   }()
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     avatarImageView.layer.cornerRadius = 4
     avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: 40)

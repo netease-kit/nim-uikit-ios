@@ -7,7 +7,8 @@ import NECoreIM2Kit
 import UIKit
 
 /// 转发 - 多选 - 已选详情页面 TableViewCell - 协议
-protocol NEBaseSelectedListCellDelegate: NSObjectProtocol {
+@objc
+public protocol NEBaseSelectedListCellDelegate: NSObjectProtocol {
   /// 移除按钮点击事件
   /// - Parameter model: 数据模型
   func removeButtonAction(_ model: MultiSelectModel?)
@@ -82,7 +83,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
 
   /// 重写设置model方法
   /// - Parameter model: 转发选择页面数据模型
-  func removeButtonAction(_ sender: ExpandButton) {
+  open func removeButtonAction(_ sender: ExpandButton) {
     delegate?.removeButtonAction(contentModel)
   }
 

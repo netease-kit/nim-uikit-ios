@@ -82,7 +82,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
     }
   }
 
-  private func setupBackUI() {
+  open func setupBackUI() {
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -96,9 +96,9 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
     navigationController?.navigationBar.topItem?.backBarButtonItem?.tintColor = .ne_darkText
   }
 
-  func backEvent() {
+  open func backEvent() {
     navigationController?.popViewController(animated: true)
   }
 
-  func toSetting() {}
+  open func toSetting() {}
 }

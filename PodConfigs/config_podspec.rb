@@ -2,11 +2,11 @@
 
 module YXConfig
   def self.imuikit_version
-    "10.6.0"
+    "10.6.1"
   end
 
   def self.deployment_target
-    "12.0"
+    "13.0"
   end
 
   def self.swift_version

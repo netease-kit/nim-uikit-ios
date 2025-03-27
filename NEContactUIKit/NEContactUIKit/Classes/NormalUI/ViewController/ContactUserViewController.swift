@@ -10,7 +10,7 @@ import UIKit
 
 @objcMembers
 open class ContactUserViewController: NEBaseContactUserViewController {
-  func initNormal() {
+  open func initNormal() {
     className = "ContactUserViewController"
     headerView = UserInfoHeaderView()
   }

@@ -36,7 +36,8 @@
 "product_intro"="产品介绍";
 "receiver_mode"="听筒模式";
 "message_read_function"="消息已读未读功能";
-"local_conversation"="本地会话";
+"cloud_conversation"="云端会话";
+"restart_tips"="重启生效，是否退出？";
 "version"="版本号";
 "headImage"="头像";
 "nickname"="昵称";
@@ -61,6 +62,7 @@
 "domestic_node"="国内节点配置";
 "overseas_node"="海外节点配置";
 "restart"="重启";
+"exit"="退出";
 "text_count_limit"="最多只能输入 %d 个字符哦";
 
 // style

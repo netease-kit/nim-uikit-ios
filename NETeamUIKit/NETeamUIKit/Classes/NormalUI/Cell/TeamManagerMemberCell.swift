@@ -5,7 +5,7 @@
 import UIKit
 
 class TeamManagerMemberCell: TeamMemberCell {
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     ownerLabel.isHidden = true
     nameLabelRightMargin?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? -100 : -65

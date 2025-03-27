@@ -67,7 +67,7 @@ class NENodeViewController: NEBaseViewController, UITableViewDataSource, UITable
     let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .default) { action in
     }
     alertController.addAction(cancelAction)
-    let sureAction = UIAlertAction(title: localizable("restart"), style: .default) { action in
+    let sureAction = UIAlertAction(title: localizable("exit"), style: .default) { action in
       // 设置节点
       SettingRepo.shared.setNodeValue(isDomestic)
       exit(0)

@@ -18,7 +18,7 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
     super.init(coder: coder)
   }
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     tableView.register(
       FunBlackListCell.self,

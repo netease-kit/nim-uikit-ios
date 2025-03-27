@@ -8,6 +8,7 @@ import NIMSDK
 import UIKit
 
 /// 转发多选-已选页面-协议
+@objc
 public protocol NEBaseMultiSelectedViewControllerDelegate: NSObjectProtocol {
   /// 移除按钮点击事件
   /// - Parameter model: 数据模型
@@ -36,7 +37,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
   }
 
   /// 设置标题
-  func setupTitle() {
+  open func setupTitle() {
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
 
@@ -64,7 +65,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     ])
   }
 
-  func commonUI() {
+  open func commonUI() {
     view.backgroundColor = .white
     setupTitle()
 
@@ -122,7 +123,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
   // MARK: - Action
 
   /// 取消按钮点击事件
-  func cancelButtonClick() {
+  open func cancelButtonClick() {
     dismiss(animated: true, completion: nil)
   }
 
@@ -155,7 +156,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
 extension NEBaseMultiSelectedViewController: NEBaseSelectedListCellDelegate {
   /// 移除按钮点击事件
   /// - Parameter model: 数据模型
-  func removeButtonAction(_ model: MultiSelectModel?) {
+  open func removeButtonAction(_ model: MultiSelectModel?) {
     selectedArray.removeAll { $0 == model }
     emptyView.isHidden = !selectedArray.isEmpty
     tableView.reloadData()

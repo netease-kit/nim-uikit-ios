@@ -7,7 +7,7 @@ import NEChatKit
 import UIKit
 
 @objc
-public protocol MessageOperationViewDelegate: AnyObject {
+public protocol MessageOperationViewDelegate: NSObjectProtocol {
   func didSelectedItem(item: OperationItem)
 }
 

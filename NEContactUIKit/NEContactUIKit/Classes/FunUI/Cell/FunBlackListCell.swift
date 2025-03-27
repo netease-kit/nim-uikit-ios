@@ -14,7 +14,7 @@ class FunBlackListCell: NEBaseBlackListCell {
     return view
   }()
 
-  override func commonUI() {
+  override open func commonUI() {
     super.commonUI()
     button.layer.borderColor = UIColor(hexString: "#D9D9D9").cgColor
     button.setTitleColor(.ne_darkText, for: .normal)

@@ -12,7 +12,7 @@ class FunTeamMemberSelectCell: NEBaseTeamMemberSelectCell {
     return view
   }()
 
-  override func setupUI() {
+  override open func setupUI() {
     super.setupUI()
     addSubview(dividerLine)
     headerView.layer.cornerRadius = 4.0

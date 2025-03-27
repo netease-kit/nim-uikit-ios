@@ -58,14 +58,14 @@ open class FunTeamMemberCell: NEBaseTeamMemberCell {
     setupRemoveButton()
   }
 
-  func setOwnerStyle() {
+  open func setOwnerStyle() {
     ownerLabel.textColor = UIColor.funTeamThemeColor
     ownerLabel.backgroundColor = UIColor.funTeamThemeColor.withAlphaComponent(0.1)
     ownerLabel.layer.borderColor = UIColor.funTeamThemeColor.cgColor
     ownerWidth?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 48
   }
 
-  func setManagerStyle() {
+  open func setManagerStyle() {
     ownerLabel.textColor = UIColor.funTeamMangerLabelTextColor
     ownerLabel.backgroundColor = UIColor.funTeamManagerLabelBorderColor.withAlphaComponent(0.1)
     ownerLabel.layer.borderColor = UIColor.funTeamManagerLabelBorderColor.cgColor

@@ -17,7 +17,7 @@ open class ChatSectionView: UITableViewHeaderFooterView {
     super.init(coder: coder)
   }
 
-  func commonUI() {
+  open func commonUI() {
     contentView.backgroundColor = .ne_lightBackgroundColor
     titleLabel.font = UIFont.systemFont(ofSize: 12)
     titleLabel.textColor = .ne_greyText

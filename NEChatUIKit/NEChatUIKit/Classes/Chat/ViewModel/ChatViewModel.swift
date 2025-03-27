@@ -207,7 +207,7 @@ open class ChatViewModel: NSObject {
   /// 清空当前会话的未读数
   open func clearUnreadCount() {
     // 本地会话
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.clearUnreadCountByIds([conversationId]) { result, error in
         NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
       }
@@ -1044,7 +1044,7 @@ open class ChatViewModel: NSObject {
     }
 
     // 本地会话
-    if IMKitConfigCenter.shared.enableLocalConversation {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.createConversation(conversationId) { [weak self] conversation, error in
         NEALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
       }
