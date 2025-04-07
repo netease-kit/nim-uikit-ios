@@ -28,44 +28,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         registerAPNS()
         return true
     }
-    
+
+  func setupIM(_ appkey: String? = nil) {
+    // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
+    let option = NIMSDKOption()
+    option.appKey = appkey ?? AppKey.appKey
+    option.apnsCername = AppKey.apnsCername
+    option.pkCername = AppKey.pkCerName
+
+    // 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
+    let v2Option = V2NIMSDKOption()
+    v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
+
+    // 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
+    IMKitClient.instance.setupIM2(option, v2Option)
+  }
+
     func setupInit(){
         if IMSDKConfigManager.instance.getConfig().enableCustomConfig.boolValue {
             // 开启自定义配置，使用自定义配置
 //            NIMSDK.shared().serverSetting = NIMServerSetting()
-            
+
             if IMSDKConfigManager.instance.getConfig().customJson?.count ?? 0 > 0 {
                 loginWithAutoParseConfig()
                 return
             }else if let appkey = IMSDKConfigManager.instance.getConfig().configMap[#keyPath(NIMSDKOption.appKey)] as? String {
-                let option = NIMSDKOption()
-                option.v2 = true
-                option.appKey = appkey
-                IMKitClient.instance.setupIM(option)
+                setupIM(appkey)
                 loginWithCustomConfig()
                 return
             }
         }
-        
-        // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
-        let option = NIMSDKOption()
-        option.appKey = AppKey.appKey
-        option.apnsCername = AppKey.apnsCername
-        option.pkCername = AppKey.pkCerName
 
-      	// 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
-      	let v2Option = V2NIMSDKOption()
-      	v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
-
-      	// 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
-      	IMKitClient.instance.setupIM2(option, v2Option)
-
-        NEAIUserManager.shared.setProvider(provider: self)
-        NEKeyboardManager.shared.enable = true
-        NEKeyboardManager.shared.shouldResignOnTouchOutside = true
-        
+      	setupIM()
         loadService()
         loginWithUI()
+
+      	NEAIUserManager.shared.setProvider(provider: self)
+      	NEKeyboardManager.shared.enable = true
+      	NEKeyboardManager.shared.shouldResignOnTouchOutside = true
     }
     
     @objc func refreshRoot(){
@@ -196,14 +196,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let jsonData = json.data(using: .utf8) ?? Data()
         do {
             let dict = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) as? [String: Any]
-            let option = NIMSDKOption()
-            option.v2 = true
-            if let appkey = dict?["appkey"] as? String {
-                option.v2 = true
-                option.appKey = appkey
-                IMKitClient.instance.setupIM(option)
-            }
-            if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
+            let appkey = dict?["appkey"] as? String
+            setupIM(appkey)
+
+            if let accountId = IMSDKConfigManager.instance.getConfig().accountId,
+               let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
                 NEAIUserManager.shared.setProvider(provider: self)
                 IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
                     if let err = error {
