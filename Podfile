@@ -22,7 +22,7 @@ target 'app' do
   pod 'NETeamUIKit', YXConfig.imuikit_version               # 群相关设置组件
 
   # 扩展库 - 地理位置组件
-#  pod 'NEMapKit', YXConfig.imuikit_version
+  pod 'NEMapKit', YXConfig.imuikit_version
 
   # 扩展库 - 呼叫组件
   pod 'NERtcSDK/RtcBasic'                   #  RTC 音视频基础组件
