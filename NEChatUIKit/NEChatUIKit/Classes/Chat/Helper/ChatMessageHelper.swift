@@ -76,6 +76,8 @@ public class ChatMessageHelper: NSObject {
     [
       "\(MessageType.text.rawValue)":
         isFun ? FunChatMessageTextCell.self : ChatMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)":
+        isFun ? FunChatMessageAIStreamTextCell.self : ChatMessageAIStreamTextCell.self,
       "\(MessageType.rtcCallRecord.rawValue)":
         isFun ? FunChatMessageCallCell.self : ChatMessageCallCell.self,
       "\(MessageType.audio.rawValue)":
@@ -106,6 +108,8 @@ public class ChatMessageHelper: NSObject {
     [
       "\(MessageType.text.rawValue)":
         isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)":
+        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
       "\(MessageType.image.rawValue)":
         isFun ? FunPinMessageImageCell.self : PinMessageImageCell.self,
       "\(MessageType.audio.rawValue)":
@@ -131,6 +135,8 @@ public class ChatMessageHelper: NSObject {
   public static func getCollectionCellRegisterDic(isFun: Bool) -> [String: NEBaseCollectionMessageCell.Type] {
     [
       "\(MessageType.text.rawValue)":
+        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)":
         isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
       "\(MessageType.image.rawValue)":
         isFun ? FunCollectionMessageImageCell.self : CollectionMessageImageCell.self,
@@ -161,6 +167,9 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_VIDEO:
       model = MessageVideoModel(message: message)
     case .MESSAGE_TYPE_TEXT:
+      if message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+        return MessageAIStreamModel(message: message)
+      }
       model = MessageTextModel(message: message)
     case .MESSAGE_TYPE_IMAGE:
       model = MessageImageModel(message: message)
@@ -177,7 +186,9 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_CUSTOM:
       if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
         if type == customMultiForwardType {
-          return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
+          return MessageCustomModel(message: message,
+                                    customType: type,
+                                    contentHeight: Int(customMultiForwardCellHeight))
         }
         if type == customRichTextType {
           return MessageRichTextModel(message: message)
@@ -185,7 +196,10 @@ public class ChatMessageHelper: NSObject {
 
         // 注册过的自定义消息类型
         if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
-          return MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight))
+          NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
+          return MessageCustomModel(message: message,
+                                    customType: type,
+                                    contentHeight: Int(customMultiForwardCellHeight))
         }
       }
       fallthrough
@@ -209,6 +223,10 @@ public class ChatMessageHelper: NSObject {
       model = MessageVideoModel(message: message)
       completion(model)
     case .MESSAGE_TYPE_TEXT:
+      if message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+        completion(MessageAIStreamModel(message: message))
+        return
+      }
       model = MessageTextModel(message: message)
       completion(model)
     case .MESSAGE_TYPE_IMAGE:
@@ -244,7 +262,9 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_CUSTOM:
       if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
         if type == customMultiForwardType {
-          completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
+          completion(MessageCustomModel(message: message,
+                                        customType: type,
+                                        contentHeight: Int(customMultiForwardCellHeight)))
           return
         }
         if type == customRichTextType {
@@ -254,12 +274,17 @@ public class ChatMessageHelper: NSObject {
 
         // 注册过的自定义消息类型
         if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
-          completion(MessageCustomModel(message: message, contentHeight: Int(customMultiForwardCellHeight)))
+          NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
+          completion(MessageCustomModel(message: message,
+                                        customType: type,
+                                        contentHeight: Int(customMultiForwardCellHeight)))
           return
         }
       }
       fallthrough
     default:
+      NEALog.infoLog(className(), desc: #function + "message type unknown, messageClientId: \(String(describing: message.messageClientId))")
+
       // 未识别的消息类型，默认为文本消息类型，text为未知消息体
       message.text = chatLocalizable("msg_unknown")
       model = MessageTextModel(message: message)

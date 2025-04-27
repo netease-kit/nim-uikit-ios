@@ -70,6 +70,7 @@ open class TeamManagerListController: NEBaseTeamManagerListController {
     if indexPath.section == 0 {
       let selectController = TeamMemberSelectController()
       selectController.teamId = teamId
+      selectController.selectCountLimit = IMKitConfigCenter.shared.teamManagerMaxCount == -1 ? Int.max : IMKitConfigCenter.shared.teamManagerMaxCount
       selectController.selectMemberBlock = { [weak self] datas in
         self?.didAddManagers(datas)
       }

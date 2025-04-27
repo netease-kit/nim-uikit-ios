@@ -11,6 +11,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
   func didStyleClick()
   func didClickCleanCache()
+  func didClickConfigTest()
   func didClickSDKConfig()
   func didClickLanguage()
   func didChangeConversationType(_ cancel: @escaping (Bool) -> Void)
@@ -133,6 +134,14 @@ public class MineSettingViewModel: NSObject {
   private func getThreeSection() -> SettingSectionModel {
     let model = SettingSectionModel()
     weak var weakSelf = self
+
+    let configTest = SettingCellModel()
+    configTest.cellName = "全局配置"
+    configTest.type = SettingCellType.SettingArrowCell.rawValue
+    configTest.cellClick = {
+      weakSelf?.delegate?.didClickConfigTest()
+    }
+    model.cellModels.append(configTest)
 
     let sdkConfigModel = SettingCellModel()
     sdkConfigModel.cellName = "私有云环境配置"

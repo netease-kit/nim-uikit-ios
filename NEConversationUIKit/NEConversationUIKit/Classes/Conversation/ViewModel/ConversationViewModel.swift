@@ -124,9 +124,29 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
           self?.offset = set
         }
         self?.isRequesting = false
-        // 区分置顶消息和非置顶消息
+
+        var p2pConversationIds = [String]()
         conversations?.forEach { conversation in
+          // 区分置顶消息和非置顶消息
           self?.addOrUpdateConversationData(conversation)
+
+          if V2NIMConversationIdUtil.conversationType(conversation.conversationId) == .CONVERSATION_TYPE_P2P,
+             let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
+            p2pConversationIds.append(accountId)
+          }
+        }
+
+        // 单聊会话主动拉取用户信息，避免用户信息缺失影响会话展示
+        ContactRepo.shared.getUserListFromCloud(accountIds: p2pConversationIds) { [weak self] users, error in
+          let conversationIds = p2pConversationIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+          self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
+            if let conversations = conversations {
+              for conversation in conversations {
+                self?.conversationDic[conversation.conversationId]?.conversation = conversation
+              }
+              self?.delegate?.reloadTableView()
+            }
+          }
         }
       }
       completion(error, finished)
@@ -362,7 +382,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
     ChatRepo.shared.insertMessageToLocal(message: messageNew,
                                          conversationId: messageRevoke.messageRefer?.conversationId ?? "",
-                                         senderId: messageRevoke.revokeAccountId,
+                                         senderId: messageRevoke.messageRefer?.senderId,
                                          createTime: messageRevoke.messageRefer?.createTime) { _, error in
       completion(error)
     }

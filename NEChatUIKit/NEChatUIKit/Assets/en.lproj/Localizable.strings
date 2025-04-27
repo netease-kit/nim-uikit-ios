@@ -218,3 +218,4 @@
 "ai_user_pin_top"="PIN";
 "request_exception" = "AI error";
 "ai_request_ing" = "Thinking…";
+"server_busy" = "Sorry, the server is busy, please try again later.";

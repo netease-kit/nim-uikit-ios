@@ -80,7 +80,6 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
     title = localizable("modify_headImage")
     addRightAction(localizable("save"), #selector(savePhoto), self)
     navigationView.setMoreButtonTitle(localizable("save"))
-    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(savePhoto))
 
     view.backgroundColor = .ne_lightBackgroundColor

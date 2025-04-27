@@ -215,3 +215,4 @@
 "format_not_supported"="暂不支持该格式";
 "request_exception" = "模型请求异常";
 "ai_request_ing" = "大模型请求响应中...";
+"server_busy" = "服务器繁忙，请稍后再试";

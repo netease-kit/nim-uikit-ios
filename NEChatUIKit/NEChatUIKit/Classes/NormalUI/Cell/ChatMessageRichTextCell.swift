@@ -68,14 +68,6 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
   public var contentLabelLeftHeightAnchor: NSLayoutConstraint?
   public var contentLabelRightHeightAnchor: NSLayoutConstraint?
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
   override open func commonUILeft() {
     bubbleImageLeft.addSubview(replyViewLeft)
     replyViewLeftHeightAnchor = replyViewLeft.heightAnchor.constraint(equalToConstant: replyViewHeight)

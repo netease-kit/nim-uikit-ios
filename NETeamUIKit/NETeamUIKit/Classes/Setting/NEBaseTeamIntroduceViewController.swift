@@ -62,7 +62,6 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   /// 布局初始化
   open func setupUI() {
     navigationView.setMoreButtonTitle(localizable("save"))
-    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveIntr))
     if let serverExtension = team?.serverExtension, serverExtension.contains(discussTeamKey) {
       title = localizable("discuss_introduce")

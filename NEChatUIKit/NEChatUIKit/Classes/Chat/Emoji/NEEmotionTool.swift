@@ -9,7 +9,7 @@ open class NEEmotionTool: NSObject {
   /// 找出所有表情的位置集合
   /// - Parameter str: 字符串
   /// - Returns: 表情位置
-  class func getRegularArray(str: String) -> [NSTextCheckingResult]? {
+  open class func getRegularArray(str: String) -> [NSTextCheckingResult]? {
     let regular = "\\[[^\\[|^\\]]+\\]"
 
     var reExpression: NSRegularExpression?
@@ -32,8 +32,8 @@ open class NEEmotionTool: NSObject {
   ///   - font: 字体
   ///   - offset: 偏移量
   /// - Returns: 替换表情后的富文本
-  class func getAttWithStr(str: String, font: UIFont,
-                           _ offset: CGPoint = CGPoint(x: 0, y: -4)) -> NSMutableAttributedString {
+  open class func getAttWithStr(str: String, font: UIFont,
+                                _ offset: CGPoint = CGPoint(x: 0, y: -4)) -> NSMutableAttributedString {
     let regularArr = getRegularArray(str: str)
     let emoticons = NIMInputEmoticonManager.shared
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
@@ -61,7 +61,7 @@ open class NEEmotionTool: NSObject {
     return attStr
   }
 
-  class func getAttWithStr(str: String, font: UIFont, color: UIColor, _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
+  open class func getAttWithStr(str: String, font: UIFont, color: UIColor, _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
     let att = getAttWithStr(str: str, font: font, offset)
     att.addAttribute(.foregroundColor, value: color, range: NSRange(location: 0, length: att.length))
     return att
@@ -81,7 +81,7 @@ open class NEEmotionTool: NSObject {
   ///   - att: 富文本
   ///   - range: 范围
   /// - Returns: 文本
-  class func getTextWithAtt(_ att: NSMutableAttributedString?, _ range: NSRange) -> String? {
+  open class func getTextWithAtt(_ att: NSMutableAttributedString?, _ range: NSRange) -> String? {
     guard let att = att else {
       return nil
     }

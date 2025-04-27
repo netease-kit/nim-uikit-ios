@@ -119,7 +119,7 @@ open class NormalChatMessageBaseCell: NEBaseChatMessageCell {
       replyLabel.accessibilityValue = text
 
       if let attriText = replyLabel.attributedText {
-        let textSize = NSAttributedString.getRealSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
+        let textSize = NSAttributedString.getRealLabelSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
 
         if let _ = model as? MessageTextModel {
           model.contentSize.width = max(textSize.width, model.textWidth) + chat_content_margin * 2

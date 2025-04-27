@@ -541,6 +541,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       return
     }
 
+    // 流式/占位 不可长按
+    if model?.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_PLACEHOLDER ||
+      model?.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING {
+      return
+    }
+
     // 多选模式下屏蔽消息长按事件
     if isMutilSelect {
       return
@@ -969,9 +975,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func scrollTableViewToBottom() {
-    NEALog.infoLog(className(), desc: "self.viewModel.messages.count\(viewModel.messages.count)")
-    NEALog.infoLog(className(), desc: "self.tableView.numberOfRows(inSection: 0)\(tableView.numberOfRows(inSection: 0))")
-
     if viewModel.isHistoryChat {
       dataReload()
       return
@@ -1714,14 +1717,37 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func sendSuccess(_ message: V2NIMMessage, _ index: IndexPath) {
     tableViewReloadIndexs([index])
 
-    // 提示【大模型请求响应中...】
-    if message.aiConfig != nil, message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_AT {
+    // 非流式消息则提示【大模型请求响应中...】
+    if !IMKitConfigCenter.shared.enableAIStream,
+       message.aiConfig != nil,
+       message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_AT {
       showToast(chatLocalizable("ai_request_ing"))
     }
   }
 
   open func onLoadMoreWithMessage(_ indexs: [IndexPath]) {
     tableViewReloadIndexs(indexs)
+  }
+
+  public func onModefiedMessage(_ index: IndexPath) {
+    let visibleRows = tableView.indexPathsForVisibleRows
+
+    UIView.performWithoutAnimation {
+      tableViewReloadIndexs([index])
+    }
+
+    if !(tableView.isDragging || tableView.isDecelerating),
+       let visibleRows = visibleRows,
+       visibleRows.contains(index) {
+      if visibleRows.last == index {
+        tableView.scrollToRow(at: index, at: .bottom, animated: false)
+      } else {
+        let index = IndexPath(row: tableView.numberOfRows(inSection: 0) - 1, section: 0)
+        if visibleRows.last == index {
+          tableView.scrollToRow(at: index, at: .bottom, animated: false)
+        }
+      }
+    }
   }
 
   open func onDeleteMessage(_ messages: [V2NIMMessage], deleteIndexs: [IndexPath], reloadIndex: [IndexPath]) {
@@ -2028,6 +2054,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     if !indexs.isEmpty {
       tableView.insertData(indexs) { [weak self] _ in
+        // 滑动过程中
+        if self?.tableView.isDragging == true || self?.tableView.isDecelerating == true {
+          return
+        }
+
         if let row = self?.tableView.numberOfRows(inSection: 0), row > 0 {
           self?.tableView.scrollToRow(
             at: IndexPath(row: row - 1, section: 0),
@@ -2111,12 +2142,19 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     present(selectVC, animated: true, completion: nil)
   }
 
-  private func showErrorToast(_ error: Error?) {
+  public func showErrorToast(_ error: (any Error)?, _ defaultToast: String? = nil) {
     if let err = error as? NSError {
       switch err.code {
       case protocolSendFailed:
         showToast(commonLocalizable("network_error"))
+      case aiMessagesNotExist:
+        showToast(chatLocalizable("message_not_found"))
       default:
+        if let toast = defaultToast {
+          showToast(toast)
+        } else {
+          showToast(err.localizedDescription)
+        }
         print(err.localizedDescription)
       }
     }
@@ -2546,7 +2584,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     navigationView.setMoreButtonTitle(commonLocalizable("cancel"))
-    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(cancelMutilSelect))
     setInputView(edit: false)
@@ -2562,10 +2599,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
     setMoreButton()
     setInputView(edit: true)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25,
-                                  execute: DispatchWorkItem(block: { [weak self] in
-                                    self?.scrollTableViewToBottom()
-                                  }))
     tableView.reloadData()
   }
 
@@ -2575,6 +2608,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     chatInputView.isHidden = !edit
     mutilSelectBottomView.isHidden = edit
     bottomViewTopAnchor?.constant = edit ? -normalInputHeight : -100
+    chatInputView.contentSubView?.isHidden = true
+    chatInputView.currentButton?.isSelected = false
   }
 
   // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -2595,6 +2630,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       } else if model.customType == customRichTextType {
         reuseId = "\(MessageType.richText.rawValue)"
       } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(model.customType)"] != nil {
+        NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(model.customType), messageClientId: \(String(describing: model.message?.messageClientId))")
         reuseId = "\(model.customType)"
       } else {
         reuseId = "\(NEBaseChatMessageCell.self)"
@@ -2677,8 +2713,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     removeOperationView()
     if chatInputView.textView.isFirstResponder {
       chatInputView.textView.resignFirstResponder()
-    } else {
-//      layoutInputView(offset: 0)
     }
   }
 
@@ -2869,7 +2903,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   ///   - replyIndex: 被回复消息的下标
   open func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     switch model?.type {
-    case .text:
+    case .text, .aiStreamText:
       if replyIndex != nil {
         showTextViewController(model)
       }
@@ -3512,7 +3546,7 @@ extension ChatViewController: ChatBaseCellDelegate {
       return
     }
 
-    if model?.type == .text,
+    if model?.type == .text || model?.type == .aiStreamText,
        var replyModel = replyModel as? MessageContentModel {
       var index = -1
       for (i, m) in viewModel.messages.enumerated() {
@@ -3714,6 +3748,26 @@ extension ChatViewController: ChatBaseCellDelegate {
         needMarkReadMsgs.append(message)
       }
     }
+  }
+
+  public func stopAIStreamMessage(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    guard let message = model?.message else {
+      return
+    }
+
+    viewModel.stopAIStreamMessage(message)
+  }
+
+  public func regenAIStreamMessage(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    guard let message = model?.message else {
+      return
+    }
+
+    if message.aiConfig?.aiStream == false {
+      showToast(chatLocalizable("ai_request_ing"))
+    }
+
+    viewModel.regenAIMessage(message)
   }
 
   open func getReadView(_ message: V2NIMMessage, _ teamId: String) -> NEBaseReadViewController {

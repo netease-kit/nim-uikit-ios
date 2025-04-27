@@ -47,17 +47,17 @@ open class NEPinMessageModel: NSObject {
 
     if let textModel = chatmodel as? MessageTextModel {
       // 文本消息最多显示 3 行
-      let textSize = NSAttributedString.getRealSize(textModel.attributeStr, bodyFont, maxSize, 3)
+      let textSize = NSAttributedString.getRealLabelSize(textModel.attributeStr, bodyFont, maxSize, 3)
       height = textSize.height
     }
 
     if let textModel = chatmodel as? MessageRichTextModel {
       // 换行消息中的标题最多显示 1 行
-      let titleSize = NSAttributedString.getRealSize(textModel.titleAttributeStr, titleFont, maxSize, 1)
+      let titleSize = NSAttributedString.getRealLabelSize(textModel.titleAttributeStr, titleFont, maxSize, 1)
       height = titleSize.height
 
       // 换行消息中的内容最多显示 2 行
-      let textSize = NSAttributedString.getRealSize(textModel.attributeStr, bodyFont, maxSize, 2)
+      let textSize = NSAttributedString.getRealLabelSize(textModel.attributeStr, bodyFont, maxSize, 2)
       height += textSize.height
     }
 

@@ -6,27 +6,34 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageCallCell: FunChatMessageBaseCell {
-  public let contentLabelLeft = UILabel()
-  public let contentLabelRight = UILabel()
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
-  }
+  public lazy var contentLabelLeft: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.isEnabled = false
+    label.numberOfLines = 0
+    label.isUserInteractionEnabled = false
+    label.font = messageTextFont
+    label.textAlignment = .center
+    label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.chatMessageCallText"
+    return label
+  }()
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
+  public lazy var contentLabelRight: UILabel = {
+    let label = UILabel()
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.isEnabled = false
+    label.numberOfLines = 0
+    label.isUserInteractionEnabled = false
+    label.font = messageTextFont
+    label.textAlignment = .center
+    label.backgroundColor = .clear
+    label.accessibilityIdentifier = "id.chatMessageCallText"
+    return label
+  }()
 
   override open func commonUILeft() {
     super.commonUILeft()
-    contentLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    contentLabelLeft.isEnabled = false
-    contentLabelLeft.numberOfLines = 0
-    contentLabelLeft.isUserInteractionEnabled = false
-    contentLabelLeft.font = messageTextFont
-    contentLabelLeft.textAlignment = .center
-    contentLabelLeft.backgroundColor = .clear
-    contentLabelLeft.accessibilityIdentifier = "id.chatMessageCallText"
     bubbleImageLeft.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
@@ -37,14 +44,6 @@ open class FunChatMessageCallCell: FunChatMessageBaseCell {
 
   override open func commonUIRight() {
     super.commonUIRight()
-    contentLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    contentLabelRight.isEnabled = false
-    contentLabelRight.numberOfLines = 0
-    contentLabelRight.isUserInteractionEnabled = false
-    contentLabelRight.font = messageTextFont
-    contentLabelRight.textAlignment = .center
-    contentLabelRight.backgroundColor = .clear
-    contentLabelRight.accessibilityIdentifier = "id.chatMessageCallText"
     bubbleImageRight.addSubview(contentLabelRight)
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -(chat_content_margin + funMargin)),

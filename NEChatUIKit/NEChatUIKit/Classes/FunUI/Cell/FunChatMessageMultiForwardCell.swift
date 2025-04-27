@@ -14,21 +14,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   let titleLabelFontSize: CGFloat = 16
   let contentLabelFontSize: CGFloat = 12
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  open func setupUI() {
-    setupUIRight()
-    setupUILeft()
-  }
-
-  open func setupUILeft() {
+  override open func commonUILeft() {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive_fun")
     backViewLeft.image = image?
@@ -98,7 +84,7 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func setupUIRight() {
+  override open func commonUIRight() {
     bubbleImageRight.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_send_fun")
     backViewRight.image = image?

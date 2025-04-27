@@ -12,21 +12,8 @@ import UIKit
 open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
   let contentWidth: CGFloat = 234
   let titleLabelFontSize: CGFloat = 14
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupUI()
-  }
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  open func setupUI() {
-    setupUIRight()
-    setupUILeft()
-  }
-
-  open func setupUILeft() {
+  override open func commonUILeft() {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive")
     backViewLeft.image = image?
@@ -95,7 +82,7 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
     ])
   }
 
-  open func setupUIRight() {
+  override open func commonUIRight() {
     bubbleImageRight.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_send")
     backViewRight.image = image?

@@ -12,7 +12,7 @@ open class ReplyMessageUtil: NSObject {
       text += name + ": "
     }
 
-    if model.type == .text {
+    if model.type == .text || model.type == .aiStreamText {
       if let content = NECustomUtils.contentOfRichText(model.message?.attachment) {
         return text + content
       }

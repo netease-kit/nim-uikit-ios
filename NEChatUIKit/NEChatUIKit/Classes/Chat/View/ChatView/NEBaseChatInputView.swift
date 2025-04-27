@@ -45,7 +45,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   public var currentButton: UIButton?
   public var menuHeight = 100.0
   public var contentHeight = 204.0
-  public var atCache: NIMInputAtCache?
 
   public var atRangeCache = [String: MessageAtCacheModel]()
 
@@ -220,10 +219,30 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     }
     delegate?.sendText(text: text, attribute: textView.attributedText)
     textView.text = ""
-    atCache?.clean()
   }
 
   open func textViewDidChange(_ textView: UITextView) {
+    textView.attributedText.enumerateAttribute(
+      NSAttributedString.Key.foregroundColor,
+      in: NSMakeRange(0, textView.attributedText.length)
+    ) { value, findRange, stop in
+      guard let findColor = value as? UIColor else {
+        return
+      }
+
+      if isEqualToColor(findColor, UIColor.ne_normalTheme) {
+        let string = textView.attributedText.string
+        if let range = Range(findRange, in: string) {
+          let text = String(string[range])
+          if nickAccidDic[text] == nil {
+            let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
+            mutableAttri.addAttribute(.foregroundColor, value: UIColor.ne_darkText, range: findRange)
+            textView.attributedText = mutableAttri
+          }
+        }
+      }
+    }
+
     delegate?.textFieldDidChange(textView.text)
   }
 
@@ -250,9 +269,11 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
+
       if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
         return
       }
+
       if findRange.location <= start, start < findRange.location + findRange.length + atRangeOffset {
         temRange = NSMakeRange(findRange.location, findRange.length + atRangeOffset)
         stop.pointee = true
@@ -323,14 +344,25 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       return false
     }
 
-    if text.count == 0 {
+    if text.count == 0, range.length > 0 {
       let temRange = checkRemoveAtMessage(range: range, attribute: textView.attributedText)
       if let findRange = temRange {
         let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
         if mutableAttri.length >= findRange.location + findRange.length {
+          let string = textView.attributedText.string
+          let rawRange = NSRange(location: findRange.location, length: findRange.length - atRangeOffset)
+          if let range = Range(rawRange, in: string) {
+            let text = String(string[range])
+            if let nick = nickAccidDic[text] {
+              nickAccidDic[text] = nil
+              nickAccidList.removeAll { $0 == nick }
+            }
+          }
+
           if range.length == 1 {
             mutableAttri.replaceCharacters(in: findRange, with: "")
-          } else if range.location >= findRange.location,
+          } else if range.length - 1 > 0,
+                    range.location >= findRange.location,
                     range.location <= findRange.location + findRange.length {
             mutableAttri.replaceCharacters(in: NSRange(location: range.location + 1, length: range.length - 1), with: "")
           }

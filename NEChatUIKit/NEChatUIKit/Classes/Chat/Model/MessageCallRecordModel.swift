@@ -72,7 +72,7 @@ open class MessageCallRecordModel: MessageContentModel {
       attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: ChatUIConfig.shared.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
-    let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
+    let textSize = NSAttributedString.getRealLabelSize(attributeStr, messageTextFont, messageMaxSize)
     let contentSizeWidth = textSize.width + chat_cell_margin * 2
     let contentSizeHeight = textSize.height + (isAuiodRecord ? 20 : 24)
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)

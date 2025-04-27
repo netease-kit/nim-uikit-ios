@@ -119,6 +119,7 @@ class CollectionMessageViewModel: NSObject {
 
     let aiConfig = V2NIMMessageAIConfigParams()
     aiConfig.accountId = aiAccid
+    aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
     if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
       aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)

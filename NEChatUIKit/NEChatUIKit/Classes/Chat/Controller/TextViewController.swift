@@ -123,8 +123,8 @@ open class TextViewController: NEChatBaseViewController {
 
   // textView 垂直居中
   func contentSizeToFit() {
-    let titleSize = NSAttributedString.getRealSize(titleLabel.attributedText, titleFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
-    let bodySize = NSAttributedString.getRealSize(bodyLabel.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
+    let titleSize = NSAttributedString.getRealLabelSize(titleLabel.attributedText, titleFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
+    let bodySize = NSAttributedString.getRealLabelSize(bodyLabel.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
 
     let textHeight = titleSize.height + bodySize.height
     let textViewHeight = kScreenHeight - kNavigationHeight - KStatusBarHeight

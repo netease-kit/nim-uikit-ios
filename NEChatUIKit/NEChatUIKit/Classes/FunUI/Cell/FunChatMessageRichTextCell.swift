@@ -69,8 +69,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
   public var contentLabelLeftHeightAnchor: NSLayoutConstraint?
   public var contentLabelRightHeightAnchor: NSLayoutConstraint?
 
-  override open func commonUI() {
-    /// left
+  override open func commonUILeft() {
     bubbleImageLeft.addSubview(titleLabelLeft)
     titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelLeftHeightAnchor?.priority = .fittingSizeLevel
@@ -91,10 +90,9 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
       contentLabelLeft.leftAnchor.constraint(equalTo: titleLabelLeft.leftAnchor, constant: 0),
       contentLabelLeft.topAnchor.constraint(equalTo: titleLabelLeft.bottomAnchor, constant: chat_content_margin),
     ])
+  }
 
-    commonUILeft()
-
-    /// right
+  override open func commonUIRight() {
     bubbleImageRight.addSubview(titleLabelRight)
     titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelRightHeightAnchor?.priority = .fittingSizeLevel
@@ -115,8 +113,6 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
       contentLabelRight.leftAnchor.constraint(equalTo: titleLabelRight.leftAnchor, constant: 0),
       contentLabelRight.topAnchor.constraint(equalTo: titleLabelRight.bottomAnchor, constant: chat_content_margin),
     ])
-
-    commonUIRight()
   }
 
   override open func showLeftOrRight(showRight: Bool) {
