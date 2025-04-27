@@ -64,19 +64,10 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     return label
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
   func tapFunc() {}
 
-  override open func commonUI() {
-    super.commonUI()
+  override open func commonUILeft() {
+    super.commonUILeft()
     bubbleImageLeft.addSubview(contentLabelLeft)
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
@@ -84,7 +75,10 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       contentLabelLeft.topAnchor.constraint(equalTo: bubbleImageLeft.topAnchor, constant: chat_content_margin),
       contentLabelLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: -chat_content_margin),
     ])
+  }
 
+  override open func commonUIRight() {
+    super.commonUIRight()
     bubbleImageRight.addSubview(contentLabelRight)
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin - funMargin),
@@ -108,6 +102,10 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
   /// 选中所有文本
   override open func selectAllRange() {
+    if contentModel?.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING {
+      return
+    }
+
     let contentLabel = contentLabelLeft.isHidden ? contentLabelRight : contentLabelLeft
 
     // 选中所有
@@ -198,11 +196,13 @@ extension FunChatMessageTextCell: UITextViewDelegate {
     }
   }
 
+  func getTextSize(_ attributedText: NSAttributedString?) -> CGSize {
+    NSAttributedString.getRealLabelSize(attributedText, messageTextFont, messageMaxSize)
+  }
+
   // textView 垂直居中
   func contentSizeToFit(_ contentLabel: UITextView, _ model: MessageTextModel) {
-    let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
-    let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
-    let titleSize = NSAttributedString.getRealSize(contentLabel.attributedText, messageTextFont, messageMaxSize)
+    let titleSize = getTextSize(contentLabel.attributedText)
 
     if model.contentSize.height == fun_chat_min_h {
       // 单行消息单独设置文本内边距

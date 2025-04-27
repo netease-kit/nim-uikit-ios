@@ -128,21 +128,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     return view
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  open func setupUI() {
-    setupUIRight()
-    setupUILeft()
-  }
-
-  open func setupUILeft() {
+  override open func commonUILeft() {
     bubbleImageLeft.image = nil
     bubbleImageLeft.backgroundColor = .white
     bubbleImageLeft.layer.cornerRadius = 4
@@ -174,7 +160,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     ])
   }
 
-  open func setupUIRight() {
+  override open func commonUIRight() {
     bubbleImageRight.image = nil
     bubbleImageRight.backgroundColor = .white
     bubbleImageRight.layer.cornerRadius = 4

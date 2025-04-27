@@ -17,6 +17,12 @@ open class MessageTextModel: MessageContentModel {
     super.init(message: message)
     type = .text
 
+    resetMessage(message)
+  }
+
+  public func resetMessage(_ message: V2NIMMessage?) {
+    self.message = message
+
     if let text = message?.text, !text.isEmpty {
       attributeStr = NEEmotionTool.getAttWithStr(
         str: text,
@@ -31,13 +37,30 @@ open class MessageTextModel: MessageContentModel {
       }
     }
 
-    let textSize = NSAttributedString.getRealSize(attributeStr, messageTextFont, messageMaxSize)
+    resetHeight()
+  }
+
+  public func getTextSize(_ attributeStr: NSAttributedString?) -> CGSize {
+    NSAttributedString.getRealLabelSize(attributeStr ?? self.attributeStr, messageTextFont, messageMaxSize)
+  }
+
+  public func resetHeight(_ attributeStr: NSAttributedString? = nil) {
+    let textSize = getTextSize(attributeStr)
     textHeight = ceil(textSize.height)
     textWidth = ceil(textSize.width)
     let contentSizeWidth = textWidth + chat_content_margin * 2
     let contentSizeHeight = textHeight + chat_content_margin * 2
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
     height = contentSizeHeight + chat_content_margin * 2 + fullNameHeight + chat_pin_height
+  }
+
+  public func resetWH(_ height: CGFloat, _ width: CGFloat = chat_content_maxW) {
+    textHeight = ceil(height)
+    textWidth = ceil(width)
+    let contentSizeWidth = textWidth + chat_content_margin * 2
+    let contentSizeHeight = textHeight + chat_content_margin * 2
+    contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
+    self.height = contentSizeHeight + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 
   /// 获取划词选中的文本（替换内置表情）

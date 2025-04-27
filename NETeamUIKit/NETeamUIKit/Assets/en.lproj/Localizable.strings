@@ -74,7 +74,7 @@
 "select_limit_tip"="Exceeding the %d person limit";
 "remove_manager_title"="Remove or not?";
 "remove_manager_tip"="Less permission after demotion.";
-"max_managers_tip"="10 admins at most";
+"max_managers_tip"="%d admins at most";
 "no_permission_tip"="No permission";
 "no_manager_member"="No Admin";
 "remove_member_tip"="This member will leave group after remove";

@@ -47,6 +47,7 @@
 		181EE58D2B234C510043817F /* CustomContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5842B234C510043817F /* CustomContactTableViewCell.swift */; };
 		181EE58E2B234C510043817F /* CustomChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5852B234C510043817F /* CustomChatCell.swift */; };
 		181EE58F2B234C510043817F /* CustomConversationListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181EE5862B234C510043817F /* CustomConversationListCell.swift */; };
+		18565AD82DBDF9D10034FD2B /* ConfigTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18565AD72DBDF9D10034FD2B /* ConfigTestViewController.swift */; };
 		18A6A9842D1E822900209FC5 /* NESecurityWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */; };
 		18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */; };
 		18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */; };
@@ -126,6 +127,7 @@
 		181EE5842B234C510043817F /* CustomContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomContactTableViewCell.swift; sourceTree = "<group>"; };
 		181EE5852B234C510043817F /* CustomChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomChatCell.swift; sourceTree = "<group>"; };
 		181EE5862B234C510043817F /* CustomConversationListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomConversationListCell.swift; sourceTree = "<group>"; };
+		18565AD72DBDF9D10034FD2B /* ConfigTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigTestViewController.swift; sourceTree = "<group>"; };
 		18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESecurityWarningView.swift; sourceTree = "<group>"; };
 		18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFunChatViewController.swift; sourceTree = "<group>"; };
 		18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNormalChatViewController.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		180E81B82D07D9F600151DD8 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				18565AD72DBDF9D10034FD2B /* ConfigTestViewController.swift */,
 				180E81F62D081DD400151DD8 /* NELoginViewController.swift */,
 				180E81AB2D07D9F600151DD8 /* IMSDKConfigViewController.swift */,
 				180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */,
@@ -498,6 +501,7 @@
 				180E81E42D07D9F600151DD8 /* NENodeViewController.swift in Sources */,
 				180E81E52D07D9F600151DD8 /* VersionCell.swift in Sources */,
 				180E81E62D07D9F600151DD8 /* MessageRemindViewController.swift in Sources */,
+				18565AD82DBDF9D10034FD2B /* ConfigTestViewController.swift in Sources */,
 				180E81F72D081DD400151DD8 /* NELoginViewController.swift in Sources */,
 				180E81E72D07D9F600151DD8 /* NEAboutWebViewController.swift in Sources */,
 				180E81E92D07D9F600151DD8 /* MeViewController.swift in Sources */,
@@ -719,7 +723,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.6.1;
+				MARKETING_VERSION = 10.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -768,7 +772,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.6.1;
+				MARKETING_VERSION = 10.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

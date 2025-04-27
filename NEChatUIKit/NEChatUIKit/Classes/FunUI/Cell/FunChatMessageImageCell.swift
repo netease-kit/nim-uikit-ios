@@ -8,23 +8,29 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageImageCell: FunChatMessageBaseCell {
-  public let contentImageViewLeft = UIImageView()
-  public let contentImageViewRight = UIImageView()
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
+  public lazy var contentImageViewLeft: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    imageView.clipsToBounds = true
+    imageView.layer.cornerRadius = 4
+    imageView.accessibilityIdentifier = "id.thumbnail"
+    return imageView
+  }()
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
+  public lazy var contentImageViewRight: UIImageView = {
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFill
+    imageView.clipsToBounds = true
+    imageView.layer.cornerRadius = 4
+    imageView.accessibilityIdentifier = "id.thumbnail"
+    return imageView
+  }()
 
   override open func commonUILeft() {
     super.commonUILeft()
-    contentImageViewLeft.translatesAutoresizingMaskIntoConstraints = false
-    contentImageViewLeft.contentMode = .scaleAspectFill
-    contentImageViewLeft.clipsToBounds = true
-    contentImageViewLeft.layer.cornerRadius = 4
-    contentImageViewLeft.accessibilityIdentifier = "id.thumbnail"
+
     bubbleImageLeft.image = nil
     bubbleImageLeft.addSubview(contentImageViewLeft)
     NSLayoutConstraint.activate([
@@ -37,11 +43,7 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
 
   override open func commonUIRight() {
     super.commonUIRight()
-    contentImageViewRight.translatesAutoresizingMaskIntoConstraints = false
-    contentImageViewRight.contentMode = .scaleAspectFill
-    contentImageViewRight.clipsToBounds = true
-    contentImageViewRight.layer.cornerRadius = 4
-    contentImageViewRight.accessibilityIdentifier = "id.thumbnail"
+
     bubbleImageRight.image = nil
     bubbleImageRight.addSubview(contentImageViewRight)
     NSLayoutConstraint.activate([

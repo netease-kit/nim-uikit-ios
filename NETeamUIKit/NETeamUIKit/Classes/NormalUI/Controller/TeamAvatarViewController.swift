@@ -18,7 +18,6 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
     view.backgroundColor = .ne_lightBackgroundColor
     navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationView.setBackButtonTitle(commonLocalizable("cancel"))
-    navigationView.setBackButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.backButton.setTitleColor(.ne_greyText, for: .normal)
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
 

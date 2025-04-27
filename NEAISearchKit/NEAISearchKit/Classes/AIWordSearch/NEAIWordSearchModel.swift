@@ -10,7 +10,7 @@ open class NEAIWordSearchModel: NSObject {
 
   init(_ content: NSAttributedString?) {
     self.content = content
-    let textSize = NSAttributedString.getRealSize(content, textFont, textMaxSize)
+    let textSize = NSAttributedString.getRealLabelSize(content, textFont, textMaxSize)
     height = ceil(textSize.height)
   }
 }

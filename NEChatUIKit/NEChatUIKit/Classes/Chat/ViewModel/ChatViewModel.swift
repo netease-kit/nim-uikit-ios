@@ -56,6 +56,10 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// - Parameter indexs: 消息下标列表
   func onLoadMoreWithMessage(_ indexs: [IndexPath])
 
+  /// 消息更新回调
+  /// - Parameter indexs: 消息下标列表
+  func onModefiedMessage(_ index: IndexPath)
+
   /// 删除消息或收到删除消息回调
   /// - Parameters:
   ///   - messages: 消息列表
@@ -98,7 +102,7 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
 
   /// 显示错误浮窗
   /// - Parameter error: 错误信息
-  @objc optional func showErrorToast(error: Error?)
+  @objc optional func showErrorToast(_ error: Error?, _ defaultToast: String?)
 
   /// 消息重新加载
   @objc optional func dataReload()
@@ -643,7 +647,7 @@ open class ChatViewModel: NSObject {
     }
 
     let messageModels = messages.suffix(aiMessagNum)
-    let aiMessageModels = messageModels.filter { $0.type == .text || $0.type == .richText }
+    let aiMessageModels = messageModels.filter { $0.type == .text || $0.type == .aiStreamText || $0.type == .richText }
 
     var firstUserMessage = false // 是否找到第一条用户发的消息
     var aiMessages = [V2NIMAIModelCallMessage]()
@@ -669,7 +673,7 @@ open class ChatViewModel: NSObject {
         aiMessage.role = .NIM_AI_MODEL_ROLE_TYPE_ASSISTANT
       }
 
-      if model.type == .text {
+      if model.type == .text || model.type == .aiStreamText {
         let text = model.message?.text ?? ""
         aiMessage.msg = text
         NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], message text\(i + 1): \(text)")
@@ -702,6 +706,7 @@ open class ChatViewModel: NSObject {
     if let aiAccid = aiUserAccid {
       let aiConfig = V2NIMMessageAIConfigParams()
       aiConfig.accountId = aiAccid
+      aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
@@ -744,6 +749,7 @@ open class ChatViewModel: NSObject {
     if let aiAccid = aiUserAccid {
       let aiConfig = V2NIMMessageAIConfigParams()
       aiConfig.accountId = aiAccid
+      aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if replyMessage.messageType == .MESSAGE_TYPE_TEXT {
@@ -792,6 +798,7 @@ open class ChatViewModel: NSObject {
     if let aiAccid = aiUserAccid {
       let aiConfig = V2NIMMessageAIConfigParams()
       aiConfig.accountId = aiAccid
+      aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if forwordMessage.messageType == .MESSAGE_TYPE_TEXT {
@@ -1417,7 +1424,8 @@ open class ChatViewModel: NSObject {
     }
 
     // 自己发送且非未知消息可以 【撤回】
-    if model?.message?.isSelf == true {
+    if model?.message?.isSelf == true,
+       model?.message?.aiConfig?.aiStatus != .MESSAGE_AI_STATUS_RESPONSE {
       if model?.message?.messageType == .MESSAGE_TYPE_CUSTOM,
          model?.unkonwMessage == true {
         return items
@@ -1742,9 +1750,18 @@ open class ChatViewModel: NSObject {
       messages[index].isPined = false
 
       // 是否可以重新编辑
-      if let content = ChatMessageHelper.getRevokeMessageContent(message: messages[index].message) {
+      if message.aiConfig?.aiStatus != .MESSAGE_AI_STATUS_RESPONSE,
+         let content = ChatMessageHelper.getRevokeMessageContent(message: messages[index].message) {
         messages[index].isReedit = true
         messages[index].message?.text = content
+      }
+
+      if message.senderId == IMKitClient.instance.account() {
+        messages[index].message?.aiConfig?.accountId = IMKitClient.instance.account()
+        (messages[index] as? MessageContentModel)?.fullNameHeight = 0
+        messages[index].avatar = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.user?.avatar
+        messages[index].shortName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.shortName(count: 2)
+        messages[index].fullName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.showName()
       }
 
       indexs.append(IndexPath(row: index, section: 0))
@@ -2105,6 +2122,26 @@ open class ChatViewModel: NSObject {
     }
   }
 
+  open func stopAIStreamMessage(_ message: V2NIMMessage) {
+    print("stopAIStreamMessage")
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
+    let params = V2NIMMessageAIStreamStopParams()
+    params.operationType = .MESSAGE_AI_STREAM_STOP_OP_DEFAULT
+    chatRepo.stopAIStreamMessage(message, params) { [weak self] error in
+      self?.delegate?.showErrorToast?(error, chatLocalizable("request_exception"))
+    }
+  }
+
+  open func regenAIMessage(_ message: V2NIMMessage) {
+    print("regenStreamButtonAction")
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    let params = V2NIMMessageAIRegenParams(.MESSAGE_AI_REGEN_OP_NEW)
+    chatRepo.regenAIMessage(message, params) { [weak self] error in
+      self?.delegate?.showErrorToast?(error, chatLocalizable("request_exception"))
+    }
+  }
+
   /// 获取听筒模式
   /// - Returns: 听筒模式
   open func getHandSetEnable() -> Bool {
@@ -2377,6 +2414,31 @@ extension ChatViewModel: NEChatListener {
             self?.delegate?.onRecvMessages(messages, [IndexPath(row: index, section: 0)])
             self?.loadMoreWithMessage([msg])
           }
+        }
+      }
+    }
+  }
+
+  public func onReceiveMessagesModified(_ messages: [V2NIMMessage]) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
+
+    for msg in messages {
+      guard V2NIMConversationIdUtil.conversationTargetId(msg.conversationId ?? "") == sessionId else {
+        return
+      }
+
+      for (index, model) in self.messages.enumerated() {
+        if let model = model as? MessageAIStreamModel,
+           model.message?.messageClientId == msg.messageClientId {
+          model.resetMessage(msg)
+          if index > 0 {
+            ChatMessageHelper.addTimeMessage(model, self.messages[index - 1])
+          }
+          delegate?.getMessageModel?(model: model)
+
+          self.messages[index] = model
+          delegate?.onModefiedMessage(IndexPath(row: index, section: 0))
+          break
         }
       }
     }

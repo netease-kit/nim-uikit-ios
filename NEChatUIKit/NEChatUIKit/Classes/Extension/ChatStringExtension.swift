@@ -19,7 +19,7 @@ extension String {
   static func calculateMaxLines(width: CGFloat, attributeString: NSAttributedString?, font: UIFont) -> Int {
     let maxSize = CGSize(width: width, height: CGFloat(Float.infinity))
     let charSize = font.lineHeight
-    let textSize = NSAttributedString.getRealSize(attributeString, font, maxSize)
+    let textSize = NSAttributedString.getRealLabelSize(attributeString, font, maxSize)
     let lines = Int(textSize.height / charSize)
     return lines
   }

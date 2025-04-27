@@ -35,8 +35,6 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     return label
   }()
 
-  public var mapViewLeft: UIView?
-
   public var mapImageViewLeft: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -45,7 +43,17 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     return imageView
   }()
 
-  let backgroundViewLeft = UIView()
+  public lazy var backgroundViewLeft: UIView = {
+    let view = UIView()
+    view.backgroundColor = UIColor.white
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.clipsToBounds = true
+    view.layer.cornerRadius = 4
+    view.layer.borderWidth = 1
+    view.layer.borderColor = UIColor.ne_outlineColor.cgColor
+    view.accessibilityIdentifier = "id.mapView"
+    return view
+  }()
 
   // Right
   public lazy var titleLabelRight: UILabel = {
@@ -76,8 +84,6 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     return label
   }()
 
-  public var mapViewRight: UIView?
-
   public var mapImageViewRight: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -86,41 +92,36 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     return imageView
   }()
 
-  let backgroundViewRight = UIView()
+  public lazy var backgroundViewRight: UIView = {
+    let view = UIView()
+    view.backgroundColor = UIColor.white
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.clipsToBounds = true
+    view.layer.cornerRadius = 4
+    view.layer.borderWidth = 1
+    view.layer.borderColor = UIColor.ne_outlineColor.cgColor
+    view.accessibilityIdentifier = "id.mapView"
+    return view
+  }()
 
-  lazy var pointImageRight: UIImageView = {
+  public lazy var pointImageRight: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.image = coreLoader.loadImage("location_point")
     return imageView
   }()
 
-  lazy var pointImageLeft: UIImageView = {
+  public lazy var pointImageLeft: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.image = coreLoader.loadImage("location_point")
     return imageView
   }()
-
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
 
   override open func commonUILeft() {
     super.commonUILeft()
-    backgroundViewLeft.backgroundColor = UIColor.white
-    contentView.addSubview(backgroundViewLeft)
     bubbleImageLeft.isHidden = true
-    backgroundViewLeft.translatesAutoresizingMaskIntoConstraints = false
-    backgroundViewLeft.clipsToBounds = true
-    backgroundViewLeft.layer.cornerRadius = 4
-    backgroundViewLeft.layer.borderWidth = 1
-    backgroundViewLeft.layer.borderColor = UIColor.ne_outlineColor.cgColor
-    backgroundViewLeft.accessibilityIdentifier = "id.mapView"
+    contentView.addSubview(backgroundViewLeft)
 
     let messageLongPress = UILongPressGestureRecognizer(
       target: self,
@@ -177,15 +178,8 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
 
   override open func commonUIRight() {
     super.commonUIRight()
-    backgroundViewRight.backgroundColor = UIColor.white
-    contentView.addSubview(backgroundViewRight)
     bubbleImageRight.isHidden = true
-    backgroundViewRight.translatesAutoresizingMaskIntoConstraints = false
-    backgroundViewRight.clipsToBounds = true
-    backgroundViewRight.layer.cornerRadius = 4
-    backgroundViewRight.layer.borderWidth = 1
-    backgroundViewRight.layer.borderColor = UIColor.ne_outlineColor.cgColor
-    backgroundViewRight.accessibilityIdentifier = "id.mapView"
+    contentView.addSubview(backgroundViewRight)
 
     let messageLongPress = UILongPressGestureRecognizer(
       target: self,
@@ -249,8 +243,6 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     super.setModel(model, isSend)
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let subTitleLabel = isSend ? subTitleLabelRight : subTitleLabelLeft
-    let mapView = isSend ? mapViewRight : mapViewLeft
-    let bubbleW = isSend ? bubbleWRight : bubbleWLeft
     let mapImageView = isSend ? mapImageViewRight : mapImageViewLeft
     let emptyLabel = isSend ? emptyLabelRight : emptyLabelLeft
     let pointImage = isSend ? pointImageRight : pointImageLeft

@@ -6,17 +6,6 @@ import UIKit
 
 @objcMembers
 open class FunLanguageCell: NEBaseLanguageCell {
-  override open func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override open func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   override open func setupLanguageCellUI() {
     super.setupLanguageCellUI()
     contentView.addSubview(languageLabel)

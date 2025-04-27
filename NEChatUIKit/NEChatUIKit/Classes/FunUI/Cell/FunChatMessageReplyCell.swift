@@ -5,4 +5,4 @@
 import UIKit
 
 @objcMembers
-open class FunChatMessageReplyCell: FunChatMessageTextCell {}
+open class FunChatMessageReplyCell: FunChatMessageAIStreamTextCell {}

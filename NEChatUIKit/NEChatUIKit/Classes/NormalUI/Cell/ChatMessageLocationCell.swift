@@ -204,15 +204,6 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     return imageView
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
   override open func commonUILeft() {
     super.commonUILeft()
     bubbleImageLeft.addSubview(backgroundViewLeft)

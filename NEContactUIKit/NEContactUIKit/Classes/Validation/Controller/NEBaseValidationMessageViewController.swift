@@ -93,7 +93,6 @@ open class NEBaseValidationMessageViewController: NEContactBaseViewController {
     navigationItem.rightBarButtonItem = clearItem
 
     navigationView.setMoreButtonTitle(localizable("clear"))
-    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
   }
 

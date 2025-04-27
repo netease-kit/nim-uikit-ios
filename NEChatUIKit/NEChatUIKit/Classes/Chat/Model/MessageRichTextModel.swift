@@ -33,7 +33,7 @@ open class MessageRichTextModel: MessageTextModel {
       font: font
     )
 
-    let textSize = NSAttributedString.getRealSize(titleAttributeStr, messageTextFont, messageMaxSize)
+    let textSize = NSAttributedString.getRealLabelSize(titleAttributeStr, messageTextFont, messageMaxSize)
     titleTextHeight = textSize.height
 
     let contentSizeWidth = max(textWidth, textSize.width) + chat_content_margin * 2

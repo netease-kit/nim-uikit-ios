@@ -17,7 +17,9 @@ public class NEConversationListModel: NSObject, Comparable {
   /// 会话
   public var conversation: V2NIMConversation? {
     didSet {
-      if let lastMessage = conversation?.lastMessage, lastMessage.messageType == .MESSAGE_TYPE_TEXT, let text = lastMessage.text {
+      if let lastMessage = conversation?.lastMessage,
+         lastMessage.messageType == .MESSAGE_TYPE_TEXT,
+         let text = lastMessage.text {
         lastMessageConent = NEChatKitClient.instance.getEmojString(text, ConversationUIConfig.shared.conversationProperties.itemContentSize > 0 ? ConversationUIConfig.shared.conversationProperties.itemContentSize : 13)
       } else {
         lastMessageConent = nil

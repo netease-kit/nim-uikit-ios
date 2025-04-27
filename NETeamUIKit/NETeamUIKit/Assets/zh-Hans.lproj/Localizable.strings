@@ -73,7 +73,7 @@
 "select_limit_tip"="超出%d人限制";
 "remove_manager_title"="是否移除";
 "remove_manager_tip"="移除后该成员将无管理权限";
-"max_managers_tip"="最多只能设置10个管理员";
+"max_managers_tip"="最多只能设置%d个管理员";
 "no_permission_tip"="您暂无操作权限";
 "no_manager_member"="暂无群管理人员";
 "remove_member_tip"="移除后该成员将离开当前群聊";

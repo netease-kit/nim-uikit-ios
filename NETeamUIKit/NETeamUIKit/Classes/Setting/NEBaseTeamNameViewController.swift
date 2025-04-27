@@ -73,7 +73,6 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
   /// UI 控件初始化
   open func setupUI() {
     navigationView.setMoreButtonTitle(localizable("save"))
-    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
     view.addSubview(backView)

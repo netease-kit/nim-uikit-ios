@@ -76,21 +76,8 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     return view
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    setupUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
-  open func setupUI() {
-    setupUIRight()
-    setupUILeft()
-  }
-
-  open func setupUILeft() {
+  override open func commonUILeft() {
+    super.commonUILeft()
     contentImageViewLeft.addSubview(stateViewLeft)
     NSLayoutConstraint.activate([
       stateViewLeft.centerXAnchor.constraint(equalTo: contentImageViewLeft.centerXAnchor),
@@ -106,7 +93,8 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     ])
   }
 
-  open func setupUIRight() {
+  override open func commonUIRight() {
+    super.commonUIRight()
     contentImageViewRight.addSubview(stateViewRight)
     NSLayoutConstraint.activate([
       stateViewRight.centerXAnchor.constraint(equalTo: contentImageViewRight.centerXAnchor),

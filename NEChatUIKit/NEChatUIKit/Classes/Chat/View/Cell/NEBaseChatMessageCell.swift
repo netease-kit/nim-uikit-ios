@@ -40,6 +40,12 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 
   // 消息即将展示
   @objc optional func messageWillShow(_ cell: UITableViewCell, _ model: MessageContentModel?)
+
+  // 停止流式消息
+  @objc optional func stopAIStreamMessage(_ cell: UITableViewCell, _ model: MessageContentModel?)
+
+  // 重新生成流式消息
+  @objc optional func regenAIStreamMessage(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 @objc
@@ -95,6 +101,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   private var tapGesture: UITapGestureRecognizer?
 
   public let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
+  public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

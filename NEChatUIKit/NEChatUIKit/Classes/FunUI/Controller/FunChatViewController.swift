@@ -343,14 +343,15 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     let contentWidth = model.contentSize.width
     let contentHeight = model.contentSize.height
+    var subHeight: CGFloat = 0
     if contentHeight < fun_chat_min_h {
-      let subHeight = fun_chat_min_h - contentHeight
+      subHeight = fun_chat_min_h - contentHeight
       model.contentSize = CGSize(width: contentWidth, height: fun_chat_min_h)
       model.offset = CGFloat(subHeight)
     }
 
     if model.isReplay {
-      model.offset += 44 + chat_content_margin
+      model.offset = subHeight + fun_chat_reply_height + chat_content_margin
     }
 
     if model.type == .rtcCallRecord {

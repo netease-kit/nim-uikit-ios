@@ -52,7 +52,6 @@ class LanguageViewController: NEBaseViewController, UITableViewDelegate,
       navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
       navigationView.setMoreButtonTitle(localizable("save"))
-      navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 34)
       navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
     } else {
       view.backgroundColor = .funChatBackgroundColor

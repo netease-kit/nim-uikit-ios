@@ -29,14 +29,6 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
 
   public var reeditButton = UIButton(type: .custom)
   public var reeditButtonW: NSLayoutConstraint?
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    commonUI()
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
 
   override open func commonUILeft() {
     bubbleImageLeft.addSubview(revokeLabelLeft)

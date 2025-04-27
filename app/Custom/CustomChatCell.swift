@@ -8,17 +8,6 @@ import UIKit
 class CustomChatCell: NEChatBaseCell {
   public var testLabel = UILabel()
 
-  override func awakeFromNib() {
-    super.awakeFromNib()
-    // Initialization code
-  }
-
-  override func setSelected(_ selected: Bool, animated: Bool) {
-    super.setSelected(selected, animated: animated)
-
-    // Configure the view for the selected state
-  }
-
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
@@ -38,7 +27,9 @@ class CustomChatCell: NEChatBaseCell {
   }
 
   override func setModel(_ model: MessageContentModel, _ isSend: Bool) {
-    print("this is custom message")
-    testLabel.text = model.message?.text
+    if let model = model as? MessageCustomModel {
+      print("this is custom message, customType: \(model.customType)")
+      testLabel.text = model.message?.text
+    }
   }
 }

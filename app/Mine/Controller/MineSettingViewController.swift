@@ -232,6 +232,11 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
 
   func didClickCleanCache() {}
 
+  func didClickConfigTest() {
+    let configTestVC = ConfigTestViewController()
+    navigationController?.pushViewController(configTestVC, animated: true)
+  }
+
   func didClickSDKConfig() {
     let configController = IMSDKConfigViewController()
     navigationController?.pushViewController(configController, animated: true)

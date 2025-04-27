@@ -265,7 +265,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
     }
 
     if viewModel.selectDic.count + viewModel.managerSet.count > selectCountLimit {
-      view.makeToast(localizable("max_managers_tip"))
+      view.makeToast(String(format: localizable("max_managers_tip"), selectCountLimit))
       return
     }
 

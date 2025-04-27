@@ -17,6 +17,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     return label
   }()
 
+  var revokeLabelRightXAnchor: NSLayoutConstraint?
   public lazy var revokeLabelRight: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -27,16 +28,15 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     return label
   }()
 
-  public var reeditButton = UIButton(type: .custom)
-  var revokeLabelRightXAnchor: NSLayoutConstraint?
-
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
+  public lazy var reeditButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
+    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.addTarget(self, action: #selector(reeditEvent), for: .touchUpInside)
+    button.accessibilityIdentifier = "id.reeditButton"
+    return button
+  }()
 
   override open func commonUILeft() {
     super.commonUILeft()
@@ -60,11 +60,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
       revokeLabelRight.heightAnchor.constraint(equalToConstant: 16),
     ])
 
-    reeditButton.translatesAutoresizingMaskIntoConstraints = false
-    reeditButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-    reeditButton.setTitleColor(UIColor.ne_normalTheme, for: .normal)
-    reeditButton.accessibilityIdentifier = "id.reeditButton"
-
     contentView.addSubview(reeditButton)
     NSLayoutConstraint.activate([
       reeditButton.leftAnchor.constraint(equalTo: revokeLabelRight.rightAnchor, constant: 8),
@@ -72,7 +67,6 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
       reeditButton.topAnchor.constraint(equalTo: revokeLabelRight.topAnchor, constant: 0),
       reeditButton.bottomAnchor.constraint(equalTo: revokeLabelRight.bottomAnchor, constant: 0),
     ])
-    reeditButton.addTarget(self, action: #selector(reeditEvent), for: .touchUpInside)
   }
 
   override open func showLeftOrRight(showRight: Bool) {

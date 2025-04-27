@@ -8,7 +8,7 @@ import SDWebImage
 import UIKit
 
 @objcMembers
-open class ChatMessageReplyCell: ChatMessageTextCell {
+open class ChatMessageReplyCell: ChatMessageAIStreamTextCell {
   public lazy var replyImageViewLeft: UIImageView = {
     let view = UIImageView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -28,14 +28,6 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
     view.layer.cornerRadius = 8
     return view
   }()
-
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
 
   override open func showLeftOrRight(showRight: Bool) {
     super.showLeftOrRight(showRight: showRight)
@@ -61,7 +53,7 @@ open class ChatMessageReplyCell: ChatMessageTextCell {
       replyLabel.accessibilityValue = text
 
       if let attriText = replyLabel.attributedText {
-        let textSize = NSAttributedString.getRealSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
+        let textSize = NSAttributedString.getRealLabelSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
         model.contentSize.width = max(textSize.width, model.textWidth) + chat_content_margin * 2
       }
     }

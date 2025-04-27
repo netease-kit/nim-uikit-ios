@@ -32,14 +32,6 @@ open class ChatMessageCallCell: NormalChatMessageBaseCell {
     return label
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
   override open func commonUILeft() {
     super.commonUILeft()
     bubbleImageLeft.addSubview(contentLabelLeft)

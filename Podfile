@@ -12,7 +12,7 @@ target 'app' do
   # 基础库
   pod 'NEChatKit', YXConfig.imuikit_version
 
-  # UI 组件，YXConfig.imuikit_version = 10.6.1
+  # UI 组件，YXConfig.imuikit_version = 10.8.0
   pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件
   pod 'NEContactUIKit', YXConfig.imuikit_version            # 通讯录组件
   pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件, 与本地会话组件二者选其一
@@ -43,12 +43,14 @@ target 'app' do
   
 end
 
-# ⚠️如果pod依赖报错，可打开以下注释
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = YXConfig.deployment_target
+      
+      # Apple 芯片模拟器运行打开以下代码
+#      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
 end

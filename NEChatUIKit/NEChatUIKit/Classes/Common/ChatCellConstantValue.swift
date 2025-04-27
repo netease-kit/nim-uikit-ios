@@ -7,8 +7,10 @@ import Foundation
 
 // 距离cell边缘的距离
 public let chat_cell_margin: CGFloat = 16.0
+
 // 控件之间的间距
 public let chat_content_margin: CGFloat = 8.0
+
 // 头像宽高
 public let chat_headWH: CGFloat = 32.0
 
@@ -29,6 +31,9 @@ public let fun_chat_min_h: CGFloat = 42.0
 
 // 回复消息replyLabel高度
 public let chat_reply_height: CGFloat = 16.0
+
+// 回复消息replyLabel高度(通用版)
+public let fun_chat_reply_height: CGFloat = 44.0
 
 // 气泡最大宽度
 public let chat_content_maxW: CGFloat = (kScreenWidth - 156)

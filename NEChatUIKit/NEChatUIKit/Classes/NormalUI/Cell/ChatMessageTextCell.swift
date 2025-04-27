@@ -66,14 +66,6 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     return label
   }()
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-  }
-
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-
   func tapFunc() {
     contentModel?.selectRange = nil
     delegate?.didTextViewLoseFocus?(self, contentModel)
@@ -116,6 +108,10 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
 
   /// 选中所有文本
   override open func selectAllRange() {
+    if contentModel?.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING {
+      return
+    }
+
     let contentLabel = contentLabelLeft.isHidden ? contentLabelRight : contentLabelLeft
 
     // 选中所有
@@ -205,11 +201,13 @@ extension ChatMessageTextCell: UITextViewDelegate {
     }
   }
 
+  func getTextSize(_ attributedText: NSAttributedString?) -> CGSize {
+    NSAttributedString.getRealLabelSize(attributedText, messageTextFont, messageMaxSize)
+  }
+
   // textView 垂直居中
   func contentSizeToFit(_ contentLabel: UITextView, _ model: MessageTextModel) {
-    let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
-    let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
-    let titleSize = NSAttributedString.getRealSize(contentLabel.attributedText, messageTextFont, messageMaxSize)
+    let titleSize = getTextSize(contentLabel.attributedText)
 
     let textHeight = titleSize.height
     let textViewHeight = model.textHeight
