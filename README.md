@@ -41,15 +41,6 @@ IM UIKit 业务逻辑层提供完善的业务逻辑处理能力。您无需关�
 
 ## 工作原理
 
-<style>
-table th:first-of-type {
-    width: 20%;
-}
-table th:nth-of-type(2) {
-    width: 80%;
-}
-</style>
-
 IM UIKit 采用 （Model–View–ViewModel）MVVM 架构模型，实现 UI 展示与业务逻辑开发的相互独立。
 
 <img alt="IMuikitDataFlow_iOS.png" src="https://yx-web-nosdn.netease.im/common/4526057a8ef3f59f6c65c56c42991de9/IMuikitDataFlow_iOS.png" style="width:60%;border: 1px solid #BFBFBF;">
