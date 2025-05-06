@@ -6,6 +6,9 @@ import NEChatUIKit
 import NIMSDK
 import UIKit
 
+// 自定义消息类型，用于绑定 cell 和内部标识
+public let customMessageType = 20
+
 public class CustomAttachment: NECustomAttachment {
   public var goodsName = "name"
 
@@ -42,7 +45,7 @@ public class CustomAttachmentDecoder: NECustomAttachmentDecoder {
     let neCustomAttachment = super.decodeCustomMessage(info: info)
       let customAttachment = CustomAttachment(neCustomAttachment)
     // 对自定义消息高度进行解析
-    if customAttachment.customType == 20 {
+    if customAttachment.customType == customMessageType {
       customAttachment.cellHeight = 50
     }
       
