@@ -159,10 +159,6 @@ open class AIChatDataLoader: NSObject {
   }
 
   private static func getHost() -> String {
-    #if DEBUG
-      "https://yiyong-qa.netease.im/"
-    #else
-      "https://yiyong.netease.im/"
-    #endif
+    "https://yiyong.netease.im/"
   }
 }
