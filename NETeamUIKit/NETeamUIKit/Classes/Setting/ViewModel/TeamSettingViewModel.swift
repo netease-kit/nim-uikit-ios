@@ -693,8 +693,8 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
   }
 
   /// 离开群回调
-  /// - Parameter teamMembers: 群成员
   /// - Parameter team: 群信息
+  /// - Parameter isKicked: 是否被踢
   open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {}
 
   /// 群成员变更统一处理

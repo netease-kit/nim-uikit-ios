@@ -36,7 +36,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
     super.addListener()
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)
-    NETeamUserManager.shared.loadData(sessionId)
+    NETeamUserManager.shared.loadData(ChatRepo.sessionId)
   }
 
   deinit {
@@ -56,8 +56,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   /// 重写 获取用户展示名称
   /// - Parameters:
-  ///   - accountId: 用户 accountId
-  ///   - showAlias: 是否展示备注
+  ///   - accountIds: 用户 accountId 列表
+  ///   - teamId: 群 id
   ///   - completion: 完成回调
   override open func loadShowName(_ accountIds: [String],
                                   _ teamId: String?,
@@ -86,7 +86,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
               if senderName == senderId {
                 group.enter()
-                self?.loadShowName([senderId], self?.sessionId) {
+                self?.loadShowName([senderId], ChatRepo.sessionId) {
                   senderName = self?.getShowName(senderId) ?? ""
                   group.leave()
                 }
@@ -182,14 +182,14 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
     ]
 
     // 更新群扩展
-    TeamRepo.shared.getTeamInfo(sessionId) { [weak self] team, error in
+    TeamRepo.shared.getTeamInfo(ChatRepo.sessionId) { [weak self] team, error in
       if let err = error {
         print("getTeamInfo error: \(String(describing: err))")
         completion(err)
         return
       }
 
-      guard let tid = self?.sessionId else { return }
+      let tid = ChatRepo.sessionId
 
       // 校验权限
       if self?.hasTopMessagePremission() == false {
@@ -230,14 +230,14 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
     ]
 
     // 更新群扩展
-    TeamRepo.shared.getTeamInfo(sessionId) { [weak self] team, error in
+    TeamRepo.shared.getTeamInfo(ChatRepo.sessionId) { [weak self] team, error in
       if let err = error {
         print("getTeamInfo error: \(String(describing: err))")
         completion(err)
         return
       }
 
-      guard let tid = self?.sessionId else { return }
+      let tid = ChatRepo.sessionId
 
       // 校验权限
       if self?.hasTopMessagePremission() == false {
@@ -284,7 +284,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
       self.teamMember = teamMember
       completion()
     } else {
-      teamRepo.getTeamMember(sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
+      teamRepo.getTeamMember(ChatRepo.sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
         self?.teamMember = member
         completion()
       }
@@ -375,7 +375,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   open func onTeamDismissed(_ team: V2NIMTeam) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + (team.teamId))
-    if sessionId == team.teamId {
+    if ChatRepo.sessionId == team.teamId {
       if let delegate = delegate as? TeamChatViewModelDelegate {
         delegate.onTeamRemoved?(team: team)
       }
@@ -389,7 +389,7 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
   /// 群信息更新
   /// - Parameter teamId: 群 id
   open func onTeamInfoUpdate(_ teamId: String) {
-    guard let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == sessionId else { return }
+    guard let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == ChatRepo.sessionId else { return }
 
     self.team = team
     loadTopMessage()
@@ -420,12 +420,15 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
 // MARK: - NEIMKitClientListener
 
 extension TeamChatViewModel: NEIMKitClientListener {
-  /// 登录连接状态回调
-  /// - Parameter status: 连接状态
+  /// 数据同步回调
+  /// - Parameters:
+  ///   - type: 同步的数据类型
+  ///   - state: 同步状态
+  ///   - error: 错误信息
   open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
     // 断网重连后，重新拉取群信息、自己的群成员信息
     if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
-      getTeamInfo(teamId: sessionId) { [weak self] error, team in
+      getTeamInfo(teamId: ChatRepo.sessionId) { [weak self] error, team in
         if error == nil {
           self?.team = team
         }

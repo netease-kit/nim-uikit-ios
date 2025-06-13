@@ -10,7 +10,7 @@ import UIKit
 open class UserInfoHeaderView: NEBaseUserInfoHeaderView {
   override open func commonUI() {
     super.commonUI()
-    avatarImageView.layer.cornerRadius = 30
+    userHeaderView.layer.cornerRadius = 30
 
     NSLayoutConstraint.activate([
       lineView.leftAnchor.constraint(equalTo: leftAnchor),

@@ -20,9 +20,10 @@ open class ContactInfo: NSObject {
   }
 
   public var user: NEUserWithFriend?
-  public var contactCellType = ContactCellType.ContactPerson.rawValue
+  public var contactCellType = ContactCellType.ContactPerson
   public var router = ContactPersonRouter
   public var isSelected = false
+  public var isOnline = false
   public var headerBackColor: UIColor?
   public var localExtension: [String: Any]?
 }

@@ -37,7 +37,7 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
   lazy var multiSelectImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = UIImage.ne_imageNamed(name: "unselect")
+    imageView.image = coreLoader.loadImage("unselect")
     imageView.accessibilityIdentifier = "id.selector"
     return imageView
   }()
@@ -67,7 +67,7 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
     titleLabelWidthAnchor = titleLabel.widthAnchor.constraint(lessThanOrEqualToConstant: titleLabelMaxWidth)
     titleLabelWidthAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 12),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
@@ -86,8 +86,6 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
   /// 设置文案字体字号
   open func setConfig() {
     titleLabel.textColor = ContactUIConfig.shared.contactProperties.itemTitleColor
-    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
-    nameLabel.textColor = UIColor.white
   }
 
   /// 设置选中状态显隐
@@ -105,7 +103,6 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
 
     multiSelectImageView.isHighlighted = model.isSelected
     titleLabel.text = model.name
-    nameLabel.text = NEFriendUserCache.getShortName(model.name ?? "")
     optionLabel.text = model.memberCount > 0 ? " (\(model.memberCount))" : nil
 
     // 单聊（人数为 0）不展示人数
@@ -113,17 +110,10 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
       titleLabelMaxWidth += memberLabelMaxWidth
     }
 
-    if let imageUrl = model.avatar, !imageUrl.isEmpty {
-      nameLabel.isHidden = true
-      avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      avatarImageView.backgroundColor = .clear
-    } else {
-      nameLabel.isHidden = false
-      avatarImageView.sd_setImage(with: nil)
-      if let cid = model.conversationId, let sessionId = V2NIMConversationIdUtil.conversationTargetId(cid) {
-        avatarImageView.backgroundColor = UIColor.colorWithString(string: sessionId)
-      }
-    }
+    let url = model.avatar
+    let name = NEFriendUserCache.getShortName(model.name ?? "")
+    let accountId = V2NIMConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 
   /// 搜索字符

@@ -46,6 +46,7 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
     recordAudioMessagePaths.removeAll()
     revokeMessageIds.removeAll()
     NEFriendUserCache.shared.removeAllFriendInfo()
+    NESubscribeManager.shared.cleanCache()
   }
 
   // 是否已经发送过对应消息的提示

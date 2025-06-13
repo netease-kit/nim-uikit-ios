@@ -13,27 +13,17 @@ import UIKit
 open class NEBaseTeamUserCell: UICollectionViewCell {
   public var user: NETeamMemberInfoModel? {
     didSet {
-      if let name = user?.showNickInTeam() {
-        userHeaderView.setTitle(name)
-      }
-
       if let userId = user?.nimUser?.user?.accountId {
         if let u = NEFriendUserCache.shared.getFriendInfo(userId) {
-          if let url = u.user?.avatar, !url.isEmpty {
-            userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-            userHeaderView.setTitle("")
-          } else if let id = u.user?.accountId {
-            userHeaderView.image = nil
-            userHeaderView.backgroundColor = UIColor.colorWithString(string: "\(id)")
-          }
+          let url = u.user?.avatar
+          let name = user?.getShortName(user?.showNickInTeam() ?? "") ?? ""
+          let accountId = u.user?.accountId ?? ""
+          userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
         } else {
-          if let url = user?.nimUser?.user?.avatar, !url.isEmpty {
-            userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-            userHeaderView.setTitle("")
-          } else if let id = user?.nimUser?.user?.accountId {
-            userHeaderView.image = nil
-            userHeaderView.backgroundColor = UIColor.colorWithString(string: "\(id)")
-          }
+          let url = user?.nimUser?.user?.avatar
+          let name = user?.getShortName(user?.showNickInTeam() ?? "") ?? ""
+          let accountId = user?.nimUser?.user?.accountId ?? ""
+          userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
         }
       }
     }

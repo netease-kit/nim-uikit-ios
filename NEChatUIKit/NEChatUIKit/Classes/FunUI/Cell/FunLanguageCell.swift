@@ -20,7 +20,7 @@ open class FunLanguageCell: NEBaseLanguageCell {
     NSLayoutConstraint.activate([
       selectedImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -40),
       selectedImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      selectedImageView.widthAnchor.constraint(equalToConstant: 16),
+      selectedImageView.widthAnchor.constraint(equalToConstant: 20),
       selectedImageView.heightAnchor.constraint(equalToConstant: 16),
     ])
 

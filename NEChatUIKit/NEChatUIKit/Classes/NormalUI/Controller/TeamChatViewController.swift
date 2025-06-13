@@ -74,7 +74,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
             if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == true, team.isValidTeam == false {
-              self?.showSingleAlert(message: coreLoader.localizable("team_not_exist")) {
+              self?.showSingleAlert(message: chatCoreLoader.localizable("team_not_exist")) {
                 NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
               }
@@ -114,13 +114,13 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
     style.alignment = .left
     attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
     attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
-    attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.utf16.count))
+    attribute.addAttribute(.foregroundColor, value: UIColor.normalChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
     return attribute
   }
 
   open func updateTeamTitle(_ noti: Notification) {
     if let tid = noti.userInfo?["teamId"] as? String,
-       tid == viewModel.sessionId,
+       tid == ChatRepo.sessionId,
        let team = NETeamUserManager.shared.getTeamInfo() {
       updateTeamInfo(team: team)
     }
@@ -129,7 +129,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
   /// 更新群聊信息（群聊名称、群禁言状态、缓存）
   /// - Parameter team: 群聊信息
   open func updateTeamInfo(team: V2NIMTeam) {
-    title = team.name
+    titleContent = team.name
     setMute(team: team)
   }
 
@@ -145,7 +145,6 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
       isMute = true
       chatInputView.textView.isEditable = false
       chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
-      chatInputView.textView.backgroundColor = UIColor(hexString: "#E3E4E4")
       layoutInputView(offset: 0)
       chatInputView.stackView.isUserInteractionEnabled = false
       chatInputView.setMuteInputStyle()
@@ -158,9 +157,8 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
       // 解除群禁言
       isMute = false
       chatInputView.textView.isEditable = true
-      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: "\(chatLocalizable("send_to"))\(title ?? team.name)")
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: "\(chatLocalizable("send_to"))\(titleContent)")
 
-      chatInputView.textView.backgroundColor = .white
       chatInputView.stackView.isUserInteractionEnabled = true
       chatInputView.setUnMuteInputStyle()
     }
@@ -173,7 +171,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
         if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO,
            let updatedTeamInfo = content.updatedTeamInfo {
           if let name = updatedTeamInfo.name {
-            title = name
+            titleContent = name
             onTeamMemberUpdate([])
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE,

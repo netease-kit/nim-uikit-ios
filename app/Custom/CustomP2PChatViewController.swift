@@ -156,7 +156,7 @@ class CustomP2PChatViewController: P2PChatViewController {
     let customMessage = MessageUtils.customMessage(text: "this is a custom message, create time:\(Date.timeIntervalSinceReferenceDate)",
                                                    rawAttachment: dataJson)
 
-    ChatRepo.shared.sendMessage(message: customMessage, conversationId: viewModel.conversationId) { result, error, pro in
+    ChatRepo.shared.sendMessage(message: customMessage, conversationId: ChatRepo.conversationId) { result, error, pro in
       if let err = error {
         print("send custom message error : ", err.localizedDescription)
       }

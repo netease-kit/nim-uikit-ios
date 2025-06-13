@@ -7,28 +7,18 @@ import UIKit
 
 @objcMembers
 open class NEBaseTeamTableViewCell: UITableViewCell {
-  // 头像图片
-  lazy var avatarImageView: UIImageView = {
-    let imageView = UIImageView()
+  // 头像
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let imageView = NEUserHeaderView(frame: .zero)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
-    imageView.contentMode = .scaleAspectFill
-    imageView.accessibilityIdentifier = "id.avatar"
+    imageView.titleLabel.font = NEConstant.defaultTextFont(16.0)
+    imageView.isUserInteractionEnabled = true
     return imageView
   }()
 
-  // 头像文本
-  lazy var nameLabel: UILabel = {
-    let label = UILabel()
-    label.textAlignment = .center
-    label.font = UIFont.systemFont(ofSize: 16)
-    label.textColor = .white
-    label.translatesAutoresizingMaskIntoConstraints = false
-    return label
-  }()
-
   // 名称
-  lazy var titleLabel: UILabel = {
+  public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.name"
@@ -36,8 +26,8 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
   }()
 
   // 右侧图标
-  lazy var arrowImageView: UIImageView = {
-    let arrow = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
+  public lazy var arrowImageView: UIImageView = {
+    let arrow = UIImageView(image: coreLoader.loadImage("arrow_right"))
     arrow.translatesAutoresizingMaskIntoConstraints = false
     arrow.contentMode = .center
     arrow.isHidden = true
@@ -56,25 +46,17 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
   open func commonUI() {
     selectionStyle = .none
 
-    contentView.addSubview(avatarImageView)
+    contentView.addSubview(userHeaderView)
     NSLayoutConstraint.activate([
-      avatarImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-      avatarImageView.widthAnchor.constraint(equalToConstant: 42),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 42),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
-    ])
-
-    contentView.addSubview(nameLabel)
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
-      nameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
-      nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
+      userHeaderView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 42),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 42),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
 
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -35),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -93,28 +75,12 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
     guard let team = model as? NETeam else {
       return
     }
-    guard let name = team.teamName else {
-      return
-    }
-    titleLabel.text = name
-//        self.nameLabel.text = name.count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
-    if let url = team.avatarUrl, !url.isEmpty {
-      avatarImageView.sd_setImage(with: URL(string: url), completed: nil)
-      avatarImageView.backgroundColor = .clear
-    } else {
-      // random avatar
-//      avatarImage.image = randomAvatar(teamId: team.teamId)
-      avatarImageView.backgroundColor = UIColor.colorWithString(string: team.teamId)
-    }
-  }
 
-  private func randomAvatar(teamId: String?) -> UIImage? {
-    guard let tid = teamId else {
-      return nil
-    }
-    // mod: 0 1 2 3 4
-    let mod = (Int(tid) ?? 0) % 5
-    let name = "icon_" + String(mod)
-    return UIImage.ne_imageNamed(name: name)
+    titleLabel.text = team.teamName
+
+    let url = team.avatarUrl
+    let name = team.v2Team?.getShortName() ?? ""
+    let accountId = team.teamId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 }

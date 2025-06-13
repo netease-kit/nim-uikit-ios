@@ -32,4 +32,7 @@ public class NEConversationListModel: NSObject, Comparable {
 
   /// 最后一条消息内容(包含表情解析)
   var lastMessageConent: NSAttributedString?
+
+  /// 单聊是否在线
+  public var p2pOnline: Bool = false
 }

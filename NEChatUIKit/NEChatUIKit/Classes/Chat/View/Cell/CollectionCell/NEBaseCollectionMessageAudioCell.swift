@@ -38,8 +38,13 @@ class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
     super.setupCommonUI()
 
     let receiveImage = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
-    bubbleImage.image = receiveImage?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImage.image = receiveImage?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImage.image = receiveImage
+      bubbleImage.contentMode = .scaleAspectFill
+    }
+
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     backView.addSubview(bubbleImage)
     contentWidth = bubbleImage.widthAnchor.constraint(equalToConstant: chat_content_maxW)

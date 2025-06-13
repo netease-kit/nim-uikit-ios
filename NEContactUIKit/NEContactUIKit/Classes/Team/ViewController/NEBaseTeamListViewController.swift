@@ -52,7 +52,7 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
   }
 
   open func initNav() {
-    let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
+    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,

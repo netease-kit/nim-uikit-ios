@@ -32,8 +32,8 @@
 "agreed_request"="同意了你的好友请求";
 "refused_request"="拒绝了你的好友请求";
 "clear"="清空";
-"agreed"="已同意";
-"refused"="已拒绝";
+"valid_agreed"="已同意";
+"valid_refused"="已拒绝";
 "expired"="已过期";
 "refuse"="拒绝";
 "agree"="同意";

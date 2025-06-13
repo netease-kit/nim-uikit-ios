@@ -207,7 +207,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
   }
 
   /// 选择成员列表回调
-  /// - Parameter user: 用户对象
+  /// - Parameter model: 成员model
   open func didSelectedUser(_ model: NEFusionContactCellModel) -> Bool {
     if selectArray.count >= limit {
       return false
@@ -218,7 +218,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
   }
 
   /// 取消选择成员列表回调
-  /// - Parameter user: 用户对象
+  /// - Parameter model: 成员model
   open func didUnselectedUser(_ model: NEFusionContactCellModel) {
     selectArray.removeAll { selectModel in
       let selectAccountId = selectModel.getAccountId()

@@ -44,8 +44,7 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
   /// 初始化子视图
   override open func setupSubviews() {
     super.setupSubviews()
-    let leftImageView = UIImageView(image: UIImage
-      .ne_imageNamed(name: "funSearch"))
+    let leftImageView = UIImageView(image: coreLoader.loadImage("fun_search"))
     searchTextField.leftView = leftImageView
     searchTextField.font = UIFont.systemFont(ofSize: 16)
     searchTextField.textColor = .black
@@ -81,7 +80,7 @@ open class FunConversationSearchController: NEBaseConversationSearchController {
       FunSearchSessionHeaderView.self,
       forHeaderFooterViewReuseIdentifier: "\(NSStringFromClass(SearchSessionBaseView.self))"
     )
-    tableView.backgroundColor = .funConversationBackgroundColor
+
     if #available(iOS 15.0, *) {
       tableView.sectionHeaderTopPadding = 0
     }

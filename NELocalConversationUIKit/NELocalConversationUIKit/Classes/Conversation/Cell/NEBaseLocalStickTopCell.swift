@@ -46,25 +46,16 @@ open class NEBaseStickTopCell: UICollectionViewCell {
   }
 
   /// 绑定会话数据
-  /// - Parameter 会话数据模型
+  /// - Parameter model: 会话数据模型
   open func configAIUserCellData(_ model: NEAIUserModel?) {
-    guard let user = model?.aiUser else { return }
-    if let imageUrl = user.avatar, !imageUrl.isEmpty {
-      stickTopHeadImageView.setTitle("")
-      stickTopHeadImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      stickTopHeadImageView.backgroundColor = .clear
-    } else {
-      if let name = user.shortName() {
-        stickTopHeadImageView.setTitle(name)
-      } else if let showId = user.shortName() {
-        stickTopHeadImageView.setTitle(showId)
-      }
-      stickTopHeadImageView.sd_setImage(with: nil, completed: nil)
-      if let uid = user.accountId {
-        stickTopHeadImageView.backgroundColor = UIColor
-          .colorWithString(string: uid)
-      }
+    guard let user = model?.aiUser else {
+      return
     }
+
+    let url = user.avatar
+    let name = user.shortName() ?? ""
+    let accountId = user.accountId ?? ""
+    stickTopHeadImageView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     if let name = user.name {
       stickTopNameLabel.text = name

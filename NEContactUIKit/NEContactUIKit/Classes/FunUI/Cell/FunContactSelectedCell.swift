@@ -10,15 +10,15 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 40),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 40),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 
   override open func commonUI() {
     super.commonUI()
-    sImageView.highlightedImage = UIImage.ne_imageNamed(name: "fun_select")
+    sImageView.highlightedImage = coreLoader.loadImage("fun_select")
     NSLayoutConstraint.activate([
       sImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       sImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
@@ -29,11 +29,11 @@ open class FunContactSelectedCell: NEBaseContactSelectedCell {
 
   override open func initSubviewsLayout() {
     if ContactUIConfig.shared.contactProperties.avatarType == .cycle {
-      avatarImageView.layer.cornerRadius = 20.0
+      userHeaderView.layer.cornerRadius = 20.0
     } else if ContactUIConfig.shared.contactProperties.avatarCornerRadius > 0 {
-      avatarImageView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
+      userHeaderView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
     } else {
-      avatarImageView.layer.cornerRadius = 4.0 // Fun UI
+      userHeaderView.layer.cornerRadius = 4.0 // Fun UI
     }
   }
 

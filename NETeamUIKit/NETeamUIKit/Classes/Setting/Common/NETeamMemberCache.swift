@@ -6,15 +6,17 @@ import NECoreIM2Kit
 import NIMSDK
 import UIKit
 
-// 废弃，使用 NEChatUIKit 中的 NETeamChatUserCacheListener
+/// 废弃，使用 NEChatUIKit 中的 NETeamChatUserCacheListener
+@available(*, deprecated, message: "请改用 `NEChatUIKit` 中的 `NETeamChatUserCacheListener` 协议")
 @objc public protocol NETeamMemberCacheListener: NSObjectProtocol {
   /// 缓存变更回调协议
   @objc optional func memberCacheDidChange()
 }
 
-// 废弃，使用 NEChatUIKit 中的 NETeamUserManager
+/// 废弃，使用 NEChatUIKit 中的 NETeamUserManager
 @objc
 @objcMembers
+@available(*, deprecated, message: "请改用 `NEChatUIKit` 中的 `NETeamUserManager` 类")
 open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, NEContactListener {
   private let teamMemberCacheMultiDelegate = MultiDelegate<NETeamMemberCacheListener>(strongReferences: false)
 
@@ -133,7 +135,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   }
 
   /// 好友信息更新
-  /// - Parameter friendInfo： 好友信息
+  /// - Parameter friendInfo: 好友信息
   open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     if let account = friendInfo.accountId, let model = cacheDic[account] {
       model.nimUser = NEUserWithFriend(friend: friendInfo)
@@ -216,7 +218,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   }
 
   /// 群成员变更统一处理
-  /// - Parameter teamMembers: 群成员
+  /// - Parameter members: 群成员
   open func onMemberDidChanged(_ members: [V2NIMTeamMember]) {
     for member in members {
       if currentTeamId != member.teamId {
@@ -230,7 +232,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   }
 
   /// 群成员减少统一处理处理
-  /// - Parameter teamMembers: 群成员
+  /// - Parameter members: 群成员
   open func onMemberDidRemove(_ members: [V2NIMTeamMember]) {
     for member in members {
       if currentTeamId != member.teamId {
@@ -242,7 +244,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   }
 
   /// 群成员增加统一处理
-  /// - Parameter teamMembers: 群成员
+  /// - Parameter members: 群成员
   open func onMemberDidAdd(_ members: [V2NIMTeamMember]) {
     var allMembmers = [V2NIMTeamMember]()
     for member in members {

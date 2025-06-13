@@ -26,7 +26,7 @@ open class FunRecordAudioView: UIView {
   public var minRecordProgressWidth: CGFloat = 165.0
 
   lazy var lottieView: NELottieAnimationView = {
-    let lottie = NELottieAnimationView(name: "fun_vioce_data", bundle: coreLoader.bundle)
+    let lottie = NELottieAnimationView(name: "fun_voice_data", bundle: chatCoreLoader.bundle)
     lottie.translatesAutoresizingMaskIntoConstraints = false
     lottie.loopMode = .loop
     lottie.contentMode = .scaleToFill
@@ -61,8 +61,8 @@ open class FunRecordAudioView: UIView {
   public let recordGestureArea: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = coreLoader.loadImage("fun_chat_record_gesture_inner")
-    imageView.highlightedImage = coreLoader.loadImage("fun_chat_record_gesture_outter")
+    imageView.image = chatCoreLoader.loadImage("fun_chat_record_gesture_inner")
+    imageView.highlightedImage = chatCoreLoader.loadImage("fun_chat_record_gesture_outter")
     imageView.isHighlighted = false
     return imageView
   }()
@@ -71,8 +71,8 @@ open class FunRecordAudioView: UIView {
     let imageView = UIImageView()
     imageView.contentMode = .center
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = coreLoader.loadImage("fun_chat_record_close_dark")
-    imageView.highlightedImage = coreLoader.loadImage("fun_chat_record_close_light")
+    imageView.image = chatCoreLoader.loadImage("fun_chat_record_close_dark")
+    imageView.highlightedImage = chatCoreLoader.loadImage("fun_chat_record_close_light")
     imageView.isHighlighted = false
     return imageView
   }()

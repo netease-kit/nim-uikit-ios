@@ -76,7 +76,7 @@ open class NETeamBaseViewController: UIViewController, UIGestureRecognizerDelega
   }
 
   open func setupBackUI() {
-    let image = coreLoader.loadImage("backArrow")?.withRenderingMode(.alwaysOriginal)
+    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,

@@ -395,7 +395,9 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
 
   open func setCellModel(cell: NEBaseForwardSessionCell, indexPath: IndexPath) -> UICollectionViewCell {
     let item = forwardSessions[indexPath.row]
-    cell.sessionHeaderView.configHeadData(headUrl: item.avatar, name: item.name ?? "", uid: item.conversationId ?? "")
+    cell.sessionHeaderView.configHeadData(headUrl: item.avatar,
+                                          name: item.name ?? "",
+                                          uid: item.conversationId ?? "")
     return cell
   }
 

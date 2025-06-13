@@ -56,6 +56,7 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
   public lazy var tabView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
+    view.backgroundColor = .white
 
     view.addSubview(readButton)
     NSLayoutConstraint.activate([

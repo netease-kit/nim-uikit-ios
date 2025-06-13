@@ -219,3 +219,10 @@
 "request_exception" = "AI error";
 "ai_request_ing" = "Thinking…";
 "server_busy" = "Sorry, the server is busy, please try again later.";
+
+"ai_chat_title" = "Reply Inspiration";
+"ai_chat_for_failure" = "Reply Inspiration Acquisition Failed";
+"ai_chat_click_retry" = "Click to Retry";
+
+"p2p_chat_online" = "(Online)";
+"p2p_chat_offline" = "(Offline)";

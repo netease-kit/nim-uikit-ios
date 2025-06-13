@@ -101,9 +101,9 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     let showOnlineStatus = SettingCellModel()
     showOnlineStatus.cellName = "显示在线状态"
     showOnlineStatus.type = SettingCellType.SettingSwitchCell.rawValue
-    showOnlineStatus.switchOpen = IMKitConfigCenter.shared.onlineStatusEnable
+    showOnlineStatus.switchOpen = IMKitConfigCenter.shared.enableOnlineStatus
     showOnlineStatus.swichChange = { isOpen in
-      IMKitConfigCenter.shared.onlineStatusEnable = isOpen
+      IMKitConfigCenter.shared.enableOnlineStatus = isOpen
     }
     model.cellModels.append(showOnlineStatus)
 
@@ -117,7 +117,7 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     model.cellModels.append(strangerCallModel)
 
     let invalidTeamDeleteModel = SettingCellModel()
-    invalidTeamDeleteModel.cellName = "无效群聊是否保留会话"
+    invalidTeamDeleteModel.cellName = "无效群聊是否删除会话"
     invalidTeamDeleteModel.type = SettingCellType.SettingSwitchCell.rawValue
     invalidTeamDeleteModel.switchOpen = IMKitConfigCenter.shared.enableDismissTeamDeleteConversation
     invalidTeamDeleteModel.swichChange = { isOpen in
@@ -142,6 +142,24 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       IMKitConfigCenter.shared.enableAIStream = isOpen
     }
     model.cellModels.append(aiStreamMessageModel)
+
+    let aiChatModel = SettingCellModel()
+    aiChatModel.cellName = "AI 助聊"
+    aiChatModel.type = SettingCellType.SettingSwitchCell.rawValue
+    aiChatModel.switchOpen = IMKitConfigCenter.shared.enableAIChatHelper
+    aiChatModel.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableAIChatHelper = isOpen
+    }
+    model.cellModels.append(aiChatModel)
+
+    let sendRichTextMessageModel = SettingCellModel()
+    sendRichTextMessageModel.cellName = "允许发送【换行消息】"
+    sendRichTextMessageModel.type = SettingCellType.SettingSwitchCell.rawValue
+    sendRichTextMessageModel.switchOpen = IMKitConfigCenter.shared.enableRichTextMessage
+    sendRichTextMessageModel.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableRichTextMessage = isOpen
+    }
+    model.cellModels.append(sendRichTextMessageModel)
 
     recentForwardListMaxCountModel.cellName = "最近转发的会话 id 列表最大长度"
     recentForwardListMaxCountModel.type = SettingCellType.SettingSubtitleCell.rawValue

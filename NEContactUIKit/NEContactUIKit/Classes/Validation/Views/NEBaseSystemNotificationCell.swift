@@ -46,7 +46,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
   public lazy var resultImage: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = UIImage.ne_imageNamed(name: "finishFlag")
+    imageView.image = UIImage.ne_imageNamed(name: "valid_processed")
     return imageView
   }()
 
@@ -123,14 +123,14 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
 
         switch model.handleStatus {
         case .FRIEND_ADD_APPLICATION_STATUS_AGREED, .FRIEND_ADD_APPLICATION_STATUS_DIRECT_ADD:
-          resultLabel.text = localizable("agreed")
-          resultImage.image = UIImage.ne_imageNamed(name: "finishFlag")
+          resultLabel.text = localizable("valid_agreed")
+          resultImage.image = UIImage.ne_imageNamed(name: "valid_processed")
         case .FRIEND_ADD_APPLICATION_STATUS_REJECED:
-          resultLabel.text = localizable("refused")
-          resultImage.image = UIImage.ne_imageNamed(name: "refused")
+          resultLabel.text = localizable("valid_refused")
+          resultImage.image = UIImage.ne_imageNamed(name: "valid_refused")
         case .FRIEND_ADD_APPLICATION_STATUS_EXPIRED:
           resultLabel.text = localizable("expired")
-          resultImage.image = UIImage.ne_imageNamed(name: "refused")
+          resultImage.image = UIImage.ne_imageNamed(name: "valid_refused")
         default:
           resultLabel.text = ""
         }

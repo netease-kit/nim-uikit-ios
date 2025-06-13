@@ -40,6 +40,21 @@ public class ChatUIConfig: NSObject {
   /// 消息列表的视图控制器回调，回调中会返回消息列表的视图控制器
   public var customController: ((ChatViewController) -> Void)?
 
+  /// 消息列表的 AI 助聊视图控制器回调，回调中会返回消息列表的 AI 助聊视图控制器
+  public var aiChatViewController: ((AIChatViewController) -> Void)?
+
+  /// AI 助聊的数据加载器
+  /// 参数分别为：上下文消息、对方发送的最后一条文本消息、回调
+  public var aiChatDataLoader: (([V2NIMMessage]?, V2NIMMessage?, @escaping ([AIChatCellModel]?, Error?) -> Void) -> Void)?
+
+  /// AI 助聊入口按钮点击事件
+  /// 参数分别为：消息列表视图控制器、按钮开关
+  public var aiChatClick: ((ChatViewController, Bool) -> Void)?
+
+  /// AI 助聊重新加载按钮点击事件
+  /// 参数分别为：AI 助聊视图控制器、上下文消息、对方发送的最后一条文本消息
+  public var aiChatReloadClick: ((AIChatViewController, [V2NIMMessage]?, V2NIMMessage?) -> Void)?
+
   /*
    * 用户可自定义参数
    */
@@ -100,6 +115,12 @@ public class MessageProperties: NSObject {
   // 聊天字体颜色(文本类型)
   public var messageTextColor = UIColor.ne_darkText
 
+  // 输入框文本字体颜色
+  public var inputTextColor = UIColor.ne_darkText
+
+  // 输入框占位文本字体颜色
+  public var inputPlaceholderTextColor: UIColor?
+
   // 自己发送的消息体的背景色
   public var selfMessageBg: UIColor = .clear
 
@@ -107,7 +128,7 @@ public class MessageProperties: NSObject {
   public var receiveMessageBg: UIColor = .clear
 
   // 背景图片拉伸参数（边距偏移）
-  public var backgroundImageCapInsets = UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25)
+  public var backgroundImageCapInsets: UIEdgeInsets? = UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25)
 
   // 不设置头像的用户所展示的文字头像中的文字颜色
   public var userNickColor: UIColor = .white
@@ -132,6 +153,9 @@ public class MessageProperties: NSObject {
   public var titleBarRightRes: UIImage?
   // 标题栏右侧图标的点击事件
   public var titleBarRightClick: ((ChatViewController) -> Void)?
-  // 设置会话界面背景色
-  public var chatViewBackground: UIColor?
+  // 设置消息列表背景色，仅消息列表生效
+  public var chatTableViewBackgroundColor: UIColor?
+
+  // 设置聊天界面背景色，包含状态栏、导航栏、消息列表、输入区域，颜色同 chatViewBackgroundColor
+  public var chatViewBackgroundSolid: Bool = false
 }

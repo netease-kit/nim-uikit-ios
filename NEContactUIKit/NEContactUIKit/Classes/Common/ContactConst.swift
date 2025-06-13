@@ -16,9 +16,9 @@ public enum ContactCellType: Int {
 
 public typealias ContactsSelectCompletion = ([ContactInfo]) -> Void?
 
-let coreLoader = CommonLoader<NEContactBaseViewController>()
+let contactCoreLoader = CommonLoader<NEContactBaseViewController>()
 func localizable(_ key: String) -> String {
-  coreLoader.localizable(key)
+  contactCoreLoader.localizable(key)
 }
 
 public let ModuleName = "NEContactUIKit"

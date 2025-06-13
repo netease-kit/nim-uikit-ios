@@ -34,7 +34,7 @@ open class NEChatMoreActionView: UIView {
     layout.sectionInset = UIEdgeInsets(top: 0, left: NEMoreView_Section_Padding, bottom: 0, right: NEMoreView_Section_Padding)
     self.moreFlowLayout = layout
     let collcetionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collcetionView.backgroundColor = UIColor.ne_backgroundColor
+    collcetionView.backgroundColor = UIColor.clear
     collcetionView.translatesAutoresizingMaskIntoConstraints = false
     collcetionView.dataSource = self
     collcetionView.delegate = self

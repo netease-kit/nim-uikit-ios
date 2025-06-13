@@ -49,7 +49,7 @@ open class TeamAvatarViewModel: NSObject {
   }
 
   /// 上传文件
-  ///   - Parameter filepath: 上传文件路径
+  ///   - Parameter fileTask: 文件上传任务
   ///   - Parameter progress: 进度回调
   ///   - Parameter completion: 完成回调
   open func uploadImageFile(_ fileTask: V2NIMUploadFileTask,

@@ -32,8 +32,8 @@
 "agreed_request"="Approved your apply";
 "refused_request"="Reject your apply";
 "clear"="Clear";
-"agreed"="Added";
-"refused"="Declined";
+"valid_agreed"="Added";
+"valid_refused"="Declined";
 "expired"="Expired";
 "refuse"="Decline";
 "agree"="Accept";

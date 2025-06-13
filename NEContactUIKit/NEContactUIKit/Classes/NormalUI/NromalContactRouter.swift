@@ -67,7 +67,7 @@ public extension ContactRouter {
           let userInfoVC = ContactUserViewController(nim_user: nimUser)
           nav.pushViewController(userInfoVC, animated: true)
         } else if let uid = param["uid"] as? String {
-          let userInfoVC = ContactUserViewController(uid: uid)
+          let userInfoVC = ContactUserViewController(accountId: uid)
           nav.pushViewController(userInfoVC, animated: true)
         }
       }

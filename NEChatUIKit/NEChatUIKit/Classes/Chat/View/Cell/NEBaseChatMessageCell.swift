@@ -63,9 +63,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   public var contentModel: MessageContentModel? // 消息模型
 
   /// Left
-  public var avatarImageLeft = UIImageView() // 左侧头像
+  public var userHeaderViewLeft = NEUserHeaderView(frame: .zero) // 左侧头像
   public var avatarImageLeftAnchor: NSLayoutConstraint? // 左侧头像左侧布局依赖
-  public var nameLabelLeft = UILabel() // 左侧头像文字（无头像预设）
   public var bubbleImageLeft = UIImageView() // 左侧气泡
   public var bubbleTopAnchorLeft: NSLayoutConstraint? // 左侧气泡顶部布局约束
   public var bubbleWLeft: NSLayoutConstraint? // 左侧气泡宽度布局约束
@@ -78,8 +77,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   public var fullNameH: NSLayoutConstraint? // 群昵称高度布局约束
 
   /// Right
-  public var avatarImageRight = UIImageView() // 右侧头像
-  public var nameLabelRight = UILabel() // 右侧头像文字（无头像预设）
+  public var userHeaderViewRight = NEUserHeaderView(frame: .zero) // 右侧头像
   public var bubbleImageRight = UIImageView() // 右侧气泡
   public var bubbleWRight: NSLayoutConstraint? // 右侧气泡宽度布局约束
   public var bubbleHRight: NSLayoutConstraint? // 右侧气泡高度布局约束
@@ -124,13 +122,23 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   open func setBubbleImage() {
     var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBg
-    bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImageLeft.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImageLeft.image = image
+      bubbleImageLeft.contentMode = .scaleAspectFill
+    }
 
     image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
     bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBg
-    bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImageRight.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImageRight.image = image
+      bubbleImageRight.contentMode = .scaleAspectFill
+    }
   }
 
   open func initProperty() {
@@ -142,30 +150,17 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     timeLabel.backgroundColor = .clear
 
     // avatar
-    avatarImageLeft.backgroundColor = UIColor(hexString: "#537FF4")
-    avatarImageLeft.translatesAutoresizingMaskIntoConstraints = false
-    avatarImageLeft.clipsToBounds = true
-    avatarImageLeft.isUserInteractionEnabled = true
-    avatarImageLeft.contentMode = .scaleAspectFill
-    avatarImageLeft.accessibilityIdentifier = "id.avatar"
+    userHeaderViewLeft.translatesAutoresizingMaskIntoConstraints = false
+    userHeaderViewLeft.clipsToBounds = true
+    userHeaderViewLeft.isUserInteractionEnabled = true
+    userHeaderViewLeft.titleLabel.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
+    userHeaderViewLeft.titleLabel.textColor = ChatUIConfig.shared.messageProperties.userNickColor
 
-    avatarImageRight.backgroundColor = UIColor(hexString: "#537FF4")
-    avatarImageRight.translatesAutoresizingMaskIntoConstraints = false
-    avatarImageRight.clipsToBounds = true
-    avatarImageRight.isUserInteractionEnabled = true
-    avatarImageRight.contentMode = .scaleAspectFill
-    avatarImageRight.accessibilityIdentifier = "id.avatar"
-
-    // name
-    nameLabelLeft.textAlignment = .center
-    nameLabelLeft.translatesAutoresizingMaskIntoConstraints = false
-    nameLabelLeft.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
-    nameLabelLeft.textColor = ChatUIConfig.shared.messageProperties.userNickColor
-
-    nameLabelRight.textAlignment = .center
-    nameLabelRight.translatesAutoresizingMaskIntoConstraints = false
-    nameLabelRight.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
-    nameLabelRight.textColor = ChatUIConfig.shared.messageProperties.userNickColor
+    userHeaderViewRight.translatesAutoresizingMaskIntoConstraints = false
+    userHeaderViewRight.clipsToBounds = true
+    userHeaderViewRight.isUserInteractionEnabled = true
+    userHeaderViewRight.titleLabel.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.userNickTextSize)
+    userHeaderViewRight.titleLabel.textColor = ChatUIConfig.shared.messageProperties.userNickColor
 
     // fullName
     fullNameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -209,8 +204,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     activityView.accessibilityIdentifier = "id.status"
 
     selectedButton.translatesAutoresizingMaskIntoConstraints = false
-    selectedButton.setImage(.ne_imageNamed(name: "unselect"), for: .normal)
-    selectedButton.setImage(.ne_imageNamed(name: "select"), for: .selected)
+    selectedButton.setImage(coreLoader.loadImage("unselect"), for: .normal)
+    selectedButton.setImage(coreLoader.loadImage("select"), for: .selected)
     selectedButton.addTarget(self, action: #selector(selectButtonClicked), for: .touchUpInside)
   }
 
@@ -233,30 +228,22 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func baseCommonUILeft() {
-    contentView.addSubview(avatarImageLeft)
-    avatarImageLeftAnchor = avatarImageLeft.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16)
+    contentView.addSubview(userHeaderViewLeft)
+    avatarImageLeftAnchor = userHeaderViewLeft.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16)
     avatarImageLeftAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      avatarImageLeft.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: chat_content_margin),
-      avatarImageLeft.widthAnchor.constraint(equalToConstant: 32),
-      avatarImageLeft.heightAnchor.constraint(equalToConstant: 32),
-    ])
-
-    contentView.addSubview(nameLabelLeft)
-    NSLayoutConstraint.activate([
-      nameLabelLeft.leftAnchor.constraint(equalTo: avatarImageLeft.leftAnchor),
-      nameLabelLeft.rightAnchor.constraint(equalTo: avatarImageLeft.rightAnchor),
-      nameLabelLeft.topAnchor.constraint(equalTo: avatarImageLeft.topAnchor),
-      nameLabelLeft.bottomAnchor.constraint(equalTo: avatarImageLeft.bottomAnchor),
+      userHeaderViewLeft.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: chat_content_margin),
+      userHeaderViewLeft.widthAnchor.constraint(equalToConstant: 32),
+      userHeaderViewLeft.heightAnchor.constraint(equalToConstant: 32),
     ])
 
     contentView.addSubview(fullNameLabel)
     fullNameH = fullNameLabel.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     fullNameH?.isActive = true
     NSLayoutConstraint.activate([
-      fullNameLabel.leftAnchor.constraint(equalTo: avatarImageLeft.rightAnchor, constant: chat_content_margin),
+      fullNameLabel.leftAnchor.constraint(equalTo: userHeaderViewLeft.rightAnchor, constant: chat_content_margin),
       fullNameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
-      fullNameLabel.topAnchor.constraint(equalTo: avatarImageLeft.topAnchor),
+      fullNameLabel.topAnchor.constraint(equalTo: userHeaderViewLeft.topAnchor),
     ])
 
     //  bubbleImageLeft
@@ -267,7 +254,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     bubbleWLeft?.isActive = true
     bubbleHLeft = bubbleImageLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     bubbleHLeft?.isActive = true
-    bubbleImageLeft.leftAnchor.constraint(equalTo: avatarImageLeft.rightAnchor, constant: chat_content_margin).isActive = true
+    bubbleImageLeft.leftAnchor.constraint(equalTo: userHeaderViewLeft.rightAnchor, constant: chat_content_margin).isActive = true
 
     contentView.addSubview(pinLabelLeft)
     pinLabelHLeft = pinLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
@@ -288,20 +275,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func baseCommonUIRight() {
-    contentView.addSubview(avatarImageRight)
+    contentView.addSubview(userHeaderViewRight)
     NSLayoutConstraint.activate([
-      avatarImageRight.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
-      avatarImageRight.widthAnchor.constraint(equalToConstant: 32),
-      avatarImageRight.heightAnchor.constraint(equalToConstant: 32),
-      avatarImageRight.topAnchor.constraint(equalTo: avatarImageLeft.topAnchor, constant: 0),
-    ])
-
-    contentView.addSubview(nameLabelRight)
-    NSLayoutConstraint.activate([
-      nameLabelRight.leftAnchor.constraint(equalTo: avatarImageRight.leftAnchor),
-      nameLabelRight.rightAnchor.constraint(equalTo: avatarImageRight.rightAnchor),
-      nameLabelRight.topAnchor.constraint(equalTo: avatarImageRight.topAnchor),
-      nameLabelRight.bottomAnchor.constraint(equalTo: avatarImageRight.bottomAnchor),
+      userHeaderViewRight.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      userHeaderViewRight.widthAnchor.constraint(equalToConstant: 32),
+      userHeaderViewRight.heightAnchor.constraint(equalToConstant: 32),
+      userHeaderViewRight.topAnchor.constraint(equalTo: userHeaderViewLeft.topAnchor, constant: 0),
     ])
 
     contentView.addSubview(bubbleImageRight)
@@ -310,8 +289,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     bubbleHRight = bubbleImageRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     bubbleHRight?.isActive = true
     NSLayoutConstraint.activate([
-      bubbleImageRight.topAnchor.constraint(equalTo: avatarImageRight.topAnchor, constant: 0),
-      bubbleImageRight.rightAnchor.constraint(equalTo: avatarImageRight.leftAnchor, constant: -chat_content_margin),
+      bubbleImageRight.topAnchor.constraint(equalTo: userHeaderViewRight.topAnchor, constant: 0),
+      bubbleImageRight.rightAnchor.constraint(equalTo: userHeaderViewRight.leftAnchor, constant: -chat_content_margin),
     ])
 
 //        activityView
@@ -362,21 +341,21 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   open func addGesture() {
 //        avatar
     let avatarTapRight = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
-    avatarTapRight.cancelsTouchesInView = false
-    avatarImageRight.addGestureRecognizer(avatarTapRight)
+    avatarTapRight.cancelsTouchesInView = true
+    userHeaderViewRight.addGestureRecognizer(avatarTapRight)
     let avatarTapLeft = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
-    avatarTapLeft.cancelsTouchesInView = false
-    avatarImageLeft.addGestureRecognizer(avatarTapLeft)
+    avatarTapLeft.cancelsTouchesInView = true
+    userHeaderViewLeft.addGestureRecognizer(avatarTapLeft)
 
     let avatarLongGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPressAvatar))
     avatarLongGesture.cancelsTouchesInView = false
-    avatarImageLeft.addGestureRecognizer(avatarLongGesture)
+    userHeaderViewLeft.addGestureRecognizer(avatarLongGesture)
 
     let messageTapRight = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
-    messageTapRight.cancelsTouchesInView = false
+    messageTapRight.cancelsTouchesInView = true
     bubbleImageRight.addGestureRecognizer(messageTapRight)
     let messageTapLeft = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
-    messageTapLeft.cancelsTouchesInView = false
+    messageTapLeft.cancelsTouchesInView = true
     bubbleImageLeft.addGestureRecognizer(messageTapLeft)
 
     let messageLongPressRight = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
@@ -385,21 +364,21 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     bubbleImageLeft.addGestureRecognizer(messageLongPressLeft)
 
     let tapReadView = UITapGestureRecognizer(target: self, action: #selector(tapReadView))
-    tapReadView.cancelsTouchesInView = false
+    tapReadView.cancelsTouchesInView = true
     readView.addGestureRecognizer(tapReadView)
     tapGesture = tapReadView
   }
 
   open func initSubviewsLayout() {
     if ChatUIConfig.shared.messageProperties.avatarType == .cycle {
-      avatarImageRight.layer.cornerRadius = 16.0
-      avatarImageLeft.layer.cornerRadius = 16.0
+      userHeaderViewRight.layer.cornerRadius = 16.0
+      userHeaderViewLeft.layer.cornerRadius = 16.0
     } else if ChatUIConfig.shared.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      userHeaderViewRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      userHeaderViewLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
     } else {
-      avatarImageRight.layer.cornerRadius = 16.0
-      avatarImageLeft.layer.cornerRadius = 16.0
+      userHeaderViewRight.layer.cornerRadius = 16.0
+      userHeaderViewLeft.layer.cornerRadius = 16.0
     }
   }
 
@@ -467,8 +446,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
     let bubbleH = isSend ? bubbleHRight : bubbleHLeft
-    let nameLabel = isSend ? nameLabelRight : nameLabelLeft
-    let avatarImage = isSend ? avatarImageRight : avatarImageLeft
+    let userHeaderView = isSend ? userHeaderViewRight : userHeaderViewLeft
 
     contentModel = model
     contentModel?.cell = self
@@ -494,29 +472,10 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     selectedButtonCenterYAnchor?.isActive = true
 
     // avatar
-    nameLabel.text = model.shortName
-    nameLabel.isHidden = true
-    avatarImage.backgroundColor = .clear
-    if let avatarURL = model.avatar, !avatarURL.isEmpty {
-      avatarImage
-        .sd_setImage(with: URL(string: avatarURL)) { image, error, type, url in
-          if image != nil {
-            avatarImage.image = image
-            nameLabel.isHidden = true
-            avatarImage.backgroundColor = .clear
-          } else {
-            avatarImage.image = nil
-            nameLabel.isHidden = false
-            avatarImage.backgroundColor = UIColor
-              .colorWithString(string: ChatMessageHelper.getSenderId(model.message))
-          }
-        }
-    } else {
-      avatarImage.image = nil
-      nameLabel.isHidden = false
-      avatarImage.backgroundColor = UIColor
-        .colorWithString(string: ChatMessageHelper.getSenderId(model.message))
-    }
+    let url = model.avatar
+    let name = model.shortName ?? ""
+    let accountId = ChatMessageHelper.getSenderId(model.message) ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     if model.fullNameHeight > 0 {
       fullNameLabel.text = model.fullName
@@ -603,15 +562,13 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   /// 根据消息发送方向决定元素的显隐
   /// @param showRight    是否右侧显示（是否是发送的消息）
   open func showLeftOrRight(showRight: Bool) {
-    avatarImageLeft.isHidden = showRight
-    nameLabelLeft.isHidden = showRight
+    userHeaderViewLeft.isHidden = showRight
     bubbleImageLeft.isHidden = showRight
     pinImageLeft.isHidden = showRight
     pinLabelLeft.isHidden = showRight
     fullNameLabel.isHidden = showRight
 
-    avatarImageRight.isHidden = !showRight
-    nameLabelRight.isHidden = !showRight
+    userHeaderViewRight.isHidden = !showRight
     bubbleImageRight.isHidden = !showRight
     pinImageRight.isHidden = !showRight
     pinLabelRight.isHidden = !showRight
@@ -655,20 +612,6 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       pinLabelH?.constant = 0
       pinLabelW?.constant = 0
     }
-  }
-
-  /// 设置头像大小（正方形）
-  func setAvatarImgSize(size: CGFloat) {
-    NSLayoutConstraint.deactivate(avatarImageLeft.constraints)
-    NSLayoutConstraint.activate([
-      avatarImageLeft.widthAnchor.constraint(equalToConstant: size),
-      avatarImageLeft.heightAnchor.constraint(equalToConstant: size),
-    ])
-    NSLayoutConstraint.deactivate(avatarImageRight.constraints)
-    NSLayoutConstraint.activate([
-      avatarImageRight.widthAnchor.constraint(equalToConstant: size),
-      avatarImageRight.heightAnchor.constraint(equalToConstant: size),
-    ])
   }
 
   func sizeWidthFromString(_ text: NSAttributedString, _ font: UIFont) -> Double {

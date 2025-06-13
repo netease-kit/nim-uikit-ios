@@ -27,7 +27,7 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
 
     let searchImageView = UIImageView()
     searchBackView.addSubview(searchImageView)
-    searchImageView.image = UIImage.ne_imageNamed(name: "search")
+    searchImageView.image = coreLoader.loadImage("textField_search_icon")
     searchImageView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       searchImageView.centerYAnchor.constraint(equalTo: searchBackView.centerYAnchor),

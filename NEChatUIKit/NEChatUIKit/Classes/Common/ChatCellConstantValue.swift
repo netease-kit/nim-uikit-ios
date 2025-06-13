@@ -49,3 +49,6 @@ public let chat_full_name_height: CGFloat = 16.0
 
 // 语音消息最大宽度
 public let audio_max_width = kScreenWidth <= 325 ? 230 : 265.0
+
+// AI 助聊区域高度
+public let ai_chat_view_height: CGFloat = 234

@@ -3,9 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NECommonKit
 import NECommonUIKit
 import NECoreKit
+import NIMSDK
 import UIKit
 
 @objc
@@ -33,6 +35,9 @@ public let atTextKey = "text"
 public protocol ChatInputMultilineDelegate: NSObjectProtocol {
   func expandButtonDidClick()
   func didHideMultipleButtonClick()
+
+  func aiChatButtonDidClick(_ aiChatViewController: AIChatViewController, _ open: Bool)
+  func aiChatMessageDidClick(_ text: String)
 }
 
 @objcMembers
@@ -51,9 +56,8 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   public var nickAccidList = [String]()
   public var nickAccidDic = [String: String]()
 
-  public var isMultipleLineMode = false // 是否是多行模式
-
   public var chatInpuMode = ChatInputMode.normal
+  public var conversationType = V2NIMConversationType.CONVERSATION_TYPE_UNKNOWN
 
   // 换行输入框 标题限制字数
   public var textLimit = 20
@@ -65,10 +69,10 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textView.font = UIFont.systemFont(ofSize: 16)
     textView.clipsToBounds = true
     textView.translatesAutoresizingMaskIntoConstraints = false
-    textView.backgroundColor = .white
+    textView.backgroundColor = .clear
     textView.returnKeyType = .send
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
-    textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+    textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.dataDetectorTypes = []
     textView.accessibilityIdentifier = "id.chatMessageInput"
     return textView
@@ -77,22 +81,36 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   lazy var backView: UIView = {
     let back = UIView()
     back.translatesAutoresizingMaskIntoConstraints = false
-    back.backgroundColor = .white
+    back.backgroundColor = .clear
     back.clipsToBounds = true
     back.layer.cornerRadius = 8
     return back
   }()
 
   // 展开按钮
-  public var expandButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.backgroundColor = .clear
-    button.accessibilityIdentifier = "id.chatExpandButton"
+  public var expandButton: ExpandButton? = {
+    let button = IMKitConfigCenter.shared.enableRichTextMessage ? ExpandButton() : nil
+    button?.translatesAutoresizingMaskIntoConstraints = false
+    button?.backgroundColor = .clear
+    button?.accessibilityIdentifier = "id.chatExpandButton"
     return button
   }()
 
-  public var stackView = UIStackView()
+  // 助聊按钮
+  public var aiChatButton: ExpandButton? = {
+    let button = IMKitConfigCenter.shared.enableAIChatHelper ? ExpandButton() : nil
+    button?.translatesAutoresizingMaskIntoConstraints = false
+    button?.backgroundColor = .clear
+    button?.accessibilityIdentifier = "id.aiChatButton"
+    return button
+  }()
+
+  public lazy var stackView: UIStackView = {
+    let view = UIStackView()
+    view.accessibilityIdentifier = "id.chatInputStackView"
+    return view
+  }()
+
   var contentView = UIView()
   public var contentSubView: UIView?
   public var greyView = UIView()
@@ -105,11 +123,11 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   public var multipleLineView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.white
-    view.clipsToBounds = true
-    view.layer.cornerRadius = 6.0
+    view.backgroundColor = .white
+    view.clipsToBounds = false
     view.isHidden = true
 
+    view.layer.cornerRadius = 6.0
     view.layer.shadowColor = UIColor.black.cgColor
     view.layer.shadowOpacity = 0.5
     view.layer.shadowOffset = CGSize(width: 3, height: 3)
@@ -124,8 +142,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textField.font = UIFont.systemFont(ofSize: 18.0)
     textField.textColor = .ne_darkText
     textField.returnKeyType = .send
-    textField.attributedPlaceholder = NSAttributedString(string: coreLoader.localizable("multiple_line_placleholder"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText])
-    textField.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
+    textField.attributedPlaceholder = NSAttributedString(string: chatCoreLoader.localizable("multiple_line_placleholder"), attributes: [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor])
     return textField
   }()
 
@@ -140,7 +157,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = .clear
-    button.setImage(coreLoader.loadImage("multiple_send_image"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("multiple_send_image"), for: .normal)
     return button
   }()
 
@@ -167,7 +184,22 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     return view
   }()
 
+  public var aiChatViewControllerTopConstant: CGFloat = 54
+  public lazy var aiChatViewController: AIChatViewController = {
+    let view = AIChatViewController()
+    view.view.translatesAutoresizingMaskIntoConstraints = false
+    view.view.clipsToBounds = true
+    view.delegate = self
+    return view
+  }()
+
   public var multipleLineViewHeight: NSLayoutConstraint?
+
+  public init(_ conversationType: V2NIMConversationType) {
+    super.init(frame: .zero)
+    self.conversationType = conversationType
+    commonUI()
+  }
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
@@ -182,7 +214,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     NotificationCenter.default.removeObserver(self)
   }
 
-  open func commonUI() {}
+  open func commonUI() {
+    accessibilityIdentifier = "id.chatInputView"
+  }
 
   open func addRecordView() {
     currentType = .audio
@@ -213,11 +247,12 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     contentSubView?.isHidden = false
   }
 
-  open func sendText(textView: NETextView) {
+  open func sendText() {
     guard let text = getRealSendText(textView.attributedText) else {
       return
     }
     delegate?.sendText(text: text, attribute: textView.attributedText)
+    titleField.text = ""
     textView.text = ""
   }
 
@@ -236,7 +271,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
           let text = String(string[range])
           if nickAccidDic[text] == nil {
             let mutableAttri = NSMutableAttributedString(attributedString: textView.attributedText)
-            mutableAttri.addAttribute(.foregroundColor, value: UIColor.ne_darkText, range: findRange)
+            mutableAttri.addAttribute(.foregroundColor, value: ChatUIConfig.shared.messageProperties.inputTextColor, range: findRange)
             textView.attributedText = mutableAttri
           }
         }
@@ -312,7 +347,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                      replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.messageTextColor,
+    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor,
                                  NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
 
     if chatInpuMode == .normal || chatInpuMode == .multipleSend, text == "\n" {
@@ -324,6 +359,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         realText = ""
       }
       delegate?.sendText(text: realText, attribute: textView.attributedText)
+      titleField.text = ""
       textView.text = ""
       return false
     }
@@ -435,9 +471,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     if emoticonID.isEmpty { // 删除键
       delegate?.textViewDidChange()
       textView.deleteBackward()
-      print("delete ward")
     } else {
-      delegate?.textViewDidChange()
       let range = textView.selectedRange
       let attribute = NEEmotionTool.getAttWithStr(str: description, font: .systemFont(ofSize: 16))
       let mutaAttribute = NSMutableAttributedString(attributedString: textView.attributedText)
@@ -445,6 +479,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       textView.attributedText = mutaAttribute
       textView.selectedRange = NSMakeRange(range.location + attribute.length, 0)
       textView.font = UIFont.systemFont(ofSize: 16)
+
+      textViewDidChange(textView)
+      delegate?.textViewDidChange()
     }
   }
 
@@ -465,8 +502,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     return true
   }
 
+  /// 点击表情列表中的【发送】
   open func didPressSend(sender: UIButton) {
-    sendText(textView: textView)
+    sendText()
   }
 
   open func stopRecordAnimation() {
@@ -700,6 +738,8 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
           realText = text
         }
         delegate?.sendText(text: realText, attribute: textView.attributedText)
+        titleField.text = ""
+        textView.text = ""
         return false
       }
     }
@@ -728,10 +768,11 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       multipleLineViewHeight!,
       multipleLineView.leftAnchor.constraint(equalTo: leftAnchor),
       multipleLineView.rightAnchor.constraint(equalTo: rightAnchor),
-      multipleLineView.topAnchor.constraint(equalTo: topAnchor, constant: -4),
+      multipleLineView.topAnchor.constraint(equalTo: topAnchor, constant: 4),
     ])
 
     multipleLineView.addSubview(titleField)
+    titleField.addTarget(self, action: #selector(textFieldChange), for: .editingChanged)
     titleField.delegate = self
     NSLayoutConstraint.activate([
       titleField.leftAnchor.constraint(equalTo: multipleLineView.leftAnchor, constant: 16),
@@ -774,8 +815,53 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     multipleLineDelegate?.expandButtonDidClick()
   }
 
+  open func didClickAIChatButton() {
+    aiChatButton?.isSelected = !(aiChatButton?.isSelected ?? true)
+    stackView.isHidden = aiChatButton?.isSelected ?? true
+    contentView.isHidden = aiChatButton?.isSelected ?? true
+    contentSubView?.isHidden = aiChatButton?.isSelected ?? true
+
+    if aiChatButton?.isSelected ?? true {
+      showAIChatView()
+    } else {
+      hideAIChatView()
+      multipleLineDelegate?.aiChatButtonDidClick(aiChatViewController, false)
+    }
+  }
+
+  func showAIChatView() {
+    currentButton?.isSelected = false
+    setLayerContents(true)
+
+    if let customController = ChatUIConfig.shared.aiChatViewController {
+      customController(aiChatViewController)
+    }
+
+    if chatInpuMode != .multipleReturn {
+      addSubview(aiChatViewController.view)
+      NSLayoutConstraint.activate([
+        aiChatViewController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
+        aiChatViewController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
+        aiChatViewController.view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0),
+        aiChatViewController.view.topAnchor.constraint(equalTo: topAnchor, constant: aiChatViewControllerTopConstant),
+      ])
+    }
+    multipleLineDelegate?.aiChatButtonDidClick(aiChatViewController, true)
+  }
+
+  open func setLayerContents(_ open: Bool) {}
+
+  open func hideAIChatView() {
+    setLayerContents(false)
+    stackView.isHidden = false
+    contentView.isHidden = false
+    contentSubView?.isHidden = false
+    aiChatButton?.isSelected = false
+    aiChatViewController.view.removeFromSuperview()
+  }
+
   open func didClickSendButton() {
-    sendText(textView: textView)
+    sendText()
   }
 
   open func didClickHideMultipleButton() {
@@ -789,23 +875,33 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     } else {
       chatInpuMode = .normal
     }
-    isMultipleLineMode = false
   }
 
   open func changeToMultipleLineStyle() {
     chatInpuMode = .multipleReturn
-    isMultipleLineMode = true
     multipleLineView.isHidden = false
   }
 
   open func setMuteInputStyle() {
     clearAtCache()
-    expandButton.isEnabled = false
+    expandButton?.isEnabled = false
     textView.attributedText = nil
     textView.text = nil
   }
 
   open func setUnMuteInputStyle() {
-    expandButton.isEnabled = true
+    expandButton?.isEnabled = true
+  }
+}
+
+extension NEBaseChatInputView: AIChatViewDelegate {
+  public func didClickEditButton(_ text: String?) {
+    textView.text = text
+    textView.becomeFirstResponder()
+    hideAIChatView()
+  }
+
+  public func didClickMessageItem(_ text: String) {
+    multipleLineDelegate?.aiChatMessageDidClick(text)
   }
 }

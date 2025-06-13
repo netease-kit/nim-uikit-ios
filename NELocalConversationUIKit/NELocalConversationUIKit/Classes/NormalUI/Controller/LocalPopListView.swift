@@ -16,6 +16,6 @@ open class PopListView: NEBasePopListView {
       shadowView.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
     ])
 
-    popView.backgroundColor = NEConstant.hexRGB(0xFFFFFF)
+    popView.backgroundColor = .normalConversationPopViewBg
   }
 }

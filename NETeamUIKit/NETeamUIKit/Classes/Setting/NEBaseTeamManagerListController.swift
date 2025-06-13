@@ -38,6 +38,14 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
     return tableView
   }()
 
+  public lazy var emptyView: NEEmptyDataView = {
+    let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
+    view.isHidden = true
+    return view
+  }()
+
   public var cellClassDic = [Int: UITableViewCell.Type]() // key 值为 table section 值
 
   override open func viewDidLoad() {

@@ -91,14 +91,10 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
     titleLabel.text = message?.fullName
     timeLabel.text = message?.time
 
-    if let imageName = message?.avatar, !imageName.isEmpty {
-      headView.setTitle("")
-      headView.sd_setImage(with: URL(string: imageName), completed: nil)
-    } else {
-      headView.setTitle(message?.shortName ?? "")
-      headView.sd_setImage(with: nil, completed: nil)
-      headView.backgroundColor = UIColor.colorWithString(string: ChatMessageHelper.getSenderId(message?.imMessage))
-    }
+    let url = message?.avatar
+    let name = message?.shortName ?? ""
+    let accountId = ChatMessageHelper.getSenderId(message?.imMessage) ?? ""
+    headView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 
   /// 根据label宽度显示关键字段

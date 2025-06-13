@@ -11,6 +11,8 @@ open class NEBaseConversationListCell: UITableViewCell {
   public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
 
   private var timeWidth: NSLayoutConstraint?
+  private var conversationType: V2NIMConversationType = .CONVERSATION_TYPE_UNKNOWN
+  private var sessionId = ""
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,11 +26,10 @@ open class NEBaseConversationListCell: UITableViewCell {
 
   open func setupSubviews() {
     selectionStyle = .none
-    if let bgColor = ConversationUIConfig.shared.conversationProperties.itemBackground {
-      backgroundColor = bgColor
-    }
+    backgroundColor = .clear
 
     contentView.addSubview(headImageView)
+    contentView.addSubview(onlineView)
     contentView.addSubview(redAngleView)
     contentView.addSubview(titleLabel)
     contentView.addSubview(subTitleLabel)
@@ -40,6 +41,14 @@ open class NEBaseConversationListCell: UITableViewCell {
       redAngleView.centerYAnchor.constraint(equalTo: headImageView.topAnchor, constant: 8),
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
+
+    NSLayoutConstraint.activate([
+      onlineView.rightAnchor.constraint(equalTo: headImageView.rightAnchor),
+      onlineView.bottomAnchor.constraint(equalTo: headImageView.bottomAnchor),
+      onlineView.widthAnchor.constraint(equalToConstant: 12),
+      onlineView.heightAnchor.constraint(equalToConstant: 12),
+    ])
+
     timeWidth = timeLabel.widthAnchor.constraint(equalToConstant: 0)
     timeWidth?.isActive = true
     NSLayoutConstraint.activate([
@@ -57,69 +66,58 @@ open class NEBaseConversationListCell: UITableViewCell {
     ])
   }
 
-  func initSubviewsLayout() {}
+  open func setOnline(_ online: Bool) {
+    onlineView.isHidden = conversationType != .CONVERSATION_TYPE_P2P || NEAIUserManager.shared.isAIUser(sessionId)
+    onlineView.backgroundColor = online ? UIColor(hexString: "#84ED85") : UIColor(hexString: "#D4D9DA")
+  }
+
+  open func initSubviewsLayout() {}
 
   /// 数据绑定UI
   /// - Parameter sessionModel: 会话数据
   open func configureData(_ sessionModel: NEConversationListModel?) {
-    guard let conversationModel = sessionModel else { return }
+    guard let conversationModel = sessionModel else {
+      return
+    }
+
+    conversationType = conversationModel.conversation?.type ?? .CONVERSATION_TYPE_UNKNOWN
+
     if conversationModel.conversation?.type == .CONVERSATION_TYPE_P2P {
-      // p2p head image
-      if let imageName = conversationModel.conversation?.avatar, !imageName.isEmpty {
-        headImageView.setTitle("")
-        headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
-        headImageView.backgroundColor = .clear
-      } else {
-        if let name = conversationModel.conversation?.shortName(count: 2) {
-          headImageView.setTitle(name)
-        } else if let conversationId = conversationModel.conversation?.conversationId {
-          // 截断长度
-          let count = 2
-          let showId = conversationId
-            .count > count ? String(conversationId[conversationId.index(conversationId.endIndex, offsetBy: -count)...]) : conversationId
-          headImageView.setTitle(showId)
-        }
-        headImageView.sd_setImage(with: nil, completed: nil)
-        if let cid = conversationModel.conversation?.conversationId, let uid = V2NIMConversationIdUtil.conversationTargetId(cid) {
-          headImageView.backgroundColor = UIColor
-            .colorWithString(string: uid)
-        }
+      guard let conversationId = conversationModel.conversation?.conversationId,
+            let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+        return
       }
+
+      sessionId = accountId
+
+      // p2p head image
+      let url = conversationModel.conversation?.avatar
+      let name = conversationModel.conversation?.shortName() ?? ""
+      headImageView.configHeadData(headUrl: url, name: name, uid: accountId)
 
       // p2p nickName
-      if let name = conversationModel.conversation?.name, name.count > 0 {
-        titleLabel.text = conversationModel.conversation?.name
-      } else if let conversationId = conversationModel.conversation?.conversationId, let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
+      if let name = conversationModel.conversation?.name, !name.isEmpty {
+        titleLabel.text = name
+      } else {
         titleLabel.text = accountId
       }
-
     } else if conversationModel.conversation?.type == .CONVERSATION_TYPE_TEAM {
-      // team head image
-      if let imageName = conversationModel.conversation?.avatar, !imageName.isEmpty {
-        headImageView.setTitle("")
-        headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
-        headImageView.backgroundColor = .clear
-      } else {
-        headImageView.setTitle(conversationModel.conversation?.name ?? "")
-        headImageView.sd_setImage(with: nil, completed: nil)
-        if let name = conversationModel.conversation?.shortName(count: 2) {
-          headImageView.setTitle(name)
-        } else if let conversationId = conversationModel.conversation?.conversationId {
-          // 截断长度
-          let count = 2
-          let showId = conversationId
-            .count > count ? String(conversationId[conversationId.index(conversationId.endIndex, offsetBy: -count)...]) : conversationId
-          headImageView.setTitle(showId)
-        }
-        if let cid = conversationModel.conversation?.conversationId, let uid = V2NIMConversationIdUtil.conversationTargetId(cid) {
-          headImageView.backgroundColor = UIColor
-            .colorWithString(string: uid)
-        }
+      guard let conversationId = conversationModel.conversation?.conversationId,
+            let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+        return
       }
-      titleLabel.text = conversationModel.conversation?.name
-      if let name = conversationModel.conversation?.name {
+
+      sessionId = teamId
+
+      // team head image
+      let url = conversationModel.conversation?.avatar
+      let name = conversationModel.conversation?.shortName() ?? ""
+      headImageView.configHeadData(headUrl: url, name: name, uid: teamId)
+
+      // team nickName
+      if let name = conversationModel.conversation?.name, !name.isEmpty {
         titleLabel.text = name
-      } else if let conversationId = conversationModel.conversation?.conversationId, let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
+      } else {
         titleLabel.text = teamId
       }
     }
@@ -214,7 +212,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     return headView
   }()
 
-  // 单条会话未读数
+  /// 单条会话未读数
   public lazy var redAngleView: RedAngleLabel = {
     let label = RedAngleLabel()
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -227,6 +225,16 @@ open class NEBaseConversationListCell: UITableViewCell {
     label.clipsToBounds = true
     label.isHidden = true
     return label
+  }()
+
+  /// 在线状态
+  public lazy var onlineView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.layer.cornerRadius = 6
+    view.backgroundColor = UIColor(hexString: "#D4D9DA")
+    view.isHidden = true
+    return view
   }()
 
   // 会话列表会话名称

@@ -46,7 +46,7 @@ open class TopMessageView: UIView {
   public lazy var playIcon: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = NECommonUIKit.coreLoader.loadImage("video_play")
+    imageView.image = coreLoader.loadImage("video_play")
     return imageView
   }()
 
@@ -63,7 +63,7 @@ open class TopMessageView: UIView {
   /// 关闭按钮
   public lazy var closeButton: UIButton = {
     let button = UIButton(type: .custom)
-    button.setImage(UIImage.ne_imageNamed(name: "top_close"), for: .normal)
+    button.setImage(coreLoader.loadImage("remove"), for: .normal)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.topClose"
     button.addTarget(self, action: #selector(didClickCloseButton), for: .touchUpInside)
@@ -140,7 +140,7 @@ open class TopMessageView: UIView {
   }
 
   /// 设置（更新）置顶消息发送者昵称
-  /// - Parameter content: 发送者昵称
+  /// - Parameter name: 发送者昵称
   open func updateTopName(name: String?) {
     var text = ""
 

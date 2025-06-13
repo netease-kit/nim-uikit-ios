@@ -77,6 +77,7 @@ open class NEBaseSelectLanguageViewController: NEChatBaseViewController, UITable
   open func setupLanguageUI() {
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
+    view.backgroundColor = .white
   }
 
   open func cancelClick() {

@@ -22,7 +22,7 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
     tableView.delegate = self
     tableView.dataSource = self
     tableView.rowHeight = 60
-    tableView.backgroundColor = .white
+    tableView.backgroundColor = .clear
     tableView.sectionHeaderHeight = 30
     tableView.sectionFooterHeight = 0
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
@@ -41,8 +41,7 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
   public var searchTextFieldTopAnchor: NSLayoutConstraint?
   public lazy var searchTextField: SearchTextField = {
     let textField = SearchTextField()
-    let leftImageView = UIImageView(image: UIImage
-      .ne_imageNamed(name: "conversation_search_icon"))
+    let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always

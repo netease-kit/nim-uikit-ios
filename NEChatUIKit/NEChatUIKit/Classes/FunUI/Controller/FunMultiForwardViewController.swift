@@ -25,10 +25,10 @@ open class FunMultiForwardViewController: MultiForwardViewController {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor // 换肤颜色提取
     brokenNetworkView.errorIconView.isHidden = false
-    brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
+    brokenNetworkView.backgroundColor = .funChatNetworkBrokenViewBg
     brokenNetworkView.contentLabel.textColor = .funChatNetworkBrokenTitleColor
     navigationView.backgroundColor = .funChatBackgroundColor
-    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
+    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationDivideBg
   }
 
   override open func getMultiForwardViewController(_ messageAttachmentUrl: String?,

@@ -18,23 +18,16 @@ public typealias ContactCallBack = ([ContactSection]?, NSError?) -> Void
 @objcMembers
 open class ContactViewModel: NSObject {
   typealias RefreshBlock = () -> Void
-  public var contacts: [ContactSection] = []
+  public var contactSections: [ContactSection] = []
+
   public var indexs: [String]?
   private var contactHeaders: ContactSection?
   public var contactRepo = ContactRepo.shared
   private var initalDict = [String: [ContactInfo]]()
   public weak var delegate: ContactViewModelDelegate?
 
-  /// 在线状态记录
-  public var onlineStatusDic = [String: NIMSubscribeEvent]()
-
-  /// 是否同步完成
-  public var syncFinished = false
-
-  /// 回调
-  public var callBack: ContactCallBack?
-  /// 过滤列表
-  public var filters: Set<String>?
+  /// 在线状态记录，[accountId: 是否在线]
+  public var onlineStatusDic = [String: Bool]()
 
   var unreadCount = 0 {
     didSet {
@@ -52,29 +45,29 @@ open class ContactViewModel: NSObject {
 
     if let headSection = headerSection(headerItem: contactHeaders) {
       self.contactHeaders = headSection
-      contacts.append(headSection)
+      contactSections.append(headSection)
     }
 
     contactRepo.addContactListener(self)
-    IMKitClient.instance.addLoginListener(self)
 
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      EventSubscribeRepo.shared.addListener(self)
+    if IMKitConfigCenter.shared.enableOnlineStatus {
+      SubscribeRepo.shared.addListener(self)
     }
   }
 
   deinit {
     contactRepo.removeContactListener(self)
-    IMKitClient.instance.removeLoginListener(self)
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      EventSubscribeRepo.shared.removeListener(self)
+
+    if IMKitConfigCenter.shared.enableOnlineStatus {
+      SubscribeRepo.shared.removeListener(self)
     }
   }
 
   open func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
-    if NEFriendUserCache.shared.isRequesting {
+    if indexs != nil {
+      completion(nil, indexs!.count)
       return
     }
 
@@ -82,14 +75,14 @@ open class ContactViewModel: NSObject {
     getContactList(filters) { contacts, error in
       if let users = contacts {
         NEALog.infoLog("contact loadData", desc: "contact data:\(users)")
-        weakSelf?.contacts.removeAll()
+        weakSelf?.contactSections.removeAll()
         if let contactHeaders = weakSelf?.contactHeaders {
-          weakSelf?.contacts.append(contactHeaders)
+          weakSelf?.contactSections.append(contactHeaders)
         }
-        weakSelf?.contacts.append(contentsOf: users)
+        weakSelf?.contactSections.append(contentsOf: users)
         weakSelf?.indexs = self.getIndexs(contactSections: users)
         completion(nil, users.count)
-        if IMKitConfigCenter.shared.onlineStatusEnable {
+        if IMKitConfigCenter.shared.enableOnlineStatus {
           weakSelf?.subscribeOnlineStatus()
         }
       } else {
@@ -109,18 +102,9 @@ open class ContactViewModel: NSObject {
       return
     }
 
-    if !syncFinished {
-      callBack = completion
-      self.filters = filters
-      completion(nil, nil)
-      return
-    }
-
-    // 缓存中没有则远端查询
-    contactRepo.getContactList { [weak self] friends, error in
+    // 缓存中没有则远端查询, 刷新统一走缓存通知
+    contactRepo.getContactList { friends, error in
       NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
-      let contactList = self?.formatData(friends, filters)
-      completion(contactList, error)
     }
   }
 
@@ -160,7 +144,6 @@ open class ContactViewModel: NSObject {
         let inital = name?.initalLetter() ?? "#"
         let contactInfo = ContactInfo()
         contactInfo.user = userFriend
-        contactInfo.headerBackColor = UIColor.colorWithString(string: userFriend.user?.accountId ?? "")
 
         if digitRegular.evaluate(with: inital) { // [0-9]
           digitList.append(contactInfo)
@@ -207,7 +190,7 @@ open class ContactViewModel: NSObject {
   /// 返回好友列表
   /// - Returns: 不包含顶部预设数据（验证消息、黑名单、我的群聊）的好友列表
   open func getFriendSections() -> [ContactSection] {
-    let friendSections = contacts.filter { $0.initial != "" }
+    let friendSections = contactSections.filter { $0.initial != "" }
     return friendSections
   }
 
@@ -228,9 +211,8 @@ open class ContactViewModel: NSObject {
     for item in header {
       let info = ContactInfo()
       info.user = NEUserWithFriend(alias: item.name, avatar: item.imageName)
-      info.contactCellType = ContactCellType.ContactOthers.rawValue
+      info.contactCellType = .ContactOthers
       info.router = item.router
-      info.headerBackColor = item.color
       infos.append(info)
     }
     return ContactSection(initial: "", contacts: infos)
@@ -246,35 +228,12 @@ open class ContactViewModel: NSObject {
   }
 }
 
-// MARK: - NEIMKitClientListener
-
-extension ContactViewModel: NEIMKitClientListener {
-  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
-    if type == .DATA_SYNC_TYPE_MAIN, state == .DATA_SYNC_STATE_COMPLETED {
-      /// 设置同步完成标识
-      syncFinished = true
-
-      if !NEFriendUserCache.shared.isRequesting,
-         let completion = callBack {
-        NEALog.infoLog(className(), desc: "onDataSync getContactList")
-
-        /// 取数据
-        getContactList(filters, completion)
-
-        /// 回调置空
-        callBack = nil
-        /// 过滤器置空
-        filters = nil
-      }
-    }
-  }
-}
-
 // MARK: - NEContactListener
 
 extension ContactViewModel: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,
@@ -289,14 +248,14 @@ extension ContactViewModel: NEContactListener {
   /// 从通讯录中移除
   /// - Parameter accountId: 好友 Id
   open func removeFromContacts(_ accountId: String) {
-    for (title, section) in contacts.enumerated() {
+    for (title, section) in contactSections.enumerated() {
       for (i, contact) in section.contacts.enumerated() {
         if contact.user?.user?.accountId == accountId {
           section.contacts.remove(at: i)
 
           // 该分组无好友后要删除该分组
           if section.contacts.isEmpty {
-            contacts.remove(at: title)
+            contactSections.remove(at: title)
           }
           delegate?.reloadTableView()
           return
@@ -359,21 +318,24 @@ extension ContactViewModel: NEContactListener {
 
 // MARK: - NEEventListener
 
-extension ContactViewModel: NEEventListener {
+extension ContactViewModel: NESubscribeListener {
   /// 订阅在线状态
   open func subscribeOnlineStatus() {
     var subscribeList: [String] = []
-    for section in contacts {
+    for section in contactSections {
       for contact in section.contacts {
         if let accountId = contact.user?.user?.accountId {
-          subscribeList.append(accountId)
+          if let event = NESubscribeManager.shared.getSubscribeStatus(accountId) {
+            onlineStatusDic[accountId] = event.statusType == .USER_STATUS_TYPE_LOGIN
+          } else {
+            subscribeList.append(accountId)
+          }
         }
       }
     }
-    weak var weakSelf = self
+
     if subscribeList.count > 0 {
-      NEEventSubscribeManager.shared.subscribeUsersOnlineState(subscribeList) { error in
-        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " contact subscribeUsersOnlineState : \(error?.localizedDescription ?? "")")
+      NESubscribeManager.shared.subscribeUsersOnlineState(subscribeList) { error in
       }
     }
   }
@@ -381,27 +343,31 @@ extension ContactViewModel: NEEventListener {
   /// 取消订阅
   open func unsubscribeOnlineStatus() {
     var subscribeList: [String] = []
-    for section in contacts {
+    for section in contactSections {
       for contact in section.contacts {
         if let accountId = contact.user?.user?.accountId {
           subscribeList.append(accountId)
         }
       }
     }
-    weak var weakSelf = self
-    NEEventSubscribeManager.shared.unSubscribeUsersOnlineState(subscribeList) { error in
-      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " contact unSubscribeUsersOnlineState : \(error?.localizedDescription ?? "")")
+
+    NESubscribeManager.shared.unSubscribeUsersOnlineState(subscribeList) { error in
     }
   }
 
-  open func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
-    NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
-    for e in event {
-      print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")
-      if e.type == NIMSubscribeSystemEventType.online.rawValue, let acountId = e.from {
-        onlineStatusDic[acountId] = e
+  /// 用户状态变更
+  /// - Parameter data: 用户状态列表
+  public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+    var needRefresh = false
+    for d in data {
+      if NEFriendUserCache.shared.isFriend(d.accountId) {
+        onlineStatusDic[d.accountId] = d.statusType == .USER_STATUS_TYPE_LOGIN
+        needRefresh = true
       }
     }
-    delegate?.reloadTableView()
+
+    if needRefresh {
+      delegate?.reloadTableView()
+    }
   }
 }

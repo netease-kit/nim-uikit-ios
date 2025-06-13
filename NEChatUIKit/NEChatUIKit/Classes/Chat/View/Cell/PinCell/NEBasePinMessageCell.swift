@@ -109,7 +109,7 @@ open class NEBasePinMessageCell: UITableViewCell {
       headerView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    let image = UIImage.ne_imageNamed(name: "three_point")
+    let image = coreLoader.loadImage("three_point")
     let imageView = UIImageView()
     imageView.image = image
     imageView.translatesAutoresizingMaskIntoConstraints = false

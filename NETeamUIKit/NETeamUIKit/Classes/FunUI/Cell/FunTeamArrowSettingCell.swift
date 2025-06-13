@@ -17,8 +17,8 @@ open class FunTeamArrowSettingCell: NEBaseTeamArrowSettingCell {
 
   override open func setupUI() {
     super.setupUI()
-    contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .left, constant: 16)
-    contentView.updateLayoutConstraint(firstItem: dividerLine, seconedItem: contentView, attribute: .right, constant: 0)
+    contentView.updateLayoutConstraint(firstItem: dividerLine, secondItem: contentView, attribute: .left, constant: 16)
+    contentView.updateLayoutConstraint(firstItem: dividerLine, secondItem: contentView, attribute: .right, constant: 0)
 
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),

@@ -125,7 +125,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
       headerView.heightAnchor.constraint(equalToConstant: 32),
     ])
 
-    let image = UIImage.ne_imageNamed(name: "three_point")
+    let image = coreLoader.loadImage("three_point")
     moreImageView.image = image
     moreImageView.translatesAutoresizingMaskIntoConstraints = false
     backView.addSubview(moreImageView)
@@ -184,7 +184,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
   open func configureData(_ model: CollectionMessageModel) {
     collectionModel = model
     headerView.configHeadData(headUrl: model.chatmodel.avatar,
-                              name: model.chatmodel.fullName ?? "",
+                              name: model.chatmodel.shortName ?? "",
                               uid: ChatMessageHelper.getSenderId(model.chatmodel.message) ?? "")
     nameLabel.text = model.chatmodel.fullName
     if let time = model.collection?.updateTime ?? model.message?.createTime {

@@ -48,6 +48,8 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
 
   /// UI 内容初始化以及布局
   func commonUI() {
+    view.backgroundColor = .white
+
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.arrowDown"

@@ -40,5 +40,3 @@
 // error toast
 "leave_team_desc"="You have been removed from the group chat or the group chat has been dissolved.";
 
-"ai_user_pin_top"="PIN";
-"ai_user_cancel_pin_top"="Remove Pin top";

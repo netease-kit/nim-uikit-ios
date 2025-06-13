@@ -41,6 +41,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   public var topConstant: CGFloat = 0
   private var bodyTopViewHeightAnchor: NSLayoutConstraint?
   private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
+  private var networkBroken = false // 网络断开标志
 
   public lazy var navigationView: TabNavigationView = {
     let nav = TabNavigationView(frame: CGRect.zero)
@@ -108,9 +109,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     tableView.separatorStyle = .none
     tableView.delegate = self
     tableView.dataSource = self
-    tableView.backgroundColor = UIColor.ne_backgroundColor
+    tableView.backgroundColor = UIColor.clear
     tableView.sectionFooterHeight = 0
-    tableView.sectionIndexColor = .ne_greyText
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     tableView.keyboardDismissMode = .onDrag
 
@@ -129,7 +129,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isUserInteractionEnabled = false
     view.backgroundColor = .clear
-    view.isHidden = true
+    view.isHidden = false
     return view
   }()
 
@@ -170,6 +170,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     if let customController = ContactUIConfig.shared.customController {
       customController(self)
     }
+
+    subscribeVisibleRows()
   }
 
   override open func viewDidLoad() {
@@ -186,6 +188,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: UIApplication.didEnterBackgroundNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
+    IMKitClient.instance.addLoginListener(self)
   }
 
   /// 清除未读数
@@ -280,30 +283,43 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   // UITableViewDataSource
   open func numberOfSections(in tableView: UITableView) -> Int {
-    viewModel.contacts.count
+    viewModel.contactSections.count
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    NEALog.infoLog(ModuleName + " " + className(), desc: "contact section: \(section), count:\(viewModel.contacts[section].contacts.count)")
-
-    return viewModel.contacts[section].contacts.count
-  }
-
-  open func configCell(info: ContactInfo, _ cell: NEBaseContactTableViewCell, _ indexPath: IndexPath) -> UITableViewCell {
-    cell.setModel(info)
-    if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
-      cell.redAngleView.isHidden = false
-      cell.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
-    } else {
-      cell.redAngleView.isHidden = true
-    }
-    return cell
+    viewModel.contactSections[section].contacts.count
   }
 
   // 具体逻辑在子类实现
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    UITableViewCell()
+    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
+    let reusedId = "\(info.contactCellType.rawValue)"
+    let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
+
+    if let c = cell as? NEBaseContactTableViewCell {
+      c.setModel(info)
+
+      if IMKitConfigCenter.shared.enableOnlineStatus {
+        if indexPath.section != 0 {
+          if let accountId = info.user?.user?.accountId {
+            let online = viewModel.onlineStatusDic[accountId] ?? false
+            info.isOnline = online
+            c.setOnline(online)
+          }
+        }
+      }
+
+      if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
+        c.redAngleView.isHidden = false
+        c.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
+      } else {
+        c.redAngleView.isHidden = true
+      }
+
+      return c
+    }
+    return cell
   }
 
   open func tableView(_ tableView: UITableView,
@@ -312,13 +328,13 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
       ) as! ContactSectionView
-    sectionView.titleLabel.text = viewModel.contacts[section].initial
+    sectionView.titleLabel.text = viewModel.contactSections[section].initial
     return sectionView
   }
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
-    if viewModel.contacts[section].initial.count > 0 {
+    if viewModel.contactSections[section].initial.count > 0 {
       return 40
     }
     return 0
@@ -330,7 +346,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String,
                       at index: Int) -> Int {
-    for (i, t) in viewModel.contacts.enumerated() {
+    for (i, t) in viewModel.contactSections.enumerated() {
       if t.initial == title {
         lastTitleIndex = i
         return i
@@ -345,9 +361,9 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
+    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
 
-    if info.contactCellType == ContactCellType.ContactOthers.rawValue {
+    if info.contactCellType == .ContactOthers {
       if let headerItemClick = ContactUIConfig.shared.headerItemClick {
         headerItemClick(self, info, indexPath)
         return
@@ -395,6 +411,45 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         closure: nil
       )
     }
+  }
+
+  /// 订阅可见好友
+  open func subscribeVisibleRows() {
+    guard IMKitConfigCenter.shared.enableOnlineStatus else {
+      return
+    }
+
+    guard NESubscribeManager.shared.outOfLimit() else {
+      return
+    }
+
+    if let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows {
+      var accountIds = [String]()
+      for indexPath in indexPathsForVisibleRows {
+        if indexPath.section != 0 {
+          let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
+          if let accountId = info.user?.user?.accountId {
+            if !NESubscribeManager.shared.hasSubscribe(accountId) {
+              accountIds.append(accountId)
+            }
+          }
+        }
+      }
+
+      if !accountIds.isEmpty {
+        NESubscribeManager.shared.subscribeUsersOnlineState(accountIds) { error in }
+      }
+    }
+  }
+
+  /// 用户拖拽结束（手指松开），订阅可见好友
+  public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    subscribeVisibleRows()
+  }
+
+  /// 减速动画结束，订阅可见好友
+  public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    subscribeVisibleRows()
   }
 
   open func didRefreshTable() {
@@ -445,5 +500,24 @@ extension NEBaseContactViewController {
       return
     }
     goToFindFriend()
+  }
+}
+
+// MARK: - NEIMKitClientListener
+
+extension NEBaseContactViewController: NEIMKitClientListener {
+  /// 登录连接状态回调
+  /// - Parameter status: 连接状态
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+    if status == .CONNECT_STATUS_WAITING {
+      networkBroken = true
+    }
+
+    if status == .CONNECT_STATUS_CONNECTED, networkBroken {
+      networkBroken = false
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+        self?.subscribeVisibleRows()
+      }))
+    }
   }
 }

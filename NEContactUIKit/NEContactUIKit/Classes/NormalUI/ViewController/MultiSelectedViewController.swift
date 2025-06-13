@@ -23,7 +23,7 @@ open class MultiSelectedViewController: NEBaseMultiSelectedViewController {
     commonUI()
 
     cancelButton.setTitle(nil, for: .normal)
-    cancelButton.setImage(UIImage.ne_imageNamed(name: "backArrow"), for: .normal)
+    cancelButton.setImage(coreLoader.loadImage("back_arrow"), for: .normal)
 
     tableView.rowHeight = 62
     tableView.register(SelectedListCell.self, forCellReuseIdentifier: "\(NSStringFromClass(NEBaseSelectedListCell.self))")

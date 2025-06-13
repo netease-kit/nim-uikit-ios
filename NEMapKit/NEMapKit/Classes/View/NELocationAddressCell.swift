@@ -3,20 +3,21 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEChatUIKit
 import UIKit
 
 @objcMembers
 open class NELocationAddressCell: UITableViewCell {
   /// 位置指示图片
   public lazy var locationImgView: UIImageView = {
-    let locationImageView = UIImageView(image: mapCoreLoader.loadImage("chat_loacaiton_img"))
+    let locationImageView = UIImageView(image: chatCoreLoader.loadImage("chat_location_img"))
     locationImageView.translatesAutoresizingMaskIntoConstraints = false
     return locationImageView
   }()
 
   /// 选中图片
   public lazy var selectImgView: UIImageView = {
-    let imgView = UIImageView(image: mapCoreLoader.loadImage("chat_map_select"))
+    let imgView = UIImageView(image: chatCoreLoader.loadImage("chat_map_select"))
     imgView.translatesAutoresizingMaskIntoConstraints = false
     return imgView
   }()

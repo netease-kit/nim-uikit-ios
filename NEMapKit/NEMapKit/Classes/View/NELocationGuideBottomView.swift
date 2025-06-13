@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatUIKit
 import UIKit
 
 @objc
@@ -17,8 +18,8 @@ open class NELocationGuideBottomView: UIView {
   lazy var guideButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(mapCoreLoader.loadImage("chat_map_path"), for: .normal)
-    button.setImage(mapCoreLoader.loadImage("chat_map_path"), for: .highlighted)
+    button.setImage(chatCoreLoader.loadImage("chat_map_path"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("chat_map_path"), for: .highlighted)
     button.addTarget(self, action: #selector(guideBtnClick), for: .touchUpInside)
     return button
   }()

@@ -12,7 +12,7 @@ open class FunContactViewController: NEBaseContactViewController {
   public lazy var searchView: FunSearchView = {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setImage(coreLoader.loadImage("fun_search"), for: .normal)
     view.searchButton.setTitle(commonLocalizable("search"), for: .normal)
     return view
   }()
@@ -48,34 +48,30 @@ open class FunContactViewController: NEBaseContactViewController {
     if ContactUIConfig.shared.showHeader {
       contactHeaders = [
         ContactHeadItem(
-          name: localizable("validation_message"),
-          imageName: "funValid",
           router: ValidationMessageRouter,
-          color: UIColor(hexString: "#60CFA7")
+          name: localizable("validation_message"),
+          imageName: "fun_valid_message"
         ),
         ContactHeadItem(
-          name: localizable("blacklist"),
-          imageName: "funBlackName",
           router: ContactBlackListRouter,
-          color: UIColor(hexString: "#53C3F3")
+          name: localizable("blacklist"),
+          imageName: "fun_blacklist"
         ),
       ]
 
       if IMKitConfigCenter.shared.enableTeam {
         contactHeaders.append(ContactHeadItem(
-          name: localizable("my_teams"),
-          imageName: "funGroup",
           router: ContactTeamListRouter,
-          color: UIColor(hexString: "#BE65D9")
+          name: localizable("my_teams"),
+          imageName: "fun_my_team"
         ))
       }
 
       if IMKitConfigCenter.shared.enableAIUser {
         contactHeaders.append(ContactHeadItem(
-          name: localizable("my_ai_user"),
-          imageName: "funAIUser",
           router: ContactAIUserListRouter,
-          color: UIColor(hexString: "#BE65D9")
+          name: localizable("my_ai_user"),
+          imageName: "fun_ai_user"
         ))
       }
 
@@ -92,6 +88,11 @@ open class FunContactViewController: NEBaseContactViewController {
   override open func commonUI() {
     super.commonUI()
     view.backgroundColor = .funContactBackgroundColor
+    bodyTopView.backgroundColor = .funContactBodyTopViewBackgroundColor
+    bodyView.backgroundColor = .funContactBodyViewBackgroundColor
+    tableView.backgroundColor = .funContactTableViewBackgroundColor
+    tableView.sectionIndexColor = .funContactTableViewSectionIndexColor
+    bodyBottomView.backgroundColor = .funContactBodyBottomViewBackgroundColor
 
     let tap = UITapGestureRecognizer(target: self, action: #selector(searchAction))
     tap.cancelsTouchesInView = false
@@ -104,8 +105,6 @@ open class FunContactViewController: NEBaseContactViewController {
       searchView.rightAnchor.constraint(equalTo: bodyTopView.rightAnchor, constant: -8),
       searchView.heightAnchor.constraint(equalToConstant: 36),
     ])
-
-    tableView.backgroundColor = .clear
 
     tableView.register(
       ContactSectionView.self,
@@ -120,36 +119,11 @@ open class FunContactViewController: NEBaseContactViewController {
   }
 
   override open func tableView(_ tableView: UITableView,
-                               cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    let reusedId = "\(info.contactCellType)"
-    let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
-
-    if let c = cell as? FunContactTableViewCell {
-      if IMKitConfigCenter.shared.onlineStatusEnable {
-        if indexPath.section != 0 {
-          c.avatarImageView.alpha = 0.5
-          if let accountId = info.user?.user?.accountId {
-            if let event = viewModel.onlineStatusDic[accountId] {
-              if event.value == NIMSubscribeEventOnlineValue.login.rawValue {
-                c.avatarImageView.alpha = 1.0
-              }
-            }
-          }
-        } else {
-          c.avatarImageView.alpha = 1.0
-        }
-      }
-      return configCell(info: info, c, indexPath)
-    }
-
-    return cell
-  }
-
-  override open func tableView(_ tableView: UITableView,
                                viewForHeaderInSection section: Int) -> UIView? {
     if let sectionView = super.tableView(tableView, viewForHeaderInSection: section) as? ContactSectionView {
       sectionView.line.isHidden = true
+      sectionView.backView.backgroundColor = .funContactSectionViewBackgroundColor
+      sectionView.titleLabel.textColor = .funContactSectionViewTitleLabelTextColor
       return sectionView
     }
     return nil
@@ -168,25 +142,25 @@ open class FunContactViewController: NEBaseContactViewController {
 extension FunContactViewController {
   override open func initSystemNav() {
     edgesForExtendedLayout = []
-    let addItem = UIBarButtonItem(
-      image: ContactUIConfig.shared.titleBarRightRes ?? UIImage.ne_imageNamed(name: "funAdd"),
-      style: .plain,
-      target: self,
-      action: #selector(goToFindFriend)
-    )
-    addItem.tintColor = UIColor(hexString: "333333")
 
-    navigationItem.rightBarButtonItems = [addItem]
-    navigationView.addBtn.setImage(UIImage.ne_imageNamed(name: "funAdd"), for: .normal)
+    if ContactUIConfig.shared.showTitleBarRightIcon {
+      let addItem = UIBarButtonItem(
+        image: ContactUIConfig.shared.titleBarRightRes ?? contactCoreLoader.loadImage("fun_nav_add"),
+        style: .plain,
+        target: self,
+        action: #selector(goToFindFriend)
+      )
+      addItem.tintColor = UIColor(hexString: "333333")
 
-    if !ContactUIConfig.shared.showTitleBarRightIcon {
-      navigationItem.rightBarButtonItems = []
+      navigationItem.rightBarButtonItems = [addItem]
+      navigationView.addBtn.setImage(ContactUIConfig.shared.titleBarRightRes ?? contactCoreLoader.loadImage("fun_nav_add"), for: .normal)
+    } else {
       navigationView.addBtn.isHidden = true
     }
 
     title = localizable("contact")
     navigationView.navigationTitle.text = localizable("contact")
-    navigationView.backgroundColor = .funContactBackgroundColor
+    navigationView.backgroundColor = .funContactNavigationBackgroundColor
     navigationView.titleBarBottomLine.isHidden = true
     navigationView.brandBtn.isHidden = true
     navigationView.navigationTitle.isHidden = false

@@ -44,7 +44,7 @@ open class ContactSelectedViewController: NEBaseContactSelectedViewController {
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
       ) as! ContactSectionView
-    sectionView.titleLabel.text = viewModel.contacts[section].initial
+    sectionView.titleLabel.text = viewModel.contactSections[section].initial
     return sectionView
   }
 

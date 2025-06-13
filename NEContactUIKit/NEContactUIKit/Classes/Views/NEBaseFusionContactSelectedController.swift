@@ -86,7 +86,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
     emptyView.setText(localizable("no_friend"))
     emptyView.translatesAutoresizingMaskIntoConstraints = false
     emptyView.isUserInteractionEnabled = false
-    emptyView.isHidden = true
+    emptyView.isHidden = false
     return emptyView
   }()
 
@@ -132,16 +132,14 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
           weakSelf?.view.makeToast(err.localizedDescription)
         } else {
           weakSelf?.fusionContactTableView.reloadData()
-          weakSelf?.fusionEmptyView.isHidden = (weakSelf?.viewModel.memberDatas.count ?? 0) > 0
         }
+        weakSelf?.fusionEmptyView.isHidden = (weakSelf?.viewModel.memberDatas.count ?? 0) > 0
       }
     } else if fusionType == .FusionContactTypeAIUser {
       fusionEmptyView.setText(localizable("no_ai_user"))
       viewModel.loadAIUserData(filterSet)
       fusionContactTableView.reloadData()
-      if viewModel.memberDatas.count <= 0 {
-        fusionEmptyView.isHidden = false
-      }
+      fusionEmptyView.isHidden = viewModel.memberDatas.count > 0
     }
   }
 

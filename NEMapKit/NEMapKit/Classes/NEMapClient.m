@@ -61,6 +61,10 @@ typedef void (^MapMoveCompletion)(void);
   return instance;
 }
 
+/// 高德地图组件初始化
+/// - Parameters:
+///   - appkey: 高德地图的 API Key
+///   - serverKey: 高德地图 web API 的 key
 - (void)setupMapClientWithAppkey:(NSString *)appkey withServerKey:(NSString *)serverKey {
   self.serverKey = serverKey;
   [self setupMapClientWithAppkey:appkey];

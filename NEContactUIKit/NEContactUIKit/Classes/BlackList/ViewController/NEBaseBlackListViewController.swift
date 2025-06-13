@@ -70,7 +70,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   }
 
   open func initNav() {
-    let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
+    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,
@@ -80,7 +80,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     backItem.accessibilityIdentifier = "id.backArrow"
     navigationItem.leftBarButtonItem = backItem
 
-    let addImage = UIImage.ne_imageNamed(name: "add")?.withRenderingMode(.alwaysOriginal)
+    let addImage = UIImage.ne_imageNamed(name: "add_black")?.withRenderingMode(.alwaysOriginal)
     let addItem = UIBarButtonItem(
       image: addImage,
       style: .plain,
@@ -90,7 +90,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     addItem.accessibilityIdentifier = "id.threePoint"
     navigationItem.rightBarButtonItem = addItem
 
-    navigationView.setMoreButtonImage(UIImage.ne_imageNamed(name: "add"))
+    navigationView.setMoreButtonImage(UIImage.ne_imageNamed(name: "add_black"))
   }
 
   /// UI 初始化

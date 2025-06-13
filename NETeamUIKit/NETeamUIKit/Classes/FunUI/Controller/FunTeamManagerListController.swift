@@ -13,14 +13,6 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     cellClassDic = [0: FunTeamArrowSettingCell.self, 1: FunTeamManagerMemberCell.self]
   }
 
-  public lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(imageName: "fun_user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isUserInteractionEnabled = false
-    view.isHidden = true
-    return view
-  }()
-
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
@@ -37,6 +29,7 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
       emptyView.heightAnchor.constraint(equalToConstant: 91),
     ])
     sortAndReloadData()
+    emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

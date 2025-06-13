@@ -9,8 +9,10 @@
 "contact"="Contacts";
 "mine"="Me";
 "logout"="Log out";
+"account_Cancellation" = "Delete Account";
 "about_yunxin"="About CommsEase";
 "want_to_logout"="Sure to log out?";
+"want_to_delete_account"="Sure to delete account?";
 "person_info"="My Proflie";
 "setting_birthday_failure"="Set birthday Failed";
 "setting_head_failure"="Set Avatar Failed";

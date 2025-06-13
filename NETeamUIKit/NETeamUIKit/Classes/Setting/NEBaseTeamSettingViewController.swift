@@ -119,12 +119,11 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     if let model = viewModel.teamInfoModel {
-      if let url = model.team?.avatar, !url.isEmpty {
-        teamHeaderView.sd_setImage(with: URL(string: url))
-      }
-      if let name = model.team?.name {
-        teamNameLabel.text = name
-      }
+      let url = model.team?.avatar
+      let name = model.team?.getShortName() ?? ""
+      let teamId = model.team?.teamId ?? ""
+      teamHeaderView.configHeadData(headUrl: url, name: name, uid: teamId)
+      teamNameLabel.text = model.team?.getShowName() ?? ""
     }
   }
 
@@ -183,18 +182,10 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   /// 设置群设置顶部视图展示内容
   open func setTeamHeaderInfo() {
-    if let url = viewModel.teamInfoModel?.team?.avatar, !url.isEmpty {
-      print("icon url : ", url)
-      teamHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-      teamHeaderView.backgroundColor = .clear
-    } else {
-      if let tid = teamId {
-        if let name = viewModel.teamInfoModel?.team?.getShowName() {
-          teamHeaderView.setTitle(name)
-        }
-        teamHeaderView.backgroundColor = UIColor.colorWithString(string: "\(tid)")
-      }
-    }
+    let url = viewModel.teamInfoModel?.team?.avatar
+    let name = viewModel.teamInfoModel?.team?.getShortName() ?? ""
+    let accountId = teamId ?? ""
+    teamHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
     teamNameLabel.text = viewModel.teamInfoModel?.team?.getShowName()
   }
 
@@ -744,7 +735,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   override open func didMove(toParent parent: UIViewController?) {
     super.didMove(toParent: parent)
-    if IMKitConfigCenter.shared.onlineStatusEnable {
+    if IMKitConfigCenter.shared.enableOnlineStatus {
       if parent == nil {
         viewModel.clear()
       }

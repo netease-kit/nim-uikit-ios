@@ -10,9 +10,9 @@ import Foundation
 @_exported import NECoreIM2Kit
 @_exported import NECoreKit
 
-let coreLoader = CommonLoader<NEBaseTeamSettingViewController>()
+let teamCoreLoader = CommonLoader<NEBaseTeamSettingViewController>()
 func localizable(_ key: String) -> String {
-  coreLoader.localizable(key)
+  teamCoreLoader.localizable(key)
 }
 
 public let ModuleName = "NETeamUIKit"

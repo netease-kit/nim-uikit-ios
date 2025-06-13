@@ -13,11 +13,11 @@ import UIKit
 open class SystemNotificationCell: NEBaseSystemNotificationCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImageView.layer.cornerRadius = 18
+    userHeaderView.layer.cornerRadius = 18
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 36),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 36),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 }

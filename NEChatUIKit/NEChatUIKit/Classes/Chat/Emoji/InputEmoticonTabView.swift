@@ -20,7 +20,7 @@ open class InputEmoticonTabView: UIControl {
   public lazy var sendButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(coreLoader.localizable("send"), for: .normal)
+    button.setTitle(chatCoreLoader.localizable("send"), for: .normal)
     button.titleLabel?.textColor = .white
     button.backgroundColor = UIColor.ne_normalTheme
     button.titleLabel?.font = DefaultTextFont(14)
@@ -69,7 +69,8 @@ open class InputEmoticonTabView: UIControl {
       NEALog.errorLog(className, desc: "emoticonCatalogs is nil")
       return
     }
-    for catelog in catalogs {
+
+    for _ in catalogs {
       let button = UIButton()
       button.addTarget(self, action: #selector(onTouchTab), for: .touchUpInside)
       button.sizeToFit()

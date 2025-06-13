@@ -15,7 +15,7 @@ open class NEBaseContactSelectedCell: NEBaseContactTableViewCell {
     super.commonUI()
     leftConstraint?.constant = 50
     contentView.addSubview(sImageView)
-    sImageView.image = UIImage.ne_imageNamed(name: "unselect")
+    sImageView.image = coreLoader.loadImage("unselect")
     sImageView.translatesAutoresizingMaskIntoConstraints = false
     sImageView.accessibilityIdentifier = "id.selector"
   }

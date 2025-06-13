@@ -44,7 +44,6 @@ open class BlackListViewModel: NSObject {
   /// 移除黑名单
   /// - Parameters:
   ///   - account: 好友 Id
-  ///   - index: 该用户在表格中的位置
   ///   - completion: 回调
   open func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
@@ -94,8 +93,9 @@ extension BlackListViewModel: NEContactListener {
     }
   }
 
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       // 添加黑名单

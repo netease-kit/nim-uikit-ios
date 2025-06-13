@@ -7,20 +7,13 @@ import UIKit
 
 @objcMembers
 open class NEBaseContactViewCell: UITableViewCell {
-  public lazy var avatarImageView: UIImageView = {
-    let imageView = UIImageView()
+  // 头像
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let imageView = NEUserHeaderView(frame: .zero)
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.addSubview(nameLabel)
     imageView.clipsToBounds = true
-    imageView.contentMode = .scaleAspectFill
-    imageView.backgroundColor = UIColor.colorWithNumber(number: 0)
-    imageView.accessibilityIdentifier = "id.avatar"
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: imageView.leftAnchor, constant: 1),
-      nameLabel.rightAnchor.constraint(equalTo: imageView.rightAnchor, constant: -1),
-      nameLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
-      nameLabel.centerYAnchor.constraint(equalTo: imageView.centerYAnchor),
-    ])
+    imageView.titleLabel.font = NEConstant.defaultTextFont(14.0)
+    imageView.isUserInteractionEnabled = true
     return imageView
   }()
 
@@ -37,17 +30,6 @@ open class NEBaseContactViewCell: UITableViewCell {
     label.isHidden = true
     label.accessibilityIdentifier = "id.unread"
     return label
-  }()
-
-  public lazy var nameLabel: UILabel = {
-    let nameLabel = UILabel()
-    nameLabel.translatesAutoresizingMaskIntoConstraints = false
-    nameLabel.textColor = .white
-    nameLabel.textAlignment = .center
-    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
-    nameLabel.adjustsFontSizeToFitWidth = true
-    nameLabel.accessibilityIdentifier = "id.noAvatar"
-    return nameLabel
   }()
 
   public lazy var titleLabel: UILabel = {
@@ -82,16 +64,11 @@ open class NEBaseContactViewCell: UITableViewCell {
   }
 
   open func setupCommonCircleHeader() {
-    contentView.addSubview(avatarImageView)
-    leftConstraint = avatarImageView.leftAnchor.constraint(
+    contentView.addSubview(userHeaderView)
+    leftConstraint = userHeaderView.leftAnchor.constraint(
       equalTo: contentView.leftAnchor,
       constant: 20
     )
     leftConstraint?.isActive = true
-  }
-
-  open func showNameOnCircleHeader(_ name: String) {
-    nameLabel.text = name
-      .count > 2 ? String(name[name.index(name.endIndex, offsetBy: -2)...]) : name
   }
 }

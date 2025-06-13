@@ -216,3 +216,10 @@
 "request_exception" = "模型请求异常";
 "ai_request_ing" = "大模型请求响应中...";
 "server_busy" = "服务器繁忙，请稍后再试";
+
+"ai_chat_title" = "回复灵感";
+"ai_chat_for_failure" = "回复灵感获取失败";
+"ai_chat_click_retry" = "点击重试";
+
+"p2p_chat_online" = "(在线)";
+"p2p_chat_offline" = "(离线)";

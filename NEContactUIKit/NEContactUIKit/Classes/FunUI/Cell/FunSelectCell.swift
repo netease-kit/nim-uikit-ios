@@ -23,7 +23,7 @@ open class FunSelectCell: NEBaseSelectCell {
   /// 重写布局方法
   override open func commonUI() {
     super.commonUI()
-    multiSelectImageView.highlightedImage = UIImage.ne_imageNamed(name: "fun_select")
+    multiSelectImageView.highlightedImage = coreLoader.loadImage("fun_select")
   }
 
   /// 重写设置文案字体方案
@@ -37,11 +37,11 @@ open class FunSelectCell: NEBaseSelectCell {
   /// 重写设置头像方法
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImageView.layer.cornerRadius = 4
+    userHeaderView.layer.cornerRadius = 4
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 40),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 40),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 }

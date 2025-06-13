@@ -79,7 +79,7 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
       withReuseIdentifier: "\(TeamDefaultIconCell.self)",
       for: indexPath
     ) as? TeamDefaultIconCell {
-      cell.iconImageView.image = coreLoader.loadImage("icon_\(indexPath.row)")
+      cell.iconImageView.image = teamCoreLoader.loadImage("icon_\(indexPath.row)")
       cell.iconImageView.accessibilityIdentifier = "id.default\(indexPath.row + 1)"
       return cell
     }

@@ -16,15 +16,15 @@ open class FunTeamTableViewCell: NEBaseTeamTableViewCell {
 
   override open func commonUI() {
     super.commonUI()
-    avatarImageView.layer.cornerRadius = 4
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: 40)
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: 40)
+    userHeaderView.layer.cornerRadius = 4
+    userHeaderView.updateLayoutConstraint(firstItem: userHeaderView, secondItem: nil, attribute: .width, constant: 40)
+    userHeaderView.updateLayoutConstraint(firstItem: userHeaderView, secondItem: nil, attribute: .height, constant: 40)
 
     titleLabel.textColor = .ne_darkText
 
     contentView.addSubview(bottomLine)
     NSLayoutConstraint.activate([
-      bottomLine.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
+      bottomLine.leftAnchor.constraint(equalTo: userHeaderView.leftAnchor),
       bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
       bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       bottomLine.heightAnchor.constraint(equalToConstant: 1),

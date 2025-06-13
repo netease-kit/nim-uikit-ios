@@ -124,8 +124,8 @@ open class TeamRouter: NSObject {
       }
     }
 
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      _ = NEEventSubscribeManager.shared
+    if IMKitConfigCenter.shared.enableOnlineStatus {
+      _ = NESubscribeManager.shared
     }
   }
 }

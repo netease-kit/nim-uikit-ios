@@ -41,4 +41,10 @@ open class NEFusionContactCellModel: NSObject {
     }
     return ""
   }
+
+  open func getShortName(_ count: Int = 2) -> String {
+    let name = getShowName()
+    return name
+      .count > count ? String(name[name.index(name.endIndex, offsetBy: -count)...]) : name
+  }
 }

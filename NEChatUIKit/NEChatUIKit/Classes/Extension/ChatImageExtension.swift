@@ -12,7 +12,7 @@ public extension UIImage {
     guard let imageName = name else {
       return nil
     }
-    return coreLoader.loadImage(imageName)
+    return chatCoreLoader.loadImage(imageName)
   }
 
   class func ne_bundleImage(name: String) -> UIImage {

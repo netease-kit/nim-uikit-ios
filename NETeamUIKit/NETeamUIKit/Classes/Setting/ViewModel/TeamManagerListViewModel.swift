@@ -227,7 +227,7 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
   }
 
   /// 获取群管理员
-  /// - Parameter teamModel：群信息对象
+  /// - Parameter teamInfo: 群信息对象
   /// - Parameter queryType:  查询类型
   /// - Parameter completion:  完成后的回调
   open func getTeamManagers(_ teamInfo: NETeamInfoModel,
@@ -348,8 +348,9 @@ open class TeamManagerListViewModel: NSObject, NETeamListener {
 // MARK: - NEContactListener
 
 extension TeamManagerListViewModel: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       for memberInfo in managers {

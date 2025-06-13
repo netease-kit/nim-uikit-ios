@@ -35,7 +35,7 @@ open class LocalConversationListCell: NEBaseLocalConversationListCell {
     ])
   }
 
-  override func initSubviewsLayout() {
+  override open func initSubviewsLayout() {
     if LocalConversationUIConfig.shared.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 21.0
     } else if LocalConversationUIConfig.shared.conversationProperties.avatarCornerRadius > 0 {
@@ -48,9 +48,9 @@ open class LocalConversationListCell: NEBaseLocalConversationListCell {
   override open func configureData(_ sessionModel: NELocalConversationListModel?) {
     super.configureData(sessionModel)
     if sessionModel?.conversation?.stickTop == true {
-      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
+      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? .normalConversationTopItemBackgroundColor
     } else {
-      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemBackground ?? .white
+      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemBackground ?? .normalConversationItemBackgroundColor
     }
   }
 }

@@ -9,7 +9,7 @@ import UIKit
 open class ContactSelectedCell: NEBaseContactSelectedCell {
   override open func commonUI() {
     super.commonUI()
-    sImageView.highlightedImage = UIImage.ne_imageNamed(name: "select")
+    sImageView.highlightedImage = coreLoader.loadImage("select")
     NSLayoutConstraint.activate([
       sImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       sImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
@@ -24,9 +24,9 @@ open class ContactSelectedCell: NEBaseContactSelectedCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 36),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 36),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 }

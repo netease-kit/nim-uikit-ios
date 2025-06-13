@@ -47,7 +47,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
   /// 搜索文本框
   public lazy var searchTextField: SearchTextField = {
     let textField = SearchTextField()
-    let leftImageView = UIImageView(image: coreLoader.loadImage("search_icon"))
+    let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always

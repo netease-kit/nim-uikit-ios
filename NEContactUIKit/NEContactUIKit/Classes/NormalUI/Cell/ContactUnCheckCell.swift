@@ -20,8 +20,8 @@ open class ContactUnCheckCell: NEBaseContactUnCheckCell {
 
   open func setAvatarWH(_ height: CGFloat) {
     avatarImageView.layer.cornerRadius = height / 2
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: height)
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: height)
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, secondItem: nil, attribute: .width, constant: height)
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, secondItem: nil, attribute: .height, constant: height)
   }
 
   /// 重写控件赋值方法
@@ -31,7 +31,7 @@ open class ContactUnCheckCell: NEBaseContactUnCheckCell {
 
     avatarImageView.configHeadData(
       headUrl: model.user?.user?.avatar,
-      name: model.user?.showName() ?? "",
+      name: model.user?.shortName() ?? "",
       uid: model.user?.user?.accountId ?? ""
     )
   }

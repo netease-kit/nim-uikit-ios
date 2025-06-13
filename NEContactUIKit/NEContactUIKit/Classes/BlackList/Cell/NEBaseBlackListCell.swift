@@ -59,7 +59,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
     ])
 
-    contentView.updateLayoutConstraint(firstItem: titleLabel, seconedItem: contentView, attribute: .right, constant: -80)
+    contentView.updateLayoutConstraint(firstItem: titleLabel, secondItem: contentView, attribute: .right, constant: -80)
   }
 
   open func buttonEvent(sender: UIButton) {
@@ -76,14 +76,9 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
     titleLabel.text = user.showName()
 
     // avatar
-    if let imageUrl = user.user?.avatar, !imageUrl.isEmpty {
-      nameLabel.text = ""
-      avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      avatarImageView.backgroundColor = .clear
-    } else {
-      nameLabel.text = user.shortName(count: 2)
-      avatarImageView.image = nil
-      avatarImageView.backgroundColor = UIColor.colorWithString(string: user.user?.accountId)
-    }
+    let url = user.user?.avatar
+    let name = user.shortName() ?? ""
+    let accountId = user.user?.accountId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 }

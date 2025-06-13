@@ -53,14 +53,11 @@ open class NEBaseTeamMemberSelectCell: UITableViewCell {
 
   open func configureMember(_ model: NESelectTeamMember?) {
     checkImageView.isHighlighted = model?.isSelected ?? false
-    if let url = model?.member?.nimUser?.user?.avatar, !url.isEmpty {
-      headerView.sd_setImage(with: URL(string: url), completed: nil)
-      headerView.setTitle("")
-    } else {
-      headerView.image = nil
-      headerView.setTitle(model?.member?.showNickInTeam() ?? "")
-      headerView.backgroundColor = UIColor.colorWithString(string: model?.member?.nimUser?.user?.accountId)
-    }
+
+    let url = model?.member?.nimUser?.user?.avatar
+    let name = model?.member?.getShortName(model?.member?.showNickInTeam() ?? "") ?? ""
+    let accountId = model?.member?.nimUser?.user?.accountId ?? ""
+    headerView.configHeadData(headUrl: url, name: name, uid: accountId)
     nameLabel.text = model?.member?.atNameInTeam()
   }
 }

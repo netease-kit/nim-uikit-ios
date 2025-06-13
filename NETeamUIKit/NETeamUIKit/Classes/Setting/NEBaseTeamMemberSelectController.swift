@@ -105,7 +105,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
 
   let searchImageView: UIImageView = {
     let searchImageView = UIImageView()
-    searchImageView.image = coreLoader.loadImage("search")
+    searchImageView.image = coreLoader.loadImage("textField_search_icon")
     searchImageView.translatesAutoresizingMaskIntoConstraints = false
     return searchImageView
   }()

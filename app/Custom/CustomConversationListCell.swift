@@ -7,8 +7,8 @@ import NEConversationUIKit
 import UIKit
 
 open class CustomConversationListCell: ConversationListCell {
-  // 新增 UI 元素，用于展示在线状态
-  private lazy var onlineView: UIImageView = {
+  // 新增 UI 元素
+  private lazy var customView: UIImageView = {
     let notifyView = UIImageView()
     notifyView.translatesAutoresizingMaskIntoConstraints = false
     notifyView.image = UIImage(named: "about_yunxin")
@@ -19,12 +19,12 @@ open class CustomConversationListCell: ConversationListCell {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
 
     // 头像右下角
-    contentView.addSubview(onlineView)
+    contentView.addSubview(customView)
     NSLayoutConstraint.activate([
-      onlineView.rightAnchor.constraint(equalTo: headImageView.rightAnchor),
-      onlineView.bottomAnchor.constraint(equalTo: headImageView.bottomAnchor),
-      onlineView.widthAnchor.constraint(equalToConstant: 12),
-      onlineView.heightAnchor.constraint(equalToConstant: 12),
+      customView.leftAnchor.constraint(equalTo: headImageView.leftAnchor),
+      customView.bottomAnchor.constraint(equalTo: headImageView.bottomAnchor),
+      customView.widthAnchor.constraint(equalToConstant: 12),
+      customView.heightAnchor.constraint(equalToConstant: 12),
     ])
   }
 

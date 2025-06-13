@@ -20,7 +20,7 @@ open class NEBaseRecentSelectCell: NEBaseSelectedCell {
 
   /// 选择状态
   lazy var selectImageView: UIImageView = {
-    let imageView = UIImageView(image: UIImage.ne_imageNamed(name: "unselect"))
+    let imageView = UIImageView(image: coreLoader.loadImage("unselect"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView
   }()
@@ -58,8 +58,8 @@ open class NEBaseRecentSelectCell: NEBaseSelectedCell {
   /// - Parameter height: 宽高
   open func setAvatarWH(_ height: CGFloat) {
     avatarImageView.layer.cornerRadius = height / 2
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .width, constant: height)
-    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, seconedItem: nil, attribute: .height, constant: height)
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, secondItem: nil, attribute: .width, constant: height)
+    avatarImageView.updateLayoutConstraint(firstItem: avatarImageView, secondItem: nil, attribute: .height, constant: height)
   }
 
   /// 设置选中状态显隐

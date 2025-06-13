@@ -27,7 +27,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
   public lazy var addButton: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(coreLoader.loadImage("setting_add"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("setting_add"), for: .normal)
     button.accessibilityIdentifier = "id.add"
     return button
   }()
@@ -139,15 +139,10 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
     tapGesture.numberOfTapsRequired = 1
     tapGesture.numberOfTouchesRequired = 1
 
-    if let url = viewModel.userInfo?.user?.avatar, !url.isEmpty {
-      userHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-      userHeaderView.setTitle("")
-      userHeaderView.backgroundColor = .clear
-    } else if let name = viewModel.userInfo?.showName() {
-      userHeaderView.sd_setImage(with: nil)
-      userHeaderView.setTitle(name)
-      userHeaderView.backgroundColor = UIColor.colorWithString(string: viewModel.userInfo?.user?.accountId)
-    }
+    let url = viewModel.userInfo?.user?.avatar
+    let name = viewModel.userInfo?.shortName() ?? ""
+    let accountId = viewModel.userInfo?.user?.accountId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     nameLabel.text = viewModel.userInfo?.showName()
     cornerBackView.addSubview(nameLabel)

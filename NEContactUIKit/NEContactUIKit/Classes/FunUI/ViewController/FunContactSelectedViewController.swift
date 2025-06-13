@@ -47,7 +47,7 @@ open class FunContactSelectedViewController: NEBaseContactSelectedViewController
       ) as! ContactSectionView
     sectionView.titleLabel.textColor = ContactUIConfig.shared.contactProperties.indexTitleColor ?? .ne_greyText
     sectionView.line.isHidden = true
-    sectionView.titleLabel.text = viewModel.contacts[section].initial
+    sectionView.titleLabel.text = viewModel.contactSections[section].initial
     return sectionView
   }
 
