@@ -186,7 +186,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     let view = FunSearchView(searchButtonLeftConstant: 16)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backView.backgroundColor = UIColor.ne_backcolor
-    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setImage(coreLoader.loadImage("fun_search"), for: .normal)
     view.searchButton.setTitle(commonLocalizable("search"), for: .normal)
     view.searchButton.contentHorizontalAlignment = .left
     return view
@@ -194,7 +194,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   public lazy var searchTextField: SearchTextField = {
     let textField = SearchTextField()
-    let leftImageView = UIImageView(image: UIImage.ne_imageNamed(name: "search"))
+    let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always
@@ -233,7 +233,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     // 向右箭头（更多）
     let arrowRight = UIImageView()
     arrowRight.translatesAutoresizingMaskIntoConstraints = false
-    arrowRight.image = UIImage.ne_imageNamed(name: "arrowRight")
+    arrowRight.image = coreLoader.loadImage("arrow_right")
 
     view.addSubview(arrowRight)
     NSLayoutConstraint.activate([
@@ -653,7 +653,6 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 确认按钮点击事件
-  /// - Parameter sender: 按钮
   open func sureButtonAction() {
     // 校验网络
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
@@ -681,7 +680,6 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 取消按钮点击事件
-  /// - Parameter button: 按钮
   open func cancelButtonAction() {
     dismiss(animated: true, completion: nil)
   }

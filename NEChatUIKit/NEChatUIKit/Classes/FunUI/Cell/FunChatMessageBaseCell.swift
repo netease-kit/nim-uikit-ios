@@ -22,7 +22,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   public lazy var replyTextViewLeft: UIView = {
     let replyTextView = UIView()
     replyTextView.translatesAutoresizingMaskIntoConstraints = false
-    replyTextView.backgroundColor = .funChatInputReplyBg
+    replyTextView.backgroundColor = .funChatReplyViewBg
     replyTextView.layer.cornerRadius = 4
     replyTextView.accessibilityIdentifier = "id.replyTextView"
 
@@ -74,7 +74,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   public lazy var replyTextViewRight: UIView = {
     let replyTextView = UIView()
     replyTextView.translatesAutoresizingMaskIntoConstraints = false
-    replyTextView.backgroundColor = .funChatInputReplyBg
+    replyTextView.backgroundColor = .funChatReplyViewBg
     replyTextView.layer.cornerRadius = 4
     replyTextView.accessibilityIdentifier = "id.replyTextView"
 
@@ -154,11 +154,11 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
 
   open func addReplyGesture() {
     let replyViewTapLeft = UITapGestureRecognizer(target: self, action: #selector(tapReplyView(tap:)))
-    replyViewTapLeft.cancelsTouchesInView = false
+    replyViewTapLeft.cancelsTouchesInView = true
     replyViewLeft.addGestureRecognizer(replyViewTapLeft)
 
     let replyViewTapRight = UITapGestureRecognizer(target: self, action: #selector(tapReplyView(tap:)))
-    replyViewTapRight.cancelsTouchesInView = false
+    replyViewTapRight.cancelsTouchesInView = true
     replyViewRight.addGestureRecognizer(replyViewTapRight)
   }
 
@@ -202,37 +202,74 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     readView.sectorLayer.fillColor = UIColor.funChatThemeColor.cgColor
 
     var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
-    bubbleImageLeft.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImageLeft.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImageLeft.image = image
+      bubbleImageLeft.contentMode = .scaleAspectFill
+    }
 
     image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
-    bubbleImageRight.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImageRight.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImageRight.image = image
+      bubbleImageRight.contentMode = .scaleAspectFill
+    }
 
-    selectedButton.setImage(.ne_imageNamed(name: "fun_select"), for: .selected)
+    selectedButton.setImage(coreLoader.loadImage("fun_select"), for: .selected)
   }
 
   override open func baseCommonUI() {
     super.baseCommonUI()
-    setAvatarImgSize(size: fun_chat_min_h)
 
-    contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .left, constant: 8 + funMargin)
-    contentView.updateLayoutConstraint(firstItem: fullNameLabel, seconedItem: avatarImageLeft, attribute: .top, constant: -4)
+    userHeaderViewLeft.updateLayoutConstraint(firstItem: userHeaderViewLeft,
+                                              secondItem: userHeaderViewLeft,
+                                              attribute: .width,
+                                              constant: fun_chat_min_h)
+    userHeaderViewLeft.updateLayoutConstraint(firstItem: userHeaderViewLeft,
+                                              secondItem: userHeaderViewLeft,
+                                              attribute: .height,
+                                              constant: fun_chat_min_h)
 
-    contentView.updateLayoutConstraint(firstItem: pinLabelLeft, seconedItem: bubbleImageLeft, attribute: .left, constant: 14 + funMargin)
-    contentView.updateLayoutConstraint(firstItem: pinLabelRight, seconedItem: bubbleImageRight, attribute: .right, constant: -funMargin)
+    userHeaderViewRight.updateLayoutConstraint(firstItem: userHeaderViewRight,
+                                               secondItem: userHeaderViewRight,
+                                               attribute: .width,
+                                               constant: fun_chat_min_h)
+    userHeaderViewRight.updateLayoutConstraint(firstItem: userHeaderViewRight,
+                                               secondItem: userHeaderViewRight,
+                                               attribute: .height,
+                                               constant: fun_chat_min_h)
+
+    contentView.updateLayoutConstraint(firstItem: fullNameLabel,
+                                       secondItem: userHeaderViewLeft,
+                                       attribute: .left,
+                                       constant: 8 + funMargin)
+    contentView.updateLayoutConstraint(firstItem: fullNameLabel,
+                                       secondItem: userHeaderViewLeft,
+                                       attribute: .top,
+                                       constant: -4)
+
+    contentView.updateLayoutConstraint(firstItem: pinLabelLeft,
+                                       secondItem: bubbleImageLeft,
+                                       attribute: .left,
+                                       constant: 14 + funMargin)
+    contentView.updateLayoutConstraint(firstItem: pinLabelRight,
+                                       secondItem: bubbleImageRight,
+                                       attribute: .right,
+                                       constant: -funMargin)
   }
 
   override open func initSubviewsLayout() {
     if ChatUIConfig.shared.messageProperties.avatarType == .cycle {
-      avatarImageRight.layer.cornerRadius = 21.0
-      avatarImageLeft.layer.cornerRadius = 21.0
+      userHeaderViewRight.layer.cornerRadius = 21.0
+      userHeaderViewLeft.layer.cornerRadius = 21.0
     } else if ChatUIConfig.shared.messageProperties.avatarCornerRadius > 0 {
-      avatarImageRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
-      avatarImageLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      userHeaderViewRight.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
+      userHeaderViewLeft.layer.cornerRadius = ChatUIConfig.shared.messageProperties.avatarCornerRadius
     } else {
-      avatarImageRight.layer.cornerRadius = 4
-      avatarImageLeft.layer.cornerRadius = 4
+      userHeaderViewRight.layer.cornerRadius = 4
+      userHeaderViewLeft.layer.cornerRadius = 4
     }
   }
 }

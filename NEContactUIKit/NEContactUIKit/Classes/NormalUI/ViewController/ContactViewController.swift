@@ -34,34 +34,30 @@ open class ContactViewController: NEBaseContactViewController {
     if ContactUIConfig.shared.showHeader {
       contactHeaders = [
         ContactHeadItem(
-          name: localizable("validation_message"),
-          imageName: "valid",
           router: ValidationMessageRouter,
-          color: UIColor(hexString: "#60CFA7")
+          name: localizable("validation_message"),
+          imageName: "valid_message"
         ),
         ContactHeadItem(
-          name: localizable("blacklist"),
-          imageName: "blackName",
           router: ContactBlackListRouter,
-          color: UIColor(hexString: "#53C3F3")
+          name: localizable("blacklist"),
+          imageName: "blacklist"
         ),
       ]
 
       if IMKitConfigCenter.shared.enableTeam {
         contactHeaders.append(ContactHeadItem(
-          name: localizable("my_teams"),
-          imageName: "group",
           router: ContactTeamListRouter,
-          color: UIColor(hexString: "#BE65D9")
+          name: localizable("my_teams"),
+          imageName: "group"
         ))
       }
 
       if IMKitConfigCenter.shared.enableAIUser {
         contactHeaders.append(ContactHeadItem(
-          name: localizable("my_ai_user"),
-          imageName: "aiUser",
           router: ContactAIUserListRouter,
-          color: UIColor(hexString: "#BE65D9")
+          name: localizable("my_ai_user"),
+          imageName: "ai_user"
         ))
       }
 
@@ -75,6 +71,12 @@ open class ContactViewController: NEBaseContactViewController {
 
   override open func commonUI() {
     super.commonUI()
+    view.backgroundColor = .normalContactBackgroundColor
+    bodyTopView.backgroundColor = .normalContactBodyTopViewBackgroundColor
+    bodyView.backgroundColor = .normalContactBodyViewBackgroundColor
+    tableView.backgroundColor = .normalContactTableViewBackgroundColor
+    tableView.sectionIndexColor = .normalContactTableViewSectionIndexColor
+    bodyBottomView.backgroundColor = .normalContactBodyBottomViewBackgroundColor
 
     tableView.register(
       ContactSectionView.self,
@@ -91,29 +93,14 @@ open class ContactViewController: NEBaseContactViewController {
   }
 
   override open func tableView(_ tableView: UITableView,
-                               cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    let reusedId = "\(info.contactCellType)"
-    let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
-
-    if let c = cell as? ContactTableViewCell {
-      if IMKitConfigCenter.shared.onlineStatusEnable {
-        if indexPath.section != 0 {
-          c.avatarImageView.alpha = 0.5
-          if let accountId = info.user?.user?.accountId {
-            if let event = viewModel.onlineStatusDic[accountId] {
-              if event.value == NIMSubscribeEventOnlineValue.login.rawValue {
-                c.avatarImageView.alpha = 1.0
-              }
-            }
-          }
-        } else {
-          c.avatarImageView.alpha = 1.0
-        }
-      }
-      return configCell(info: info, c, indexPath)
+                               viewForHeaderInSection section: Int) -> UIView? {
+    if let sectionView = super.tableView(tableView, viewForHeaderInSection: section) as? ContactSectionView {
+      sectionView.backView.backgroundColor = .normalContactSectionViewBackgroundColor
+      sectionView.line.backgroundColor = .normalContactSectionViewLineColor
+      sectionView.titleLabel.textColor = .normalContactSectionViewTitleLabelTextColor
+      return sectionView
     }
-    return cell
+    return nil
   }
 }
 
@@ -121,14 +108,14 @@ extension ContactViewController {
   override open func initSystemNav() {
     super.initSystemNav()
     let addItem = UIBarButtonItem(
-      image: ContactUIConfig.shared.titleBarRightRes ?? UIImage.ne_imageNamed(name: "add"),
+      image: ContactUIConfig.shared.titleBarRightRes ?? coreLoader.loadImage("nav_add"),
       style: .plain,
       target: self,
       action: #selector(goToFindFriend)
     )
     addItem.tintColor = UIColor(hexString: "333333")
     let searchItem = UIBarButtonItem(
-      image: ContactUIConfig.shared.titleBarRight2Res ?? UIImage.ne_imageNamed(name: "contact_search"),
+      image: ContactUIConfig.shared.titleBarRight2Res ?? coreLoader.loadImage("nav_search"),
       style: .plain,
       target: self,
       action: #selector(searchContact)
@@ -157,5 +144,7 @@ extension ContactViewController {
     navigationView.brandBtn.setTitle(ContactUIConfig.shared.title ?? localizable("contact"), for: .normal)
     navigationView.brandBtn.setTitleColor(ContactUIConfig.shared.titleColor ?? UIColor.black, for: .normal)
     navigationView.brandBtn.titleEdgeInsets = UIEdgeInsets.zero
+    navigationView.backgroundColor = .normalContactNavigationBackgroundColor
+    navigationView.titleBarBottomLine.backgroundColor = .normalContactNavigationDivideBg
   }
 }

@@ -18,6 +18,7 @@ public protocol NEBaseLocalConversationControllerDelegate {
 open class NEBaseLocalConversationController: UIViewController, UIGestureRecognizerDelegate {
   var className = "NEBaseLocalConversationController"
   public var deleteButtonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
+  public var topButtonBackgroundColor: UIColor = NEConstant.hexRGB(0x337EFF)
 
   public var brokenNetworkViewHeight = 36.0
   private var bodyTopViewHeightAnchor: NSLayoutConstraint?
@@ -49,6 +50,7 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
   /// 置顶l列表样式注册表
   public var stickTopCellRegisterDic = [0: NEBaseStickTopCell.self]
   public let viewModel = LocalConversationViewModel()
+  private var networkBroken = false // 网络断开标志
 
   public lazy var navigationView: TabNavigationView = {
     let nav = TabNavigationView(frame: CGRect.zero)
@@ -169,6 +171,7 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
     tableView.dataSource = self
     tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
     tableView.keyboardDismissMode = .onDrag
+    tableView.backgroundColor = .clear
 
     tableView.estimatedRowHeight = 0
     tableView.estimatedSectionHeaderHeight = 0
@@ -250,6 +253,8 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
     if let customController = LocalConversationUIConfig.shared.customController {
       customController(self)
     }
+
+    subscribeVisibleRows()
   }
 
   override open func viewDidLoad() {
@@ -257,6 +262,7 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
     showTitleBar()
     setupSubviews()
     initialConfig()
+    IMKitClient.instance.addLoginListener(self)
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
@@ -365,9 +371,9 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
   }
 
   func loadMoreData() {
-    viewModel.getConversationListByPage { [weak self] error, finishied in
+    viewModel.getConversationListByPage { [weak self] error, finished in
       self?.isRequestedData = true
-      if let end = finishied, end == true {
+      if finished == true, self?.viewModel.syncFinished == true {
         self?.tableView.mj_footer?.endRefreshingWithNoMoreData()
         DispatchQueue.main.async {
           self?.tableView.mj_footer = nil
@@ -392,11 +398,12 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
           desc: "CALLBACK requestData failed，error = \(error!)"
         )
       } else {
-        if let end = finished, end == true {
+        if finished == true, self?.viewModel.syncFinished == true {
           DispatchQueue.main.async {
             self?.tableView.mj_footer = nil
           }
         }
+
         if let topDats = self?.viewModel.stickTopConversations, let normalDatas = self?.viewModel.conversationListData {
           if topDats.count <= 0, normalDatas.count <= 0 {
             self?.emptyView.isHidden = false
@@ -442,7 +449,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
     var items = [PopListItem]()
     let addFriend = PopListItem()
     addFriend.showName = localizable("add_friend")
-    addFriend.image = UIImage.ne_imageNamed(name: "add_friend")
+    addFriend.image = localConversationCoreLoader.loadImage("add_friend")
     addFriend.completion = {
       Router.shared.use(
         ContactAddFriendRouter,
@@ -654,6 +661,14 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
 
     if let c = cell as? NEBaseLocalConversationListCell, let m = model {
       c.configureData(m)
+
+      if IMKitConfigCenter.shared.enableOnlineStatus {
+        if let conversationId = model?.conversation?.conversationId {
+          let online = viewModel.onlineStatusDic[conversationId] ?? false
+          model?.p2pOnline = online
+          c.setOnline(online)
+        }
+      }
     }
 
     return cell
@@ -696,34 +711,56 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
                                            LocalConversationUIConfig.shared.stickTopButtonTitle ?? localizable("stickTop")) { action, indexPath in
       weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
     }
-    topAction.backgroundColor = LocalConversationUIConfig.shared.stickTopButtonBackgroundColor ?? NEConstant.hexRGB(0x337EFF)
+    topAction.backgroundColor = LocalConversationUIConfig.shared.stickTopButtonBackgroundColor ?? topButtonBackgroundColor
 
     rowActions.append(deleteAction)
     rowActions.append(topAction)
-
-    /* 会话数字人pin到顶部处理
-      var model: NELocalConversationListModel?
-      if indexPath.section == 0 {
-        model = viewModel.stickTopConversations[indexPath.row]
-      } else if indexPath.section == 1 {
-        model = viewModel.conversationListData[indexPath.row]
-      }
-     if model?.conversation?.type == .CONVERSATION_TYPE_P2P {
-       if let conversationId = model?.conversation?.conversationId {
-         if let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
-           if let enalbeAIUser = NEAIUserPinManager.shared.checkoutPinEnable(accountId) {
-             let pinToTop = NEAIUserPinManager.shared.checkoutUnPinAIUser(enalbeAIUser)
-             let pinToTopAction = UITableViewRowAction(style: .destructive, title: pinToTop ? localizable("ai_user_cancel_pin_top") : localizable("ai_user_pin_top")) { action, indexPath in
-               weakSelf?.pinToTopActionHandler(user: enalbeAIUser, pinTop: pinToTop)
-             }
-             pinToTopAction.backgroundColor = .green
-             rowActions.append(pinToTopAction)
-           }
-         }
-       }
-     } */
-
     return rowActions
+  }
+
+  /// 订阅可见单聊
+  open func subscribeVisibleRows() {
+    guard IMKitConfigCenter.shared.enableOnlineStatus else {
+      return
+    }
+
+    guard NESubscribeManager.shared.outOfLimit() else {
+      return
+    }
+
+    if let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows {
+      var accountIds = [String]()
+      for indexPath in indexPathsForVisibleRows {
+        var model: NELocalConversationListModel?
+        if indexPath.section == 0 {
+          model = viewModel.stickTopConversations[indexPath.row]
+        } else if indexPath.section == 1 {
+          model = viewModel.conversationListData[indexPath.row]
+        }
+
+        if let conversationId = model?.conversation?.conversationId,
+           V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
+          if let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+             !NESubscribeManager.shared.hasSubscribe(accountId) {
+            accountIds.append(accountId)
+          }
+        }
+      }
+
+      if !accountIds.isEmpty {
+        NESubscribeManager.shared.subscribeUsersOnlineState(accountIds) { error in }
+      }
+    }
+  }
+
+  /// 用户拖拽结束（手指松开），订阅可见单聊
+  public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    subscribeVisibleRows()
+  }
+
+  /// 减速动画结束，订阅可见单聊
+  public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    subscribeVisibleRows()
   }
 
   /// 删除会话
@@ -757,23 +794,6 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
       }
     } else {
       reloadTableView()
-    }
-  }
-
-  /// pin 置顶
-  open func pinToTopActionHandler(user: V2NIMUser, pinTop: Bool) {
-    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(commonLocalizable("network_error"))
-      return
-    }
-    if let accountId = user.accountId {
-      if pinTop {
-        NEAIUserPinManager.shared.unpinAIUser(accountId) { error, finish in
-        }
-      } else {
-        NEAIUserPinManager.shared.pinAIUser(accountId) { error, finish in
-        }
-      }
     }
   }
 
@@ -926,17 +946,17 @@ extension NEBaseLocalConversationController {
 
   /// 删除会话
   ///   - parameter model: 会话模型
-  ///   - parameter indexpath: 索引
+  ///   - parameter indexPath: 索引
   open func didDeleteConversationCell(model: NELocalConversationListModel, indexPath: IndexPath) {}
 
   /// 删除一条置顶记录
   ///   - parameter model: 会话模型
-  ///   - parameter indexpath
+  ///   - parameter indexPath: 索引
   open func didRemoveStickTopSession(model: NELocalConversationListModel, indexPath: IndexPath) {}
 
   /// 添加一条置顶记录
   ///   - Parameter model: 会话模型
-  ///   - Parameter indexpath: 索引
+  ///   - parameter indexPath: 索引
   open func didAddStickTopSession(model: NELocalConversationListModel, indexPath: IndexPath) {}
 }
 
@@ -968,6 +988,25 @@ extension NEBaseLocalConversationController: LocalConversationViewModelDelegate 
         refreshingTarget: self,
         refreshingAction: #selector(loadMoreData)
       )
+    }
+  }
+}
+
+// MARK: - NEIMKitClientListener
+
+extension NEBaseLocalConversationController: NEIMKitClientListener {
+  /// 登录连接状态回调
+  /// - Parameter status: 连接状态
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+    if status == .CONNECT_STATUS_WAITING {
+      networkBroken = true
+    }
+
+    if status == .CONNECT_STATUS_CONNECTED, networkBroken {
+      networkBroken = false
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+        self?.subscribeVisibleRows()
+      }))
     }
   }
 }

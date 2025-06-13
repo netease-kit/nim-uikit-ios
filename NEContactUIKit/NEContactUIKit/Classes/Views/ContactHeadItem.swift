@@ -4,18 +4,19 @@
 // found in the LICENSE file.
 
 import Foundation
+import UIKit
 
 @objcMembers
 open class ContactHeadItem {
   public var name: String?
   public var imageName: String?
-  public var color = UIColor(hexString: "#60CFA7")
+  public var color: UIColor?
   public var router: String
 
-  public init(name: String, imageName: String?, router: String, color: UIColor) {
+  public init(router: String, name: String? = nil, imageName: String? = nil, color: UIColor? = nil) {
     self.name = name
     self.imageName = imageName
-    self.router = router
     self.color = color
+    self.router = router
   }
 }

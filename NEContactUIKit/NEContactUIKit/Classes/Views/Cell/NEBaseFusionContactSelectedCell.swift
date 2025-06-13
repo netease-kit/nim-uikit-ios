@@ -8,26 +8,13 @@ import UIKit
 @objcMembers
 open class NEBaseFusionContactSelectedCell: UITableViewCell {
   /// 用户头像
-  public lazy var avatarImageView: UIImageView = {
-    let imageView = UIImageView()
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let imageView = NEUserHeaderView(frame: .zero)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
-    imageView.contentMode = .scaleAspectFill
-    imageView.backgroundColor = UIColor.colorWithNumber(number: 0)
-    imageView.accessibilityIdentifier = "id.avatar"
+    imageView.titleLabel.font = NEConstant.defaultTextFont(14.0)
+    imageView.isUserInteractionEnabled = true
     return imageView
-  }()
-
-  /// 没有头像的头像覆盖Label
-  public lazy var avatarNameLabel: UILabel = {
-    let nameLabel = UILabel()
-    nameLabel.translatesAutoresizingMaskIntoConstraints = false
-    nameLabel.textColor = .white
-    nameLabel.textAlignment = .center
-    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
-    nameLabel.adjustsFontSizeToFitWidth = true
-    nameLabel.accessibilityIdentifier = "id.noAvatar"
-    return nameLabel
   }()
 
   /// 用户名展示标签
@@ -44,7 +31,7 @@ open class NEBaseFusionContactSelectedCell: UITableViewCell {
   /// 选中图片
   let selectedStateImage: UIImageView = {
     let imageView = UIImageView()
-    imageView.image = UIImage.ne_imageNamed(name: "unselect")
+    imageView.image = coreLoader.loadImage("unselect")
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.accessibilityIdentifier = "id.selector"
     return imageView
@@ -75,26 +62,18 @@ open class NEBaseFusionContactSelectedCell: UITableViewCell {
   open func configFusionModel(_ model: NEFusionContactCellModel) {
     if model.user != nil {
       nameLabel.text = model.user?.showName()
-      avatarNameLabel.text = model.user?.shortName(showAlias: false, count: 2)
-      if let imageUrl = model.user?.user?.avatar, !imageUrl.isEmpty {
-        avatarNameLabel.isHidden = true
-        avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      } else {
-        avatarNameLabel.isHidden = false
-        avatarImageView.sd_setImage(with: nil)
-        avatarImageView.backgroundColor = UIColor.colorWithString(string: model.user?.user?.accountId ?? "")
-      }
+
+      let url = model.user?.user?.avatar
+      let name = model.user?.shortName() ?? ""
+      let accountId = model.user?.user?.accountId ?? ""
+      userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
     } else if model.aiUser != nil {
       nameLabel.text = model.aiUser?.showName()
-      avatarNameLabel.text = model.aiUser?.shortName()
-      if let imageUrl = model.aiUser?.avatar, !imageUrl.isEmpty {
-        avatarNameLabel.isHidden = true
-        avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      } else {
-        avatarNameLabel.isHidden = false
-        avatarImageView.sd_setImage(with: nil)
-        avatarImageView.backgroundColor = UIColor.colorWithString(string: model.aiUser?.accountId ?? "")
-      }
+
+      let url = model.aiUser?.avatar
+      let name = model.aiUser?.shortName() ?? ""
+      let accountId = model.aiUser?.accountId ?? ""
+      userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
     }
 
     selectedStateImage.isHighlighted = model.selected

@@ -179,15 +179,20 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
     cellDatas.append(remind)
     cellDatas.append(setTop)
 
-    if let user = userInfo?.user, let account = user.accountId, let serverExtensions = user.serverExtension, let jsonObject = NECommonUtil.getDictionaryFromJSONString(serverExtensions) {
+    if let user = userInfo?.user,
+       let account = user.accountId,
+       let serverExtensions = user.serverExtension,
+       let jsonObject = NECommonUtil.getDictionaryFromJSONString(serverExtensions) {
       if jsonObject[aiUserPinKey] != nil {
         let changePin = UserSettingCellModel()
         changePin.cellName = chatLocalizable("ai_user_pin_top")
+
         if NEAIUserPinManager.shared.checkoutUnPinAIUser(user) == true {
           changePin.switchOpen = true
         } else {
           changePin.switchOpen = false
         }
+
         changePin.swichChange = { isOpen in
           if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
             weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
@@ -195,6 +200,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
             weakSelf?.delegate?.didNeedRefreshUI()
             return
           }
+
           if isOpen {
             NEAIUserPinManager.shared.pinAIUser(account) { error, finish in
               NEALog.infoLog(ModuleName, desc: #function + " pinAIUser error: \(String(describing: error)), finish: \(finish)")

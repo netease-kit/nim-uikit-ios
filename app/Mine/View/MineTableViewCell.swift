@@ -35,7 +35,7 @@ public class MineTableViewCell: UITableViewCell {
 
   /// 箭头图片
   public lazy var arrowImageView: UIImageView = {
-    let imageView = UIImageView(image: UIImage(named: "arrow_right"))
+    let imageView = UIImageView(image: appCoreLoader.loadImage("arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView
   }()

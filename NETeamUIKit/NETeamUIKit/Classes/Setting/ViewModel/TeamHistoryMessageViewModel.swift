@@ -51,7 +51,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   /// - Parameter searchContent: 搜索内容
   open func searchHistoryMessages(_ teamId: String?, _ searchContent: String, _ completion: @escaping (Error?, [HistoryMessageModel]?) -> Void) {
     var infoDic = [String: NETeamMemberInfoModel]()
-    for (key, value) in memberModelCacheDic {
+    for (_, value) in memberModelCacheDic {
       if let accountId = value.teamMember?.accountId {
         infoDic[accountId] = value
       }
@@ -230,8 +230,9 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
 // MARK: - NEContactListener
 
 extension TeamHistoryMessageViewModel: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,

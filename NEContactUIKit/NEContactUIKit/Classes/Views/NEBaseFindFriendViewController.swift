@@ -43,7 +43,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
   /// 搜索图片
   public lazy var searchImageView: UIImageView = {
     let searchImageView = UIImageView()
-    searchImageView.image = UIImage.ne_imageNamed(name: "search")
+    searchImageView.image = coreLoader.loadImage("textField_search_icon")
     searchImageView.translatesAutoresizingMaskIntoConstraints = false
     return searchImageView
   }()

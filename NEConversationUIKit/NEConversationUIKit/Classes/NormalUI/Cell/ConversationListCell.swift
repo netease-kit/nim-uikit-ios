@@ -48,9 +48,9 @@ open class ConversationListCell: NEBaseConversationListCell {
   override open func configureData(_ sessionModel: NEConversationListModel?) {
     super.configureData(sessionModel)
     if sessionModel?.conversation?.stickTop == true {
-      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? UIColor(hexString: "0xF3F5F7")
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? .normalConversationTopItemBackgroundColor
     } else {
-      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemBackground ?? .white
+      contentView.backgroundColor = ConversationUIConfig.shared.conversationProperties.itemBackground ?? .normalConversationItemBackgroundColor
     }
   }
 }

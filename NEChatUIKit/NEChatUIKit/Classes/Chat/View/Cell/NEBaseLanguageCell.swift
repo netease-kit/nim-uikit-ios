@@ -21,7 +21,7 @@ open class NEBaseLanguageCell: CornerCell {
   public lazy var selectedImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = coreLoader.loadImage("language_selected")
+    imageView.image = chatCoreLoader.loadImage("chat_map_select")
     imageView.isHidden = true
     return imageView
   }()

@@ -32,7 +32,11 @@ class FunCollectionMessageAudioCell: NEBaseCollectionMessageAudioCell {
     super.setupCommonUI()
     setFunStyle()
     let image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "fun_pin_message_audio_bg")
-    bubbleImage.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImage.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImage.image = image
+      bubbleImage.contentMode = .scaleAspectFill
+    }
   }
 }

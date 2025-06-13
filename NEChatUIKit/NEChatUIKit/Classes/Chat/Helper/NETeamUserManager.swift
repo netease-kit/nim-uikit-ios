@@ -427,8 +427,9 @@ public class NETeamUserManager: NSObject {
 // MARK: - NEContactListener
 
 extension NETeamUserManager: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId {
@@ -494,7 +495,7 @@ extension NETeamUserManager: NETeamListener {
   }
 
   /// 群组成员退出回调
-  /// - Parameter teamMembers： 群成员列表
+  /// - Parameter teamMembers: 群成员列表
   open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
     for member in teamMembers {
       if member.teamId == tid {
@@ -504,7 +505,7 @@ extension NETeamUserManager: NETeamListener {
   }
 
   /// 群组成员被踢回调
-  /// - Parameter operatorAccountId： 操作者用户id
+  /// - Parameter operatorAccountId: 操作者用户id
   /// - Parameter teamMembers: 群成员列表
   open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
     for member in teamMembers {
@@ -518,8 +519,11 @@ extension NETeamUserManager: NETeamListener {
 // MARK: - NEIMKitClientListener
 
 extension NETeamUserManager: NEIMKitClientListener {
-  /// 登录连接状态回调
-  /// - Parameter status: 连接状态
+  /// 数据同步回调
+  /// - Parameters:
+  ///   - type: 同步的数据类型
+  ///   - state: 同步状态
+  ///   - error: 错误信息
   open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
     guard let tid = tid else { return }
 

@@ -10,7 +10,7 @@ import UIKit
 @objcMembers
 open class ChatMessageAIStreamTextCell: ChatMessageTextCell {
   public lazy var loadingViewLeft: NELottieAnimationView = {
-    let view = NELottieAnimationView(name: "ai_stream_loading_data", bundle: coreLoader.bundle)
+    let view = NELottieAnimationView(name: "ai_stream_loading_data", bundle: chatCoreLoader.bundle)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.loopMode = .loop
     view.contentMode = .scaleAspectFill

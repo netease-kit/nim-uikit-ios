@@ -7,8 +7,26 @@ import UIKit
 
 @objcMembers
 open class ContactSectionView: UITableViewHeaderFooterView {
-  public var titleLabel = UILabel()
-  var line = UIView()
+  public lazy var backView: UIView = {
+    let backView = UIView()
+    backView.translatesAutoresizingMaskIntoConstraints = false
+    return backView
+  }()
+
+  public lazy var titleLabel: UILabel = {
+    let titleLabel = UILabel()
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.backgroundColor = .clear
+    titleLabel.textColor = ContactUIConfig.shared.contactProperties.indexTitleColor ?? UIColor.ne_emptyTitleColor
+    titleLabel.font = UIFont.systemFont(ofSize: 14.0)
+    return titleLabel
+  }()
+
+  public lazy var line: UIView = {
+    let line = UIView()
+    line.translatesAutoresizingMaskIntoConstraints = false
+    return line
+  }()
 
   override public init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
@@ -20,27 +38,30 @@ open class ContactSectionView: UITableViewHeaderFooterView {
   }
 
   open func commonUI() {
-    contentView.backgroundColor = .white
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.backgroundColor = .white
-    titleLabel.textColor = ContactUIConfig.shared.contactProperties.indexTitleColor ?? UIColor.ne_emptyTitleColor
-    titleLabel.font = UIFont.systemFont(ofSize: 14.0)
-    contentView.addSubview(titleLabel)
+    backgroundColor = .clear
+
+    addSubview(backView)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-      titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 20),
+      backView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0),
+      backView.topAnchor.constraint(equalTo: topAnchor),
+      backView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      backView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0),
     ])
 
-    line.translatesAutoresizingMaskIntoConstraints = false
-    line.backgroundColor = ContactUIConfig.shared.contactProperties.divideLineColor
-    contentView.addSubview(line)
+    backView.addSubview(titleLabel)
+    NSLayoutConstraint.activate([
+      titleLabel.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 20),
+      titleLabel.topAnchor.constraint(equalTo: backView.topAnchor),
+      titleLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
+      titleLabel.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: 20),
+    ])
+
+    backView.addSubview(line)
     NSLayoutConstraint.activate([
       line.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),
       line.heightAnchor.constraint(equalToConstant: 1.0),
-      line.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0),
-      line.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      line.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: 0),
+      line.rightAnchor.constraint(equalTo: backView.rightAnchor),
     ])
   }
 }

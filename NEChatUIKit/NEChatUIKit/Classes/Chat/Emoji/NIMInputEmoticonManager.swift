@@ -90,6 +90,7 @@ open class NIMInputEmoticonManager: NSObject {
           info: info as NSDictionary?,
           emoticonsArray: emotions
         )
+        catalogs.append(cataLog)
       }
     }
     self.catalogs = catalogs

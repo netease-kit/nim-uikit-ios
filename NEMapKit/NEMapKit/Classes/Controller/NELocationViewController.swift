@@ -39,20 +39,9 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   lazy var backButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(mapCoreLoader.loadImage("chat_map_back"), for: .normal)
-    button.setImage(mapCoreLoader.loadImage("chat_map_back"), for: .highlighted)
+    button.setImage(chatCoreLoader.loadImage("chat_map_back"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("chat_map_back"), for: .highlighted)
     button.addTarget(self, action: #selector(backBackClick), for: .touchUpInside)
-    return button
-  }()
-
-  // 顶部取消按钮
-  lazy var cancelButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitleColor(.white, for: .normal)
-    button.setTitle(commonLocalizable("cancel"), for: .normal)
-    button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-    button.addTarget(self, action: #selector(cancelBtnClick), for: .touchUpInside)
     return button
   }()
 
@@ -72,8 +61,8 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   lazy var resetButton: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(mapCoreLoader.loadImage("map_reset_normal"), for: .normal)
-    button.setImage(mapCoreLoader.loadImage("map_reset_select"), for: .selected)
+    button.setImage(chatCoreLoader.loadImage("map_reset_normal"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("map_reset_select"), for: .selected)
     button.addTarget(self, action: #selector(resetClick), for: .touchUpInside)
     return button
   }()
@@ -103,7 +92,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   public lazy var emptyImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = mapCoreLoader.loadImage("chat_map_empty")
+    imageView.image = chatCoreLoader.loadImage("chat_map_empty")
     imageView.isHidden = true
     return imageView
   }()
@@ -149,7 +138,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     let textField = SearchTextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.contentMode = .center
-    textField.leftView = UIImageView(image: mapCoreLoader.loadImage("search"))
+    textField.leftView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.leftViewMode = .always
     textField.placeholder = mapLocalizable("search_place")
     textField.font = UIFont.systemFont(ofSize: 14)
@@ -173,7 +162,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   public lazy var pointImage: UIImageView = {
     let pointImage = UIImageView()
     pointImage.translatesAutoresizingMaskIntoConstraints = false
-    pointImage.image = mapCoreLoader.loadImage("location_point")
+    pointImage.image = chatCoreLoader.loadImage("location_point")
     return pointImage
   }()
 
@@ -248,7 +237,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     }
 
     if mapType == .detail {
-      NEMapClient.shared().setCustomAnnotationWith(mapCoreLoader.loadImage("location_point"), lat: currentPoint.x, lng: currentPoint.y)
+      NEMapClient.shared().setCustomAnnotationWith(chatCoreLoader.loadImage("location_point"), lat: currentPoint.x, lng: currentPoint.y)
       addDetailSubviews()
     } else {
       NEMapClient.shared().setCustomAnnotationWith(nil, lat: 0, lng: 0)
@@ -298,17 +287,17 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
                                            selector: #selector(keyBoardWillHide(_:)),
                                            name: UIResponder.keyboardWillHideNotification,
                                            object: nil)
-    view.addSubview(cancelButton)
+    view.addSubview(backButton)
     view.addSubview(sendButton)
     view.addSubview(tableView)
     view.addSubview(resetButton)
     view.addSubview(searchBgView)
 
     NSLayoutConstraint.activate([
-      cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-      cancelButton.widthAnchor.constraint(equalToConstant: 64),
-      cancelButton.heightAnchor.constraint(equalToConstant: 32),
-      cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: kNavigationHeight),
+      backButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 28),
+      backButton.widthAnchor.constraint(equalToConstant: 32),
+      backButton.heightAnchor.constraint(equalToConstant: 32),
+      backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: kNavigationHeight),
     ])
 
     NSLayoutConstraint.activate([
@@ -447,10 +436,6 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   }
 
   open func backBackClick() {
-    navigationController?.popViewController(animated: true)
-  }
-
-  open func cancelBtnClick() {
     navigationController?.popViewController(animated: true)
   }
 

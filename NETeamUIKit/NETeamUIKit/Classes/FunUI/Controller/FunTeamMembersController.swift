@@ -63,19 +63,24 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
         cell.removeButton.isHidden = !isShowRemove
         cell.removeLabel.isHidden = !isShowRemove
 
-        if IMKitConfigCenter.shared.onlineStatusEnable {
-          cell.headerView.alpha = 0.5
-
-          if let accountId = model.nimUser?.user?.accountId {
-            if accountId == IMKitClient.instance.account() {
-              cell.headerView.alpha = 1.0
-            } else if let event = viewModel.onLineEventDic[accountId] {
-              if event.value == NIMSubscribeEventOnlineValue.login.rawValue {
-                cell.headerView.alpha = 1.0
-              }
-            }
-          }
-        }
+//        if IMKitConfigCenter.shared.enableOnlineStatus {
+//          cell.headerView.alpha = 0.5
+//
+//          if let accountId = model.nimUser?.user?.accountId {
+//            if accountId == IMKitClient.instance.account() {
+//              cell.headerView.alpha = 1.0
+//            } else if let online = viewModel.onLineEventDic[accountId], online == true {
+//              cell.headerView.alpha = 1.0
+//            }
+//
+//            if NESubscribeManager.shared.getSubscribeStatus(accountId) == nil || NESubscribeManager.shared.outOfLimit() {
+//              weak var weakSelf = self
+//              NESubscribeManager.shared.subscribeUsersOnlineState([accountId]) { error in
+//
+//              }
+//            }
+//          }
+//        }
       }
 
       if isLastRow(indexPath.row) {

@@ -27,11 +27,11 @@ open class NEChatUIKitClient: NSObject {
     picture.type = .takePicture
     moreAction.append(picture)
 
-    let location = NEMoreItemModel()
-    location.image = UIImage.ne_imageNamed(name: "chat_location")
-    location.title = chatLocalizable("chat_location")
-    location.type = .location
-    moreAction.append(location)
+//    let location = NEMoreItemModel()
+//    location.image = UIImage.ne_imageNamed(name: "chat_location")
+//    location.title = chatLocalizable("chat_location")
+//    location.type = .location
+//    moreAction.append(location)
 
     let file = NEMoreItemModel()
     file.image = UIImage.ne_imageNamed(name: "chat_file")
@@ -53,6 +53,14 @@ open class NEChatUIKitClient: NSObject {
       translate.title = chatLocalizable("chat_translate")
       translate.type = .translate
       moreAction.append(translate)
+    }
+
+    if IMKitConfigCenter.shared.enableAIChatHelper == true {
+      let aiChat = NEMoreItemModel()
+      aiChat.image = UIImage.ne_imageNamed(name: "fun_chat_aiChat")
+      aiChat.title = chatLocalizable("ai_chat_title")
+      aiChat.type = .aiChat
+      moreAction.append(aiChat)
     }
   }
 
@@ -91,13 +99,13 @@ open class NEChatUIKitClient: NSObject {
   /// - Parameter imageName  图片名称
   /// - Returns  图片资源
   open func getImageSource(imageName: String) -> UIImage? {
-    coreLoader.loadImage(imageName)
+    chatCoreLoader.loadImage(imageName)
   }
 
   /// 获取多语言
   /// - Parameter key  多语言key
   /// - Returns  多语言
   open func getLanguage(key: String) -> String? {
-    coreLoader.localizable(key)
+    chatCoreLoader.localizable(key)
   }
 }

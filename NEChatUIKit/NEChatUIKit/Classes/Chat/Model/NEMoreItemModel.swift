@@ -15,6 +15,7 @@ public enum NEMoreActionType: NSInteger {
   case remind
   case photo
   case translate
+  case aiChat
   case other = 100
 }
 

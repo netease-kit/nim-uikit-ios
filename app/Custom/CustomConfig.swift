@@ -35,7 +35,7 @@ public class CustomConfig {
     ChatUIConfig.shared.messageProperties.titleBarRightClick = { viewController in
       viewController.showToast("标题栏右侧图标的点击事件")
     }
-    ChatUIConfig.shared.messageProperties.chatViewBackground = UIColor.ne_redText
+    ChatUIConfig.shared.messageProperties.chatTableViewBackgroundColor = UIColor.ne_redText
 
     ChatUIConfig.shared.messageItemClick = { viewController, cell, model in
       viewController.showToast("点击了消息: \(String(describing: model?.message?.text))")
@@ -358,6 +358,40 @@ public class CustomConfig {
       viewController.bodyBottomView.backgroundColor = .purple
       viewController.bodyBottomView.addSubview(self.customBottomView)
       viewController.bodyBottomViewHeight = 60
+    }
+  }
+
+  /// 加载 AI 助聊数据
+  func loadAIChatData() {
+    // 自定义 AI 助聊视图
+    ChatUIConfig.shared.aiChatViewController = { aiChatViewController in
+//      aiChatViewController.view.layer.contents = nil
+//      aiChatViewController.view.backgroundColor = .red
+    }
+
+    // AI 助聊的数据加载器
+    ChatUIConfig.shared.aiChatDataLoader = { messages, lastMessage, completion in
+      AIChatDataLoader.loadData(messages, lastMessage, completion)
+    }
+
+    // AI 助聊入口按钮点击事件
+    ChatUIConfig.shared.aiChatClick = { chatViewController, open in
+      if open {
+        chatViewController.showAIChatView()
+
+        // 加载数据，最后一条消息不变时不强制加载
+        let messages = chatViewController.viewModel.getAIChatContents()
+        let lastMessage = chatViewController.viewModel.getLastTextMessage()
+        chatViewController.chatInputView.aiChatViewController.loadData(messages, lastMessage, false)
+      } else {
+        chatViewController.closeAIChatView()
+      }
+    }
+
+    // AI 助聊重新加载按钮点击事件
+    ChatUIConfig.shared.aiChatReloadClick = { aiChatViewController, messages, lastMessage in
+      // 重新加载数据，强制加载
+      aiChatViewController.loadData(nil, nil, true)
     }
   }
 

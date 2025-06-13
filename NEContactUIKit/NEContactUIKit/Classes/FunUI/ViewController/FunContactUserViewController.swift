@@ -14,8 +14,8 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     headerView = FunUserInfoHeaderView()
   }
 
-  override public init(uid: String) {
-    super.init(uid: uid)
+  override public init(accountId: String) {
+    super.init(accountId: accountId)
     initFun()
   }
 

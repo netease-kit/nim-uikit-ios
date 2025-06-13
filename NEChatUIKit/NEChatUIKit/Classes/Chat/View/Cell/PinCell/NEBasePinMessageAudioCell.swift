@@ -24,8 +24,12 @@ open class NEBasePinMessageAudioCell: NEBasePinMessageCell {
     super.setupUI()
 
     let image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
-    bubbleImage.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      bubbleImage.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      bubbleImage.image = image
+      bubbleImage.contentMode = .scaleAspectFill
+    }
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.isUserInteractionEnabled = true
     backView.addSubview(bubbleImage)

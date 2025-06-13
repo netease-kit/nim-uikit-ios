@@ -12,11 +12,11 @@ open class SelectedListCell: NEBaseSelectedListCell {
   /// 重写设置头像方法
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImageView.layer.cornerRadius = 21
+    userHeaderView.layer.cornerRadius = 21
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 42),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 42),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 42),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 42),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 

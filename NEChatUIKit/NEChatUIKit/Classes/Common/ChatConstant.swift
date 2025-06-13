@@ -10,9 +10,9 @@ import NEChatKit
 @_exported import NECoreIM2Kit
 @_exported import NECoreKit
 
-let coreLoader = CommonLoader<NEChatBaseViewController>()
+public let chatCoreLoader = CommonLoader<NEChatBaseViewController>()
 func chatLocalizable(_ key: String) -> String {
-  coreLoader.localizable(key)
+  chatCoreLoader.localizable(key)
 }
 
 public func getJSONStringFromDictionary(_ dictionary: [String: Any]) -> String {
@@ -92,6 +92,9 @@ public let NEMoreCell_Image_Size: CGSize = .init(width: 56.0, height: 56.0)
 public let NEMoreCell_Title_Height: CGFloat = 20.0
 public let NEMoreView_Margin: CGFloat = 16.0
 public let NEMoreView_Column_Count: Int = 4
+
+/// AI 助聊上下文条数
+public let aiChatContentsCount: Int = 5
 
 // MARK: 字体
 

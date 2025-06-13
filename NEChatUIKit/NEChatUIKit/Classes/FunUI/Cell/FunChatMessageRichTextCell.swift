@@ -70,6 +70,15 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
   public var contentLabelRightHeightAnchor: NSLayoutConstraint?
 
   override open func commonUILeft() {
+    contentView.addSubview(replyViewLeft)
+    replyViewLeftHeightAnchor = replyViewLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    replyViewLeftHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      replyViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 0),
+      replyViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
+      replyViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+    ])
+
     bubbleImageLeft.addSubview(titleLabelLeft)
     titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelLeftHeightAnchor?.priority = .fittingSizeLevel
@@ -93,6 +102,15 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
   }
 
   override open func commonUIRight() {
+    contentView.addSubview(replyViewRight)
+    replyViewRightHeightAnchor = replyViewRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    replyViewRightHeightAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      replyViewRight.topAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
+      replyViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
+      replyViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+    ])
+
     bubbleImageRight.addSubview(titleLabelRight)
     titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     titleLabelRightHeightAnchor?.priority = .fittingSizeLevel
@@ -171,7 +189,6 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     super.setModel(model, isSend)
     let replyView = isSend ? replyTextViewRight : replyTextViewLeft
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
-    let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     let titleLabelHeightAnchor = isSend ? titleLabelRightHeightAnchor : titleLabelLeftHeightAnchor
     let titleLabelBottomAnchor = isSend ? titleLabelRightBottomAnchor : titleLabelLeftBottomAnchor
     let contentLabelHeightAnchor = isSend ? contentLabelRightHeightAnchor : contentLabelLeftHeightAnchor

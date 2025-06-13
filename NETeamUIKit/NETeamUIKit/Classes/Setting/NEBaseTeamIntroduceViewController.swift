@@ -32,7 +32,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   public lazy var clearButton: UIButton = {
     let text = UIButton()
     text.translatesAutoresizingMaskIntoConstraints = false
-    text.setImage(coreLoader.loadImage("clear_btn"), for: .normal)
+    text.setImage(teamCoreLoader.loadImage("clear_btn"), for: .normal)
     text.addTarget(self, action: #selector(clearText), for: .touchUpInside)
     text.accessibilityIdentifier = "id.clear"
     return text

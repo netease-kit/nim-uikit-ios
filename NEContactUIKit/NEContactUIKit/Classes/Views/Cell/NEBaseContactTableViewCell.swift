@@ -11,12 +11,23 @@ import UIKit
 
 @objcMembers
 open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataProtrol {
+  public var contactCellType = ContactCellType.ContactPerson
+
   public lazy var arrowImageView: UIImageView = {
-    let imageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
+    let imageView = UIImageView(image: coreLoader.loadImage("arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.contentMode = .center
     imageView.accessibilityIdentifier = "id.arrow"
     return imageView
+  }()
+
+  public lazy var onlineView: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.layer.cornerRadius = 4
+    view.backgroundColor = UIColor(hexString: "#D4D9DA")
+    view.isHidden = true
+    return view
   }()
 
   public lazy var bottomLine: UIView = {
@@ -37,10 +48,11 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
 
   open func commonUI() {
     setupCommonCircleHeader()
+    backgroundColor = .clear
 
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 12),
+      titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 12),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -35),
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -54,9 +66,17 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
       arrowImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
 
+    contentView.addSubview(onlineView)
+    NSLayoutConstraint.activate([
+      onlineView.rightAnchor.constraint(equalTo: userHeaderView.rightAnchor),
+      onlineView.bottomAnchor.constraint(equalTo: userHeaderView.bottomAnchor),
+      onlineView.widthAnchor.constraint(equalToConstant: 8),
+      onlineView.heightAnchor.constraint(equalToConstant: 8),
+    ])
+
     contentView.addSubview(bottomLine)
     NSLayoutConstraint.activate([
-      bottomLine.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
+      bottomLine.leftAnchor.constraint(equalTo: userHeaderView.leftAnchor),
       bottomLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
       bottomLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
@@ -72,18 +92,21 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
 
   open func initSubviewsLayout() {
     if ContactUIConfig.shared.contactProperties.avatarType == .cycle {
-      avatarImageView.layer.cornerRadius = 18.0
+      userHeaderView.layer.cornerRadius = 18.0
     } else if ContactUIConfig.shared.contactProperties.avatarCornerRadius > 0 {
-      avatarImageView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
+      userHeaderView.layer.cornerRadius = ContactUIConfig.shared.contactProperties.avatarCornerRadius
     } else {
-      avatarImageView.layer.cornerRadius = 18.0 // Normal UI
+      userHeaderView.layer.cornerRadius = 18.0 // Normal UI
     }
   }
 
   open func setConfig() {
     titleLabel.textColor = ContactUIConfig.shared.contactProperties.itemTitleColor
-    nameLabel.font = UIFont.systemFont(ofSize: 14.0)
-    nameLabel.textColor = UIColor.white
+  }
+
+  open func setOnline(_ online: Bool) {
+    onlineView.isHidden = contactCellType != .ContactPerson
+    onlineView.backgroundColor = online ? UIColor(hexString: "#84ED85") : UIColor(hexString: "#D4D9DA")
   }
 
   open func setModel(_ model: ContactInfo) {
@@ -97,29 +120,24 @@ open class NEBaseContactTableViewCell: NEBaseContactViewCell, ContactCellDataPro
       user = u
     }
 
-    if model.contactCellType == 1 {
-      NEALog.infoLog("contact other cell configData", desc: "\(user.friend?.alias), image name:\(user.user?.avatar)")
-      nameLabel.text = ""
+    contactCellType = model.contactCellType
+    if model.contactCellType == .ContactOthers {
       titleLabel.text = user.friend?.alias
-      avatarImageView.image = UIImage.ne_imageNamed(name: user.user?.avatar)
-      avatarImageView.backgroundColor = model.headerBackColor
       arrowImageView.isHidden = false
+
+      let url = user.user?.avatar
+      userHeaderView.image = UIImage.ne_imageNamed(name: url)
+      userHeaderView.setTitle("")
+      userHeaderView.backgroundColor = .clear
     } else {
       // person、custom
       titleLabel.text = user.showName()
-      nameLabel.text = user.shortName(count: 2)
-
-      if let imageUrl = user.user?.avatar, !imageUrl.isEmpty {
-        NEALog.infoLog("contact p2p cell configData", desc: "imageName:\(imageUrl)")
-        nameLabel.isHidden = true
-        avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      } else {
-        NEALog.infoLog("contact p2p cell configData", desc: "imageName is nil")
-        nameLabel.isHidden = false
-        avatarImageView.sd_setImage(with: nil)
-        avatarImageView.backgroundColor = model.headerBackColor
-      }
       arrowImageView.isHidden = true
+
+      let url = user.user?.avatar
+      let name = user.shortName() ?? ""
+      let accountId = user.user?.accountId ?? ""
+      userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
     }
   }
 }

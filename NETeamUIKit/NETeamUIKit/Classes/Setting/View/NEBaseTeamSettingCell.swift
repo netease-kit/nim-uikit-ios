@@ -31,7 +31,7 @@ open class NEBaseTeamSettingCell: CornerCell {
   }()
 
   public lazy var arrowView: UIImageView = {
-    let imageView = UIImageView(image: coreLoader.loadImage("arrowRight"))
+    let imageView = UIImageView(image: coreLoader.loadImage("arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView
   }()

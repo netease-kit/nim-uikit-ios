@@ -103,7 +103,7 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
     }
 
     photoImageView.translatesAutoresizingMaskIntoConstraints = false
-    photoImageView.image = coreLoader.loadImage("photo")
+    photoImageView.image = teamCoreLoader.loadImage("photo")
     photoImageView.accessibilityIdentifier = "id.camera"
     headerBackView.addSubview(photoImageView)
 

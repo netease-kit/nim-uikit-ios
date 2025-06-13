@@ -50,7 +50,7 @@ open class SelectLanguageViewController: NEBaseSelectLanguageViewController {
     NSLayoutConstraint.activate([
       languageTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       languageTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      languageTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
+      languageTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 58),
       languageTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
     languageTableView.backgroundColor = .clear

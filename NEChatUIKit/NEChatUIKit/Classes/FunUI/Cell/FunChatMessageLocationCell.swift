@@ -107,14 +107,14 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
   public lazy var pointImageRight: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = coreLoader.loadImage("location_point")
+    imageView.image = chatCoreLoader.loadImage("location_point")
     return imageView
   }()
 
   public lazy var pointImageLeft: UIImageView = {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.image = coreLoader.loadImage("location_point")
+    imageView.image = chatCoreLoader.loadImage("location_point")
     return imageView
   }()
 
@@ -137,7 +137,7 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     ])
 
     let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
-    messageTap.cancelsTouchesInView = false
+    messageTap.cancelsTouchesInView = true
     backgroundViewLeft.addGestureRecognizer(messageTap)
 
     backgroundViewLeft.addSubview(titleLabelLeft)
@@ -194,7 +194,7 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
       backgroundViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor),
     ])
     let messageTap = UITapGestureRecognizer(target: self, action: #selector(tapMessage))
-    messageTap.cancelsTouchesInView = false
+    messageTap.cancelsTouchesInView = true
     backgroundViewRight.addGestureRecognizer(messageTap)
 
     backgroundViewRight.addSubview(titleLabelRight)
@@ -254,12 +254,12 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
         if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
           NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
           mapImageView.sd_setImage(with: URL(string: url),
-                                   placeholderImage: coreLoader.loadImage("map_placeholder_image"),
+                                   placeholderImage: .ne_imageNamed(name: "map_placeholder_image"),
                                    options: .retryFailed)
           emptyLabel.isHidden = true
           pointImage.isHidden = false
         } else {
-          mapImageView.image = UIImage.ne_imageNamed(name: "map_placeholder_image")
+          mapImageView.image = .ne_imageNamed(name: "map_placeholder_image")
           emptyLabel.isHidden = false
           pointImage.isHidden = true
         }

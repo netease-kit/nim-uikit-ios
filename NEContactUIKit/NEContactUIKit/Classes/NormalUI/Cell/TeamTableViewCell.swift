@@ -9,7 +9,7 @@ import UIKit
 open class TeamTableViewCell: NEBaseTeamTableViewCell {
   override open func commonUI() {
     super.commonUI()
-    avatarImageView.layer.cornerRadius = 21
+    userHeaderView.layer.cornerRadius = 21
 
     titleLabel.font = UIFont.systemFont(ofSize: 16)
     titleLabel.textColor = UIColor(

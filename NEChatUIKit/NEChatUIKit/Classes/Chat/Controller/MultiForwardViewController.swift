@@ -86,6 +86,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     navigationView.titleBarBottomLine.isHidden = false
     navigationView.moreButton.isHidden = true
     navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
+    view.backgroundColor = .white
 
     tableView.register(
       NEBaseChatMessageCell.self,

@@ -61,7 +61,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackground ?? .white
+    view.backgroundColor = .clear
 
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       topConstant = NEConstant.navigationAndStatusHeight
@@ -83,7 +83,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   }
 
   open func setupBackUI() {
-    let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
+    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,

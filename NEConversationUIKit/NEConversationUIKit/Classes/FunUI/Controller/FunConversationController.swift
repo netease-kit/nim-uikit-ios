@@ -13,7 +13,7 @@ open class FunConversationController: NEBaseConversationController {
   public lazy var searchView: FunSearchView = {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setImage(coreLoader.loadImage("fun_search"), for: .normal)
     view.searchButton.setTitle(commonLocalizable("search"), for: .normal)
     view.searchButton.accessibilityIdentifier = "id.titleBarSearchImg"
     return view
@@ -22,7 +22,8 @@ open class FunConversationController: NEBaseConversationController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     className = "FunConversationController"
-    deleteButtonBackgroundColor = .funConversationdeleteActionColor
+    deleteButtonBackgroundColor = .funConversationDeleteActionColor
+    topButtonBackgroundColor = .funConversationTopActionColor
     cellRegisterDic = [0: FunConversationListCell.self]
     stickTopCellRegisterDic = [0: FunStickTopCell.self]
     brokenNetworkViewHeight = 48
@@ -39,7 +40,7 @@ open class FunConversationController: NEBaseConversationController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funConversationBackgroundColor
-    navigationView.backgroundColor = .funConversationBackgroundColor
+    navigationView.backgroundColor = .funConversationNavigationBg
     navigationView.titleBarBottomLine.isHidden = true
     changeLanguage()
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
@@ -69,7 +70,7 @@ open class FunConversationController: NEBaseConversationController {
     super.initSystemNav()
     let addBarButton = UIButton()
     addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
-    addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
+    addBarButton.setImage(coreLoader.loadImage("nav_add"), for: .normal)
     addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
     let addBarItem = UIBarButtonItem(customView: addBarButton)
 
@@ -104,7 +105,6 @@ open class FunConversationController: NEBaseConversationController {
     ])
 
     tableView.rowHeight = 72
-    tableView.backgroundColor = .funConversationBackgroundColor
 
     stickTopCollcetionView.frame = CGRect(x: 4, y: 0, width: view.frame.size.width - 8.0, height: 104)
   }
@@ -113,15 +113,15 @@ open class FunConversationController: NEBaseConversationController {
     let items = super.getPopListItems()
     let addFriend = items[0]
     addFriend.showNameColor = .white
-    addFriend.image = UIImage.ne_imageNamed(name: "funAddFriend")
+    addFriend.image = UIImage.ne_imageNamed(name: "fun_add_friend")
 
     let createGroup = items[1]
     createGroup.showNameColor = .white
-    createGroup.image = UIImage.ne_imageNamed(name: "funCreateTeam")
+    createGroup.image = UIImage.ne_imageNamed(name: "fun_create_team")
 
     let createDicuss = items[2]
     createDicuss.showNameColor = .white
-    createDicuss.image = UIImage.ne_imageNamed(name: "funCreateTeam")
+    createDicuss.image = UIImage.ne_imageNamed(name: "fun_create_team")
 
     return items
   }

@@ -15,8 +15,8 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     headerView = UserInfoHeaderView()
   }
 
-  override public init(uid: String) {
-    super.init(uid: uid)
+  override public init(accountId: String) {
+    super.init(accountId: accountId)
     initNormal()
   }
 

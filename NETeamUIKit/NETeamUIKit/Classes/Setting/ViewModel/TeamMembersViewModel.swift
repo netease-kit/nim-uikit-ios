@@ -13,7 +13,7 @@ public protocol TeamMembersViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
 }
 
-class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NEEventListener {
+class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NESubscribeListener {
   /// 是否正在请求数据
   public var isRequest = false
   /// 群id
@@ -31,24 +31,24 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   public var currentMember: V2NIMTeamMember?
 
   /// 在线状态记录
-  var onLineEventDic = [String: NIMSubscribeEvent]()
+  var onLineEventDic = [String: Bool]()
 
   override public init() {
     super.init()
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      EventSubscribeRepo.shared.addListener(self)
-    }
+//    if IMKitConfigCenter.shared.enableOnlineStatus {
+//      SubscribeRepo.shared.addListener(self)
+//    }
     NotificationCenter.default.addObserver(self, selector: #selector(didTapHeader), name: NENotificationName.didTapHeader, object: nil)
   }
 
   deinit {
     teamRepo.removeTeamListener(self)
     NETeamUserManager.shared.removeListener(self)
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      EventSubscribeRepo.shared.removeListener(self)
-    }
+//    if IMKitConfigCenter.shared.enableOnlineStatus {
+//      SubscribeRepo.shared.removeListener(self)
+//    }
   }
 
   /// 点击群成员头像
@@ -159,9 +159,19 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 群成员离开
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
-    removeSearchData(teamMembers)
-    let uids = teamMembers.map(\.accountId)
-    removeModel(uids)
+    var isCurrentTeam = false
+    for member in teamMembers {
+      if let currentTid = teamId, currentTid == member.teamId {
+        isCurrentTeam = true
+        break
+      }
+    }
+
+    if isCurrentTeam {
+      removeSearchData(teamMembers)
+      let uids = teamMembers.map(\.accountId)
+      removeModel(uids)
+    }
   }
 
   /// 判断离开用户是不是当前搜索展示用户
@@ -197,9 +207,19 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员信息
   func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
-    removeSearchData(teamMembers)
-    let uids = teamMembers.map(\.accountId)
-    removeModel(uids)
+    var isCurrentTeam = false
+    for member in teamMembers {
+      if let currentTid = teamId, currentTid == member.teamId {
+        isCurrentTeam = true
+        break
+      }
+    }
+
+    if isCurrentTeam {
+      removeSearchData(teamMembers)
+      let uids = teamMembers.map(\.accountId)
+      removeModel(uids)
+    }
   }
 
   /// 群成员信息更新统一处理方法
@@ -285,10 +305,18 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
     var accounts = [String]()
     for model in members {
       if let accountId = model.teamMember?.accountId {
-        accounts.append(accountId)
+        if NEAIUserManager.shared.isAIUser(accountId) {
+          continue
+        }
+
+        if let event = NESubscribeManager.shared.getSubscribeStatus(accountId) {
+          onLineEventDic[accountId] = event.statusType == .USER_STATUS_TYPE_LOGIN
+        } else {
+          accounts.append(accountId)
+        }
       }
     }
-    NEEventSubscribeManager.shared.subscribeUsersOnlineState(accounts) { error in
+    NESubscribeManager.shared.subscribeUsersOnlineState(accounts) { error in
       completion(error)
     }
   }
@@ -301,20 +329,17 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
         accounts.append(accountId)
       }
     }
-    NEEventSubscribeManager.shared.unSubscribeUsersOnlineState(accounts) { error in
+    NESubscribeManager.shared.unSubscribeUsersOnlineState(accounts) { error in
       completion(error)
     }
   }
 
-  /// 订阅状态变更回调
-  /// - Parameter event: 订阅事件
-  open func onRecvSubscribeEvents(_ event: [NIMSubscribeEvent]) {
-    NEALog.infoLog(className(), desc: #function + " event count : \(event.count)")
-    for e in event {
-      print("event from : \(e.from ?? "") event value : \(e.value) event type : \(e.type)")
-      if e.type == NIMSubscribeSystemEventType.online.rawValue, let acountId = e.from {
-        onLineEventDic[acountId] = e
-      }
+  /// 用户状态变更
+  /// - Parameter data: 用户状态列表
+  func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+    NEALog.infoLog(className(), desc: #function + " event count : \(data.count)")
+    for d in data {
+      onLineEventDic[d.accountId] = d.statusType == .USER_STATUS_TYPE_LOGIN
     }
     delegate?.didNeedRefreshUI()
   }

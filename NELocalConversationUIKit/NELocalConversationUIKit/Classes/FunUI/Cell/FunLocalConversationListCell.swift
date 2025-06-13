@@ -53,7 +53,7 @@ open class FunLocalConversationListCell: NEBaseLocalConversationListCell {
     ])
   }
 
-  override func initSubviewsLayout() {
+  override open func initSubviewsLayout() {
     if LocalConversationUIConfig.shared.conversationProperties.avatarType == .cycle {
       headImageView.layer.cornerRadius = 24.0
     } else if LocalConversationUIConfig.shared.conversationProperties.avatarCornerRadius > 0 {
@@ -68,9 +68,9 @@ open class FunLocalConversationListCell: NEBaseLocalConversationListCell {
     contentModel = sessionModel
 
     if sessionModel?.conversation?.stickTop == true {
-      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? .funConversationBackgroundColor
+      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemStickTopBackground ?? .funConversationTopItemBackgroundColor
     } else {
-      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemBackground ?? .white
+      contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemBackground ?? .funConversationItemBackgroundColor
     }
   }
 }

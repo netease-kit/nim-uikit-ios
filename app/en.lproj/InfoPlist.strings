@@ -1,13 +1,12 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-"NSCameraUsageDescription"="Can't take photo before agree";
-"NSPhotoLibraryAddUsageDescription"="Can't upload photo before agree";
-"NSPhotoLibraryUsageDescription"="Can't use album before agree";
-"NSMicrophoneUsageDescription"="Can't use microphone before agree";
+"NSCameraUsageDescription"="App requires your consent to take photos or record videos during the use of the app, for sending their own pictures, video messages ";
+"NSPhotoLibraryAddUsageDescription"="App need your approval to access photo album during use, to save chat in pictures or video content";
+"NSPhotoLibraryUsageDescription"="App need your approval to access photo album during use, used to send picture messages";
+"NSMicrophoneUsageDescription"="App need your approval to access microphone during use, used to send the recorded voice message.";
 "CFBundleDisplayName"="CommsEase IM";
-"NSLocationWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";
-"NSLocationAlwaysUsageDescription"="App需要您的同意,才能在使用期间访问位置";
-"NSLocationAlwaysAndWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";
+"NSLocationWhenInUseUsageDescription"="App need your approval to access position during use, to send, receive, check the location message";
+"NSLocationAlwaysUsageDescription"="App need your approval to access position during use, to send, receive, check the location message";
+"NSLocationAlwaysAndWhenInUseUsageDescription"="App need your approval to access position during use, to send, receive, check the location message";

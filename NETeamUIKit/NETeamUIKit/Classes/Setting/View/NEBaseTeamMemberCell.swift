@@ -116,14 +116,11 @@ open class NEBaseTeamMemberCell: UITableViewCell {
       model.nimUser = user
     }
     currentModel = model
-    if let url = model.nimUser?.user?.avatar, !url.isEmpty {
-      headerView.sd_setImage(with: URL(string: url), completed: nil)
-      headerView.setTitle("")
-    } else {
-      headerView.image = nil
-      headerView.setTitle(model.showNickInTeam() ?? "")
-      headerView.backgroundColor = UIColor.colorWithString(string: model.nimUser?.user?.accountId)
-    }
+
+    let url = model.nimUser?.user?.avatar
+    let name = model.getShortName(model.showNickInTeam() ?? "")
+    let accountId = model.nimUser?.user?.accountId ?? ""
+    headerView.configHeadData(headUrl: url, name: name, uid: accountId)
     nameLabel.text = model.atNameInTeam()
   }
 

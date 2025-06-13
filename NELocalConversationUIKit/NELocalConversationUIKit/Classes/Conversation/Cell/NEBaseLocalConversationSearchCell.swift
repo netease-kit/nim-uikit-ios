@@ -19,31 +19,23 @@ open class NEBaseLocalConversationSearchCell: TextBaseCell {
     didSet {
       if let _ = searchModel {
         if let userFriend = searchModel?.userInfo {
+          let url = userFriend.user?.avatar
+          let name = userFriend.shortName() ?? ""
+          let accountId = userFriend.user?.accountId ?? ""
+          headImageView.configHeadData(headUrl: url, name: name, uid: accountId)
+
           titleLabel.text = userFriend.showName()
           subTitleLabel.text = userFriend.user?.accountId
-
-          if let imageName = userFriend.user?.avatar, !imageName.isEmpty {
-            headImageView.setTitle("")
-            headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
-            headImageView.backgroundColor = .clear
-          } else {
-            headImageView.setTitle(userFriend.showName() ?? "")
-            headImageView.sd_setImage(with: nil, completed: nil)
-            headImageView.backgroundColor = UIColor.colorWithString(string: userFriend.user?.accountId)
-          }
         }
+
         if let teamInfo = searchModel?.team {
+          let url = teamInfo.avatar
+          let name = teamInfo.getShortName()
+          let accountId = teamInfo.teamId
+          headImageView.configHeadData(headUrl: url, name: name, uid: accountId)
+
           titleLabel.text = teamInfo.getShowName()
           subTitleLabel.text = nil
-          if let imageName = teamInfo.avatar, !imageName.isEmpty {
-            headImageView.setTitle("")
-            headImageView.sd_setImage(with: URL(string: imageName), completed: nil)
-            headImageView.backgroundColor = .clear
-          } else {
-            headImageView.setTitle(teamInfo.getShowName())
-            headImageView.sd_setImage(with: nil, completed: nil)
-            headImageView.backgroundColor = UIColor.colorWithString(string: teamInfo.teamId)
-          }
         }
       }
     }

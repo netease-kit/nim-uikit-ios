@@ -9,7 +9,7 @@ import UIKit
 open class FunUserInfoHeaderView: NEBaseUserInfoHeaderView {
   override open func commonUI() {
     super.commonUI()
-    avatarImageView.layer.cornerRadius = 4
+    userHeaderView.layer.cornerRadius = 4
 
     NSLayoutConstraint.activate([
       lineView.leftAnchor.constraint(equalTo: titleLabel.leftAnchor),

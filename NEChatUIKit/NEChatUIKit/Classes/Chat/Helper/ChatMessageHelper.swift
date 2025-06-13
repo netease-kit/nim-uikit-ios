@@ -435,7 +435,6 @@ public class ChatMessageHelper: NSObject {
   /// 构建合并转发消息附件的 header
   /// - Parameters:
   ///   - messageCount: 消息数量
-  ///   - completion: 完成回调
   public static func buildHeader(messageCount: Int) -> String {
     var dic = [String: Any]()
     dic["version"] = 0 // 功能版本
@@ -536,9 +535,45 @@ public class ChatMessageHelper: NSObject {
     return nil
   }
 
+  /// 生成回复信息键值对
+  /// - Parameter messageRefer: 消息 refer
+  /// - Returns: 回复消息 refer 组成的 map
+  public static func createReplyDic(_ messageRefer: V2NIMMessageRefer) -> [String: Any] {
+    let yxReplyMsg: [String: Any] = [
+      "idClient": messageRefer.messageClientId as Any,
+      "scene": messageRefer.conversationType.rawValue,
+      "from": messageRefer.senderId as Any,
+      "receiverId": messageRefer.receiverId as Any,
+      "to": messageRefer.conversationId as Any,
+      "idServer": messageRefer.messageServerId as Any,
+      "time": Int(messageRefer.createTime * 1000),
+    ]
+
+    return yxReplyMsg
+  }
+
+  /// 生成回复信息refer
+  /// - Parameter params: 回复信息键值对
+  /// - Returns: 回复消息的 refer
+  public static func createMessageRefer(_ params: [String: Any]?) -> V2NIMMessageRefer {
+    let refer = V2NIMMessageRefer()
+    refer.messageClientId = params?["idClient"] as? String
+    refer.messageServerId = params?["idServer"] as? String
+    refer.senderId = params?["from"] as? String
+    refer.createTime = TimeInterval(Double(params?["time"] as? Int ?? 0) / 1000.0)
+    refer.conversationId = params?["to"] as? String
+    refer.receiverId = params?["receiverId"] as? String
+    if let scene = params?["scene"] as? Int,
+       let type = V2NIMConversationType(rawValue: scene) {
+      refer.conversationType = type
+    }
+
+    return refer
+  }
+
   /// 查找回复信息键值对
   /// - Parameter message: 消息
-  /// - Returns: 回复消息的 id
+  /// - Returns: 回复消息 refer 组成的 map
   public static func getReplyDictionary(message: V2NIMMessage) -> [String: Any]? {
     if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""),
        let yxReplyMsg = remoteExt[keyReplyMsgKey] as? [String: Any] {
@@ -578,25 +613,6 @@ public class ChatMessageHelper: NSObject {
   /// - Returns: 用户信息
   public static func getUserFromCache(_ accountId: String) -> NEUserWithFriend? {
     NEAIUserManager.shared.getAIUserById(accountId) ?? NEFriendUserCache.shared.getFriendInfo(accountId) ?? NEP2PChatUserCache.shared.getUserInfo(accountId) ?? NETeamUserManager.shared.getUserInfo(accountId)
-  }
-
-  /// 查找回复信息键值对
-  /// - Parameter message: 消息
-  /// - Returns: 回复消息的 id
-  public static func createMessageRefer(_ params: [String: Any]?) -> V2NIMMessageRefer {
-    let refer = V2NIMMessageRefer()
-    refer.messageClientId = params?["idClient"] as? String
-    refer.messageServerId = params?["idServer"] as? String
-    refer.senderId = params?["from"] as? String
-    refer.createTime = TimeInterval(Double(params?["time"] as? Int ?? 0) / 1000.0)
-    refer.conversationId = params?["to"] as? String
-    refer.receiverId = params?["receiverId"] as? String
-    if let scene = params?["scene"] as? Int,
-       let type = V2NIMConversationType(rawValue: scene) {
-      refer.conversationType = type
-    }
-
-    return refer
   }
 
   /// 计算减少的

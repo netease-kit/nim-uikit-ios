@@ -10,23 +10,14 @@ import UIKit
 @objcMembers
 open class NEBaseUserInfoHeaderView: UIView {
   public var labelConstraints = [NSLayoutConstraint]()
-  public lazy var avatarImageView: UIImageView = {
-    let imageView = UIImageView()
-    imageView.backgroundColor = UIColor(hexString: "#537FF4")
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.contentMode = .scaleAspectFill
-    imageView.clipsToBounds = true
-    imageView.accessibilityIdentifier = "id.avatar"
-    return imageView
-  }()
 
-  public lazy var nameLabel: UILabel = {
-    let nameLabel = UILabel()
-    nameLabel.textAlignment = .center
-    nameLabel.translatesAutoresizingMaskIntoConstraints = false
-    nameLabel.font = UIFont.systemFont(ofSize: 22)
-    nameLabel.textColor = .white
-    return nameLabel
+  public lazy var userHeaderView: NEUserHeaderView = {
+    let imageView = NEUserHeaderView(frame: .zero)
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.clipsToBounds = true
+    imageView.titleLabel.font = NEConstant.defaultTextFont(14.0)
+    imageView.isUserInteractionEnabled = true
+    return imageView
   }()
 
   public lazy var titleLabel: CopyableLabel = {
@@ -74,24 +65,16 @@ open class NEBaseUserInfoHeaderView: UIView {
 
   open func commonUI() {
     backgroundColor = .white
-    addSubview(avatarImageView)
-    addSubview(nameLabel)
+    addSubview(userHeaderView)
     addSubview(titleLabel)
     addSubview(detailLabel)
     addSubview(lineView)
 
     NSLayoutConstraint.activate([
-      avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
-      avatarImageView.widthAnchor.constraint(equalToConstant: 60),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 60),
-      avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0),
-    ])
-
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: avatarImageView.leftAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: avatarImageView.rightAnchor),
-      nameLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
-      nameLabel.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
+      userHeaderView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 60),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 60),
+      userHeaderView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: 0),
     ])
 
     commonUI(showDetail: false)
@@ -104,9 +87,9 @@ open class NEBaseUserInfoHeaderView: UIView {
     var detail2Constraint = [NSLayoutConstraint]()
     if showDetail {
       titleConstraint = [
-        titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 20),
+        titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 20),
         titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -35),
-        titleLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor, constant: -2),
+        titleLabel.topAnchor.constraint(equalTo: userHeaderView.topAnchor, constant: -2),
         titleLabel.heightAnchor.constraint(equalToConstant: 22),
       ]
 
@@ -126,9 +109,9 @@ open class NEBaseUserInfoHeaderView: UIView {
       ]
     } else {
       titleConstraint = [
-        titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 16),
+        titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 16),
         titleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
-        titleLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor, constant: 7),
+        titleLabel.topAnchor.constraint(equalTo: userHeaderView.topAnchor, constant: 7),
         titleLabel.heightAnchor.constraint(equalToConstant: 22),
       ]
 
@@ -153,16 +136,10 @@ open class NEBaseUserInfoHeaderView: UIView {
     }
 
     // avatar
-    if let imageUrl = userFriend.user?.avatar, !imageUrl.isEmpty {
-      avatarImageView.sd_setImage(with: URL(string: imageUrl), completed: nil)
-      avatarImageView.backgroundColor = .clear
-      nameLabel.isHidden = true
-    } else {
-      avatarImageView.sd_setImage(with: nil)
-      avatarImageView.backgroundColor = UIColor.colorWithString(string: userFriend.user?.accountId)
-      nameLabel.text = userFriend.shortName(count: 2)
-      nameLabel.isHidden = false
-    }
+    let url = userFriend.user?.avatar
+    let name = userFriend.shortName() ?? ""
+    let accountId = userFriend.user?.accountId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     // title
     let uid = userFriend.user?.accountId ?? ""

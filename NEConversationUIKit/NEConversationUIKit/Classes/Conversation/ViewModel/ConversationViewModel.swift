@@ -57,6 +57,12 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 回调
   public var callBack: ConversationCallBack?
 
+  /// 单聊账号 id
+  var p2pAccountIds = Set<String>()
+
+  /// （单聊会话）在线状态记录，[单聊会话 id: 是否在线]
+  public var onlineStatusDic = [String: Bool]()
+
   override public init() {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     super.init()
@@ -69,6 +75,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     IMKitClient.instance.addLoginListener(self)
     NEAIUserPinManager.shared.addPinManagerListener(self)
     NEAIUserManager.shared.addAIUserChangeListener(listener: self)
+
+    if IMKitConfigCenter.shared.enableOnlineStatus {
+      SubscribeRepo.shared.addListener(self)
+    }
   }
 
   deinit {
@@ -81,6 +91,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     IMKitClient.instance.removeLoginListener(self)
     NEAIUserPinManager.shared.removePinManagerListener(self)
     NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
+
+    if IMKitConfigCenter.shared.enableOnlineStatus {
+      SubscribeRepo.shared.removeListener(self)
+    }
   }
 
   open func atMessageChange() {
@@ -107,7 +121,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   open func getConversationListByPage(_ completion: @escaping (NSError?, Bool?) -> Void) {
     if syncFinished == false {
       callBack = completion
-      return
     }
 
     if isRequesting == true {
@@ -125,29 +138,37 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         }
         self?.isRequesting = false
 
-        var p2pConversationIds = [String]()
         conversations?.forEach { conversation in
           // 区分置顶消息和非置顶消息
           self?.addOrUpdateConversationData(conversation)
 
           if V2NIMConversationIdUtil.conversationType(conversation.conversationId) == .CONVERSATION_TYPE_P2P,
              let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
-            p2pConversationIds.append(accountId)
+            self?.p2pAccountIds.insert(accountId)
           }
         }
 
+        // 订阅单聊在线状态
+        if IMKitConfigCenter.shared.enableOnlineStatus,
+           let accountIds = self?.p2pAccountIds {
+          self?.subscribeOnlineStatus(Array(accountIds))
+        }
+
         // 单聊会话主动拉取用户信息，避免用户信息缺失影响会话展示
-        ContactRepo.shared.getUserListFromCloud(accountIds: p2pConversationIds) { [weak self] users, error in
-          let conversationIds = p2pConversationIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
-          self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
-            if let conversations = conversations {
-              for conversation in conversations {
-                self?.conversationDic[conversation.conversationId]?.conversation = conversation
+        if let p2pAccountIds = self?.p2pAccountIds, !p2pAccountIds.isEmpty {
+          ContactRepo.shared.getUserListFromCloud(accountIds: Array(p2pAccountIds)) { [weak self] users, error in
+            let conversationIds = p2pAccountIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+            self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
+              if let conversations = conversations {
+                for conversation in conversations {
+                  self?.conversationDic[conversation.conversationId]?.conversation = conversation
+                }
+                self?.delegate?.reloadTableView()
               }
-              self?.delegate?.reloadTableView()
             }
           }
         }
+        self?.delegate?.reloadTableView()
       }
       completion(error, finished)
     }
@@ -268,6 +289,14 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
 
     addOrUpdateConversationData(conversation)
+
+    // 订阅单聊在线状态
+    if IMKitConfigCenter.shared.enableOnlineStatus,
+       let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
+      p2pAccountIds.insert(accountId)
+      subscribeOnlineStatus([accountId])
+    }
+
     delegate?.reloadTableView()
   }
 
@@ -363,10 +392,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   /// 保存撤回消息
-  /// - Parameter conversationId: 会话id
-  /// - Parameter createTime: 撤回时间
-  /// - Parameter revokeAccountId: 撤回人id
-  /// - Parameter extention: 扩展信息
+  /// - Parameter messageRevoke: 撤回通知
   /// - Parameter completion: 完成回调
   open func saveRevokeMessage(_ messageRevoke: V2NIMMessageRevokeNotification,
                               _ completion: @escaping (NSError?) -> Void) {
@@ -554,7 +580,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// - Parameter friendInfo: 好友信息
   open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     NEALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
     delegate?.reloadTableView()
@@ -582,5 +608,55 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       }
     }
     delegate?.reloadTableView()
+  }
+}
+
+// MARK: - NEEventListener
+
+extension ConversationViewModel: NESubscribeListener {
+  /// 订阅在线状态
+  open func subscribeOnlineStatus(_ accoundIds: [String]) {
+    var subscribeList: [String] = []
+    for accountId in accoundIds {
+      if NEAIUserManager.shared.isAIUser(accountId) {
+        continue
+      }
+
+      if let event = NESubscribeManager.shared.getSubscribeStatus(accountId),
+         let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
+        onlineStatusDic[conversationId] = event.statusType == .USER_STATUS_TYPE_LOGIN
+      } else {
+        subscribeList.append(accountId)
+      }
+    }
+
+    if !subscribeList.isEmpty {
+      NESubscribeManager.shared.subscribeUsersOnlineState(subscribeList) { error in
+      }
+    }
+  }
+
+  /// 取消订阅
+  open func unsubscribeOnlineStatus() {
+    let subscribeList = Array(p2pAccountIds)
+    NESubscribeManager.shared.unSubscribeUsersOnlineState(subscribeList) { error in
+    }
+  }
+
+  /// 用户状态变更
+  /// - Parameter data: 用户状态列表
+  public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+    var needRefresh = false
+    for d in data {
+      if p2pAccountIds.contains(d.accountId),
+         let conversationId = V2NIMConversationIdUtil.p2pConversationId(d.accountId) {
+        onlineStatusDic[conversationId] = d.statusType == .USER_STATUS_TYPE_LOGIN
+        needRefresh = true
+      }
+    }
+
+    if needRefresh {
+      delegate?.reloadTableView()
+    }
   }
 }

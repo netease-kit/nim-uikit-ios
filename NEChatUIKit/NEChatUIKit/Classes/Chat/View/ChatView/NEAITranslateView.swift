@@ -95,7 +95,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   /// 关闭图片
   public lazy var closeImageView: UIImageView = {
     let imageView = UIImageView()
-    imageView.image = coreLoader.loadImage("top_close")
+    imageView.image = coreLoader.loadImage("remove")
     imageView.translatesAutoresizingMaskIntoConstraints = false
     return imageView
   }()
@@ -143,7 +143,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   /// 使用文案富文本
   public var useAttributeString: NSMutableAttributedString = {
     let attributeString = NSMutableAttributedString(string: chatLocalizable("translate_use"))
-    if let attachmentImage = coreLoader.loadImage("use_arrow") {
+    if let attachmentImage = chatCoreLoader.loadImage("use_arrow") {
       let attachment = NSTextAttachment()
       attachment.image = attachmentImage
       attachment.bounds = CGRectMake(0, -2, 10, 13)
@@ -172,7 +172,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
 
   /// 标题栏 loading 动画
   public lazy var loadingAnimationView: NELottieAnimationView = {
-    let view = NELottieAnimationView(name: "ne_loading_data", bundle: coreLoader.bundle)
+    let view = NELottieAnimationView(name: "ne_loading_data", bundle: chatCoreLoader.bundle)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.loopMode = .loop
     view.contentMode = .scaleAspectFill
@@ -284,12 +284,14 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
 
     statusLabel.attributedText = translateString
     let userDefault = UserDefaults.standard
-    if let cacheLanguage = userDefault.value(forKey: IMKitClient.instance.account() + languageSuffix) as? String, cacheLanguage.count > 0 {
+    if let cacheLanguage = userDefault.value(forKey: IMKitClient.instance.account() + languageSuffix) as? String,
+       let first = cacheLanguage.first {
       currentLanguage = cacheLanguage
-      shortLanguageLabel.text = cacheLanguage
-    } else if let firstLanguage = NETranslateLanguageManager.shared.languageDatas.first, let first = firstLanguage.first {
+      shortLanguageLabel.text = String(first)
+    } else if let firstLanguage = NETranslateLanguageManager.shared.languageDatas.first,
+              let first = firstLanguage.first {
       currentLanguage = firstLanguage
-      shortLanguageLabel.text = firstLanguage
+      shortLanguageLabel.text = String(first)
     }
 
     // 事件绑定
@@ -309,7 +311,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
     changeToIdleState(true)
   }
 
-  /// 切花语言按钮点击回调
+  /// 切换语言按钮点击回调
   func didClickChange() {
     delegate?.didSwitchLanguageClick(currentLanguage)
   }

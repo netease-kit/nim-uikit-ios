@@ -62,14 +62,12 @@ open class NEBaseAIUserListCell: UITableViewCell {
   /// 数据源与UI绑定
   open func configure(_ model: NEAIUserModel) {
     currentModel = model
-    if let url = model.aiUser?.avatar, !url.isEmpty {
-      aiUserHeaderView.sd_setImage(with: URL(string: url), completed: nil)
-      aiUserHeaderView.setTitle("")
-    } else {
-      aiUserHeaderView.image = nil
-      aiUserHeaderView.setTitle(model.aiUser?.name ?? "")
-      aiUserHeaderView.backgroundColor = UIColor.colorWithString(string: model.aiUser?.accountId)
-    }
+
+    let url = model.aiUser?.avatar
+    let name = model.aiUser?.shortName() ?? ""
+    let accountId = model.aiUser?.accountId ?? ""
+    aiUserHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
+
     if let name = model.aiUser?.name {
       aiUserNameLabel.text = name
     } else {

@@ -97,7 +97,7 @@ open class NEContactBaseViewController: UIViewController, UIGestureRecognizerDel
   open func setupBackUI() {
     navigationController?.navigationBar.tintColor = .white
     let backItem = UIBarButtonItem(
-      image: UIImage.ne_imageNamed(name: "backArrow"),
+      image: coreLoader.loadImage("back_arrow"),
       style: .plain,
       target: self,
       action: #selector(backEvent)

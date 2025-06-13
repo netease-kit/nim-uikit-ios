@@ -41,7 +41,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   lazy var arrowImageView: UIImageView = {
     let arrowImageView = UIImageView()
     arrowImageView.translatesAutoresizingMaskIntoConstraints = false
-    arrowImageView.image = coreLoader.loadImage("arrowRight")
+    arrowImageView.image = coreLoader.loadImage("arrow_right")
     return arrowImageView
   }()
 
@@ -57,7 +57,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   public var memberArrowImageView: UIImageView = {
     let memberArrowImageView = UIImageView()
     memberArrowImageView.translatesAutoresizingMaskIntoConstraints = false
-    memberArrowImageView.image = coreLoader.loadImage("arrowRight")
+    memberArrowImageView.image = coreLoader.loadImage("arrow_right")
     return memberArrowImageView
   }()
 
@@ -85,7 +85,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
 
     teamHeaderView.layer.cornerRadius = 21.0
-    addButton.setImage(coreLoader.loadImage("add"), for: .normal)
+    addButton.setImage(teamCoreLoader.loadImage("setting_add"), for: .normal)
     addButtonWidth = addButton.widthAnchor.constraint(equalToConstant: 36)
     addButtonWidth?.isActive = true
     addButtonLeftMargin = addButton.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16.0)

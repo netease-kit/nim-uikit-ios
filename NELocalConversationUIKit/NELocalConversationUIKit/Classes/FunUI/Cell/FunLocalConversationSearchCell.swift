@@ -21,8 +21,8 @@ open class FunLocalConversationSearchCell: NEBaseLocalConversationSearchCell {
     super.setupSubviews()
     headImageView.layer.cornerRadius = 4.0
 
-    headImageView.updateLayoutConstraint(firstItem: headImageView, seconedItem: nil, attribute: .width, constant: 40)
-    headImageView.updateLayoutConstraint(firstItem: headImageView, seconedItem: nil, attribute: .height, constant: 40)
+    headImageView.updateLayoutConstraint(firstItem: headImageView, secondItem: nil, attribute: .width, constant: 40)
+    headImageView.updateLayoutConstraint(firstItem: headImageView, secondItem: nil, attribute: .height, constant: 40)
 
     contentView.addSubview(bottomLine)
     NSLayoutConstraint.activate([

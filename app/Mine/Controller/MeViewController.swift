@@ -38,7 +38,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   }()
 
   private lazy var arrowImageView: UIImageView = {
-    let imageView = UIImageView(image: UIImage(named: "arrow_right"))
+    let imageView = UIImageView(image: coreLoader.loadImage("arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.accessibilityIdentifier = "id.rightArrow"
     return imageView
@@ -209,7 +209,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     idLabel.text = "\(localizable("account")):\(userFriend?.user?.accountId ?? "")"
     nameLabel.text = userFriend?.showName()
     header.configHeadData(headUrl: userFriend?.user?.avatar,
-                          name: userFriend?.showName() ?? "",
+                          name: userFriend?.shortName() ?? "",
                           uid: userFriend?.user?.accountId ?? "")
   }
 

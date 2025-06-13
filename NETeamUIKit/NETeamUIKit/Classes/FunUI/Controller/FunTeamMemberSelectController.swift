@@ -19,7 +19,7 @@ open class FunTeamMemberSelectController: NEBaseTeamMemberSelectController {
     super.viewDidLoad()
     navigationView.moreButton.setTitleColor(.funTeamThemeColor, for: .normal)
     // Do any additional setup after loading the view.
-    emptyView.setEmptyImage(image: coreLoader.loadImage("fun_user_empty"))
+    emptyView.setEmptyImage(image: teamCoreLoader.loadImage("fun_user_empty"))
   }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

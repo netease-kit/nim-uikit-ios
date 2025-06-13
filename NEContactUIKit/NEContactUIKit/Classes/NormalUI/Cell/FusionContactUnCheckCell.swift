@@ -11,13 +11,13 @@ open class FusionContactUnCheckCell: ContactUnCheckCell {
       if cellModel.user != nil {
         avatarImageView.configHeadData(
           headUrl: cellModel.user?.user?.avatar,
-          name: cellModel.getShowName(),
+          name: cellModel.getShortName(),
           uid: cellModel.getAccountId()
         )
       } else if cellModel.aiUser != nil {
         avatarImageView.configHeadData(
           headUrl: cellModel.aiUser?.avatar,
-          name: cellModel.getShowName(),
+          name: cellModel.getShortName(),
           uid: cellModel.getAccountId()
         )
       }

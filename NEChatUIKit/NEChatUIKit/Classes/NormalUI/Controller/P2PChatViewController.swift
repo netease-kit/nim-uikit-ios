@@ -42,12 +42,13 @@ open class P2PChatViewController: NormalChatViewController {
     NEP2PChatUserCache.shared.removeListener(self)
   }
 
-  override open var title: String? {
+  override public var titleContent: String {
     didSet {
-      super.title = title
+      super.titleContent = titleContent
       let text = "\(chatLocalizable("send_to"))\(titleContent)"
       let attribute = getPlaceHolder(text: text)
       chatInputView.textView.attributedPlaceholder = attribute
+      chatInputView.setUnMuteInputStyle()
       chatInputView.textView.setNeedsLayout()
     }
   }
@@ -58,7 +59,7 @@ open class P2PChatViewController: NormalChatViewController {
     style.lineBreakMode = .byTruncatingTail
     style.alignment = .left
     attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
-    attribute.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, text.utf16.count))
+    attribute.addAttribute(.foregroundColor, value: UIColor.normalChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
     attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
     return attribute
   }
@@ -69,7 +70,6 @@ open class P2PChatViewController: NormalChatViewController {
       self?.viewModel.loadShowName([sessionId]) {
         let name = self?.viewModel.getShowName(sessionId) ?? sessionId
         self?.titleContent = name
-        self?.title = name
       }
       completion()
     }
@@ -116,14 +116,16 @@ open class P2PChatViewController: NormalChatViewController {
 // MARK: - NEContactListener
 
 extension P2PChatViewController: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
-      if let accid = contact.user?.accountId, contact.user?.accountId == viewModel.sessionId {
+      if let accid = contact.user?.accountId,
+         accid == ChatRepo.sessionId {
         // 好友添加，则从 NEP2PChatUserCache 中移除信息缓存
         if changeType == .addFriend {
-          NEP2PChatUserCache.shared.removeUserInfo(viewModel.sessionId)
+          NEP2PChatUserCache.shared.removeUserInfo(ChatRepo.sessionId)
         }
 
         // 好友被删除，则信息缓存移至 NEP2PChatUserCache

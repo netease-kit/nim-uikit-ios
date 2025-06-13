@@ -14,7 +14,7 @@ import UIKit
 open class NEBaseContactUserViewController: NEContactBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   var user: NEUserWithFriend?
-  var uid: String?
+  var accountId: String?
   var className = "ContactUserViewController"
 
   public let viewModel = ContactUserViewModel()
@@ -24,9 +24,9 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 
   /// 使用 accountId 初始化
   /// - Parameter accountId: 用户 id
-  public init(uid: String) {
+  public init(accountId: String) {
     super.init(nibName: nil, bundle: nil)
-    self.uid = uid
+    self.accountId = accountId
   }
 
   /// 使用 V2NIMUser 初始化
@@ -34,7 +34,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   public init(nim_user: V2NIMUser) {
     super.init(nibName: nil, bundle: nil)
     user = NEUserWithFriend(user: nim_user)
-    uid = user?.user?.accountId
+    accountId = user?.user?.accountId
   }
 
   /// 使用 NEUserWithFriend 初始化
@@ -42,7 +42,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   public init(user: NEUserWithFriend?) {
     super.init(nibName: nil, bundle: nil)
     self.user = user
-    uid = user?.user?.accountId
+    accountId = user?.user?.accountId
   }
 
   public required init?(coder: NSCoder) {
@@ -66,7 +66,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       return
     }
 
-    if let userId = uid {
+    if let userId = accountId {
       weak var weakSelf = self
       if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
         weakSelf?.showToast(commonLocalizable("network_error"), .bottom)
@@ -147,7 +147,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   }
 
   open func loadData() {
-    guard let uid = user?.user?.accountId ?? uid else { return }
+    guard let uid = user?.user?.accountId ?? accountId else { return }
 
     // 数字人信息从缓存中取
     if let aiUser: NEUserWithFriend = NEAIUserManager.shared.getAIUserById(uid) {
@@ -483,11 +483,12 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 // MARK: - NEContactListener
 
 extension NEBaseContactUserViewController: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
-      if contact.user?.accountId == uid {
+      if contact.user?.accountId == accountId {
         user = contact
         loadData()
       }

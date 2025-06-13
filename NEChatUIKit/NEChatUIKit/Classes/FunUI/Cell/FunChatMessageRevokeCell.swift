@@ -70,15 +70,13 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
   }
 
   override open func showLeftOrRight(showRight: Bool) {
-    avatarImageLeft.isHidden = true
-    nameLabelLeft.isHidden = true
+    userHeaderViewLeft.isHidden = true
     bubbleImageLeft.isHidden = true
     pinImageLeft.isHidden = true
     pinLabelLeft.isHidden = true
     fullNameLabel.isHidden = true
 
-    avatarImageRight.isHidden = true
-    nameLabelRight.isHidden = true
+    userHeaderViewRight.isHidden = true
     bubbleImageRight.isHidden = true
     pinImageRight.isHidden = true
     pinLabelRight.isHidden = true

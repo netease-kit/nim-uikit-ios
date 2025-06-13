@@ -113,7 +113,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
   /// - Returns: 消息发送参数
   func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
     let params = chatRepo.getSendMessageParams()
-    guard let cid = conversationId,
+    guard let cid = aiUserAccid,
           let aiAccid = V2NIMConversationIdUtil.conversationTargetId(cid),
           NEAIUserManager.shared.isAIUser(aiAccid) else {
       return params
@@ -123,10 +123,12 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     aiConfig.accountId = aiAccid
     aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
+    // 文本消
     if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
       aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
     }
 
+    // 换行消息
     if message.messageType == .MESSAGE_TYPE_CUSTOM,
        let type = NECustomUtils.typeOfCustomMessage(message.attachment),
        type == customRichTextType {
@@ -159,6 +161,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
 
   /// 转发消息
   /// - Parameters:
+  ///   - message: 消息列表
   ///   - conversationIds: 会话 id 列表
   ///   - comment: 留言
   ///   - completion: 完成回调
@@ -170,8 +173,10 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     for conversationId in conversationIds {
       let forwardMessage = MessageUtils.forwardMessage(message: message)
       ChatMessageHelper.clearForwardAtMark(forwardMessage)
+
       let params = getSendMessageParams(conversationId, message)
       chatRepo.sendMessage(message: forwardMessage, conversationId: conversationId, params: params, completion)
+
       if let text = comment, !text.isEmpty {
         sendTextMessage(text: text, conversationId: conversationId, completion)
       }

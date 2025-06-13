@@ -11,7 +11,7 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
   public lazy var searchView: FunSearchView = {
     let view = FunSearchView()
     view.translatesAutoresizingMaskIntoConstraints = false
-    view.searchButton.setImage(UIImage.ne_imageNamed(name: "funSearch"), for: .normal)
+    view.searchButton.setImage(coreLoader.loadImage("fun_search"), for: .normal)
     view.searchButton.setTitle(localizable("search"), for: .normal)
     return view
   }()
@@ -50,7 +50,7 @@ open class FunTeamHistoryMessageController: NEBaseTeamHistoryMessageController {
       cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
     ])
 
-    let leftImageView = UIImageView(image: coreLoader.loadImage("funSearch"))
+    let leftImageView = UIImageView(image: coreLoader.loadImage("fun_search"))
     searchTextField.leftView = leftImageView
     searchTextField.font = UIFont.systemFont(ofSize: 16)
     searchTextField.textColor = .black

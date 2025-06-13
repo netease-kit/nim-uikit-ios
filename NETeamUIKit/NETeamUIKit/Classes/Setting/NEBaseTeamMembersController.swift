@@ -85,7 +85,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
   /// 搜索背景图
   public lazy var searchIconImageView: UIImageView = {
     let searchIconImageView = UIImageView()
-    searchIconImageView.image = coreLoader.loadImage("search_icon")
+    searchIconImageView.image = coreLoader.loadImage("textField_search_icon")
     searchIconImageView.translatesAutoresizingMaskIntoConstraints = false
     return searchIconImageView
   }()
@@ -121,21 +121,23 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
           } else {
             weakSelf?.title = localizable("discuss_mebmer")
           }
-          if IMKitConfigCenter.shared.onlineStatusEnable {
-            if let members = teamInfo?.users {
-              var subcribeMembers = [NETeamMemberInfoModel]()
-              for model in members {
-                if let account = model.teamMember?.accountId {
-                  if account != IMKitClient.instance.account() {
-                    subcribeMembers.append(model)
-                  }
-                }
-              }
-              weakSelf?.viewModel.subcribeMembers(members) { error in
-                NEALog.infoLog(weakSelf?.className() ?? "", desc: "sub cribe members error : \(error?.localizedDescription ?? "")")
-              }
-            }
-          }
+
+          // 订阅群成员在线状态
+//          if IMKitConfigCenter.shared.enableOnlineStatus {
+//            if let members = teamInfo?.users {
+//              var subcribeMembers = [NETeamMemberInfoModel]()
+//              for model in members {
+//                if let account = model.teamMember?.accountId {
+//                  if account != IMKitClient.instance.account() {
+//                    subcribeMembers.append(model)
+//                  }
+//                }
+//              }
+//              weakSelf?.viewModel.subcribeMembers(members) { error in
+//                NEALog.infoLog(weakSelf?.className() ?? "", desc: "sub cribe members error : \(error?.localizedDescription ?? "")")
+//              }
+//            }
+//          }
           weakSelf?.didNeedRefreshUI()
         }
       }
@@ -336,12 +338,12 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
 
   override open func didMove(toParent parent: UIViewController?) {
     super.didMove(toParent: parent)
-    if IMKitConfigCenter.shared.onlineStatusEnable {
-      if parent == nil {
-        viewModel.unSubcribeMembers(viewModel.datas) { [weak self] error in
-          NEALog.infoLog(self?.className() ?? " ", desc: #function + " un sub scribe member error : \(error?.localizedDescription ?? "")")
-        }
-      }
-    }
+//    if IMKitConfigCenter.shared.enableOnlineStatus {
+//      if parent == nil {
+//        viewModel.unSubcribeMembers(viewModel.datas) { [weak self] error in
+//          NEALog.infoLog(self?.className() ?? " ", desc: #function + " un sub scribe member error : \(error?.localizedDescription ?? "")")
+//        }
+//      }
+//    }
   }
 }

@@ -9,8 +9,10 @@
 "contact"="通讯录";
 "mine"="我";
 "logout"="退出登录";
+"account_Cancellation" = "注销账号";
 "about_yunxin"="关于云信";
 "want_to_logout"="确定要退出登录吗？";
+"want_to_delete_account"="确定要注销账号吗？";
 "person_info"="个人信息";
 "setting_birthday_failure"="设置生日失败";
 "setting_head_failure"="修改头像失败";

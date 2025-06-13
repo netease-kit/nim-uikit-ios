@@ -39,15 +39,15 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
 
     contentView.addSubview(redAngleView)
     NSLayoutConstraint.activate([
-      redAngleView.centerXAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: -8),
-      redAngleView.centerYAnchor.constraint(equalTo: avatarImageView.topAnchor, constant: 8),
+      redAngleView.centerXAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: -8),
+      redAngleView.centerYAnchor.constraint(equalTo: userHeaderView.topAnchor, constant: 8),
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
 
     addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 10),
-      titleLabel.topAnchor.constraint(equalTo: avatarImageView.topAnchor),
+      titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 10),
+      titleLabel.topAnchor.constraint(equalTo: userHeaderView.topAnchor),
     ])
     titleLabelRightMargin = titleLabel.rightAnchor.constraint(
       equalTo: contentView.rightAnchor,
@@ -57,7 +57,7 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
 
     addSubview(optionLabel)
     NSLayoutConstraint.activate([
-      optionLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 10),
+      optionLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 10),
       optionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
       optionLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -180),
     ])
@@ -75,16 +75,10 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
 
   open func confige(_ model: NENotification) {
     // 设置头像
-    if let headerUrl = model.displayUserWithFriend?.user?.avatar, !headerUrl.isEmpty {
-      avatarImageView.sd_setImage(with: URL(string: headerUrl), completed: nil)
-      nameLabel.text = ""
-      avatarImageView.backgroundColor = .clear
-    } else {
-      // 无头像设置其name
-      showNameOnCircleHeader(model.displayUserWithFriend?.showName() ?? model.displayUserId ?? "")
-      avatarImageView.sd_setImage(with: URL(string: ""), completed: nil)
-      avatarImageView.backgroundColor = UIColor.colorWithString(string: model.displayUserWithFriend?.user?.accountId)
-    }
+    let url = model.displayUserWithFriend?.user?.avatar
+    let name = model.displayUserWithFriend?.shortName() ?? model.displayUserId ?? ""
+    let accountId = model.displayUserWithFriend?.user?.accountId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     // 设置未读状态（未读数角标+底色）
     redAngleView.isHidden = true

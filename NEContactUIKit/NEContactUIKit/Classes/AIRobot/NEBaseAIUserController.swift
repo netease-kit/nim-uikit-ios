@@ -73,7 +73,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   /// 搜索背景图
   public lazy var searchIconImageView: UIImageView = {
     let searchIconImageView = UIImageView()
-    searchIconImageView.image = coreLoader.loadImage("search_icon")
+    searchIconImageView.image = coreLoader.loadImage("textField_search_icon")
     searchIconImageView.translatesAutoresizingMaskIntoConstraints = false
     return searchIconImageView
   }()

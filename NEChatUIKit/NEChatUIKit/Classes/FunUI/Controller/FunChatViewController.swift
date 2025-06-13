@@ -24,22 +24,36 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackground ?? .funChatBackgroundColor // 换肤颜色提取
 
-    navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationBottomLineColor
+    if ChatUIConfig.shared.messageProperties.chatViewBackgroundSolid,
+       let color = ChatUIConfig.shared.messageProperties.chatTableViewBackgroundColor {
+      navigationController?.navigationBar.backgroundColor = color
+      navigationView.setNavigationBackgroundColor(color)
+      chatInputView.chatAddMoreView.backgroundColor = color
+    } else {
+      navigationController?.navigationBar.backgroundColor = .funChatNavigationBg
+      navigationView.backgroundColor = .funChatNavigationBg
+      navigationView.titleBarBottomLine.backgroundColor = .funChatNavigationDivideBg
+      view.backgroundColor = .funChatBackgroundColor
+      bodyTopView.backgroundColor = .funChatBodyTopViewBg
+      brokenNetworkView.backgroundColor = .funChatNetworkBrokenViewBg
+      bodyView.backgroundColor = .funChatBodyViewBg
+      tableView.backgroundColor = .funChatTableViewBg
+      bodyBottomView.backgroundColor = .funChatBodyBottomViewBg
+      chatInputView.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackgroundSolid ? ChatUIConfig.shared.messageProperties.chatTableViewBackgroundColor : .funChatInputViewBg
+    }
 
     topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
 
     brokenNetworkView.errorIconView.isHidden = false
-    brokenNetworkView.backgroundColor = .funChatNetworkBrokenBackgroundColor
     brokenNetworkView.contentLabel.textColor = .funChatNetworkBrokenTitleColor
 
     view.bringSubviewToFront(chatInputView)
     getFunInputView()?.funDelegate = self
   }
 
-  override open func getMenuView() -> NEBaseChatInputView {
-    let input = FunChatInputView()
+  override open func getMenuView(_ conversationType: V2NIMConversationType) -> NEBaseChatInputView {
+    let input = FunChatInputView(conversationType)
     input.multipleLineDelegate = self
     let gesture = UILongPressGestureRecognizer(target: self, action: #selector(holdToSpeak(gesture:)))
     input.holdToSpeakView.addGestureRecognizer(gesture)
@@ -60,7 +74,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   /// 获取@列表视图控制器 - 通用版
   override open func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
-    FunSelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
+    FunSelectUserViewController(conversationId: ChatRepo.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
   /// 获取文本详情页视图控制器 - 通用版
@@ -137,7 +151,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   override open func getUserSettingViewController() -> NEBaseUserSettingViewController {
-    FunUserSettingViewController(userId: viewModel.sessionId)
+    FunUserSettingViewController(userId: ChatRepo.sessionId)
   }
 
   override open func keyBoardWillShow(_ notification: Notification) {
@@ -285,7 +299,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         replyView.replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: viewModel.operationModel?.replyText ?? "",
                                                                           font: .systemFont(ofSize: 13),
                                                                           color: .ne_greyText)
-        viewModel.getReplyMessageWithoutThread(message: message) { model in
+        viewModel.getReplyMessage(message: message) { model in
           if let replyMessage = model as? MessageContentModel {
             self.viewModel.operationModel = replyMessage
           }
@@ -294,7 +308,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         var text = chatLocalizable("operation_replay")
         if let uid = ChatMessageHelper.getSenderId(message) {
           var showName = NETeamUserManager.shared.getShowName(uid, false)
-          if V2NIMConversationIdUtil.conversationType(viewModel.conversationId) != .CONVERSATION_TYPE_P2P,
+          if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) != .CONVERSATION_TYPE_P2P,
              !IMKitClient.instance.isMe(uid) {
             addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
           }

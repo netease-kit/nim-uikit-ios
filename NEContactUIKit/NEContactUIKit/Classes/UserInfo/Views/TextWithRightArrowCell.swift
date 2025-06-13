@@ -7,7 +7,7 @@ import UIKit
 
 @objcMembers
 open class TextWithRightArrowCell: ContactBaseTextCell {
-  public var arrowImageView = UIImageView(image: UIImage.ne_imageNamed(name: "arrowRight"))
+  public var arrowImageView = UIImageView(image: coreLoader.loadImage("arrow_right"))
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)

@@ -17,21 +17,22 @@ open class ContactTableViewCell: NEBaseContactTableViewCell {
 
   override open func commonUI() {
     super.commonUI()
-    bottomLine.backgroundColor = .ne_greyLine
+    backgroundColor = .normalContactItemBackgroundColor
+    bottomLine.backgroundColor = .normalContactItemLineBackgroundColor
   }
 
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 36),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 36),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 36),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 36),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 
   override open func setModel(_ model: ContactInfo) {
     super.setModel(model)
-    if model.contactCellType == 2 {
+    if model.contactCellType == .ContactPerson {
       bottomLine.isHidden = true
     }
   }

@@ -258,17 +258,17 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
   // MARK: - Table View DataSource And Delegate
 
   open func numberOfSections(in tableView: UITableView) -> Int {
-    viewModel.contacts.count
+    viewModel.contactSections.count
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewModel.contacts[section].contacts.count
+    viewModel.contactSections[section].contacts.count
   }
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
-    if let cellClass = customCells[info.contactCellType] {
+    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
+    if let cellClass = customCells[info.contactCellType.rawValue] {
       let anyCell = tableView.dequeueReusableCell(
         withIdentifier: "\(NSStringFromClass(cellClass))",
         for: indexPath
@@ -288,14 +288,14 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
-    if viewModel.contacts[section].initial.count > 0 {
+    if viewModel.contactSections[section].initial.count > 0 {
       return 40
     }
     return 0
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let info = viewModel.contacts[indexPath.section].contacts[indexPath.row]
+    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
     if info.isSelected == true {
       didUnselectContact(info)
     } else {
@@ -312,7 +312,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
   }
 
   open func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
-    for (i, t) in viewModel.contacts.enumerated() {
+    for (i, t) in viewModel.contactSections.enumerated() {
       if t.initial == title {
         lastTitleIndex = i
         return i

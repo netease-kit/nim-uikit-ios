@@ -19,16 +19,33 @@ open class NormalChatViewController: ChatViewController {
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    navigationController?.navigationBar.backgroundColor = .white
-    navigationView.backgroundColor = .white
+
+    if ChatUIConfig.shared.messageProperties.chatViewBackgroundSolid,
+       let color = ChatUIConfig.shared.messageProperties.chatTableViewBackgroundColor {
+      navigationController?.navigationBar.backgroundColor = color
+      navigationView.setNavigationBackgroundColor(color)
+      chatInputView.recordView.backgroundColor = color
+      chatInputView.chatAddMoreView.backgroundColor = color
+    } else {
+      navigationController?.navigationBar.backgroundColor = .normalChatNavigationBg
+      navigationView.backgroundColor = .normalChatNavigationBg
+      navigationView.titleBarBottomLine.backgroundColor = .normalChatNavigationDivideBg
+      bodyTopView.backgroundColor = .normalChatBodyTopViewBg
+      brokenNetworkView.backgroundColor = .normalChatNetworkBrokenViewBg
+      brokenNetworkView.contentLabel.textColor = .normalChatNetworkBrokenTitleColor
+      bodyView.backgroundColor = .normalChatBodyViewBg
+      tableView.backgroundColor = .normalChatTableViewBg
+      bodyBottomView.backgroundColor = .normalChatBodyBottomViewBg
+//      chatInputView.backgroundColor = ChatUIConfig.shared.messageProperties.chatViewBackgroundSolid ? ChatUIConfig.shared.messageProperties.chatTableViewBackgroundColor : .normalChatInputViewBg
+    }
 
     topMessageView.topImageView.image = UIImage.ne_imageNamed(name: "top_message_image")
     topMessageView.layer.borderColor = UIColor(hexString: "#E8EAED").cgColor
     topMessageView.layer.borderWidth = 1
   }
 
-  override open func getMenuView() -> NEBaseChatInputView {
-    let chat = ChatInputView()
+  override open func getMenuView(_ conversationType: V2NIMConversationType) -> NEBaseChatInputView {
+    let chat = ChatInputView(conversationType)
     chat.multipleLineDelegate = self
     return chat
   }
@@ -47,7 +64,7 @@ open class NormalChatViewController: ChatViewController {
 
   /// 获取@列表视图控制器 - 协同版
   override open func getUserSelectVC(showTeamMembers: Bool) -> NEBaseSelectUserViewController {
-    SelectUserViewController(conversationId: viewModel.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
+    SelectUserViewController(conversationId: ChatRepo.conversationId, showSelf: false, showTeamMembers: showTeamMembers)
   }
 
   open func getMessageModel(model: MessageModel) {
@@ -66,7 +83,7 @@ open class NormalChatViewController: ChatViewController {
     var items = super.expandMoreAction()
 
     items.removeAll { item in
-      if item.type == .photo {
+      if item.type == .photo || item.type == .aiChat {
         return true
       }
       return false

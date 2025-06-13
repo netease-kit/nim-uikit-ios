@@ -16,8 +16,13 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
   override open func commonUILeft() {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive")
-    backViewLeft.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      backViewLeft.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      backViewLeft.image = image
+      backViewLeft.contentMode = .scaleAspectFill
+    }
+
     bubbleImageLeft.addSubview(backViewLeft)
     NSLayoutConstraint.activate([
       backViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor),
@@ -85,8 +90,13 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
   override open func commonUIRight() {
     bubbleImageRight.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_send")
-    backViewRight.image = image?
-      .resizableImage(withCapInsets: ChatUIConfig.shared.messageProperties.backgroundImageCapInsets)
+    if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
+      backViewRight.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
+    } else {
+      backViewRight.image = image
+      backViewRight.contentMode = .scaleAspectFill
+    }
+
     bubbleImageRight.addSubview(backViewRight)
     NSLayoutConstraint.activate([
       backViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor),

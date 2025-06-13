@@ -98,7 +98,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   }
 
   /// 判断是否是当前用户
-  ///  - Parameter sessionId: 会话id
+  ///  - Parameter conversationId: 会话id
   ///  - Returns: 是否是当前用户
   open func isAtCurrentUser(conversationId: String) -> Bool {
     let dic = getMessageDic()

@@ -6,9 +6,9 @@
 import Foundation
 import NECommonKit
 
-let coreLoader = CommonLoader<NEBaseLocalConversationController>()
+let localConversationCoreLoader = CommonLoader<NEBaseLocalConversationController>()
 func localizable(_ key: String) -> String {
-  coreLoader.localizable(key)
+  localConversationCoreLoader.localizable(key)
 }
 
 public let ModuleName = "NELocalConversationUIKit"

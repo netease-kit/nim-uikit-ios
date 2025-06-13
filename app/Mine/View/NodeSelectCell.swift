@@ -17,8 +17,8 @@ class NodeSelectCell: CornerCell {
 
   lazy var stateImageView: UIImageView = {
     let imgView = UIImageView()
-    imgView.image = UIImage(named: "unselect")
-    imgView.highlightedImage = UIImage(named: "select")
+    imgView.image = appCoreLoader.loadImage("unselect")
+    imgView.highlightedImage = appCoreLoader.loadImage("select")
     imgView.translatesAutoresizingMaskIntoConstraints = false
     return imgView
   }()

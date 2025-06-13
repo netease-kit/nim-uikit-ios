@@ -24,7 +24,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
   lazy var removeButton: ExpandButton = {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(UIImage.ne_imageNamed(name: "remove"), for: .normal)
+    button.setImage(coreLoader.loadImage("remove"), for: .normal)
     button.addTarget(self, action: #selector(removeButtonAction), for: .touchUpInside)
     button.accessibilityIdentifier = "id.remove"
     return button
@@ -69,7 +69,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
       bottomLine.heightAnchor.constraint(equalToConstant: 1),
     ])
 
-    contentView.updateLayoutConstraint(firstItem: titleLabel, seconedItem: contentView, attribute: .right, constant: -48)
+    contentView.updateLayoutConstraint(firstItem: titleLabel, secondItem: contentView, attribute: .right, constant: -48)
   }
 
   /// 重写设置文案字体方法
@@ -81,8 +81,8 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     optionLabel.font = .systemFont(ofSize: 16)
   }
 
-  /// 重写设置model方法
-  /// - Parameter model: 转发选择页面数据模型
+  /// 移除按钮点击事件
+  /// - Parameter sender: 按钮
   open func removeButtonAction(_ sender: ExpandButton) {
     delegate?.removeButtonAction(contentModel)
   }

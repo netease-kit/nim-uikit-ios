@@ -72,7 +72,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
             if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == true, team.isValidTeam == false {
-              self?.showSingleAlert(message: coreLoader.localizable("team_not_exist")) {
+              self?.showSingleAlert(message: chatCoreLoader.localizable("team_not_exist")) {
                 NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
               }
@@ -118,7 +118,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
 
   open func updateTeamTitle(_ noti: Notification) {
     if let tid = noti.userInfo?["teamId"] as? String,
-       tid == viewModel.sessionId,
+       tid == ChatRepo.sessionId,
        let team = NETeamUserManager.shared.getTeamInfo() {
       updateTeamInfo(team: team)
     }
@@ -127,7 +127,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
   /// 更新群聊信息（群聊名称、群禁言状态、缓存）
   /// - Parameter team: 群聊信息
   open func updateTeamInfo(team: V2NIMTeam) {
-    title = team.name
+    titleContent = team.name
     setMute(team: team)
   }
 
@@ -142,7 +142,6 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
       // 群禁言
       isMute = true
       chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("team_mute"))
-      chatInputView.textView.backgroundColor = .funChatInputViewBackgroundColorInMute
       layoutInputView(offset: 0)
       getFunInputView()?.hideRecordMode()
       chatInputView.isUserInteractionEnabled = false
@@ -158,7 +157,6 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
       // 解除群禁言
       isMute = false
       chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
-      chatInputView.textView.backgroundColor = .white
       chatInputView.isUserInteractionEnabled = true
       chatInputView.setUnMuteInputStyle()
     }
@@ -171,7 +169,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
         if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO,
            let updatedTeamInfo = content.updatedTeamInfo {
           if let name = updatedTeamInfo.name {
-            title = name
+            titleContent = name
             onTeamMemberUpdate([])
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE,

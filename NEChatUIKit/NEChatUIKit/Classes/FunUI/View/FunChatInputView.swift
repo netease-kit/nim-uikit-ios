@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import UIKit
 
 let addMoreBtnTag = 8
@@ -37,7 +38,7 @@ open class FunChatInputView: NEBaseChatInputView {
     backView.translatesAutoresizingMaskIntoConstraints = false
     backView.layer.cornerRadius = 8.0
     backView.clipsToBounds = true
-    backView.backgroundColor = UIColor.funChatInputReplyBg
+    backView.backgroundColor = UIColor.funChatReplyViewBg
     return backView
   }()
 
@@ -54,7 +55,7 @@ open class FunChatInputView: NEBaseChatInputView {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
-    button.setImage(coreLoader.loadImage("fun_chat_input_reply_clear"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("fun_chat_input_reply_clear"), for: .normal)
     button.accessibilityIdentifier = "id.replyClose"
     return button
   }()
@@ -63,8 +64,8 @@ open class FunChatInputView: NEBaseChatInputView {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
-    button.setImage(coreLoader.loadImage("fun_chat_input_change_record"), for: .normal)
-    button.setImage(coreLoader.loadImage("fun_chat_input_keyboard"), for: .selected)
+    button.setImage(chatCoreLoader.loadImage("fun_chat_input_change_record"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("fun_chat_input_keyboard"), for: .selected)
     button.accessibilityIdentifier = "id.changeRecordMode"
     return button
   }()
@@ -74,7 +75,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
     button.tag = addMoreBtnTag
-    button.setImage(coreLoader.loadImage("fun_chat_input_show_more"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("fun_chat_input_show_more"), for: .normal)
     button.accessibilityIdentifier = "id.inputMore"
     return button
   }()
@@ -84,7 +85,7 @@ open class FunChatInputView: NEBaseChatInputView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.backgroundColor = UIColor.clear
     button.tag = addEmojBtnTag
-    button.setImage(coreLoader.loadImage("fun_chat_input_show_emoj"), for: .normal)
+    button.setImage(chatCoreLoader.loadImage("fun_chat_input_show_emoj"), for: .normal)
     button.accessibilityIdentifier = "id.inputEmoji"
     return button
   }()
@@ -111,13 +112,14 @@ open class FunChatInputView: NEBaseChatInputView {
   }()
 
   override open func commonUI() {
-    backgroundColor = UIColor.funChatInputBg
+    super.commonUI()
+    backgroundColor = UIColor.funChatInputViewBg
 
     addSubview(textView)
     textView.layer.cornerRadius = 4.0
     textView.delegate = self
     textviewLeftConstraint = textView.leftAnchor.constraint(equalTo: leftAnchor, constant: 48)
-    textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: -132)
+    textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: getTextviewRightConstraint())
     textViewTop = textView.topAnchor.constraint(equalTo: topAnchor, constant: 8)
 
     NSLayoutConstraint.activate([
@@ -128,16 +130,6 @@ open class FunChatInputView: NEBaseChatInputView {
     ])
     textInput = textView
 
-    addSubview(expandButton)
-    NSLayoutConstraint.activate([
-      expandButton.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-      expandButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -88),
-      expandButton.heightAnchor.constraint(equalToConstant: 40),
-      expandButton.widthAnchor.constraint(equalToConstant: 44.0),
-    ])
-    expandButton.setImage(coreLoader.loadImage("fun_input_unfold"), for: .normal)
-    expandButton.addTarget(self, action: #selector(didClickExpandButton), for: .touchUpInside)
-
     backViewHeightConstaint = backView.heightAnchor.constraint(equalToConstant: 40)
     insertSubview(backView, belowSubview: textView)
     NSLayoutConstraint.activate([
@@ -146,6 +138,20 @@ open class FunChatInputView: NEBaseChatInputView {
       backView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
       backViewHeightConstaint!,
     ])
+
+    if let expandButton = expandButton {
+      addSubview(expandButton)
+      NSLayoutConstraint.activate([
+        expandButton.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+        expandButton.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: 7),
+        expandButton.heightAnchor.constraint(equalToConstant: 40),
+        expandButton.widthAnchor.constraint(equalToConstant: 44.0),
+      ])
+      expandButton.setImage(chatCoreLoader.loadImage("fun_input_unfold"), for: .normal)
+      expandButton.addTarget(self, action: #selector(didClickExpandButton), for: .touchUpInside)
+    }
+
+    aiChatButton = nil
 
     insertSubview(replyBackView, belowSubview: backView)
     replyViewTopConstraint = replyBackView.topAnchor.constraint(equalTo: topAnchor, constant: defaultReplyTopSpace)
@@ -212,6 +218,7 @@ open class FunChatInputView: NEBaseChatInputView {
 
     contentView.addSubview(emojiView)
 
+    chatAddMoreView.backgroundColor = .funChatAddMoreViewBg
     chatAddMoreView.frame = CGRect(x: chatAddMoreView.frame.origin.x,
                                    y: chatAddMoreView.frame.origin.y + 10,
                                    width: chatAddMoreView.frame.size.width,
@@ -223,7 +230,7 @@ open class FunChatInputView: NEBaseChatInputView {
     chatAddMoreView.addSubview(moreActionViewLine)
     chatAddMoreView.clipsToBounds = false
     moreActionViewLine.frame = CGRect(x: 0, y: -10, width: chatAddMoreView.width, height: 1.0)
-    moreActionViewLine.backgroundColor = UIColor.funChatInputMoreActionViewLineColor
+    moreActionViewLine.backgroundColor = UIColor.funChatAddMoreActionViewLineColor
 
     addSubview(holdToSpeakView)
     NSLayoutConstraint.activate([
@@ -235,7 +242,33 @@ open class FunChatInputView: NEBaseChatInputView {
     holdToSpeakView.isHidden = true
 
     setupMultipleLineView()
-    multipleLineExpandButton.setImage(coreLoader.loadImage("fun_input_fold"), for: .normal)
+    multipleLineExpandButton.setImage(chatCoreLoader.loadImage("fun_input_fold"), for: .normal)
+  }
+
+  override open func setLayerContents(_ open: Bool) {
+    super.setLayerContents(open)
+    if open {
+      if let cgImage = UIImage.ne_imageNamed(name: "fun_ai_back")?.cgImage {
+        aiChatViewController.view.layer.contents = cgImage
+        aiChatViewController.view.layer.contentsGravity = .resizeAspectFill // 内容填充模式
+        aiChatViewController.view.layer.contentsScale = UIScreen.main.scale // 适配 Retina 屏幕
+      }
+    } else {
+      aiChatViewController.view.layer.contents = nil
+    }
+  }
+
+  open func getTextviewRightConstraint() -> CGFloat {
+    let expandButtonWidth = IMKitConfigCenter.shared.enableRichTextMessage ? 32 : 0
+    let totalWidth = expandButtonWidth + 88
+    return -CGFloat(totalWidth)
+  }
+
+  override open func didClickAIChatButton() {
+    let replyViewOffset: CGFloat = replyLabel.attributedText == nil ? 0 : 40
+    let multiInputOffset: CGFloat = chatInpuMode == .normal ? 0 : 40
+    aiChatViewControllerTopConstant = 54 + replyViewOffset + multiInputOffset
+    super.didClickAIChatButton()
   }
 
   open func changeToRecordMode(_ button: UIButton) {
@@ -257,6 +290,7 @@ open class FunChatInputView: NEBaseChatInputView {
     currentType = .audio
     holdToSpeakView.isHidden = false
     hideReplyMode()
+    hideAIChatView()
     funDelegate?.recordModeChangeDidClick()
   }
 
@@ -304,6 +338,7 @@ open class FunChatInputView: NEBaseChatInputView {
       funDelegate?.didHideRecordMode()
     }
     hideRecordMode()
+    hideAIChatView()
     changeRecordModeBtn.isSelected = false
     buttonEvent(button: showMoreActionBtn)
   }
@@ -314,12 +349,17 @@ open class FunChatInputView: NEBaseChatInputView {
       funDelegate?.didHideRecordMode()
     }
     hideRecordMode()
+    hideAIChatView()
     changeRecordModeBtn.isSelected = false
     buttonEvent(button: showEmojBtn)
   }
 
   override open func restoreNormalInputStyle() {
     super.restoreNormalInputStyle()
+
+    guard let expandButton = expandButton else {
+      return
+    }
 
     contentSubView?.isHidden = true
     textView.returnKeyType = .send
@@ -328,8 +368,9 @@ open class FunChatInputView: NEBaseChatInputView {
     textView.removeConstraints(textView.constraints)
 
     if chatInpuMode == .normal {
+      titleField.isHidden = true
       textviewLeftConstraint = textView.leftAnchor.constraint(equalTo: leftAnchor, constant: 48)
-      textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: -132)
+      textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: getTextviewRightConstraint())
       textViewTop = textView.topAnchor.constraint(equalTo: topAnchor, constant: 8)
       NSLayoutConstraint.activate([
         textviewLeftConstraint!,
@@ -344,17 +385,18 @@ open class FunChatInputView: NEBaseChatInputView {
         replyViewTopConstraint?.constant = defaultReplyTopSpace
       }
     } else if chatInpuMode == .multipleSend {
+      titleField.isHidden = false
       titleField.removeAllAutoLayout()
       insertSubview(titleField, aboveSubview: backView)
       NSLayoutConstraint.activate([
         titleField.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 4),
-        titleField.rightAnchor.constraint(equalTo: expandButton.leftAnchor, constant: 2),
+        titleField.rightAnchor.constraint(equalTo: aiChatButton?.leftAnchor ?? expandButton.leftAnchor, constant: 2),
         titleField.topAnchor.constraint(equalTo: backView.topAnchor),
         titleField.heightAnchor.constraint(equalToConstant: 40),
       ])
 
       textviewLeftConstraint = textView.leftAnchor.constraint(equalTo: leftAnchor, constant: 48)
-      textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: -132)
+      textviewRightConstraint = textView.rightAnchor.constraint(equalTo: rightAnchor, constant: -88)
       textViewTop = textView.topAnchor.constraint(equalTo: topAnchor, constant: 40)
 
       NSLayoutConstraint.activate([
@@ -374,6 +416,7 @@ open class FunChatInputView: NEBaseChatInputView {
 
   override open func changeToMultipleLineStyle() {
     super.changeToMultipleLineStyle()
+    titleField.isHidden = false
     textView.removeAllAutoLayout()
     textView.returnKeyType = .default
     multipleLineView.addSubview(textView)
@@ -398,12 +441,12 @@ open class FunChatInputView: NEBaseChatInputView {
 
   override open func setMuteInputStyle() {
     super.setMuteInputStyle()
-    backView.backgroundColor = .funChatInputViewBackgroundColorInMute
+    backView.backgroundColor = .funChatInputMuteBg
   }
 
   override open func setUnMuteInputStyle() {
     super.setUnMuteInputStyle()
-    backView.backgroundColor = .white
+    backView.backgroundColor = .funChatInputBg
   }
 
   // 多行输入模式下进入录音模式，切换回单行样式

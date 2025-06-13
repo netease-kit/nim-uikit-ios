@@ -1,13 +1,12 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-"NSCameraUsageDescription"="若不允许，你将无法拍摄照片1";
-"NSPhotoLibraryAddUsageDescription"="若不允许，你将无法导入照片";
-"NSPhotoLibraryUsageDescription"="若不允许，则无法使用相册功能";
-"NSMicrophoneUsageDescription"="若不允许，则无法使用麦克风功能";
+"NSCameraUsageDescription"="应用需要您的同意,才能在使用期间拍摄照片或者录制视频,用于发送自己拍摄的图片、视频消息";
+"NSPhotoLibraryAddUsageDescription"="应用需要您的同意,才能在使用期间访问相册，用于保存聊天内容中图片或者视频";
+"NSPhotoLibraryUsageDescription"="应用需要您的同意,才能在使用期间访问相册，用于发送图片消息";
+"NSMicrophoneUsageDescription"="应用需要您的同意,才能在使用期间访问麦克风，用于发送录制的语音消息";
 "CFBundleDisplayName"="云信IM";
-"NSLocationWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";
-"NSLocationAlwaysUsageDescription"="App需要您的同意,才能在使用期间访问位置";
-"NSLocationAlwaysAndWhenInUseUsageDescription"="App需要您的同意,才能在使用期间访问位置";
+"NSLocationWhenInUseUsageDescription"="应用需要您的同意,才能在使用期间访问位置,用于发送、接收、查看地理位置消息";
+"NSLocationAlwaysUsageDescription"="应用需要您的同意,才能在使用期间访问位置,用于发送、接收、查看地理位置消息";
+"NSLocationAlwaysAndWhenInUseUsageDescription"="应用需要您的同意,才能在使用期间访问位置,用于发送、接收、查看地理位置消息";

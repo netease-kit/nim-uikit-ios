@@ -28,22 +28,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         registerAPNS()
         return true
     }
-
+  
   func setupIM(_ appkey: String? = nil) {
     // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
     let option = NIMSDKOption()
     option.appKey = appkey ?? AppKey.appKey
     option.apnsCername = AppKey.apnsCername
     option.pkCername = AppKey.pkCerName
-
+    
     // 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
     let v2Option = V2NIMSDKOption()
     v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
-
+    
     // 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
     IMKitClient.instance.setupIM2(option, v2Option)
   }
-
+    
     func setupInit(){
         if IMSDKConfigManager.instance.getConfig().enableCustomConfig.boolValue {
             // 开启自定义配置，使用自定义配置
@@ -122,6 +122,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         // 会话列表顶部插入警告内容
         CustomConfig.shared.loadSecurityWarningView()
+      
+      	// 加载 AI 助聊数据
+      	CustomConfig.shared.loadAIChatData()
         
         // 注册【个人信息】页面
         Router.shared.register(MeSettingRouter) { param in
@@ -131,7 +134,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
     }
-    
     
     /// 注册娱乐版自定义内容
     func registerFunCustom(){
@@ -199,7 +201,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             let appkey = dict?["appkey"] as? String
             setupIM(appkey)
 
-            if let accountId = IMSDKConfigManager.instance.getConfig().accountId,
+            if let accountId = IMSDKConfigManager.instance.getConfig().accountId, 
                let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
                 NEAIUserManager.shared.setProvider(provider: self)
                 IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
@@ -222,7 +224,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func loginWithCustomConfig(){
-        if let accountId = IMSDKConfigManager.instance.getConfig().accountId, let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
+        if let accountId = IMSDKConfigManager.instance.getConfig().accountId, 
+           let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
             NEAIUserManager.shared.setProvider(provider: self)
             IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
                 if let err = error {

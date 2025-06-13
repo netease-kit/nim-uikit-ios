@@ -13,18 +13,18 @@ import UIKit
 open class FunSystemNotificationCell: NEBaseSystemNotificationCell {
   override open func setupCommonCircleHeader() {
     super.setupCommonCircleHeader()
-    avatarImageView.layer.cornerRadius = 4
+    userHeaderView.layer.cornerRadius = 4
     NSLayoutConstraint.activate([
-      avatarImageView.widthAnchor.constraint(equalToConstant: 40),
-      avatarImageView.heightAnchor.constraint(equalToConstant: 40),
-      avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
+      userHeaderView.widthAnchor.constraint(equalToConstant: 40),
+      userHeaderView.heightAnchor.constraint(equalToConstant: 40),
+      userHeaderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0),
     ])
   }
 
   override open func setupUI() {
     super.setupUI()
 
-    contentView.updateLayoutConstraint(firstItem: line, seconedItem: contentView, attribute: .right, constant: 0)
+    contentView.updateLayoutConstraint(firstItem: line, secondItem: contentView, attribute: .right, constant: 0)
     line.backgroundColor = .funContactLineBorderColor
     agreeButton.backgroundColor = .funContactThemeColor
     agreeButton.setTitleColor(.white, for: .normal)

@@ -13,8 +13,8 @@ open class ReplyView: UIView {
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = UIColor(hexString: "#EFF1F2")
-    closeButton.setImage(UIImage.ne_imageNamed(name: "close"), for: .normal)
+    backgroundColor = .normalChatReplyViewBg
+    closeButton.setImage(coreLoader.loadImage("remove"), for: .normal)
     closeButton.translatesAutoresizingMaskIntoConstraints = false
     closeButton.accessibilityIdentifier = "id.replyClose"
 //        closeButton.addTarget(self, action: #selector(closeButtonEvent), for: .touchUpInside)

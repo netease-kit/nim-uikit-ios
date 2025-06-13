@@ -15,7 +15,7 @@ open class ConversationController: NEBaseConversationController {
   public lazy var searchBarButton: UIButton = {
     let searchBarButton = UIButton()
     searchBarButton.accessibilityIdentifier = "id.titleBarSearchImg"
-    searchBarButton.setImage(UIImage.ne_imageNamed(name: "chat_search"), for: .normal)
+    searchBarButton.setImage(UIImage.ne_imageNamed(name: "nav_search"), for: .normal)
     searchBarButton.addTarget(self, action: #selector(searchAction), for: .touchUpInside)
     return searchBarButton
   }()
@@ -32,7 +32,7 @@ open class ConversationController: NEBaseConversationController {
   public lazy var addBarButton: UIButton = {
     let addBarButton = UIButton()
     addBarButton.accessibilityIdentifier = "id.titleBarMoreImg"
-    addBarButton.setImage(UIImage.ne_imageNamed(name: "chat_add"), for: .normal)
+    addBarButton.setImage(coreLoader.loadImage("nav_add"), for: .normal)
     addBarButton.addTarget(self, action: #selector(didClickAddBtn), for: .touchUpInside)
     return addBarButton
   }()
@@ -40,6 +40,10 @@ open class ConversationController: NEBaseConversationController {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nil, bundle: nil)
     className = "ConversationController"
+    deleteButtonBackgroundColor = .normalConversationDeleteActionColor
+    topButtonBackgroundColor = .normalConversationTopActionColor
+    brokenNetworkView.backgroundColor = .normalConversationNetworkBrokenBackgroundColor
+    brokenNetworkView.contentLabel.textColor = .normalConversationNetworkBrokenTitleColor
     cellRegisterDic = [0: ConversationListCell.self]
     stickTopCellRegisterDic = [0: StickTopCell.self]
   }
@@ -50,7 +54,8 @@ open class ConversationController: NEBaseConversationController {
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .ne_navLineColor
+    view.backgroundColor = .normalConversationBackgroundColor
+    navigationView.backgroundColor = .normalConversationNavigationBg
     changeLanguage()
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
@@ -99,7 +104,6 @@ open class ConversationController: NEBaseConversationController {
     super.setupSubviews()
 
     tableView.rowHeight = 62
-    tableView.backgroundColor = .white
 
     // 设置置顶列表宽高
     stickTopCollcetionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width - 20.0, height: 181 - NEConstant.navigationAndStatusHeight)
@@ -135,7 +139,6 @@ open class ConversationController: NEBaseConversationController {
 
   override open func reloadTableView() {
     super.reloadTableView()
-    NEALog.infoLog(className(), desc: #function + " reloadTableView in conversation controller stick top count \(viewModel.stickTopConversations.count)")
     setupNormalStickTopView()
   }
 }

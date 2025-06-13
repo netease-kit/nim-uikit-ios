@@ -41,21 +41,20 @@ open class FunP2PChatViewController: FunChatViewController {
     NEP2PChatUserCache.shared.removeListener(self)
   }
 
-  override open var title: String? {
+  override public var titleContent: String {
     didSet {
-      super.title = title
-      if title != nil {
-        let text = chatLocalizable("fun_chat_input_placeholder")
-        let attribute = NSMutableAttributedString(string: text)
-        let style = NSMutableParagraphStyle()
-        style.lineBreakMode = .byTruncatingTail
-        style.alignment = .left
-        attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
-        attribute.addAttribute(.foregroundColor, value: UIColor.funChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
-        attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
-        chatInputView.textView.attributedPlaceholder = attribute
-        chatInputView.textView.setNeedsLayout()
-      }
+      super.titleContent = titleContent
+      let text = chatLocalizable("fun_chat_input_placeholder")
+      let attribute = NSMutableAttributedString(string: text)
+      let style = NSMutableParagraphStyle()
+      style.lineBreakMode = .byTruncatingTail
+      style.alignment = .left
+      attribute.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSMakeRange(0, text.utf16.count))
+      attribute.addAttribute(.foregroundColor, value: UIColor.funChatInputViewPlaceholderTextColor, range: NSMakeRange(0, text.utf16.count))
+      attribute.addAttribute(.paragraphStyle, value: style, range: NSMakeRange(0, text.utf16.count))
+      chatInputView.textView.attributedPlaceholder = attribute
+      chatInputView.setUnMuteInputStyle()
+      chatInputView.textView.setNeedsLayout()
     }
   }
 
@@ -63,10 +62,17 @@ open class FunP2PChatViewController: FunChatViewController {
     super.getSessionInfo(sessionId: sessionId) { [weak self] in
       self?.viewModel.loadShowName([sessionId]) {
         let name = self?.viewModel.getShowName(sessionId) ?? sessionId
-        self?.title = name
         self?.titleContent = name
       }
       completion()
+    }
+  }
+
+  override open func commonUI() {
+    super.commonUI()
+    if IMKitConfigCenter.shared.enableAIChatHelper {
+      chatInputView.aiChatViewController.loadDataView.animation = .named("fun_ai_chat_loading", bundle: chatCoreLoader.bundle)
+      chatInputView.aiChatViewController.titleIcon.image = UIImage.ne_imageNamed(name: "fun_ai_icon_highlight")
     }
   }
 
@@ -111,14 +117,16 @@ open class FunP2PChatViewController: FunChatViewController {
 // MARK: - NEContactListener
 
 extension FunP2PChatViewController: NEContactListener {
-  /// 好友信息缓存更新
-  /// - Parameter accountId: 用户 id
+  /// 好友信息缓存更新（包含好友信息和用户信息）
+  /// - Parameter changeType: 操作类型
+  /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
     for contact in contacts {
-      if let accid = contact.user?.accountId, contact.user?.accountId == viewModel.sessionId {
+      if let accid = contact.user?.accountId,
+         accid == ChatRepo.sessionId {
         // 好友添加，则从 NEP2PChatUserCache 中移除信息缓存
         if changeType == .addFriend {
-          NEP2PChatUserCache.shared.removeUserInfo(viewModel.sessionId)
+          NEP2PChatUserCache.shared.removeUserInfo(ChatRepo.sessionId)
         }
 
         // 好友被删除，则信息缓存移至 NEP2PChatUserCache

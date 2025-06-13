@@ -19,6 +19,6 @@ open class RecentSelectCell: NEBaseRecentSelectCell {
     guard let model = model as? MultiSelectModel else { return }
 
     super.configure(model)
-    selectImageView.image = model.isSelected ? UIImage.ne_imageNamed(name: "select") : UIImage.ne_imageNamed(name: "unselect")
+    selectImageView.image = model.isSelected ? coreLoader.loadImage("select") : coreLoader.loadImage("unselect")
   }
 }

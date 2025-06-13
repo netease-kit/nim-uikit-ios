@@ -282,7 +282,6 @@ extension InputEmoticonContainerView {
   }
 
   @objc func didPressSend(sender: UIButton) {
-    print("did press send")
     delegate?.didPressSend(sender: sender)
   }
 }

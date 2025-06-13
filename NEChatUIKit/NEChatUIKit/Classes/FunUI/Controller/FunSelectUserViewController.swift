@@ -35,7 +35,7 @@ open class FunSelectUserViewController: NEBaseSelectUserViewController {
       for: indexPath
     ) as! FunChatTeamMemberCell
     if indexPath.section == 0 {
-      cell.headerView.image = UIImage.ne_imageNamed(name: "fun_all")
+      cell.headerView.image = UIImage.ne_imageNamed(name: "fun_at_all")
       cell.nameLabel.text = chatLocalizable("user_select_all")
     } else {
       if let model = teamInfo?.users[indexPath.row] {

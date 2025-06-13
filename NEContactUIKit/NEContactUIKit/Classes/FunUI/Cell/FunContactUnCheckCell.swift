@@ -25,7 +25,7 @@ open class FunContactUnCheckCell: NEBaseContactUnCheckCell {
 
     avatarImageView.configHeadData(
       headUrl: model.user?.user?.avatar,
-      name: model.user?.showName() ?? "",
+      name: model.user?.shortName() ?? "",
       uid: model.user?.user?.accountId ?? ""
     )
   }

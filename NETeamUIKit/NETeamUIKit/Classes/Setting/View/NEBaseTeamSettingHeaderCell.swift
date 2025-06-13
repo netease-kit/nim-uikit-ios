@@ -28,13 +28,10 @@ open class NEBaseTeamSettingHeaderCell: NEBaseTeamSettingCell {
 
   override open func configure(_ anyModel: Any) {
     super.configure(anyModel)
-    if let url = model?.headerUrl, !url.isEmpty {
-      headerView.sd_setImage(with: URL(string: url), completed: nil)
-      headerView.setTitle("")
-    } else {
-      headerView.setTitle(model?.defaultHeadData ?? "")
-      headerView.backgroundColor = UIColor.colorWithString(string: model?.subTitle)
-    }
+    let url = model?.headerUrl
+    let name = model?.defaultHeadData ?? ""
+    let accountId = model?.subTitle ?? ""
+    headerView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 
   open func setupUI() {

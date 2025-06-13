@@ -109,7 +109,7 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
     ])
 
     pointImageView.translatesAutoresizingMaskIntoConstraints = false
-    pointImageView.image = coreLoader.loadImage("location_point")
+    pointImageView.image = chatCoreLoader.loadImage("location_point")
     mapImageView.addSubview(pointImageView)
     NSLayoutConstraint.activate([
       pointImageView.centerXAnchor.constraint(equalTo: mapImageView.centerXAnchor),
@@ -136,10 +136,15 @@ open class NEBasePinMessageLocationCell: NEBasePinMessageCell {
       if let lat = m.lat, let lng = m.lng {
         if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
           NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
-          mapImageView.sd_setImage(with: URL(string: url))
+          mapImageView.sd_setImage(
+            with: URL(string: url),
+            placeholderImage: .ne_imageNamed(name: "map_placeholder_image"),
+            options: .retryFailed
+          )
           emptyLabel.isHidden = true
           pointImageView.isHidden = false
         } else {
+          mapImageView.image = .ne_imageNamed(name: "map_placeholder_image")
           emptyLabel.isHidden = false
           pointImageView.isHidden = true
         }
