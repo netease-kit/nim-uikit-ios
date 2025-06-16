@@ -67,14 +67,14 @@ open class LocalConversationController: NEBaseLocalConversationController {
     }
   }
 
-  func changeLanguage() {
+  open func changeLanguage() {
     requestData()
     initSystemNav()
     popListView = PopListView()
     brokenNetworkView.contentLabel.text = commonLocalizable("network_error")
   }
 
-  override func initSystemNav() {
+  override open func initSystemNav() {
     super.initSystemNav()
 
     let searchBarItem = UIBarButtonItem(customView: searchBarButton)
@@ -92,7 +92,12 @@ open class LocalConversationController: NEBaseLocalConversationController {
       navigationView.addBtn.isHidden = true
       navigationItem.rightBarButtonItems = [searchBarItem]
     }
-    navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+
+    if let brandTitle = LocalConversationUIConfig.shared.titleBarTitle {
+      navigationView.brandBtn.setTitle(brandTitle, for: .normal)
+    } else {
+      navigationView.brandBtn.setTitle(commonLocalizable("appName"), for: .normal)
+    }
   }
 
   override open func setupSubviews() {
