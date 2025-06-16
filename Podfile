@@ -15,8 +15,8 @@ target 'app' do
   # UI 组件，YXConfig.imuikit_version = 10.8.1
   pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件
   pod 'NEContactUIKit', YXConfig.imuikit_version            # 通讯录组件
-  pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件, 与本地会话组件二者选其一
-  pod 'NELocalConversationUIKit', YXConfig.imuikit_version  # (本地)会话列表组件, 与云端会话组件二者选其一
+  pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件
+  pod 'NELocalConversationUIKit', YXConfig.imuikit_version  # (本地)会话列表组件
   pod 'NETeamUIKit', YXConfig.imuikit_version               # 群相关设置组件
 
   # 扩展库 - 地理位置组件
@@ -32,7 +32,7 @@ target 'app' do
   pod 'NERtcCallKit/NOS_Special', '3.5.0'
   pod 'NERtcCallUIKit/NOS_Special', '3.5.0' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
 
-  # 如果需要查看UI部分源码请注释掉以上在线依赖，打开下面的本地依赖，云端会话组件与本地会话组件二者选其一
+  # 如果需要查看UI部分源码请注释掉以上在线依赖(不包含呼叫组件)，打开下面的本地依赖
 #  pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
 #  pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
 #  pod 'NELocalConversationUIKit', :path => 'NELocalConversationUIKit/NELocalConversationUIKit.podspec'
