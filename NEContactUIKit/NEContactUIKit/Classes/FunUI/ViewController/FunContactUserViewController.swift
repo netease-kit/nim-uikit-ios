@@ -42,7 +42,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let item = data[indexPath.section][indexPath.row]
     let cell = super.tableView(tableView, cellForRowAt: indexPath)
-    if let c = cell as? CenterTextCell, item.title == localizable("chat") || item.title == localizable("add_friend") {
+    if let c = cell as? CenterTextCell, item.title == commonLocalizable("chat") || item.title == localizable("add_friend") {
       c.titleLabel.textColor = .funContactUserViewChatTitleTextColor
       return c
     }

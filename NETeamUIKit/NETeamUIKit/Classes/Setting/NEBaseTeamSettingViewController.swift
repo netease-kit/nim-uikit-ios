@@ -59,21 +59,14 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     return tableView
   }()
 
-  public lazy var teamHeaderView: NEUserHeaderView = {
-    let imageView = NEUserHeaderView(frame: .zero)
+  public lazy var teamHeaderView: TeamDetailHeaderView = {
+    let imageView = TeamDetailHeaderView(avatarWH: 42)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.clipsToBounds = true
-    imageView.titleLabel.font = NEConstant.defaultTextFont(16.0)
+    imageView.teamNameLabel.font = NEConstant.defaultTextFont(16.0)
+    imageView.teamNameLabel.textColor = .ne_darkText
+    imageView.lineView.isHidden = true
     return imageView
-  }()
-
-  public lazy var teamNameLabel: UILabel = {
-    let label = UILabel()
-    label.translatesAutoresizingMaskIntoConstraints = false
-    label.font = NEConstant.defaultTextFont(16.0)
-    label.textColor = NEConstant.hexRGB(0x333333)
-    label.accessibilityIdentifier = "id.name"
-    return label
   }()
 
   public lazy var memberLabel: UILabel = {
@@ -119,11 +112,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     if let model = viewModel.teamInfoModel {
-      let url = model.team?.avatar
-      let name = model.team?.getShortName() ?? ""
-      let teamId = model.team?.teamId ?? ""
-      teamHeaderView.configHeadData(headUrl: url, name: name, uid: teamId)
-      teamNameLabel.text = model.team?.getShowName() ?? ""
+      teamHeaderView.setData(model.team, false)
     }
   }
 
@@ -182,11 +171,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   /// 设置群设置顶部视图展示内容
   open func setTeamHeaderInfo() {
-    let url = viewModel.teamInfoModel?.team?.avatar
-    let name = viewModel.teamInfoModel?.team?.getShortName() ?? ""
-    let accountId = teamId ?? ""
-    teamHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
-    teamNameLabel.text = viewModel.teamInfoModel?.team?.getShowName()
+    teamHeaderView.setData(viewModel.teamInfoModel?.team, false)
   }
 
   /// 获取群设置数据
@@ -201,7 +186,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
         if err.code == protocolSendFailed {
           weakSelf?.showToast(commonLocalizable("network_error"))
         } else if err.code == teamNotExistCode {
-          weakSelf?.showToast(localizable("team_not_exist"))
+          weakSelf?.showToast(commonLocalizable("team_not_exist"))
         } else {
           weakSelf?.showToast(err.localizedDescription)
         }
@@ -612,111 +597,6 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
         weakSelf?.contentTableView.reloadData()
       }
     }
-  }
-
-  open func didChangeInviteModeClick(_ model: SettingCellModel) {
-    weak var weakSelf = self
-
-    let actionSheetController = UIAlertController(
-      title: nil,
-      message: nil,
-      preferredStyle: .actionSheet
-    )
-
-    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
-      print("Cancel")
-    }
-    cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    actionSheetController.addAction(cancelActionButton)
-
-    let ownerActionButton = UIAlertAction(title: localizable("team_owner"), style: .default) { _ in
-      weakSelf?.updateInviteModeOwnerAction(model)
-    }
-    ownerActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    ownerActionButton.accessibilityIdentifier = "id.teamOwner"
-    actionSheetController.addAction(ownerActionButton)
-
-    let allActionButton = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
-      weakSelf?.updateInviteModeAllAction(model)
-    }
-
-    allActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    allActionButton.accessibilityIdentifier = "id.teamAllMember"
-    actionSheetController.addAction(allActionButton)
-
-    navigationController?.present(actionSheetController, animated: true, completion: nil)
-  }
-
-  open func updateTeamInfoOwnerAction(_ model: SettingCellModel) {
-    weak var weakSelf = self
-    weakSelf?.view.makeToastActivity(.center)
-    weakSelf?.viewModel.teamRepo
-      .updateTeamInfoMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_UPDATE_INFO_MODE_MANAGER) { error, team in
-        NEALog.infoLog(
-          ModuleName + " " + self.className(),
-          desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
-        )
-        weakSelf?.view.hideToastActivity()
-        if let err = error {
-          weakSelf?.didError(err)
-        } else {
-          weakSelf?.viewModel.teamInfoModel?.team = team
-          model.subTitle = localizable("team_owner")
-          weakSelf?.contentTableView.reloadData()
-        }
-      }
-  }
-
-  open func updateTeamInfoAllAction(_ model: SettingCellModel) {
-    weak var weakSelf = self
-    weakSelf?.view.makeToastActivity(.center)
-    weakSelf?.viewModel.teamRepo
-      .updateTeamInfoMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_UPDATE_INFO_MODE_ALL) { error, team in
-        NEALog.infoLog(
-          ModuleName + " " + self.className(),
-          desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
-        )
-        weakSelf?.view.hideToastActivity()
-        if let err = error {
-          weakSelf?.didError(err)
-        } else {
-          weakSelf?.viewModel.teamInfoModel?.team = team
-          model.subTitle = localizable("team_all")
-          weakSelf?.contentTableView.reloadData()
-        }
-      }
-  }
-
-  open func didUpdateTeamInfoClick(_ model: SettingCellModel) {
-    weak var weakSelf = self
-
-    let actionSheetController = UIAlertController(
-      title: nil,
-      message: nil,
-      preferredStyle: .actionSheet
-    )
-
-    let cancelActionButton = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in
-      print("Cancel")
-    }
-    cancelActionButton.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    actionSheetController.addAction(cancelActionButton)
-
-    let manager = UIAlertAction(title: localizable("team_owner"), style: .default) { _ in
-      weakSelf?.updateTeamInfoOwnerAction(model)
-    }
-    manager.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    manager.accessibilityIdentifier = "id.teamOwner"
-    actionSheetController.addAction(manager)
-
-    let all = UIAlertAction(title: localizable("team_all"), style: .default) { _ in
-      weakSelf?.updateTeamInfoAllAction(model)
-    }
-    all.setValue(UIColor.ne_darkText, forKey: "_titleTextColor")
-    all.accessibilityIdentifier = "id.teamAllMember"
-    actionSheetController.addAction(all)
-
-    navigationController?.present(actionSheetController, animated: true, completion: nil)
   }
 
   open func didClickChangeNick() {}

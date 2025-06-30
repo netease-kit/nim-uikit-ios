@@ -13,6 +13,7 @@ open class TeamManagerController: NEBaseTeamManagerController {
       SettingCellType.SettingArrowCell.rawValue: TeamSettingLabelArrowCell.self,
       SettingCellType.SettingSwitchCell.rawValue: TeamSettingSwitchCell.self,
       SettingCellType.SettingSelectCell.rawValue: TeamSettingSelectCell.self,
+      SettingCellType.SettingSubtitleSelectCell.rawValue: TeamSettingSubtitleSwitchCell.self,
     ]
   }
 

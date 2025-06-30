@@ -12,6 +12,7 @@ open class FunTeamManagerController: NEBaseTeamManagerController {
       SettingCellType.SettingArrowCell.rawValue: FunTeamSettingLabelArrowCell.self,
       SettingCellType.SettingSwitchCell.rawValue: FunTeamSettingSwitchCell.self,
       SettingCellType.SettingSelectCell.rawValue: FunTeamSettingSelectCell.self,
+      SettingCellType.SettingSubtitleSelectCell.rawValue: FunTeamSettingSubtitleSwitchCell.self,
     ]
   }
 

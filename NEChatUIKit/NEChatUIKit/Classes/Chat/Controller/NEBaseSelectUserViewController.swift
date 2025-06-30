@@ -132,7 +132,9 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     }
 
     // 获取群成员列表
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     viewModel.getTeamMembers(teamId) { [weak self] error, team in
+      NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       NEALog.infoLog(
         ModuleName + " " + (self?.className ?? "SelectUserViewController"),
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")
@@ -213,6 +215,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       }
 
       self?.teamInfo = team
+      NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " reload @ tableview, timestamp: \(Date().timeIntervalSince1970)")
       self?.tableView.reloadData()
     }
   }

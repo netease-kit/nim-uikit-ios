@@ -37,20 +37,13 @@ open class FunFindFriendViewController: NEBaseFindFriendViewController {
     ])
 
     searchBackView.addSubview(searchInput)
-    searchInput.translatesAutoresizingMaskIntoConstraints = false
+    searchInput.delegate = self
     NSLayoutConstraint.activate([
       searchInput.leftAnchor.constraint(equalTo: searchImageView.rightAnchor, constant: 5),
       searchInput.rightAnchor.constraint(equalTo: searchBackView.rightAnchor, constant: -18),
       searchInput.topAnchor.constraint(equalTo: searchBackView.topAnchor),
       searchInput.bottomAnchor.constraint(equalTo: searchBackView.bottomAnchor),
     ])
-    searchInput.textColor = UIColor(hexString: "0x333333")
-    searchInput.placeholder = localizable("input_userId")
-    searchInput.font = UIFont.systemFont(ofSize: 14.0)
-    searchInput.returnKeyType = .search
-    searchInput.delegate = self
-    searchInput.clearButtonMode = .always
-    searchInput.accessibilityIdentifier = "id.addFriendAccount"
     if let clearButton = searchInput.value(forKey: "_clearButton") as? UIButton {
       clearButton.accessibilityIdentifier = "id.clear"
     }

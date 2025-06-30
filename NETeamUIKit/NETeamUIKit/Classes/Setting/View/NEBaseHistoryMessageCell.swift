@@ -103,38 +103,24 @@ open class NEBaseHistoryMessageCell: UITableViewCell {
   /// - Parameter importantText: 关键字段
   /// - Parameter fullText: 全文本
   open func truncateTextForLabel(_ label: UILabel, _ maxWidth: CGFloat, _ importantText: String, _ fullText: String) {
-    guard let font = label.font else {
-      return
-    }
-
-    var truncatedText = ""
-    var displayText = fullText
-
-    let importantTextWidth = importantText.width(withConstrainedHeight: label.frame.size.height, font: font)
-    let fullTextWidth = fullText.width(withConstrainedHeight: label.frame.size.height, font: font)
-
-    if fullTextWidth > maxWidth {
-      let ellipsis = "..."
-      var accumulatedWidth: CGFloat = 0
-
-      for (_, char) in fullText.enumerated() {
-        let charWidth = String(char).width(withConstrainedHeight: label.frame.size.height, font: font)
-        if accumulatedWidth + charWidth + importantTextWidth + ellipsis.width(withConstrainedHeight: label.frame.size.height, font: font) <= maxWidth {
-          truncatedText.append(char)
-          accumulatedWidth += charWidth
-        } else {
-          break
-        }
-      }
-
-      displayText = truncatedText + ellipsis + importantText
-    }
-
-    let attributedStr = NSMutableAttributedString(string: displayText)
-
+    var attributedStr = NSMutableAttributedString(string: fullText)
+    var displaText = fullText
     do {
       let regex = try NSRegularExpression(pattern: importantText, options: [])
-      let matches = regex.matches(in: displayText, options: [], range: NSRange(location: 0, length: displayText.count))
+      var matches = regex.matches(in: fullText, options: [], range: NSRange(location: 0, length: fullText.utf16.count))
+
+      if let range = matches.first?.range {
+        let maxDisplayLength = 16
+        if range.location > maxDisplayLength {
+          var offset = range.location
+          if range.length < maxDisplayLength {
+            offset = max(0, range.location - (maxDisplayLength - range.length))
+          }
+          displaText = "..." + String(fullText[fullText.index(fullText.startIndex, offsetBy: offset)...])
+          attributedStr = NSMutableAttributedString(string: displaText)
+          matches = regex.matches(in: displaText, options: [], range: NSRange(location: 0, length: displaText.utf16.count))
+        }
+      }
 
       for match in matches {
         let matchRange = match.range

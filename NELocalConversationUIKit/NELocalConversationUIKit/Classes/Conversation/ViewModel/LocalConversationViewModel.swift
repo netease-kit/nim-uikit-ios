@@ -30,7 +30,7 @@ open class LocalConversationViewModel: NSObject, NELocalConversationListener, NE
   public var offset: Int = 0
 
   /// 会话列表分页大小
-  public var page = 200
+  public var page = 100
 
   /// 非置顶会话数据
   public var conversationListData = [NELocalConversationListModel]()
@@ -110,7 +110,8 @@ open class LocalConversationViewModel: NSObject, NELocalConversationListener, NE
   }
 
   open func getAIUserList() {
-    if IMKitConfigCenter.shared.enableAIUser {
+    if IMKitConfigCenter.shared.enableAIUser,
+       NEAIUserManager.shared.isAIUserListEmpty() {
       NEAIUserManager.shared.getAIUserList()
     }
   }
@@ -128,7 +129,10 @@ open class LocalConversationViewModel: NSObject, NELocalConversationListener, NE
     }
 
     isRequesting = true
+
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(syncFinished), timestamp: \(Date().timeIntervalSince1970)")
     conversationRepo.getConversationList(offset, page) { [weak self] conversations, offset, finished, error in
+      NEALog.infoLog((self?.className() ?? "") + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.syncFinished ?? false), count: \(conversations?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
         if let set = offset {
           // 更新索引
@@ -502,12 +506,12 @@ open class LocalConversationViewModel: NSObject, NELocalConversationListener, NE
   }
 
   open func onLocalConversationSyncFinished() {
-    NEALog.infoLog(className(), desc: "onLocalConversationSyncFinished")
+    NEALog.infoLog(className() + "[Performance]", desc: #function + " timestamp: \(Date().timeIntervalSince1970)")
     /// 设置同步完成标识
     syncFinished = true
 
     if let completion = callBack {
-      NEALog.infoLog(className(), desc: "onLocalConversationSyncFinished getConversationListByPage")
+      NEALog.infoLog(className() + "[Performance]", desc: #function + " getConversationListByPage again")
       /// 取数据
 
       getConversationListByPage(completion)

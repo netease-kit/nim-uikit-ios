@@ -532,7 +532,7 @@ public class ChatMessageHelper: NSObject {
         return content
       }
     }
-    return nil
+    return message.text
   }
 
   /// 生成回复信息键值对

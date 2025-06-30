@@ -41,18 +41,17 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
   override open func viewDidLoad() {
     super.viewDidLoad()
-
-    // Do any additional setup after loading the view.
-    title = localizable("manage_team")
-    viewModel.delegate = self
     view.backgroundColor = .ne_lightBackgroundColor
-    view.addSubview(contentTableView)
+    title = localizable("manage_team")
+    navigationView.moreButton.isHidden = true
+    viewModel.delegate = self
 
     if let teamId = viewModel.teamInfoModel?.team?.teamId {
       viewModel.getCurrentUserTeamMember(IMKitClient.instance.account(), teamId) { member, error in
       }
     }
 
+    view.addSubview(contentTableView)
     NSLayoutConstraint.activate([
       contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       contentTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -62,7 +61,6 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     for (key, value) in cellClassDic {
       contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
-    navigationView.moreButton.isHidden = true
   }
 
   /// 页面出现回到(系统类生命周期函数)
@@ -479,6 +477,69 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     actionSheetController.addAction(managerAction)
 
     navigationController?.present(actionSheetController, animated: true, completion: nil)
+  }
+
+  // [入群邀请需同意] 变更回调
+  public func didJoinTeamNeedAgreeClick(_ model: SettingCellModel, _ isOpen: Bool) {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      model.switchOpen = !isOpen
+      contentTableView.reloadData()
+      return
+    }
+
+    if viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER,
+       viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
+      showToast(localizable("no_permission_tip"))
+      return
+    }
+
+    viewModel.updateTeamAgreeMode(isOpen) { [weak self] error in
+      if let err = error as? NSError {
+        if err.code == protocolSendFailed {
+          self?.showToast(commonLocalizable("network_error"))
+        } else if err.code == noPermissionCode {
+          self?.showToast(localizable("no_permission_tip"))
+        } else {
+          self?.showToast(commonLocalizable("failed_operation"))
+        }
+        model.switchOpen = !isOpen
+      } else {
+        model.switchOpen = isOpen
+      }
+      self?.contentTableView.reloadData()
+    }
+  }
+
+  public func didJoinTeamNeedVerificationClick(_ model: SettingCellModel, _ isOpen: Bool) {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      model.switchOpen = !isOpen
+      contentTableView.reloadData()
+      return
+    }
+
+    if viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER,
+       viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
+      showToast(localizable("no_permission_tip"))
+      return
+    }
+
+    viewModel.updateTeamJoinMode(isOpen) { [weak self] error in
+      if let err = error as? NSError {
+        if err.code == protocolSendFailed {
+          self?.showToast(commonLocalizable("network_error"))
+        } else if err.code == noPermissionCode {
+          self?.showToast(localizable("no_permission_tip"))
+        } else {
+          self?.showToast(commonLocalizable("failed_operation"))
+        }
+        model.switchOpen = !isOpen
+      } else {
+        model.switchOpen = isOpen
+      }
+      self?.contentTableView.reloadData()
+    }
   }
 
   open func didManagerClick() {}

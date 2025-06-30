@@ -10,6 +10,7 @@ public enum SettingCellType: Int {
   case SettingArrowCell = 0
   case SettingSwitchCell
   case SettingSelectCell
+  case SettingSubtitleSelectCell
   case SettingHeaderCell
   case SettingTeamUserCell
   case SettingSubtitleCell

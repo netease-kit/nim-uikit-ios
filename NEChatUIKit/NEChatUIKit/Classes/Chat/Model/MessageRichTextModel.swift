@@ -24,7 +24,7 @@ open class MessageRichTextModel: MessageTextModel {
     let body = (data["body"] as? String) ?? ""
     message?.text = body
     super.init(message: message)
-    type = .custom
+    type = .richText
     customType = customRichTextType
 
     let font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)

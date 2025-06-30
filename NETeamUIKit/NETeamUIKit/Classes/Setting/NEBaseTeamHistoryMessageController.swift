@@ -70,20 +70,6 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
 
   }()
 
-  /// 空占位图
-  public lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(
-      imageName: "emptyView",
-      content: localizable("no_search_results"),
-      frame: CGRect.zero
-    )
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isUserInteractionEnabled = false
-    view.isHidden = true
-    return view
-
-  }()
-
   /// 正在搜索标志，防止多次点击多次搜索
   public var isSearching = false
 
@@ -102,7 +88,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
 
     viewModel.getTeamInfo(teamId) { team, error in
       if team?.isValidTeam == false || team == nil {
-        weakSelf?.view.makeToast(localizable("team_not_exist"))
+        weakSelf?.view.makeToast(commonLocalizable("team_not_exist"))
       }
     }
     setupSubviews()
@@ -122,6 +108,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
     ])
 
     navigationView.moreButton.isHidden = true
+    emptyView.setText(localizable("no_search_results"))
   }
 
   open func initialConfig() {

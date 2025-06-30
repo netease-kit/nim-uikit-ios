@@ -82,7 +82,7 @@ public extension ContactRouter {
 
     Router.shared.register(ValidationMessageRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
-        let validationController = FunValidationMessageViewController()
+        let validationController = FunValidationPageController()
         nav.pushViewController(validationController, animated: true)
       }
     }

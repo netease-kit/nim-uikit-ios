@@ -113,7 +113,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       weakSelf?.isLoadingData = false
       if let err = error as? NSError {
         if V2NIMConversationIdUtil.conversationType(weakSelf?.conversationId ?? "") == .CONVERSATION_TYPE_TEAM, err.code == teamNotExistCode {
-          weakSelf?.showToast(chatLocalizable("team_not_exist"))
+          weakSelf?.showToast(commonLocalizable("team_not_exist"))
         } else if err.code == protocolTimeout {
           weakSelf?.showToast(commonLocalizable("network_error"))
         } else {

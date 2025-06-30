@@ -27,7 +27,8 @@
 "add_blackList"="Block";
 "send_friend_apply"="Contact Request Sent";
 "validation_message"="Verifications ";
-"no_validation_message"="Verifications Empty";
+"no_add_application"="No Verifications";
+"no_team_join_action"="No Verifications";
 "add_request"="Friend Request";
 "agreed_request"="Approved your apply";
 "refused_request"="Reject your apply";
@@ -40,17 +41,20 @@
 "select"="Select";
 "select_contact"="Please select Contact";
 "user_not_exist"="User not found";
-"team_not_exist"="No team";
 "no_friend"="No Contact";
 "no_ai_user"="No AI User";
 "session_empty"="No Chat";
 "team_empty"="No Group";
-"chat"="Chat";
 "message_remind"="Notification";
-"clear_all_validate_message"="Whether to clear all verification";
+"clear_all_add_application"="Whether to clear all add application？";
+"clear_all_team_join_action"="Whether to clear all team join action？";
 "sure_delte_friend"="Whether to delete Contact？";
 "input_userId"="Enter Account";
 "space_not_support"="All Spaces are not supported";
+"apply_to_the_team_of"="Apply to the group of";
+"invite_to_join_the_team_of"="Invite to join the group of";
+"rejected_the_apply"="Rejected the apply";
+"refused_the_invitation"="Refused the invitation";
 
 
 "let_us_chat"="I\'ve accepted your friend request. Now let\'s chat";
@@ -67,7 +71,13 @@
 "choose_max_limit"="Choose at most %d chats";
 
 // error toast
-"validate_processed"="Already done on other devices";
+"verification_processed"="The verification message has been processed.";
+"team_does_not_exist"="Team does not exist";
+"team_member_limit_exceeded"="Team member limit exceeded";
+"joined_team_limit_exceeded"="Joined team limit exceeded";
+"already_in_the_team"="Already in the team";
+"no_permission_tip"="No Permission";
+"invitation_expired"="Invitation expired";
 
 "black_tip"="You won't receive message from this memberlist";
 

@@ -110,18 +110,51 @@ open class FunConversationController: NEBaseConversationController {
   }
 
   override open func getPopListItems() -> [PopListItem] {
-    let items = super.getPopListItems()
-    let addFriend = items[0]
+    weak var weakSelf = self
+    var items = [PopListItem]()
+    let addFriend = PopListItem()
+    addFriend.showName = localizable("add_friend")
     addFriend.showNameColor = .white
-    addFriend.image = UIImage.ne_imageNamed(name: "fun_add_friend")
+    addFriend.image = .ne_imageNamed(name: "fun_add_friend")
+    addFriend.completion = {
+      Router.shared.use(
+        ContactAddFriendRouter,
+        parameters: ["nav": self.navigationController as Any],
+        closure: nil
+      )
+    }
+    items.append(addFriend)
 
-    let createGroup = items[1]
-    createGroup.showNameColor = .white
-    createGroup.image = UIImage.ne_imageNamed(name: "fun_create_team")
+    let joinTeam = PopListItem()
+    joinTeam.showName = commonLocalizable("join_team")
+    joinTeam.showNameColor = .white
+    joinTeam.image = .ne_imageNamed(name: "fun_join_team")
+    joinTeam.completion = {
+      Router.shared.use(
+        TeamJoinTeamRouter,
+        parameters: ["nav": self.navigationController as Any],
+        closure: nil
+      )
+    }
+    items.append(joinTeam)
 
-    let createDicuss = items[2]
+    let createDicuss = PopListItem()
+    createDicuss.showName = localizable("create_discussion_group")
     createDicuss.showNameColor = .white
-    createDicuss.image = UIImage.ne_imageNamed(name: "fun_create_team")
+    createDicuss.image = .ne_imageNamed(name: "fun_create_discussion")
+    createDicuss.completion = {
+      weakSelf?.createDiscussGroup()
+    }
+    items.append(createDicuss)
+
+    let createGroup = PopListItem()
+    createGroup.showName = localizable("create_senior_group")
+    createGroup.showNameColor = .white
+    createGroup.image = .ne_imageNamed(name: "fun_create_team")
+    createGroup.completion = {
+      weakSelf?.createSeniorGroup()
+    }
+    items.append(createGroup)
 
     return items
   }

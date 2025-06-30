@@ -17,6 +17,7 @@ protocol AIChatViewDelegate: NSObjectProtocol {
 open class AIChatViewController: UIViewController {
   public weak var delegate: AIChatViewDelegate?
   public let viewModel = AIChatViewModel()
+  public var lastMessages: [V2NIMMessage]?
 
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -183,44 +184,64 @@ open class AIChatViewController: UIViewController {
     ])
   }
 
-  /// 加载 AI 助聊语句
-  /// - Parameters:
-  ///   - messages: 上下文消息
-  ///   - lastMessage: 对方发送的最后一条消息
-  ///   - force: 是否强制刷新助聊语句
-  open func loadData(_ messages: [V2NIMMessage]? = nil,
-                     _ lastMessage: V2NIMMessage?,
-                     _ force: Bool) {
-    if !force, messages?.last?.messageClientId == viewModel.lastContents?.last?.messageClientId {
-      return
-    }
-
+  /// 展示加载中视图
+  open func showLoadingView() {
     tableView.isHidden = true
     loadDataFailedView.isHidden = true
     loadDataView.isHidden = false
     loadDataView.play()
+  }
 
-    viewModel.loadData(messages, lastMessage) { [weak self] error in
-      self?.loadDataView.isHidden = true
-      self?.loadDataView.stop()
+  /// 展示加载失败视图
+  open func showFaildeView() {
+    tableView.isHidden = true
+    loadDataFailedView.isHidden = false
+    loadDataView.isHidden = true
+    loadDataView.stop()
+  }
+
+  /// 展示加载结果视图
+  open func showTableView() {
+    tableView.isHidden = false
+    tableView.reloadData()
+    loadDataFailedView.isHidden = true
+    loadDataView.isHidden = true
+    loadDataView.stop()
+  }
+
+  /// 加载 AI 助聊语句
+  /// - Parameters:
+  ///   - messages: 上下文消息
+  open func loadData(_ messages: [V2NIMMessage]? = nil) {
+    if let aiChatClick = ChatUIConfig.shared.aiChatDidClick {
+      aiChatClick(self, messages)
+      return
+    }
+  }
+
+  /// 加载 AI 助聊语句
+  /// - Parameters:
+  ///   - messages: 上下文消息
+  open func loadMoreData(_ messages: [V2NIMMessage]? = nil) {
+    if messages != nil {
+      lastMessages = messages
+    }
+
+    viewModel.loadData(messages) { [weak self] error in
       if error != nil {
-        self?.loadDataFailedView.isHidden = false
-        self?.tableView.isHidden = true
+        self?.showFaildeView()
       } else {
-        self?.loadDataFailedView.isHidden = true
-        self?.tableView.isHidden = false
-        self?.tableView.reloadData()
+        self?.showTableView()
       }
     }
   }
 
+  /// 重新加载数据
   open func reloadData() {
     if let aiChatReloadClick = ChatUIConfig.shared.aiChatReloadClick {
-      aiChatReloadClick(self, viewModel.lastContents, viewModel.lastMessage)
+      aiChatReloadClick(self, lastMessages)
       return
     }
-
-    loadData(nil, nil, true)
   }
 }
 

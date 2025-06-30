@@ -49,6 +49,7 @@ open class ContactViewModel: NSObject {
     }
 
     contactRepo.addContactListener(self)
+    TeamRepo.shared.addTeamListener(self)
 
     if IMKitConfigCenter.shared.enableOnlineStatus {
       SubscribeRepo.shared.addListener(self)
@@ -57,6 +58,7 @@ open class ContactViewModel: NSObject {
 
   deinit {
     contactRepo.removeContactListener(self)
+    TeamRepo.shared.removeTeamListener(self)
 
     if IMKitConfigCenter.shared.enableOnlineStatus {
       SubscribeRepo.shared.removeListener(self)
@@ -65,12 +67,6 @@ open class ContactViewModel: NSObject {
 
   open func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-
-    if indexs != nil {
-      completion(nil, indexs!.count)
-      return
-    }
-
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
       if let users = contacts {
@@ -94,17 +90,12 @@ open class ContactViewModel: NSObject {
   open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
-    // 优选从缓存中取
+    // 从缓存中取
     if !NEFriendUserCache.shared.isEmpty() {
       let friends = NEFriendUserCache.shared.getFriendListNotInBlocklist().map(\.value)
       let contactList = formatData(friends, filters)
       completion(contactList, nil)
       return
-    }
-
-    // 缓存中没有则远端查询, 刷新统一走缓存通知
-    contactRepo.getContactList { friends, error in
-      NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
     }
   }
 
@@ -194,11 +185,25 @@ open class ContactViewModel: NSObject {
     return friendSections
   }
 
-  open func getAddApplicationUnreadCount(_ completion: ((Int, NSError?) -> Void)?) {
+  /// 获取验证消息未读数，包含好友申请和入群申请
+  /// - Parameter completion: 回调
+  open func getValidationMessage(_ completion: ((Int, NSError?) -> Void)?) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.getUnreadApplicationCount { [weak self] count, error in
-      self?.unreadCount = count
-      completion?(count, error)
+      if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
+        let option = V2NIMTeamJoinActionInfoQueryOption()
+        option.offset = 0
+        option.limit = neTeamJoinActionPageLimit
+        TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
+          if let actions = result?.infos {
+            let unreadActions = actions.filter { $0.timestamp > neTeamJoinActionReadTime }
+            self?.unreadCount = count + unreadActions.count
+          } else {
+            self?.unreadCount = count
+          }
+          completion?(self?.unreadCount ?? count, error)
+        }
+      }
     }
   }
 
@@ -288,13 +293,13 @@ extension ContactViewModel: NEContactListener {
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
   open func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
-    getAddApplicationUnreadCount(nil)
+    getValidationMessage(nil)
   }
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
   open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
-    getAddApplicationUnreadCount(nil)
+    getValidationMessage(nil)
   }
 
   /// 黑名单添加回调
@@ -313,6 +318,16 @@ extension ContactViewModel: NEContactListener {
         self?.delegate?.reloadTableView()
       }
     }
+  }
+}
+
+// MARK: - NETeamListener
+
+/// 入群操作回调
+/// - Parameter joinActionInfo： 群信息
+extension ContactViewModel: NETeamListener {
+  public func onReceive(_ joinActionInfo: V2NIMTeamJoinActionInfo) {
+    getValidationMessage(nil)
   }
 }
 

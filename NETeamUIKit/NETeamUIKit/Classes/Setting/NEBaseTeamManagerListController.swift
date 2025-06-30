@@ -38,14 +38,6 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
     return tableView
   }()
 
-  public lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_manager_member"), frame: CGRect.zero)
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isUserInteractionEnabled = false
-    view.isHidden = true
-    return view
-  }()
-
   public var cellClassDic = [Int: UITableViewCell.Type]() // key 值为 table section 值
 
   override open func viewDidLoad() {
@@ -79,6 +71,8 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
       contentTableView.register(value, forCellReuseIdentifier: "\(key)")
     }
     navigationView.moreButton.isHidden = true
+    emptyView.setEmptyImage(name: "user_empty")
+    emptyView.setText(localizable("no_manager_member"))
   }
 
   open func numberOfSections(in tableView: UITableView) -> Int {

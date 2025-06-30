@@ -12,7 +12,7 @@ target 'app' do
   # 基础库
   pod 'NEChatKit', YXConfig.imuikit_version
 
-  # UI 组件，YXConfig.imuikit_version = 10.8.1
+  # UI 组件，YXConfig.imuikit_version = 10.8.2
   pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件
   pod 'NEContactUIKit', YXConfig.imuikit_version            # 通讯录组件
   pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件

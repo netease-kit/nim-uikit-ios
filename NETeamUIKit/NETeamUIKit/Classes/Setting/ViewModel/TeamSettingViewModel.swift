@@ -11,8 +11,6 @@ import UIKit
 @objc
 public protocol TeamSettingViewModelDelegate: NSObjectProtocol {
   func didClickChangeNick()
-  func didChangeInviteModeClick(_ model: SettingCellModel)
-  func didUpdateTeamInfoClick(_ model: SettingCellModel)
   func didClickHistoryMessage()
   func didNeedRefreshUI()
   func didError(_ error: NSError)
@@ -309,49 +307,6 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     return model
   }
 
-  // 邀请 修改群信息
-  open func getFourSection() -> SettingSectionModel {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function)
-    weak var weakSelf = self
-    let model = SettingSectionModel()
-
-    let invitePermission = SettingCellModel()
-    invitePermission.cellName = localizable("invite_permission")
-    invitePermission.type = SettingCellType.SettingSelectCell.rawValue
-    invitePermission.rowHeight = 73
-
-    if let inviteMode = teamInfoModel?.team?.inviteMode, inviteMode == .TEAM_INVITE_MODE_ALL {
-      invitePermission.subTitle = localizable("team_all")
-    } else {
-      invitePermission.subTitle = localizable("team_owner")
-    }
-
-    invitePermission.cellClick = {
-      weakSelf?.delegate?.didChangeInviteModeClick(invitePermission)
-    }
-
-    let modifyPermission = SettingCellModel()
-    modifyPermission.cellName = localizable("modify_team_info_permission")
-    modifyPermission.type = SettingCellType.SettingSelectCell.rawValue
-    modifyPermission.rowHeight = 73
-    if let updateMode = teamInfoModel?.team?.updateInfoMode, updateMode == .TEAM_UPDATE_INFO_MODE_ALL {
-      modifyPermission.subTitle = localizable("team_all")
-    } else {
-      modifyPermission.subTitle = localizable("team_owner")
-    }
-
-    modifyPermission.cellClick = {
-      weakSelf?.delegate?.didUpdateTeamInfoClick(modifyPermission)
-    }
-
-    if isOwner() {
-      model.cellModels.append(contentsOf: [invitePermission, modifyPermission])
-      model.setCornerType()
-    }
-
-    return model
-  }
-
   /// 获取群(内部获取群成员)
   /// - Parameter teamId: 群id
   /// - Parameter completion: 回调
@@ -361,7 +316,10 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     if isRequestSettingData == true {
       return
     }
+
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " first page start, timestamp: \(Date().timeIntervalSince1970)")
     getTeamInfoWithSomeMembers(teamId) { error, finished in
+      NEALog.infoLog(TeamSettingViewModel.className() + " [Performance]", desc: #function + " first page onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       weakSelf?.isRequestSettingData = false
       if error == nil {
         weakSelf?.getData()

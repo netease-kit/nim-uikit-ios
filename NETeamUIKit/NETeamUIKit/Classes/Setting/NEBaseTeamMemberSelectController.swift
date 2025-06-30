@@ -61,24 +61,11 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
   /// 搜索框背景视图
   let searchBackView = UIView()
 
-  /// 数据为空占位图
-  public lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(
-      imageName: "user_empty",
-      content: localizable("member_select_no_member"),
-      frame: CGRect.zero
-    )
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isUserInteractionEnabled = false
-    view.isHidden = true
-    return view
-
-  }()
-
   override open func viewDidLoad() {
     super.viewDidLoad()
 
-    // Do any additional setup after loading the view.
+    emptyView.setEmptyImage(name: "user_empty")
+    emptyView.setText("member_select_no_member")
     viewModel.delegate = self
     setupUI()
     if let tid = teamId {

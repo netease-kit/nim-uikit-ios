@@ -85,6 +85,13 @@ public class NETeamUserManager: NSObject {
     teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] teamMember, error in
       self?.updateTeamMemberInfo(teamMember)
     }
+
+    DispatchQueue.global().async { [weak self] in
+      NEALog.infoLog(NETeamUserManager.className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
+      self?.getAllTeamMembers(teamId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { _ in
+        NEALog.infoLog(NETeamUserManager.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+      }
+    }
   }
 
   /// 更新当前群信息
@@ -318,9 +325,11 @@ public class NETeamUserManager: NSObject {
                               _ queryType: V2NIMTeamMemberRoleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
                               _ completion: @escaping ([NEUserWithFriend]) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     var memberLists = [V2NIMTeamMember]()
     weak var weakSelf = self
     getAllTeamMemberWithMaxLimit(teamId, nil, &memberLists, queryType) { members, error in
+      NEALog.infoLog(NETeamUserManager.className() + " [Performance]", desc: #function + " onSuccess, count:\(members?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
       if let err = error {
         NEALog.errorLog(ModuleName + " " + NETeamUserManager.className(), desc: #function + ", err:\(err.localizedDescription)")
       } else {
@@ -385,7 +394,12 @@ public class NETeamUserManager: NSObject {
     var remaind = [[String]]()
     remaind.append(contentsOf: members.chunk(maxSizeByPage))
     let memberUsers = [NEUserWithFriend]()
-    fetchTeamMemberUserInfos(&remaind, memberUsers, completion)
+    NEALog.infoLog(className() + " [Performance]", desc: "fetchTeamMemberUserInfos start, timestamp: \(Date().timeIntervalSince1970)")
+
+    weak var weakSelf = self
+    DispatchQueue.global().async {
+      weakSelf?.fetchTeamMemberUserInfos(&remaind, memberUsers, completion)
+    }
   }
 
   /// 从云信服务器批量获取用户资料
@@ -397,7 +411,10 @@ public class NETeamUserManager: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       haveLoadAllMembers = true
-      completion(memberUsers)
+      NEALog.infoLog(className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+      DispatchQueue.main.async {
+        completion(memberUsers)
+      }
       return
     }
 

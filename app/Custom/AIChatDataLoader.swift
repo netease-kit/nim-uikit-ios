@@ -19,9 +19,19 @@ public class NECommonResult: NSObject {
 
 @objcMembers
 open class AIChatDataLoader: NSObject {
+  public static var messages: [V2NIMMessage]?
+  public static var lastMessage: V2NIMMessage?
+  /// AI 助聊上下文条数
+  public let aiChatContentsCount: Int = 5
+
   public static func loadData(_ messages: [V2NIMMessage]?,
-                              _ lastMessage: V2NIMMessage?,
                               _ completion: @escaping ([AIChatCellModel]?, Error?) -> Void) {
+    if messages != nil {
+      self.messages = messages
+    }
+
+    lastMessage = AIChatDataLoader.getLastTextMessage(messages)
+
     getSquareData(messages, lastMessage) { error, result in
       var models = [AIChatCellModel]()
       if let data = result?.originData?["data"] as? [String: Any],
@@ -51,6 +61,18 @@ open class AIChatDataLoader: NSObject {
       }
       completion(models, error)
     }
+  }
+
+  /// 取最后 N 条文本消息
+  open func getAIChatContents(_ messages: [V2NIMMessage]?) -> [V2NIMMessage]? {
+    let textMessages = messages?.filter { $0.messageType == .MESSAGE_TYPE_TEXT && $0.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED }
+    return textMessages?.suffix(aiChatContentsCount)
+  }
+
+  /// 取对方（非自己）发送的最后一条文本消息
+  public static func getLastTextMessage(_ messages: [V2NIMMessage]?) -> V2NIMMessage? {
+    let textMessages = messages?.filter { $0.messageType == .MESSAGE_TYPE_TEXT && $0.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED && $0.isSelf == false }
+    return textMessages?.last
   }
 
   public static func getSquareData(_ messages: [V2NIMMessage]?,

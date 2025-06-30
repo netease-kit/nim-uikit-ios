@@ -17,7 +17,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
   public let searchInput: UITextField = {
     let searchInput = UITextField()
     searchInput.translatesAutoresizingMaskIntoConstraints = false
-    searchInput.textColor = UIColor(hexString: "333333")
+    searchInput.textColor = .ne_darkText
     searchInput.placeholder = localizable("input_userId")
     searchInput.font = UIFont.systemFont(ofSize: 14.0)
     searchInput.returnKeyType = .search
@@ -60,7 +60,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
     emptyView.setText(localizable("user_not_exist"))
     setupUI()
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.52, execute: DispatchWorkItem(block: { [weak self] in
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
       self?.searchInput.becomeFirstResponder()
     }))
   }
@@ -176,14 +176,4 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
       }
     }
   }
-
-  /*
-   // MARK: - Navigation
-
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       // Get the new view controller using segue.destination.
-       // Pass the selected object to the new view controller.
-   }
-   */
 }
