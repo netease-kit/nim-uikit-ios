@@ -68,7 +68,7 @@ open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDe
     NSLayoutConstraint.activate([
       contentTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       contentTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      contentTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + 12),
+      contentTableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       contentTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
     /// 列表视图内容注册

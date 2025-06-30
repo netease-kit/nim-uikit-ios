@@ -9,8 +9,10 @@ import UIKit
 
 @objc
 public protocol SystemNotificationCellDelegate: NSObjectProtocol {
-  func onAccept(_ notifiModel: NENotification)
-  func onRefuse(_ notifiModel: NENotification)
+  @objc optional func onAccept(application: NEAddApplication)
+  @objc optional func onRefuse(application: NEAddApplication)
+  @objc optional func onAccept(action: NETeamJoinAction)
+  @objc optional func onRefuse(action: NETeamJoinAction)
 }
 
 enum NotificationHandleType: Int {
@@ -44,7 +46,7 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
       redAngleView.heightAnchor.constraint(equalToConstant: 18),
     ])
 
-    addSubview(titleLabel)
+    contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
       titleLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 10),
       titleLabel.topAnchor.constraint(equalTo: userHeaderView.topAnchor),
@@ -55,14 +57,14 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
     )
     titleLabelRightMargin?.isActive = true
 
-    addSubview(optionLabel)
+    contentView.addSubview(optionLabel)
     NSLayoutConstraint.activate([
       optionLabel.leftAnchor.constraint(equalTo: userHeaderView.rightAnchor, constant: 10),
       optionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
       optionLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -180),
     ])
 
-    addSubview(line)
+    contentView.addSubview(line)
     line.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       line.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
@@ -73,25 +75,47 @@ open class NEBaseValidationCell: NEBaseContactViewCell {
     line.backgroundColor = UIColor(hexString: "#F5F8FC")
   }
 
-  open func confige(_ model: NENotification) {
+  open func confige(application: NEAddApplication) {
     // 设置头像
-    let url = model.displayUserWithFriend?.user?.avatar
-    let name = model.displayUserWithFriend?.shortName() ?? model.displayUserId ?? ""
-    let accountId = model.displayUserWithFriend?.user?.accountId ?? ""
+    let url = application.displayUserWithFriend?.user?.avatar
+    let name = application.displayUserWithFriend?.shortName() ?? application.displayUserId ?? ""
+    let accountId = application.displayUserWithFriend?.user?.accountId ?? ""
     userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
 
     // 设置未读状态（未读数角标+底色）
     redAngleView.isHidden = true
     contentView.backgroundColor = .white
-    if model.unreadCount > 0 {
+    if application.unreadCount > 0 {
       contentView.backgroundColor = UIColor(hexString: "0xF3F5F7")
-      if model.unreadCount > 1 {
+      if application.unreadCount > 1 {
         redAngleView.isHidden = false
-        redAngleView.text = model.unreadCount > 99 ? "99+" : "\(model.unreadCount)"
+        redAngleView.text = application.unreadCount > 99 ? "99+" : "\(application.unreadCount)"
       }
     }
 
-    titleLabel.text = model.displayUserWithFriend?.showName() ?? model.displayUserId
-    optionLabel.text = model.detail
+    titleLabel.text = application.displayUserWithFriend?.showName() ?? application.displayUserId
+    optionLabel.text = application.detail
+  }
+
+  open func confige(teamJoinAction: NETeamJoinAction) {
+    // 设置头像
+    let url = teamJoinAction.displayUserWithFriend?.user?.avatar
+    let name = teamJoinAction.displayUserWithFriend?.shortName() ?? teamJoinAction.displayUserId
+    let accountId = teamJoinAction.displayUserWithFriend?.user?.accountId ?? ""
+    userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
+
+    // 设置未读状态（未读数角标+底色）
+    redAngleView.isHidden = true
+    contentView.backgroundColor = .white
+    if teamJoinAction.unreadCount > 0 {
+      contentView.backgroundColor = UIColor(hexString: "0xF3F5F7")
+      if teamJoinAction.unreadCount > 1 {
+        redAngleView.isHidden = false
+        redAngleView.text = teamJoinAction.unreadCount > 99 ? "99+" : "\(teamJoinAction.unreadCount)"
+      }
+    }
+
+    titleLabel.text = teamJoinAction.displayUserWithFriend?.showName() ?? teamJoinAction.displayUserId
+    optionLabel.text = teamJoinAction.detail
   }
 }

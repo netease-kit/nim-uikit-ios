@@ -44,16 +44,16 @@ public class ChatUIConfig: NSObject {
   public var aiChatViewController: ((AIChatViewController) -> Void)?
 
   /// AI 助聊的数据加载器
-  /// 参数分别为：上下文消息、对方发送的最后一条文本消息、回调
-  public var aiChatDataLoader: (([V2NIMMessage]?, V2NIMMessage?, @escaping ([AIChatCellModel]?, Error?) -> Void) -> Void)?
+  /// 参数分别为：上下文消息、回调
+  public var aiChatDataLoader: (([V2NIMMessage]?, @escaping ([AIChatCellModel]?, Error?) -> Void) -> Void)?
 
-  /// AI 助聊入口按钮点击事件
-  /// 参数分别为：消息列表视图控制器、按钮开关
-  public var aiChatClick: ((ChatViewController, Bool) -> Void)?
+  /// AI 助聊入口按钮点击事件，仅在展开时回调
+  /// 参数分别为：AI 助聊视图控制器、上下文消息
+  public var aiChatDidClick: ((AIChatViewController, [V2NIMMessage]?) -> Void)?
 
   /// AI 助聊重新加载按钮点击事件
-  /// 参数分别为：AI 助聊视图控制器、上下文消息、对方发送的最后一条文本消息
-  public var aiChatReloadClick: ((AIChatViewController, [V2NIMMessage]?, V2NIMMessage?) -> Void)?
+  /// 参数分别为：AI 助聊视图控制器、上下文消息
+  public var aiChatReloadClick: ((AIChatViewController, [V2NIMMessage]?) -> Void)?
 
   /*
    * 用户可自定义参数

@@ -370,28 +370,29 @@ public class CustomConfig {
     }
 
     // AI 助聊的数据加载器
-    ChatUIConfig.shared.aiChatDataLoader = { messages, lastMessage, completion in
-      AIChatDataLoader.loadData(messages, lastMessage, completion)
+    ChatUIConfig.shared.aiChatDataLoader = { messages, completion in
+      AIChatDataLoader.loadData(messages, completion)
     }
 
     // AI 助聊入口按钮点击事件
-    ChatUIConfig.shared.aiChatClick = { chatViewController, open in
-      if open {
-        chatViewController.showAIChatView()
-
-        // 加载数据，最后一条消息不变时不强制加载
-        let messages = chatViewController.viewModel.getAIChatContents()
-        let lastMessage = chatViewController.viewModel.getLastTextMessage()
-        chatViewController.chatInputView.aiChatViewController.loadData(messages, lastMessage, false)
-      } else {
-        chatViewController.closeAIChatView()
+    ChatUIConfig.shared.aiChatDidClick = { aiChatViewController, messages in
+      // 最后一条消息未发生变更则不重新加载
+      if messages?.last?.messageClientId == aiChatViewController.lastMessages?.last?.messageClientId {
+        return
       }
+
+      // 展示加载中动画
+      aiChatViewController.showLoadingView()
+      // 加载数据，调用 ChatUIConfig.shared.aiChatDataLoader
+      aiChatViewController.loadMoreData(messages)
     }
 
     // AI 助聊重新加载按钮点击事件
-    ChatUIConfig.shared.aiChatReloadClick = { aiChatViewController, messages, lastMessage in
-      // 重新加载数据，强制加载
-      aiChatViewController.loadData(nil, nil, true)
+    ChatUIConfig.shared.aiChatReloadClick = { aiChatViewController, messages in
+      // 展示加载中动画
+      aiChatViewController.showLoadingView()
+      // 重新加载数据，调用 ChatUIConfig.shared.aiChatDataLoader
+      aiChatViewController.loadMoreData(messages)
     }
   }
 

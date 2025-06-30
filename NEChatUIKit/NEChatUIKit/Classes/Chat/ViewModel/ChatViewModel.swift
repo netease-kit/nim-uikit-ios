@@ -127,6 +127,7 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
 @objcMembers
 open class ChatViewModel: NSObject {
   public var messages = [MessageModel]()
+  public var messageClientIds = [String]()
   public weak var delegate: ChatViewModelDelegate?
 
   // 多选选中的消息
@@ -180,6 +181,7 @@ open class ChatViewModel: NSObject {
     anchor = nil
     super.init()
     addListener()
+    getAIUserList()
   }
 
   public init(conversationId: String, anchor: V2NIMMessage?) {
@@ -192,6 +194,7 @@ open class ChatViewModel: NSObject {
       isHistoryChat = true
     }
     addListener()
+    getAIUserList()
   }
 
   /// 添加监听
@@ -210,6 +213,13 @@ open class ChatViewModel: NSObject {
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.removeAIListener(self)
+    }
+  }
+
+  open func getAIUserList() {
+    if IMKitConfigCenter.shared.enableAIUser,
+       NEAIUserManager.shared.isAIUserListEmpty() {
+      NEAIUserManager.shared.getAIUserList()
     }
   }
 
@@ -360,7 +370,7 @@ open class ChatViewModel: NSObject {
     let group = DispatchGroup()
 
     group.enter()
-    DispatchQueue.main.async { [weak self] in
+    DispatchQueue.global().async { [weak self] in
       let conversationId = ChatRepo.conversationId
 
       group.enter()
@@ -513,6 +523,10 @@ open class ChatViewModel: NSObject {
           self?.newMsg = messageArray.last
         }
         for msg in messageArray {
+          if let messageClientId = msg.messageClientId {
+            self?.messageClientIds.append(messageClientId)
+          }
+
           // 数字人回复的消息
           if ChatMessageHelper.isAISender(msg) {
             self?.setErrorText(msg)
@@ -692,20 +706,6 @@ open class ChatViewModel: NSObject {
     }
 
     return aiMessages.isEmpty ? nil : aiMessages
-  }
-
-  /// 取最后 N 条文本消息
-  open func getAIChatContents() -> [V2NIMMessage]? {
-    let textMessageModels = messages.filter { $0.message?.messageType == .MESSAGE_TYPE_TEXT && $0.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED }
-    let textMessages = textMessageModels.compactMap(\.message)
-    return textMessages.suffix(aiChatContentsCount)
-  }
-
-  /// 取对方（非自己）发送的最后一条文本消息
-  open func getLastTextMessage() -> V2NIMMessage? {
-    let textMessageModels = messages.filter { $0.message?.messageType == .MESSAGE_TYPE_TEXT && $0.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED && $0.message?.isSelf == false }
-    let textMessages = textMessageModels.compactMap(\.message)
-    return textMessages.last
   }
 
   /// 获取消息发送参数
@@ -1277,7 +1277,8 @@ open class ChatViewModel: NSObject {
       muta = serverExt
     }
 
-    if let threadReply = message.threadReply {
+    if let threadReply = message.threadReply,
+       message.threadReply?.messageClientId?.isEmpty == false {
       muta[keyReplyMsgKey] = ChatMessageHelper.createReplyDic(threadReply)
     }
 
@@ -1288,7 +1289,7 @@ open class ChatViewModel: NSObject {
 
     if message.messageType == .MESSAGE_TYPE_CUSTOM {
       if let title = NECustomUtils.titleOfRichText(message.attachment), !title.isEmpty {
-        muta[revokeLocalMessageContent] = title
+        muta[revokeLocalMessageTitle] = title
       }
       if let body = NECustomUtils.bodyOfRichText(message.attachment), !body.isEmpty {
         muta[revokeLocalMessageContent] = body
@@ -1780,7 +1781,7 @@ open class ChatViewModel: NSObject {
       messages[index].isPined = false
 
       // 是否可以重新编辑
-      if message.aiConfig?.aiStatus != .MESSAGE_AI_STATUS_RESPONSE,
+      if message.aiConfig == nil || message.aiConfig?.aiStatus != .MESSAGE_AI_STATUS_RESPONSE,
          let content = ChatMessageHelper.getRevokeMessageContent(message: messages[index].message) {
         messages[index].isReedit = true
         messages[index].message?.text = content
@@ -2152,7 +2153,6 @@ open class ChatViewModel: NSObject {
   }
 
   open func stopAIStreamMessage(_ message: V2NIMMessage) {
-    print("stopAIStreamMessage")
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
     let params = V2NIMMessageAIStreamStopParams()
     params.operationType = .MESSAGE_AI_STREAM_STOP_OP_DEFAULT
@@ -2162,7 +2162,6 @@ open class ChatViewModel: NSObject {
   }
 
   open func regenAIMessage(_ message: V2NIMMessage) {
-    print("regenStreamButtonAction")
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     let params = V2NIMMessageAIRegenParams(.MESSAGE_AI_REGEN_OP_NEW)
@@ -2200,10 +2199,10 @@ open class ChatViewModel: NSObject {
   /// - Parameter message: 消息
   open func sendingMsg(_ message: V2NIMMessage) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
-    print("\(#function)")
 
     // 消息不是当前会话的消息，不处理（转发）
     if message.conversationId != ChatRepo.conversationId {
+      NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) != ChatRepo.conversationId(\(ChatRepo.conversationId)")
       return
     }
 
@@ -2212,12 +2211,14 @@ open class ChatViewModel: NSObject {
       if message.messageClientId == model.message?.messageClientId {
         messages[i].message = message
         delegate?.sendSuccess(message, IndexPath(row: i, section: 0))
+        NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already exist")
         return
       }
     }
 
     // 避免重复发送
     if ChatDeduplicationHelper.instance.isMessageSended(messageId: message.messageClientId ?? "") {
+      NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already send")
       return
     }
 
@@ -2413,13 +2414,21 @@ extension ChatViewModel: NEChatListener {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
 
     for msg in messages {
-      guard V2NIMConversationIdUtil.conversationTargetId(msg.conversationId ?? "") == ChatRepo.sessionId else {
-        return
+      guard let conversationId = msg.conversationId,
+            conversationId == ChatRepo.conversationId else {
+        continue
       }
 
       if !(msg.messageServerId?.isEmpty == false), msg.messageType != .MESSAGE_TYPE_CUSTOM {
         continue
       }
+
+      if let messageClientId = msg.messageClientId {
+        if messageClientIds.contains(messageClientId) {
+          continue
+        }
+      }
+
       newMsg = msg
 
       if isHistoryChat {

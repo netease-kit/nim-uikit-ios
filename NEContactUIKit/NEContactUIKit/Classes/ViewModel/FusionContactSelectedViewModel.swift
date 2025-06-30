@@ -27,7 +27,7 @@ open class FusionContactSelectedViewModel: NSObject {
   open func loadMemberDatas(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
 
-    // 优选从缓存中取
+    // 从缓存中取
     if !NEFriendUserCache.shared.isEmpty() {
       var friends = NEFriendUserCache.shared.getFriendListNotInBlocklist().map(\.value)
       friends.sort { model1, model2 in
@@ -49,11 +49,6 @@ open class FusionContactSelectedViewModel: NSObject {
       }
       completion(nil)
       return
-    }
-
-    // 缓存中没有则远端查询, 刷新统一走缓存通知
-    contactRepo.getContactList { friends, error in
-      NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
     }
   }
 

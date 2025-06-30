@@ -10,7 +10,7 @@ import NELocalConversationUIKit
 import NIMSDK
 import UIKit
 
-class NETabBarController: UITabBarController, NEContactListener {
+class NETabBarController: UITabBarController {
   private var chat = UIViewController()
   private var contactVC = NEBaseContactViewController()
   private var meVC = MeViewController()
@@ -34,6 +34,7 @@ class NETabBarController: UITabBarController, NEContactListener {
   override func viewDidLoad() {
     super.viewDidLoad()
     ContactRepo.shared.addContactListener(self)
+    TeamRepo.shared.addTeamListener(self)
     setUpControllers()
     setUpSessionBadgeValue()
     setUpContactBadgeValue()
@@ -44,7 +45,7 @@ class NETabBarController: UITabBarController, NEContactListener {
       ConversationRepo.shared.addConversationListener(self)
     }
 
-    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationMessageUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
 
@@ -62,6 +63,7 @@ class NETabBarController: UITabBarController, NEContactListener {
     }
 
     ContactRepo.shared.removeContactListener(self)
+    TeamRepo.shared.removeTeamListener(self)
     NotificationCenter.default.removeObserver(self)
   }
 
@@ -200,18 +202,30 @@ class NETabBarController: UITabBarController, NEContactListener {
 
   // 设置通讯录未读显示状态
   func setUpContactBadgeValue() {
-    ContactRepo.shared.getUnreadApplicationCount { [self] unreadCount, error in
-      contactUnreadCount = unreadCount
+    ContactRepo.shared.getUnreadApplicationCount { [weak self] count, error in
+      if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
+        let option = V2NIMTeamJoinActionInfoQueryOption()
+        option.offset = 0
+        option.limit = neTeamJoinActionPageLimit
+        TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
+          if let actions = result?.infos {
+            let unreadActions = actions.filter { $0.timestamp > neTeamJoinActionReadTime }
+            self?.contactUnreadCount = count + unreadActions.count
+          } else {
+            self?.contactUnreadCount = count
+          }
 
-      // 显示红点
-      if unreadCount > 0 {
-        tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
-      } else {
-        tabBar.hideBadg(on: 1)
+          // 显示红点
+          if (self?.contactUnreadCount ?? 0) > 0 {
+            self?.tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
+          } else {
+            self?.tabBar.hideBadg(on: 1)
+          }
+
+          //      // 显示未读数
+          //      self?.setupContactBadge(unreadCount: contactUnreadCount)
+        }
       }
-
-//            // 显示未读数
-//            setupContactBadge(unreadCount: unreadCount)
     }
   }
 
@@ -233,6 +247,26 @@ class NETabBarController: UITabBarController, NEContactListener {
   }
 
   @objc open func clearValidationUnreadCount() {
+    tabBar.hideBadg(on: 1)
+  }
+}
+
+// MARK: - NEContactListener
+
+extension NETabBarController: NEContactListener {
+  func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+    setUpContactBadgeValue()
+  }
+
+  func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+    setUpContactBadgeValue()
+  }
+}
+
+// MARK: - NETeamListener
+
+extension NETabBarController: NETeamListener {
+  func onReceive(_ joinActionInfo: V2NIMTeamJoinActionInfo) {
     setUpContactBadgeValue()
   }
 }
@@ -251,10 +285,6 @@ extension NETabBarController: NEConversationListener {
   func onConversationDeleted(_ conversationIds: [String]) {
     refreshSessionBadge()
   }
-
-  func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
-    setUpContactBadgeValue()
-  }
 }
 
 // MARK: - NELocalConversationListener
@@ -270,9 +300,5 @@ extension NETabBarController: NELocalConversationListener {
 
   func onLocalConversationDeleted(_ conversationIds: [String]) {
     refreshSessionBadge()
-  }
-
-  func onLocalFriendAddApplication(_ application: V2NIMFriendAddApplication) {
-    setUpContactBadgeValue()
   }
 }

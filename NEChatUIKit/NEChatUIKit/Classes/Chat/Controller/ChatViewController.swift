@@ -32,7 +32,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   var audioPlayer: AVAudioPlayer? // 仅用于语音消息的播放
 
-  public var viewModel: ChatViewModel = .init()
+  public var viewModel: ChatViewModel
   let interactionController = UIDocumentInteractionController()
   private lazy var manager = CLLocationManager()
   private var playingCell: ChatAudioCellProtocol?
@@ -277,6 +277,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }()
 
   public init(conversationId: String) {
+    viewModel = ChatViewModel(conversationId: conversationId)
     super.init(nibName: nil, bundle: nil)
 
     NEKeyboardManager.shared.enable = false
@@ -285,6 +286,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   public required init?(coder: NSCoder) {
+    viewModel = ChatViewModel()
     super.init(coder: coder)
   }
 
@@ -320,6 +322,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         self?.brokenNetworkView.isHidden = true
         self?.contentViewTopAnchor?.constant = 0
       }
+    }
+
+    if !viewModel.isHistoryChat {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
+        self?.scrollTableViewToBottom()
+      }))
     }
   }
 
@@ -763,7 +771,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     viewModel.clearUnreadCount()
 
     isLoadingData = true
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     viewModel.loadData { error, historyEnd, newEnd, index in
+      NEALog.infoLog(ChatViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       NEALog.infoLog(
         ModuleName + " " + ChatViewController.className(),
         desc: #function + "CALLBACK loadData " + (error?.localizedDescription ?? "no error")
@@ -2028,6 +2038,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     if !indexs.isEmpty {
       tableView.insertData(indexs) { [weak self] _ in
+        if self?.isCurrentPage == false {
+          return
+        }
+
         // 滑动过程中
         if self?.tableView.isDragging == true || self?.tableView.isDecelerating == true {
           return
@@ -3532,7 +3546,7 @@ extension ChatViewController: ChatBaseCellDelegate {
       return
     }
 
-    if model?.type == .text || model?.type == .aiStreamText,
+    if model?.type == .text || model?.type == .richText || model?.type == .aiStreamText,
        var replyModel = replyModel as? MessageContentModel {
       var index = -1
       for (i, m) in viewModel.messages.enumerated() {
@@ -3607,7 +3621,8 @@ extension ChatViewController: ChatBaseCellDelegate {
           return
         }
       }
-      let data = NECustomUtils.dataOfCustomMessage(model?.message?.attachment)
+      let data: [String: Any]? = NECustomUtils.dataOfCustomMessage(message.attachment) ??
+        (getDictionaryFromJSONString(message.serverExtension ?? "") as? [String: Any])
 
       let time = message.createTime
       let date = Date()
@@ -3625,7 +3640,7 @@ extension ChatViewController: ChatBaseCellDelegate {
         extensionStr = localExt
       }
 
-      if message.threadReply != nil ||
+      if message.threadReply?.messageClientId?.isEmpty == false ||
         getDictionaryFromJSONString(extensionStr)?[keyReplyMsgKey] != nil {
         viewModel.operationModel = model
         showReplyMessageView(isReEdit: true)
@@ -3637,7 +3652,7 @@ extension ChatViewController: ChatBaseCellDelegate {
       var text = ""
       if message.messageType == .MESSAGE_TYPE_TEXT, let txt = message.text {
         text = txt
-      } else if message.messageType == .MESSAGE_TYPE_CUSTOM, let body = data?["body"] as? String {
+      } else if message.messageType == .MESSAGE_TYPE_CUSTOM, let body = data?["body"] as? String ?? data?[revokeLocalMessageContent] as? String {
         text = body
       }
 
@@ -3669,7 +3684,7 @@ extension ChatViewController: ChatBaseCellDelegate {
         }
       }
 
-      if let title = data?["title"] as? String {
+      if let title = data?["title"] as? String ?? data?[revokeLocalMessageTitle] as? String {
         // 切换换行输入框
         // 标题填入
         chatInputView.titleField.text = title
@@ -3788,11 +3803,6 @@ extension ChatViewController: ChatBaseCellDelegate {
   }
 
   public func aiChatButtonDidClick(_ aiChatViewController: AIChatViewController, _ open: Bool) {
-    if let aiChatClick = ChatUIConfig.shared.aiChatClick {
-      aiChatClick(self, open)
-      return
-    }
-
     if open {
       showAIChatView()
       loadAIChatData(aiChatViewController)
@@ -3819,9 +3829,8 @@ extension ChatViewController: ChatBaseCellDelegate {
   }
 
   open func loadAIChatData(_ aiChatViewController: AIChatViewController) {
-    let messages = viewModel.getAIChatContents()
-    let lastMessage = viewModel.getLastTextMessage()
-    aiChatViewController.loadData(messages, lastMessage, false)
+    let messages = viewModel.messages.compactMap(\.message)
+    aiChatViewController.loadData(messages)
   }
 
   open func showAIChatView() {

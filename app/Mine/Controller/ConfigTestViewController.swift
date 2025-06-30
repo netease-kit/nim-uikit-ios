@@ -71,6 +71,15 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     }
     model.cellModels.append(showTeam)
 
+    let showTeamAction = SettingCellModel()
+    showTeamAction.cellName = "群聊申请邀请功能"
+    showTeamAction.type = SettingCellType.SettingSwitchCell.rawValue
+    showTeamAction.switchOpen = IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth
+    showTeamAction.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth = isOpen
+    }
+    model.cellModels.append(showTeamAction)
+
     let showMessageCollection = SettingCellModel()
     showMessageCollection.cellName = "显示收藏"
     showMessageCollection.type = SettingCellType.SettingSwitchCell.rawValue

@@ -53,13 +53,6 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     return memberListButton
   }()
 
-  /// 群信息页面跳转按钮
-  public var infoButton: UIButton = {
-    let infoButton = UIButton()
-    infoButton.translatesAutoresizingMaskIntoConstraints = false
-    return infoButton
-  }()
-
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     className = "FunTeamSettingViewController"
@@ -115,27 +108,35 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
       cornerView.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
     ])
 
-    cornerView.addSubview(teamHeaderView)
+    let teamHeaderBackView = UIView()
+    teamHeaderBackView.translatesAutoresizingMaskIntoConstraints = false
+    teamHeaderBackView.backgroundColor = .clear
+    cornerView.addSubview(teamHeaderBackView)
     NSLayoutConstraint.activate([
-      teamHeaderView.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16),
-      teamHeaderView.topAnchor.constraint(equalTo: cornerView.topAnchor, constant: 16),
-      teamHeaderView.widthAnchor.constraint(equalToConstant: 50),
-      teamHeaderView.heightAnchor.constraint(equalToConstant: 50),
+      teamHeaderBackView.leftAnchor.constraint(equalTo: cornerView.leftAnchor),
+      teamHeaderBackView.topAnchor.constraint(equalTo: cornerView.topAnchor),
+      teamHeaderBackView.heightAnchor.constraint(equalToConstant: 76),
+      teamHeaderBackView.rightAnchor.constraint(equalTo: cornerView.rightAnchor),
+    ])
+
+    let tap = UITapGestureRecognizer(target: self, action: #selector(toInfoView))
+    teamHeaderBackView.addGestureRecognizer(tap)
+
+    teamHeaderBackView.addSubview(teamHeaderView)
+    teamHeaderView.resetAvatarWH(50)
+    NSLayoutConstraint.activate([
+      teamHeaderView.leftAnchor.constraint(equalTo: teamHeaderBackView.leftAnchor, constant: 16),
+      teamHeaderView.topAnchor.constraint(equalTo: teamHeaderBackView.topAnchor, constant: 6),
+      teamHeaderView.rightAnchor.constraint(equalTo: teamHeaderBackView.rightAnchor, constant: -50),
+      teamHeaderView.heightAnchor.constraint(equalToConstant: 70),
     ])
 
     setTeamHeaderInfo()
 
-    cornerView.addSubview(teamNameLabel)
-    NSLayoutConstraint.activate([
-      teamNameLabel.leftAnchor.constraint(equalTo: teamHeaderView.rightAnchor, constant: 16),
-      teamNameLabel.centerYAnchor.constraint(equalTo: teamHeaderView.centerYAnchor),
-      teamNameLabel.rightAnchor.constraint(equalTo: cornerView.rightAnchor, constant: -50),
-    ])
-
-    cornerView.addSubview(arrowImageView)
+    teamHeaderBackView.addSubview(arrowImageView)
     NSLayoutConstraint.activate([
       arrowImageView.centerYAnchor.constraint(equalTo: teamHeaderView.centerYAnchor),
-      arrowImageView.rightAnchor.constraint(equalTo: cornerView.rightAnchor, constant: -16),
+      arrowImageView.rightAnchor.constraint(equalTo: teamHeaderBackView.rightAnchor, constant: -16),
     ])
 
     cornerView.addSubview(dividerLineView)
@@ -143,7 +144,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
       dividerLineView.heightAnchor.constraint(equalToConstant: 1.0),
       dividerLineView.rightAnchor.constraint(equalTo: cornerView.rightAnchor),
       dividerLineView.leftAnchor.constraint(equalTo: teamHeaderView.leftAnchor, constant: 0),
-      dividerLineView.topAnchor.constraint(equalTo: teamHeaderView.bottomAnchor, constant: 16.0),
+      dividerLineView.topAnchor.constraint(equalTo: teamHeaderView.bottomAnchor, constant: 6),
     ])
 
     cornerView.addSubview(memberLabel)
@@ -197,15 +198,6 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     }
 
     setupUserInfoCollection(cornerView)
-
-    cornerView.addSubview(infoButton)
-    NSLayoutConstraint.activate([
-      infoButton.leftAnchor.constraint(equalTo: teamHeaderView.leftAnchor),
-      infoButton.topAnchor.constraint(equalTo: teamHeaderView.topAnchor),
-      infoButton.bottomAnchor.constraint(equalTo: teamHeaderView.bottomAnchor),
-      infoButton.rightAnchor.constraint(equalTo: arrowImageView.rightAnchor),
-    ])
-    infoButton.addTarget(self, action: #selector(toInfoView), for: .touchUpInside)
 
     return backView
   }
@@ -292,34 +284,6 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
     nick.team = viewModel.teamInfoModel?.team
     nick.teamMember = viewModel.memberInTeam
     navigationController?.pushViewController(nick, animated: true)
-  }
-
-  override open func didChangeInviteModeClick(_ model: SettingCellModel) {
-    weak var weakSelf = self
-
-    let allAction = NECustomAlertAction(title: localizable("team_all")) {
-      weakSelf?.updateInviteModeAllAction(model)
-    }
-
-    let ownerAction = NECustomAlertAction(title: localizable("team_owner")) {
-      weakSelf?.updateInviteModeOwnerAction(model)
-    }
-
-    showCustomActionSheet([ownerAction, allAction])
-  }
-
-  override open func didUpdateTeamInfoClick(_ model: SettingCellModel) {
-    weak var weakSelf = self
-
-    let allAction = NECustomAlertAction(title: localizable("team_all")) {
-      weakSelf?.updateTeamInfoAllAction(model)
-    }
-
-    let ownerAction = NECustomAlertAction(title: localizable("team_owner")) {
-      weakSelf?.updateTeamInfoOwnerAction(model)
-    }
-
-    showCustomActionSheet([ownerAction, allAction])
   }
 
   override open func didClickHistoryMessage() {

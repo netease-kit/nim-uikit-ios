@@ -56,19 +56,19 @@ open class NotificationMessageUtils: NSObject {
     if let content = message.attachment as? V2NIMMessageNotificationAttachment {
       let fromName = fromName(message: message)
       let toNames = toName(message: message)
-      let toFirstName = toNames.first ?? ""
+      let toFirstName = "\"\(toNames.first ?? "")\""
       let teamName = teamName(message: message)
-      var toNamestext = toNames.first ?? ""
+      var toNamestext = "\"\(toNames.first ?? "")\""
       if toNames.count > 1 {
-        toNamestext = toNames.joined(separator: "、")
+        toNamestext = "\"\(toNames.joined(separator: "、"))\""
       }
       switch content.type {
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE:
-        text = fromName + chatLocalizable("invite") + toNamestext + chatLocalizable("enter") + chatLocalizable("group_chat")
+        text = fromName + chatLocalizable("invite") + toNamestext + chatLocalizable("enter") + commonLocalizable("group_chat")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS:
-        text = fromName + chatLocalizable("dissolve") + chatLocalizable("group_chat")
+        text = fromName + chatLocalizable("dissolve") + commonLocalizable("group_chat")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_KICK:
-        text = fromName + chatLocalizable("kick") + toNamestext + chatLocalizable("out") + chatLocalizable("group_chat")
+        text = fromName + chatLocalizable("kick") + toNamestext + chatLocalizable("out") + commonLocalizable("group_chat")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO:
         text = "update team info"
         text = textOfUpdateTeam(
@@ -77,12 +77,12 @@ open class NotificationMessageUtils: NSObject {
           content: content
         )
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE:
-        text = fromName + chatLocalizable("leave") + chatLocalizable("group_chat")
+        text = fromName + chatLocalizable("leave") + commonLocalizable("group_chat")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_APPLY_PASS:
-        if fromName == toNamestext {
-          text = fromName + chatLocalizable("join") + chatLocalizable("group_chat")
+        if content.targetIds?.count == 1, content.targetIds?.first == message.senderId {
+          text = fromName + chatLocalizable("join") + commonLocalizable("group_chat")
         } else {
-          text = fromName + chatLocalizable("pass") + toNamestext
+          text = toNamestext + chatLocalizable("team_apply")
         }
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_OWNER_TRANSFER:
         text = fromName + chatLocalizable("transfer") + toFirstName
@@ -91,7 +91,7 @@ open class NotificationMessageUtils: NSObject {
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_REMOVE_MANAGER:
         text = toFirstName + chatLocalizable("removed_manager")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE_ACCEPT:
-        text = fromName + chatLocalizable("accept") + toNamestext
+        text = fromName + chatLocalizable("pass") + toNamestext + chatLocalizable("team_invitation")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_BANNED_TEAM_MEMBER:
         text = "\(toNamestext) \(content.chatBanned ? chatLocalizable("mute") : chatLocalizable("not_mute"))"
       default:
@@ -106,9 +106,9 @@ open class NotificationMessageUtils: NSObject {
   open class func fromName(message: V2NIMMessage) -> String {
     if let sourceId = message.senderId {
       if sourceId == IMKitClient.instance.account() {
-        return chatLocalizable("You") + " "
+        return chatLocalizable("You")
       } else {
-        return NETeamUserManager.shared.getShowName(sourceId)
+        return "\"\(NETeamUserManager.shared.getShowName(sourceId))\""
       }
     } else {
       return ""
@@ -124,7 +124,7 @@ open class NotificationMessageUtils: NSObject {
 
     for targetID in targetIDs {
       if targetID == IMKitClient.instance.account() {
-        toNames.append(chatLocalizable("You") + " ")
+        toNames.append(chatLocalizable("You"))
       } else {
         let name = NETeamUserManager.shared.getShowName(targetID)
         toNames.append(name)
@@ -137,9 +137,9 @@ open class NotificationMessageUtils: NSObject {
     let teamtype = teamType(message: message)
     switch teamtype {
     case .advanceTeam:
-      return chatLocalizable("group")
+      return commonLocalizable("team_group")
     case .discussTeam:
-      return chatLocalizable("discussion_group")
+      return commonLocalizable("team_group")
     }
   }
 
@@ -163,49 +163,51 @@ open class NotificationMessageUtils: NSObject {
 
     // 群名
     if let name = updatedTeamInfo.name {
-      return fromName + " " + chatLocalizable("has_updated") + teamName +
+      return fromName + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_name") + chatLocalizable("to") + "\"" + name + "\""
     }
 
     // 群简介
     if updatedTeamInfo.intro != nil {
-      return fromName + " " + chatLocalizable("has_updated") + teamName +
+      return fromName + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_intro")
     }
 
     // 群公告
     if updatedTeamInfo.announcement != nil {
-      return fromName + " " + chatLocalizable("has_updated") + teamName +
+      return fromName + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_anouncement")
     }
 
     // 头像
     if updatedTeamInfo.avatar != nil {
-      return fromName + " " + chatLocalizable("has_updated") + teamName +
+      return fromName + chatLocalizable("has_updated") + teamName +
         chatLocalizable("team_avatar")
     }
 
-    // 群验证方式
+    // 申请入群模式
     if updatedTeamInfo.joinMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") + teamName +
-        chatLocalizable("team_join_mode")
+      return fromName +
+        (updatedTeamInfo.joinMode == .TEAM_JOIN_MODE_APPLY ? chatLocalizable("has_open") : chatLocalizable("has_closed"))
+        + chatLocalizable("team_join_mode")
     }
 
     // 被邀请模式
     if updatedTeamInfo.agreeMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") +
-        chatLocalizable("team_be_invited_author")
+      return fromName +
+        (updatedTeamInfo.agreeMode == .TEAM_AGREE_MODE_AUTH ? chatLocalizable("has_open") : chatLocalizable("has_closed"))
+        + chatLocalizable("team_agree_mode")
     }
 
-    // 邀请权限,仅高级群有效
+    // 邀请权限
     if updatedTeamInfo.inviteMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
+      return fromName + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
         chatLocalizable("team_be_invited_permission") + "\" " + chatLocalizable("to") + "\"" + (updatedTeamInfo.inviteMode == .TEAM_INVITE_MODE_MANAGER ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
     }
 
-    // 更新群信息权限,仅高级群有效
+    // 更新群信息权限
     if updatedTeamInfo.updateInfoMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
+      return fromName + chatLocalizable("has_updated") + chatLocalizable("team_permission") + " \"" +
         chatLocalizable("team_update_info_permission") + "\" " + chatLocalizable("to") + "\"" + (updatedTeamInfo.updateInfoMode == .TEAM_UPDATE_INFO_MODE_MANAGER ? chatLocalizable("only_team_owner") : chatLocalizable("user_select_all")) + "\""
     }
 
@@ -246,16 +248,16 @@ open class NotificationMessageUtils: NSObject {
       // 置顶消息
       if lastOpt == keyTopMessage, let topInfo = extDic[keyTopMessage] as? [String: Any] {
         if let type = topInfo["operation"] as? Int {
-          return fromName + " " + (type == 0 ? chatLocalizable("top_message") : chatLocalizable("untop_message"))
+          return fromName + (type == 0 ? chatLocalizable("top_message") : chatLocalizable("untop_message"))
         }
       }
     } else {
-      return fromName + " " + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
+      return fromName + chatLocalizable("has_updated") + chatLocalizable("team_custom_info")
     }
 
     // 更新群客户端自定义拓展字段权限
     if updatedTeamInfo.updateExtensionMode.rawValue != -1 {
-      return fromName + " " + chatLocalizable("has_updated") +
+      return fromName + chatLocalizable("has_updated") +
         chatLocalizable("team_update_client_custom")
     }
 

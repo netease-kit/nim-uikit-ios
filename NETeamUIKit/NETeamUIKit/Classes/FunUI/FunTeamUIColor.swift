@@ -19,4 +19,6 @@ extension UIColor {
   static let funTeamMangerLabelTextColor = UIColor(hexString: "#EA8339")
   static let funTeamMangerLabelBackColor = UIColor(hexString: "#F2C46B", 0.1)
   static let funTeamManagerLabelBorderColor = UIColor(hexString: "#F2C46B")
+
+  static let funTeamDetailTitleTextColor = UIColor(hexString: "#525C8C")
 }

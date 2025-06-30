@@ -11,6 +11,21 @@ public extension TeamRouter {
   static func register() {
     registerCommon(icUrls: iconUrls)
 
+    Router.shared.register(TeamJoinTeamRouter) { param in
+      let nav = param["nav"] as? UINavigationController
+      let joinTeam = JoinTeamViewController()
+      nav?.pushViewController(joinTeam, animated: true)
+    }
+
+    Router.shared.register(TeamDetailInfoPageRouter) { param in
+      if let nav = param["nav"] as? UINavigationController {
+        if let team = param["team"] as? V2NIMTeam {
+          let teamInfoVC = TeamDetailViewController(nim_team: team)
+          nav.pushViewController(teamInfoVC, animated: true)
+        }
+      }
+    }
+
     Router.shared.register(TeamSettingViewRouter) { param in
       let nav = param["nav"] as? UINavigationController
       let teamId = param["teamid"] as? String

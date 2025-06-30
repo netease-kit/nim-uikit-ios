@@ -111,5 +111,7 @@ open class NEContactBaseViewController: UIViewController, UIGestureRecognizerDel
     navigationController?.popViewController(animated: true)
   }
 
+  open func appEnterBackground() {}
+
   open func toSetting() {}
 }

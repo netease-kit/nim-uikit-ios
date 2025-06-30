@@ -165,7 +165,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     }
 
     loadData()
-    viewModel.getAddApplicationUnreadCount(nil)
+    viewModel.getValidationMessage(nil)
 
     if let customController = ContactUIConfig.shared.customController {
       customController(self)
@@ -185,8 +185,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       weakSelf?.didRefreshTable()
     }
 
-    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationUnreadCount, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationMessageUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
     IMKitClient.instance.addLoginListener(self)
   }
@@ -273,7 +272,9 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func loadData() {
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     viewModel.loadData { [weak self] error, userSectionCount in
+      NEALog.infoLog(NEBaseContactViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
         self?.delegate?.onDataLoaded()
         self?.didRefreshTable()

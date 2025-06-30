@@ -167,6 +167,7 @@ public class NELoginViewController: UIViewController {
     print("login token : ", token)
     
     let option = V2NIMLoginOption()
+    option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
     IMKitClient.instance.login(account, token, option) { error in
         if let err = error {
             NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")

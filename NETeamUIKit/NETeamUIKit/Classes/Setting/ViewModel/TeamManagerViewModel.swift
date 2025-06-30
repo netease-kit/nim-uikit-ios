@@ -21,6 +21,12 @@ public protocol TeamManagerViewModelDelegate: NSObjectProtocol {
   /// 置顶权限变更回调
   /// - Parameter model: 设置数据模型
   func didTopMessagePermissionClick(_ model: SettingCellModel)
+  /// [入群邀请需同意] 变更回调
+  /// - Parameter model: 设置数据模型
+  func didJoinTeamNeedAgreeClick(_ model: SettingCellModel, _ isOpen: Bool)
+  /// [入群审核] 变更回调
+  /// - Parameter model: 设置数据模型
+  func didJoinTeamNeedVerificationClick(_ model: SettingCellModel, _ isOpen: Bool)
   /// 管理员点击回调
   func didManagerClick()
   /// 通知页面刷新回调
@@ -64,6 +70,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       sectionData.append(getFirstSection())
     }
     sectionData.append(getSecondSection())
+    sectionData.append(getThirdSection())
   }
 
   /// 获取当前用户在群中的信息
@@ -151,7 +158,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     weak var weakSelf = self
     let model = SettingSectionModel()
 
-    // 谁可以编辑群信息
+    // MARK: 谁可以编辑群信息
+
     let editTeamPermission = SettingCellModel()
     editTeamPermission.cellName = localizable("who_edit_team_info")
     editTeamPermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -167,7 +175,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       weakSelf?.delegate?.didUpdateTeamInfoClick(editTeamPermission)
     }
 
-    // 谁可以添加群成员
+    // MARK: 谁可以添加群成员
+
     let invitePermission = SettingCellModel()
     invitePermission.cellName = localizable("who_edit_user_info")
     invitePermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -182,7 +191,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       weakSelf?.delegate?.didChangeInviteModeClick(invitePermission)
     }
 
-    // 谁可以 @所有人
+    // MARK: 谁可以 @所有人
+
     let atAllPermission = SettingCellModel()
     atAllPermission.cellName = localizable("who_at_all")
     atAllPermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -197,7 +207,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     model.cellModels.append(contentsOf: [editTeamPermission, invitePermission, atAllPermission])
 
     if IMKitConfigCenter.shared.enableTopMessage {
-      // 谁可以置顶消息
+      // MARK: 谁可以置顶消息
+
       let topMessagePermission = SettingCellModel()
       topMessagePermission.cellName = localizable("who_can_top_message")
       topMessagePermission.type = SettingCellType.SettingSelectCell.rawValue
@@ -210,6 +221,50 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       }
 
       model.cellModels.append(topMessagePermission)
+    }
+
+    // 设置 section 圆角
+    model.setCornerType()
+
+    return model
+  }
+
+  /// 获取 third section数据(进群管理)
+  open func getThirdSection() -> SettingSectionModel {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    weak var weakSelf = self
+    let model = SettingSectionModel()
+
+    if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
+      // MARK: 入群邀请需同意
+
+      let joinTeamNeedAgree = SettingCellModel()
+      joinTeamNeedAgree.cellName = localizable("invitation_acceptance_requirement")
+      joinTeamNeedAgree.type = SettingCellType.SettingSubtitleSelectCell.rawValue
+      joinTeamNeedAgree.rowHeight = 73
+      joinTeamNeedAgree.subTitle = localizable("invitation_acceptance_requirement_desc")
+      joinTeamNeedAgree.switchOpen = (teamInfoModel?.team?.agreeMode == .TEAM_AGREE_MODE_AUTH) ? true : false
+
+      joinTeamNeedAgree.swichChange = { isOpen in
+        weakSelf?.delegate?.didJoinTeamNeedAgreeClick(joinTeamNeedAgree, isOpen)
+      }
+
+      model.cellModels.append(joinTeamNeedAgree)
+
+      // MARK: 入群审核
+
+      let joinTeamNeedVerification = SettingCellModel()
+      joinTeamNeedVerification.cellName = localizable("require_verification_to_join")
+      joinTeamNeedVerification.type = SettingCellType.SettingSubtitleSelectCell.rawValue
+      joinTeamNeedVerification.rowHeight = 73
+      joinTeamNeedVerification.subTitle = localizable("require_verification_to_join_desc")
+      joinTeamNeedVerification.switchOpen = (teamInfoModel?.team?.joinMode == .TEAM_JOIN_MODE_APPLY) ? true : false
+
+      joinTeamNeedVerification.swichChange = { isOpen in
+        weakSelf?.delegate?.didJoinTeamNeedVerificationClick(joinTeamNeedVerification, isOpen)
+      }
+
+      model.cellModels.append(joinTeamNeedVerification)
     }
 
     // 设置 section 圆角
@@ -305,6 +360,34 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
           completion(error)
         }
       }
+    }
+  }
+
+  /// 更新群组被邀请人同意入群模式
+  ///  - Parameter  isNeedAgree: 邀请入群是否需要对方同意
+  ///  - Parameter completion: 完成回调
+  open func updateTeamAgreeMode(_ isNeedAgree: Bool, _ completion: @escaping (Error?) -> Void) {
+    guard let tid = teamInfoModel?.team?.teamId else {
+      return
+    }
+
+    let value: V2NIMTeamAgreeMode = isNeedAgree ? .TEAM_AGREE_MODE_AUTH : .TEAM_AGREE_MODE_NO_AUTH
+    teamRepo.updateTeamAgreeMode(tid, .TEAM_TYPE_NORMAL, value) { error, team in
+      completion(error)
+    }
+  }
+
+  /// 更新群组申请入群模式
+  ///  - Parameter  isNeedAgree: 入群是否需要群主或管理同意
+  ///  - Parameter completion: 完成回调
+  open func updateTeamJoinMode(_ isNeedAgree: Bool, _ completion: @escaping (Error?) -> Void) {
+    guard let tid = teamInfoModel?.team?.teamId else {
+      return
+    }
+
+    let value: V2NIMTeamJoinMode = isNeedAgree ? .TEAM_JOIN_MODE_APPLY : .TEAM_JOIN_MODE_FREE
+    teamRepo.updateTeamJoinMode(tid, .TEAM_TYPE_NORMAL, value) { error, team in
+      completion(error)
     }
   }
 

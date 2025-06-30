@@ -37,11 +37,17 @@ public extension ChatRouter {
         }
       }
 
-      if let remove = param["removeUserVC"] as? Bool, remove {
-        nav?.viewControllers.removeLast()
-      }
-
+      let count = nav?.viewControllers.count ?? 0
       nav?.pushViewController(p2pChatVC, animated: true)
+
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
+        if let remove = param["removeUserVC"] as? Bool, remove {
+          if count > 1,
+             nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
+            nav?.viewControllers.remove(at: count - 1)
+          }
+        }
+      }))
     }
 
     // group
@@ -67,7 +73,18 @@ public extension ChatRouter {
           return
         }
       }
+
+      let count = nav?.viewControllers.count ?? 0
       nav?.pushViewController(groupVC, animated: true)
+
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
+        if let remove = param["removeTeamVC"] as? Bool, remove {
+          if count > 1,
+             nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
+            nav?.viewControllers.remove(at: count - 1)
+          }
+        }
+      }))
     }
   }
 }

@@ -387,7 +387,10 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
   }
 
   func requestData() {
+    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(viewModel.syncFinished), timestamp: \(Date().timeIntervalSince1970)")
     viewModel.getConversationListByPage { [weak self] error, finished in
+      NEALog.infoLog(NEBaseLocalConversationController.className() + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.viewModel.syncFinished ?? false), timestamp: \(Date().timeIntervalSince1970)")
+
       self?.viewModel.getAIUserList()
 
       if let err = error {
@@ -449,7 +452,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
     var items = [PopListItem]()
     let addFriend = PopListItem()
     addFriend.showName = localizable("add_friend")
-    addFriend.image = localConversationCoreLoader.loadImage("add_friend")
+    addFriend.image = .ne_imageNamed(name: "add_friend")
     addFriend.completion = {
       Router.shared.use(
         ContactAddFriendRouter,
@@ -459,21 +462,33 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
     }
     items.append(addFriend)
 
-    let createGroup = PopListItem()
-    createGroup.showName = localizable("create_discussion_group")
-    createGroup.image = UIImage.ne_imageNamed(name: "create_discussion")
-    createGroup.completion = {
-      weakSelf?.createDiscussGroup()
+    let joinTeam = PopListItem()
+    joinTeam.showName = commonLocalizable("join_team")
+    joinTeam.image = .ne_imageNamed(name: "join_team")
+    joinTeam.completion = {
+      Router.shared.use(
+        TeamJoinTeamRouter,
+        parameters: ["nav": self.navigationController as Any],
+        closure: nil
+      )
     }
-    items.append(createGroup)
+    items.append(joinTeam)
 
     let createDicuss = PopListItem()
-    createDicuss.showName = localizable("create_senior_group")
-    createDicuss.image = UIImage.ne_imageNamed(name: "create_group")
+    createDicuss.showName = localizable("create_discussion_group")
+    createDicuss.image = .ne_imageNamed(name: "create_discussion")
     createDicuss.completion = {
-      weakSelf?.createSeniorGroup()
+      weakSelf?.createDiscussGroup()
     }
     items.append(createDicuss)
+
+    let createGroup = PopListItem()
+    createGroup.showName = localizable("create_senior_group")
+    createGroup.image = .ne_imageNamed(name: "create_group")
+    createGroup.completion = {
+      weakSelf?.createSeniorGroup()
+    }
+    items.append(createGroup)
 
     return items
   }

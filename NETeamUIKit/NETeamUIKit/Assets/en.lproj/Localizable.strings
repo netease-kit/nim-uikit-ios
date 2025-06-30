@@ -8,8 +8,10 @@
 "session_set_top"="Sticky on Top";
 "team_nick"="My Alias in Group";
 "team_no_speak"="Mute";
-"invite_permission"="Invite Permission";
-"modify_team_info_permission"="Group info Permission";
+"invitation_acceptance_requirement"="Invitation acceptance requirement";
+"invitation_acceptance_requirement_desc"="When enabled, inviting someone to join the team requires the invitee's approval before they can successfully join.";
+"require_verification_to_join"="Require verification to join";
+"require_verification_to_join_desc"="When enabled, members must obtain approval from the team owner or administrators before joining the team.";
 "setting"="Setting";
 "group_memmber"="Group Member";
 "discuss_mebmer"="Temp Group Member";
@@ -47,7 +49,6 @@
 
 // error toast
 "space_not_support"="All Spaces are not supported";
-"team_not_exist"="team not exist";
 
 "manage_team"="Manage Group";
 "confirm_delete_text"="Sure to Remove '%@'";
@@ -81,3 +82,8 @@
 "member_select_no_member"="No member";
 "remove_failed"="remove failed";
 "requesting"="Thinking…";
+"team_id"="team id";
+"team_owner"="team owner";
+"input_team_id"="input team id";
+"no_team_find"="no team was fond";
+"send_team_join_apply"="Team Join Request Sent";

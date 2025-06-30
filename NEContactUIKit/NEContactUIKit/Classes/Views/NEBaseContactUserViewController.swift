@@ -158,7 +158,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       // 数字人仅展示【聊天】
       data = [
         [
-          UserItem(title: localizable("chat"),
+          UserItem(title: commonLocalizable("chat"),
                    detailTitle: "",
                    value: false,
                    textColor: UIColor(hexString: "#337EFF"),
@@ -205,7 +205,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
                    cellClass: TextWithSwitchCell.self),
         ],
         [
-          UserItem(title: localizable("chat"),
+          UserItem(title: commonLocalizable("chat"),
                    detailTitle: "",
                    value: false,
                    textColor: UIColor(hexString: "#337EFF"),
@@ -318,7 +318,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 //        if item.title == localizable("加入黑名单") {
 //            blackList(isBlack: item.value)
 //        }
-    if item.title == localizable("chat") {
+    if item.title == commonLocalizable("chat") {
       chat(user: user)
     }
     if item.title == localizable("delete_friend") {

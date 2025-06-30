@@ -8,8 +8,10 @@
 "session_set_top"="聊天置顶";
 "team_nick"="我在群里的昵称";
 "team_no_speak"="群禁言";
-"invite_permission"="邀请他人权限";
-"modify_team_info_permission"="群资料修改权限";
+"invitation_acceptance_requirement"="入群邀请需同意";
+"invitation_acceptance_requirement_desc"="开启后，拉入入群，需被邀请人同意后才可成功";
+"require_verification_to_join"="入群审核";
+"require_verification_to_join_desc"="开启后，成员入群时需要群主或管理同意后才可加入";
 "setting"="设置";
 "group_memmber"="群成员";
 "discuss_mebmer"="讨论组成员";
@@ -47,7 +49,6 @@
 
 // error toast
 "space_not_support"="不支持全空格";
-"team_not_exist"="群组不存在";
 
 "manage_team"="群管理";
 "who_edit_team_info"="谁可以编辑群信息";
@@ -80,3 +81,8 @@
 "member_select_no_member"="暂无成员";
 "remove_failed"="移除失败";
 "requesting"="请求响应中...";
+"team_id"="群号";
+"team_owner"="群主";
+"input_team_id"="输入群号";
+"no_team_find"="该群组不存在";
+"send_team_join_apply"="入群申请已发送";

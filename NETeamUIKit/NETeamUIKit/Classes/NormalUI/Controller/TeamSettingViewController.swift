@@ -68,13 +68,6 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     return memberListButton
   }()
 
-  /// 群信息页面跳转按钮
-  public var infoButton: UIButton = {
-    let infoButton = UIButton()
-    infoButton.translatesAutoresizingMaskIntoConstraints = false
-    return infoButton
-  }()
-
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
@@ -102,27 +95,34 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
       cornerView.heightAnchor.constraint(equalToConstant: 160),
     ])
 
-    cornerView.addSubview(teamHeaderView)
+    let teamHeaderBackView = UIView()
+    teamHeaderBackView.translatesAutoresizingMaskIntoConstraints = false
+    teamHeaderBackView.backgroundColor = .clear
+    cornerView.addSubview(teamHeaderBackView)
     NSLayoutConstraint.activate([
-      teamHeaderView.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16),
-      teamHeaderView.topAnchor.constraint(equalTo: cornerView.topAnchor, constant: 16),
-      teamHeaderView.widthAnchor.constraint(equalToConstant: 42),
-      teamHeaderView.heightAnchor.constraint(equalToConstant: 42),
+      teamHeaderBackView.leftAnchor.constraint(equalTo: cornerView.leftAnchor),
+      teamHeaderBackView.topAnchor.constraint(equalTo: cornerView.topAnchor),
+      teamHeaderBackView.heightAnchor.constraint(equalToConstant: 68),
+      teamHeaderBackView.rightAnchor.constraint(equalTo: cornerView.rightAnchor),
+    ])
+
+    let tap = UITapGestureRecognizer(target: self, action: #selector(toInfoView))
+    teamHeaderBackView.addGestureRecognizer(tap)
+
+    teamHeaderBackView.addSubview(teamHeaderView)
+    NSLayoutConstraint.activate([
+      teamHeaderView.leftAnchor.constraint(equalTo: teamHeaderBackView.leftAnchor, constant: 16),
+      teamHeaderView.topAnchor.constraint(equalTo: teamHeaderBackView.topAnchor, constant: 6),
+      teamHeaderView.rightAnchor.constraint(equalTo: teamHeaderBackView.rightAnchor, constant: -34),
+      teamHeaderView.heightAnchor.constraint(equalToConstant: 62),
     ])
 
     setTeamHeaderInfo()
 
-    cornerView.addSubview(teamNameLabel)
-    NSLayoutConstraint.activate([
-      teamNameLabel.leftAnchor.constraint(equalTo: teamHeaderView.rightAnchor, constant: 11),
-      teamNameLabel.centerYAnchor.constraint(equalTo: teamHeaderView.centerYAnchor),
-      teamNameLabel.rightAnchor.constraint(equalTo: cornerView.rightAnchor, constant: -34),
-    ])
-
-    cornerView.addSubview(arrowImageView)
+    teamHeaderBackView.addSubview(arrowImageView)
     NSLayoutConstraint.activate([
       arrowImageView.centerYAnchor.constraint(equalTo: teamHeaderView.centerYAnchor),
-      arrowImageView.rightAnchor.constraint(equalTo: cornerView.rightAnchor, constant: -16),
+      arrowImageView.rightAnchor.constraint(equalTo: teamHeaderBackView.rightAnchor, constant: -16),
     ])
 
     cornerView.addSubview(dividerLineView)
@@ -130,7 +130,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
       dividerLineView.heightAnchor.constraint(equalToConstant: 1.0),
       dividerLineView.rightAnchor.constraint(equalTo: cornerView.rightAnchor),
       dividerLineView.leftAnchor.constraint(equalTo: cornerView.leftAnchor, constant: 16.0),
-      dividerLineView.topAnchor.constraint(equalTo: teamHeaderView.bottomAnchor, constant: 12.0),
+      dividerLineView.topAnchor.constraint(equalTo: teamHeaderView.bottomAnchor, constant: 6),
     ])
 
     cornerView.addSubview(memberLabel)
@@ -182,21 +182,9 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
        member.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
       addButtonWidth?.constant = 0
       addButton.isHidden = true
-    } else {
-      addButtonWidth?.constant = 36
-      addButton.isHidden = false
     }
 
     setupUserInfoCollection(cornerView)
-
-    cornerView.addSubview(infoButton)
-    NSLayoutConstraint.activate([
-      infoButton.leftAnchor.constraint(equalTo: teamHeaderView.leftAnchor),
-      infoButton.topAnchor.constraint(equalTo: teamHeaderView.topAnchor),
-      infoButton.bottomAnchor.constraint(equalTo: teamHeaderView.bottomAnchor),
-      infoButton.rightAnchor.constraint(equalTo: arrowImageView.rightAnchor),
-    ])
-    infoButton.addTarget(self, action: #selector(toInfoView), for: .touchUpInside)
 
     return backView
   }

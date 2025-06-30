@@ -72,16 +72,6 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     return tableView
   }()
 
-  /// 空占位图
-  public lazy var emptyView: NEEmptyDataView = {
-    // member_select_no_member
-    let view = NEEmptyDataView(imageName: "user_empty", content: localizable("no_result"), frame: .zero)
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.isUserInteractionEnabled = false
-    view.isHidden = true
-    return view
-  }()
-
   /// 搜索背景图
   public lazy var searchIconImageView: UIImageView = {
     let searchIconImageView = UIImageView()
@@ -105,6 +95,9 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     viewModel.delegate = self
     viewModel.teamId = teamId
     navigationView.moreButton.isHidden = true
+    emptyView.setEmptyImage(name: "user_empty")
+    emptyView.setText("no_result")
+
     weak var weakSelf = self
     if let tid = teamId {
       weakSelf?.viewModel.getTeamInfo(tid) { teamInfo, error in

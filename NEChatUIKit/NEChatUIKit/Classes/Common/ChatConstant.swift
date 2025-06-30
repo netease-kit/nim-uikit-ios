@@ -93,9 +93,6 @@ public let NEMoreCell_Title_Height: CGFloat = 20.0
 public let NEMoreView_Margin: CGFloat = 16.0
 public let NEMoreView_Column_Count: Int = 4
 
-/// AI 助聊上下文条数
-public let aiChatContentsCount: Int = 5
-
 // MARK: 字体
 
 let TextFont: ((String, Float) -> UIFont) = {

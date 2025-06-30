@@ -18,17 +18,16 @@
 
 //MARK: tips
 //MARK: team
-"invite"="邀请 ";
+"invite"="邀请";
 "enter"="加入";
 "unknown_system_message"="未知消息类型";
 "You"="你";
-"discussion_group"="群";
-"group"="群";
-"group_chat"="群聊";
 "dissolve"="解散了";
-"kick"="将 ";
-"out"="移除了 ";
-"has_updated" = "更新了";
+"kick"="将";
+"out"="移除了";
+"has_updated" = "更新了 ";
+"has_open" = "开启了 ";
+"has_closed" = "关闭了 ";
 "to" = "为 ";
 "only_team_owner" = "群主和管理员";
 "everyone" = "所有人";
@@ -37,11 +36,11 @@
 "team_intro" = "介绍";
 "team_anouncement" = "公告";
 "team_avatar" = "头像";
-"team_join_mode" = "加入方式";
+"team_join_mode" = "入群审核";
 "team_permission" = "群权限";
 "team_be_invited_mode" = "邀请方式";
 "team_be_invited_permission" = "邀请他人权限";
-"team_be_invited_author" = "是否需要被邀请者同意权限";
+"team_agree_mode" = "入群邀请需同意";
 "team_update_info_permission" = "群资料修改权限";
 "team_update_client_custom"="更新客户端自定义字段的权限";
 "team_at_permission"="@所有人权限更新为";
@@ -59,7 +58,6 @@
 "transfer"="转移了群主身份给";
 "added_manager"="被任命为群管理员";
 "removed_manager"="被移除管理员";
-"accept"="接受入群邀请来自";
 "team_mute"="当前群主设置为禁言";
 "team_all_mute"="群禁言已开启";
 "team_all_no_mute"="群禁言已关闭";
@@ -71,6 +69,8 @@
 "message_remind"="开启消息提醒";
 "open_soon"="暂未开放";
 "no_permission_tip"="暂无操作权限";
+"team_apply"="的入群申请已通过";
+"team_invitation"="的入群邀请";
 
 //MARK: operation
 "operation_copy"="复制";
@@ -161,7 +161,6 @@
 
 "you_were_mentioned"="[有人@我]";
 // MARK: error toast
-"team_not_exist"="群组不存在";
 "unpin_failed"="取消标记失败";
 "pin_limit_exceeded"="已超出 pin 数量上限";
 

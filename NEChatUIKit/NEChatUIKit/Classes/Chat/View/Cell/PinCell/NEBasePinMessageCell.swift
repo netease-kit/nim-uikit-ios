@@ -97,8 +97,8 @@ open class NEBasePinMessageCell: UITableViewCell {
     backRightConstraint = backView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20)
     backRightConstraint?.isActive = true
     NSLayoutConstraint.activate([
-      backView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-      backView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+      backView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
+      backView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
     ])
 
     backView.addSubview(headerView)

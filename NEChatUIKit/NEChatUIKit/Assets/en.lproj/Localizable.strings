@@ -23,13 +23,12 @@
 "enter"="join";
 "unknown_system_message"="Unknown message";
 "You"="you";
-"discussion_group"="group";
-"group"="group";
-"group_chat"="group chat";
 "dissolve"="dissolved";
 "kick"="将 ";
 "out"="remove";
 "has_updated" = "update ";
+"has_open" = "open ";
+"has_closed" = "closed ";
 "to" = "to ";
 "only_team_owner" = "Owner & Admin";
 "everyone" = "Everyone";
@@ -38,11 +37,11 @@
 "team_intro" = "Description";
 "team_anouncement" = "Notice";
 "team_avatar" = "Group Avatar";
-"team_join_mode" = "Join Mode";
+"team_join_mode" = "Require verification to join";
 "team_permission" = "Team Permisson";
 "team_be_invited_mode" = "Invite Mode";
 "team_be_invited_permission" = "Invite Permission";
-"team_be_invited_author" = "BeInvite Permission";
+"team_agree_mode" = "Invitation acceptance requirement";
 "team_update_info_permission" = "Update Info Permission";
 "team_update_client_custom"="Update Permission";
 "team_at_permission"="@All Permission update to ";
@@ -60,7 +59,6 @@
 "transfer"="Transferred the group leader identity to";
 "added_manager"="add to be Group administrator";
 "removed_manager"="Group administrator identity revoked";
-"accept"="Accept the group invitation from";
 "team_mute"="Mute";
 "team_all_mute"="Mute everyone";
 "team_all_no_mute"="Unmute all";
@@ -76,6 +74,9 @@
 
 "open_soon"="Not open";
 "no_permission_tip"="No Permission";
+
+"team_apply"="team apply has been approved";
+"team_invitation"="team invitation has been approved";
 
 //MARK: operation
 "operation_copy"="Copy";
@@ -164,7 +165,6 @@
 
 "you_were_mentioned"="[You were mentioned]";
 // MARK: error toast
-"team_not_exist"="team not exist";
 "unpin_failed"="Unpin failed";
 "pin_limit_exceeded"="Number of pin reaches the limit.";
 

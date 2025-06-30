@@ -16,14 +16,14 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
   private var isdismissDiscuss = false // 讨论组是否已解散
   private var onCurrentPage = false // 是否位于聊天详情页
 
+  /// 创建群的构造方法
+  /// - Parameter sessionId: 会话id
   public init(conversationId: String, anchor: V2NIMMessage?) {
     super.init(conversationId: conversationId)
     viewModel = TeamChatViewModel(conversationId: conversationId, anchor: anchor)
     viewModel.delegate = self
   }
 
-  /// 创建群的构造方法
-  /// - Parameter sessionId: 会话id
   public init(sessionId: String) {
     let conversationId = V2NIMConversationIdUtil.teamConversationId(sessionId) ?? ""
     super.init(conversationId: conversationId)
@@ -74,7 +74,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {
             if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == true, team.isValidTeam == false {
-              self?.showSingleAlert(message: chatCoreLoader.localizable("team_not_exist")) {
+              self?.showSingleAlert(message: commonLocalizable("team_not_exist")) {
                 NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
               }
