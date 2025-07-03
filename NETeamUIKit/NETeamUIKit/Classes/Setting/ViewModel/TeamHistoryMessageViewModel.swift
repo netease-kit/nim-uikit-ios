@@ -69,7 +69,6 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
 
     weak var weakSelf = self
     chatRepo.searchMessages(params: param) { messages, error in
-
       if error == nil {
         // 未找到用户信息信息记录
         var noFindUserSet = Set<String>()
@@ -184,7 +183,6 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
     }
 
     contactRepo.getUserWithFriend(accountIds: accids) { users, v2Error in
-
       if v2Error != nil {
         completion(nil, memberModels)
       } else {

@@ -67,7 +67,6 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
   override open func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
     chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
     super.getSessionInfo(sessionId: sessionId) { [weak self] in
-
       if let vm = self?.viewModel as? TeamChatViewModel {
         vm.getTeamInfo(teamId: sessionId) { error, team in
           if let team = team {

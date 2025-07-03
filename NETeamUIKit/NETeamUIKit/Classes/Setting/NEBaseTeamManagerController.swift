@@ -358,7 +358,6 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     actionSheetController.addAction(cancelActionButton)
 
     let allAction = UIAlertAction(title: localizable("team_all"), style: .default) { [weak self] _ in
-
       if self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER, self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
         self?.showToast(localizable("no_permission_tip"))
         return
@@ -427,7 +426,6 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     actionSheetController.addAction(cancelActionButton)
 
     let allAction = UIAlertAction(title: localizable("team_all"), style: .default) { [weak self] _ in
-
       if self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_OWNER, self?.viewModel.teamMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER {
         self?.showToast(localizable("no_permission_tip"))
         return

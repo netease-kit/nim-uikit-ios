@@ -383,7 +383,6 @@ open class ChatViewModel: NSObject {
           userIds += self?.messages.compactMap { $0.message?.senderId } ?? []
           group.enter()
           self?.loadShowName(userIds, ChatRepo.sessionId) { [weak self] in
-
             // 获取头像昵称
             for model in self?.messages ?? [] {
               if let uid = ChatMessageHelper.getSenderId(model.message),
@@ -1773,6 +1772,11 @@ open class ChatViewModel: NSObject {
           hasFind = true
         }
       }
+    }
+
+    if !IMKitConfigCenter.shared.enableInsertLocalMsgWhenRevoke {
+      deleteMessageUpdateUI([message])
+      return
     }
 
     if index >= 0 {

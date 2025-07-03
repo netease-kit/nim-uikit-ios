@@ -369,7 +369,6 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
               weakSelf?.teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { result, error in
                 if let members = result?.memberList {
                   weakSelf?.getUserInfo(members) { error, models in
-
                     if let err = error {
                       completion(err, result?.finished)
                     } else {
@@ -406,7 +405,6 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
               weakSelf?.teamRepo.getTeamMemberList(teamId, .TEAM_TYPE_NORMAL, option) { result, error in
                 if let members = result?.memberList {
                   weakSelf?.getUserInfo(members) { error, models in
-
                     if let err = error {
                       completion(err, result?.finished)
                     } else {
@@ -437,7 +435,6 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     }
 
     ContactRepo.shared.getUserWithFriend(accountIds: accids) { users, v2Error in
-
       if v2Error != nil {
         completion(nil, memberModels)
       } else {

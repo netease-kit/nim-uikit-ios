@@ -192,7 +192,6 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
       let n = textInputView.text ?? ""
       view.makeToastActivity(.center)
       repo.updateMemberNick(tid, .TEAM_TYPE_NORMAL, uid, n) { error in
-
         weakSelf?.view.hideToastActivity()
         if error != nil {
           weakSelf?.showToast(commonLocalizable("failed_operation"))

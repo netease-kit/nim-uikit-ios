@@ -481,7 +481,6 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
       weak var weakSelf = self
       if let text = textfield.text {
         NEMapClient.shared().searchPosition(withKey: text) { models, error in
-
           weakSelf?.loadModels(models: models)
         }
       }
@@ -524,7 +523,6 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
   // 点击跳转三方应用
   open func didClickGuide() {
     showBottomSelectAlert(firstContent: mapLocalizable("gaode_map"), secondContent: mapLocalizable("tencent_map")) { value in
-
       if value == 0 {
         if let gaodeApp = URL(string: "iosamap://") {
           // 高德
