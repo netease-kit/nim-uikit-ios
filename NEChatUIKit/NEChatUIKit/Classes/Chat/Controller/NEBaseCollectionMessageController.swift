@@ -491,7 +491,6 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
     // 开始下载
     viewModel.downloadFile(urlString, path) { [weak self] progress in
-
       NEALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
 
       // 根据进度设置状态

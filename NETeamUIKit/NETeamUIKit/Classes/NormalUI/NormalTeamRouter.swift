@@ -35,7 +35,6 @@ public extension TeamRouter {
     }
 
     Router.shared.register(SearchMessageRouter) { param in
-
       let nav = param["nav"] as? UINavigationController
       if let teamId = param["teamId"] as? String {
         let searchMsgCtrl = TeamHistoryMessageController(teamId: teamId)

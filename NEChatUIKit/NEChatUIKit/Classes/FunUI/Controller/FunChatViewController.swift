@@ -191,7 +191,6 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   open func holdToSpeak(gesture: UILongPressGestureRecognizer) {
     switch gesture.state {
     case .possible:
-
       break
     case .began:
       print("start show record audio view")

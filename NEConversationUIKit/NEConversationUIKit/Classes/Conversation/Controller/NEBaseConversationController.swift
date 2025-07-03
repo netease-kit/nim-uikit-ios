@@ -839,7 +839,6 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       onTopRecentAtIndexPath(conversation: conversation,
                              indexPath: indexPath,
                              isTop: isTop) { [weak self] error in
-
         if let err = error {
           self?.view.ne_makeToast(err.localizedDescription)
         } else {

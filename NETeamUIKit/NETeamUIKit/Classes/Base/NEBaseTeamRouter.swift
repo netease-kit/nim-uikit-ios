@@ -66,7 +66,6 @@ open class TeamRouter: NSObject {
     }
 
     Router.shared.register(TeamCreateSenior) { param in
-
       if let accids = param["accids"] as? [String] {
         var name = (param["names"] as? String) ?? localizable("senior_team")
         if name.utf16.count > 30 {

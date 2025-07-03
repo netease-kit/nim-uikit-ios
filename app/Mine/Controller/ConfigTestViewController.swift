@@ -115,6 +115,15 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       IMKitConfigCenter.shared.enableOnlineStatus = isOpen
     }
     model.cellModels.append(showOnlineStatus)
+    
+    let enableInsertLocalMsgWhenRevoke = SettingCellModel()
+    enableInsertLocalMsgWhenRevoke.cellName = "撤回消息后是否插入提示消息"
+    enableInsertLocalMsgWhenRevoke.type = SettingCellType.SettingSwitchCell.rawValue
+    enableInsertLocalMsgWhenRevoke.switchOpen = IMKitConfigCenter.shared.enableInsertLocalMsgWhenRevoke
+    enableInsertLocalMsgWhenRevoke.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableInsertLocalMsgWhenRevoke = isOpen
+    }
+    model.cellModels.append(enableInsertLocalMsgWhenRevoke)
 
     let strangerCallModel = SettingCellModel()
     strangerCallModel.cellName = "陌生人能否进行音视频通话"

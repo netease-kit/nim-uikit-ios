@@ -183,7 +183,6 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     weak var weakSelf = self
 
     getAllConversation(&conversations) { error in
-
       let workingGroup = DispatchGroup()
       let workingQueue = DispatchQueue(label: "at_message_queue")
       guard var temDic = weakSelf?.getMessageDic() else {

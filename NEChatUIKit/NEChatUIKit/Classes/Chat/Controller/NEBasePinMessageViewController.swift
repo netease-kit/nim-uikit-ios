@@ -506,7 +506,6 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
     // 开始下载
     viewModel.downLoad(urlString, path) { [weak self] progress in
-
       NEALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
 
       // 根据进度设置状态

@@ -395,52 +395,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     return false
   }
 
-  /// 保存撤回消息
-  /// - Parameter messageRevoke: 撤回通知
-  /// - Parameter completion: 完成回调
-  open func saveRevokeMessage(_ messageRevoke: V2NIMMessageRevokeNotification,
-                              _ completion: @escaping (NSError?) -> Void) {
-    let messageNew = V2NIMMessageCreator.createTextMessage(localizable("message_recalled"))
-    messageNew.messageConfig?.unreadEnabled = false
-
-    var muta = [String: Any]()
-    if let ext = NECommonUtil.getDictionaryFromJSONString(messageRevoke.serverExtension ?? "") as? [String: Any] {
-      muta = ext
-    }
-    muta[revokeLocalMessage] = true
-    messageNew.serverExtension = NECommonUtil.getJSONStringFromDictionary(muta)
-
-    ChatRepo.shared.insertMessageToLocal(message: messageNew,
-                                         conversationId: messageRevoke.messageRefer?.conversationId ?? "",
-                                         senderId: messageRevoke.messageRefer?.senderId,
-                                         createTime: messageRevoke.messageRefer?.createTime) { _, error in
-      completion(error)
-    }
-  }
-
-  /// 撤回通知监听
-  /// - Parameter revokeNotifications: 撤回通知列表
-  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "onMessageRevokeNotifications ids: \(revokeNotifications.map { $0.messageRefer?.messageServerId })")
-
-    for messageRevoke in revokeNotifications {
-      guard let msgServerId = messageRevoke.messageRefer?.messageServerId else {
-        return
-      }
-
-      // 防止重复插入本地撤回消息
-      if ConversationDeduplicationHelper.instance.isRevokeMessageSaved(messageId: msgServerId) {
-        return
-      }
-
-      saveRevokeMessage(messageRevoke) { error in
-        if let err = error {
-          NEALog.infoLog(ModuleName + " " + ConversationViewModel.className(), desc: "saveRevokeMessage error \(err)")
-        }
-      }
-    }
-  }
-
   /// 收到点对点已读回执
   /// - Parameter readReceipts: 已读回执
   open func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIMP2PMessageReadReceipt]) {

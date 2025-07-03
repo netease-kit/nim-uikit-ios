@@ -545,7 +545,6 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       in: NSMakeRange(0, attribute.length),
       options: NSAttributedString.EnumerationOptions(rawValue: 0)
     ) { dics, range, stop in
-
       if let neAttachment = dics[NSAttributedString.Key.attachment] as? NEEmotionAttachment,
          let des = neAttachment.emotion?.tag {
         muta.append(des)

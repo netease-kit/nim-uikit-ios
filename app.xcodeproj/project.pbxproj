@@ -723,7 +723,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.8.2;
+				MARKETING_VERSION = 10.8.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -772,7 +772,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.8.2;
+				MARKETING_VERSION = 10.8.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
