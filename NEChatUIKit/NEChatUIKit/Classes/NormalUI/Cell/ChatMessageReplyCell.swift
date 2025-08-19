@@ -61,30 +61,20 @@ open class ChatMessageReplyCell: ChatMessageAIStreamTextCell {
     super.setModel(model, isSend)
 
     let replyImageView = isSend ? replyImageViewRight : replyImageViewLeft
-    if model.message?.messageType == .MESSAGE_TYPE_IMAGE,
-       let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment {
-      var urlString = ""
-      if let path = imageObject.path, FileManager.default.fileExists(atPath: path) {
-        urlString = path
-      } else if let url = imageObject.url {
-        if imageObject.ext?.lowercased() != ".gif" {
-          urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: 350)
-        }
-        urlString = url
-      }
-
+    if let m = model as? MessageImageModel,
+       let urlString = m.urlString {
       var options: SDWebImageOptions = [.retryFailed]
-      if imageObject.ext?.lowercased() != ".gif" {
+      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
+         imageObject.ext?.lowercased() != ".gif" {
         options = [.retryFailed, .progressiveLoad]
       }
 
-      let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 1000, height: 1000)]
       if urlString.hasPrefix("http") {
         let url = URL(string: urlString)
-        replyImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
+        replyImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       } else {
         let url = URL(fileURLWithPath: urlString)
-        replyImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
+        replyImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       }
     } else {
       replyImageView.image = nil

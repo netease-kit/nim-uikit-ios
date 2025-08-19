@@ -58,10 +58,8 @@ public class ChatMessageHelper: NSObject {
       return ""
     }
     if V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
-      if NEAIUserManager.shared.isAIUser(sessionId) {
-        return NEAIUserManager.shared.getShowName(sessionId) ?? sessionId
-      }
-      return NEFriendUserCache.shared.getShowName(sessionId)
+      let user = getUserFromCache(sessionId)
+      return user?.showName(showAlias) ?? sessionId
     } else {
       return NETeamUserManager.shared.getTeamInfo()?.name ?? sessionId
     }

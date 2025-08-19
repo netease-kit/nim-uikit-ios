@@ -84,19 +84,20 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
 
     setCustomCorner(model.isReplay)
 
-    if let m = model as? MessageImageModel, let imageUrl = m.urlString {
+    if let m = model as? MessageImageModel,
+       let imageUrl = m.urlString {
       var options: SDWebImageOptions = [.retryFailed]
-      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment, imageObject.ext?.lowercased() != ".gif" {
+      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
+         imageObject.ext?.lowercased() != ".gif" {
         options = [.retryFailed, .progressiveLoad]
       }
 
-      let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 1000, height: 1000)]
       if imageUrl.hasPrefix("http") {
         let url = URL(string: imageUrl)
-        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       } else {
         let url = URL(fileURLWithPath: imageUrl)
-        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: context)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       }
     } else {
       contentImageView.image = nil

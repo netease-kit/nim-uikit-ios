@@ -100,7 +100,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
                 // 获取图片缩略图
                 if let attach = topMessage.attachment as? V2NIMMessageImageAttachment, let imageUrl = attach.url {
-                  thumbUrl = V2NIMStorageUtil.imageThumbUrl(imageUrl, thumbSize: 350)
+                  thumbUrl = V2NIMStorageUtil.imageThumbUrl(imageUrl, thumbSize: ChatUIConfig.shared.imageThumbSize)
                 }
 
                 // 获取视频首帧
