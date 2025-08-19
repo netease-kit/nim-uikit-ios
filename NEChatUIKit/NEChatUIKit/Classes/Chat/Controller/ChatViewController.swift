@@ -901,6 +901,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func appEnterForegournd() {
     isCurrentPage = true
     markNeedReadMsg()
+    if !viewModel.isHistoryChat {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
+        self?.scrollTableViewToBottom()
+      }))
+    }
   }
 
   //    MARK: - 键盘通知相关操作
@@ -3949,6 +3954,10 @@ extension ChatViewController: NEIMKitClientListener {
 
     if status == .CONNECT_STATUS_CONNECTED, networkBroken {
       networkBroken = false
+      if isCurrentPage {
+        markNeedReadMsg()
+      }
+
       DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: DispatchWorkItem(block: { [weak self] in
         // 断网重连后不会重发标记回调，需要手动拉取
         self?.reLoadMoreWithMessage()

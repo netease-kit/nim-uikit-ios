@@ -18,8 +18,9 @@ open class MessageImageModel: MessageContentModel {
       if let path = imageObject.path, FileManager.default.fileExists(atPath: path) {
         urlString = path
       } else if let url = imageObject.url {
-        if imageObject.ext?.lowercased() != ".gif" {
-          urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: 350)
+        if imageObject.ext?.lowercased() != ".gif",
+           ChatUIConfig.shared.imageThumbSize > 0 {
+          urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: ChatUIConfig.shared.imageThumbSize)
         } else {
           urlString = url
         }

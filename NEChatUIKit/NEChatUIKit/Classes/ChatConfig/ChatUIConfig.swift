@@ -62,6 +62,9 @@ public class ChatUIConfig: NSObject {
   /// 发送文件大小限制(单位：MB)
   public var fileSizeLimit: Double = 200
 
+  /// 图片缩略图尺寸大小，为 0 则使用原图，本地图片默认使用原图
+  public var imageThumbSize: Int = 350
+
   /// 群未读显示限制数，默认超过200人不显示已读未读进度
   public var maxReadingNum = 200
 
