@@ -12,6 +12,11 @@ import NELocalConversationUIKit
 public class CustomConfig {
   public static let shared = CustomConfig()
 
+  /// 通过配置项实现 UI 自定义
+  open func configCommonUIKit() {
+    CommonUIConfig.shared.backArrowImage = UIImage(named: "copy_right")
+  }
+
   /// 通过配置项实现 UI 自定义，该方式不需要继承自 ChatViewController
   open func configChatUIKit() {
     ChatUIConfig.shared.messageProperties.avatarType = .cycle
@@ -23,8 +28,10 @@ public class CustomConfig {
     ChatUIConfig.shared.messageProperties.timeTextSize = 18
     ChatUIConfig.shared.messageProperties.userNickColor = UIColor.ne_redText
     ChatUIConfig.shared.messageProperties.userNickTextSize = 8.0
-    ChatUIConfig.shared.messageProperties.messageTextColor = UIColor.ne_redColor
-    ChatUIConfig.shared.messageProperties.messageTextSize = 12
+    ChatUIConfig.shared.messageProperties.selfMessageTextColor = UIColor.ne_redColor
+    ChatUIConfig.shared.messageProperties.receiveMessageTextColor = UIColor.blue
+    ChatUIConfig.shared.messageProperties.selfMessageTextSize = 14
+    ChatUIConfig.shared.messageProperties.receiveMessageTextSize = 12
     ChatUIConfig.shared.messageProperties.rightBubbleBg = UIImage(named: "copy_right")
     ChatUIConfig.shared.messageProperties.leftBubbleBg = UIImage(named: "copy_right")
     ChatUIConfig.shared.messageProperties.showP2pMessageStatus = false

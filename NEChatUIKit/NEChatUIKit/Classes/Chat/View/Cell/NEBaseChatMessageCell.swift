@@ -46,6 +46,9 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 
   // 重新生成流式消息
   @objc optional func regenAIStreamMessage(_ cell: UITableViewCell, _ model: MessageContentModel?)
+
+  // 点击自动检测的链接（url、mobile、email）
+  @objc optional func didTapDetectedLink(_ cell: UITableViewCell, _ model: MessageContentModel?, _ url: URL)
 }
 
 @objc
@@ -98,7 +101,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   // 已读未读点击手势
   private var tapGesture: UITapGestureRecognizer?
 
-  public let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
+  public var messageTextFont = UIFont.systemFont(ofSize: 16)
   public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -215,7 +218,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
 
     // time
     contentView.addSubview(timeLabel)
-    timeLabelHeightAnchor = timeLabel.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    timeLabelHeightAnchor = timeLabel.heightAnchor.constraint(equalToConstant: 22)
     timeLabelHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
@@ -238,7 +241,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     ])
 
     contentView.addSubview(fullNameLabel)
-    fullNameH = fullNameLabel.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    fullNameH = fullNameLabel.heightAnchor.constraint(equalToConstant: 20)
     fullNameH?.isActive = true
     NSLayoutConstraint.activate([
       fullNameLabel.leftAnchor.constraint(equalTo: userHeaderViewLeft.rightAnchor, constant: chat_content_margin),
@@ -257,7 +260,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     bubbleImageLeft.leftAnchor.constraint(equalTo: userHeaderViewLeft.rightAnchor, constant: chat_content_margin).isActive = true
 
     contentView.addSubview(pinLabelLeft)
-    pinLabelHLeft = pinLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    pinLabelHLeft = pinLabelLeft.heightAnchor.constraint(equalToConstant: 16)
     pinLabelHLeft?.isActive = true
     pinLabelWLeft = pinLabelLeft.widthAnchor.constraint(equalToConstant: pinLabelMaxWidth)
     pinLabelWLeft?.isActive = true
@@ -321,7 +324,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     ])
 
     contentView.addSubview(pinLabelRight)
-    pinLabelHRight = pinLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    pinLabelHRight = pinLabelRight.heightAnchor.constraint(equalToConstant: 16)
     pinLabelHRight?.isActive = true
     pinLabelWRight = pinLabelRight.widthAnchor.constraint(equalToConstant: 210)
     pinLabelWRight?.isActive = true
@@ -447,6 +450,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
     let bubbleH = isSend ? bubbleHRight : bubbleHLeft
     let userHeaderView = isSend ? userHeaderViewRight : userHeaderViewLeft
+    messageTextFont = UIFont.systemFont(ofSize: isSend ? ChatUIConfig.shared.messageProperties.receiveMessageTextSize : ChatUIConfig.shared.messageProperties.selfMessageTextSize)
 
     contentModel = model
     contentModel?.cell = self

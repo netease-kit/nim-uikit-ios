@@ -40,10 +40,6 @@ open class NEBasePinMessageRichTextCell: NEBasePinMessageTextCell {
       contentLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 1),
     ])
 
-    if let gesture = contentGesture {
-      contentLabel.addGestureRecognizer(gesture)
-    }
-
     let titleGesture = UITapGestureRecognizer(target: self, action: #selector(contentClick))
     titleLabel.addGestureRecognizer(titleGesture)
   }

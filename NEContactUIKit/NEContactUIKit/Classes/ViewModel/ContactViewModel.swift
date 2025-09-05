@@ -70,7 +70,6 @@ open class ContactViewModel: NSObject {
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
       if let users = contacts {
-        NEALog.infoLog("contact loadData", desc: "contact data:\(users)")
         weakSelf?.contactSections.removeAll()
         if let contactHeaders = weakSelf?.contactHeaders {
           weakSelf?.contactSections.append(contactHeaders)

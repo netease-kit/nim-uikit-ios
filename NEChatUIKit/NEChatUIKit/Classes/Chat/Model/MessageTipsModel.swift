@@ -13,6 +13,11 @@ open class MessageTipsModel: MessageContentModel {
   public required init(message: V2NIMMessage?) {
     super.init(message: message)
     type = .tip
+
+    resetMessage(message)
+  }
+
+  public func resetMessage(_ message: V2NIMMessage?) {
     if let msg = message {
       if msg.messageType == .MESSAGE_TYPE_NOTIFICATION {
         text = NotificationMessageUtils.textForNotification(message: msg)
@@ -25,7 +30,7 @@ open class MessageTipsModel: MessageContentModel {
 
     var font: UIFont = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
     if ChatMessageHelper.isAISender(message) {
-      font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
+      font = messageTextFont
     }
 
     let textSize = String.getRealSize(text, font, messageMaxSize)

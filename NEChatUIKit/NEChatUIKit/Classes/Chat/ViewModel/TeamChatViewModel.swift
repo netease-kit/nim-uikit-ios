@@ -50,8 +50,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   ///   - showAlias: 是否展示备注
   /// - Returns: 名称和好友信息
   override open func getShowName(_ accountId: String, _ showAlias: Bool = true) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
-    return NETeamUserManager.shared.getShowName(accountId, showAlias)
+    NETeamUserManager.shared.getShowName(accountId, showAlias)
   }
 
   /// 重写 获取用户展示名称
@@ -63,7 +62,9 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                                   _ teamId: String?,
                                   _ completion: @escaping () -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(String(describing: teamId))")
-    NETeamUserManager.shared.getTeamMembers(accountIds, false, completion)
+    DispatchQueue.global().async {
+      NETeamUserManager.shared.getTeamMembers(accountIds, false, completion)
+    }
   }
 
   /// 加载置顶消息

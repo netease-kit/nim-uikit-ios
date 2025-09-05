@@ -123,7 +123,8 @@ open class MessageContentModel: NSObject, MessageModel {
     }
   }
 
-  public let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
+  public var messageTextFont: UIFont = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.selfMessageTextSize)
+  public var messageTextColor = ChatUIConfig.shared.messageProperties.selfMessageTextColor
   public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
 
   public required init(message: V2NIMMessage?) {
@@ -134,5 +135,7 @@ open class MessageContentModel: NSObject, MessageModel {
       fullNameHeight = ChatUIConfig.shared.messageProperties.showTeamMessageNick ? 20 : 0
     }
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
+    messageTextFont = UIFont.systemFont(ofSize: message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextSize : ChatUIConfig.shared.messageProperties.receiveMessageTextSize)
+    messageTextColor = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextColor : ChatUIConfig.shared.messageProperties.receiveMessageTextColor
   }
 }

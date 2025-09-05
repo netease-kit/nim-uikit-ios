@@ -21,10 +21,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isUserInteractionEnabled = true
     label.font = messageTextFont
     label.backgroundColor = .clear
+    label.dataDetectorTypes = [.link, .phoneNumber]
     label.accessibilityIdentifier = "id.messageText"
-
-    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
-    label.addGestureRecognizer(singleTap)
 
     let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
     doubleTap.numberOfTapsRequired = 2
@@ -49,10 +47,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     label.isUserInteractionEnabled = true
     label.font = messageTextFont
     label.backgroundColor = .clear
+    label.dataDetectorTypes = [.link, .phoneNumber]
     label.accessibilityIdentifier = "id.messageText"
-
-    let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
-    label.addGestureRecognizer(singleTap)
 
     let doubleTap = UITapGestureRecognizer(target: self, action: #selector(tapFunc))
     doubleTap.numberOfTapsRequired = 2
@@ -197,7 +193,7 @@ extension FunChatMessageTextCell: UITextViewDelegate {
   }
 
   func getTextSize(_ attributedText: NSAttributedString?) -> CGSize {
-    NSAttributedString.getRealLabelSize(attributedText, messageTextFont, messageMaxSize)
+    NSAttributedString.getRealTextViewSize(attributedText, messageTextFont, messageMaxSize)
   }
 
   // textView 垂直居中
@@ -223,6 +219,13 @@ extension FunChatMessageTextCell: UITextViewDelegate {
   // 禁用长按图片突出显示
   open func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool {
     selectAllRange()
+    return false
+  }
+
+  // MARK: - 处理链接点击事件
+
+  public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
+    delegate?.didTapDetectedLink?(self, contentModel, URL)
     return false
   }
 }

@@ -81,7 +81,6 @@ public class NEP2PChatUserCache: NSObject {
   /// 获取缓存用户名字，p2p： 备注 > 昵称 > ID
   open func getShowName(_ userId: String,
                         _ showAlias: Bool = true) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId: " + userId)
     let user = getUserInfo(userId)
     return user?.showName(showAlias) ?? userId
   }

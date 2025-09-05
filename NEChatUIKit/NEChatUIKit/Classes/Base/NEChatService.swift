@@ -42,10 +42,11 @@ public class NEChatService: NSObject, ChatServiceDelegate, NEChatEmojProtocol {
     NEChatKitClient.instance.addEmojDelegate(self)
   }
 
-  open func getEmojAttributeString(_ content: String, _ font: CGFloat) -> NSAttributedString? {
+  open func getEmojAttributeString(_ content: String, _ font: CGFloat, _ color: UIColor) -> NSAttributedString? {
     let attributeStr = NEEmotionTool.getAttWithStr(
       str: content,
-      font: UIFont.systemFont(ofSize: font)
+      font: UIFont.systemFont(ofSize: font),
+      color: color
     )
     return attributeStr
   }

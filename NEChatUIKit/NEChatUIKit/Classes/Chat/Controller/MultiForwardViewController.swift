@@ -359,6 +359,28 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     }
   }
 
+  public func didTapDetectedLink(_ cell: UITableViewCell, _ model: MessageContentModel?, _ url: URL) {
+    if url.scheme == "mailto" {
+      // 处理邮箱
+      didTapMailto(url)
+    } else if url.scheme == "tel" {
+      // 处理电话号码
+      didTapTel(url)
+    } else {
+      // 处理网页链接
+      let ctrl = NEWKWebViewController(url: url.absoluteString, title: url.absoluteString)
+      navigationController?.pushViewController(ctrl, animated: true)
+    }
+  }
+
+  open func didTapTel(_ url: URL) {
+    showBottomTelAction(url)
+  }
+
+  open func didTapMailto(_ url: URL) {
+    showBottomMailAction(url)
+  }
+
   // MARK: ChatBaseCellDelegate ignore protocol
 
   open func didTapAvatarView(_ cell: UITableViewCell, _ model: MessageContentModel?) {}

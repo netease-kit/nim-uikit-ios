@@ -5,14 +5,15 @@
 import UIKit
 
 @objcMembers
-open class NEBasePinMessageTextCell: NEBasePinMessageCell {
-  public lazy var contentLabel: UILabel = {
-    let label = UILabel()
+open class NEBasePinMessageTextCell: NEBasePinMessageCell, LinkableLabelProtocol {
+  public lazy var contentLabel: NELinkableLabel = {
+    let label = NELinkableLabel()
     label.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true
     label.numberOfLines = 3
+    label.delegate = self
     label.accessibilityIdentifier = "id.message"
     return label
   }()
@@ -60,15 +61,13 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
       contentLabel.rightAnchor.constraint(equalTo: line.rightAnchor),
       contentLabel.topAnchor.constraint(equalTo: replyLabel.bottomAnchor, constant: 1),
     ])
-    if let gesture = contentGesture {
-      contentLabel.addGestureRecognizer(gesture)
-    }
   }
 
   override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
     if let model = item.chatmodel as? MessageTextModel {
       contentLabel.attributedText = model.attributeStr
+      contentLabel.updateLinkDetection()
       if model.isReplay == true {
         replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: model.replyText ?? "",
                                                                 font: replyLabel.font,
@@ -77,5 +76,11 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell {
         replyLabel.attributedText = nil
       }
     }
+  }
+
+  // MARK: LinkableLabelProtocol
+
+  public func didTapLink(url: URL?) {
+    delegate?.didTapDetectedLink?(pinModel, self, url)
   }
 }

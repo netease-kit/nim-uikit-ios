@@ -222,3 +222,5 @@
 
 "p2p_chat_online" = "(在线)";
 "p2p_chat_offline" = "(离线)";
+
+"line_break" = "换行";

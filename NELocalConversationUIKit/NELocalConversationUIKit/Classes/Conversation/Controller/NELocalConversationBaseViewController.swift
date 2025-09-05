@@ -81,7 +81,7 @@ open class NELocalConversationBaseViewController: UIViewController, UIGestureRec
   }
 
   open func setupBackUI() {
-    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
+    let image = CommonUIConfig.shared.backArrowImage?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,

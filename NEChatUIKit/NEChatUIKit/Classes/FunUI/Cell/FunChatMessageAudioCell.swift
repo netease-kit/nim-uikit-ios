@@ -130,9 +130,9 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
     }
 
     contentView.addSubview(contentLabelLeftView)
-    contentLabelLeftViewWidthAnchor = contentLabelLeftView.widthAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelLeftViewWidthAnchor = contentLabelLeftView.widthAnchor.constraint(equalToConstant: chat_content_maxW)
     contentLabelLeftViewWidthAnchor?.isActive = true
-    contentLabelLeftViewHeightAnchor = contentLabelLeftView.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelLeftViewHeightAnchor = contentLabelLeftView.heightAnchor.constraint(equalToConstant: fun_chat_min_h)
     contentLabelLeftViewHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelLeftView.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
@@ -165,9 +165,9 @@ open class FunChatMessageAudioCell: FunChatMessageBaseCell, ChatAudioCellProtoco
     }
 
     contentView.addSubview(contentLabelRightView)
-    contentLabelRightViewWidthAnchor = contentLabelRightView.widthAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelRightViewWidthAnchor = contentLabelRightView.widthAnchor.constraint(equalToConstant: chat_content_maxW)
     contentLabelRightViewWidthAnchor?.isActive = true
-    contentLabelRightViewHeightAnchor = contentLabelRightView.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelRightViewHeightAnchor = contentLabelRightView.heightAnchor.constraint(equalToConstant: fun_chat_min_h)
     contentLabelRightViewHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelRightView.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),

@@ -78,3 +78,4 @@
 "privatized_configuration"="Privatized configuration";
 "login_by_account"="login";
 "security_warning"="For test only. Beware of money transfer, lottery winnings & strange call scams.";
+"login_token_expired"="Login authentication failed, please login again.";

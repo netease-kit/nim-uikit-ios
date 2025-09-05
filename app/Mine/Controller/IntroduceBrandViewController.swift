@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatUIKit
+import NECommonUIKit
 import NECoreKit
 import NETeamUIKit
 import UIKit
@@ -113,7 +114,7 @@ class IntroduceBrandViewController: NEBaseViewController, UITableViewDelegate,
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if indexPath.row == 2 {
-      let ctrl = NEAboutWebViewController(url: "https://netease.im/m/")
+      let ctrl = NEWKWebViewController(url: "https://netease.im/m/", title: localizable("product_intro"))
       navigationController?.pushViewController(ctrl, animated: true)
     }
   }

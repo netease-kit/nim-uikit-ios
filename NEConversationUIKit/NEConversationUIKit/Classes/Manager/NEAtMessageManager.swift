@@ -258,45 +258,48 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 加载本地缓存文件
   private func loadCacheFromDocument() {
     NEALog.infoLog(className(), desc: "loadCacheFromDocument")
-    if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-      weak var weakSelf = self
-      let documentDir = documentsDirectory.appendingPathComponent(imkitDir)
-      if FileManager.default.fileExists(atPath: documentDir.path) == false {
-        do {
-          try FileManager.default.createDirectory(at: documentDir, withIntermediateDirectories: false)
-        } catch {
-          NEALog.infoLog(className(), desc: "create dir error : \(error.localizedDescription)")
-        }
+    guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+      return
+    }
+
+    weak var weakSelf = self
+    let documentDir = documentsDirectory.appendingPathComponent(imkitDir)
+    if FileManager.default.fileExists(atPath: documentDir.path) == false {
+      do {
+        try FileManager.default.createDirectory(at: documentDir, withIntermediateDirectories: false)
+      } catch {
+        NEALog.infoLog(className(), desc: "create dir error : \(error.localizedDescription)")
       }
-      let filePath = documentDir.appendingPathComponent("\(currentAccid)_at_message.plist")
-      if FileManager.default.fileExists(atPath: filePath.path) == false {
-        let success = FileManager.default.createFile(atPath: filePath.absoluteString, contents: nil)
-        NEALog.infoLog(className(), desc: "create file success:  \(success) path: \(filePath.absoluteString)")
-      } else {
-        do {
-          let data = try Data(contentsOf: filePath)
-          if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
-            var temdDic = weakSelf?.getMessageDic()
-            for (key, value) in jsonObject {
-              if let model = AtMEMessageRecord.yx_model(with: value) {
-                temdDic?[key] = model
-                if let dic = jsonObject[key], let isRead = dic[#keyPath(AtMEMessageRecord.isRead)] as? Bool {
-                  model.isRead = isRead
-                  if let atMessagesJsonObject = dic[#keyPath(AtMEMessageRecord.atMessages)] {
-                    if let atMessages = NSDictionary.yx_modelDictionary(with: NSDictionary.self, json: atMessagesJsonObject) as? [String: NSNumber] {
-                      model.atMessages = atMessages
-                    }
+    }
+
+    let filePath = documentDir.appendingPathComponent("\(currentAccid)_at_message_cloud.plist")
+    if FileManager.default.fileExists(atPath: filePath.path) == false {
+      let success = FileManager.default.createFile(atPath: filePath.path, contents: nil)
+      NEALog.infoLog(className(), desc: "create file success:  \(success) path: \(filePath.path)")
+    } else {
+      do {
+        let data = try Data(contentsOf: filePath)
+        if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
+          var temdDic = weakSelf?.getMessageDic()
+          for (key, value) in jsonObject {
+            if let model = AtMEMessageRecord.yx_model(with: value) {
+              temdDic?[key] = model
+              if let dic = jsonObject[key], let isRead = dic[#keyPath(AtMEMessageRecord.isRead)] as? Bool {
+                model.isRead = isRead
+                if let atMessagesJsonObject = dic[#keyPath(AtMEMessageRecord.atMessages)] {
+                  if let atMessages = NSDictionary.yx_modelDictionary(with: NSDictionary.self, json: atMessagesJsonObject) as? [String: NSNumber] {
+                    model.atMessages = atMessages
                   }
                 }
               }
             }
-            if let tem = temdDic {
-              weakSelf?.setMessageDic(tem)
-            }
           }
-        } catch {
-          NEALog.infoLog(className(), desc: "convert to message data to json object error : \(error.localizedDescription)")
+          if let tem = temdDic {
+            weakSelf?.setMessageDic(tem)
+          }
         }
+      } catch {
+        NEALog.infoLog(className(), desc: "convert to message data to json object error : \(error.localizedDescription)")
       }
     }
   }

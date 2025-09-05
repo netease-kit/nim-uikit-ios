@@ -152,7 +152,9 @@ open class TopMessageView: UIView {
     let attributedString = NSMutableAttributedString(string: text)
 
     if let content = content {
-      let emojiAttr = NEEmotionTool.getAttWithStr(str: content, font: topContentLabel.font)
+      let emojiAttr = NEEmotionTool.getAttWithStr(str: content,
+                                                  font: topContentLabel.font,
+                                                  color: UIColor.ne_darkText)
       attributedString.append(emojiAttr)
     }
 

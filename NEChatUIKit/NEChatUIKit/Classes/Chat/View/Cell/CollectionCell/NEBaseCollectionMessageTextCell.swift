@@ -2,19 +2,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NECommonUIKit
 import UIKit
 
 @objcMembers
 open
-class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell {
+class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell, LinkableLabelProtocol {
   /// 内容文本
-  public lazy var collectionContentLabel: UILabel = {
-    let label = UILabel()
+  public lazy var collectionContentLabel: NELinkableLabel = {
+    let label = NELinkableLabel()
     label.font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.pinMessageTextSize)
     label.textColor = .ne_darkText
     label.translatesAutoresizingMaskIntoConstraints = false
     label.isUserInteractionEnabled = true
     label.numberOfLines = 3
+    label.delegate = self
     label.accessibilityIdentifier = "id.message"
     return label
   }()
@@ -50,9 +52,6 @@ class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell {
       collectionContentLabel.rightAnchor.constraint(equalTo: line.rightAnchor),
       collectionContentLabel.bottomAnchor.constraint(equalTo: line.topAnchor, constant: -12),
     ])
-    if let gesture = contentGesture {
-      collectionContentLabel.addGestureRecognizer(gesture)
-    }
   }
 
   override open func setupCommonUI() {
@@ -64,6 +63,13 @@ class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell {
     super.configureData(model)
     if let model = model.chatmodel as? MessageTextModel {
       collectionContentLabel.attributedText = model.attributeStr
+      collectionContentLabel.updateLinkDetection()
     }
+  }
+
+  // MARK: LinkableLabelProtocol
+
+  public func didTapLink(url: URL?) {
+    delegate?.didTapDetectedLink?(collectionModel, self, url)
   }
 }

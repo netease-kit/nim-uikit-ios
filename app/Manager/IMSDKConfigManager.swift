@@ -53,8 +53,12 @@ class IMSDKConfigManager: NSObject {
   }
 
   func loadObjectFromDisk(fileName: String) -> IMSDKConfigModel? {
-    if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-      let archiveURL = documentsDirectory.appendingPathComponent(fileName)
+    guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+      return nil
+    }
+
+    let archiveURL = documentsDirectory.appendingPathComponent(fileName)
+    if FileManager.default.fileExists(atPath: archiveURL.path) {
       do {
         let retrievedData = try Data(contentsOf: archiveURL)
         if let object = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(retrievedData) as? IMSDKConfigModel {
@@ -64,6 +68,7 @@ class IMSDKConfigManager: NSObject {
         print("loadObjectFromDisk error: \(error)")
       }
     }
+
     return nil
   }
 

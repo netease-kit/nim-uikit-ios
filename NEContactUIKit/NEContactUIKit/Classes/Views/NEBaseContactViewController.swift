@@ -288,12 +288,21 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewModel.contactSections[section].contacts.count
+    guard section < viewModel.contactSections.count else {
+      return 0
+    }
+
+    return viewModel.contactSections[section].contacts.count
   }
 
   // 具体逻辑在子类实现
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    guard indexPath.section < viewModel.contactSections.count,
+          indexPath.row < viewModel.contactSections[indexPath.section].contacts.count else {
+      return UITableViewCell()
+    }
+
     let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
     let reusedId = "\(info.contactCellType.rawValue)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
@@ -325,6 +334,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func tableView(_ tableView: UITableView,
                       viewForHeaderInSection section: Int) -> UIView? {
+    guard section < viewModel.contactSections.count else {
+      return nil
+    }
+
     let sectionView: ContactSectionView = tableView
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
@@ -335,6 +348,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
+    guard section < viewModel.contactSections.count else {
+      return 0
+    }
+
     if viewModel.contactSections[section].initial.count > 0 {
       return 40
     }
@@ -362,6 +379,11 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard indexPath.section < viewModel.contactSections.count,
+          indexPath.row < viewModel.contactSections[indexPath.section].contacts.count else {
+      return
+    }
+
     let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
 
     if info.contactCellType == .ContactOthers {
