@@ -62,4 +62,18 @@ open class FunPinMessageViewController: NEBasePinMessageViewController {
                                                    _ messageAttachmentMD5: String?) -> MultiForwardViewController {
     FunMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
+
+  override func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
+    let textViewController = FunTextViewController(title: title, body: body)
+    textViewController.updateLinkDetection()
+    return textViewController
+  }
+
+  override open func didTapTel(_ url: URL) {
+    showCustomBottomTelAction(url)
+  }
+
+  override open func didTapMailto(_ url: URL) {
+    showCustomBottomMailAction(url)
+  }
 }

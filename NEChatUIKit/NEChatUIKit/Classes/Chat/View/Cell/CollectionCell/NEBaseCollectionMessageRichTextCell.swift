@@ -55,10 +55,6 @@ class NEBaseCollectionMessageRichTextCell: NEBaseCollectionMessageTextCell {
       collectionTitleLabel.bottomAnchor.constraint(equalTo: collectionContentLabel.topAnchor, constant: -1),
     ])
 
-    if let gesture = contentGesture {
-      collectionContentLabel.addGestureRecognizer(gesture)
-    }
-
     let titleGesture = UITapGestureRecognizer(target: self, action: #selector(contentClick))
     collectionTitleLabel.addGestureRecognizer(titleGesture)
   }

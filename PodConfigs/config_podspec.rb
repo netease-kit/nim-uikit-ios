@@ -1,8 +1,12 @@
 # podspec 配置文件，用于源码依赖时统一配置
 
 module YXConfig
+  def self.commonuikit_version
+    "9.8.0"
+  end
+
   def self.imuikit_version
-    "10.8.4"
+    "10.8.5"
   end
 
   def self.deployment_target

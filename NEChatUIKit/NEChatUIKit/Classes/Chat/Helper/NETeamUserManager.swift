@@ -222,8 +222,6 @@ public class NETeamUserManager: NSObject {
   /// 获取缓存群成员名字，team: 备注 > 群昵称 > 昵称 > ID
   open func getShowName(_ accountId: String,
                         _ showAlias: Bool = true) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", userId: " + accountId)
-
     // 数字人直接返回
     if let aiUser: NEUserWithFriend = NEAIUserManager.shared.getAIUserById(accountId) {
       return aiUser.showName() ?? accountId
@@ -285,10 +283,13 @@ public class NETeamUserManager: NSObject {
 
     // 先查询用户信息(陌生人)
     if !loadUserIds.isEmpty {
-      group.enter()
-      ContactRepo.shared.getUserListFromCloud(accountIds: Array(loadUserIds)) { [weak self] users, error in
-        users?.forEach { self?.updateUserInfo(userWithFriend: $0) }
-        group.leave()
+      let loadUserIdChunks = Array(loadUserIds).chunk(150)
+      for loadUserIdChunk in loadUserIdChunks {
+        group.enter()
+        ContactRepo.shared.getUserListFromCloud(accountIds: loadUserIdChunk) { [weak self] users, error in
+          users?.forEach { self?.updateUserInfo(userWithFriend: $0) }
+          group.leave()
+        }
       }
     }
 
@@ -408,7 +409,6 @@ public class NETeamUserManager: NSObject {
   private func fetchTeamMemberUserInfos(_ remainUserIds: inout [[String]],
                                         _ memberUsers: [NEUserWithFriend],
                                         _ completion: @escaping ([NEUserWithFriend]) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       haveLoadAllMembers = true
       NEALog.infoLog(className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")

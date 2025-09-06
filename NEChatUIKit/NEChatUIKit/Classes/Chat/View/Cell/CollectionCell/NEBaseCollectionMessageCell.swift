@@ -10,6 +10,9 @@ import UIKit
 public protocol CollectionMessageCellDelegate: NSObjectProtocol {
   func didClickMore(_ model: CollectionMessageModel?)
   func didClickContent(_ model: CollectionMessageModel?, _ cell: NEBaseCollectionMessageCell)
+
+  // 点击自动检测的链接（url、mobile、email）
+  @objc optional func didTapDetectedLink(_ model: CollectionMessageModel?, _ cell: NEBaseCollectionMessageCell, _ url: URL?)
 }
 
 @objcMembers

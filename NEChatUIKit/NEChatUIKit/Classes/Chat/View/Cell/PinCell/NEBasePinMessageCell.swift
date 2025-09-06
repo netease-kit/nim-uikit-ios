@@ -11,6 +11,9 @@ import UIKit
 public protocol PinMessageCellDelegate: NSObjectProtocol {
   func didClickMore(_ model: NEPinMessageModel?)
   func didClickContent(_ model: NEPinMessageModel?, _ cell: NEBasePinMessageCell)
+
+  // 点击自动检测的链接（url、mobile、email）
+  @objc optional func didTapDetectedLink(_ model: NEPinMessageModel?, _ cell: NEBasePinMessageCell, _ url: URL?)
 }
 
 @objcMembers

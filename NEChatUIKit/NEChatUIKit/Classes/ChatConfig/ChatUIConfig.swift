@@ -106,17 +106,17 @@ public class MessageProperties: NSObject {
   // 时间字体大小
   public var timeTextSize: CGFloat = 14
 
-  // 右侧聊天背景气泡
-  public var rightBubbleBg: UIImage?
+  // 自己发送的消息的字体大小(文本类型)
+  public var selfMessageTextSize: CGFloat = 16
 
-  // 左侧聊天背景气泡
-  public var leftBubbleBg: UIImage?
+  // 接收到的消息的字体大小(文本类型)
+  public var receiveMessageTextSize: CGFloat = 16
 
-  // 聊天字体大小(文本类型)
-  public var messageTextSize: CGFloat = 16
+  // 自己发送的消息的字体颜色(文本类型)
+  public var selfMessageTextColor = UIColor.ne_darkText
 
-  // 聊天字体颜色(文本类型)
-  public var messageTextColor = UIColor.ne_darkText
+  // 接收到的消息的字体颜色(文本类型)
+  public var receiveMessageTextColor = UIColor.ne_darkText
 
   // 输入框文本字体颜色
   public var inputTextColor = UIColor.ne_darkText
@@ -130,7 +130,13 @@ public class MessageProperties: NSObject {
   // 接收到的消息体的背景色
   public var receiveMessageBg: UIColor = .clear
 
-  // 背景图片拉伸参数（边距偏移）
+  // 右侧聊天背景气泡
+  public var rightBubbleBg: UIImage?
+
+  // 左侧聊天背景气泡
+  public var leftBubbleBg: UIImage?
+
+  // 气泡图片拉伸参数（边距偏移）
   public var backgroundImageCapInsets: UIEdgeInsets? = UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25)
 
   // 不设置头像的用户所展示的文字头像中的文字颜色

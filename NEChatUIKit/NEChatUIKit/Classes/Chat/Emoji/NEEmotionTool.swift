@@ -32,14 +32,16 @@ open class NEEmotionTool: NSObject {
   ///   - font: 字体
   ///   - offset: 偏移量
   /// - Returns: 替换表情后的富文本
-  open class func getAttWithStr(str: String, font: UIFont,
+  open class func getAttWithStr(str: String,
+                                font: UIFont,
+                                color: UIColor,
                                 _ offset: CGPoint = CGPoint(x: 0, y: -4)) -> NSMutableAttributedString {
     let regularArr = getRegularArray(str: str)
     let emoticons = NIMInputEmoticonManager.shared
       .emoticonCatalog(catalogID: NIMKit_EmojiCatalog)?.emoticons
     let attStr = NSMutableAttributedString(string: str, attributes: [
       NSAttributedString.Key.font: font,
-      .foregroundColor: ChatUIConfig.shared.messageProperties.messageTextColor,
+      .foregroundColor: color,
     ])
 
     if let regArr = regularArr, regArr.count > 0, let targetEmotions = emoticons {
@@ -59,12 +61,6 @@ open class NEEmotionTool: NSObject {
       }
     }
     return attStr
-  }
-
-  open class func getAttWithStr(str: String, font: UIFont, color: UIColor, _ offset: CGPoint = CGPoint(x: 0, y: -3)) -> NSMutableAttributedString {
-    let att = getAttWithStr(str: str, font: font, offset)
-    att.addAttribute(.foregroundColor, value: color, range: NSRange(location: 0, length: att.length))
-    return att
   }
 
   class func getAttWithEmotion(emotion: NIMInputEmoticon, font: UIFont,

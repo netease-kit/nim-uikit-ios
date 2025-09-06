@@ -13,7 +13,6 @@ import NECoreKit
 import NIMSDK
 import Photos
 import UIKit
-import WebKit
 
 @objcMembers
 open class ChatViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, NIMMediaManagerDelegate, CLLocationManagerDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, ChatInputViewDelegate, ChatInputMultilineDelegate, ChatViewModelDelegate, MessageOperationViewDelegate, NETranslateViewDelegate, SelectLanguageDelegate {
@@ -269,7 +268,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   /// 长按操作菜单
   public lazy var operationView: MessageOperationView = {
-    let operationView = MessageOperationView(frame: .zero)
+    let operationView = MessageOperationView(frame: CGRect(x: 0, y: 0, width: 16, height: 16))
     operationView.isHidden = true
     operationView.delegate = self
     view.addSubview(operationView)
@@ -322,12 +321,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         self?.brokenNetworkView.isHidden = true
         self?.contentViewTopAnchor?.constant = 0
       }
-    }
-
-    if !viewModel.isHistoryChat {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
-        self?.scrollTableViewToBottom()
-      }))
     }
   }
 
@@ -1719,9 +1712,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   public func onModefiedMessage(_ index: IndexPath) {
     let visibleRows = tableView.indexPathsForVisibleRows
 
-    UIView.performWithoutAnimation {
-      tableViewReloadIndexs([index])
-    }
+    tableViewReloadIndexs([index])
 
     if !(tableView.isDragging || tableView.isDecelerating),
        let visibleRows = visibleRows,
@@ -2826,7 +2817,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 获取文本详情页视图控制器
   open func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = TextViewController(title: title, body: body)
-    textViewController.view.backgroundColor = .white
+    textViewController.updateLinkDetection()
     return textViewController
   }
 
@@ -2895,11 +2886,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       return
     }
 
-    let textView = getTextViewController(title: title, body: body)
-    textView.modalPresentationStyle = .fullScreen
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
-      self?.navigationController?.present(textView, animated: false)
-    }))
+    let textViewController = getTextViewController(title: title, body: body)
+    let nav = NENavigationController(rootViewController: textViewController)
+    nav.modalPresentationStyle = .fullScreen
+    present(nav, animated: false)
   }
 
   /// 单击消息
@@ -2925,7 +2915,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       didTapLocationMessage(model)
     case .rtcCallRecord:
       didTapCallMessage(model)
-    case .custom:
+    case .richText, .multiForward, .custom:
       didTapCustomMessage(model, replyIndex)
     default:
       print(#function + "message did tap, type:\(String(describing: model?.type.rawValue))")
@@ -3774,6 +3764,28 @@ extension ChatViewController: ChatBaseCellDelegate {
     }
 
     viewModel.regenAIMessage(message)
+  }
+
+  public func didTapDetectedLink(_ cell: UITableViewCell, _ model: MessageContentModel?, _ url: URL) {
+    if url.scheme == "mailto" {
+      // 处理邮箱
+      didTapMailto(url)
+    } else if url.scheme == "tel" {
+      // 处理电话号码
+      didTapTel(url)
+    } else {
+      // 处理网页链接
+      let ctrl = NEWKWebViewController(url: url.absoluteString, title: url.absoluteString)
+      navigationController?.pushViewController(ctrl, animated: true)
+    }
+  }
+
+  open func didTapTel(_ url: URL) {
+    showBottomTelAction(url)
+  }
+
+  open func didTapMailto(_ url: URL) {
+    showBottomMailAction(url)
   }
 
   open func getReadView(_ message: V2NIMMessage, _ teamId: String) -> NEBaseReadViewController {

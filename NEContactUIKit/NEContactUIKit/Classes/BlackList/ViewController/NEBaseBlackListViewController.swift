@@ -70,7 +70,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   }
 
   open func initNav() {
-    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
+    let image = CommonUIConfig.shared.backArrowImage?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,

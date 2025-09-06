@@ -226,3 +226,5 @@
 
 "p2p_chat_online" = "(Online)";
 "p2p_chat_offline" = "(Offline)";
+
+"line_break" = "Return";

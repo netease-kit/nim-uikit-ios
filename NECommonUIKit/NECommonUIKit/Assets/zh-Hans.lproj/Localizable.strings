@@ -1,0 +1,68 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"appName"="云信IM";
+"tip"="提示";
+"sure"="确定";
+"ok"="确认";
+"complete"="完成";
+"cancel"="取消";
+"camera"="摄像";
+"take_picture"="拍照";
+"network_error"="当前网络不可用，请检查你的网络设置。";
+"select_from_album"="从相册选择";
+"select_from_icloud"="从iCloud选择";
+"jump_camera_setting"="请去-> [设置 - 隐私 - 相机] 打开访问开关";
+"jump_photo_setting"="请去-> [设置 - 隐私 - 照片] 打开访问开关";
+"jump_microphone_setting"="请去-> [设置 - 隐私 - 麦克风] 打开访问开关";
+"jump_location_setting"="请去-> [设置 - 隐私 - 定位服务] 打开访问开关";
+"camera_limit"="相机权限受限";
+"not_open_album"="未打开相册权限";
+"save_system_album"="已保存到系统相册";
+"video_not_save"="视频文件未保存到本地";
+"search"="搜索";
+"no_search_result"="未搜索到“%@”相关结果";
+"no_content"="暂无内容";
+
+"copy"="复制";
+"copy_success"="复制成功!";
+"join_team"="加入群组";
+"chat"="去聊天";
+"group_chat"="群聊";
+"team_group"="群";
+
+// error code
+"failed_operation"="操作失败";
+"parameter_setting_error"="参数错误";
+"rate_limit_exceeded"="频率超限";
+"user_not_exist"="用户不存在";
+"team_not_exist"="群组不存在";
+"user_banned"="用户被禁用";
+"user_chat_banned"="用户被禁言";
+"friend_not_exist"="好友不存在";
+"message_hit_antispam"="消息命中反垃圾";
+"team_member_not_exist"="群成员不存在";
+"team_normal_member_chat_banned"="群普通成员禁言";
+"team_member_chat_banned"="群成员被禁言";
+
+"not_ai_account"="不是数字人账号";
+"cannot_blocklist_ai_account"="不允许对数字人进行黑名单操作";
+"ai_messages_function_disabled"="AI 消息功能未开通";
+"failed_request_to_the_LLM"="请求大语言模型失败";
+
+"hm"="HH:mm";
+"mdhm"="MM月dd日 HH:mm";
+"ymdhm"="yyyy年MM月dd日 HH:mm";
+"ahm"="a HH:mm";
+"amdhm"="MM月dd日 a HH:mm";
+"aymdhm"="yyyy年MM月dd日 a HH:mm";
+
+"detect_tel_title"="\“%@\”可能是一个电话号码， 你可以";
+"detect_tel_call"="呼叫";
+"detect_tel_copy"="复制号码";
+
+"detect_mailto_title"="向\“%@\”发送邮件";
+"detect_mailto_send"="使用默认邮件账户";
+"detect_mailto_copy"="复制邮箱";

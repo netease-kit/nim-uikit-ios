@@ -377,14 +377,14 @@ open class ChatViewModel: NSObject {
       self?.getMessageReceipts(messages: messageArray) { reloadIndexs, error in
         group.enter()
         self?.chatRepo.getPinnedMessageList(conversationId: conversationId) { [weak self] pinList, error in
-          var userIds = pinList?.map(\.operatorId) ?? []
+          var userIds: Set<String> = Set(pinList?.map(\.operatorId) ?? [])
 
           // 群聊需要获取群昵称
-          userIds += self?.messages.compactMap { $0.message?.senderId } ?? []
+          userIds.formUnion(self?.messages.compactMap { $0.message?.senderId } ?? [])
           group.enter()
-          self?.loadShowName(userIds, ChatRepo.sessionId) { [weak self] in
-            // 获取头像昵称
+          self?.loadShowName(Array(userIds), ChatRepo.sessionId) { [weak self] in
             for model in self?.messages ?? [] {
+              // 更新头像昵称
               if let uid = ChatMessageHelper.getSenderId(model.message),
                  let fullName = self?.getShowName(uid) {
                 let userFriend = ChatMessageHelper.getUserFromCache(uid)
@@ -425,6 +425,31 @@ open class ChatViewModel: NSObject {
 
     // 加载置顶消息
     loadTopMessage()
+
+    DispatchQueue.global().async { [weak self] in
+      // 查询通知消息中 targetId 的用户信息
+      var accids = Set<String>()
+      for model in self?.messages ?? [] {
+        if model.message?.messageType == .MESSAGE_TYPE_NOTIFICATION,
+           let attach = model.message?.attachment as? V2NIMMessageNotificationAttachment,
+           let accIds = attach.targetIds {
+          accids.formUnion(accIds)
+        }
+      }
+
+      self?.loadShowName(Array(accids), ChatRepo.sessionId) {
+        for model in self?.messages ?? [] {
+          // 更新通知消息文案
+          if let m = model as? MessageTipsModel {
+            m.resetMessage(m.message)
+          }
+        }
+
+        DispatchQueue.main.async {
+          self?.delegate?.tableViewReload()
+        }
+      }
+    }
   }
 
   /// 更新消息发送者的信息
@@ -456,7 +481,9 @@ open class ChatViewModel: NSObject {
       delegate?.updateTopName(name: showName)
     }
 
-    delegate?.onLoadMoreWithMessage(indexPaths)
+    DispatchQueue.main.async { [weak self] in
+      self?.delegate?.onLoadMoreWithMessage(indexPaths)
+    }
   }
 
   /// 插入消息
@@ -531,22 +558,18 @@ open class ChatViewModel: NSObject {
             self?.setErrorText(msg)
           }
 
-          group.enter()
-          self?.modelFromMessage(message: msg) { model in
+          if let model = self?.modelFromMessage(message: msg) {
             if self?.messages.contains(where: { $0.message?.messageClientId == model.message?.messageClientId }) == false {
               self?.insertToMessages(model)
             }
-            group.leave()
           }
         }
 
-        group.notify(queue: .main) {
-          // 显示时间
-          self?.addTimeForHistoryMessage()
+        // 显示时间
+        self?.addTimeForHistoryMessage()
 
-          // 回调消息列表
-          completion(error, messageArray.count, messageArray)
-        }
+        // 回调消息列表
+        completion(error, messageArray.count, messageArray)
       } else {
         if self?.messages.isEmpty == true,
            NEAIUserManager.shared.isAIUser(ChatRepo.sessionId) {
@@ -1312,8 +1335,7 @@ open class ChatViewModel: NSObject {
   /// - Returns: 名称和好友信息
   open func getShowName(_ accountId: String,
                         _ showAlias: Bool = true) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
-    return NEAIUserManager.shared.getShowName(accountId) ?? NEFriendUserCache.shared.getShowName(accountId, showAlias)
+    NEAIUserManager.shared.getShowName(accountId) ?? NEFriendUserCache.shared.getShowName(accountId, showAlias)
   }
 
   /// 获取用户展示名称
@@ -2467,7 +2489,7 @@ extension ChatViewModel: NEChatListener {
       }
 
       for (index, model) in self.messages.enumerated() {
-        if let model = model as? MessageAIStreamModel,
+        if let model = model as? MessageTextModel,
            model.message?.messageClientId == msg.messageClientId {
           model.resetMessage(msg)
           if index > 0 {
@@ -2634,7 +2656,10 @@ extension ChatViewModel: NEChatListener {
         }
       }
     }
-    delegate?.onLoadMoreWithMessage(reloadIndexPaths)
+
+    DispatchQueue.main.async { [weak self] in
+      self?.delegate?.onLoadMoreWithMessage(reloadIndexPaths)
+    }
   }
 
   /// 收到群已读回执
@@ -2663,7 +2688,10 @@ extension ChatViewModel: NEChatListener {
         }
       }
     }
-    delegate?.onLoadMoreWithMessage(reloadIndexPaths)
+
+    DispatchQueue.main.async { [weak self] in
+      self?.delegate?.onLoadMoreWithMessage(reloadIndexPaths)
+    }
   }
 }
 

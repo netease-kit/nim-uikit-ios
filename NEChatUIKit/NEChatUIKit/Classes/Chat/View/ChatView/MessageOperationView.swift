@@ -53,8 +53,6 @@ open class MessageOperationView: UIView, UICollectionViewDataSource, UICollectio
       collcetionView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
       collcetionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
     ])
-
-    addSubview(collcetionView)
   }
 
   public required init?(coder: NSCoder) {

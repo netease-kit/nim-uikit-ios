@@ -9,8 +9,8 @@ import UIKit
 @objcMembers
 public class NEConversationListModel: NSObject, Comparable {
   public static func < (lhs: NEConversationListModel, rhs: NEConversationListModel) -> Bool {
-    let time1 = lhs.conversation?.lastMessage?.messageRefer.createTime ?? lhs.conversation?.updateTime ?? 0
-    let time2 = rhs.conversation?.lastMessage?.messageRefer.createTime ?? rhs.conversation?.updateTime ?? 0
+    let time1 = lhs.conversation?.sortOrder ?? 0
+    let time2 = rhs.conversation?.sortOrder ?? 0
     return time1 > time2
   }
 
@@ -20,7 +20,10 @@ public class NEConversationListModel: NSObject, Comparable {
       if let lastMessage = conversation?.lastMessage,
          lastMessage.messageType == .MESSAGE_TYPE_TEXT,
          let text = lastMessage.text {
-        lastMessageConent = NEChatKitClient.instance.getEmojString(text, ConversationUIConfig.shared.conversationProperties.itemContentSize > 0 ? ConversationUIConfig.shared.conversationProperties.itemContentSize : 13)
+        let itemContentSize = ConversationUIConfig.shared.conversationProperties.itemContentSize > 0 ? ConversationUIConfig.shared.conversationProperties.itemContentSize : 13
+        lastMessageConent = NEChatKitClient.instance.getEmojString(text,
+                                                                   itemContentSize,
+                                                                   ConversationUIConfig.shared.conversationProperties.itemContentColor)
       } else {
         lastMessageConent = nil
       }

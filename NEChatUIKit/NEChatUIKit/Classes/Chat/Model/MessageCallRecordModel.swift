@@ -59,20 +59,23 @@ open class MessageCallRecordModel: MessageContentModel {
       let attachment = NSTextAttachment()
       attachment.image = image
       attachment.bounds = bound
+      var messageTextColor = ChatUIConfig.shared.messageProperties.selfMessageTextColor
       if message?.isSelf == true {
         attributeStr?.append(NSAttributedString(string: " "))
         attributeStr?.append(NSAttributedString(attachment: attachment))
+        messageTextColor = ChatUIConfig.shared.messageProperties.selfMessageTextColor
       } else {
         attributeStr?.insert(NSAttributedString(string: " "), at: 0)
         attributeStr?.insert(NSAttributedString(attachment: attachment), at: 0)
+        messageTextColor = ChatUIConfig.shared.messageProperties.receiveMessageTextColor
       }
 
       attributeStr?.addAttribute(NSAttributedString.Key.font, value: messageTextFont, range: NSMakeRange(0, attributeStr?.length ?? 0))
 
-      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: ChatUIConfig.shared.messageProperties.messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
+      attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: messageTextColor, range: NSMakeRange(0, attributeStr?.length ?? 0))
     }
 
-    let textSize = NSAttributedString.getRealLabelSize(attributeStr, messageTextFont, messageMaxSize)
+    let textSize = NSAttributedString.getRealTextViewSize(attributeStr, messageTextFont, messageMaxSize)
     let contentSizeWidth = textSize.width + chat_cell_margin * 2
     let contentSizeHeight = textSize.height + (isAuiodRecord ? 20 : 24)
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)

@@ -642,7 +642,9 @@ public class ChatMessageHelper: NSObject {
     }
 
     let text = message?.text ?? ""
-    let messageTextFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize)
+    let messageTextSize = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextSize : ChatUIConfig.shared.messageProperties.receiveMessageTextSize
+    let messageTextFont = UIFont.systemFont(ofSize: messageTextSize)
+    let messageTextColor = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextColor : ChatUIConfig.shared.messageProperties.receiveMessageTextColor
 
     // 兼容老的表情消息，如果前面有表情而位置计算异常则回退回老的解析
     var notFound = false
@@ -656,10 +658,11 @@ public class ChatMessageHelper: NSObject {
               for model in models {
                 // 前面因为表情增加的索引数量
                 var count = 0
-                if text.count > model.start {
+                if model.start > 0, text.count > model.start {
                   let frontAttributeStr = NEEmotionTool.getAttWithStr(
                     str: String(text.prefix(model.start)),
-                    font: messageTextFont
+                    font: messageTextFont,
+                    color: messageTextColor
                   )
                   count = getReduceIndexCount(frontAttributeStr)
                 }
@@ -680,7 +683,8 @@ public class ChatMessageHelper: NSObject {
                 let endIndex = text.index(text.startIndex, offsetBy: model.end + atRangeOffset)
                 let frontAttributeStr = NEEmotionTool.getAttWithStr(
                   str: String(text[startIndex ..< endIndex]),
-                  font: messageTextFont
+                  font: messageTextFont,
+                  color: messageTextColor
                 )
                 let innerCount = getReduceIndexCount(frontAttributeStr)
                 end = end - innerCount

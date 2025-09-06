@@ -46,7 +46,6 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Returns: 名称和好友信息
   override open func getShowName(_ accountId: String,
                                  _ showAlias: Bool = true) -> String {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:" + accountId)
     if NEFriendUserCache.shared.isFriend(accountId) {
       return NEFriendUserCache.shared.getShowName(accountId, showAlias)
     } else {

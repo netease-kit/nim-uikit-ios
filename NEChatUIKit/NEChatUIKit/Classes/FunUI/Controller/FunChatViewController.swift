@@ -79,8 +79,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   /// 获取文本详情页视图控制器 - 通用版
   override open func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
-    let textViewController = super.getTextViewController(title: title, body: body)
-    textViewController.view.backgroundColor = .funChatBackgroundColor
+    let textViewController = FunTextViewController(title: title, body: body)
+    textViewController.updateLinkDetection()
     return textViewController
   }
 
@@ -231,6 +231,14 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
   override open func showFileAction() {
     showCustomBottomFileAction(self)
+  }
+
+  override open func didTapTel(_ url: URL) {
+    showCustomBottomTelAction(url)
+  }
+
+  override open func didTapMailto(_ url: URL) {
+    showCustomBottomMailAction(url)
   }
 
   open func showRecordView() {

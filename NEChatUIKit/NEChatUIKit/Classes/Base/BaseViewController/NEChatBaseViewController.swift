@@ -83,7 +83,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   }
 
   open func setupBackUI() {
-    let image = coreLoader.loadImage("back_arrow")?.withRenderingMode(.alwaysOriginal)
+    let image = CommonUIConfig.shared.backArrowImage?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
       style: .plain,
@@ -101,4 +101,17 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   }
 
   open func toSetting() {}
+
+  open func addLeftSwipeDismissGesture() {
+    // 侧滑返回（根视图）
+    let gestureRecognizer = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(swipeDismiss))
+    gestureRecognizer.edges = .left
+    view.addGestureRecognizer(gestureRecognizer)
+  }
+
+  func swipeDismiss(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
+    if gestureRecognizer.state == .ended {
+      navigationController?.dismiss(animated: true, completion: nil)
+    }
+  }
 }

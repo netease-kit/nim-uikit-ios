@@ -1,0 +1,67 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+"appName"="CommsEase IM";
+"tip"="tip";
+"sure"="Sure";
+"ok"="OK";
+"complete"="Complete";
+"cancel"="Cancel";
+"camera"="Video";
+"take_picture"="Photo";
+"network_error"="No Network";
+"select_from_album"="Album";
+"select_from_icloud"="iCloud";
+"jump_camera_setting"="Please open the Switch[setting-Privacy-album]";
+"jump_photo_setting"="Please open the Switch[setting-Privacy-photo]";
+"jump_location_setting"="Please open the Switch[setting-Privacy-location]";
+"camera_limit"="camera limit";
+"not_open_album"="No album permission";
+"save_system_album"="Saved to album";
+"video_not_save"="Saved Failed";
+"search"="Search";
+"no_search_result"="No results related to \"%@\"";
+"no_content"="No content";
+
+"copy"="Copy";
+"copy_success"="Copied!";
+"join_team"="Join Team";
+"chat"="Go Chat";
+"group_chat"="group chat";
+"team_group"="Team";
+
+// error code
+"failed_operation"="Failure";
+"parameter_setting_error"="Parameter setting error";
+"rate_limit_exceeded"="Rate limit exceeded";
+"user_not_exist"="User not found";
+"team_not_exist"="team not exist";
+"user_banned"="user banned";
+"user_chat_banned"="user chat banned";
+"friend_not_exist"="friend not exist";
+"message_hit_antispam"="message hit antispam";
+"team_member_not_exist"="team member not exist";
+"team_normal_member_chat_banned"="team normal member chat banned";
+"team_member_chat_banned"="team member chat banned";
+
+"not_ai_account"="It's not an AI account.";
+"cannot_blocklist_ai_account"="You cannot blocklist an AI account.";
+"ai_messages_function_disabled"="AI messages function disabled.";
+"failed_request_to_the_LLM"="Failed request to the LLM.";
+
+"hm"="HH:mm";
+"mdhm"="MM.dd HH:mm";
+"ymdhm"="yyyy.MM.dd HH:mm";
+"ahm"="a HH:mm";
+"amdhm"="MM.dd a HH:mm";
+"aymdhm"="yyyy.MM.dd a HH:mm";
+
+"detect_tel_title"="\“%@\”may be a phone number, You can:";
+"detect_tel_call"="Call";
+"detect_tel_copy"="Copy Number";
+
+"detect_mailto_title"="Send message to\“%@\”";
+"detect_mailto_send"="Send via default email account";
+"detect_mailto_copy"="Copy Email";

@@ -115,7 +115,7 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       IMKitConfigCenter.shared.enableOnlineStatus = isOpen
     }
     model.cellModels.append(showOnlineStatus)
-    
+
     let enableInsertLocalMsgWhenRevoke = SettingCellModel()
     enableInsertLocalMsgWhenRevoke.cellName = "撤回消息后是否插入提示消息"
     enableInsertLocalMsgWhenRevoke.type = SettingCellType.SettingSwitchCell.rawValue
@@ -286,21 +286,5 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     let model = sectionData[indexPath.section].cellModels[indexPath.row]
     return model.rowHeight
-  }
-
-  func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    if sectionData.count > section {
-      let model = sectionData[section]
-      if model.cellModels.count > 0 {
-        return 12.0
-      }
-    }
-    return 0
-  }
-
-  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let headerView = UIView()
-    headerView.backgroundColor = .ne_lightBackgroundColor
-    return headerView
   }
 }

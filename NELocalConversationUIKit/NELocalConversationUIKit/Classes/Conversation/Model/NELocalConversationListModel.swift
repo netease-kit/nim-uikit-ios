@@ -9,16 +9,21 @@ import UIKit
 @objcMembers
 public class NELocalConversationListModel: NSObject, Comparable {
   public static func < (lhs: NELocalConversationListModel, rhs: NELocalConversationListModel) -> Bool {
-    let time1 = lhs.conversation?.lastMessage?.messageRefer.createTime ?? lhs.conversation?.updateTime ?? 0
-    let time2 = rhs.conversation?.lastMessage?.messageRefer.createTime ?? rhs.conversation?.updateTime ?? 0
+    let time1 = lhs.conversation?.sortOrder ?? 0
+    let time2 = rhs.conversation?.sortOrder ?? 0
     return time1 > time2
   }
 
   /// 会话
   public var conversation: V2NIMLocalConversation? {
     didSet {
-      if let lastMessage = conversation?.lastMessage, lastMessage.messageType == .MESSAGE_TYPE_TEXT, let text = lastMessage.text {
-        lastMessageConent = NEChatKitClient.instance.getEmojString(text, LocalConversationUIConfig.shared.conversationProperties.itemContentSize > 0 ? LocalConversationUIConfig.shared.conversationProperties.itemContentSize : 13)
+      if let lastMessage = conversation?.lastMessage,
+         lastMessage.messageType == .MESSAGE_TYPE_TEXT,
+         let text = lastMessage.text {
+        let itemContentSize = LocalConversationUIConfig.shared.conversationProperties.itemContentSize > 0 ? LocalConversationUIConfig.shared.conversationProperties.itemContentSize : 13
+        lastMessageConent = NEChatKitClient.instance.getEmojString(text,
+                                                                   itemContentSize,
+                                                                   LocalConversationUIConfig.shared.conversationProperties.itemContentColor)
       } else {
         lastMessageConent = nil
       }

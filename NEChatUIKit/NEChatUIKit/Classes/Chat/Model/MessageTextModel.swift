@@ -26,7 +26,8 @@ open class MessageTextModel: MessageContentModel {
     if let text = message?.text, !text.isEmpty {
       attributeStr = NEEmotionTool.getAttWithStr(
         str: text,
-        font: messageTextFont
+        font: messageTextFont,
+        color: messageTextColor
       )
     }
 
@@ -41,7 +42,7 @@ open class MessageTextModel: MessageContentModel {
   }
 
   public func getTextSize(_ attributeStr: NSAttributedString?) -> CGSize {
-    NSAttributedString.getRealLabelSize(attributeStr ?? self.attributeStr, messageTextFont, messageMaxSize)
+    NSAttributedString.getRealTextViewSize(attributeStr ?? self.attributeStr, messageTextFont, messageMaxSize)
   }
 
   public func resetHeight(_ attributeStr: NSAttributedString? = nil) {

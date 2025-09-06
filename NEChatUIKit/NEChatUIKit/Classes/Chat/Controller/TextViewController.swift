@@ -6,7 +6,7 @@ import Foundation
 import NECommonKit
 
 @objcMembers
-open class TextViewController: NEChatBaseViewController {
+open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
   let leftRightMargin: CGFloat = 20
   var contentMaxWidth: CGFloat = 0
   let titleFont = UIFont.systemFont(ofSize: 24, weight: .semibold)
@@ -59,6 +59,7 @@ open class TextViewController: NEChatBaseViewController {
     label.font = bodyFont
     label.backgroundColor = .clear
     label.textColor = .ne_darkText
+    label.delegate = self
     return label
   }()
 
@@ -70,7 +71,10 @@ open class TextViewController: NEChatBaseViewController {
     contentMaxWidth = kScreenWidth - leftRightMargin * 2
     if let title = title {
       titleLabel.copyString = title
-      let titleAtt = NEEmotionTool.getAttWithStr(str: title, font: titleFont, CGPoint(x: 0, y: -3))
+      let titleAtt = NEEmotionTool.getAttWithStr(str: title,
+                                                 font: titleFont,
+                                                 color: UIColor.ne_darkText,
+                                                 CGPoint(x: 0, y: -3))
       titleLabel.attributedText = titleAtt
     }
 
@@ -84,6 +88,27 @@ open class TextViewController: NEChatBaseViewController {
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    if navigationController?.viewControllers.count ?? 0 > 0 {
+      if let root = navigationController?.viewControllers[0] as? UIViewController {
+        if root.isKind(of: TextViewController.self) {
+          navigationController?.interactivePopGestureRecognizer?.delegate = self
+        }
+      }
+    }
+  }
+
+  open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    if let navigationController = navigationController,
+       navigationController.responds(to: #selector(getter: UINavigationController.interactivePopGestureRecognizer)),
+       gestureRecognizer == navigationController.interactivePopGestureRecognizer,
+       navigationController.visibleViewController == navigationController.viewControllers.first {
+      return false
+    }
+    return true
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = true
@@ -92,6 +117,7 @@ open class TextViewController: NEChatBaseViewController {
     scrollView.addGestureRecognizer(tap)
     setupUI()
     contentSizeToFit()
+    addLeftSwipeDismissGesture()
   }
 
   open func viewTap() {
@@ -100,6 +126,7 @@ open class TextViewController: NEChatBaseViewController {
   }
 
   open func setupUI() {
+    view.backgroundColor = .white
     view.addSubview(scrollView)
     NSLayoutConstraint.activate([
       scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -139,5 +166,37 @@ open class TextViewController: NEChatBaseViewController {
       contentLabelLeftAnchor?.constant = offsetX
     }
     scrollView.contentSize = CGSize(width: textWidth, height: textHeight)
+  }
+
+  public func updateLinkDetection() {
+    bodyLabel.updateLinkDetection()
+  }
+
+  // MARK: LinkableLabelProtocol
+
+  public func didTapLink(url: URL?) {
+    if let url = url {
+      if url.scheme == "mailto" {
+        // 处理邮箱
+        didTapMailto(url)
+      } else if url.scheme == "tel" {
+        // 处理电话号码
+        didTapTel(url)
+      } else {
+        // 处理网页链接
+        let ctrl = NEWKWebViewController(url: url.absoluteString, title: url.absoluteString)
+        navigationController?.pushViewController(ctrl, animated: true)
+      }
+    } else {
+      viewTap()
+    }
+  }
+
+  open func didTapTel(_ url: URL) {
+    showBottomTelAction(url)
+  }
+
+  open func didTapMailto(_ url: URL) {
+    showBottomMailAction(url)
   }
 }

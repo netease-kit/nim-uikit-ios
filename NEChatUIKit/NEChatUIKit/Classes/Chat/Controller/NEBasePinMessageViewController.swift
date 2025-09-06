@@ -579,6 +579,36 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     }
   }
 
+  public func didTapDetectedLink(_ model: NEPinMessageModel?, _ cell: NEBasePinMessageCell, _ url: URL?) {
+    if let url = url {
+      if url.scheme == "mailto" {
+        // 处理邮箱
+        didTapMailto(url)
+      } else if url.scheme == "tel" {
+        // 处理电话号码
+        didTapTel(url)
+      } else {
+        // 处理网页链接
+        let ctrl = NEWKWebViewController(url: url.absoluteString, title: url.absoluteString)
+        navigationController?.pushViewController(ctrl, animated: true)
+      }
+    } else {
+      if model?.message.messageType == .MESSAGE_TYPE_TEXT {
+        showTextViewController(model)
+      } else if model?.message.messageType == .MESSAGE_TYPE_CUSTOM {
+        toTextViewShow(model)
+      }
+    }
+  }
+
+  open func didTapTel(_ url: URL) {
+    showBottomTelAction(url)
+  }
+
+  open func didTapMailto(_ url: URL) {
+    showBottomMailAction(url)
+  }
+
   /// 点击开始播放
   /// - Parameter cell: 标记列表视图对象
   /// - Parameter model: 标记对象
@@ -694,16 +724,15 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
     let title = NECustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
-    let textView = getTextViewController(title: title, body: body)
-    textView.modalPresentationStyle = .fullScreen
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
-      self?.navigationController?.present(textView, animated: false)
-    }))
+    let textViewController = getTextViewController(title: title, body: body)
+    let nav = NENavigationController(rootViewController: textViewController)
+    nav.modalPresentationStyle = .fullScreen
+    present(nav, animated: false)
   }
 
   func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
     let textViewController = TextViewController(title: title, body: body)
-    textViewController.view.backgroundColor = .white
+    textViewController.updateLinkDetection()
     return textViewController
   }
 

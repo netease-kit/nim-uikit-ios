@@ -75,6 +75,12 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textView.linkTextAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
     textView.dataDetectorTypes = []
     textView.accessibilityIdentifier = "id.chatMessageInput"
+
+    // 创建自定义菜单项
+    let lineBreakItem = UIMenuItem(title: chatLocalizable("line_break"), action: #selector(lineBreakAction))
+    UIMenuController.shared.menuItems = [lineBreakItem]
+    // 强制更新菜单
+    UIMenuController.shared.showMenu(from: textView, rect: textView.caretRect(for: textView.selectedTextRange!.start))
     return textView
   }()
 
@@ -368,7 +374,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     if text.count >= 3,
        (NEEmotionTool.getRegularArray(str: text)?.count ?? 0) > 0 {
       let mutaString = NSMutableAttributedString(attributedString: textView.attributedText)
-      let addString = NEEmotionTool.getAttWithStr(str: text, font: .systemFont(ofSize: 16))
+      let addString = NEEmotionTool.getAttWithStr(str: text,
+                                                  font: .systemFont(ofSize: 16),
+                                                  color: UIColor.ne_darkText)
       mutaString.replaceCharacters(in: range, with: addString)
       textView.attributedText = mutaString
       textView.accessibilityValue = text
@@ -465,6 +473,14 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     delegate?.willSelectItem(button: button, index: button.tag - 5)
   }
 
+  // 长按输入框，菜单【换行/Return】点击事件
+  open func lineBreakAction() {
+    guard let selectedRange = textView.selectedTextRange else {
+      return
+    }
+    textView.replace(selectedRange, withText: "\n") // 插入换行符
+  }
+
   // MARK: NIMInputEmoticonContainerViewDelegate
 
   open func selectedEmoticon(emoticonID: String, emotCatalogID: String, description: String) {
@@ -473,7 +489,9 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       textView.deleteBackward()
     } else {
       let range = textView.selectedRange
-      let attribute = NEEmotionTool.getAttWithStr(str: description, font: .systemFont(ofSize: 16))
+      let attribute = NEEmotionTool.getAttWithStr(str: description,
+                                                  font: .systemFont(ofSize: 16),
+                                                  color: UIColor.ne_darkText)
       let mutaAttribute = NSMutableAttributedString(attributedString: textView.attributedText)
       mutaAttribute.insert(attribute, at: range.location)
       textView.attributedText = mutaAttribute

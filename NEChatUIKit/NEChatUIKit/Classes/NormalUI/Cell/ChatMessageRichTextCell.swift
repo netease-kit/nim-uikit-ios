@@ -18,7 +18,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     label.contentInset = .zero
     label.textContainer.lineFragmentPadding = 0.0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)
+    label.font = .systemFont(ofSize: messageTextFont.pointSize, weight: .semibold)
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 
@@ -46,7 +46,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     label.contentInset = .zero
     label.textContainer.lineFragmentPadding = 0.0
     label.isUserInteractionEnabled = false
-    label.font = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)
+    label.font = .systemFont(ofSize: messageTextFont.pointSize, weight: .semibold)
     label.backgroundColor = .clear
     label.accessibilityIdentifier = "id.messageTitle"
 
@@ -79,7 +79,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     ])
 
     bubbleImageLeft.addSubview(titleLabelLeft)
-    titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    titleLabelLeftHeightAnchor = titleLabelLeft.heightAnchor.constraint(equalToConstant: kScreenHeight)
     titleLabelLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       titleLabelLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: chat_content_margin),
@@ -88,7 +88,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     ])
 
     bubbleImageLeft.addSubview(contentLabelLeft)
-    contentLabelLeftHeightAnchor = contentLabelLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelLeftHeightAnchor = contentLabelLeft.heightAnchor.constraint(equalToConstant: kScreenHeight)
     contentLabelLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: titleLabelLeft.rightAnchor, constant: 0),
@@ -108,7 +108,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     ])
 
     bubbleImageRight.addSubview(titleLabelRight)
-    titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    titleLabelRightHeightAnchor = titleLabelRight.heightAnchor.constraint(equalToConstant: kScreenHeight)
     titleLabelRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       titleLabelRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: chat_content_margin),
@@ -117,7 +117,7 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     ])
 
     bubbleImageRight.addSubview(contentLabelRight)
-    contentLabelRightHeightAnchor = contentLabelRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
+    contentLabelRightHeightAnchor = contentLabelRight.heightAnchor.constraint(equalToConstant: kScreenHeight)
     contentLabelRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: titleLabelRight.rightAnchor, constant: -0),

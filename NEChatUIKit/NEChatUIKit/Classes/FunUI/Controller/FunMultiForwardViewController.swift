@@ -37,6 +37,14 @@ open class FunMultiForwardViewController: MultiForwardViewController {
     FunMultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
   }
 
+  override open func didTapTel(_ url: URL) {
+    showCustomBottomTelAction(url)
+  }
+
+  override open func didTapMailto(_ url: URL) {
+    showCustomBottomMailAction(url)
+  }
+
   override open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     viewModel.messages[indexPath.row].cellHeight()
   }

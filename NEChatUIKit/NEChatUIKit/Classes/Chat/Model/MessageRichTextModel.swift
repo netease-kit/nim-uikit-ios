@@ -27,13 +27,14 @@ open class MessageRichTextModel: MessageTextModel {
     type = .richText
     customType = customRichTextType
 
-    let font = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.messageTextSize, weight: .semibold)
+    let font = UIFont.systemFont(ofSize: messageTextFont.pointSize, weight: .semibold)
     titleAttributeStr = NEEmotionTool.getAttWithStr(
       str: title,
-      font: font
+      font: font,
+      color: messageTextColor
     )
 
-    let textSize = NSAttributedString.getRealLabelSize(titleAttributeStr, messageTextFont, messageMaxSize)
+    let textSize = NSAttributedString.getRealTextViewSize(titleAttributeStr, messageTextFont, messageMaxSize)
     titleTextHeight = textSize.height
 
     let contentSizeWidth = max(textWidth, textSize.width) + chat_content_margin * 2

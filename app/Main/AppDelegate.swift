@@ -22,8 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
   
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     window?.backgroundColor = .white
-    setupMarvel()
-    setupInit() {}
+    setupInit(nil)
     NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(refreshUIStyle), name: Notification.Name(CHANGE_UI), object: nil)
     registerAPNS()
@@ -41,11 +40,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     let v2Option = V2NIMSDKOption()
     v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
     
+    // IM配置
+    IMKitClient.instance.config.fcsEnable = false
+    IMKitClient.instance.config.shouldSyncStickTopSessionInfos = true
+    IMKitClient.instance.config.teamReceiptEnabled = true
+    IMKitClient.instance.config.shouldSyncUnreadCount = true
+    IMKitClient.instance.config.shouldConsiderRevokedMessageUnreadCount = true
+    
     // 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
     IMKitClient.instance.setupIM2(option, v2Option)
   }
   
-  func setupInit(_ completion: @escaping () -> Void) {
+  func setupInit(_ completion: ((Error?) -> Void)?) {
     if IMSDKConfigManager.instance.getConfig().enableCustomConfig.boolValue {
       // 开启自定义配置，使用自定义配置
 //      NIMSDK.shared().serverSetting = NIMServerSetting()
@@ -98,16 +104,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
     
     //呼叫组件初始化
-    let setupConfig = NESetupConfig(appkey: AppKey.appKey)
-    NECallEngine.sharedInstance().setup(setupConfig)
-    NECallEngine.sharedInstance().setTimeout(30)
-    
-    let uiConfig = NECallUIKitConfig()
-    NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
-    
-    let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
-    pushRegistry.delegate = self
-    pushRegistry.desiredPushTypes = [PKPushType.voIP]
+    DispatchQueue.global().async {
+      let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+      NECallEngine.sharedInstance().setup(setupConfig)
+      NECallEngine.sharedInstance().setTimeout(30)
+      
+      let uiConfig = NECallUIKitConfig()
+      NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+      
+      let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
+      pushRegistry.delegate = self
+      pushRegistry.desiredPushTypes = [PKPushType.voIP]
+    }
   }
   
   func initializePage(_ isLoginInit: Bool = false) {
@@ -207,11 +215,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
   }
   
-  func loginWithAutoParseConfig(_ completion: @escaping () -> Void) {
+  func loginWithAutoParseConfig(_ completion: ((Error?) -> Void)?) {
     
     guard let json = IMSDKConfigManager.instance.getConfig().customJson else {
       loginWithUI()
-      completion()
+      completion?(nil)
       return
     }
     
@@ -227,65 +235,57 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
           if let err = error {
             NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-            UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+            self?.window?.makeToast(err.localizedDescription)
             self?.loginWithUI()
           } else {
             NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
             self?.initConfig()
             self?.initializePage()
           }
-          completion()
+          completion?(error)
         }
       } else {
         loginWithUI()
-        completion()
+        completion?(nil)
       }
     } catch let error {
       NEALog.infoLog(self.className(), desc: "login poc IM error : \(error.localizedDescription)")
       loginWithUI()
-      completion()
+      completion?(error)
     }
   }
   
-  func loginWithCustomConfig(_ completion: @escaping () -> Void) {
+  func loginWithCustomConfig(_ completion: ((Error?) -> Void)?) {
     if let accountId = IMSDKConfigManager.instance.getConfig().accountId, 
         let accountIdToken = IMSDKConfigManager.instance.getConfig().accountIdToken {
       NEAIUserManager.shared.setProvider(provider: self)
       IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
         if let err = error {
           NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-          UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+          self?.window?.makeToast(err.localizedDescription)
           self?.loginWithUI()
         } else {
           NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
           self?.initConfig()
           self?.initializePage()
         }
-        completion()
+        completion?(error)
       }
     } else {
       loginWithUI()
-      completion()
+      completion?(nil)
     }
   }
   
-  func setupMarvel(){
-#if DEBUG
-    // 本地开发不上报
-#else
-    // 打正式包之后上报
-    MarvelWrapper.initMarvel(ServerAddresses.getAppkey())
-#endif
-  }
   
   func registerAPNS(){
     if #available(iOS 10.0, *) {
       let center = UNUserNotificationCenter.current()
       center.delegate = self
-      center.requestAuthorization(options: [.badge, .sound, .alert]) { grant, error in
+      center.requestAuthorization(options: [.badge, .sound, .alert]) { [weak self] grant, error in
         if grant == false {
           DispatchQueue.main.async {
-            UIApplication.shared.keyWindow?.makeToast(localizable("open_push"))
+            self?.window?.makeToast(localizable("open_push"))
           }
         }
       }
@@ -301,7 +301,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // 获取 sessionId 和 type
     if let sessionId = userInfo["sessionId"] as? String,
        let sessionType = userInfo["sessionType"] as? String {
-      setupInit { [weak self] in
+      setupInit { [weak self] error in
+        guard error == nil else {
+          return
+        }
+        
         let tabBar = self?.window?.rootViewController as? NETabBarController
         if sessionType == "p2p" {
           let cid = V2NIMConversationIdUtil.p2pConversationId(sessionId)
