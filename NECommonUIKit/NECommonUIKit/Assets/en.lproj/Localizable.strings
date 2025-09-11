@@ -65,3 +65,7 @@
 "detect_mailto_title"="Send message to\“%@\”";
 "detect_mailto_send"="Send via default email account";
 "detect_mailto_copy"="Copy Email";
+
+"request_timed_out"="Request timed out. Please try again.";
+"invalid_URL"="Invalid URL";
+"failed_to_load"="Failed to load. Error code: %d";

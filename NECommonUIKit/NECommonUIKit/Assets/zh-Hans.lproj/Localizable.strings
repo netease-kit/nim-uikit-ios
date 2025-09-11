@@ -66,3 +66,7 @@
 "detect_mailto_title"="向\“%@\”发送邮件";
 "detect_mailto_send"="使用默认邮件账户";
 "detect_mailto_copy"="复制邮箱";
+
+"request_timed_out"="请求超时，请重试";
+"invalid_URL"="无效的网页地址";
+"failed_to_load"="加载失败，错误代码：";

@@ -201,7 +201,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     readView.borderLayer.strokeColor = UIColor.funChatThemeColor.cgColor
     readView.sectorLayer.fillColor = UIColor.funChatThemeColor.cgColor
 
-    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
+    var image = ChatUIConfig.shared.messageProperties.receiveMessageBgImage ?? UIImage.ne_imageNamed(name: "chat_message_receive_fun")
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImageLeft.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
     } else {
@@ -209,7 +209,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
       bubbleImageLeft.contentMode = .scaleAspectFill
     }
 
-    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
+    image = ChatUIConfig.shared.messageProperties.selfMessageBgImage ?? UIImage.ne_imageNamed(name: "chat_message_send_fun")
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImageRight.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
     } else {

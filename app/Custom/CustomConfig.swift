@@ -22,8 +22,8 @@ public class CustomConfig {
     ChatUIConfig.shared.messageProperties.avatarType = .cycle
     ChatUIConfig.shared.messageProperties.avatarCornerRadius = 8.0
     ChatUIConfig.shared.messageProperties.signalBgColor = UIColor.yellow
-    ChatUIConfig.shared.messageProperties.selfMessageBg = UIColor.ne_greenText
-    ChatUIConfig.shared.messageProperties.receiveMessageBg = UIColor.ne_greenText
+    ChatUIConfig.shared.messageProperties.selfMessageBgColor = UIColor.ne_greenText
+    ChatUIConfig.shared.messageProperties.receiveMessageBgColor = UIColor.ne_greenText
     ChatUIConfig.shared.messageProperties.timeTextColor = UIColor.ne_darkText
     ChatUIConfig.shared.messageProperties.timeTextSize = 18
     ChatUIConfig.shared.messageProperties.userNickColor = UIColor.ne_redText
@@ -32,8 +32,8 @@ public class CustomConfig {
     ChatUIConfig.shared.messageProperties.receiveMessageTextColor = UIColor.blue
     ChatUIConfig.shared.messageProperties.selfMessageTextSize = 14
     ChatUIConfig.shared.messageProperties.receiveMessageTextSize = 12
-    ChatUIConfig.shared.messageProperties.rightBubbleBg = UIImage(named: "copy_right")
-    ChatUIConfig.shared.messageProperties.leftBubbleBg = UIImage(named: "copy_right")
+    ChatUIConfig.shared.messageProperties.selfMessageBgImage = UIImage(named: "copy_right")
+    ChatUIConfig.shared.messageProperties.receiveMessageBgImage = UIImage(named: "copy_right")
     ChatUIConfig.shared.messageProperties.showP2pMessageStatus = false
     ChatUIConfig.shared.messageProperties.showTeamMessageStatus = false
     //    ChatUIConfig.shared.messageProperties.showTitleBar = false
