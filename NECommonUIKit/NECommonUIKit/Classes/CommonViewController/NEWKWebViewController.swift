@@ -10,6 +10,13 @@ import WebKit
 public class NEWKWebViewController: NEBaseViewController {
   private var loadUrl: String = ""
 
+  lazy var webview: WKWebView = {
+    let webview = WKWebView()
+    webview.translatesAutoresizingMaskIntoConstraints = false
+    webview.navigationDelegate = self
+    return webview
+  }()
+
   override public func viewDidLoad() {
     super.viewDidLoad()
     setUpSubViews()
@@ -34,8 +41,6 @@ public class NEWKWebViewController: NEBaseViewController {
       return
     }
 
-    let webview = WKWebView()
-    webview.translatesAutoresizingMaskIntoConstraints = false
     let request = URLRequest(url: requestUrl)
     webview.load(request)
     view.addSubview(webview)
@@ -46,5 +51,57 @@ public class NEWKWebViewController: NEBaseViewController {
       webview.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       webview.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
+  }
+}
+
+extension NEWKWebViewController: WKNavigationDelegate {
+  // 处理页面加载失败
+  public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    handleWebViewError(error)
+  }
+
+  // 处理导航失败
+  public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    handleWebViewError(error)
+  }
+
+  private func handleWebViewError(_ error: Error) {
+    let nsError = error as NSError
+    let errorCode = nsError.code
+
+    // 常见错误类型处理
+    switch errorCode {
+    case NSURLErrorNotConnectedToInternet:
+      showErrorAlert(message: commonLocalizable("network_error"))
+    case NSURLErrorTimedOut:
+      showErrorAlert(message: commonLocalizable("request_timed_out"))
+    case NSURLErrorCannotFindHost, NSURLErrorBadURL:
+      showErrorAlert(message: commonLocalizable("invalid_URL"))
+    default:
+      showErrorAlert(message: String(format: commonLocalizable("failed_to_load"), errorCode))
+    }
+
+    // 加载本地错误页面
+    loadLocalErrorPage()
+  }
+
+  private func showErrorAlert(message: String) {
+    DispatchQueue.main.async { [weak self] in
+      self?.showSingleAlert(message: message) {
+        self?.navigationController?.popViewController(animated: true)
+      }
+    }
+  }
+
+  private func loadLocalErrorPage() {
+    let htmlContent = """
+    <html>
+    <body style="font-family: -apple-system; padding: 20px;">
+        <h2 style="color: #FF3B30;">Page Failed to Load</h2>
+        <p>Please check your internet connection or verify the URL.</p>
+    </body>
+    </html>
+    """
+    webview.loadHTMLString(htmlContent, baseURL: nil)
   }
 }

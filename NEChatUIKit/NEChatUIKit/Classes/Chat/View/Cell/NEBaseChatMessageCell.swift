@@ -123,8 +123,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
   }
 
   open func setBubbleImage() {
-    var image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
-    bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBg
+    var image = ChatUIConfig.shared.messageProperties.receiveMessageBgImage ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    bubbleImageLeft.backgroundColor = ChatUIConfig.shared.messageProperties.receiveMessageBgColor
 
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImageLeft.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
@@ -133,8 +133,8 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       bubbleImageLeft.contentMode = .scaleAspectFill
     }
 
-    image = ChatUIConfig.shared.messageProperties.rightBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_send")
-    bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBg
+    image = ChatUIConfig.shared.messageProperties.selfMessageBgImage ?? UIImage.ne_imageNamed(name: "chat_message_send")
+    bubbleImageRight.backgroundColor = ChatUIConfig.shared.messageProperties.selfMessageBgColor
 
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImageRight.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)

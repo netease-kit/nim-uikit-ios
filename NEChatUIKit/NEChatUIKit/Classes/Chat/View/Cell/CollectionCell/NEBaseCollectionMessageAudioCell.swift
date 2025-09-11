@@ -37,7 +37,7 @@ class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
   override open func setupCommonUI() {
     super.setupCommonUI()
 
-    let receiveImage = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "chat_message_receive")
+    let receiveImage = ChatUIConfig.shared.messageProperties.receiveMessageBgImage ?? UIImage.ne_imageNamed(name: "chat_message_receive")
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImage.image = receiveImage?.resizableImage(withCapInsets: backgroundImageCapInsets)
     } else {

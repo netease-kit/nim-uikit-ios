@@ -171,6 +171,9 @@ class CustomP2PChatViewController: P2PChatViewController {
     // 例如设置自定义消息高度
     if model.type == .custom {
       if model.customType == customMessageType {
+        // 设置气泡宽高，不设置则不展示气泡
+        model.contentSize = CGSize(width: 20, height: 20)
+        // 设置 cell 高度
         model.height = 50
       }
     }

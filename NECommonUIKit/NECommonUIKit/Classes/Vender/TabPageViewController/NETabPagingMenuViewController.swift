@@ -5,7 +5,7 @@
 import UIKit
 
 /// this represents the display and behaviour of the cells.
-public protocol NEPagingMenuViewControllerDelegate: AnyObject {
+public protocol NETabPagingMenuViewControllerDelegate: AnyObject {
   /// Tells the delegate when the menu finished to scroll focus view.
   ///
   /// - Parameters:
@@ -38,7 +38,7 @@ public protocol NEPagingMenuViewControllerDelegate: AnyObject {
   func menuViewController(viewController: NETabPagingMenuViewController, willDisplay cell: NEPagingMenuViewCell, forItemAt index: Int)
 }
 
-public extension NEPagingMenuViewControllerDelegate {
+public extension NETabPagingMenuViewControllerDelegate {
   func menuViewController(viewController: NETabPagingMenuViewController, focusViewDidEndTransition focusView: PagingMenuFocusView) {}
 
   func menuViewController(viewController: NETabPagingMenuViewController, willAnimateFocusViewTo index: Int, with coordinator: PagingMenuFocusViewAnimationCoordinator) {}
@@ -46,7 +46,7 @@ public extension NEPagingMenuViewControllerDelegate {
 }
 
 /// The data source provides the paging menu view controller object with the information it needs to construct and modify the menus.
-public protocol NEPagingMenuViewControllerDataSource: AnyObject {
+public protocol NETabPagingMenuViewControllerDataSource: AnyObject {
   /// Tells the data source to return the number of items in a menu view of the menu view controller.
   ///
   /// - Parameter viewController: The menu view controller object requesting this information.
@@ -73,9 +73,9 @@ public protocol NEPagingMenuViewControllerDataSource: AnyObject {
 /// A view controller that presents menu using cells arranged in a single column.
 public class NETabPagingMenuViewController: UIViewController {
   /// The object that acts as the delegate of the menu view controller.
-  public weak var delegate: NEPagingMenuViewControllerDelegate?
+  public weak var delegate: NETabPagingMenuViewControllerDelegate?
   /// The object that acts as the data source of the menu view controller.
-  public weak var dataSource: NEPagingMenuViewControllerDataSource?
+  public weak var dataSource: NETabPagingMenuViewControllerDataSource?
 
   private var fireInvalidateLayout: (() -> Void)?
 

@@ -13,7 +13,7 @@ open class FunPinMessageAudioCell: NEBasePinMessageAudioCell {
     backRightConstraint?.constant = 0
     backView.layer.cornerRadius = 0
     headerView.layer.cornerRadius = 4.0
-    let image = ChatUIConfig.shared.messageProperties.leftBubbleBg ?? UIImage.ne_imageNamed(name: "fun_pin_message_audio_bg")
+    let image = ChatUIConfig.shared.messageProperties.receiveMessageBgImage ?? UIImage.ne_imageNamed(name: "fun_pin_message_audio_bg")
     if let backgroundImageCapInsets = ChatUIConfig.shared.messageProperties.backgroundImageCapInsets {
       bubbleImage.image = image?.resizableImage(withCapInsets: backgroundImageCapInsets)
     } else {

@@ -125,16 +125,16 @@ public class MessageProperties: NSObject {
   public var inputPlaceholderTextColor: UIColor?
 
   // 自己发送的消息体的背景色
-  public var selfMessageBg: UIColor = .clear
+  public var selfMessageBgColor: UIColor = .clear
 
   // 接收到的消息体的背景色
-  public var receiveMessageBg: UIColor = .clear
+  public var receiveMessageBgColor: UIColor = .clear
 
-  // 右侧聊天背景气泡
-  public var rightBubbleBg: UIImage?
+  // 自己发送的消息体的背景气泡
+  public var selfMessageBgImage: UIImage?
 
-  // 左侧聊天背景气泡
-  public var leftBubbleBg: UIImage?
+  // 接收到的消息体的背景气泡
+  public var receiveMessageBgImage: UIImage?
 
   // 气泡图片拉伸参数（边距偏移）
   public var backgroundImageCapInsets: UIEdgeInsets? = UIEdgeInsets(top: 35, left: 25, bottom: 10, right: 25)
