@@ -144,7 +144,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if let text = searchAIUserTextField.text, text.count > 0 {
+    if searchAIUserTextField.text?.isEmpty == false {
       return viewModel.searchDatas.count
     }
     return viewModel.datas.count
@@ -168,7 +168,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   }
 
   open func isLastAIUser(_ index: Int) -> Bool {
-    if let text = searchAIUserTextField.text, text.count > 0 {
+    if searchAIUserTextField.text?.isEmpty == false {
       if viewModel.searchDatas.count - 1 == index {
         return true
       }
@@ -182,7 +182,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   /// 判断该当前是搜索列表还是内容列表
   /// - Parameter index: 列表索引
   open func getRealAIUserModel(_ index: Int) -> NEAIUserModel? {
-    if let text = searchAIUserTextField.text, text.count > 0 {
+    if searchAIUserTextField.text?.isEmpty == false {
       return viewModel.searchDatas[index]
     }
     return viewModel.datas[index]
@@ -201,7 +201,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
   /// 输入变更
   open func textChange() {
     viewModel.searchDatas.removeAll()
-    if let text = searchAIUserTextField.text, text.count > 0 {
+    if let text = searchAIUserTextField.text, !text.isEmpty {
       for model in viewModel.datas {
         if let uid = model.aiUser?.accountId, uid.contains(text) {
           viewModel.searchDatas.append(model)

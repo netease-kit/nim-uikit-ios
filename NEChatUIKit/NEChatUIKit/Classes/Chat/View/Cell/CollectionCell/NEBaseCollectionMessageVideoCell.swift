@@ -7,8 +7,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageVideoCell: NEBaseCollectionMessageImageCell {
+open class NEBaseCollectionMessageVideoCell: NEBaseCollectionMessageImageCell {
   /// 状态视图
   public lazy var collectionStateView: VideoStateView = {
     let state = VideoStateView()

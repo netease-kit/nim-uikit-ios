@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class FunCollectionMessageMultiForwardCell: NEBaseCollectionMessageMultiForwardCell {
+open class FunCollectionMessageMultiForwardCell: NEBaseCollectionMessageMultiForwardCell {
   override open func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code

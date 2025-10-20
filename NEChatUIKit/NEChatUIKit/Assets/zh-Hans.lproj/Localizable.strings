@@ -73,6 +73,8 @@
 "team_invitation"="的入群邀请";
 
 //MARK: operation
+"operation_earpiece"="听筒播放";
+"operation_speaker"="扬声器";
 "operation_copy"="复制";
 "operation_replay"="回复";
 "operation_forward"="转发";
@@ -224,3 +226,105 @@
 "p2p_chat_offline" = "(离线)";
 
 "line_break" = "换行";
+
+"switch_ear" = "切换听筒播放模式，请贴近手机聆听";
+"switch_speaker" = "扬声器播放";
+
+
+/// PhotoBrowser
+"previewCamera" = "拍照";
+"previewCameraRecord" = "拍摄";
+"previewAlbum" = "相册";
+"cancel" = "取消";
+
+"originalPhoto" = "原图";
+"originalTotalSize" = "共";
+"done" = "确定";
+"ok" = "确定";
+"editFinish" = "完成";
+"cameraDone" = "确定";
+"inputDone" = "确定";
+
+"back" = "返回";
+"edit" = "编辑";
+"revert" = "还原";
+"brightness" = "亮度";
+"contrast" = "对比度";
+"saturation" = "饱和度";
+
+"photo" = "照片";
+"preview" = "预览";
+
+"noPhotoTips" = "无照片";
+
+"hudLoading" = "正在加载";
+"hudProcessing" = "正在处理";
+
+"exceededMaxSelectCount" = "最多只能选择%ld张图片";
+"longerThanMaxVideoDuration" = "不能选择超过%ld秒的视频";
+"shorterThanMinVideoDuration" = "不能选择低于%ld秒的视频";
+//"largerThanMaxVideoDataSize" = "不能选择大于%@MB的视频";
+"smallerThanMinVideoDataSize" = "不能选择小于%@MB的视频";
+"exceededMaxVideoSelectCount" = "最多只能选择%ld个视频";
+"lessThanMinVideoSelectCount" = "最少选择%ld个视频";
+
+"noCameraAuthorityAlertMessage" = "请在iPhone的\"设置 > 隐私 > 相机\"选项中，允许%@访问你的相机";
+"noPhotoLibraryAuthorityAlertMessage" = "请在iPhone的\"设置 > 隐私 >照片\"选项中，允许%@访问你的照片";
+"noMicrophoneAuthorityAlertMessage" = "无法录制声音，前往\"设置 > %@\"中打开麦克风权限";
+"unableToAccessAllPhotos" = "你已设置%@只能访问相册部分照片，建议允许访问「所有照片」";
+"noLibraryAuthTitleInThumbList" = "无法访问相册中照片";
+"noLibraryAuthDescInThumbList" = "你已关闭%@照片访问权限，建议允许访问「所有照片」";
+"gotoSystemSettingInThumbList" = "前往系统设置";
+
+"cameraUnavailable" = "相机不可用";
+"keepRecording" = "继续拍摄";
+"gotoSettings" = "前往设置";
+
+"iCloudVideoLoadFaild" = "iCloud无法同步";
+"imageLoadFailed" = "图片加载失败";
+
+"save" = "保存";
+"saveImageError" = "图片保存失败";
+"saveVideoError" = "视频保存失败";
+"timeout" = "请求超时";
+
+"customCameraTips" = "轻触拍照，按住摄像";
+"customCameraTakePhotoTips" = "轻触拍照";
+"customCameraRecordVideoTips" = "按住摄像";
+"customCameraTapToRecordVideoTips" = "轻触摄像";
+"minRecordTimeTips" = "至少录制%ld秒";
+
+"cameraRoll" = "最近项目";
+"panoramas" = "全景照片";
+"videos" = "视频";
+"favorites" = "个人收藏";
+"timelapses" = "延时摄影";
+"recentlyAdded" = "最近添加";
+"bursts" = "连拍快照";
+"slomoVideos" = "慢动作";
+"selfPortraits" = "自拍";
+"screenshots" = "屏幕快照";
+"depthEffect" = "人像";
+"livePhotos" = "Live Photos";
+"animated" = "动图";
+"myPhotoStream" = "我的照片流";
+
+"noTitleAlbumListPlaceholder" = "所有照片";
+"textStickerRemoveTips" = "拖到此处删除";
+
+"filter_normal" = "正常";
+"filter_clarendon" = "克莱伦登";
+"filter_nashville" = "纳什维尔";
+"filter_apply1977" = "1977复古";  
+"filter_toaster" = "烘烤";
+"filter_chrome" = "铬黄";
+"filter_fade" = "褪色";
+"filter_instant" = "拍立得";  
+"filter_process" = "冲印";
+"filter_transfer" = "转印";
+"filter_tone" = "色调";
+"filter_linear" = "线性";
+"filter_sepia" = "怀旧";
+"filter_mono" = "单色";
+"filter_noir" = "暗黑"; 
+"filter_tonal" = "调性";

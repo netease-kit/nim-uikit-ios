@@ -103,10 +103,10 @@ final class NEKeyframeInterpolator<ValueType>: NEValueProvider where ValueType: 
 
   fileprivate var lastUpdatedFrame: CGFloat?
 
-  fileprivate var leadingIndex: Int? = nil
-  fileprivate var trailingIndex: Int? = nil
-  fileprivate var leadingKeyframe: NEKeyframe<ValueType>? = nil
-  fileprivate var trailingKeyframe: NEKeyframe<ValueType>? = nil
+  fileprivate var leadingIndex: Int?
+  fileprivate var trailingIndex: Int?
+  fileprivate var leadingKeyframe: NEKeyframe<ValueType>?
+  fileprivate var trailingKeyframe: NEKeyframe<ValueType>?
 
   /// Finds the appropriate Leading and Trailing keyframe index for the given time.
   fileprivate func updateSpanIndices(frame: CGFloat) {

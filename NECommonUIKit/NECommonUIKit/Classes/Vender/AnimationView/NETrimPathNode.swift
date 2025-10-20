@@ -56,7 +56,7 @@ final class NETrimPathNode: NEAnimatorNode {
   let outputNode: NENodeOutput
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat? = nil
+  var lastUpdateFrame: CGFloat?
   var isEnabled = true
 
   // MARK: Animator Node

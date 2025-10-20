@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class FunCollectionMessageAudioCell: NEBaseCollectionMessageAudioCell {
+open class FunCollectionMessageAudioCell: NEBaseCollectionMessageAudioCell {
   override open func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code

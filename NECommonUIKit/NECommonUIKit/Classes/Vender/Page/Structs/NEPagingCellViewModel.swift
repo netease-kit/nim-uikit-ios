@@ -17,7 +17,7 @@ struct NEPagingTitleCellViewModel {
   let selected: Bool
   let labelSpacing: CGFloat
 
-  public init(title: String?, selected: Bool, options: NEPagingOptions) {
+  init(title: String?, selected: Bool, options: NEPagingOptions) {
     self.title = title
     font = options.font
     selectedFont = options.selectedFont

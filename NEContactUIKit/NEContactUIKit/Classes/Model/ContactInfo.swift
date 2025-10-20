@@ -14,7 +14,15 @@ import UIKit
  // localExtension: 本地扩展字段，可根据业务需求添加数据，与 contactCellType 结合可实现多种自定义 cell 的展示
  */
 @objcMembers
-open class ContactInfo: NSObject {
+open class ContactInfo: NSObject, Comparable {
+  public static func == (lhs: ContactInfo, rhs: ContactInfo) -> Bool {
+    (lhs.user?.showName ?? "") == (rhs.user?.showName ?? "")
+  }
+
+  public static func < (lhs: ContactInfo, rhs: ContactInfo) -> Bool {
+    (lhs.user?.showName ?? "") < (rhs.user?.showName ?? "")
+  }
+
   open func getRowHeight() -> CGFloat? {
     nil
   }

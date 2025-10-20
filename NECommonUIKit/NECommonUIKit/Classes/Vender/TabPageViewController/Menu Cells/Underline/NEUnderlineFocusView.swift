@@ -22,7 +22,7 @@ public class NEUnderlineFocusView: UIView {
     }
   }
 
-  public var underlineWidth: CGFloat? = nil {
+  public var underlineWidth: CGFloat? {
     didSet {
       if let underlineWidth = underlineWidth {
         widthConstraint.isActive = true

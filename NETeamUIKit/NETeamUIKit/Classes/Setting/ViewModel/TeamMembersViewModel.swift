@@ -15,7 +15,7 @@ public protocol TeamMembersViewModelDelegate: NSObjectProtocol {
 
 class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NESubscribeListener {
   /// 是否正在请求数据
-  public var isRequest = false
+  var isRequest = false
   /// 群id
   var teamId: String?
 
@@ -24,16 +24,16 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   var datas = [NETeamMemberInfoModel]()
 
   /// 搜索结果数据
-  public var searchDatas = [NETeamMemberInfoModel]()
+  var searchDatas = [NETeamMemberInfoModel]()
 
   let teamRepo = TeamRepo.shared
 
-  public var currentMember: V2NIMTeamMember?
+  var currentMember: V2NIMTeamMember?
 
   /// 在线状态记录
   var onLineEventDic = [String: Bool]()
 
-  override public init() {
+  override init() {
     super.init()
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)

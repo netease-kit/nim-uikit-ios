@@ -8,7 +8,6 @@ import UIKit
 @objc
 public protocol BrowserToolsBarDelegate: NSObjectProtocol {
   func didCloseClick()
-  func didPhotoClick()
   func didSaveClick()
 }
 
@@ -27,13 +26,6 @@ open class BrowserToolsBar: UIView {
     let button = ExpandButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(coreLoader.loadImage("close_btn"), for: .normal)
-    return button
-  }()
-
-  public lazy var photoButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
-    button.setImage(coreLoader.loadImage("photo_btn"), for: .normal)
     return button
   }()
 
@@ -57,18 +49,9 @@ open class BrowserToolsBar: UIView {
     ])
     closeButton.addTarget(self, action: #selector(closeClick), for: .touchUpInside)
 
-    addSubview(photoButton)
-    NSLayoutConstraint.activate([
-      photoButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
-      photoButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-      photoButton.heightAnchor.constraint(equalToConstant: 28),
-      photoButton.widthAnchor.constraint(equalToConstant: 28),
-    ])
-    photoButton.addTarget(self, action: #selector(photoClick), for: .touchUpInside)
-
     addSubview(saveButton)
     NSLayoutConstraint.activate([
-      saveButton.rightAnchor.constraint(equalTo: photoButton.leftAnchor, constant: -20),
+      saveButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
       saveButton.centerYAnchor.constraint(equalTo: centerYAnchor),
       saveButton.heightAnchor.constraint(equalToConstant: 28),
       saveButton.widthAnchor.constraint(equalToConstant: 28),
@@ -78,10 +61,6 @@ open class BrowserToolsBar: UIView {
 
   open func saveClick() {
     delegate?.didSaveClick()
-  }
-
-  open func photoClick() {
-    delegate?.didPhotoClick()
   }
 
   open func closeClick() {

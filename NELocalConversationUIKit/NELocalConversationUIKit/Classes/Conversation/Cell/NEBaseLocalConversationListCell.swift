@@ -8,8 +8,6 @@ import UIKit
 
 @objcMembers
 open class NEBaseLocalConversationListCell: UITableViewCell {
-  public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
-
   private var timeWidth: NSLayoutConstraint?
   private var conversationType: V2NIMConversationType = .CONVERSATION_TYPE_UNKNOWN
   private var sessionId = ""
@@ -137,7 +135,7 @@ open class NEBaseLocalConversationListCell: UITableViewCell {
         mutaAttri.append(NSAttributedString(string: text))
       }
       if let sessionId = conversationModel.conversation?.conversationId {
-        let isAtMessage = NEAtMessageManager.instance?.isAtCurrentUser(conversationId: sessionId)
+        let isAtMessage = NELocalAtMessageManager.instance?.isAtCurrentUser(conversationId: sessionId)
         if isAtMessage == true {
           let atStr = localizable("you_were_mentioned")
           mutaAttri.insert(NSAttributedString(string: atStr), at: 0)

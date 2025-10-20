@@ -87,12 +87,10 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
     let isSend = IMKitClient.instance.isMe(model.message?.senderId)
 
     // 校验撤回消息可编辑时间
-    if let time = model.message?.createTime {
-      let date = Date()
-      let currentTime = date.timeIntervalSince1970
-      if Int(currentTime - time) >= ChatUIConfig.shared.revokeEditTimeGap * 60 {
-        model.timeOut = true
-      }
+    let date = Date()
+    let currentTime = date.timeIntervalSince1970
+    if Int(currentTime - model.revokeTime) >= ChatUIConfig.shared.revokeEditTimeGap * 60 {
+      model.timeOut = true
     }
 
     if isSend,

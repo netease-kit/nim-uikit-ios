@@ -23,7 +23,7 @@ open class NEBaseStickTopCell: UICollectionViewCell {
   public lazy var stickTopNameLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.font = NEConstant.defaultTextFont(14)
+    label.font = NEConstant.defaultTextFont(12)
     label.textColor = UIColor.ne_greyText
     label.accessibilityIdentifier = "id.name"
     label.textAlignment = .center

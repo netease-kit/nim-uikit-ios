@@ -13,8 +13,6 @@ public protocol ContactViewModelDelegate: NSObjectProtocol {
   func reloadTableView()
 }
 
-public typealias ContactCallBack = ([ContactSection]?, NSError?) -> Void
-
 @objcMembers
 open class ContactViewModel: NSObject {
   typealias RefreshBlock = () -> Void
@@ -89,12 +87,17 @@ open class ContactViewModel: NSObject {
   open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
-    // 从缓存中取
+    // 优选从缓存中取
     if !NEFriendUserCache.shared.isEmpty() {
       let friends = NEFriendUserCache.shared.getFriendListNotInBlocklist().map(\.value)
       let contactList = formatData(friends, filters)
       completion(contactList, nil)
       return
+    }
+
+    // 缓存中没有则远端查询, 刷新统一走缓存通知
+    contactRepo.getContactList { friends, error in
+      NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
     }
   }
 
@@ -148,28 +151,19 @@ open class ContactViewModel: NSObject {
         }
       }
 
-      digitList.sort { s1, s2 in
-        s1.user!.showName()! < s2.user!.showName()!
-      }
-      specialCharList.sort { s1, s2 in
-        s1.user!.showName()! < s2.user!.showName()!
-      }
+      digitList.sort()
+      specialCharList.sort()
 
       for key in initalDict.keys {
-        if var value = initalDict[key] {
-          value.sort { s1, s2 in
-            s1.user!.showName()! < s2.user!.showName()!
-          }
-          contactList.append(ContactSection(initial: key, contacts: value))
+        if let value = initalDict[key] {
+          contactList.append(ContactSection(initial: key, contacts: value.sorted()))
         }
       }
 
-      var result = contactList.sorted { s1, s2 in
-        s1.initial < s2.initial
-      }
+      var result = contactList.sorted()
 
       let specialList = digitList + specialCharList
-      if specialList.count > 0 {
+      if !specialList.isEmpty {
         result.append(ContactSection(initial: "#", contacts: specialList))
       }
       return result
@@ -239,12 +233,23 @@ extension ContactViewModel: NEContactListener {
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
   open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+    guard contactSections.count > 1 else {
+      return
+    }
+
+    var needRefresh = false
     for contact in contacts {
       if let accid = contact.user?.accountId,
+         NEFriendUserCache.shared.isFriend(accid),
          !NEFriendUserCache.shared.isBlockAccount(accid) {
-        loadData { [weak self] _, _ in
-          self?.delegate?.reloadTableView()
-        }
+        needRefresh = true
+        break
+      }
+    }
+
+    if needRefresh {
+      loadData { [weak self] _, _ in
+        self?.delegate?.reloadTableView()
       }
     }
   }
@@ -252,14 +257,14 @@ extension ContactViewModel: NEContactListener {
   /// 从通讯录中移除
   /// - Parameter accountId: 好友 Id
   open func removeFromContacts(_ accountId: String) {
-    for (title, section) in contactSections.enumerated() {
+    for (index, section) in contactSections.enumerated() {
       for (i, contact) in section.contacts.enumerated() {
         if contact.user?.user?.accountId == accountId {
           section.contacts.remove(at: i)
 
           // 该分组无好友后要删除该分组
           if section.contacts.isEmpty {
-            contactSections.remove(at: title)
+            contactSections.remove(at: index)
           }
           delegate?.reloadTableView()
           return
@@ -348,7 +353,7 @@ extension ContactViewModel: NESubscribeListener {
       }
     }
 
-    if subscribeList.count > 0 {
+    if !subscribeList.isEmpty {
       NESubscribeManager.shared.subscribeUsersOnlineState(subscribeList) { error in
       }
     }
@@ -377,6 +382,7 @@ extension ContactViewModel: NESubscribeListener {
       if NEFriendUserCache.shared.isFriend(d.accountId) {
         onlineStatusDic[d.accountId] = d.statusType == .USER_STATUS_TYPE_LOGIN
         needRefresh = true
+        break
       }
     }
 

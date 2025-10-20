@@ -394,7 +394,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid)
     Router.shared.use(
       PushP2pChatVCRouter,
-      parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any, "removeUserVC": true],
+      parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any, "removeUserVC": true, "animated": false],
       closure: nil
     )
   }

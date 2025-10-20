@@ -46,8 +46,8 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       if let searchViewGestures = searchView.gestureRecognizers {
         for gesture in searchViewGestures {
@@ -104,10 +104,10 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     stickTopCollcetionView.frame = CGRect(x: 4, y: 0, width: view.frame.size.width - 8.0, height: 104)
   }
 
-  override open func getPopListItems() -> [PopListItem] {
+  override open func getPopListItems() -> [LocalPopListItem] {
     weak var weakSelf = self
-    var items = [PopListItem]()
-    let addFriend = PopListItem()
+    var items = [LocalPopListItem]()
+    let addFriend = LocalPopListItem()
     addFriend.showName = localizable("add_friend")
     addFriend.showNameColor = .white
     addFriend.image = .ne_imageNamed(name: "fun_add_friend")
@@ -120,7 +120,7 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     }
     items.append(addFriend)
 
-    let joinTeam = PopListItem()
+    let joinTeam = LocalPopListItem()
     joinTeam.showName = commonLocalizable("join_team")
     joinTeam.showNameColor = .white
     joinTeam.image = .ne_imageNamed(name: "fun_join_team")
@@ -133,7 +133,7 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     }
     items.append(joinTeam)
 
-    let createDicuss = PopListItem()
+    let createDicuss = LocalPopListItem()
     createDicuss.showName = localizable("create_discussion_group")
     createDicuss.showNameColor = .white
     createDicuss.image = .ne_imageNamed(name: "fun_create_discussion")
@@ -142,7 +142,7 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     }
     items.append(createDicuss)
 
-    let createGroup = PopListItem()
+    let createGroup = LocalPopListItem()
     createGroup.showName = localizable("create_senior_group")
     createGroup.showNameColor = .white
     createGroup.image = .ne_imageNamed(name: "fun_create_team")
@@ -156,7 +156,7 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 72, height: 104)
+    CGSize(width: 80, height: 104)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)
@@ -181,7 +181,6 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
 
   override open func reloadTableView() {
     super.reloadTableView()
-    NEALog.infoLog(className(), desc: #function + " reloadTableView in fun conversation controller stick top count \(viewModel.stickTopConversations.count)")
     setupFunStickTopView()
   }
 }

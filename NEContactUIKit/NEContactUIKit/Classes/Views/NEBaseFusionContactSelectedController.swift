@@ -139,7 +139,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
       fusionEmptyView.setText(localizable("no_ai_user"))
       viewModel.loadAIUserData(filterSet)
       fusionContactTableView.reloadData()
-      fusionEmptyView.isHidden = viewModel.memberDatas.count > 0
+      fusionEmptyView.isHidden = !viewModel.memberDatas.isEmpty
     }
   }
 

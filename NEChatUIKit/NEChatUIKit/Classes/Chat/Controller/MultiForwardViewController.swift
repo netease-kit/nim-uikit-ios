@@ -247,7 +247,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
             imageUrl = path
           }
         }
-        if imageUrl.count > 0 {
+        if !imageUrl.isEmpty {
           let showController = PhotoBrowserController(
             urls: ChatMessageHelper.getUrls(messages: viewModel.messages),
             url: imageUrl
@@ -258,6 +258,10 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
       }
     } else if model?.type == .video,
               let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
+      // 设置扬声器
+      NEAudioSessionManager.shared.switchToSpeaker()
+      NEAudioSessionManager.shared.stopProximityMonitoring()
+
       let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
       if FileManager.default.fileExists(atPath: path) {
         let url = URL(fileURLWithPath: path)

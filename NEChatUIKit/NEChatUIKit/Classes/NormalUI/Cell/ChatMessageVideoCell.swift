@@ -130,7 +130,7 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     let stateView = isSend ? stateViewRight : stateViewLeft
     let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
-    if model.isReplay {
+    if model.isReply {
       setBubbleImage()
     } else {
       bubble.image = nil

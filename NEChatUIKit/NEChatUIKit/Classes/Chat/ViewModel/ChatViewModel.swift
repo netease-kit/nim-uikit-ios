@@ -217,8 +217,7 @@ open class ChatViewModel: NSObject {
   }
 
   open func getAIUserList() {
-    if IMKitConfigCenter.shared.enableAIUser,
-       NEAIUserManager.shared.isAIUserListEmpty() {
+    if IMKitConfigCenter.shared.enableAIUser {
       NEAIUserManager.shared.getAIUserList()
     }
   }
@@ -540,9 +539,7 @@ open class ChatViewModel: NSObject {
     }
 
     chatRepo.getMessageList(option: opt) { [weak self] messages, error in
-      if let messageArray = messages, messageArray.count > 0 {
-        let group = DispatchGroup()
-
+      if let messageArray = messages, !messageArray.isEmpty {
         if order == .QUERY_DIRECTION_DESC {
           self?.oldMsg = messageArray.last
         } else {
@@ -1305,6 +1302,7 @@ open class ChatViewModel: NSObject {
     }
 
     muta[revokeLocalMessage] = true
+    muta[revokeLocalMessageTime] = Date().timeIntervalSince1970
     if message.messageType == .MESSAGE_TYPE_TEXT {
       muta[revokeLocalMessageContent] = message.text
     }
@@ -1354,18 +1352,20 @@ open class ChatViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", pinAccount: " + (model?.pinAccount ?? "nil"))
     var items = [OperationItem]()
 
-    /// 消息发送中的消息只能删除（文本可复制）
+    /// 消息发送中的消息只能多选和删除（文本可复制）
     if model?.message?.sendingState == .MESSAGE_SENDING_STATE_SENDING {
       switch model?.message?.messageType {
       case .MESSAGE_TYPE_TEXT:
         items.append(contentsOf: [
           OperationItem.copyItem(),
           OperationItem.deleteItem(),
+          OperationItem.selectItem(),
         ])
         return items
       default:
         return [
           OperationItem.deleteItem(),
+          OperationItem.selectItem(),
         ]
       }
     }
@@ -1426,7 +1426,9 @@ open class ChatViewModel: NSObject {
         topItem,
       ]
     case .MESSAGE_TYPE_AUDIO:
+      let earItem = SettingRepo.shared.getHandsetMode() ? OperationItem.earpieceItem() : OperationItem.speakerItem()
       items = [
+        earItem,
         OperationItem.replayItem(),
         pinItem,
         OperationItem.deleteItem(),
@@ -1553,7 +1555,7 @@ open class ChatViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     ChatMessageHelper.modelFromMessage(message: message) { [weak self] model in
       if ChatMessageHelper.isRevokeMessage(message: model.message) {
-        if let content = ChatMessageHelper.getRevokeMessageContent(message: model.message) {
+        if let content = ChatMessageHelper.getRevokeMessageContent(model: model) {
           model.isReedit = true
           model.message?.text = content
         }
@@ -1584,7 +1586,7 @@ open class ChatViewModel: NSObject {
     let model = ChatMessageHelper.modelFromMessage(message: message)
 
     if ChatMessageHelper.isRevokeMessage(message: model.message) {
-      if let content = ChatMessageHelper.getRevokeMessageContent(message: model.message) {
+      if let content = ChatMessageHelper.getRevokeMessageContent(model: model) {
         model.isReedit = true
         model.message?.text = content
       }
@@ -1597,10 +1599,6 @@ open class ChatViewModel: NSObject {
       model.avatar = user?.user?.avatar
       model.fullName = fullName
       model.shortName = NEFriendUserCache.getShortName(fullName)
-
-      if user == nil {
-        contactRepo.getUserWithFriend(accountIds: [uid]) { _, _ in }
-      }
     }
 
     if let replyModel = getReplyMessage(message: message) {
@@ -1808,7 +1806,7 @@ open class ChatViewModel: NSObject {
 
       // 是否可以重新编辑
       if message.aiConfig == nil || message.aiConfig?.aiStatus != .MESSAGE_AI_STATUS_RESPONSE,
-         let content = ChatMessageHelper.getRevokeMessageContent(message: messages[index].message) {
+         let content = ChatMessageHelper.getRevokeMessageContent(model: messages[index]) {
         messages[index].isReedit = true
         messages[index].message?.text = content
       }
@@ -2197,10 +2195,17 @@ open class ChatViewModel: NSObject {
   }
 
   /// 获取听筒模式
-  /// - Returns: 听筒模式
+  /// - Returns: 听筒是否外放
   open func getHandSetEnable() -> Bool {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     return SettingRepo.shared.getHandsetMode()
+  }
+
+  /// 设置听筒模式
+  /// - Parameter ear: 是否外放
+  open func setHandSetEnable(_ ear: Bool) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    SettingRepo.shared.setHandsetMode(ear)
   }
 
   /// 移除缓存数据的标记状态
@@ -2243,10 +2248,10 @@ open class ChatViewModel: NSObject {
     }
 
     // 避免重复发送
-    if ChatDeduplicationHelper.instance.isMessageSended(messageId: message.messageClientId ?? "") {
-      NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already send")
-      return
-    }
+//    if ChatDeduplicationHelper.instance.isMessageSended(messageId: message.messageClientId ?? "") {
+//      NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already send")
+//      return
+//    }
 
     // 自定义消息发送之前的处理
     if newMsg == nil {
@@ -2258,7 +2263,11 @@ open class ChatViewModel: NSObject {
     ChatMessageHelper.addTimeMessage(model, messages.last)
     let index = insertToMessages(model)
 
-    delegate?.sending(message, IndexPath(row: index, section: 0))
+    if isHistoryChat {
+      delegate?.dataReload?()
+    } else {
+      delegate?.sending(message, IndexPath(row: index, section: 0))
+    }
   }
 
   /// 消息发送完成

@@ -7,13 +7,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-public class NELocalConversationListModel: NSObject, Comparable {
-  public static func < (lhs: NELocalConversationListModel, rhs: NELocalConversationListModel) -> Bool {
-    let time1 = lhs.conversation?.sortOrder ?? 0
-    let time2 = rhs.conversation?.sortOrder ?? 0
-    return time1 > time2
-  }
-
+public class NELocalConversationListModel: NSObject {
   /// 会话
   public var conversation: V2NIMLocalConversation? {
     didSet {

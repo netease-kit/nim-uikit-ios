@@ -288,7 +288,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
-    if viewModel.contactSections[section].initial.count > 0 {
+    if !viewModel.contactSections[section].initial.isEmpty {
       return 40
     }
     return 0
@@ -376,7 +376,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
   }
 
   open func refreshSelectCount() {
-    if selectArray.count > 0 {
+    if !selectArray.isEmpty {
       sureButton.setTitle("确定(\(selectArray.count))", for: .normal)
     } else {
       sureButton.setTitle(commonLocalizable("sure"), for: .normal)

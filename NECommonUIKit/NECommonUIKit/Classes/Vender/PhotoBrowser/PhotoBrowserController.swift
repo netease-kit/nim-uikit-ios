@@ -9,8 +9,6 @@ import Photos
 
 @objcMembers
 open class PhotoBrowserController: UIViewController {
-  private let SystemNaviBarHeight: CGFloat = UIApplication.shared.statusBarFrame.height + 24
-
   public lazy var toolsBar: BrowserToolsBar = {
     let bar = BrowserToolsBar()
     bar.delegate = self
@@ -90,13 +88,6 @@ extension PhotoBrowserController: BrowserToolsBarDelegate {
     showView.dismissPhotoBrowser()
   }
 
-  public func didPhotoClick() {
-    let imagePickerVC = UIImagePickerController()
-    imagePickerVC.allowsEditing = false
-    imagePickerVC.sourceType = .photoLibrary
-    present(imagePickerVC, animated: true)
-  }
-
   public func didSaveClick() {
     weak var weakSelf = self
     NEAuthManager.requestPhotoAuthorization { granted in
@@ -115,15 +106,15 @@ extension PhotoBrowserController: BrowserToolsBarDelegate {
   @objc func saveImage() {
     let index = showView.currentIndex()
     weak var weakSelf = self
-    if showView.urlArray.count > 0 {
+    if !showView.urlArray.isEmpty {
       let urlString = showView.urlArray[index]
       if let url = URL(string: urlString) {
-        PHPhotoLibrary.shared().performChanges({
+        PHPhotoLibrary.shared().performChanges {
           if let data = try? Data(contentsOf: url) {
             let creationRequest = PHAssetCreationRequest.forAsset()
             creationRequest.addResource(with: .photo, data: data, options: nil)
           }
-        }, completionHandler: { success, error in
+        } completionHandler: { success, error in
           DispatchQueue.main.async {
             weakSelf?.view.hideToastActivity()
             if let err = error {
@@ -134,7 +125,7 @@ extension PhotoBrowserController: BrowserToolsBarDelegate {
               }
             }
           }
-        })
+        }
       } else {
         view.hideToastActivity()
       }

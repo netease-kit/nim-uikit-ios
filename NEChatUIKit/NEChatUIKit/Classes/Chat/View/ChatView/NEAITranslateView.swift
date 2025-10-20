@@ -40,7 +40,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   public var currentLanguage = "" {
     didSet {
       if oldValue != currentLanguage {
-        if currentLanguage.count > 0 {
+        if !currentLanguage.isEmpty {
           let userDefault = UserDefaults.standard
           userDefault.setValue(currentLanguage, forKey: IMKitClient.instance.account() + languageSuffix)
           userDefault.synchronize()

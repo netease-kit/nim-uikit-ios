@@ -9,7 +9,7 @@ class NEPagingStaticDataSource: NEPagingViewControllerInfiniteDataSource {
   private(set) var items: [NEPagingItem] = []
   private let viewControllers: [UIViewController]
 
-  public init(viewControllers: [UIViewController]) {
+  init(viewControllers: [UIViewController]) {
     self.viewControllers = viewControllers
     reloadItems()
   }

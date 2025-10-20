@@ -56,13 +56,6 @@ public class NELoginViewController: UIViewController {
     return button
   }()
 
-  lazy var dividerLineView: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backgroundColor = UIColor.ne_lightText
-    return view
-  }()
-
   /// 节点按钮
   lazy var nodeButton: UIButton = {
     let button = UIButton()
@@ -113,12 +106,10 @@ public class NELoginViewController: UIViewController {
   }
 
   func setupUI() {
+    view.backgroundColor = .white
     view.addSubview(launchIconView)
     view.addSubview(launchIconLabel)
     view.addSubview(loginButton)
-    view.addSubview(emailLoginButton)
-    view.addSubview(dividerLineView)
-    view.addSubview(nodeButton)
 
     NSLayoutConstraint.activate([
       launchIconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -154,7 +145,7 @@ public class NELoginViewController: UIViewController {
     view.addSubview(stackView)
     NSLayoutConstraint.activate([
       stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
+      stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -70),
       stackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       stackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       stackView.heightAnchor.constraint(equalToConstant: 44),
@@ -190,7 +181,7 @@ public class NELoginViewController: UIViewController {
   }
 
   func pocLoginBtnClick(sender: UIButton) {
-    let ctrl = PocLoginController()
+    let ctrl = PocLoginViewController()
     ctrl.loginSuccess = { [weak self] in
       self?.successLogin?()
     }
@@ -198,7 +189,7 @@ public class NELoginViewController: UIViewController {
   }
 
   func pocSettingBtnClick(sender: UIButton) {
-    let configeController = IMSDKConfigViewController()
-    navigationController?.pushViewController(configeController, animated: true)
+    let pocConfigController = IMPocConfigViewController()
+    navigationController?.pushViewController(pocConfigController, animated: true)
   }
 }

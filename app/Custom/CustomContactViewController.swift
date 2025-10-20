@@ -58,7 +58,7 @@ public class CustomContactViewController: ContactViewController, NEBaseContactVi
 
   //  父类加载完数据后会调用此方法，可在此对数据进行二次处理
   open func onDataLoaded() {
-    for info in viewModel.contactSections[1].contacts {
+    for info in viewModel?.contactSections[1].contacts ?? [] {
       info.contactCellType = ContactCellType.ContactCutom
     }
   }

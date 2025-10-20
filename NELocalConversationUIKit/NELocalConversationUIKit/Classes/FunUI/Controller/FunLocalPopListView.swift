@@ -8,7 +8,7 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open class FunPopListView: NEBasePopListView {
+open class FunPopListView: NELocalBasePopListView {
   public var triangleView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false

@@ -309,7 +309,7 @@
         viewController.view.bottomAnchor.constraint(equalTo: bottomAnchor),
       ])
 
-      viewController.didMove(toParent: parent)
+      viewController.willMove(toParent: parent)
     }
 
     private func removeViewControllerIfNeeded() {
@@ -318,7 +318,7 @@
       viewController.willMove(toParent: nil)
       viewController.view.removeFromSuperview()
       viewController.removeFromParent()
-      viewController.didMove(toParent: nil)
+      viewController.willMove(toParent: nil)
     }
   }
 

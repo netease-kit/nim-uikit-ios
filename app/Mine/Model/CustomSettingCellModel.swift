@@ -6,14 +6,14 @@ import NETeamUIKit
 import UIKit
 
 class CustomSettingCellModel: SettingCellModel {
-  public var placeholder = "请填写"
+  var placeholder = "请填写"
 
-  public var customInputText: String?
+  var customInputText: String?
 
   /// 输入内容对应SDK配置字段的key，便于自动解析映射
-  public var inputKey = ""
+  var inputKey = ""
 
-  override public init() {
+  override init() {
     super.init()
     rowHeight = 100
   }

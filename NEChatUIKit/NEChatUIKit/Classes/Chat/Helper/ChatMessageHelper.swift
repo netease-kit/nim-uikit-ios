@@ -522,15 +522,19 @@ public class ChatMessageHelper: NSObject {
   /// 获取消息撤回前的内容（用于重新编辑）
   /// - Parameter message: 消息
   /// - Returns: 撤回前的内容
-  public static func getRevokeMessageContent(message: V2NIMMessage?) -> String? {
-    guard let message = message else { return nil }
+  public static func getRevokeMessageContent(model: MessageModel) -> String? {
+    guard let message = model.message, model.type == .text || model.type == .richText else { return nil }
 
     if let localExt = getMessageServerExtension(message: message) {
+      if let time = localExt[revokeLocalMessageTime] as? TimeInterval {
+        model.revokeTime = time
+      }
+
       if let content = localExt[revokeLocalMessageContent] as? String {
         return content
       }
     }
-    return message.text
+    return nil
   }
 
   /// 生成回复信息键值对

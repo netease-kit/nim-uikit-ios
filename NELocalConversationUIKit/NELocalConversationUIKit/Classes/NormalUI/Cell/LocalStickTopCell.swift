@@ -17,8 +17,7 @@ open class StickTopCell: NEBaseStickTopCell {
     NSLayoutConstraint.activate([
       stickTopNameLabel.topAnchor.constraint(equalTo: stickTopHeadImageView.bottomAnchor, constant: 6),
       stickTopNameLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      stickTopNameLabel.leftAnchor.constraint(equalTo: stickTopHeadImageView.leftAnchor),
-      stickTopNameLabel.rightAnchor.constraint(equalTo: stickTopHeadImageView.rightAnchor),
+      stickTopNameLabel.widthAnchor.constraint(equalToConstant: 66),
     ])
   }
 }

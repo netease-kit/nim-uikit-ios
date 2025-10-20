@@ -99,7 +99,7 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
   }
 
   func isLastRow(_ index: Int) -> Bool {
-    if let text = searchTextField.text, text.count > 0 {
+    if searchTextField.text?.isEmpty == false {
       if viewModel.searchDatas.count - 1 == index {
         return true
       }

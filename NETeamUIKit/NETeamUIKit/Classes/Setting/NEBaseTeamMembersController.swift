@@ -207,7 +207,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
 
   open func textChange() {
     viewModel.searchDatas.removeAll()
-    if let text = searchTextField.text, text.count > 0 {
+    if let text = searchTextField.text, !text.isEmpty {
       for model in viewModel.datas {
         if let teamName = model.atNameInTeam() {
           if teamName.contains(text) {
@@ -222,7 +222,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
   }
 
   open func getRealModel(_ index: Int) -> NETeamMemberInfoModel? {
-    if let text = searchTextField.text, text.count > 0 {
+    if let text = searchTextField.text, !text.isEmpty {
       return viewModel.searchDatas[index]
     }
     return viewModel.datas[index]
@@ -235,7 +235,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
   // MARK: UITableViewDelegate, UITableViewDataSource
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if let text = searchTextField.text, text.count > 0 {
+    if let text = searchTextField.text, !text.isEmpty {
       return viewModel.searchDatas.count
     }
     return viewModel.datas.count
@@ -302,7 +302,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
               weakSelf?.view.makeToast(localizable("remove_failed"))
             }
           } else {
-            if let text = weakSelf?.searchTextField.text, text.count > 0 {
+            if let text = weakSelf?.searchTextField.text, !text.isEmpty {
               weakSelf?.viewModel.searchDatas.remove(at: index)
               weakSelf?.viewModel.searchDatas.removeAll(where: { model in
                 if model.teamMember?.accountId == uid {
@@ -323,14 +323,14 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
   }
 
   open func didNeedRefreshUI() {
-    if let text = searchTextField.text, text.count > 0 {
-      emptyView.isHidden = viewModel.searchDatas.count > 0
+    if let text = searchTextField.text, !text.isEmpty {
+      emptyView.isHidden = !viewModel.searchDatas.isEmpty
     }
     contentTableView.reloadData()
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
 //    if IMKitConfigCenter.shared.enableOnlineStatus {
 //      if parent == nil {
 //        viewModel.unSubcribeMembers(viewModel.datas) { [weak self] error in

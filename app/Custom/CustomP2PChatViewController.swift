@@ -181,13 +181,13 @@ class CustomP2PChatViewController: P2PChatViewController {
 
   // MARK: lazy load
 
-  public lazy var customTopView: CustomView = {
+  lazy var customTopView: CustomView = {
     let view = CustomView(frame: CGRect(x: 0, y: 10, width: NEConstant.screenWidth, height: 40))
     view.backgroundColor = .blue
     return view
   }()
 
-  public lazy var customBottomView: CustomView = {
+  lazy var customBottomView: CustomView = {
     let view = CustomView(frame: CGRect(x: 0, y: 10, width: NEConstant.screenWidth, height: 40))
     view.backgroundColor = .green
     return view

@@ -23,7 +23,8 @@ public class NEConversationService: NSObject, ChatServiceDelegate {
   /// - Parameter param: 参数
   open func registerRouter(_ param: [String: Any]?) {
     // @功能初始化
-    if IMKitConfigCenter.shared.enableAtMessage {
+    if IMKitConfigCenter.shared.enableAtMessage,
+       NIMSDK.shared().v2Option?.enableV2CloudConversation == true {
       NEAtMessageManager.setupInstance()
     }
 

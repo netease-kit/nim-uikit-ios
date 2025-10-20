@@ -28,6 +28,7 @@ open class ChatInputView: NEBaseChatInputView {
 
     backViewHeightConstraint = backView.heightAnchor.constraint(equalToConstant: 40)
     insertSubview(backView, belowSubview: textView)
+    setUnMuteInputStyle()
     NSLayoutConstraint.activate([
       backView.leftAnchor.constraint(equalTo: leftAnchor, constant: 7),
       backView.rightAnchor.constraint(equalTo: rightAnchor, constant: -7),

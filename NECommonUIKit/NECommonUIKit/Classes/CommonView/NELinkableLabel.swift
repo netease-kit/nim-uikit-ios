@@ -38,7 +38,7 @@ open class NELinkableLabel: UILabel {
     isUserInteractionEnabled = true
     numberOfLines = 0
     let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-    tap.cancelsTouchesInView = false
+    tap.cancelsTouchesInView = true
     addGestureRecognizer(tap)
   }
 

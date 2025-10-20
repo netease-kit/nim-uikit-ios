@@ -142,11 +142,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
         desc: "CALLBACK searchMessages " + (error?.localizedDescription ?? "no error")
       )
       if error == nil {
-        if let msg = messages, msg.count > 0 {
-          weakSelf?.emptyView.isHidden = true
-        } else {
-          weakSelf?.emptyView.isHidden = false
-        }
+        weakSelf?.emptyView.isHidden = messages?.isEmpty == false
         weakSelf?.tableView.reloadData()
       } else {
         NEALog.errorLog(

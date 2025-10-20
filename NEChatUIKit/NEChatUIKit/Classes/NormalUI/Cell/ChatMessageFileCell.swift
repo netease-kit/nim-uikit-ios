@@ -236,7 +236,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
 
     bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
 
-    if model.isReplay {
+    if model.isReply {
       setBubbleImage()
     } else {
       bubble.image = nil

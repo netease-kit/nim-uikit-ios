@@ -12,7 +12,7 @@ target 'app' do
   # 基础库
   pod 'NEChatKit', YXConfig.imuikit_version
 
-  # UI 组件，YXConfig.imuikit_version = 10.8.5
+  # UI 组件，YXConfig.imuikit_version = 10.8.7
   pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件
   pod 'NEContactUIKit', YXConfig.imuikit_version            # 通讯录组件
   pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件
@@ -29,8 +29,11 @@ target 'app' do
   pod 'NERtcSDK/RtcBasic'                   #  RTC 音视频基础组件
   pod 'NERtcSDK/Nenn'                       #  RTC 音视频神经网络组件（使用背景虚化功能需要集成）
   pod 'NERtcSDK/Segment'                    #  RTC 音视频背景分割组件（使用背景虚化功能需要集成）
-  pod 'NERtcCallKit/NOS_Special', '3.6.0'
-  pod 'NERtcCallUIKit/NOS_Special', '3.6.0' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
+  pod 'NERtcCallKit/NOS_Special', '3.7.1'
+  pod 'NERtcCallUIKit/NOS_Special', '3.7.1' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
+  
+  # 可选 - 图片选择库
+  pod 'ZLPhotoBrowser'
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖(不包含呼叫组件)，打开下面的本地依赖
 #  pod 'NECommonUIKit', :path => 'NECommonUIKit/NECommonUIKit.podspec'

@@ -65,22 +65,19 @@ open class CustomConversationController: ConversationController, NEBaseConversat
     bodyBottomViewHeight = 0
   }
 
-  override open func deleteActionHandler(action: UITableViewRowAction?, indexPath: IndexPath) {
+  override open func deleteActionHandler(indexPath: IndexPath) {
     showSingleAlert(message: "override deleteActionHandler") {}
   }
 
-  override open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
+  override open func topActionHandler(indexPath: IndexPath, isTop: Bool) {
     showSingleAlert(message: "override topActionHandler") {
-      super.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
+      super.topActionHandler(indexPath: indexPath, isTop: isTop)
     }
   }
 
   //  可自行处理数据
   open func onDataLoaded() {
     for model in viewModel.conversationListData {
-      model.customType = 1
-    }
-    for model in viewModel.stickTopConversations {
       model.customType = 1
     }
     tableView.reloadData()

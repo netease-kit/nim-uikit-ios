@@ -11,6 +11,8 @@
 "cancel"="取消";
 "camera"="摄像";
 "take_picture"="拍照";
+"photos"="照片";
+"videos"="视频";
 "network_error"="当前网络不可用，请检查你的网络设置。";
 "select_from_album"="从相册选择";
 "select_from_icloud"="从iCloud选择";
@@ -70,3 +72,8 @@
 "request_timed_out"="请求超时，请重试";
 "invalid_URL"="无效的网页地址";
 "failed_to_load"="加载失败，错误代码：";
+"file_upload_failed"="文件上传失败";
+
+"only_support_choose_image"="仅支持选择图片";
+"video_count_over_limit" = "视频数量超过%d张限制";
+"image_count_over_limit" = "图片数量超过%d张限制";

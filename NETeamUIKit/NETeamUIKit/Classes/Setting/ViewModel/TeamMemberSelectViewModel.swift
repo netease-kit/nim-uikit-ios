@@ -32,7 +32,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 管理员account id 存放
   var managerSet = Set<String>()
 
-  override public init() {
+  override init() {
     super.init()
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)
@@ -108,7 +108,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
             } else {
               if let members = ms {
                 weakSelf?.splitSelectMembers(members, teamInfo, 150) { error, model in
-                  if var users = model?.users, users.count > 0 {
+                  if var users = model?.users, !users.isEmpty {
                     users.removeAll { model in
                       if let account = model.nimUser?.user?.accountId {
                         if NEAIUserManager.shared.isAIUser(account) {

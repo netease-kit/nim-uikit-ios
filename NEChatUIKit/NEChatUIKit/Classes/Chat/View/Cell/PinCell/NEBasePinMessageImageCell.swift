@@ -2,6 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NIMSDK
+import SDWebImage
 import UIKit
 
 @objcMembers
@@ -55,19 +57,29 @@ open class NEBasePinMessageImageCell: NEBasePinMessageCell {
     super.configure(item)
 
     if let m = item.chatmodel as? MessageImageModel, let imageUrl = m.urlString {
+      let options: SDWebImageOptions = [.retryFailed, .allowInvalidSSLCertificates]
+
       if imageUrl.hasPrefix("http") {
-        contentImageView.sd_setImage(
-          with: URL(string: imageUrl),
-          placeholderImage: nil,
-          options: .retryFailed,
-          progress: nil,
-          completed: nil
-        )
+        let url = URL(string: imageUrl)
+        contentImageView.sd_setImage(with: url) { [weak self] image, error, type, url in
+          if let err = error as? NSError, err.code == 2001,
+             let imageObject = item.message.attachment as? V2NIMMessageImageAttachment,
+             let imageUrl = imageObject.url {
+            let url = URL(string: imageUrl)
+            let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 350, height: 350)]
+            self?.contentImageView.sd_setImage(
+              with: url,
+              placeholderImage: UIImage(contentsOfFile: imageUrl),
+              options: options,
+              context: context,
+              progress: nil
+            )
+          }
+        }
       } else {
         let url = URL(fileURLWithPath: imageUrl)
-        contentImageView.sd_setImage(with: url)
+        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       }
-
     } else {
       contentImageView.image = nil
     }

@@ -241,7 +241,7 @@ open class ChatMessageLocationCell: NormalChatMessageBaseCell {
     let pointImage = isSend ? pointImageRight : pointImageLeft
     let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
-    if model.isReplay {
+    if model.isReply {
       setBubbleImage()
     } else {
       bubble.image = nil

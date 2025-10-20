@@ -63,7 +63,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       self?.setEmptyViewText(self?.searchText)
 
       if let sessions = self?.viewModel.sessions {
-        self?.emptyView.isHidden = sessions.count > 0
+        self?.emptyView.isHidden = !sessions.isEmpty
         self?.currentTableView?.reloadData()
       }
 
@@ -949,7 +949,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 刷新（确定按钮）已选人数
   open func refreshSelectCount() {
-    if selectedArray.count > 0 {
+    if !selectedArray.isEmpty {
       sureButton.isEnabled = true
       sureButton.setTitle(sureButtonText + "(\(selectedArray.count))", for: .normal)
     } else {

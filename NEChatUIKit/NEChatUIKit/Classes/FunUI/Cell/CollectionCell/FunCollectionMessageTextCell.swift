@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class FunCollectionMessageTextCell: NEBaseCollectionMessageTextCell {
+open class FunCollectionMessageTextCell: NEBaseCollectionMessageTextCell {
   override open func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code

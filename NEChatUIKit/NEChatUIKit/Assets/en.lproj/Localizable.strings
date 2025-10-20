@@ -79,6 +79,8 @@
 "team_invitation"="team invitation has been approved";
 
 //MARK: operation
+"operation_earpiece"="Earpiece";
+"operation_speaker"="Speaker";
 "operation_copy"="Copy";
 "operation_replay"="Reply";
 "operation_forward"="Forward";
@@ -228,3 +230,104 @@
 "p2p_chat_offline" = "(Offline)";
 
 "line_break" = "Return";
+
+"switch_ear" = "Switched to ear speaker，Move phone to ear to hear audio";
+"switch_speaker" = "Turn on speaker";
+
+/// PhotoBrowser
+"previewCamera" = "Camera";
+"previewCameraRecord" = "Record";
+"previewAlbum" = "Album";
+"cancel" = "Cancel";
+
+"originalPhoto" = "Full Image";
+"originalTotalSize" = "Total";
+"done" = "Done";
+"ok" = "OK";
+"editFinish" = "Done";
+"cameraDone" = "Done";
+"inputDone" = "Done";
+
+"back" = "Back";
+"edit" = "Edit";
+"revert" = "Undo";
+"brightness" = "Brightness";
+"contrast" = "Contrast";
+"saturation" = "Saturation";
+
+"photo" = "Photos";
+"preview" = "Preview";
+
+"noPhotoTips" = "No Photos";
+
+"hudLoading" = "Loading";
+"hudProcessing" = "Processing";
+
+"exceededMaxSelectCount" = "Max count for selection: %ld";
+"longerThanMaxVideoDuration" = "Can't select videos longer than %lds";
+"shorterThanMinVideoDuration" = "Can't select videos shorter than %lds";
+//"largerThanMaxVideoDataSize" = "Can't select videos larger than %@MB";
+"smallerThanMinVideoDataSize" = "Can't select videos smaller than %@MB";
+"exceededMaxVideoSelectCount" = "Max count for video selection: %ld";
+"lessThanMinVideoSelectCount" = "Min count for video selection: %ld";
+
+"noCameraAuthorityAlertMessage" = "Please allow %@ to access your device's camera in \"Settings\" > \"Privacy\" > \"Camera\"";
+"noPhotoLibraryAuthorityAlertMessage" = "Please allow %@ to access your album in \"Settings\" > \"Privacy\" > \"Photos\"";
+"noMicrophoneAuthorityAlertMessage" = "Unable to record audio. Go to \"Settings\" > \"%@\" and enable microphone access";
+"unableToAccessAllPhotos" = "%@ can only access selected photos. Allow permission for %@ to access \"All Photos\"";
+"noLibraryAuthTitleInThumbList" = "Unable to access photos in album";
+"noLibraryAuthDescInThumbList" = "%@ cannot access photos. Allow permission for %@ to access \"All Photos\"";
+"gotoSystemSettingInThumbList" = "Go to system settings";
+
+"cameraUnavailable" = "Camera is unavailable";
+"keepRecording" = "Keep Recording";
+"gotoSettings" = "Go to Settings";
+
+"iCloudVideoLoadFaild" = "Unable to sync from iCloud";
+"imageLoadFailed" = "loading failed";
+
+"save" = "Save";
+"saveImageError" = "Failed to save the image";
+"saveVideoError" = "Failed to save the video";
+"timeout" = "Request timed out";
+
+"customCameraTips" = "Tap to take photo and hold to record video";
+"customCameraTakePhotoTips" = "Tap to take photo";
+"customCameraRecordVideoTips" = "Hold to record video";
+"customCameraTapToRecordVideoTips" = "Tap to record video";
+"minRecordTimeTips" = "Record at least %lds";
+
+"cameraRoll" = "Recents";
+"panoramas" = "Panoramas";
+"videos" = "Videos";
+"favorites" = "Favorites";
+"timelapses" = "Time-Lapse";
+"recentlyAdded" = "Recently Added";
+"bursts" = "Bursts";
+"slomoVideos" = "Slo-mo";
+"selfPortraits" = "Selfies";
+"screenshots" = "Screenshots";
+"depthEffect" = "Portrait";
+"livePhotos" = "Live Photos";
+"animated" = "Animated";
+"myPhotoStream" = "My Photo Stream";
+
+"noTitleAlbumListPlaceholder" = "All Photos";
+"textStickerRemoveTips" = "Drag here to remove";
+
+"filter_normal" = "Normal";
+"filter_clarendon" = "Clarendon";  
+"filter_nashville" = "Nashville"; 
+"filter_apply1977" = "1977";
+"filter_toaster" = "Toaster";  
+"filter_chrome" = "Chrome";
+"filter_fade" = "Fade";
+"filter_instant" = "Instant";  
+"filter_process" = "Process"; 
+"filter_transfer" = "Transfer";  
+"filter_tone" = "Tone";
+"filter_linear" = "Linear";  
+"filter_sepia" = "Sepia";
+"filter_mono" = "Mono";
+"filter_noir" = "Noir"; 
+"filter_tonal" = "Tonal";

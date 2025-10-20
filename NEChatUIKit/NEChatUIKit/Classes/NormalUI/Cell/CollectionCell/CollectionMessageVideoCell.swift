@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class CollectionMessageVideoCell: NEBaseCollectionMessageVideoCell {
+open class CollectionMessageVideoCell: NEBaseCollectionMessageVideoCell {
   override open func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code

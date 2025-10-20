@@ -82,19 +82,29 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
-    setCustomCorner(model.isReplay)
+    setCustomCorner(model.isReply)
 
     if let m = model as? MessageImageModel,
        let imageUrl = m.urlString {
-      var options: SDWebImageOptions = [.retryFailed]
-      if let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
-         imageObject.ext?.lowercased() != ".gif" {
-        options = [.retryFailed, .progressiveLoad]
-      }
+      let options: SDWebImageOptions = [.retryFailed, .allowInvalidSSLCertificates]
 
       if imageUrl.hasPrefix("http") {
         let url = URL(string: imageUrl)
-        contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
+        contentImageView.sd_setImage(with: url) { image, error, type, url in
+          if let err = error as? NSError, err.code == 2001,
+             let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
+             let imageUrl = imageObject.url {
+            let url = URL(string: imageUrl)
+            let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 350, height: 350)]
+            contentImageView.sd_setImage(
+              with: url,
+              placeholderImage: UIImage(contentsOfFile: imageUrl),
+              options: options,
+              context: context,
+              progress: nil
+            )
+          }
+        }
       } else {
         let url = URL(fileURLWithPath: imageUrl)
         contentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)

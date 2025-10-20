@@ -89,7 +89,7 @@ open class FunP2PChatViewController: FunChatViewController {
     }
 
     if chatInputView.chatInpuMode == .normal {
-      if let content = chatInputView.textView.text, content.count > 0 {
+      if !chatInputView.textView.text.isEmpty {
         viewModel.sendInputTypingState()
       } else {
         viewModel.sendInputTypingEndState()
@@ -105,7 +105,7 @@ open class FunP2PChatViewController: FunChatViewController {
       if let contentText = chatInputView.textView.text {
         content = contentText
       }
-      if title.count <= 0, content.count <= 0 {
+      if title.isEmpty, content.isEmpty {
         viewModel.sendInputTypingEndState()
       } else {
         viewModel.sendInputTypingState()

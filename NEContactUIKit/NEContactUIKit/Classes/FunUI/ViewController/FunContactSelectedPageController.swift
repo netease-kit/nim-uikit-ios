@@ -50,7 +50,7 @@ open class FunContactSelectedPageController: NEBaseContactSelectedPageController
       insets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     )
     pagingViewController.borderOptions = NEPagingBorderOptions.visible(height: 1, zIndex: Int.max, insets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
-    pagingViewController.didMove(toParent: self)
+    pagingViewController.willMove(toParent: self)
     selectCollectionView.register(FunFusionContactUnCheckCell.self, forCellWithReuseIdentifier: "\(NSStringFromClass(FunFusionContactUnCheckCell.self))")
   }
 

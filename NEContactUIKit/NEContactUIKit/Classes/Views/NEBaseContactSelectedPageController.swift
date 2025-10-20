@@ -178,9 +178,9 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
 
         let name = model.getShowName()
         let accountId = model.getAccountId()
-        if names.count > 0 {
+        if !names.isEmpty {
           names.append(name)
-        } else if accountId.count > 0 {
+        } else if !accountId.isEmpty {
           names.append(accountId)
         }
         if let user = model.user?.user {
@@ -223,7 +223,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
     selectArray.removeAll { selectModel in
       let selectAccountId = selectModel.getAccountId()
       let rmAccountId = model.getAccountId()
-      if selectAccountId.count > 0, rmAccountId == selectAccountId {
+      if !selectAccountId.isEmpty, rmAccountId == selectAccountId {
         return true
       }
       return false
@@ -233,7 +233,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
 
   /// 选择用户变更统一处理
   open func didChangeSelectUser() {
-    if selectArray.count > 0 {
+    if !selectArray.isEmpty {
       selectedSureButton.setTitle("\(commonLocalizable("sure"))(\(selectArray.count))", for: .normal)
     } else {
       selectedSureButton.setTitle(commonLocalizable("sure"), for: .normal)

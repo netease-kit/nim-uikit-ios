@@ -254,10 +254,6 @@ extension VideoPlayerViewController: BrowserToolsBarDelegate, UINavigationContro
     dismiss(animated: true, completion: nil)
   }
 
-  public func didPhotoClick() {
-    goPhotoAlbum(self, false, true)
-  }
-
   public func didSaveClick() {
     weak var weakSelf = self
     NEAuthManager.requestPhotoAuthorization { granted in

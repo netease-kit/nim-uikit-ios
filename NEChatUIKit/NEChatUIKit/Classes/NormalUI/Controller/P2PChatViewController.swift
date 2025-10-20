@@ -28,6 +28,10 @@ open class P2PChatViewController: NormalChatViewController {
     super.init(coder: coder)
   }
 
+  override open func viewDidLoad() {
+    super.viewDidLoad()
+  }
+
   /// 添加子类监听
   override open func addListener() {
     super.addListener()
@@ -88,7 +92,7 @@ open class P2PChatViewController: NormalChatViewController {
     }
 
     if chatInputView.chatInpuMode == .normal {
-      if let content = chatInputView.textView.text, content.count > 0 {
+      if !chatInputView.textView.text.isEmpty {
         viewModel.sendInputTypingState()
       } else {
         viewModel.sendInputTypingEndState()
@@ -104,7 +108,7 @@ open class P2PChatViewController: NormalChatViewController {
       if let contentText = chatInputView.textView.text {
         content = contentText
       }
-      if title.count <= 0, content.count <= 0 {
+      if title.isEmpty, content.isEmpty {
         viewModel.sendInputTypingEndState()
       } else {
         viewModel.sendInputTypingState()

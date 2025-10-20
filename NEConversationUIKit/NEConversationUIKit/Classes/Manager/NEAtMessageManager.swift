@@ -450,7 +450,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
         messageRefers.append(messageRefer)
       }
     }
-    if messageRefers.count > 0 {
+    if !messageRefers.isEmpty {
       removeRevokeAtMessage(messages: messageRefers)
     }
   }
@@ -481,7 +481,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     }
     if isAtMessageChange == true {
       atMessageChangeNoti()
-      DispatchQueue.main.async {
+      DispatchQueue.global().async {
         weakSelf?.writeCacheToDocument(dictionary: temDic)
       }
     }

@@ -338,7 +338,7 @@ open class NEPagingViewController:
 
     addChild(pageViewController)
     pagingView.configure()
-    pageViewController.didMove(toParent: self)
+    pageViewController.willMove(toParent: self)
 
     pageViewController.delegate = self
     pageViewController.dataSource = self

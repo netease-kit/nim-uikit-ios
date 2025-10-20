@@ -52,7 +52,7 @@ final class NEPagingController: NSObject {
   private var swipeGestureRecognizerLeft: UISwipeGestureRecognizer?
   private var swipeGestureRecognizerRight: UISwipeGestureRecognizer?
 
-  public init(options: NEPagingOptions) {
+  init(options: NEPagingOptions) {
     self.options = options
     sizeCache = NEPagingSizeCache(options: options)
     visibleItems = NEPagingItems(items: [])

@@ -22,8 +22,8 @@ open class ContactViewController: NEBaseContactViewController {
     super.init(coder: coder)
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       NotificationCenter.default.removeObserver(self)
     }

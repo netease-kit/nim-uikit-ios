@@ -6,7 +6,7 @@ import NETeamUIKit
 import UIKit
 
 class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
-  public var subCornerType: CornerType {
+  var subCornerType: CornerType {
     get { cornerType }
     set {
       if cornerType != newValue {
@@ -18,7 +18,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
 
   var dataModel: CustomSettingCellModel?
 
-  public lazy var inputTextField: UITextField = {
+  lazy var inputTextField: UITextField = {
     let textField = UITextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.font = UIFont.systemFont(ofSize: 14)
@@ -95,11 +95,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     }
   }
 
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    if let textString = textField.text as? NSString {
-      let changeString = textString.replacingCharacters(in: range, with: string)
-      dataModel?.customInputText = changeString
-    }
-    return true
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    dataModel?.customInputText = textField.text
   }
 }

@@ -8,8 +8,6 @@ import UIKit
 
 @objcMembers
 open class NEBaseConversationListCell: UITableViewCell {
-  public var topStickInfos = [NIMSession: NIMStickTopSessionInfo]()
-
   private var timeWidth: NSLayoutConstraint?
   private var conversationType: V2NIMConversationType = .CONVERSATION_TYPE_UNKNOWN
   private var sessionId = ""

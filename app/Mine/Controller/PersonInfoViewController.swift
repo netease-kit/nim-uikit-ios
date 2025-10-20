@@ -202,9 +202,66 @@ public class PersonInfoViewController: NEBaseViewController,
 
   func didClickHeadImage() {
     if NEStyleManager.instance.isNormalStyle() {
-      showBottomAlert(self)
+      if let callback = ChatUIConfig.shared.chatInputPhotoClick {
+        let chatVC = self
+        let takingPicturesAction = UIAlertAction(title: commonLocalizable("take_picture"),
+                                                 style: .default) { [weak self] action in
+          self?.goCamera(chatVC, true)
+        }
+
+        let photoAction = UIAlertAction(title: commonLocalizable("select_from_album"), style: .default) { _ in
+          // 自定义图片选择器
+          let vc = self
+          callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
+            for model in models {
+              if model.asset.mediaType == .video {
+                vc.showToast(commonLocalizable("only_support_choose_image"))
+                return
+              }
+              if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
+                vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
+                return
+              }
+              self?.uploadHeadImage(image: model.image)
+            }
+          }
+        }
+
+        let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in }
+
+        showActionSheet([takingPicturesAction, photoAction, cancelAction])
+      } else {
+        showBottomAlert(self)
+      }
     } else {
-      showCustomBottomAlert(self)
+      if let callback = ChatUIConfig.shared.chatInputPhotoClick {
+        let chatVC = self
+        let takingPicturesAction = NECustomAlertAction(title: commonLocalizable("take_picture")) { [weak self] in
+          self?.goCamera(chatVC, true)
+        }
+
+        let photoAction = NECustomAlertAction(title: commonLocalizable("select_from_album")) {
+          // 自定义图片选择器
+          let vc = self
+          callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
+            for model in models {
+              if model.asset.mediaType == .video {
+                vc.showToast(commonLocalizable("only_support_choose_image"))
+                return
+              }
+              if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
+                vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
+                return
+              }
+              self?.uploadHeadImage(image: model.image)
+            }
+          }
+        }
+
+        showCustomActionSheet([takingPicturesAction, photoAction])
+      } else {
+        showCustomBottomAlert(self)
+      }
     }
   }
 
@@ -302,7 +359,6 @@ public class PersonInfoViewController: NEBaseViewController,
     ctrl.contentText = email
     weak var weakSelf = self
     ctrl.callBack = { editText in
-
       if editText.count > 0, weakSelf?.isValidEmail(editText) == false {
         weakSelf?.showToastInWindow(localizable("change_email_failure"))
         return

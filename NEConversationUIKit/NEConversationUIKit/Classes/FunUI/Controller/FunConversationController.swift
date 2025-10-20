@@ -46,8 +46,8 @@ open class FunConversationController: NEBaseConversationController {
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       if let searchViewGestures = searchView.gestureRecognizers {
         for gesture in searchViewGestures {
@@ -161,12 +161,12 @@ open class FunConversationController: NEBaseConversationController {
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 72, height: 104)
+    CGSize(width: 80, height: 104)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)
   open func setupFunStickTopView() {
-    if viewModel.aiUserListData.count > 0 {
+    if !viewModel.aiUserListData.isEmpty {
       if let headerView = tableView.tableHeaderView {
         if headerView.isKind(of: UICollectionView.self) == false {
           NEALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
@@ -186,7 +186,6 @@ open class FunConversationController: NEBaseConversationController {
 
   override open func reloadTableView() {
     super.reloadTableView()
-    NEALog.infoLog(className(), desc: #function + " reloadTableView in fun conversation controller stick top count \(viewModel.stickTopConversations.count)")
     setupFunStickTopView()
   }
 }

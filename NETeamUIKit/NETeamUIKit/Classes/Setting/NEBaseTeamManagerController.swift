@@ -121,7 +121,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
                       heightForHeaderInSection section: Int) -> CGFloat {
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
-      if model.cellModels.count > 0 {
+      if !model.cellModels.isEmpty {
         return 12.0
       }
     }

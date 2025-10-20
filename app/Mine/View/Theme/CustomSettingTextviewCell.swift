@@ -6,7 +6,7 @@ import NETeamUIKit
 import UIKit
 
 class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
-  public var subCornerType: CornerType {
+  var subCornerType: CornerType {
     get { cornerType }
     set {
       if cornerType != newValue {
@@ -19,7 +19,7 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
   var dataModel: CustomSettingCellModel?
 
   /// 自定义json配置输入
-  public lazy var inputTextView: UITextView = {
+  lazy var inputTextView: UITextView = {
     let textView = UITextView()
     textView.translatesAutoresizingMaskIntoConstraints = false
     textView.font = UIFont.systemFont(ofSize: 14)
@@ -94,11 +94,7 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
     }
   }
 
-  func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-    if let textString = textView.text as? NSString {
-      let changeString = textString.replacingCharacters(in: range, with: text)
-      dataModel?.customInputText = changeString
-    }
-    return true
+  func textViewDidChange(_ textView: UITextView) {
+    dataModel?.customInputText = textView.text
   }
 }

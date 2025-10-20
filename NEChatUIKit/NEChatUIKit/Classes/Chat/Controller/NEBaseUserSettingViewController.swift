@@ -321,7 +321,8 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.row == 0 {
+    if indexPath.row == 0,
+       IMKitConfigCenter.shared.enablePinMessage {
       if let accid = userId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
         let pin = getPinMessageViewController(conversationId: conversationId)
         navigationController?.pushViewController(pin, animated: true)

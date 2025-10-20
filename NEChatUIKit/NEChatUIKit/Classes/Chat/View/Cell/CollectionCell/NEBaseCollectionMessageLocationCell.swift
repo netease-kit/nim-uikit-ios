@@ -7,8 +7,7 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageLocationCell: NEBaseCollectionMessageCell {
+open class NEBaseCollectionMessageLocationCell: NEBaseCollectionMessageCell {
   /// 位置信息
   public lazy var locationTitleLabel: UILabel = {
     let label = UILabel()

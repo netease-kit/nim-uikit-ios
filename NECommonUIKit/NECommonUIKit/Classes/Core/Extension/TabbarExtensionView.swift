@@ -22,12 +22,34 @@ public extension UITabBar {
     bageView.accessibilityIdentifier = "id.bageDot"
     let tabFrame = frame
 
-    // 确定小红点的位置
-    let percentX: CGFloat = (CGFloat(itemIndex) + 0.59) / tabbarItemNums
-    let x = CGFloat(ceilf(Float(percentX * tabFrame.size.width)))
-    let y = CGFloat(ceilf(Float(0.015 * tabFrame.size.height)))
-    bageView.frame = CGRect(x: x, y: y, width: 6, height: 6)
-    addSubview(bageView)
+    if #available(iOS 26, *) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: DispatchWorkItem(block: { [weak self] in
+        // 确定小红点的位置
+        var percentX: CGFloat = (CGFloat(itemIndex) + 0.59) / tabbarItemNums
+        var x = CGFloat(ceilf(Float(percentX * tabFrame.size.width)))
+        var y = CGFloat(ceilf(Float(0.015 * tabFrame.size.height)))
+        if let requiresCompatibility = Bundle.main.infoDictionary?["UIDesignRequiresCompatibility"] as? Bool,
+           requiresCompatibility == true {
+          // 使用兼容模式显示传统UI风格
+        } else {
+          if let view = self?.subviews.first {
+            percentX = (CGFloat(itemIndex) + 0.05) / tabbarItemNums
+            x = tabFrame.size.width - view.frame.width + CGFloat(ceilf(Float(percentX * view.frame.width)))
+            y = CGFloat(ceilf(Float(0.1 * tabFrame.size.height)))
+          }
+        }
+
+        bageView.frame = CGRect(x: x, y: y, width: 6, height: 6)
+        self?.addSubview(bageView)
+      }))
+    } else {
+      // 确定小红点的位置
+      let percentX: CGFloat = (CGFloat(itemIndex) + 0.59) / tabbarItemNums
+      let x = CGFloat(ceilf(Float(percentX * tabFrame.size.width)))
+      let y = CGFloat(ceilf(Float(0.015 * tabFrame.size.height)))
+      bageView.frame = CGRect(x: x, y: y, width: 6, height: 6)
+      addSubview(bageView)
+    }
   }
 
   func setRedDotView(index ItemIndex: Int) {

@@ -10,7 +10,7 @@ import UIKit
 
 class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  public var cellClassDic = [
+  var cellClassDic = [
     SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self,
     SettingCellType.SettingSubtitleCell.rawValue: CustomSettingTextviewCell.self,
   ]

@@ -33,7 +33,7 @@ class VersionCell: UITableViewCell {
   }()
 
   /// 箭头图片
-  public lazy var arrowImageView: UIImageView = {
+  lazy var arrowImageView: UIImageView = {
     let imageView = UIImageView(image: appCoreLoader.loadImage("arrow_right"))
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.isHidden = true
@@ -47,7 +47,7 @@ class VersionCell: UITableViewCell {
     return view
   }()
 
-  public var cellType: IntroduceCellType? {
+  var cellType: IntroduceCellType? {
     didSet {
       if cellType == .version {
         subTitleLabel.isHidden = false
@@ -70,7 +70,7 @@ class VersionCell: UITableViewCell {
     // Configure the view for the selected state
   }
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     setupSubviews()
     selectionStyle = .none

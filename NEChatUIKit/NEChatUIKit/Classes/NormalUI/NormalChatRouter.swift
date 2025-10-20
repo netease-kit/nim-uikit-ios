@@ -12,17 +12,19 @@ public extension ChatRouter {
     // pin
     Router.shared.register(PushPinMessageVCRouter) { param in
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
       let pin = PinMessageViewController(conversationId: conversationId)
-      nav?.pushViewController(pin, animated: true)
+      nav?.pushViewController(pin, animated: animated)
     }
 
     // p2p
     Router.shared.register(PushP2pChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
@@ -32,13 +34,13 @@ public extension ChatRouter {
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
           nav?.viewControllers[i] = p2pChatVC
-          nav?.popToViewController(p2pChatVC, animated: true)
+          nav?.popToViewController(p2pChatVC, animated: animated)
           return
         }
       }
 
       let count = nav?.viewControllers.count ?? 0
-      nav?.pushViewController(p2pChatVC, animated: true)
+      nav?.pushViewController(p2pChatVC, animated: animated)
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
         if let remove = param["removeUserVC"] as? Bool, remove {
@@ -54,6 +56,7 @@ public extension ChatRouter {
     Router.shared.register(PushTeamChatVCRouter) { param in
       print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
@@ -65,17 +68,17 @@ public extension ChatRouter {
           if vc.isKind(of: TeamChatViewController.self) {
             (vc as? ChatViewController)?.viewModel.anchor = anchor
             (vc as? ChatViewController)?.loadData()
-            nav?.popToViewController(vc, animated: true)
+            nav?.popToViewController(vc, animated: animated)
           } else {
             nav?.viewControllers[i] = groupVC
-            nav?.popToViewController(groupVC, animated: true)
+            nav?.popToViewController(groupVC, animated: animated)
           }
           return
         }
       }
 
       let count = nav?.viewControllers.count ?? 0
-      nav?.pushViewController(groupVC, animated: true)
+      nav?.pushViewController(groupVC, animated: animated)
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
         if let remove = param["removeTeamVC"] as? Bool, remove {

@@ -124,7 +124,7 @@ final class NEGroupNode: NEAnimatorNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat? = nil
+  var lastUpdateFrame: CGFloat?
 
   var keypathLayer: CALayer? {
     container

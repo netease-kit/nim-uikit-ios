@@ -7,7 +7,7 @@ import NETeamUIKit
 import UIKit
 
 class MeViewModel: NSObject {
-  public var mineData: [[String: String]] = []
+  var mineData: [[String: String]] = []
 
   open func getData() {
     mineData = [

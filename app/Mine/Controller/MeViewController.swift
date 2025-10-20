@@ -111,8 +111,8 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     viewModel.getData()
   }
 
-  override func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       NotificationCenter.default.removeObserver(self)
     }

@@ -117,7 +117,6 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
     scrollView.addGestureRecognizer(tap)
     setupUI()
     contentSizeToFit()
-    addLeftSwipeDismissGesture()
   }
 
   open func viewTap() {

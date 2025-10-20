@@ -353,6 +353,13 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
                      replacementText text: String) -> Bool {
+    var range = range
+    if #available(iOS 26, *) {
+      if text.isEmpty, range.location > 0, range.length == 0 {
+        range = NSRange(location: range.location - 1, length: 1)
+      }
+    }
+
     textView.typingAttributes = [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor,
                                  NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
 
@@ -621,7 +628,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         }
       }
     }
-    if atDic.count > 0 {
+    if !atDic.isEmpty {
       return [yxAtMsg: atDic]
     }
     return nil
@@ -680,7 +687,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         }
       }
     }
-    if atDic.count > 0 {
+    if !atDic.isEmpty {
       return [yxAtMsg: atDic]
     }
     return nil

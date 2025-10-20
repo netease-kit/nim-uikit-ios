@@ -351,7 +351,7 @@ open class NETabPagingMenuView: UIScrollView {
   /// - Parameter index: An index that identifies a item by its index.
   /// - Returns: A rectangle defining the area in which the table view draws the row or right edge rect if index is over the number of items.
   open func rectForItem(at index: Int) -> CGRect {
-    guard widths.count > 0 else {
+    guard !widths.isEmpty else {
       return CGRect(x: 0, y: 0, width: 0, height: bounds.height)
     }
 

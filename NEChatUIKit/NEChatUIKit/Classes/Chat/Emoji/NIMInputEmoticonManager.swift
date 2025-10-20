@@ -13,7 +13,7 @@ public enum NIMEmoticonType: NSInteger {
 
 open class NIMInputEmoticon: NSObject {
   public var type: NIMEmoticonType {
-    if let ucode = unicode, ucode.count > 0 {
+    if unicode?.isEmpty == false {
       return .unicode
     } else {
       return .file
@@ -140,11 +140,11 @@ open class NIMInputEmoticonManager: NSObject {
         emotion.unicode = dict["unicode"] as? String
         emotion.fileName = dict["file"] as? String
 
-        if let id = emotion.emoticonID, id.count > 0 {
+        if let id = emotion.emoticonID, !id.isEmpty {
           resultEmotions.append(emotion)
           id2Emoticons[id] = emotion
         }
-        if let tag = emotion.tag, tag.count > 0 {
+        if let tag = emotion.tag, !tag.isEmpty {
           tag2Emoticons[tag] = emotion
         }
       }
@@ -176,7 +176,7 @@ open class NIMInputEmoticonManager: NSObject {
       return emotion
     }
 
-    if tag.count > 0 {
+    if !tag.isEmpty {
       for catalog in clogs {
         if let tag2Emotions = catalog.tag2Emoticons {
           emotion = tag2Emotions[tag]
@@ -196,7 +196,7 @@ open class NIMInputEmoticonManager: NSObject {
       return emotion
     }
 
-    if emoticonID.count > 0 {
+    if !emoticonID.isEmpty {
       for catalog in clogs {
         if let id2Emoticons = catalog.id2Emoticons {
           emotion = id2Emoticons[emoticonID]
@@ -216,7 +216,7 @@ open class NIMInputEmoticonManager: NSObject {
       return emotion
     }
 
-    if catalogID.count > 0, emoticonID.count > 0 {
+    if !catalogID.isEmpty, !emoticonID.isEmpty {
       for catalog in clogs {
         if catalog.catalogID == catalogID {
           if let id2Emoticons = catalog.id2Emoticons {

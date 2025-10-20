@@ -5,7 +5,7 @@
 import UIKit
 
 class FunTeamMemberSelectCell: NEBaseTeamMemberSelectCell {
-  public var dividerLine: UIView = {
+  var dividerLine: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .funTeamLineBorderColor

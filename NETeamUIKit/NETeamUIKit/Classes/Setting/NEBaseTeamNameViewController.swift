@@ -216,10 +216,10 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
     if type == .NickName {
       return
     }
-    if text.count > 0 {
-      enableSubmit()
-    } else {
+    if text.isEmpty {
       disableSubmit()
+    } else {
+      enableSubmit()
     }
   }
 

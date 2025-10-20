@@ -7,6 +7,7 @@ import UIKit
 
 class CustomTeamSettingSwitchCell: TeamSettingSwitchCell {
   override func setupUI() {
+    titleLabel.numberOfLines = 0
     if NEStyleManager.instance.isNormalStyle() {
       super.setupUI()
     } else {

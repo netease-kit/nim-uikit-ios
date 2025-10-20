@@ -80,3 +80,4 @@
 "security_warning"="For test only. Beware of money transfer, lottery winnings & strange call scams.";
 "login_token_expired"="Session expired. Please login again.";
 "account_forbidden"="User Banned";
+"account_kicked_offline"="Your session was revoked";

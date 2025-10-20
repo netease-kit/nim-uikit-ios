@@ -44,7 +44,7 @@ open class NEEmotionTool: NSObject {
       .foregroundColor: color,
     ])
 
-    if let regArr = regularArr, regArr.count > 0, let targetEmotions = emoticons {
+    if let regArr = regularArr, !regArr.isEmpty, let targetEmotions = emoticons {
       for i in (0 ... regArr.count - 1).reversed() {
         let result = regArr[i]
 

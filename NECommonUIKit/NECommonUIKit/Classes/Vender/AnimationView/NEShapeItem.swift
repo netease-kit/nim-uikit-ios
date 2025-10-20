@@ -21,7 +21,7 @@ enum NEShapeType: String, Codable, Sendable {
   case transform = "tr"
   case unknown
 
-  public init(from decoder: Decoder) throws {
+  init(from decoder: Decoder) throws {
     self = try NEShapeType(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
   }
 }

@@ -98,18 +98,18 @@ final class NEMainThreadAnimationLayer: CALayer, NERootAnimationLayer {
 
   // MARK: Public
 
-  public var respectAnimationFrameRate = false
+  var respectAnimationFrameRate = false
 
   // MARK: CALayer Animations
 
-  override public class func needsDisplay(forKey key: String) -> Bool {
+  override class func needsDisplay(forKey key: String) -> Bool {
     if key == "currentFrame" {
       return true
     }
     return super.needsDisplay(forKey: key)
   }
 
-  override public func action(forKey event: String) -> CAAction? {
+  override func action(forKey event: String) -> CAAction? {
     if event == "currentFrame" {
       let animation = CABasicAnimation(keyPath: event)
       animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
@@ -119,7 +119,7 @@ final class NEMainThreadAnimationLayer: CALayer, NERootAnimationLayer {
     return super.action(forKey: event)
   }
 
-  override public func display() {
+  override func display() {
     guard Thread.isMainThread else { return }
     var newFrame: CGFloat
     if

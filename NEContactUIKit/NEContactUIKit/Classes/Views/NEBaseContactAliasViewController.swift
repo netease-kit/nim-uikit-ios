@@ -71,7 +71,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
 
   open func saveAlias() {
     if let text = aliasInput.text,
-       text.count > 0,
+       !text.isEmpty,
        text.trimmingCharacters(in: .whitespaces).isEmpty {
       view.makeToast(localizable("space_not_support"), duration: 2, position: .center)
       aliasInput.text = ""

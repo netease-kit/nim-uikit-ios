@@ -8,7 +8,7 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open class PopListView: NEBasePopListView {
+open class PopListView: NELocalBasePopListView {
   override func setupUI() {
     super.setupUI()
     NSLayoutConstraint.activate([
