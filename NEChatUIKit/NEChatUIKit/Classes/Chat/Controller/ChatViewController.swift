@@ -15,7 +15,7 @@ import Photos
 import UIKit
 
 @objcMembers
-open class ChatViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, NIMMediaManagerDelegate, CLLocationManagerDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, ChatInputViewDelegate, ChatInputMultilineDelegate, ChatViewModelDelegate, MessageOperationViewDelegate, NETranslateViewDelegate, SelectLanguageDelegate {
+open class ChatViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, UIDocumentPickerDelegate, UIDocumentInteractionControllerDelegate, NIMMediaManagerDelegate, CLLocationManagerDelegate, UIImagePickerControllerDelegate, ChatInputViewDelegate, ChatInputMultilineDelegate, ChatViewModelDelegate, MessageOperationViewDelegate, NETranslateViewDelegate, SelectLanguageDelegate {
   private let kCallKitDismissNoti = "kCallKitDismissNoti"
   private let kCallKitShowNoti = "kCallKitShowNoti"
   public var titleContent = "" {
@@ -367,8 +367,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     stopPlay()
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       let param = ["sessionId": ChatRepo.conversationId]
       Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
@@ -397,6 +397,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     titleContent = ChatRepo.sessionId
     navigationView.navTitle.lineBreakMode = .byTruncatingMiddle
     navigationView.titleBarBottomLine.isHidden = false
+    navigationView.setHandsetMode(viewModel.getHandSetEnable())
     setMoreButton()
     setMutilSelectBottomView()
 
@@ -773,7 +774,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       )
 
       weakSelf?.isLoadingData = false
-      if let ms = weakSelf?.viewModel.messages, ms.count > 0 {
+      if weakSelf?.viewModel.messages.isEmpty == false {
         weakSelf?.tableViewReload()
         if weakSelf?.viewModel.isHistoryChat == true,
            let num = weakSelf?.tableView.numberOfRows(inSection: 0),
@@ -873,7 +874,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func markNeedReadMsg() {
-    if isCurrentPage, needMarkReadMsgs.count > 0 {
+    if isCurrentPage, !needMarkReadMsgs.isEmpty {
       viewModel.markRead(messages: needMarkReadMsgs) { [weak self] error in
         NEALog.infoLog(
           ModuleName + " " + ChatViewController.className(),
@@ -884,21 +885,23 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
           self?.needMarkReadMsgs = [V2NIMMessage]()
         }
       }
+
+      if !viewModel.isHistoryChat {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
+          self?.scrollTableViewToBottom()
+        }))
+      }
     }
   }
 
   open func appEnterBackground() {
     isCurrentPage = false
+    stopPlay()
   }
 
   open func appEnterForegournd() {
     isCurrentPage = true
     markNeedReadMsg()
-    if !viewModel.isHistoryChat {
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: { [weak self] in
-        self?.scrollTableViewToBottom()
-      }))
-    }
   }
 
   //    MARK: - 键盘通知相关操作
@@ -1063,12 +1066,12 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func sendContentText(text: String?, attribute: NSAttributedString?) {
-    guard let removeSpace = text?.trimmingCharacters(in: .whitespaces), removeSpace.count > 0 else {
+    guard let removeSpace = text?.trimmingCharacters(in: .whitespaces), !removeSpace.isEmpty else {
       chatInputView.titleField.text = nil
       view.makeToast(chatLocalizable("null_message_not_support"), position: .center)
       return
     }
-    guard let content = text, content.count > 0 else {
+    guard let content = text, !content.isEmpty else {
       return
     }
     translateLanguageView.changeToIdleState(true)
@@ -1280,7 +1283,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
             atUsersTmp.append(atUser)
           }
         }
-        if atUsersTmp.count > 0 {
+        if !atUsersTmp.isEmpty {
           atUsers = atUsersTmp
         }
 
@@ -1328,11 +1331,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameter endEdit: 是否停止输入
   open func checkAndSendTypingState(endEdit: Bool = false) {}
 
-  open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-    textView.typingAttributes = [NSAttributedString.Key.foregroundColor: UIColor.ne_darkText, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
-    return true
-  }
-
   open func willSelectItem(button: UIButton?, index: Int) {
     removeOperationView()
 
@@ -1346,8 +1344,27 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       } else if index == 2 {
         // 相册
         isFile = false
-        goPhotoAlbumWithVideo(self) { [weak self] in
-          self?.stopPlay()
+
+        if let callback = ChatUIConfig.shared.chatInputPhotoClick {
+          // 自定义图片选择器
+          let vc = self
+          callback(self, .all, chatImageCountLimit) { [weak self] models, isOriginal in
+            for model in models {
+              if model.asset.mediaType == .image, models.count > chatImageCountLimit {
+                vc.showToast(String(format: commonLocalizable("video_count_over_limit"), chatImageCountLimit))
+                return
+              }
+              if model.asset.mediaType == .video, models.count > chatVideoCountLimit {
+                vc.showToast(String(format: commonLocalizable("video_count_over_limit"), chatVideoCountLimit))
+                return
+              }
+              self?.sendMediaMessage(imageModel: model, isOriginal: isOriginal)
+            }
+          }
+        } else {
+          goPhotoAlbumWithVideo(self) { [weak self] in
+            self?.stopPlay()
+          }
         }
       } else if index == 3 {
         // 更多
@@ -1400,6 +1417,128 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     imagePickerVC.allowsEditing = false
     imagePickerVC.sourceType = .camera
     present(imagePickerVC, animated: true)
+  }
+
+  open func sendMediaMessage(imageModel: NEResultModel, isOriginal: Bool) {
+    let filename = PHAssetResource.assetResources(for: imageModel.asset).first?.originalFilename ?? "unknown"
+    let width = Int32(imageModel.asset.pixelWidth)
+    let height = Int32(imageModel.asset.pixelHeight)
+
+    switch imageModel.asset.mediaType {
+    case .image:
+      if !isOriginal {
+        cacheImageToSend(imageModel.image, nil, filename)
+        return
+      }
+
+      let options = PHContentEditingInputRequestOptions()
+      options.canHandleAdjustmentData = { _ in true }
+      imageModel.asset.requestContentEditingInput(with: options) { [weak self] input, _ in
+        guard let url = input?.fullSizeImageURL else {
+          print("无法获取图片URL")
+          return
+        }
+
+        // 获取文件大小
+        var fileSize = "N/A"
+        do {
+          let resources = try url.resourceValues(forKeys: [.fileSizeKey])
+          let sizeInBytes = resources.fileSize ?? 0
+          fileSize = ByteCountFormatter.string(fromByteCount: Int64(sizeInBytes), countStyle: .file)
+          NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(fileSize) MB")
+          if (Double(fileSize) ?? 0) > ChatUIConfig.shared.fileSizeLimit {
+            self?.showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
+            return
+          }
+        } catch {
+          print("文件大小获取失败: \(error)")
+        }
+
+        if self?.isFile == true {
+          self?.viewModel.sendFileMessage(filePath: url.path,
+                                          displayName: filename) { [weak self] message, error, progress in
+            NEALog.infoLog(
+              ModuleName + " " + ChatViewController.className(),
+              desc: #function + "CALLBACK sendFileMessage" + (error?.localizedDescription ?? "no error")
+            )
+            self?.showErrorToast(error)
+
+            if progress > 0, progress <= 100 {
+              self?.setModelProgress(message, progress)
+            }
+          }
+        } else {
+          self?.viewModel.sendImageMessage(path: url.path, name: filename, width: width, height: height) { [weak self] error in
+            NEALog.infoLog(
+              ModuleName + " " + ChatViewController.className(),
+              desc: #function + "CALLBACK sendImageMessage " + (error?.localizedDescription ?? "no error")
+            )
+            self?.showErrorToast(error)
+          }
+        }
+      }
+
+    case .video:
+      let options = PHVideoRequestOptions()
+      options.version = .original
+      PHImageManager.default().requestAVAsset(forVideo: imageModel.asset, options: options) { [weak self] avAsset, _, _ in
+        guard let avURLAsset = avAsset as? AVURLAsset else { return }
+
+        // 获取视频信息
+        let duration = CMTimeGetSeconds(avURLAsset.duration) * 1000
+        let url = avURLAsset.url
+
+        // 获取文件大小
+        var fileSize = "N/A"
+        do {
+          let resources = try url.resourceValues(forKeys: [.fileSizeKey])
+          let sizeInBytes = resources.fileSize ?? 0
+          fileSize = ByteCountFormatter.string(fromByteCount: Int64(sizeInBytes), countStyle: .file)
+          NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "imgSize_MB: \(fileSize) MB")
+          if (Double(fileSize) ?? 0) > ChatUIConfig.shared.fileSizeLimit {
+            self?.showToast(String(format: chatLocalizable("fileSize_over_limit"), "\(ChatUIConfig.shared.fileSizeLimit)"))
+            return
+          }
+        } catch {
+          print("文件大小获取失败: \(error)")
+        }
+
+        weak var weakSelf = self
+        if self?.isFile == true {
+          self?.viewModel.sendFileMessage(filePath: url.path,
+                                          displayName: filename) { [weak self] message, error, progress in
+            NEALog.infoLog(
+              ModuleName + " " + ChatViewController.className(),
+              desc: #function + "CALLBACK sendFileMessage " + (error?.localizedDescription ?? "no error")
+            )
+            self?.showErrorToast(error)
+
+            if progress > 0, progress <= 100 {
+              self?.setModelProgress(message, progress)
+            }
+          }
+        } else {
+          self?.viewModel.sendVideoMessage(url: url,
+                                           name: filename,
+                                           width: width,
+                                           height: height,
+                                           duration: Int32(duration)) { [weak self] message, error, progress in
+            NEALog.infoLog(
+              ModuleName + " " + ChatViewController.className(),
+              desc: #function + "CALLBACK sendVideoMessage " + (error?.localizedDescription ?? "no error")
+            )
+            weakSelf?.showErrorToast(error)
+
+            if progress > 0, progress <= 100 {
+              self?.setModelProgress(message, progress)
+            }
+          }
+        }
+      }
+
+    default:
+      print("不支持的类型")
+    }
   }
 
   open func sendMediaMessage(_ info: [UIImagePickerController.InfoKey: Any]) {
@@ -1456,26 +1595,29 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     var imageUrl = info[.imageURL] as? URL
-    var image = (info[.originalImage] as? UIImage)
-    image = image?.fixOrientation()
+    if var image = (info[.originalImage] as? UIImage) {
+      image = image.fixOrientation()
+      cacheImageToSend(image, imageUrl, imageName)
+    } else {
+      showToast(commonLocalizable("failed_operation"))
+    }
+  }
 
+  open func cacheImageToSend(_ image: UIImage, _ imageUrl: URL?, _ imageName: String?) {
     // 获取图片宽度
-    if let width = image?.size.width {
-      imageWidth = Int32(width)
-    }
+    let imageWidth = Int32(image.size.width)
 
-    // 获取图片高度度
-    if let height = image?.size.height {
-      imageHeight = Int32(height)
-    }
+    // 获取图片高度
+    let imageHeight = Int32(image.size.height)
 
-    let pngImage = image?.pngData()
+    let pngImage = image.pngData()
     var needDelete = false
+    var imageUrl = imageUrl
 
     // 无url则临时保存到本地，发送成功后删除临时文件
     if imageUrl == nil {
       if let data = pngImage, let path = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
-        let url = URL(fileURLWithPath: path + "\(imageName).png")
+        let url = URL(fileURLWithPath: path + "\(imageName ?? "cache").png")
         do {
           try data.write(to: url)
           imageUrl = url
@@ -1914,6 +2056,13 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     playingCell?.startAnimation(byRight: isSend)
 
+    // 设置听筒/扬声器
+    if viewModel.getHandSetEnable() {
+      NEAudioSessionManager.shared.switchToSpeaker()
+    } else {
+      NEAudioSessionManager.shared.switchToReceiver()
+    }
+
     let path = audio.path ?? ChatMessageHelper.createFilePath(message)
     if FileManager.default.fileExists(atPath: path) {
       NEALog.infoLog(className(), desc: #function + " play path : " + path)
@@ -1922,11 +2071,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       let audioURL = URL(fileURLWithPath: path)
 
       do {
-        // 设置听筒/扬声器
-        let cate: AVAudioSession.Category = viewModel.getHandSetEnable() ? AVAudioSession.Category.playAndRecord : AVAudioSession.Category.playback
-        try AVAudioSession.sharedInstance().setCategory(cate, options: .duckOthers)
-        try AVAudioSession.sharedInstance().setActive(true)
-
         // 检查URL是否有效并尝试加载音频
         audioPlayer = try AVAudioPlayer(contentsOf: audioURL)
         audioPlayer?.delegate = self
@@ -1967,6 +2111,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     audioPlayer = nil
     playingCell?.stopAnimation(byRight: playingModel?.message?.isSelf ?? true)
     playingModel = nil
+    NEAudioSessionManager.shared.stopProximityMonitoring()
   }
 
   //    MARK: - NIMMediaManagerDelegate
@@ -2047,7 +2192,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
           self?.tableView.scrollToRow(
             at: IndexPath(row: row - 1, section: 0),
             at: .bottom,
-            animated: false
+            animated: true
           )
         }
       }
@@ -2074,8 +2219,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         temMutaString.append(spaceStr)
         mutaString.insert(temMutaString, at: location)
 
-        chatInputView.nickAccidList.append(accid.count > 0 ? accid : "ait_all")
-        chatInputView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
+        chatInputView.nickAccidList.append(accid.isEmpty ? "ait_all" : accid)
+        chatInputView.nickAccidDic[addText] = accid.isEmpty ? "ait_all" : accid
         chatInputView.textView.attributedText = mutaString
         chatInputView.textView.selectedRange = NSMakeRange(selectRange.location + temMutaString.length, 0)
         return
@@ -2090,8 +2235,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         selectRange = NSMakeRange(selectRange.location - 1, selectRange.length)
       }
 
-      chatInputView.nickAccidList.append(accid.count > 0 ? accid : "ait_all")
-      chatInputView.nickAccidDic[addText] = accid.count > 0 ? accid : "ait_all"
+      chatInputView.nickAccidList.append(accid.isEmpty ? "ait_all" : accid)
+      chatInputView.nickAccidDic[addText] = accid.isEmpty ? "ait_all" : accid
 
       chatInputView.textView.attributedText = mutaString
       chatInputView.textView.selectedRange = NSMakeRange(selectRange.location + addText.count + atRangeOffset, 0)
@@ -2131,6 +2276,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       switch err.code {
       case protocolSendFailed:
         showToast(commonLocalizable("network_error"))
+      case fileUploadFailed:
+        showToast(commonLocalizable("file_upload_failed"))
       case aiMessagesNotExist:
         showToast(chatLocalizable("message_not_found"))
       default:
@@ -2156,6 +2303,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     switch item.type {
+    case .earpiece, .speaker:
+      setHandsetMode(item: item)
     case .copy:
       copyMessage()
     case .delete:
@@ -2192,6 +2341,25 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func customOperation() {}
+
+  open func setHandsetMode(item: OperationItem) {
+    if item.type == .earpiece {
+      viewModel.setHandSetEnable(false)
+      navigationView.setHandsetMode(false)
+      showToast(chatLocalizable("switch_ear"))
+    } else if item.type == .speaker {
+      viewModel.setHandSetEnable(true)
+      navigationView.setHandsetMode(true)
+      showToast(chatLocalizable("switch_speaker"))
+    }
+
+    // 设置听筒/扬声器
+    if viewModel.getHandSetEnable() {
+      NEAudioSessionManager.shared.switchToSpeaker()
+    } else {
+      NEAudioSessionManager.shared.switchToReceiver()
+    }
+  }
 
   open func copyMessage() {
     if let model = viewModel.operationModel as? MessageTextModel {
@@ -2308,13 +2476,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
           return
         }
 
-        if weakSelf?.viewModel.operationModel?.type == .text {
+        if weakSelf?.viewModel.operationModel?.type == .text ||
+          weakSelf?.viewModel.operationModel?.type == .richText {
           weakSelf?.viewModel.operationModel?.isReedit = true
-        }
-
-        if weakSelf?.viewModel.operationModel?.type == .custom,
-           weakSelf?.viewModel.operationModel?.customType == customRichTextType {
-          weakSelf?.viewModel.operationModel?.isReedit = true
+          weakSelf?.viewModel.operationModel?.revokeTime = Date().timeIntervalSince1970
         }
 
         let isPin = weakSelf?.viewModel.operationModel?.isPined ?? false
@@ -2995,9 +3160,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       // 停止播放语音
       stopPlay()
 
-      // 设置听筒/扬声器
-      let cate: AVAudioSession.Category = viewModel.getHandSetEnable() ? AVAudioSession.Category.playAndRecord : AVAudioSession.Category.playback
-      try? AVAudioSession.sharedInstance().setCategory(cate, options: .duckOthers)
+      // 设置扬声器
+      NEAudioSessionManager.shared.switchToSpeaker()
+      NEAudioSessionManager.shared.stopProximityMonitoring()
 
       let url = URL(fileURLWithPath: path)
       let videoPlayer = VideoPlayerViewController()
@@ -3349,7 +3514,7 @@ extension ChatViewController: NEMutilSelectBottomViewDelegate {
     depth += 1
 
     // 存在不可转发的消息：提示+取消勾选
-    if invalidMessages.count > 0 {
+    if !invalidMessages.isEmpty {
       showAlert(title: chatLocalizable("exception_description"),
                 message: chatLocalizable("exist_invalid")) { [self] in
         filterSelectedMessage(invalidMessages: invalidMessages)
@@ -3388,7 +3553,7 @@ extension ChatViewController: NEMutilSelectBottomViewDelegate {
       }
     }
 
-    if invalidMessages.count > 0 {
+    if !invalidMessages.isEmpty {
       showAlert(title: chatLocalizable("exception_description"),
                 message: chatLocalizable("exist_invalid")) { [self] in
         filterSelectedMessage(invalidMessages: invalidMessages)
@@ -3619,10 +3784,10 @@ extension ChatViewController: ChatBaseCellDelegate {
       let data: [String: Any]? = NECustomUtils.dataOfCustomMessage(message.attachment) ??
         (getDictionaryFromJSONString(message.serverExtension ?? "") as? [String: Any])
 
-      let time = message.createTime
       let date = Date()
       let currentTime = date.timeIntervalSince1970
-      if currentTime - time >= 60 * 2 {
+      if let time = model?.revokeTime,
+         currentTime - time >= 60 * 2 {
         showToast(chatLocalizable("editable_time_expired"))
         tableViewReload()
         return

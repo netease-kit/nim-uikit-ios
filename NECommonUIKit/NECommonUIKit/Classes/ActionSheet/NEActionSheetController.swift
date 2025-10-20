@@ -26,14 +26,12 @@ public class NEActionSheetController: UINavigationController {
     navigationBar.isTranslucent = false
     navigationBar.tintColor = .black
 
-    if #available(iOS 13, *) {
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithOpaqueBackground()
-      appearance.titleTextAttributes = [.foregroundColor: UIColor.black, .font: UIFont.systemFont(ofSize: 16)]
-      appearance.backgroundColor = .white
-      navigationBar.standardAppearance = appearance
-      navigationBar.scrollEdgeAppearance = appearance
-    }
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithOpaqueBackground()
+    appearance.titleTextAttributes = [.foregroundColor: UIColor.black, .font: UIFont.systemFont(ofSize: 16)]
+    appearance.backgroundColor = .white
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
   }
 
   override open func viewDidLayoutSubviews() {

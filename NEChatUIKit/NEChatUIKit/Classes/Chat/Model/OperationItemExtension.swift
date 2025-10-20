@@ -6,6 +6,24 @@
 import NEChatKit
 
 public extension OperationItem {
+  /// 听筒
+  static func earpieceItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_earpiece")
+    item.imageName = "op_earpiece"
+    item.type = .earpiece
+    return item
+  }
+
+  /// 扬声器
+  static func speakerItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("operation_speaker")
+    item.imageName = "op_speaker"
+    item.type = .speaker
+    return item
+  }
+
   /// 复制
   static func copyItem() -> OperationItem {
     let item = OperationItem()

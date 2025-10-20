@@ -11,8 +11,9 @@ public extension LocalConversationRouter {
 
     Router.shared.register(SearchContactPageRouter) { param in
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       let searchCtrl = FunLocalConversationSearchController()
-      nav?.pushViewController(searchCtrl, animated: true)
+      nav?.pushViewController(searchCtrl, animated: animated)
     }
 
     Router.shared.register(LocalConversationPageRouter) { param in

@@ -147,7 +147,7 @@ extension NEBaseTeamJoinActionViewController: UITableViewDelegate, UITableViewDa
 extension NEBaseTeamJoinActionViewController: TeamJoinActionViewModelDelegate {
   open func tableviewReload() {
     tableView.reloadData()
-    emptyView.isHidden = viewModel.teamJoinActions.count > 0
+    emptyView.isHidden = !viewModel.teamJoinActions.isEmpty
   }
 }
 

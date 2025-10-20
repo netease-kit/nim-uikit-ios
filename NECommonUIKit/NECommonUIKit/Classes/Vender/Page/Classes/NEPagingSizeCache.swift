@@ -15,7 +15,7 @@ class NEPagingSizeCache {
 
   private var selectedSizeCache: [Int: CGFloat] = [:]
 
-  public init(options: NEPagingOptions) {
+  init(options: NEPagingOptions) {
     self.options = options
 
     let didEnterBackground = UIApplication.didEnterBackgroundNotification

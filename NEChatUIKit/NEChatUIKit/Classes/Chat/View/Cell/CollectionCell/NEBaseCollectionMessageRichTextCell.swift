@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageRichTextCell: NEBaseCollectionMessageTextCell {
+open class NEBaseCollectionMessageRichTextCell: NEBaseCollectionMessageTextCell {
   /// 换行文本
   public lazy var collectionTitleLabel: UILabel = {
     let label = UILabel()

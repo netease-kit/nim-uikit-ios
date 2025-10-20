@@ -252,11 +252,11 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
-    if section == 0, viewModel.friendDatas.count > 0 {
+    if section == 0, !viewModel.friendDatas.isEmpty {
       return 30
-    } else if section == 1, viewModel.discussionDatas.count > 0 {
+    } else if section == 1, !viewModel.discussionDatas.isEmpty {
       return 30
-    } else if section == 2, viewModel.seniorDatas.count > 0 {
+    } else if section == 2, !viewModel.seniorDatas.isEmpty {
       return 30
     } else {
       return 0

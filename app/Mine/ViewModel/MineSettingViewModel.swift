@@ -13,6 +13,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didClickCleanCache()
   func didClickConfigTest()
   func didClickSDKConfig()
+  func didClickPushConfig()
   func didClickLanguage()
   func didChangeConversationType(_ cancel: @escaping (Bool) -> Void)
 }
@@ -66,17 +67,6 @@ public class MineSettingViewModel: NSObject {
   private func getSecondSection() -> SettingSectionModel {
     let model = SettingSectionModel()
     weak var weakSelf = self
-
-    // 听筒模式
-    let receiverModel = SettingCellModel()
-    receiverModel.cellName = localizable("receiver_mode")
-    receiverModel.type = SettingCellType.SettingSwitchCell.rawValue
-//        receiverModel.switchOpen = CoreKitEngine.instance.repo.getHandSetMode()
-    receiverModel.switchOpen = SettingRepo.shared.getHandsetMode()
-    receiverModel.swichChange = { isOpen in
-      SettingRepo.shared.setHandsetMode(isOpen)
-    }
-    model.cellModels.append(receiverModel)
 
 //        //过滤通知
 //        let filterNotify = SettingCellModel()
@@ -150,6 +140,14 @@ public class MineSettingViewModel: NSObject {
       weakSelf?.delegate?.didClickSDKConfig()
     }
     model.cellModels.append(sdkConfigModel)
+
+    let pushConfigModel = SettingCellModel()
+    pushConfigModel.cellName = "推送配置"
+    pushConfigModel.type = SettingCellType.SettingArrowCell.rawValue
+    pushConfigModel.cellClick = {
+      weakSelf?.delegate?.didClickPushConfig()
+    }
+    model.cellModels.append(pushConfigModel)
 
     let languageConfigModel = SettingCellModel()
     languageConfigModel.cellName = localizable("app_language")

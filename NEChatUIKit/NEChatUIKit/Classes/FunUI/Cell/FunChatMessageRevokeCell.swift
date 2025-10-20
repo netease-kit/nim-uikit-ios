@@ -93,12 +93,10 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
 
     // 校验撤回消息可编辑时间
-    if let time = model.message?.createTime {
-      let date = Date()
-      let currentTime = date.timeIntervalSince1970
-      if Int(currentTime - time) >= ChatUIConfig.shared.revokeEditTimeGap * 60 {
-        model.timeOut = true
-      }
+    let date = Date()
+    let currentTime = date.timeIntervalSince1970
+    if Int(currentTime - model.revokeTime) >= ChatUIConfig.shared.revokeEditTimeGap * 60 {
+      model.timeOut = true
     }
 
     model.contentSize = CGSize(width: kScreenWidth, height: 0)

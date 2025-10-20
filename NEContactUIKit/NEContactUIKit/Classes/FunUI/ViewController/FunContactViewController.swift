@@ -31,8 +31,8 @@ open class FunContactViewController: NEBaseContactViewController {
     super.init(coder: coder)
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       if let searchViewGestures = searchView.gestureRecognizers {
         for gesture in searchViewGestures {

@@ -74,6 +74,6 @@ open class TeamManagerListController: NEBaseTeamManagerListController {
 
   override open func sortAndReloadData() {
     super.sortAndReloadData()
-    emptyView.isHidden = viewmodel.managers.count > 0
+    emptyView.isHidden = !viewmodel.managers.isEmpty
   }
 }

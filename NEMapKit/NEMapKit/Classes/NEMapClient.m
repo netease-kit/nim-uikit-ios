@@ -57,6 +57,7 @@ typedef void (^MapMoveCompletion)(void);
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     instance = [[[self class] alloc] init];
+    [ChatKitClient.shared buryDataPoints:@"MapKit"];
   });
   return instance;
 }

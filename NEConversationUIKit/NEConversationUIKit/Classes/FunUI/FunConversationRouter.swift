@@ -11,14 +11,16 @@ public extension ConversationRouter {
 
     Router.shared.register(SearchContactPageRouter) { param in
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       let searchCtrl = FunConversationSearchController()
-      nav?.pushViewController(searchCtrl, animated: true)
+      nav?.pushViewController(searchCtrl, animated: animated)
     }
 
     Router.shared.register(ConversationPageRouter) { param in
       let nav = param["nav"] as? UINavigationController
+      let animated = param["animated"] as? Bool ?? true
       let conversation = FunConversationController()
-      nav?.pushViewController(conversation, animated: true)
+      nav?.pushViewController(conversation, animated: animated)
     }
   }
 }

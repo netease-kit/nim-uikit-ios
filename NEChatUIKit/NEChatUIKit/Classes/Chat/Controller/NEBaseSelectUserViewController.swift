@@ -150,7 +150,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
         for (index, user) in users.enumerated() {
           if user.nimUser?.user?.accountId == IMKitClient.instance.account() {
             if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
-               let custom = team?.team?.serverExtension, custom.count > 0,
+               let custom = team?.team?.serverExtension, !custom.isEmpty,
                let json = getDictionaryFromJSONString(custom),
                let atValue = json[keyAllowAtAll] as? String, atValue == allowAtManagerValue {
               self?.isShowAtAll = false

@@ -30,22 +30,16 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   public var offset: Int64 = 0
 
   /// 会话列表分页大小
-  public var page = 100
+  public var page = 50
 
-  /// 非置顶会话数据
+  /// 会话列表
   public var conversationListData = [NEConversationListModel]()
-
-  /// 置顶会话数据
-  public var stickTopConversations = [NEConversationListModel]()
 
   /// AI 数字人列表
   public var aiUserListData = [NEAIUserModel]()
 
   /// 所有会话数据记录
   public var conversationDic = [String: NEConversationListModel]()
-
-  /// 当前是否在请求会话列表
-  private var isRequesting = false
 
   /// 是否同步完成
   public var syncFinished = false {
@@ -112,8 +106,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func getAIUserList() {
-    if IMKitConfigCenter.shared.enableAIUser,
-       NEAIUserManager.shared.isAIUserListEmpty() {
+    if IMKitConfigCenter.shared.enableAIUser {
       NEAIUserManager.shared.getAIUserList()
     }
   }
@@ -124,14 +117,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       callBack = completion
     }
 
-    if isRequesting == true {
-      // 防止多次请求造成数据混乱，等上次请求成功后进行下一次
-      completion(nil, false)
-      return
-    }
-
-    isRequesting = true
-
     NEALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(syncFinished), timestamp: \(Date().timeIntervalSince1970)")
     conversationRepo.getConversationList(offset, page) { [weak self] conversations, offset, finished, error in
       NEALog.infoLog((self?.className() ?? "") + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.syncFinished ?? false), count: \(conversations?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
@@ -140,7 +125,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
           // 更新索引
           self?.offset = set
         }
-        self?.isRequesting = false
 
         conversations?.forEach { conversation in
           // 区分置顶消息和非置顶消息
@@ -159,19 +143,24 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         }
 
         // 单聊会话主动拉取用户信息，避免用户信息缺失影响会话展示
-        if let p2pAccountIds = self?.p2pAccountIds, !p2pAccountIds.isEmpty {
-          ContactRepo.shared.getUserListFromCloud(accountIds: Array(p2pAccountIds)) { [weak self] users, error in
-            let conversationIds = p2pAccountIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
-            self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
-              if let conversations = conversations {
-                for conversation in conversations {
-                  self?.conversationDic[conversation.conversationId]?.conversation = conversation
+        DispatchQueue.global().async {
+          if let p2pAccountIds = self?.p2pAccountIds, !p2pAccountIds.isEmpty {
+            ContactRepo.shared.getUserListFromCloud(accountIds: Array(p2pAccountIds)) { [weak self] users, error in
+              let conversationIds = p2pAccountIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+              self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
+                if let conversations = conversations {
+                  for conversation in conversations {
+                    self?.conversationDic[conversation.conversationId]?.conversation = conversation
+                  }
+                  DispatchQueue.main.async {
+                    self?.delegate?.reloadTableView()
+                  }
                 }
-                self?.delegate?.reloadTableView()
               }
             }
           }
         }
+
         self?.delegate?.reloadTableView()
       }
       completion(error, finished)
@@ -180,19 +169,44 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 添加或者更新会话
   /// - Parameter conversation 会话对象
-  open func addOrUpdateConversationData(_ conversation: V2NIMConversation) {
+  open func addOrUpdateConversationData(_ conversation: V2NIMConversation,
+                                        _ isAdd: Bool = false) {
     if let cacheModel = conversationDic[conversation.conversationId] {
       cacheModel.conversation = conversation
+
+      conversationListData.removeAll(where: {
+        if let sid = $0.conversation?.conversationId, sid == conversation.conversationId {
+          return true
+        }
+        return false
+      })
+
+      compareToInsert(cacheModel)
     } else {
       let model = NEConversationListModel()
       model.conversation = conversation
       conversationDic[conversation.conversationId] = model
-      if conversation.stickTop == true {
-        stickTopConversations.insert(model, at: 0)
+      if isAdd {
+        compareToInsert(model)
       } else {
-        conversationListData.insert(model, at: 0)
+        conversationListData.append(model)
       }
     }
+  }
+
+  /// 插入会话
+  /// - Parameter cacheModel: 会话模型
+  open func compareToInsert(_ cacheModel: NEConversationListModel) {
+    for (index, model) in conversationListData.enumerated() {
+      if let sortOrder = model.conversation?.sortOrder,
+         let cacheSortOrder = cacheModel.conversation?.sortOrder,
+         sortOrder <= cacheSortOrder {
+        conversationListData.insert(cacheModel, at: index)
+        return
+      }
+    }
+
+    conversationListData.append(cacheModel)
   }
 
   /// 删除会话
@@ -245,46 +259,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     model.conversation = conversation
   }
 
-  /// 处理置顶变更逻辑
-  open func filterStickTopData(_ conversations: [V2NIMConversation]) {
-    // 记录置顶
-    var changeTostickTopSet = Set<String>()
-    // 记录移除置顶
-    var changeToUnStickTopDic = Set<String>()
-    for conversation in conversations {
-      if let model = conversationDic[conversation.conversationId] {
-        if model.conversation?.stickTop != conversation.stickTop {
-          if conversation.stickTop == true {
-            changeTostickTopSet.insert(conversation.conversationId)
-          } else {
-            changeToUnStickTopDic.insert(conversation.conversationId)
-          }
-        }
-        model.conversation = conversation
-      }
-    }
-
-    conversationListData.removeAll { model in
-      if let cid = model.conversation?.conversationId {
-        if changeTostickTopSet.contains(cid) {
-          stickTopConversations.insert(model, at: 0)
-          return true
-        }
-      }
-      return false
-    }
-
-    stickTopConversations.removeAll { model in
-      if let cid = model.conversation?.conversationId {
-        if changeToUnStickTopDic.contains(cid) {
-          conversationListData.append(model)
-          return true
-        }
-      }
-      return false
-    }
-  }
-
   // 创建会话回调
   open func onConversationCreated(_ conversation: V2NIMConversation) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + conversation.conversationId)
@@ -292,7 +266,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       return
     }
 
-    addOrUpdateConversationData(conversation)
+    addOrUpdateConversationData(conversation, true)
 
     // 订阅单聊在线状态
     if IMKitConfigCenter.shared.enableOnlineStatus,
@@ -307,9 +281,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 会话变更
   /// - Parameter conversations 会话列表
   open func onConversationChanged(_ conversations: [V2NIMConversation]) {
-    // 置顶逻辑处理
-    filterStickTopData(conversations)
-
     for conversation in conversations {
       if let manager = NEAtMessageManager.instance {
         if conversation.unreadCount == 0, manager.isAtCurrentUser(conversationId: conversation.conversationId) {
@@ -334,12 +305,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       removeFlagSet.insert(id)
       conversationDic.removeValue(forKey: id)
     }
-    stickTopConversations.removeAll(where: {
-      if let sid = $0.conversation?.conversationId, removeFlagSet.contains(sid) {
-        return true
-      }
-      return false
-    })
     conversationListData.removeAll(where: {
       if let sid = $0.conversation?.conversationId, removeFlagSet.contains(sid) {
         return true
@@ -381,7 +346,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
           // 移除置顶
           conversationDic.removeValue(forKey: targetId)
-          stickTopConversations.removeAll { model in
+          conversationListData.removeAll { model in
             if model.conversation?.conversationId == targetId {
               return true
             }
@@ -393,20 +358,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       }
     }
     return false
-  }
-
-  /// 收到点对点已读回执
-  /// - Parameter readReceipts: 已读回执
-  open func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIMP2PMessageReadReceipt]) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + "onReceive p2p readReceipts count: \(readReceipts.count)")
-    for receipt in readReceipts {
-      if let cid = receipt.conversationId {
-        if conversationDic[cid] != nil {
-          delegate?.reloadTableView()
-          break
-        }
-      }
-    }
   }
 
   /// 加入群回调
@@ -444,12 +395,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         NEALog.infoLog(self?.className() ?? " ", desc: "onTeamDismissed delete conversation error : \(err.localizedDescription)")
       } else {
         self?.conversationDic.removeValue(forKey: cid)
-        self?.stickTopConversations.removeAll { model in
-          if model.conversation?.conversationId == cid {
-            return true
-          }
-          return false
-        }
         self?.conversationListData.removeAll { model in
           if model.conversation?.conversationId == cid {
             return true
@@ -511,7 +456,6 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
           self?.offset = set
         }
         // 清理之前数据
-        self?.stickTopConversations.removeAll()
         self?.conversationListData.removeAll()
         self?.conversationDic.removeAll()
         // 区分置顶消息和非置顶消息
@@ -527,7 +471,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
-    delegate?.reloadTableView()
+    if conversationDic.keys.contains(accountId) {
+      delegate?.reloadTableView()
+    }
   }
 
   open func onTeamSyncFinished() {
@@ -542,7 +488,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter friendInfo: 好友信息
   open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     NEALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
-    delegate?.reloadTableView()
+    if let accountId = friendInfo.accountId,
+       conversationDic.keys.contains(accountId) {
+      delegate?.reloadTableView()
+    }
   }
 
   // MARK: Pin Manager Listener
@@ -611,6 +560,7 @@ extension ConversationViewModel: NESubscribeListener {
          let conversationId = V2NIMConversationIdUtil.p2pConversationId(d.accountId) {
         onlineStatusDic[conversationId] = d.statusType == .USER_STATUS_TYPE_LOGIN
         needRefresh = true
+        break
       }
     }
 

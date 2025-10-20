@@ -80,7 +80,7 @@ final class NEStrokeNode: NEAnimatorNode, NERenderNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat? = nil
+  var lastUpdateFrame: CGFloat?
 
   var renderer: NENodeOutput & NERenderable {
     strokeRender

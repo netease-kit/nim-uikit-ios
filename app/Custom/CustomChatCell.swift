@@ -6,13 +6,13 @@ import NEChatUIKit
 import UIKit
 
 class CustomChatCell: NEChatBaseCell {
-  public var testLabel = UILabel()
+  var testLabel = UILabel()
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     backgroundColor = .lightGray

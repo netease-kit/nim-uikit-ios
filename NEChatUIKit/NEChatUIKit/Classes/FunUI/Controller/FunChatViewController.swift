@@ -371,7 +371,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       model.offset = CGFloat(subHeight)
     }
 
-    if model.isReplay {
+    if model.isReply {
       model.offset = subHeight + fun_chat_reply_height + chat_content_margin
     }
 

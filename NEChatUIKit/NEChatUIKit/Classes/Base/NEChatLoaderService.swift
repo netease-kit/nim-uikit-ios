@@ -17,5 +17,6 @@ public class NEChatLoaderService: NSObject {
   /// 此方法会在模块被加载时调用
   open func setupInit() {
     ChatKitClient.shared.registerInit(NEChatService.shared)
+    ChatKitClient.shared.buryDataPoints("ChatUIKit")
   }
 }

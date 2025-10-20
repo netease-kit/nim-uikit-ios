@@ -11,7 +11,7 @@ open class LocalConversationRouter: NSObject {
   static func registerCommon() {
     Router.shared.register("ClearAtMessageRemind") { param in
       if let sessionId = param["sessionId"] as? String {
-        NEAtMessageManager.instance?.clearAtRecord(sessionId)
+        NELocalAtMessageManager.instance?.clearAtRecord(sessionId)
       }
     }
   }

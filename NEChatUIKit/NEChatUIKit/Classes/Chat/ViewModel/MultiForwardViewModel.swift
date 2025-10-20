@@ -7,8 +7,7 @@ import NIMSDK
 
 @objc
 public protocol MultiForwardViewModelDelegate: NSObjectProtocol {
-  @objc optional
-  func getMessageModel(model: MessageModel)
+  @objc optional func getMessageModel(model: MessageModel)
 }
 
 @objcMembers

@@ -128,6 +128,6 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
   /// 重写【完成】按钮设置
   override open func refreshSelectCount() {
     super.refreshSelectCount()
-    sureButton.backgroundColor = selectedArray.count > 0 ? .funContactThemeColor : .funContactThemeDisableColor
+    sureButton.backgroundColor = selectedArray.isEmpty ? .funContactThemeDisableColor : .funContactThemeColor
   }
 }

@@ -10,7 +10,7 @@ import UIKit
 
 class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  public var cellClassDic =
+  var cellClassDic =
     [SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self]
   private var viewModel = MessageRemindViewModel()
 

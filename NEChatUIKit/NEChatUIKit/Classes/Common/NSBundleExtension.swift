@@ -45,7 +45,7 @@ public extension Bundle {
         inDirectory: NIMKit_EmojiPath
       )
     }
-    if let imagePath = path, imagePath.count > 0 {
+    if let imagePath = path, !imagePath.isEmpty {
     } else {
       path = bundle?.path(
         forResource: doubleImage,

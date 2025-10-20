@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageMultiForwardCell: NEBaseCollectionMessageCell {
+open class NEBaseCollectionMessageMultiForwardCell: NEBaseCollectionMessageCell {
   public let funMargin: CGFloat = 5.2
   let contentW: CGFloat = 248
   var titleLabelFontSize: CGFloat = 14

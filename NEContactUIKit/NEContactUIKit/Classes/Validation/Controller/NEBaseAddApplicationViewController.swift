@@ -149,7 +149,7 @@ extension NEBaseAddApplicationViewController: UITableViewDelegate, UITableViewDa
 extension NEBaseAddApplicationViewController: AddApplicationViewModelDelegate {
   open func tableviewReload() {
     tableView.reloadData()
-    emptyView.isHidden = viewModel.friendAddApplications.count > 0
+    emptyView.isHidden = !viewModel.friendAddApplications.isEmpty
   }
 }
 

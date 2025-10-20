@@ -389,7 +389,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
         }
       }
 
-      if imageUrlString.count > 0 {
+      if !imageUrlString.isEmpty {
         let showController = PhotoBrowserController(urls: [imageUrlString], url: imageUrlString)
         showController.modalPresentationStyle = .overFullScreen
         present(showController, animated: false, completion: nil)
@@ -402,6 +402,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   open func showVideoView(_ model: CollectionMessageModel?) {
     if let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
       stopPlay()
+      // 设置扬声器
+      NEAudioSessionManager.shared.switchToSpeaker()
+      NEAudioSessionManager.shared.stopProximityMonitoring()
+
       let player = VideoPlayerViewController()
       player.totalTime = Int(object.duration)
       player.modalPresentationStyle = .overFullScreen
@@ -674,9 +678,11 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       let audioURL = URL(fileURLWithPath: path)
 
       do {
-        let cate: AVAudioSession.Category = viewModel.getHandSetEnable() ? AVAudioSession.Category.playAndRecord : AVAudioSession.Category.playback
-        try AVAudioSession.sharedInstance().setCategory(cate, options: .duckOthers)
-        try AVAudioSession.sharedInstance().setActive(true)
+        if viewModel.getHandSetEnable() {
+          NEAudioSessionManager.shared.switchToSpeaker()
+        } else {
+          NEAudioSessionManager.shared.switchToReceiver()
+        }
 
         // 检查URL是否有效并尝试加载音频
         audioPlayer = try AVAudioPlayer(contentsOf: audioURL)
@@ -703,13 +709,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     playingCell?.stopPlayAnimation()
     playingModel?.isPlaying = false
 
-    do {
-      // 将当前的音频会话设置为非活动状态
-      try AVAudioSession.sharedInstance().setActive(false)
-    } catch {
-      // 处理设置失败的情况
-      print("Error setActive: \(error.localizedDescription)")
-    }
+    NEAudioSessionManager.shared.stopProximityMonitoring()
   }
 
   open func showTextViewController(_ model: CollectionMessageModel?) {

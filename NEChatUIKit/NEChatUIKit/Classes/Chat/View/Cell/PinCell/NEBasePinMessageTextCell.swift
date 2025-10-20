@@ -68,7 +68,7 @@ open class NEBasePinMessageTextCell: NEBasePinMessageCell, LinkableLabelProtocol
     if let model = item.chatmodel as? MessageTextModel {
       contentLabel.attributedText = model.attributeStr
       contentLabel.updateLinkDetection()
-      if model.isReplay == true {
+      if model.isReply == true {
         replyLabel.attributedText = NEEmotionTool.getAttWithStr(str: model.replyText ?? "",
                                                                 font: replyLabel.font,
                                                                 color: replyLabel.textColor)

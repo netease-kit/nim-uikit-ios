@@ -273,7 +273,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
           filters.insert(model.accountId)
         }
 
-        if filters.count > 0 {
+        if !filters.isEmpty {
           param["filters"] = filters
         }
 
@@ -429,7 +429,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
                       heightForHeaderInSection section: Int) -> CGFloat {
     if viewModel.sectionData.count > section {
       let model = viewModel.sectionData[section]
-      if model.cellModels.count > 0 {
+      if !model.cellModels.isEmpty {
         return 12.0
       }
     }
@@ -613,8 +613,8 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     return members
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if IMKitConfigCenter.shared.enableOnlineStatus {
       if parent == nil {
         viewModel.clear()

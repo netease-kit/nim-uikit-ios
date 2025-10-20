@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class CollectionFileModel: NSObject {
+open class CollectionFileModel: NSObject {
   public var progress: UInt = 0
   public var size: Float = 0
 

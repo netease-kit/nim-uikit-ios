@@ -63,7 +63,7 @@ open class NEPinMessageModel: NSObject {
 
     height += 100
 
-    if chatmodel.isReplay == true {
+    if chatmodel.isReply == true {
       height += 12
     }
 

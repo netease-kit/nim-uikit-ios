@@ -372,7 +372,7 @@ extension NEPageViewController: NEPageViewManagerDelegate {
     viewController.willMove(toParent: self)
     addChild(viewController)
     scrollView.addSubview(viewController.view)
-    viewController.didMove(toParent: self)
+    viewController.willMove(toParent: self)
   }
 
   /// 把视图控制器从当前视图控制器移除
@@ -380,7 +380,7 @@ extension NEPageViewController: NEPageViewManagerDelegate {
     viewController.willMove(toParent: nil)
     viewController.removeFromParent()
     viewController.view.removeFromSuperview()
-    viewController.didMove(toParent: nil)
+    viewController.willMove(toParent: nil)
   }
 
   func beginAppearanceTransition(isAppearing: Bool, viewController: UIViewController, animated: Bool) {

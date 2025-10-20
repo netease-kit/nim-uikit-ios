@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatUIKit
 import NECommonUIKit
 import NIMSDK
 import UIKit
@@ -162,7 +163,37 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
 
   open func uploadPhoto() {
     if getChangePermission() {
-      showBottomAlert(self)
+      if let callback = ChatUIConfig.shared.chatInputPhotoClick {
+        let chatVC = self
+        let takingPicturesAction = UIAlertAction(title: commonLocalizable("take_picture"),
+                                                 style: .default) { [weak self] action in
+          self?.goCamera(chatVC, true)
+        }
+
+        let photoAction = UIAlertAction(title: commonLocalizable("select_from_album"), style: .default) { _ in
+          // 自定义图片选择器
+          let vc = self
+          callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
+            for model in models {
+              if model.asset.mediaType == .video {
+                vc.showToast(commonLocalizable("only_support_choose_image"))
+                return
+              }
+              if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
+                vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
+                return
+              }
+              self?.uploadHeadImage(image: model.image)
+            }
+          }
+        }
+
+        let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in }
+
+        showActionSheet([takingPicturesAction, photoAction, cancelAction])
+      } else {
+        showBottomAlert(self)
+      }
     }
   }
 

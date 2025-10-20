@@ -7,29 +7,29 @@ import NEChatKit
 import NECoreIM2Kit
 import NIMSDK
 
-public let atAllKey = "ait_all"
-public let yxAitMsg = "yxAitMsg"
-public let AtMessageChangeNoti = "at_message_change_noti"
+public let localAtAllKey = "ait_all"
+public let localYXAitMsg = "yxAitMsg"
+public let localAtMessageChangeNoti = "at_message_change_noti"
 
 @objcMembers
-open class AtMessageModel: NSObject {
+open class LocalAtMessageModel: NSObject {
   public var messageId: String?
   public var messageTime: NSNumber?
 }
 
 @objcMembers
-open class AtMEMessageRecord: NSObject {
+open class LocalAtMEMessageRecord: NSObject {
   public var atMessages = [String: NSNumber]()
   public var lastTime: NSNumber?
   public var isRead = false
 }
 
 @objcMembers
-open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
-  public static var instance: NEAtMessageManager?
+open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
+  public static var instance: NELocalAtMessageManager?
   private let workQueue = DispatchQueue(label: "AtMessageWorkQueue")
   private let lock = NSLock()
-  private var atMessageDic = [String: AtMEMessageRecord]()
+  private var atMessageDic = [String: LocalAtMEMessageRecord]()
   private var currentAccid = ""
 
   override private init() {
@@ -45,8 +45,8 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 初始化
   public static func setupInstance() {
-    if NEAtMessageManager.instance == nil {
-      NEAtMessageManager.instance = NEAtMessageManager()
+    if NELocalAtMessageManager.instance == nil {
+      NELocalAtMessageManager.instance = NELocalAtMessageManager()
     }
   }
 
@@ -57,7 +57,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
       NEALog.infoLog(className(), desc: "login ok")
       currentAccid = IMKitClient.instance.account()
       weak var weakSelf = self
-      let newDic = [String: AtMEMessageRecord]()
+      let newDic = [String: LocalAtMEMessageRecord]()
       setMessageDic(newDic)
       workQueue.async {
         weakSelf?.loadCacheFromDocument()
@@ -82,7 +82,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   }
 
   /// 获取当前at消息内存缓存
-  private func getMessageDic() -> [String: AtMEMessageRecord] {
+  private func getMessageDic() -> [String: LocalAtMEMessageRecord] {
     lock.lock()
     let result = atMessageDic
     lock.unlock()
@@ -91,7 +91,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
   /// 设置at消息缓存
   /// - Parameter dic: at消息缓存
-  private func setMessageDic(_ dic: [String: AtMEMessageRecord]) {
+  private func setMessageDic(_ dic: [String: LocalAtMEMessageRecord]) {
     lock.lock()
     atMessageDic = dic
     lock.unlock()
@@ -161,8 +161,8 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     for message in messages {
       if let serverExtension = message.serverExtension,
          let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension),
-         let dic = remoteExt[yxAitMsg] as? [String: Any] {
-        if dic[atAllKey] != nil, message.senderId != currentAccid {
+         let dic = remoteExt[localYXAitMsg] as? [String: Any] {
+        if dic[localAtAllKey] != nil, message.senderId != currentAccid {
           weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
           isExistAtMessage = true
           continue
@@ -205,8 +205,8 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
           option.strictMode = false
           ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
             messages?.forEach { message in
-              if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: Any] {
-                if dic[atAllKey] != nil, message.isSelf == false {
+              if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[localYXAitMsg] as? [String: Any] {
+                if dic[localAtAllKey] != nil, message.isSelf == false {
                   weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
                   isExistAtMessage = true
                   return
@@ -234,7 +234,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   }
 
   /// at 消息记录写文件缓存
-  private func writeCacheToDocument(dictionary: [String: AtMEMessageRecord]) {
+  private func writeCacheToDocument(dictionary: [String: LocalAtMEMessageRecord]) {
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
       let filePath = documentsDirectory.appendingPathComponent(imkitDir + "\(currentAccid)_at_message.plist")
       NEALog.infoLog(className(), desc: "writeCacheToDocument path : \(filePath)")
@@ -282,11 +282,11 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
         if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
           var temdDic = weakSelf?.getMessageDic()
           for (key, value) in jsonObject {
-            if let model = AtMEMessageRecord.yx_model(with: value) {
+            if let model = LocalAtMEMessageRecord.yx_model(with: value) {
               temdDic?[key] = model
-              if let dic = jsonObject[key], let isRead = dic[#keyPath(AtMEMessageRecord.isRead)] as? Bool {
+              if let dic = jsonObject[key], let isRead = dic[#keyPath(LocalAtMEMessageRecord.isRead)] as? Bool {
                 model.isRead = isRead
-                if let atMessagesJsonObject = dic[#keyPath(AtMEMessageRecord.atMessages)] {
+                if let atMessagesJsonObject = dic[#keyPath(LocalAtMEMessageRecord.atMessages)] {
                   if let atMessages = NSDictionary.yx_modelDictionary(with: NSDictionary.self, json: atMessagesJsonObject) as? [String: NSNumber] {
                     model.atMessages = atMessages
                   }
@@ -307,7 +307,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 移除at记录
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func removeRecord(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) -> Bool {
+  private func removeRecord(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
     var didRemove = false
     if let atMeRecord = record[message.conversationId ?? ""] {
       if atMeRecord.atMessages[message.messageClientId ?? ""] != nil {
@@ -324,7 +324,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 添加at消息记录(有时间错比较)
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) {
+  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) {
     guard let conversationId = message.conversationId else {
       NEALog.infoLog(className(), desc: #function + " addAtRecord conversationId nil ")
       return
@@ -350,7 +350,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
       if let atMeRecord = record[message.conversationId ?? ""] {
         let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
         if lastTime < message.createTime {
-          let atMessage = AtMessageModel()
+          let atMessage = LocalAtMessageModel()
           atMeRecord.isRead = false
           atMessage.messageId = message.messageClientId
           atMeRecord.lastTime = NSNumber(value: message.createTime)
@@ -361,8 +361,8 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
           }
         }
       } else {
-        let atMeRecord = AtMEMessageRecord()
-        let atMessage = AtMessageModel()
+        let atMeRecord = LocalAtMEMessageRecord()
+        let atMessage = LocalAtMessageModel()
         atMeRecord.isRead = false
         atMessage.messageId = message.messageClientId
         atMeRecord.lastTime = NSNumber(value: message.createTime)
@@ -378,11 +378,11 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 添加at消息记录
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func addAtRecord(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) {
+  private func addAtRecord(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) {
     if let atMeRecord = record[message.conversationId ?? ""] {
       let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
       if lastTime < message.createTime {
-        let atMessage = AtMessageModel()
+        let atMessage = LocalAtMessageModel()
         atMessage.messageId = message.messageClientId
         atMessage.messageTime = NSNumber(value: message.createTime)
         atMeRecord.lastTime = NSNumber(value: message.createTime)
@@ -393,8 +393,8 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
         }
       }
     } else {
-      let atMeRecord = AtMEMessageRecord()
-      let atMessage = AtMessageModel()
+      let atMeRecord = LocalAtMEMessageRecord()
+      let atMessage = LocalAtMessageModel()
       atMessage.messageId = message.messageClientId
       atMessage.messageTime = NSNumber(value: message.createTime)
       atMeRecord.lastTime = NSNumber(value: message.createTime)
@@ -411,10 +411,10 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   private func atMessageChangeNoti(_ isCurrentThread: Bool = false) {
     if isCurrentThread == false {
       DispatchQueue.main.async {
-        NotificationCenter.default.post(name: Notification.Name(AtMessageChangeNoti), object: nil)
+        NotificationCenter.default.post(name: Notification.Name(localAtMessageChangeNoti), object: nil)
       }
     } else {
-      NotificationCenter.default.post(name: Notification.Name(AtMessageChangeNoti), object: nil)
+      NotificationCenter.default.post(name: Notification.Name(localAtMessageChangeNoti), object: nil)
     }
   }
 
@@ -481,7 +481,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     }
     if isAtMessageChange == true {
       atMessageChangeNoti()
-      DispatchQueue.main.async {
+      DispatchQueue.global().async {
         weakSelf?.writeCacheToDocument(dictionary: temDic)
       }
     }
@@ -490,7 +490,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 移除at记录(根据消息指针类，因为撤回的时候拿不到消息对象)
   /// - Parameter messageRefer: 消息索引
   /// - Parameter record: at 消息记录缓存
-  private func removeRecordWithMessageref(messageRefer: V2NIMMessageRefer, record: inout [String: AtMEMessageRecord]) -> Bool {
+  private func removeRecordWithMessageref(messageRefer: V2NIMMessageRefer, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
     var didRemove = false
     if let atMeRecord = record[messageRefer.conversationId ?? ""] {
       if atMeRecord.atMessages[messageRefer.messageClientId ?? ""] != nil {

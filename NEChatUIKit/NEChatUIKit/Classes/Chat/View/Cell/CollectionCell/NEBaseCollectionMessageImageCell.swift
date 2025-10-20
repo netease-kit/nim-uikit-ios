@@ -2,11 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NIMSDK
+import SDWebImage
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageImageCell: NEBaseCollectionMessageCell {
+open class NEBaseCollectionMessageImageCell: NEBaseCollectionMessageCell {
   /// 图片消息内容图片
   public let collectionContentImageView: UIImageView = {
     let imageView = UIImageView()
@@ -64,19 +65,29 @@ class NEBaseCollectionMessageImageCell: NEBaseCollectionMessageCell {
   override open func configureData(_ model: CollectionMessageModel) {
     super.configureData(model)
     if let m = model.chatmodel as? MessageImageModel, let imageUrl = m.urlString {
+      let options: SDWebImageOptions = [.retryFailed, .allowInvalidSSLCertificates]
+
       if imageUrl.hasPrefix("http") {
-        collectionContentImageView.sd_setImage(
-          with: URL(string: imageUrl),
-          placeholderImage: nil,
-          options: .retryFailed,
-          progress: nil,
-          completed: nil
-        )
+        let url = URL(string: imageUrl)
+        collectionContentImageView.sd_setImage(with: url) { [weak self] image, error, type, url in
+          if let err = error as? NSError, err.code == 2001,
+             let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
+             let imageUrl = imageObject.url {
+            let url = URL(string: imageUrl)
+            let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 350, height: 350)]
+            self?.collectionContentImageView.sd_setImage(
+              with: url,
+              placeholderImage: UIImage(contentsOfFile: imageUrl),
+              options: options,
+              context: context,
+              progress: nil
+            )
+          }
+        }
       } else {
         let url = URL(fileURLWithPath: imageUrl)
-        collectionContentImageView.sd_setImage(with: url)
+        collectionContentImageView.sd_setImage(with: url, placeholderImage: nil, options: options, context: nil)
       }
-
     } else {
       collectionContentImageView.image = nil
     }

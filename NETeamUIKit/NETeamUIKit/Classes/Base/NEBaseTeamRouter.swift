@@ -46,7 +46,7 @@ open class TeamRouter: NSObject {
         var disucssFlag = [String: Any]()
         disucssFlag[discussTeamKey] = true
         let jsonString = NECommonUtil.getJSONStringFromDictionary(disucssFlag)
-        if jsonString.count > 0 {
+        if !jsonString.isEmpty {
           param.serverExtension = jsonString
         }
 

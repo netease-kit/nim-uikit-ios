@@ -34,7 +34,7 @@ class NodeSelectCell: CornerCell {
     // Configure the view for the selected state
   }
 
-  override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
     setupUI()

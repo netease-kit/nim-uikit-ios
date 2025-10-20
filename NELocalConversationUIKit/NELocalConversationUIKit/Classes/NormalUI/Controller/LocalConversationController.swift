@@ -60,8 +60,8 @@ open class LocalConversationController: NEBaseLocalConversationController {
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
   }
 
-  override open func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override open func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       NotificationCenter.default.removeObserver(self)
     }
@@ -114,7 +114,7 @@ open class LocalConversationController: NEBaseLocalConversationController {
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 62, height: 181 - NEConstant.navigationAndStatusHeight)
+    CGSize(width: 80, height: 181 - NEConstant.navigationAndStatusHeight)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)

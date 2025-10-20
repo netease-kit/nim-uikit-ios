@@ -24,7 +24,7 @@ public class NELocalConversationService: NSObject, ChatServiceDelegate {
   open func registerRouter(_ param: [String: Any]?) {
     // @功能初始化
     if IMKitConfigCenter.shared.enableAtMessage {
-      NEAtMessageManager.setupInstance()
+      NELocalAtMessageManager.setupInstance()
     }
 
     if let isFun = param?["isFun"] as? Bool, isFun {

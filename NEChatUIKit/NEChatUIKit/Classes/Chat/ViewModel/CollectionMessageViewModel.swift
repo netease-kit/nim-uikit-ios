@@ -7,8 +7,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open
-class CollectionMessageViewModel: NSObject {
+open class CollectionMessageViewModel: NSObject {
   public var collectionDatas = [CollectionMessageModel]()
 
   /// 消息API 单例
@@ -45,7 +44,7 @@ class CollectionMessageViewModel: NSObject {
       } else {
         if let v2Collections = collections, let models = self?.parseMessage(v2Collections) {
           self?.collectionDatas.append(contentsOf: models)
-          if models.count > 0 {
+          if !models.isEmpty {
             completion(nil, false)
           } else {
             completion(nil, true)

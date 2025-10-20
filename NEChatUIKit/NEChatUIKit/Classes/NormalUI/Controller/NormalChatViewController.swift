@@ -68,7 +68,7 @@ open class NormalChatViewController: ChatViewController {
   }
 
   open func getMessageModel(model: MessageModel) {
-    if model.isReplay {
+    if model.isReply {
       let normalMoreHeight = chat_reply_height + chat_content_margin
       model.contentSize = CGSize(
         width: model.contentSize.width,

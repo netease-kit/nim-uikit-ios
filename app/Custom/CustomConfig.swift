@@ -7,6 +7,7 @@ import NEChatUIKit
 import NEContactUIKit
 import NEConversationUIKit
 import NELocalConversationUIKit
+import ZLPhotoBrowser
 
 /// 自定义配置项示例类
 public class CustomConfig {
@@ -400,6 +401,48 @@ public class CustomConfig {
       aiChatViewController.showLoadingView()
       // 重新加载数据，调用 ChatUIConfig.shared.aiChatDataLoader
       aiChatViewController.loadMoreData(messages)
+    }
+  }
+
+  /// 加载自定义图片选择器
+  func loadPhotoBrowser() {
+    ChatUIConfig.shared.chatInputPhotoClick = { chatViewController, mediaType, limit, selectImageBlock in
+      switch mediaType {
+      case .all:
+        // 聊天页面选择图片/视频发送
+        // 图片最多选取 chatImageCountLimit 张
+        // 视频最多选取 chatVideoCountLimit 张
+        ZLPhotoConfiguration.default().allowSelectLivePhoto = true
+        ZLPhotoConfiguration.default().allowTakePhotoInLibrary = false
+        ZLPhotoConfiguration.default().allowMixSelect = false
+        ZLPhotoConfiguration.default().maxSelectCount = limit
+        ZLPhotoConfiguration.default().maxSelectVideoDataSize = ChatUIConfig.shared.fileSizeLimit * 1024
+      case .image:
+        // 选取图片上传头像
+        // 最多选取 avatarImageCountLimit 张
+        ZLPhotoConfiguration.default().allowSelectImage = true
+        ZLPhotoConfiguration.default().allowSelectVideo = false
+        ZLPhotoConfiguration.default().maxSelectCount = limit
+        ZLPhotoConfiguration.default().editAfterSelectThumbnailImage = true
+        ZLPhotoConfiguration.default().allowSelectLivePhoto = true
+        ZLPhotoConfiguration.default().allowTakePhotoInLibrary = false
+      default:
+        ZLPhotoConfiguration.default().allowSelectImage = false
+        ZLPhotoConfiguration.default().allowSelectVideo = true
+        ZLPhotoConfiguration.default().maxSelectCount = limit
+        ZLPhotoConfiguration.default().allowTakePhotoInLibrary = false
+      }
+
+      let picker = ZLPhotoPicker()
+      picker.selectImageBlock = { result, isOriginal in
+        var cbResult = [NEResultModel]()
+        for res in result {
+          let cbRes = NEResultModel(asset: res.asset, image: res.image, index: res.index)
+          cbResult.append(cbRes)
+        }
+        selectImageBlock(cbResult, isOriginal)
+      }
+      picker.showPhotoLibrary(sender: chatViewController)
     }
   }
 

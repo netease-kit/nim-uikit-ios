@@ -11,6 +11,8 @@
 "cancel"="Cancel";
 "camera"="Video";
 "take_picture"="Photo";
+"photos"="Photo";
+"videos"="Video";
 "network_error"="No Network";
 "select_from_album"="Album";
 "select_from_icloud"="iCloud";
@@ -69,3 +71,8 @@
 "request_timed_out"="Request timed out. Please try again.";
 "invalid_URL"="Invalid URL";
 "failed_to_load"="Failed to load. Error code: %d";
+"file_upload_failed"="File Upload Failed";
+
+"only_support_choose_image"="Only images can be selected";
+"video_count_over_limit" = "video more than %d limit";
+"image_count_over_limit" = "image more than %d limit";

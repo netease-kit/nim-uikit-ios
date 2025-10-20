@@ -16,13 +16,13 @@ public enum EditType: Int {
 
 class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate {
   typealias ResultCallBack = (String) -> Void
-  public var contentText: String? {
+  var contentText: String? {
     didSet {
       textField.text = contentText
     }
   }
 
-  public var callBack: ResultCallBack?
+  var callBack: ResultCallBack?
   private var limitNumberCount = 0
 
   lazy var textField: UITextField = {

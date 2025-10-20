@@ -91,7 +91,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
             }
           }
         }
-        if noFindUserSet.count > 0 {
+        if !noFindUserSet.isEmpty {
           let accids = Array(noFindUserSet)
           weakSelf?.getSearchMessageMembers(teamId, accids) { error, members in
             if let err = error {

@@ -16,10 +16,10 @@ class NEPathOutputNode: NENodeOutput {
 
   let parent: NENodeOutput?
 
-  fileprivate(set) var outputPath: CGPath? = nil
+  fileprivate(set) var outputPath: CGPath?
 
-  var lastUpdateFrame: CGFloat? = nil
-  var lastPathBuildFrame: CGFloat? = nil
+  var lastUpdateFrame: CGFloat?
+  var lastPathBuildFrame: CGFloat?
   var isEnabled = true
   fileprivate(set) var totalLength: CGFloat = 0
   fileprivate(set) var pathObjects: [NECompoundBezierPath] = []

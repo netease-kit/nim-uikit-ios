@@ -11,7 +11,7 @@ import UIKit
 
 class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
   private var viewModel = MineSettingViewModel()
-  public var cellClassDic = [
+  var cellClassDic = [
     SettingCellType.SettingArrowCell.rawValue: CustomTeamArrowSettingCell.self,
     SettingCellType.SettingSwitchCell.rawValue: CustomTeamSettingSwitchCell.self,
   ]
@@ -53,8 +53,8 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     changeLanguage()
   }
 
-  override func didMove(toParent parent: UIViewController?) {
-    super.didMove(toParent: parent)
+  override func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
     if parent == nil {
       NotificationCenter.default.removeObserver(self)
     }
@@ -142,10 +142,10 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
             object: nil
           )
 
-          let config = IMSDKConfigManager.instance.getConfig()
+          let config = IMPocConfigManager.instance.getConfig()
           config.accountId = nil
           config.accountIdToken = nil
-          IMSDKConfigManager.instance.saveConfig(model: config)
+          IMPocConfigManager.instance.saveConfig(model: config)
 
           NEFriendUserCache.shared.removeAllFriendInfo()
         }
@@ -238,8 +238,13 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
   }
 
   func didClickSDKConfig() {
-    let configController = IMSDKConfigViewController()
+    let configController = IMPocConfigViewController()
     navigationController?.pushViewController(configController, animated: true)
+  }
+
+  func didClickPushConfig() {
+    let pushConfigController = IMPushConfigViewController()
+    navigationController?.pushViewController(pushConfigController, animated: true)
   }
 
   func didClickLanguage() {

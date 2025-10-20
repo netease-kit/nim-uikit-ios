@@ -11,7 +11,7 @@ import UIKit
 
 class LanguageViewController: NEBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  public var cellClassDic =
+  var cellClassDic =
     [SettingCellType.SettingSubtitleCustomCell.rawValue: CustomTeamSettingRightCustomCell.self]
   private var viewModel = LanguageViewModel()
   private var selectedModel: SettingCellModel?

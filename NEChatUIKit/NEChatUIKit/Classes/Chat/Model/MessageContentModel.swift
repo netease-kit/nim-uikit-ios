@@ -53,7 +53,7 @@ open class MessageContentModel: NSObject, MessageModel {
   public var readCount: Int = 0
   public var unreadCount: Int = 0
 
-  public var isReplay: Bool = false
+  public var isReply: Bool = false
   public var replyText: String?
   public var replyedModel: MessageModel? {
     didSet {
@@ -62,7 +62,7 @@ open class MessageContentModel: NSObject, MessageModel {
           return
         }
 
-        isReplay = true
+        isReply = true
         replyText = ReplyMessageUtil.textForReplyModel(model: reply)
         // height 计算移至 getMessageModel(model:)
       }
@@ -71,19 +71,11 @@ open class MessageContentModel: NSObject, MessageModel {
 
   public var isReedit: Bool = false
   public var timeOut = false
+  public var revokeTime: TimeInterval = 0
   public var isRevoked: Bool = false {
     didSet {
       if isRevoked {
         type = .revoke
-
-        // 校验撤回消息可编辑时间
-        if let time = message?.createTime {
-          let date = Date()
-          let currentTime = date.timeIntervalSince1970
-          if Int(currentTime - time) > ChatUIConfig.shared.revokeEditTimeGap * 60 {
-            timeOut = true
-          }
-        }
 
         // 只有文本消息，才计算可编辑按钮的宽度
         if let isSend = message?.isSelf, isSend, message?.messageType == .MESSAGE_TYPE_TEXT, timeOut == false {

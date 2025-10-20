@@ -6,8 +6,7 @@ import NIMSDK
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageFileCell: NEBaseCollectionMessageCell {
+open class NEBaseCollectionMessageFileCell: NEBaseCollectionMessageCell {
   /// 文件下载状态
   public lazy var fileStateView: FileStateView = {
     let stateView = FileStateView()

@@ -7,8 +7,7 @@ import NEChatKit
 import NECoreIM2Kit
 import UIKit
 
-public
-protocol AIChatTableViewCellDelegate: NSObjectProtocol {
+public protocol AIChatTableViewCellDelegate: NSObjectProtocol {
   func didClickEditButton(_ text: String?)
 }
 

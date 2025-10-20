@@ -18,7 +18,7 @@ class NEGroupOutputNode: NENodeOutput {
   let rootNode: NENodeOutput?
   var isEnabled = true
 
-  private(set) var outputPath: CGPath? = nil
+  private(set) var outputPath: CGPath?
   private(set) var transform: CATransform3D = CATransform3DIdentity
 
   func setTransform(_ xform: CATransform3D, forFrame _: CGFloat) {

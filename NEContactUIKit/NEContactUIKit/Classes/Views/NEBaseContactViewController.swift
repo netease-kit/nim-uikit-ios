@@ -8,8 +8,7 @@ import NECoreKit
 import UIKit
 
 @objc
-public
-protocol NEBaseContactViewControllerDelegate: NSObjectProtocol {
+public protocol NEBaseContactViewControllerDelegate: NSObjectProtocol {
   func onDataLoaded()
 }
 
@@ -21,7 +20,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   // custom ui cell
   public var cellRegisterDic = [Int: NEBaseContactTableViewCell.Type]()
 
-  public var viewModel = ContactViewModel(contactHeaders: nil)
+  public var viewModel: ContactViewModel?
   private var lastTitleIndex = 0
 
   public var bodyTopViewHeight: CGFloat = 0 {
@@ -165,7 +164,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     }
 
     loadData()
-    viewModel.getValidationMessage(nil)
+    viewModel?.getValidationMessage(nil)
 
     if let customController = ContactUIConfig.shared.customController {
       customController(self)
@@ -180,8 +179,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     commonUI()
 
     weak var weakSelf = self
-    viewModel.delegate = self
-    viewModel.refresh = {
+    viewModel?.delegate = self
+    viewModel?.refresh = {
       weakSelf?.didRefreshTable()
     }
 
@@ -192,7 +191,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   /// 清除未读数
   open func clearValidationUnreadCount() {
-    viewModel.unreadCount = 0
+    viewModel?.unreadCount = 0
   }
 
   open func showTitleBar() {
@@ -203,9 +202,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         navigationController?.isNavigationBarHidden = false
       } else {
         navigationController?.isNavigationBarHidden = true
-        if #available(iOS 10, *) {
-          topConstant += NEConstant.statusBarHeight
-        }
+        topConstant += NEConstant.statusBarHeight
       }
     } else {
       navigationController?.isNavigationBarHidden = true
@@ -216,9 +213,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         navigationView.isHidden = true
         topConstant = 0
       }
-      if #available(iOS 10, *) {
-        topConstant += NEConstant.statusBarHeight
-      }
+      topConstant += NEConstant.statusBarHeight
     }
   }
 
@@ -273,8 +268,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func loadData() {
     NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
-    viewModel.loadData { [weak self] error, userSectionCount in
-      NEALog.infoLog(NEBaseContactViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+    viewModel?.loadData { [weak self] error, userSectionCount in
+      NEALog.infoLog((self?.className() ?? "NEBaseContactViewController") + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
         self?.delegate?.onDataLoaded()
         self?.didRefreshTable()
@@ -284,26 +279,26 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   // UITableViewDataSource
   open func numberOfSections(in tableView: UITableView) -> Int {
-    viewModel.contactSections.count
+    viewModel?.contactSections.count ?? 0
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    guard section < viewModel.contactSections.count else {
+    guard section < (viewModel?.contactSections.count ?? 0) else {
       return 0
     }
 
-    return viewModel.contactSections[section].contacts.count
+    return viewModel?.contactSections[section].contacts.count ?? 0
   }
 
   // 具体逻辑在子类实现
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    guard indexPath.section < viewModel.contactSections.count,
-          indexPath.row < viewModel.contactSections[indexPath.section].contacts.count else {
+    guard indexPath.section < (viewModel?.contactSections.count ?? 0),
+          indexPath.row < (viewModel?.contactSections[indexPath.section].contacts.count ?? 0),
+          let info = viewModel?.contactSections[indexPath.section].contacts[indexPath.row] else {
       return UITableViewCell()
     }
 
-    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
     let reusedId = "\(info.contactCellType.rawValue)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
 
@@ -313,16 +308,17 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       if IMKitConfigCenter.shared.enableOnlineStatus {
         if indexPath.section != 0 {
           if let accountId = info.user?.user?.accountId {
-            let online = viewModel.onlineStatusDic[accountId] ?? false
+            let online = viewModel?.onlineStatusDic[accountId] ?? false
             info.isOnline = online
             c.setOnline(online)
           }
         }
       }
 
-      if indexPath.section == 0, indexPath.row == 0, viewModel.unreadCount > 0 {
+      let unreadCount = viewModel?.unreadCount ?? 0
+      if indexPath.section == 0, indexPath.row == 0, unreadCount > 0 {
         c.redAngleView.isHidden = false
-        c.redAngleView.text = viewModel.unreadCount > 99 ? "99+" : "\(viewModel.unreadCount)"
+        c.redAngleView.text = unreadCount > 99 ? "99+" : "\(unreadCount)"
       } else {
         c.redAngleView.isHidden = true
       }
@@ -334,7 +330,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func tableView(_ tableView: UITableView,
                       viewForHeaderInSection section: Int) -> UIView? {
-    guard section < viewModel.contactSections.count else {
+    guard section < (viewModel?.contactSections.count ?? 0) else {
       return nil
     }
 
@@ -342,29 +338,29 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       .dequeueReusableHeaderFooterView(
         withIdentifier: "\(NSStringFromClass(ContactSectionView.self))"
       ) as! ContactSectionView
-    sectionView.titleLabel.text = viewModel.contactSections[section].initial
+    sectionView.titleLabel.text = viewModel?.contactSections[section].initial
     return sectionView
   }
 
   open func tableView(_ tableView: UITableView,
                       heightForHeaderInSection section: Int) -> CGFloat {
-    guard section < viewModel.contactSections.count else {
+    guard section < (viewModel?.contactSections.count ?? 0) else {
       return 0
     }
 
-    if viewModel.contactSections[section].initial.count > 0 {
+    if viewModel?.contactSections[section].initial.isEmpty == nil {
       return 40
     }
     return 0
   }
 
   open func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-    viewModel.indexs
+    viewModel?.indexs
   }
 
   open func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String,
                       at index: Int) -> Int {
-    for (i, t) in viewModel.contactSections.enumerated() {
+    for (i, t) in (viewModel?.contactSections ?? []).enumerated() {
       if t.initial == title {
         lastTitleIndex = i
         return i
@@ -379,12 +375,11 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard indexPath.section < viewModel.contactSections.count,
-          indexPath.row < viewModel.contactSections[indexPath.section].contacts.count else {
+    guard indexPath.section < (viewModel?.contactSections.count ?? 0),
+          indexPath.row < (viewModel?.contactSections[indexPath.section].contacts.count ?? 0),
+          let info = viewModel?.contactSections[indexPath.section].contacts[indexPath.row] else {
       return
     }
-
-    let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
 
     if info.contactCellType == .ContactOthers {
       if let headerItemClick = ContactUIConfig.shared.headerItemClick {
@@ -395,18 +390,18 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       switch info.router {
       case ValidationMessageRouter:
         Router.shared.use(ValidationMessageRouter,
-                          parameters: ["nav": navigationController as Any],
+                          parameters: ["nav": navigationController as Any, "animated": false],
                           closure: nil)
 
       case ContactBlackListRouter:
         Router.shared.use(ContactBlackListRouter,
-                          parameters: ["nav": navigationController as Any],
+                          parameters: ["nav": navigationController as Any, "animated": false],
                           closure: nil)
 
       case ContactTeamListRouter:
         // My Team
         Router.shared.use(ContactTeamListRouter,
-                          parameters: ["nav": navigationController as Any],
+                          parameters: ["nav": navigationController as Any, "animated": false],
                           closure: nil)
 
       case ContactPersonRouter:
@@ -416,9 +411,9 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
         break
 
       default:
-        if info.router.count > 0 {
+        if !info.router.isEmpty {
           Router.shared.use(info.router,
-                            parameters: ["nav": navigationController as Any],
+                            parameters: ["nav": navigationController as Any, "animated": false],
                             closure: nil)
         }
       }
@@ -430,7 +425,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
       Router.shared.use(
         ContactUserInfoPageRouter,
-        parameters: ["nav": navigationController as Any, "user": info.user as Any],
+        parameters: ["nav": navigationController as Any, "user": info.user as Any, "animated": false],
         closure: nil
       )
     }
@@ -450,8 +445,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       var accountIds = [String]()
       for indexPath in indexPathsForVisibleRows {
         if indexPath.section != 0 {
-          let info = viewModel.contactSections[indexPath.section].contacts[indexPath.row]
-          if let accountId = info.user?.user?.accountId {
+          let info = viewModel?.contactSections[indexPath.section].contacts[indexPath.row]
+          if let accountId = info?.user?.user?.accountId {
             if !NESubscribeManager.shared.hasSubscribe(accountId) {
               accountIds.append(accountId)
             }
@@ -477,7 +472,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func didRefreshTable() {
     tableView.reloadData()
-    emptyView.isHidden = viewModel.getFriendSections().count > 0
+    emptyView.isHidden = ((viewModel?.contactSections.count ?? 0) ?? 0) > 1
   }
 
   open func reloadTableView() {
@@ -496,13 +491,14 @@ extension NEBaseContactViewController {
 
   @objc open func goToFindFriend() {
     let findFriendController = getFindFriendViewController()
-    navigationController?.pushViewController(findFriendController, animated: true)
+    navigationController?.pushViewController(findFriendController, animated: false)
   }
 
   @objc open func searchContact() {
     Router.shared.use(
       SearchContactPageRouter,
-      parameters: ["nav": navigationController as Any],
+      parameters: ["nav": navigationController as Any,
+                   "animated": false],
       closure: nil
     )
   }
@@ -538,7 +534,7 @@ extension NEBaseContactViewController: NEIMKitClientListener {
 
     if status == .CONNECT_STATUS_CONNECTED, networkBroken {
       networkBroken = false
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+      DispatchQueue.global().asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
         self?.subscribeVisibleRows()
       }))
     }

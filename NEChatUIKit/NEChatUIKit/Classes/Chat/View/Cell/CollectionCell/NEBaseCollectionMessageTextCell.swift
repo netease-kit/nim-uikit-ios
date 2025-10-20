@@ -6,8 +6,7 @@ import NECommonUIKit
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell, LinkableLabelProtocol {
+open class NEBaseCollectionMessageTextCell: NEBaseCollectionMessageCell, LinkableLabelProtocol {
   /// 内容文本
   public lazy var collectionContentLabel: NELinkableLabel = {
     let label = NELinkableLabel()

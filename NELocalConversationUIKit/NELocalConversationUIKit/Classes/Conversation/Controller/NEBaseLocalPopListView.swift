@@ -8,7 +8,7 @@ import NECommonKit
 import UIKit
 
 @objcMembers
-open class PopListItem: NSObject {
+open class LocalPopListItem: NSObject {
   public typealias PopListClick = () -> Void
   public var image: UIImage?
   public var showName: String?
@@ -19,7 +19,7 @@ open class PopListItem: NSObject {
 }
 
 @objcMembers
-open class NEBasePopListView: UIView {
+open class NELocalBasePopListView: UIView {
   public let shadowView = UIView()
   public let popView = UIView()
 
@@ -29,7 +29,7 @@ open class NEBasePopListView: UIView {
   public var popViewRadius: CGFloat = 8.0
   public var topConstant: CGFloat = 0
 
-  public var itemDatas = [PopListItem]() {
+  public var itemDatas = [LocalPopListItem]() {
     didSet {
       popViewHeight = CGFloat(itemDatas.count) * 32 + 16
       setupUI()

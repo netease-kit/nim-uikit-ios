@@ -287,9 +287,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
         navigationController?.isNavigationBarHidden = false
       } else {
         navigationController?.isNavigationBarHidden = true
-        if #available(iOS 10, *) {
-          topConstant += NEConstant.statusBarHeight
-        }
+        topConstant += NEConstant.statusBarHeight
       }
     } else {
       navigationController?.isNavigationBarHidden = true
@@ -300,9 +298,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
         navigationView.isHidden = true
         topConstant = 0
       }
-      if #available(iOS 10, *) {
-        topConstant += NEConstant.statusBarHeight
-      }
+      topConstant += NEConstant.statusBarHeight
     }
   }
 
@@ -394,7 +390,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
       self?.viewModel.getAIUserList()
 
       if let err = error {
-        self?.view.ne_makeToast(err.localizedDescription)
+        self?.showToast(err.localizedDescription)
         self?.emptyView.isHidden = false
         NEALog.errorLog(
           ModuleName + " " + (self?.className ?? ""),
@@ -407,8 +403,8 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
           }
         }
 
-        if let topDats = self?.viewModel.stickTopConversations, let normalDatas = self?.viewModel.conversationListData {
-          if topDats.count <= 0, normalDatas.count <= 0 {
+        if let normalDatas = self?.viewModel.conversationListData {
+          if normalDatas.count <= 0 {
             self?.emptyView.isHidden = false
           } else {
             self?.emptyView.isHidden = true
@@ -440,7 +436,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
 
     Router.shared.use(
       SearchContactPageRouter,
-      parameters: ["nav": navigationController as Any],
+      parameters: ["nav": navigationController as Any,
+                   "animated": false],
       closure: nil
     )
   }
@@ -458,7 +455,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     addFriend.completion = {
       Router.shared.use(
         ContactAddFriendRouter,
-        parameters: ["nav": self.navigationController as Any],
+        parameters: ["nav": self.navigationController as Any, "animated": false],
         closure: nil
       )
     }
@@ -470,7 +467,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     joinTeam.completion = {
       Router.shared.use(
         TeamJoinTeamRouter,
-        parameters: ["nav": self.navigationController as Any],
+        parameters: ["nav": self.navigationController as Any, "animated": false],
         closure: nil
       )
     }
@@ -509,7 +506,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     } else {
       Router.shared.use(
         ContactAddFriendRouter,
-        parameters: ["nav": navigationController as Any],
+        parameters: ["nav": navigationController as Any,
+                     "animated": false],
         closure: nil
       )
     }
@@ -530,6 +528,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       Router.shared.use(
         ContactFusionSelectRouter,
         parameters: ["nav": navigationController as Any,
+                     "animated": false,
                      "limit": inviteNumberLimit,
                      "filters": filters],
         closure: nil
@@ -538,6 +537,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       Router.shared.use(
         ContactUserSelectRouter,
         parameters: ["nav": navigationController as Any,
+                     "animated": false,
                      "limit": inviteNumberLimit,
                      "filters": filters],
         closure: nil
@@ -576,6 +576,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       Router.shared.use(
         ContactFusionSelectRouter,
         parameters: ["nav": navigationController as Any,
+                     "animated": false,
                      "limit": inviteNumberLimit,
                      "filters": filters],
         closure: nil
@@ -584,6 +585,7 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
       Router.shared.use(
         ContactUserSelectRouter,
         parameters: ["nav": navigationController as Any,
+                     "animated": false,
                      "limit": inviteNumberLimit,
                      "filters": filters],
         closure: nil
@@ -646,7 +648,9 @@ extension NEBaseConversationController: UICollectionViewDelegate, UICollectionVi
     if let accountId = conversationModel.aiUser?.accountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
       Router.shared.use(
         PushP2pChatVCRouter,
-        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
+        parameters: ["nav": navigationController as Any,
+                     "conversationId": conversationId as Any,
+                     "animated": false],
         closure: nil
       )
     }
@@ -657,36 +661,31 @@ extension NEBaseConversationController: UICollectionViewDelegate, UICollectionVi
 
 extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSource {
   open func numberOfSections(in tableView: UITableView) -> Int {
-    2
+    1
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if section == 0 {
-      return viewModel.stickTopConversations.count
-    }
-    return viewModel.conversationListData.count
+    viewModel.conversationListData.count
   }
 
   open func tableView(_ tableView: UITableView,
                       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    var model: NEConversationListModel?
-
-    if indexPath.section == 0 {
-      model = viewModel.stickTopConversations[indexPath.row]
-    } else if indexPath.section == 1 {
-      model = viewModel.conversationListData[indexPath.row]
+    guard indexPath.row < viewModel.conversationListData.count else {
+      return UITableViewCell()
     }
 
-    let reusedId = "\(model?.customType ?? 0)"
+    let model: NEConversationListModel = viewModel.conversationListData[indexPath.row]
+
+    let reusedId = "\(model.customType)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
 
-    if let c = cell as? NEBaseConversationListCell, let m = model {
-      c.configureData(m)
+    if let c = cell as? NEBaseConversationListCell {
+      c.configureData(model)
 
       if IMKitConfigCenter.shared.enableOnlineStatus {
-        if let conversationId = model?.conversation?.conversationId {
+        if let conversationId = model.conversation?.conversationId {
           let online = viewModel.onlineStatusDic[conversationId] ?? false
-          model?.p2pOnline = online
+          model.p2pOnline = online
           c.setOnline(online)
         }
       }
@@ -696,47 +695,54 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    var conversationModel: NEConversationListModel?
-    if indexPath.section == 0 {
-      conversationModel = viewModel.stickTopConversations[indexPath.row]
-    } else if indexPath.section == 1 {
-      conversationModel = viewModel.conversationListData[indexPath.row]
-    }
-
-    if let didClick = ConversationUIConfig.shared.itemClick, let model = conversationModel {
-      didClick(self, model, indexPath)
+    guard indexPath.row < viewModel.conversationListData.count else {
       return
     }
 
-    if let conversation = conversationModel?.conversation {
+    let conversationModel = viewModel.conversationListData[indexPath.row]
+
+    if let didClick = ConversationUIConfig.shared.itemClick {
+      didClick(self, conversationModel, indexPath)
+      return
+    }
+
+    if let conversation = conversationModel.conversation {
       onselectedTableRow(conversation: conversation)
     }
   }
 
   open func tableView(_ tableView: UITableView,
-                      editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-    weak var weakSelf = self
-    var rowActions = [UITableViewRowAction]()
+                      trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    guard indexPath.row < viewModel.conversationListData.count else {
+      return nil
+    }
 
-    // 删除会话
-    let deleteAction = UITableViewRowAction(style: .destructive,
-                                            title: ConversationUIConfig.shared.deleteButtonTitle ?? localizable("delete")) { action, indexPath in
-      weakSelf?.deleteActionHandler(action: action, indexPath: indexPath)
+    let conversationModel = viewModel.conversationListData[indexPath.row]
+
+    // 删除 Action
+    let deleteAction = UIContextualAction(style: .normal,
+                                          title: ConversationUIConfig.shared.deleteButtonTitle ?? localizable("delete")) { [weak self] _, _, completion in
+      self?.deleteActionHandler(indexPath: indexPath)
+      completion(true)
     }
     deleteAction.backgroundColor = ConversationUIConfig.shared.deleteButtonBackgroundColor ?? deleteButtonBackgroundColor
 
     // 置顶和取消置顶
-    let isTop = indexPath.section == 0 ? true : false // viewModel.stickTopInfos[session] != nil
-    let topAction = UITableViewRowAction(style: .destructive,
-                                         title: isTop ? ConversationUIConfig.shared.stickTopButtonCancelTitle ?? localizable("cancel_stickTop") :
-                                           ConversationUIConfig.shared.stickTopButtonTitle ?? localizable("stickTop")) { action, indexPath in
-      weakSelf?.topActionHandler(action: action, indexPath: indexPath, isTop: isTop)
+    let isTop = conversationModel.conversation?.stickTop ?? false
+    let topTitle = isTop ?
+      (ConversationUIConfig.shared.stickTopButtonCancelTitle ?? localizable("cancel_stickTop")) :
+      (ConversationUIConfig.shared.stickTopButtonTitle ?? localizable("stickTop"))
+
+    let topAction = UIContextualAction(style: .normal,
+                                       title: topTitle) { [weak self] _, _, completion in
+      self?.topActionHandler(indexPath: indexPath, isTop: isTop)
+      completion(true)
     }
     topAction.backgroundColor = ConversationUIConfig.shared.stickTopButtonBackgroundColor ?? topButtonBackgroundColor
 
-    rowActions.append(deleteAction)
-    rowActions.append(topAction)
-    return rowActions
+    let config = UISwipeActionsConfiguration(actions: [deleteAction, topAction])
+    config.performsFirstActionWithFullSwipe = false // 禁止全滑动触发
+    return config
   }
 
   /// 订阅可见单聊
@@ -752,14 +758,9 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     if let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows {
       var accountIds = [String]()
       for indexPath in indexPathsForVisibleRows {
-        var model: NEConversationListModel?
-        if indexPath.section == 0 {
-          model = viewModel.stickTopConversations[indexPath.row]
-        } else if indexPath.section == 1 {
-          model = viewModel.conversationListData[indexPath.row]
-        }
+        let model = viewModel.conversationListData[indexPath.row]
 
-        if let conversationId = model?.conversation?.conversationId,
+        if let conversationId = model.conversation?.conversationId,
            V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
           if let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
              !NESubscribeManager.shared.hasSubscribe(accountId) {
@@ -785,7 +786,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
   }
 
   /// 删除会话
-  open func deleteActionHandler(action: UITableViewRowAction?, indexPath: IndexPath) {
+  open func deleteActionHandler(indexPath: IndexPath) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
       return
@@ -793,10 +794,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     var conversationModel: NEConversationListModel?
 
-    if indexPath.section == 0, indexPath.row < viewModel.stickTopConversations.count {
-      conversationModel = viewModel.stickTopConversations[indexPath.row]
-
-    } else if indexPath.section == 1, indexPath.row < viewModel.conversationListData.count {
+    if indexPath.row < viewModel.conversationListData.count {
       conversationModel = viewModel.conversationListData[indexPath.row]
     }
 
@@ -817,76 +815,39 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     }
   }
 
-  /// 点击会话
-  open func topActionHandler(action: UITableViewRowAction?, indexPath: IndexPath, isTop: Bool) {
+  /// 点击 置顶/取消置顶 会话
+  open func topActionHandler(indexPath: IndexPath, isTop: Bool) {
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       showToast(commonLocalizable("network_error"))
       return
     }
-    var conversationModel: NEConversationListModel?
-    if indexPath.section == 0 {
-      conversationModel = viewModel.stickTopConversations[indexPath.row]
-    } else {
-      conversationModel = viewModel.conversationListData[indexPath.row]
-    }
+    let conversationModel = viewModel.conversationListData[indexPath.row]
 
     if let stickTopButtonClick = ConversationUIConfig.shared.stickTopButtonClick {
       stickTopButtonClick(self, conversationModel, indexPath)
       return
     }
 
-    if let conversation = conversationModel?.conversation {
+    if let conversation = conversationModel.conversation {
       onTopRecentAtIndexPath(conversation: conversation,
                              indexPath: indexPath,
                              isTop: isTop) { [weak self] error in
         if let err = error {
-          self?.view.ne_makeToast(err.localizedDescription)
+          self?.showToast(err.localizedDescription)
         } else {
           if isTop {
             self?.didRemoveStickTopSession(
-              model: conversationModel ?? NEConversationListModel(),
+              model: conversationModel,
               indexPath: indexPath
             )
           } else {
             self?.didAddStickTopSession(
-              model: conversationModel ?? NEConversationListModel(),
+              model: conversationModel,
               indexPath: indexPath
             )
           }
         }
       }
-    }
-  }
-
-  /// 非置顶变为置顶
-  ///  - Parameter conversation: 会话
-  open func moveNormalConversationToTop(conversation: V2NIMConversation) {
-    var addModel: NEConversationListModel?
-    viewModel.conversationListData.removeAll(where: { model in
-      if model.conversation?.conversationId == conversation.conversationId {
-        addModel = model
-        return true
-      }
-      return false
-    })
-    if let model = addModel {
-      viewModel.stickTopConversations.append(model)
-    }
-  }
-
-  /// 置顶变为非置顶
-  ///  - Parameter conversation: 会话
-  open func moveTopToNormalConversation(conversation: V2NIMConversation) {
-    var addModel: NEConversationListModel?
-    viewModel.stickTopConversations.removeAll(where: { model in
-      if model.conversation?.conversationId == conversation.conversationId {
-        addModel = model
-        return true
-      }
-      return false
-    })
-    if let model = addModel {
-      viewModel.conversationListData.append(model)
     }
   }
 
@@ -951,13 +912,17 @@ extension NEBaseConversationController {
     if conversation.type == .CONVERSATION_TYPE_P2P {
       Router.shared.use(
         PushP2pChatVCRouter,
-        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
+        parameters: ["nav": navigationController as Any,
+                     "conversationId": conversationId as Any,
+                     "animated": false],
         closure: nil
       )
     } else if conversation.type == .CONVERSATION_TYPE_TEAM {
       Router.shared.use(
         PushTeamChatVCRouter,
-        parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
+        parameters: ["nav": navigationController as Any,
+                     "conversationId": conversationId as Any,
+                     "animated": false],
         closure: nil
       )
     }
@@ -986,15 +951,8 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
     delegate?.onDataLoaded()
   }
 
-  /// 带排序的刷新
   open func reloadTableView() {
-    if viewModel.stickTopConversations.count <= 0, viewModel.conversationListData.count <= 0 {
-      emptyView.isHidden = false
-    } else {
-      emptyView.isHidden = true
-    }
-    viewModel.conversationListData.sort()
-    viewModel.stickTopConversations.sort()
+    emptyView.isHidden = !viewModel.conversationListData.isEmpty
     tableView.reloadData()
   }
 
@@ -1031,7 +989,7 @@ extension NEBaseConversationController: NEIMKitClientListener {
 
     if status == .CONNECT_STATUS_CONNECTED, networkBroken {
       networkBroken = false
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
+      DispatchQueue.global().asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
         self?.subscribeVisibleRows()
       }))
     }

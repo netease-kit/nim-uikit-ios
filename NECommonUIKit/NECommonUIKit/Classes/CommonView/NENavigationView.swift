@@ -72,7 +72,7 @@ open class NENavigationView: UIView {
     NSLayoutConstraint.activate([
       navTitle.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -bottomMargin),
       navTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      navTitle.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth - leftMargin * 4 - max(backButtonWidthAnchor?.constant ?? 34, moreButtonWidthAnchor?.constant ?? 34) * 2),
+      navTitle.widthAnchor.constraint(lessThanOrEqualToConstant: NEConstant.screenWidth - leftMargin * 4 - max(backButtonWidthAnchor?.constant ?? 34, moreButtonWidthAnchor?.constant ?? 34) * 2),
     ])
 
     return view
@@ -95,7 +95,7 @@ open class NENavigationView: UIView {
     super.init(coder: coder)
   }
 
-  func setupUI() {
+  open func setupUI() {
     addSubview(titleBarView)
     addSubview(titleBarBottomLine)
     backgroundColor = .clear

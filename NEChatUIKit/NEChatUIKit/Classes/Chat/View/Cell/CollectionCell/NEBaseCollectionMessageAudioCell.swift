@@ -5,8 +5,7 @@
 import UIKit
 
 @objcMembers
-open
-class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
+open class NEBaseCollectionMessageAudioCell: NEBaseCollectionMessageCell {
   public lazy var audioImageView: UIImageView = {
     var audioImageView = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
     audioImageView.translatesAutoresizingMaskIntoConstraints = false

@@ -43,11 +43,15 @@ open class NEUserHeaderView: UIImageView {
   open func configHeadData(headUrl: String?, name: String, uid: String) {
     if let avatar = headUrl, !avatar.isEmpty {
       setTitle("")
-      sd_setImage(with: URL(string: avatar), completed: nil)
+      DispatchQueue.main.async { [weak self] in
+        self?.sd_setImage(with: URL(string: avatar), completed: nil)
+      }
       backgroundColor = .clear
     } else {
-      setTitle(name.count > 0 ? name : uid)
-      sd_setImage(with: nil, completed: nil)
+      setTitle(name.isEmpty ? uid : name)
+      DispatchQueue.main.async { [weak self] in
+        self?.sd_setImage(with: nil, completed: nil)
+      }
       backgroundColor = UIColor.colorWithString(string: uid)
     }
   }

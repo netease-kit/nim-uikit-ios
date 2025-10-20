@@ -118,7 +118,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
         }
         return false
       }
-      if allCacheMembers.count > 0 {
+      if !allCacheMembers.isEmpty {
         return allCacheMembers
       }
     }
@@ -257,7 +257,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
       cacheDic[member.accountId] = model
       allMembmers.append(member)
     }
-    if allMembmers.count > 0 {
+    if !allMembmers.isEmpty {
       let accids = allMembmers.map(\.accountId)
       contactRepo.getUserWithFriend(accountIds: accids) { [weak self] users, error in
         users?.forEach { user in

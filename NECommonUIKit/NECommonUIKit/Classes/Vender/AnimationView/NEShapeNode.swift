@@ -48,7 +48,7 @@ final class NEShapeNode: NEAnimatorNode, NEPathNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat? = nil
+  var lastUpdateFrame: CGFloat?
 
   // MARK: Animator Node
 

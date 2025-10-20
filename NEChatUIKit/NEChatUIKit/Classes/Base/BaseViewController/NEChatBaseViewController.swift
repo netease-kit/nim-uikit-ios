@@ -19,7 +19,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   public var navigationViewHeightAnchor: NSLayoutConstraint?
 
   // 自定义导航栏
-  public let navigationView = NENavigationView()
+  open var navigationView = ChatNavigationView()
 
   override open var title: String? {
     get {

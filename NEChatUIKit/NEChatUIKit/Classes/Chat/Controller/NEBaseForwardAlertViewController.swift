@@ -258,9 +258,9 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
       contentLabel.topAnchor.constraint(equalTo: textBackView.topAnchor, constant: 7),
       contentLabel.bottomAnchor.constraint(equalTo: textBackView.bottomAnchor, constant: -7),
     ])
-    if sessionName.count > 0 {
+    if !sessionName.isEmpty {
       contentLabel.text = "[\(forwardType)]\(sessionName)\(chatLocalizable("session_record"))"
-    } else if senderName.count > 0 {
+    } else if !senderName.isEmpty {
       contentLabel.text = "[\(forwardType)]\(senderName)\(chatLocalizable("collection_message"))"
     }
 

@@ -13,30 +13,27 @@ open class NENavigationController: UINavigationController {
   }
 
   func setUpNavigation() {
-    if #available(iOS 13.0, *) {
-      let appearance = UINavigationBarAppearance()
-      appearance.backgroundImage = UIImage()
-      appearance.backgroundColor = .white
-      appearance.shadowColor = UIColor.ne_navLineColor
-      navigationBar.standardAppearance = appearance
-      navigationBar.scrollEdgeAppearance = appearance
-    }
+    let appearance = UINavigationBarAppearance()
+    appearance.backgroundImage = UIImage()
+    appearance.backgroundColor = .white
+    appearance.shadowColor = UIColor.ne_navLineColor
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
   }
 
   override open func pushViewController(_ viewController: UIViewController, animated: Bool) {
-    if children.count > 0 {
+    if !children.isEmpty {
       viewController.hidesBottomBarWhenPushed = true
-      if children.count > 1 {
-        viewController.hidesBottomBarWhenPushed = false
-      }
     }
-    super.pushViewController(viewController, animated: true)
+
+    super.pushViewController(viewController, animated: animated)
   }
 
   override open func popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
-    if children.count > 0 {
+    if !children.isEmpty {
       viewController.hidesBottomBarWhenPushed = true
     }
+
     return super.popToViewController(viewController, animated: animated)
   }
 }

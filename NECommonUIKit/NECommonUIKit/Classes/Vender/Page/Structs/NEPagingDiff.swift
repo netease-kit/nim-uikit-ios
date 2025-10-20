@@ -11,7 +11,7 @@ struct NEPagingDiff {
   private var toCache: [Int: NEPagingItem]
   private var lastMatchingItem: NEPagingItem?
 
-  public init(from: NEPagingItems, to: NEPagingItems) {
+  init(from: NEPagingItems, to: NEPagingItems) {
     self.from = from
     self.to = to
     fromCache = [:]

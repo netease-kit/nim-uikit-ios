@@ -148,7 +148,7 @@ struct NECompoundBezierPath {
       if trim.end <= pathEndPosition {
         /// We are done with the current trim.
         /// Advance trim but remain on the same path in case the next trim overlaps it.
-        if positions.count > 0 {
+        if !positions.isEmpty {
           trim = positions.remove(at: 0)
         } else {
           finishedTrimming = true

@@ -29,12 +29,12 @@ open class NEFusionContactCellModel: NSObject {
   /// 获取显示名称
   open func getShowName() -> String {
     if let name = user?.showName() {
-      if name.count > 0 {
+      if !name.isEmpty {
         return name
       }
       return user?.user?.accountId ?? ""
     } else if let name = aiUser?.name {
-      if name.count > 0 {
+      if !name.isEmpty {
         return name
       }
       return aiUser?.accountId ?? ""
