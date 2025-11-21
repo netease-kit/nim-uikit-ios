@@ -121,13 +121,15 @@ open class MessageContentModel: NSObject, MessageModel {
 
   public required init(message: V2NIMMessage?) {
     self.message = message
+    messageTextFont = UIFont.systemFont(ofSize: message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextSize : ChatUIConfig.shared.messageProperties.receiveMessageTextSize)
+    messageTextColor = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextColor : ChatUIConfig.shared.messageProperties.receiveMessageTextColor
+
     if message?.conversationType == .CONVERSATION_TYPE_TEAM,
        let senderId = ChatMessageHelper.getSenderId(message),
        !IMKitClient.instance.isMe(senderId) {
       fullNameHeight = ChatUIConfig.shared.messageProperties.showTeamMessageNick ? 20 : 0
     }
+
     height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height
-    messageTextFont = UIFont.systemFont(ofSize: message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextSize : ChatUIConfig.shared.messageProperties.receiveMessageTextSize)
-    messageTextColor = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextColor : ChatUIConfig.shared.messageProperties.receiveMessageTextColor
   }
 }

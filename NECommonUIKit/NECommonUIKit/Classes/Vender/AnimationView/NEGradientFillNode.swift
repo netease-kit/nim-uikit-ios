@@ -65,7 +65,7 @@ final class NEGradientFillNode: NEAnimatorNode, NERenderNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat?
+  var lastUpdateFrame: CGFloat? = nil
 
   var renderer: NENodeOutput & NERenderable {
     fillRender

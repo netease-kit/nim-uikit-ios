@@ -46,7 +46,7 @@ final class NERoundedCornersNode: NEAnimatorNode {
   let outputNode: NENodeOutput
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat?
+  var lastUpdateFrame: CGFloat? = nil
   var isEnabled = true
 
   // MARK: Animator Node

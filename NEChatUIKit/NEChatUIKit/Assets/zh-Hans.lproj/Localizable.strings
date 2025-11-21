@@ -328,3 +328,15 @@
 "filter_mono" = "单色";
 "filter_noir" = "暗黑"; 
 "filter_tonal" = "调性";
+
+"failed_message_reson" = "内容可能涉及%@, 请调整后发送";
+"failed_message_reson_ornography" = "色情";
+"failed_message_reson_advertising" = "广告";
+"failed_message_reson_advertising_law" = "广告法";
+"failed_message_reson_violence_and_terrorism" = "暴恐";
+"failed_message_reson_prohibited" = "违禁";
+"failed_message_reson_political_related" = "涉政";
+"failed_message_reson_abuse" = "谩骂";
+"failed_message_reson_waterlogging" = "灌水";
+"failed_message_reson_others" = "其他";
+"failed_message_reson_value_related" = "涉价值观";

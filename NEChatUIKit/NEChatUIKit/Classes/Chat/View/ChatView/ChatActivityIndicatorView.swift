@@ -10,6 +10,7 @@ public enum ChatSendMessageStatus: Int {
   case successed = 0
   case sending
   case failed
+  case sendingFailed // 因反垃圾导致的发送失败
 }
 
 @objcMembers
@@ -30,6 +31,14 @@ open class ChatActivityIndicatorView: UIView {
         isHidden = false
         activityView.isHidden = true
         failButton.isHidden = false
+        failButton.isEnabled = true
+        failButton.tintColor = UIColor(hexString: "#FB5A6A")
+      case .sendingFailed:
+        isHidden = false
+        activityView.isHidden = true
+        failButton.isHidden = false
+        failButton.isEnabled = false
+        failButton.tintColor = .gray
       case .successed:
         isHidden = true
       default:
@@ -42,7 +51,9 @@ open class ChatActivityIndicatorView: UIView {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.contentMode = .scaleAspectFit
-    button.setImage(UIImage.ne_imageNamed(name: "sendMessage_failed"), for: .normal)
+    let originalImage = UIImage.ne_imageNamed(name: "sendMessage_failed")
+    let templateImage = originalImage?.withRenderingMode(.alwaysTemplate)
+    button.setImage(templateImage, for: .normal)
     button.accessibilityIdentifier = "id.sendMessageFailed"
     return button
   }()

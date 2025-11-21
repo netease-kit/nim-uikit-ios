@@ -254,7 +254,7 @@ class NETextAnimatorNode: NEAnimatorNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat?
+  var lastUpdateFrame: CGFloat? = nil
   var isEnabled = true
 
   var outputNode: NENodeOutput {

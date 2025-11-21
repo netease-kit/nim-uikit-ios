@@ -149,7 +149,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     timeLabel.textColor = ChatUIConfig.shared.messageProperties.timeTextColor
     timeLabel.textAlignment = .center
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
-    timeLabel.accessibilityIdentifier = "id.messageTipText"
+    timeLabel.accessibilityIdentifier = "id.messageTimeText"
     timeLabel.backgroundColor = .clear
 
     // avatar
@@ -492,43 +492,25 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
     }
     fullNameH?.constant = CGFloat(model.fullNameHeight)
 
-    if isSend {
-      switch model.message?.sendingState {
-      case .MESSAGE_SENDING_STATE_SENDING:
-        activityView.messageStatus = .sending
-      case .MESSAGE_SENDING_STATE_SUCCEEDED:
-        activityView.messageStatus = .successed
-      case .MESSAGE_SENDING_STATE_FAILED:
-        activityView.messageStatus = .failed
-      default:
-        activityView.messageStatus = .sending
-      }
-    } else {
-      activityView.messageStatus = .successed
-    }
-
     if isSend, model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED {
       if model.message?.conversationType == .CONVERSATION_TYPE_P2P {
         // 话单消息不显示已读未读
-        if model.type == .rtcCallRecord {
-          readView.isHidden = true
-        } else {
-          let receiptEnable = model.message?.messageConfig?.readReceiptEnabled ?? false
-          if receiptEnable,
-             !model.isRevoked,
-             SettingRepo.shared.getShowReadStatus(),
-             ChatUIConfig.shared.messageProperties.showP2pMessageStatus == true {
-            readView.isHidden = false
-            if model.readCount == 1, model.unreadCount == 0 {
-              readView.progress = 1
-            } else {
-              readView.progress = 0
-            }
+        let receiptEnable = model.type != .rtcCallRecord
+        if receiptEnable,
+           !model.isRevoked,
+           SettingRepo.shared.getShowReadStatus(),
+           ChatUIConfig.shared.messageProperties.showP2pMessageStatus == true {
+          readView.isHidden = false
+          if model.readCount == 1, model.unreadCount == 0 {
+            readView.progress = 1
           } else {
-            readView.isHidden = true
+            readView.progress = 0
           }
+        } else {
+          readView.isHidden = true
         }
       } else if model.message?.conversationType == .CONVERSATION_TYPE_TEAM {
+        // readReceiptEnabled 配置只对群聊消息有效
         let receiptEnable = model.message?.messageConfig?.readReceiptEnabled ?? false
         if receiptEnable,
            !model.isRevoked,
@@ -558,6 +540,26 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       }
     } else {
       readView.isHidden = true
+    }
+
+    if isSend {
+      switch model.message?.sendingState {
+      case .MESSAGE_SENDING_STATE_SENDING:
+        activityView.messageStatus = .sending
+      case .MESSAGE_SENDING_STATE_SUCCEEDED:
+        if model.message?.messageStatus.errorCode != operationSuccess {
+          activityView.messageStatus = .sendingFailed
+          readView.isHidden = true
+        } else {
+          activityView.messageStatus = .successed
+        }
+      case .MESSAGE_SENDING_STATE_FAILED:
+        activityView.messageStatus = .failed
+      default:
+        activityView.messageStatus = .sending
+      }
+    } else {
+      activityView.messageStatus = .successed
     }
 
     delegate?.messageWillShow?(self, model)

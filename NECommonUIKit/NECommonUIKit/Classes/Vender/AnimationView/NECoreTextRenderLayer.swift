@@ -21,7 +21,7 @@ import QuartzCore
 final class NECoreTextRenderLayer: CALayer {
   // MARK: Public
 
-  var text: String? {
+  public var text: String? {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -29,7 +29,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var font: CTFont? {
+  public var font: CTFont? {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -37,7 +37,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var alignment: NSTextAlignment = .left {
+  public var alignment: NSTextAlignment = .left {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -45,7 +45,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var lineHeight: CGFloat = 0 {
+  public var lineHeight: CGFloat = 0 {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -53,7 +53,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var tracking: CGFloat = 0 {
+  public var tracking: CGFloat = 0 {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -61,7 +61,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var fillColor: CGColor? {
+  public var fillColor: CGColor? {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -69,7 +69,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var strokeColor: CGColor? {
+  public var strokeColor: CGColor? {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -77,7 +77,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var strokeWidth: CGFloat = 0 {
+  public var strokeWidth: CGFloat = 0 {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -85,14 +85,14 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  var strokeOnTop = false {
+  public var strokeOnTop = false {
     didSet {
       setNeedsLayout()
       setNeedsDisplay()
     }
   }
 
-  var preferredSize: CGSize? {
+  public var preferredSize: CGSize? {
     didSet {
       needsContentUpdate = true
       setNeedsLayout()
@@ -100,7 +100,7 @@ final class NECoreTextRenderLayer: CALayer {
     }
   }
 
-  func sizeToFit() {
+  public func sizeToFit() {
     updateTextContent()
     bounds = drawingRect
     anchorPoint = drawingAnchor
