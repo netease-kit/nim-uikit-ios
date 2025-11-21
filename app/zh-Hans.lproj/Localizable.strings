@@ -80,3 +80,5 @@
 "login_token_expired"="登录信息失效，请重新登录。";
 "account_forbidden"="用户已被封禁";
 "account_kicked_offline"="您已被踢下线";
+
+"click_to_report"="点击举报";

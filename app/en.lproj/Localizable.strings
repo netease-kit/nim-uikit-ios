@@ -81,3 +81,5 @@
 "login_token_expired"="Session expired. Please login again.";
 "account_forbidden"="User Banned";
 "account_kicked_offline"="Your session was revoked";
+
+"click_to_report"="Click Report";

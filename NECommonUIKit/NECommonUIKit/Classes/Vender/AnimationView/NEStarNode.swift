@@ -80,7 +80,7 @@ final class NEStarNode: NEAnimatorNode, NEPathNode {
   let parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat?
+  var lastUpdateFrame: CGFloat? = nil
 
   // MARK: Animator Node
 

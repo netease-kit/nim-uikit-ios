@@ -89,7 +89,7 @@ public class NEPagingContentViewController: UIViewController {
     private var oneTimeHandler: (() -> Void)?
     private(set) var isPaging: Bool
 
-    init(oneTimeHandler: (() -> Void)?) {
+    public init(oneTimeHandler: (() -> Void)?) {
       self.oneTimeHandler = oneTimeHandler
       isPaging = false
     }
@@ -218,11 +218,14 @@ public class NEPagingContentViewController: UIViewController {
     let offsetX = scrollView.bounds.width * CGFloat(page)
     if animated {
       stopScrolling()
-      UIView.pk.performSystemAnimation { [weak self] in
-        self?.scrollView.contentOffset = CGPoint(x: offsetX, y: 0)
-      } completion: { finished in
-        completion(finished)
-      }
+      UIView.pk.performSystemAnimation(
+        { [weak self] in
+          self?.scrollView.contentOffset = CGPoint(x: offsetX, y: 0)
+        },
+        completion: { finished in
+          completion(finished)
+        }
+      )
     } else {
       UIView.pk.catchLayoutCompletion(
         layout: { [weak self] in

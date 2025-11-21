@@ -93,7 +93,7 @@ class NELayerTransformNode: NEAnimatorNode {
   var parentNode: NEAnimatorNode?
   var hasLocalUpdates = false
   var hasUpstreamUpdates = false
-  var lastUpdateFrame: CGFloat?
+  var lastUpdateFrame: CGFloat? = nil
   var isEnabled = true
 
   var opacity: Float = 1

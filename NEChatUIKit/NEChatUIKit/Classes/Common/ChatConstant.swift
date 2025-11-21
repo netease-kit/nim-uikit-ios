@@ -82,6 +82,20 @@ public let file_pdf_support: [String] = ["pdf", "rtf"]
 // 支持的超链接格式
 public let file_html_support: [String] = ["html"]
 
+// [反垃圾错误码: 描述]
+public let antispamResultCodeDic = [
+  100: chatLocalizable("failed_message_reson_ornography"),
+  200: chatLocalizable("failed_message_reson_advertising"),
+  260: chatLocalizable("failed_message_reson_advertising_law"),
+  300: chatLocalizable("failed_message_reson_violence_and_terrorism"),
+  400: chatLocalizable("failed_message_reson_prohibited"),
+  500: chatLocalizable("failed_message_reson_political_related"),
+  600: chatLocalizable("failed_message_reson_abuse"),
+  700: chatLocalizable("failed_message_reson_waterlogging"),
+  900: chatLocalizable("failed_message_reson_others"),
+  1000: chatLocalizable("failed_message_reson_value_related"),
+]
+
 /// 屏幕间隔
 public let kScreenInterval: CGFloat = 20
 public let NEMoreView_Section_Padding: CGFloat = 24.0

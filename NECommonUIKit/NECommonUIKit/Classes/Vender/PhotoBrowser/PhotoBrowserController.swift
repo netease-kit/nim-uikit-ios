@@ -109,12 +109,12 @@ extension PhotoBrowserController: BrowserToolsBarDelegate {
     if !showView.urlArray.isEmpty {
       let urlString = showView.urlArray[index]
       if let url = URL(string: urlString) {
-        PHPhotoLibrary.shared().performChanges {
+        PHPhotoLibrary.shared().performChanges({
           if let data = try? Data(contentsOf: url) {
             let creationRequest = PHAssetCreationRequest.forAsset()
             creationRequest.addResource(with: .photo, data: data, options: nil)
           }
-        } completionHandler: { success, error in
+        }, completionHandler: { success, error in
           DispatchQueue.main.async {
             weakSelf?.view.hideToastActivity()
             if let err = error {
@@ -125,7 +125,7 @@ extension PhotoBrowserController: BrowserToolsBarDelegate {
               }
             }
           }
-        }
+        })
       } else {
         view.hideToastActivity()
       }

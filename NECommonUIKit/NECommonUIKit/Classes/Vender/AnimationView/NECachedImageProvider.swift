@@ -14,13 +14,13 @@ private final class NECachedImageProvider: NEAnimationImageProvider {
   ///
   /// - Parameter imageProvider: The provider to load image from asset
   ///
-  init(imageProvider: NEAnimationImageProvider) {
+  public init(imageProvider: NEAnimationImageProvider) {
     self.imageProvider = imageProvider
   }
 
   // MARK: Public
 
-  func imageForAsset(asset: NEImageAsset) -> CGImage? {
+  public func imageForAsset(asset: NEImageAsset) -> CGImage? {
     if let image = imageCache.value(forKey: asset.id) {
       return image
     }

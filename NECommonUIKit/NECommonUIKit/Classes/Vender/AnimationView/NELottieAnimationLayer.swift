@@ -1004,7 +1004,7 @@ public class NELottieAnimationLayer: CALayer {
 
   // MARK: Internal
 
-  var rootAnimationLayer: NERootAnimationLayer?
+  var rootAnimationLayer: NERootAnimationLayer? = nil
 
   /// Context describing the animation that is currently playing in this `NELottieAnimationView`
   ///  - When non-nil, an animation is currently playing in this layer. Otherwise,

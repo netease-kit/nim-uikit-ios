@@ -54,7 +54,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
   public lazy var resultLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = UIColor(hexString: "B3B7BC")
+    label.textColor = .ne_emptyTitleColor
     label.font = UIFont.systemFont(ofSize: 14.0)
     label.textAlignment = .right
     label.accessibilityIdentifier = "id.verifyResult"

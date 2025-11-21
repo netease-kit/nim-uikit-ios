@@ -60,7 +60,7 @@ class NEAnimationCompletionDelegate: NSObject, CAAnimationDelegate {
 
   // MARK: Public
 
-  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+  public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     guard ignoreDelegate == false else { return }
     animationState = flag ? .complete : .cancelled
     if let animationLayer, let key = animationKey {

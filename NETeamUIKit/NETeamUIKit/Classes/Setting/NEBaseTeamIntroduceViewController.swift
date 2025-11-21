@@ -42,7 +42,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   public lazy var countLabel: UILabel = {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
-    label.textColor = NEConstant.hexRGB(0xB3B7BC)
+    label.textColor = .ne_emptyTitleColor
     label.font = NEConstant.defaultTextFont(12.0)
     label.accessibilityIdentifier = "id.flag"
     return label

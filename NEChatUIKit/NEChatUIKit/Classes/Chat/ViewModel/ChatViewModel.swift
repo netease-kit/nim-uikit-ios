@@ -657,8 +657,26 @@ open class ChatViewModel: NSObject {
 
     chatRepo.sendMessage(message: message,
                          conversationId: conversationId ?? ChatRepo.conversationId,
-                         params: params) { result, error, pro in
+                         params: params) { [weak self] result, error, pro in
+      if IMKitConfigCenter.shared.enableAntiSpamTipMessage {
+        self?.checkAntiSpam(result: result)
+      }
       completion(result?.message ?? message, error, pro)
+    }
+  }
+
+  open func checkAntiSpam(result: V2NIMSendMessageResult?) {
+    if let antispamResult = result?.antispamResult {
+      let pattern = "\\\\*\"label\\\\*\"\\s*:\\s*(\\d+)"
+      if let errorCode = NECommonUtil.extractLabelsWithRegex(from: antispamResult, pattern).first,
+         let errorCode = Int(errorCode),
+         let tipText = antispamResultCodeDic[errorCode] {
+        if let createTime = result?.message?.createTime {
+          insertTipMessage(String(format: chatLocalizable("failed_message_reson"), tipText), createTime + 1)
+        } else {
+          insertTipMessage(String(format: chatLocalizable("failed_message_reson"), tipText))
+        }
+      }
     }
   }
 
@@ -1106,6 +1124,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter conversationId: 会话 id
   /// - Parameter senderId: 发送者 id
   open func insertTipMessage(_ text: String,
+                             _ createTime: TimeInterval? = nil,
                              _ conversationId: String? = nil,
                              _ senderId: String? = nil) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
@@ -1114,7 +1133,8 @@ open class ChatViewModel: NSObject {
     let tip = MessageUtils.tipMessage(text: text)
     chatRepo.insertMessageToLocal(message: tip,
                                   conversationId: cid,
-                                  senderId: senderId) { [weak self] _, error in
+                                  senderId: senderId,
+                                  createTime: createTime) { [weak self] _, error in
       // 当前聊天页面插入的提示消息
       if cid == ChatRepo.conversationId {
         self?.modelFromMessage(message: tip) { model in
@@ -1503,7 +1523,9 @@ open class ChatViewModel: NSObject {
     }
 
     // 根据配置项移除 【标记】
-    if IMKitConfigCenter.shared.enablePinMessage == false {
+    // 反垃圾命中的消息不能【标记】
+    if IMKitConfigCenter.shared.enablePinMessage == false ||
+      model?.message?.messageStatus.errorCode != operationSuccess {
       items.removeAll { item in
         item.type == .pin || item.type == .removePin
       }
@@ -1511,7 +1533,8 @@ open class ChatViewModel: NSObject {
 
     // 根据配置项移除 【置顶】
     // 单聊移除【置顶】
-    if IMKitConfigCenter.shared.enableTopMessage == false || model?.message?.conversationType == .CONVERSATION_TYPE_P2P {
+    if IMKitConfigCenter.shared.enableTopMessage == false ||
+      model?.message?.conversationType == .CONVERSATION_TYPE_P2P {
       items.removeAll { item in
         item.type == .top || item.type == .untop
       }
@@ -2343,7 +2366,7 @@ open class ChatViewModel: NSObject {
           }
 
           DispatchQueue.main.async { [weak self] in
-            self?.insertTipMessage(chatLocalizable("black_list_tip"), conversationId)
+            self?.insertTipMessage(chatLocalizable("black_list_tip"), message.createTime + 1, conversationId)
             if conversationId == ChatRepo.conversationId {
               self?.sendMsgSuccess(message)
             }

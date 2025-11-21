@@ -483,6 +483,24 @@ public class CustomConfig {
       ])
       viewController.bodyTopViewHeight = NEStyleManager.instance.isNormalStyle() ? 56 : 60 + 56
     }
+
+    // 聊天页面
+    ChatUIConfig.shared.customController = { [weak self] viewController in
+      guard let self = self else {
+        return
+      }
+      self.p2pSecurityWarningView.delegate = viewController
+
+      // 顶部bodyTopView中添加自定义view（需要设置bodyTopView的高度）
+      viewController.bodyTopView.addSubview(self.p2pSecurityWarningView)
+      NSLayoutConstraint.activate([
+        self.p2pSecurityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: 0),
+        self.p2pSecurityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
+        self.p2pSecurityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
+        self.p2pSecurityWarningView.heightAnchor.constraint(equalToConstant: 56),
+      ])
+      viewController.bodyTopViewHeight = 56
+    }
   }
 
   @objc func customClick(_ button: UIButton) {
@@ -508,4 +526,16 @@ public class CustomConfig {
     view.translatesAutoresizingMaskIntoConstraints = false
     return view
   }()
+
+  public lazy var p2pSecurityWarningView: NEP2PSecurityWarningView = {
+    let view = NEP2PSecurityWarningView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    return view
+  }()
+}
+
+extension ChatViewController: NEP2PSecurityWarningViewDelegate {
+  public func didClickRemoveButton() {
+    bodyTopViewHeight = 0
+  }
 }

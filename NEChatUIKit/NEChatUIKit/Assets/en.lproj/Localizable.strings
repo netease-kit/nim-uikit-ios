@@ -331,3 +331,15 @@
 "filter_mono" = "Mono";
 "filter_noir" = "Noir"; 
 "filter_tonal" = "Tonal";
+
+"failed_message_reson" = "The content may involve %@. Please adjust and send.";
+"failed_message_reson_ornography" = "Pornography";
+"failed_message_reson_advertising" = "Advertising";
+"failed_message_reson_advertising_law" = "Advertising Law";
+"failed_message_reson_violence_and_terrorism" = "Violence and terrorism";
+"failed_message_reson_prohibited" = "Prohibited";
+"failed_message_reson_political_related" = "Political-related";
+"failed_message_reson_abuse" = "Abuse";
+"failed_message_reson_waterlogging" = "waterlogging";
+"failed_message_reson_others" = "Others";
+"failed_message_reson_value_related" = "value-related";

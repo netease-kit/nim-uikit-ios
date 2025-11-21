@@ -29,7 +29,7 @@ public class ChatUIConfig: NSObject {
   /// 文本输入框下方 tab 按钮定制
   public var chatInputBar: ((ChatViewController?, inout [UIButton]) -> Void)?
 
-  /// 【相册】 按钮点击事件，可自定义图片选择器，参数为聊天页面视图控制器、选择类型、数量限制，返回选中的图片/视频以及是否是原图
+  /// 【相册】 按钮点击事件，可自定义图片选择器，参数为当前页面视图控制器、选择类型、数量限制，返回选中的图片/视频以及是否是原图
   public var chatInputPhotoClick: ((UIViewController, NEMediaType, Int, @escaping ([NEResultModel], Bool) -> Void) -> Void)?
 
   /// 【更多】区域功能列表

@@ -319,7 +319,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     label.translatesAutoresizingMaskIntoConstraints = false
     label.text = localizable("recent_forward")
     label.font = .systemFont(ofSize: 12)
-    label.textColor = UIColor(hexString: "#B3B7BC")
+    label.textColor = .ne_emptyTitleColor
     return label
   }()
 

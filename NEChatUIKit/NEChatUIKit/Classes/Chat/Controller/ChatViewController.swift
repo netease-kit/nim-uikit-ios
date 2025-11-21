@@ -2284,9 +2284,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         if let toast = defaultToast {
           showToast(toast)
         } else {
-          showToast(err.localizedDescription)
+          NEALog.errorLog(ModuleName + className(), desc: "\(#function) failed, error: \(err.localizedDescription)")
         }
-        print(err.localizedDescription)
       }
     }
   }

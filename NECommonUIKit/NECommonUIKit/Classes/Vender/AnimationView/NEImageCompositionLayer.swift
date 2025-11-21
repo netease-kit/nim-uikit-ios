@@ -32,7 +32,7 @@ final class NEImageCompositionLayer: NECompositionLayer {
 
   let imageReferenceID: String
 
-  var image: CGImage? {
+  var image: CGImage? = nil {
     didSet {
       if let image {
         contentsLayer.contents = image

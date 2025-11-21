@@ -179,6 +179,15 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     }
     model.cellModels.append(sendRichTextMessageModel)
 
+    let failedMessageTipModel = SettingCellModel()
+    failedMessageTipModel.cellName = "文本安全提示"
+    failedMessageTipModel.type = SettingCellType.SettingSwitchCell.rawValue
+    failedMessageTipModel.switchOpen = IMKitConfigCenter.shared.enableAntiSpamTipMessage
+    failedMessageTipModel.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableAntiSpamTipMessage = isOpen
+    }
+    model.cellModels.append(failedMessageTipModel)
+
     recentForwardListMaxCountModel.cellName = "最近转发的会话 id 列表最大长度"
     recentForwardListMaxCountModel.type = SettingCellType.SettingSubtitleCell.rawValue
     recentForwardListMaxCountModel.customInputText = "\(IMKitConfigCenter.shared.recentForwardListMaxCount)"
