@@ -6,7 +6,7 @@ module YXConfig
   end
 
   def self.imuikit_version
-    "10.9.0"
+    "10.9.0-coexist"
   end
 
   def self.deployment_target

@@ -5,7 +5,7 @@
 
 import Foundation
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 public class IntroduceViewModel: NSObject {
@@ -21,7 +21,7 @@ public class IntroduceViewModel: NSObject {
 
     let imVersionItem = SettingCellModel()
     imVersionItem.cellName = localizable("im_version")
-    imVersionItem.subTitle = "\(NIMSDK.shared().sdkVersion())"
+    imVersionItem.subTitle = "\(NIMSDK2.sharedSDK().sdkVersion())"
     imVersionItem.type = SettingCellType.SettingSubtitleCell.rawValue
 
     let introduceItem = SettingCellModel()

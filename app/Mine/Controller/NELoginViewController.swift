@@ -4,8 +4,8 @@
 
 import NEChatUIKit
 import NECommonKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -157,14 +157,14 @@ public class NELoginViewController: UIViewController {
     print("login accid : ", account)
     print("login token : ", token)
     
-    let option = V2NIMLoginOption()
+    let option = V2NIM2LoginOption()
     option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
-    IMKitClient.instance.login(account, token, option) { error in
+    IMKit2Client.instance.login(account, token, option) { error in
         if let err = error {
-            NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
+            NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
             UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
         } else {
-            NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
+            NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
             if let block = weakSelf?.successLogin {
                 block()
             }

@@ -5,8 +5,8 @@
 import NEChatUIKit
 import NECommonKit
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -104,9 +104,9 @@ public class PocLoginViewController: NEBaseViewController {
     isLogining = true
 
     // 登录
-    let option = V2NIMLoginOption()
+    let option = V2NIM2LoginOption()
     option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
-    IMKitClient.instance.login(username, password, option) { [weak self] error in
+    IMKit2Client.instance.login(username, password, option) { [weak self] error in
       self?.isLogining = false
       if let error = error {
         // 收回键盘

@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NEContactUIKit
 import NEConversationUIKit
 import NELocalConversationUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class NETabBarController: UITabBarController {
@@ -39,7 +39,7 @@ class NETabBarController: UITabBarController {
     setUpSessionBadgeValue()
     setUpContactBadgeValue()
 
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       LocalConversationRepo.shared.addLocalConversationListener(self)
     } else {
       ConversationRepo.shared.addConversationListener(self)
@@ -56,7 +56,7 @@ class NETabBarController: UITabBarController {
   }
 
   deinit {
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       LocalConversationRepo.shared.removeLocalConversationListener(self)
     } else {
       LocalConversationRepo.shared.removeLocalConversationListener(self)
@@ -70,7 +70,7 @@ class NETabBarController: UITabBarController {
   func setUpControllers() {
     if NEStyleManager.instance.isNormalStyle() {
       // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
         chat = LocalConversationController()
         (chat as? LocalConversationController)?.viewModel.syncFinished = isChangeUIType
       } else {
@@ -126,7 +126,7 @@ class NETabBarController: UITabBarController {
       }
     } else {
       // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
         chat = FunLocalConversationController()
         (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
       } else {
@@ -187,7 +187,7 @@ class NETabBarController: UITabBarController {
   }
 
   func setUpSessionBadgeValue() {
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       sessionUnreadCount = LocalConversationRepo.shared.getTotalUnreadCount()
     } else {
       sessionUnreadCount = ConversationRepo.shared.getTotalUnreadCount()
@@ -204,7 +204,7 @@ class NETabBarController: UITabBarController {
   func setUpContactBadgeValue() {
     ContactRepo.shared.getUnreadApplicationCount { [weak self] count, error in
       if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
-        let option = V2NIMTeamJoinActionInfoQueryOption()
+        let option = V2NIM2TeamJoinActionInfoQueryOption()
         option.offset = 0
         option.limit = neTeamJoinActionPageLimit
         TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
@@ -254,11 +254,11 @@ class NETabBarController: UITabBarController {
 // MARK: - NEContactListener
 
 extension NETabBarController: NEContactListener {
-  func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+  func onFriendAddApplication(_ application: V2NIM2FriendAddApplication) {
     setUpContactBadgeValue()
   }
 
-  func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+  func onFriendAddRejected(_ rejectionInfo: V2NIM2FriendAddApplication) {
     setUpContactBadgeValue()
   }
 }
@@ -266,7 +266,7 @@ extension NETabBarController: NEContactListener {
 // MARK: - NETeamListener
 
 extension NETabBarController: NETeamListener {
-  func onReceive(_ joinActionInfo: V2NIMTeamJoinActionInfo) {
+  func onReceive(_ joinActionInfo: V2NIM2TeamJoinActionInfo) {
     setUpContactBadgeValue()
   }
 }
@@ -274,11 +274,11 @@ extension NETabBarController: NETeamListener {
 // MARK: - V2NIMConversationListener
 
 extension NETabBarController: NEConversationListener {
-  func onConversationChanged(_ conversations: [V2NIMConversation]) {
+  func onConversationChanged(_ conversations: [V2NIM2Conversation]) {
     refreshSessionBadge()
   }
 
-  func onConversationCreated(_ conversation: V2NIMConversation) {
+  func onConversationCreated(_ conversation: V2NIM2Conversation) {
     refreshSessionBadge()
   }
 
@@ -290,11 +290,11 @@ extension NETabBarController: NEConversationListener {
 // MARK: - NELocalConversationListener
 
 extension NETabBarController: NELocalConversationListener {
-  func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
+  func onLocalConversationChanged(_ conversations: [V2NIM2LocalConversation]) {
     refreshSessionBadge()
   }
 
-  func onLocalConversationCreated(_ conversation: V2NIMLocalConversation) {
+  func onLocalConversationCreated(_ conversation: V2NIM2LocalConversation) {
     refreshSessionBadge()
   }
 

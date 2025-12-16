@@ -5,7 +5,7 @@
 
 import Foundation
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 
 public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
@@ -105,7 +105,7 @@ public class MineSettingViewModel: NSObject {
     let cloudConversationModel = SettingCellModel()
     cloudConversationModel.cellName = localizable("cloud_conversation")
     cloudConversationModel.type = SettingCellType.SettingSwitchCell.rawValue
-    cloudConversationModel.switchOpen = (NIMSDK.shared().v2Option?.enableV2CloudConversation) ?? false
+    cloudConversationModel.switchOpen = (NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation) ?? false
     cloudConversationModel.swichChange = { isOpen in
       weakSelf?.delegate?.didChangeConversationType { cancel in
         if cancel {
