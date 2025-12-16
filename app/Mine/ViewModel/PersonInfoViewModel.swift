@@ -5,7 +5,7 @@
 
 import Foundation
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 
 protocol PersonInfoViewModelDelegate: AnyObject {
   func didClickHeadImage()
@@ -24,19 +24,19 @@ public class PersonInfoViewModel: NSObject {
 
   let contactRepo = ContactRepo.shared
 
-  var userInfo: NEUserWithFriend?
+  var userInfo: NE2UserWithFriend?
   weak var delegate: PersonInfoViewModelDelegate?
 
   func getData(_ completion: @escaping () -> Void) {
     sectionData.removeAll()
 
-    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account()) {
       userInfo = userFriend
       sectionData.append(getFirstSection())
       sectionData.append(getSecondSection())
       completion()
     } else {
-      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { [weak self] userFriend, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKit2Client.instance.account()]) { [weak self] userFriend, error in
         guard let self = self else { return }
         self.userInfo = userFriend?.first
         self.sectionData.append(self.getFirstSection())
@@ -185,7 +185,7 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter avatar: 头像地址
   /// - Parameter completion: 更新结果回调
   func updateSelfAvatar(_ avatar: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.avatar = avatar
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
@@ -195,8 +195,8 @@ public class PersonInfoViewModel: NSObject {
   /// 更新当前用户性别
   /// - Parameter gender: 用户性别
   /// - Parameter completion: 更新结果回调
-  func updateSelfSex(_ gender: V2NIMGender, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+  func updateSelfSex(_ gender: V2NIM2Gender, _ completion: @escaping (NSError?) -> Void) {
+    let parameter = V2NIM2UserUpdateParams()
     parameter.gender = gender
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
@@ -207,7 +207,7 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter birthDay: 生日
   /// - Parameter completion: 更新结果回调
   func updateSelfBirthday(_ birthDay: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.birthday = birthDay
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
@@ -218,12 +218,12 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter nickName: 昵称
   /// - Parameter completion: 更新结果回调
   func updateSelfNickName(_ nickName: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.name = nickName
 
     // 如果昵称为空(不设置昵称)，则使用账号作为昵称
     if nickName.isEmpty {
-      parameter.name = IMKitClient.instance.account()
+      parameter.name = IMKit2Client.instance.account()
     }
 
     contactRepo.updateSelfUserProfile(parameter) { error in
@@ -235,7 +235,7 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter mobile: 电话号码
   /// - Parameter completion: 更新结果回调
   func updateSelfMobile(_ mobile: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.mobile = mobile
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
@@ -246,7 +246,7 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter email: 邮箱
   /// - Parameter completion: 完成回调
   func updateSelfEmail(_ email: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.email = email
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)
@@ -257,7 +257,7 @@ public class PersonInfoViewModel: NSObject {
   /// - Parameter sign: 签名
   /// - Parameter completion: 完成回调
   func updateSelfSign(_ sign: String, _ completion: @escaping (NSError?) -> Void) {
-    let parameter = V2NIMUserUpdateParams()
+    let parameter = V2NIM2UserUpdateParams()
     parameter.sign = sign
     contactRepo.updateSelfUserProfile(parameter) { error in
       completion(error)

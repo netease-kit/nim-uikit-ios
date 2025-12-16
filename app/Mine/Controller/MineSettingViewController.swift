@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
@@ -130,13 +130,13 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     logoutButton.isEnabled = false
 
     showAlert(message: localizable("want_to_logout")) {
-      IMKitClient.instance.logoutIM { error in
+      IMKit2Client.instance.logoutIM { error in
         weakSelf?.logoutButton.isEnabled = true
         if error != nil {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
+          NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
           weakSelf?.view.makeToast(error?.localizedDescription)
         } else {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
+          NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
           NotificationCenter.default.post(
             name: Notification.Name("logout"),
             object: nil

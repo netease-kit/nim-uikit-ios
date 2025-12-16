@@ -5,7 +5,7 @@
 import NEChatUIKit
 import NECoreKit
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
@@ -105,7 +105,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let appKey = CustomSettingCellModel()
     appKey.cellName = "AppKey"
     appKey.type = SettingCellType.SettingSubtitleCell.rawValue
-    appKey.inputKey = #keyPath(NIMSDKOption.appKey)
+    appKey.inputKey = #keyPath(NIMSDK2Option.appKey)
     if let appKeyValue = configModel.configMap[appKey.inputKey] as? String {
       appKey.customInputText = appKeyValue
     }
@@ -114,7 +114,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let module = CustomSettingCellModel()
     module.cellName = "Module"
     module.type = SettingCellType.SettingSubtitleCell.rawValue
-    module.inputKey = #keyPath(NIMServerSetting.module)
+    module.inputKey = #keyPath(NIM2ServerSetting.module)
     if let moduleValue = configModel.configMap[module.inputKey] as? String {
       module.customInputText = moduleValue
     }
@@ -123,7 +123,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let linkModel = CustomSettingCellModel()
     linkModel.cellName = "服务器Link地址"
     linkModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    linkModel.inputKey = #keyPath(NIMServerSetting.linkAddress)
+    linkModel.inputKey = #keyPath(NIM2ServerSetting.linkAddress)
     if let linkValue = configModel.configMap[linkModel.inputKey] as? String {
       linkModel.customInputText = linkValue
     }
@@ -132,7 +132,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let lbsModel = CustomSettingCellModel()
     lbsModel.cellName = "LBS服务器地址"
     lbsModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    lbsModel.inputKey = #keyPath(NIMServerSetting.lbsAddress)
+    lbsModel.inputKey = #keyPath(NIM2ServerSetting.lbsAddress)
     if let lbsValue = configModel.configMap[lbsModel.inputKey] as? String {
       lbsModel.customInputText = lbsValue
     }
@@ -141,7 +141,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let nosToLBSModel = CustomSettingCellModel()
     nosToLBSModel.cellName = "NOS上传LBS服务器地址"
     nosToLBSModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    nosToLBSModel.inputKey = #keyPath(NIMServerSetting.nosLbsAddress)
+    nosToLBSModel.inputKey = #keyPath(NIM2ServerSetting.nosLbsAddress)
     if let nosLbsAddress = configModel.configMap[nosToLBSModel.inputKey] as? String {
       nosToLBSModel.customInputText = nosLbsAddress
     }
@@ -150,7 +150,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let nosToLBSLinkModel = CustomSettingCellModel()
     nosToLBSLinkModel.cellName = "NOS上传LBS服务器默认Link服务器地址"
     nosToLBSLinkModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    nosToLBSLinkModel.inputKey = #keyPath(NIMServerSetting.nosUploadAddress)
+    nosToLBSLinkModel.inputKey = #keyPath(NIM2ServerSetting.nosUploadAddress)
     if let nosUploadAddress = configModel.configMap[nosToLBSLinkModel.inputKey] as? String {
       nosToLBSLinkModel.customInputText = nosUploadAddress
     }
@@ -159,7 +159,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let nosSplicingModel = CustomSettingCellModel()
     nosSplicingModel.cellName = "NOS拼接下载地址"
     nosSplicingModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    nosSplicingModel.inputKey = #keyPath(NIMServerSetting.nosDownloadAddress)
+    nosSplicingModel.inputKey = #keyPath(NIM2ServerSetting.nosDownloadAddress)
     if let nosDownloadAddress = configModel.configMap[nosSplicingModel.inputKey] as? String {
       nosSplicingModel.customInputText = nosDownloadAddress
     }
@@ -168,7 +168,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     let nosUpladModel = CustomSettingCellModel()
     nosUpladModel.cellName = "NOS上传服务器主机地址"
     nosUpladModel.type = SettingCellType.SettingSubtitleCell.rawValue
-    nosUpladModel.inputKey = #keyPath(NIMServerSetting.nosUploadHost)
+    nosUpladModel.inputKey = #keyPath(NIM2ServerSetting.nosUploadHost)
     if let nosUploadHost = configModel.configMap[nosUpladModel.inputKey] as? String {
       nosUpladModel.customInputText = nosUploadHost
     }

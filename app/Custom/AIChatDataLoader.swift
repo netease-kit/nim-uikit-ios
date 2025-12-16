@@ -5,9 +5,9 @@
 
 import CommonCrypto
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 public class NECommonResult: NSObject {
@@ -19,12 +19,12 @@ public class NECommonResult: NSObject {
 
 @objcMembers
 open class AIChatDataLoader: NSObject {
-  public static var messages: [V2NIMMessage]?
-  public static var lastMessage: V2NIMMessage?
+  public static var messages: [V2NIM2Message]?
+  public static var lastMessage: V2NIM2Message?
   /// AI 助聊上下文条数
   public let aiChatContentsCount: Int = 5
 
-  public static func loadData(_ messages: [V2NIMMessage]?,
+  public static func loadData(_ messages: [V2NIM2Message]?,
                               _ completion: @escaping ([AIChatCellModel]?, Error?) -> Void) {
     if messages != nil {
       self.messages = messages
@@ -64,19 +64,19 @@ open class AIChatDataLoader: NSObject {
   }
 
   /// 取最后 N 条文本消息
-  open func getAIChatContents(_ messages: [V2NIMMessage]?) -> [V2NIMMessage]? {
+  open func getAIChatContents(_ messages: [V2NIM2Message]?) -> [V2NIM2Message]? {
     let textMessages = messages?.filter { $0.messageType == .MESSAGE_TYPE_TEXT && $0.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED }
     return textMessages?.suffix(aiChatContentsCount)
   }
 
   /// 取对方（非自己）发送的最后一条文本消息
-  public static func getLastTextMessage(_ messages: [V2NIMMessage]?) -> V2NIMMessage? {
+  public static func getLastTextMessage(_ messages: [V2NIM2Message]?) -> V2NIM2Message? {
     let textMessages = messages?.filter { $0.messageType == .MESSAGE_TYPE_TEXT && $0.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED && $0.isSelf == false }
     return textMessages?.last
   }
 
-  public static func getSquareData(_ messages: [V2NIMMessage]?,
-                                   _ lastMessage: V2NIMMessage?,
+  public static func getSquareData(_ messages: [V2NIM2Message]?,
+                                   _ lastMessage: V2NIM2Message?,
                                    _ completion: @escaping (Error?, NECommonResult?) -> Void) {
     let uri = "im/ai/chat_assistant/v1/chat_assist"
 
@@ -103,8 +103,8 @@ open class AIChatDataLoader: NSObject {
   }
 
   private static func getRequest(_ uri: String,
-                                 _ messages: [V2NIMMessage]?,
-                                 _ lastMessage: V2NIMMessage?) -> URLRequest? {
+                                 _ messages: [V2NIM2Message]?,
+                                 _ lastMessage: V2NIM2Message?) -> URLRequest? {
     let requestUrl = getHost() + uri
     guard let url = URL(string: requestUrl) else {
       return nil

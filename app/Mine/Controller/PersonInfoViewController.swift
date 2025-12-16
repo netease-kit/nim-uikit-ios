@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import NEChatUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -138,7 +138,7 @@ public class PersonInfoViewController: NEBaseViewController,
       if let t = time {
         self?.viewModel.updateSelfBirthday(t) { error in
           if let err = error {
-            if err.code == protocolSendFailed {
+            if err.code == protocolSendFailed2 {
               self?.showToast(commonLocalizable("network_error"))
             } else {
               self?.showToast(localizable("setting_birthday_failure"))
@@ -175,7 +175,7 @@ public class PersonInfoViewController: NEBaseViewController,
     view.makeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData?,
        var filePath = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
-      filePath += "\(IMKitClient.instance.account())_avatar.jpg"
+      filePath += "\(IMKit2Client.instance.account())_avatar.jpg"
       let succcess = imageData.write(toFile: filePath, atomically: true)
       if succcess {
         let fileTask = ResourceRepo.shared.createUploadFileTask(filePath)
@@ -187,7 +187,7 @@ public class PersonInfoViewController: NEBaseViewController,
               }
             }
           } else {
-            NEALog.errorLog(
+            NE2ALog.errorLog(
               weakSelf?.className ?? "",
               desc: "CALLBACK upload image failed,error = \(error!)"
             )
@@ -273,7 +273,7 @@ public class PersonInfoViewController: NEBaseViewController,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfNickName(editText) { [weak self] error in
         if let err = error {
-          if err.code == antiErrorCode {
+          if err.code == antiErrorCode2 {
             self?.showToastInWindow(localizable("anti_error"))
             return
           }
@@ -287,7 +287,7 @@ public class PersonInfoViewController: NEBaseViewController,
   }
 
   func didClickGender() {
-    var gender = V2NIMGender.GENDER_UNKNOWN
+    var gender = V2NIM2Gender.GENDER_UNKNOWN
     weak var weakSelf = self
     let block: ((_ value: NSInteger) -> Void) = {
       value in
@@ -295,11 +295,11 @@ public class PersonInfoViewController: NEBaseViewController,
 
       weakSelf?.viewModel.updateSelfSex(gender) { [weak self] error in
         if let err = error {
-          if err.code == antiErrorCode {
+          if err.code == antiErrorCode2 {
             self?.showToastInWindow(localizable("anti_error"))
             return
           }
-          if error?.code == protocolSendFailed {
+          if error?.code == protocolSendFailed2 {
             self?.showToast(commonLocalizable("network_error"))
           } else {
             self?.showToast(localizable("change_gender_failure"))
@@ -335,7 +335,7 @@ public class PersonInfoViewController: NEBaseViewController,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfMobile(editText) { [weak self] error in
         if let err = error {
-          if err.code == antiErrorCode {
+          if err.code == antiErrorCode2 {
             self?.showToastInWindow(localizable("anti_error"))
             return
           }
@@ -366,7 +366,7 @@ public class PersonInfoViewController: NEBaseViewController,
 
       weakSelf?.viewModel.updateSelfEmail(editText) { [weak self] error in
         if let err = error {
-          if err.code == antiErrorCode {
+          if err.code == antiErrorCode2 {
             self?.showToastInWindow(localizable("anti_error"))
             return
           }
@@ -387,7 +387,7 @@ public class PersonInfoViewController: NEBaseViewController,
     ctrl.callBack = { editText in
       weakSelf?.viewModel.updateSelfSign(editText) { [weak self] error in
         if let err = error {
-          if err.code == antiErrorCode {
+          if err.code == antiErrorCode2 {
             self?.showToastInWindow(localizable("anti_error"))
             return
           }
@@ -467,9 +467,9 @@ public class PersonInfoViewController: NEBaseViewController,
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     for contact in contacts {
-      if contact.user?.accountId == IMKitClient.instance.account() {
+      if contact.user?.accountId == IMKit2Client.instance.account() {
         viewModel.userInfo = contact
         viewModel.refreshData()
         tableView.reloadData()

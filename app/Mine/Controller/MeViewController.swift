@@ -3,12 +3,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class MeViewController: UIViewController, UIGestureRecognizerDelegate {
@@ -205,7 +205,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     ])
   }
 
-  func setupUserInfo(_ userFriend: NEUserWithFriend?) {
+  func setupUserInfo(_ userFriend: NE2UserWithFriend?) {
     idLabel.text = "\(localizable("account")):\(userFriend?.user?.accountId ?? "")"
     nameLabel.text = userFriend?.showName()
     header.configHeadData(headUrl: userFriend?.user?.avatar,
@@ -214,10 +214,10 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   func updateUserInfo() {
-    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+    if let userFriend = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account()) {
       setupUserInfo(userFriend)
     } else {
-      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { [weak self] users, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKit2Client.instance.account()]) { [weak self] users, error in
         self?.setupUserInfo(users?.first)
       }
     }

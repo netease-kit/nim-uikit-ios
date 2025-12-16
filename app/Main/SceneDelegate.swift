@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 // import NEMapKit
@@ -44,37 +44,36 @@ class SceneDelegate: UIResponder {
 
   func setupIM(_ appkey: String? = nil) {
     // 设置IM SDK的配置项，包括AppKey，推送配置和一些全局配置等
-    let option = NIMSDKOption()
+    let option = NIMSDK2Option()
     option.appKey = appkey ?? AppKey.appKey
     option.apnsCername = AppKey.apnsCername
     option.pkCername = AppKey.pkCerName
 
     // 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
-    let v2Option = V2NIMSDKOption()
+    let v2Option = V2NIMSDK2Option()
     v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
 
     // IM配置
-    IMKitClient.instance.config.fcsEnable = false
-    IMKitClient.instance.config.shouldSyncStickTopSessionInfos = true
-    IMKitClient.instance.config.teamReceiptEnabled = true
-    IMKitClient.instance.config.shouldSyncUnreadCount = true
-    IMKitClient.instance.config.fetchAttachmentAutomaticallyAfterReceiving = true
-    IMKitClient.instance.config.shouldConsiderRevokedMessageUnreadCount = true
+    IMKit2Client.instance.config.shouldSyncStickTopSessionInfos = true
+    IMKit2Client.instance.config.teamReceiptEnabled = true
+    IMKit2Client.instance.config.shouldSyncUnreadCount = true
+    IMKit2Client.instance.config.fetchAttachmentAutomaticallyAfterReceiving = true
+    IMKit2Client.instance.config.shouldConsiderRevokedMessageUnreadCount = true
 
     // 初始化IM UIKit，初始化Kit层和IM SDK，将配置信息透传给IM SDK。无需再次初始化IM SDK
-    IMKitClient.instance.setupIM2(option, v2Option)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.setupIM2(option, v2Option)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   func setupInit(_ completion: ((Error?) -> Void)?) {
     if IMPocConfigManager.instance.getConfig().enableCustomConfig.boolValue {
       // 开启自定义配置，使用自定义配置
-//      NIMSDK.shared().serverSetting = NIMServerSetting()
+//      NIMSDK2.sharedSDK().serverSetting = NIM2ServerSetting()
 
       if IMPocConfigManager.instance.getConfig().customJson?.count ?? 0 > 0 {
         loginWithAutoParseConfig(completion)
         return
-      } else if let appkey = IMPocConfigManager.instance.getConfig().configMap[#keyPath(NIMSDKOption.appKey)] as? String {
+      } else if let appkey = IMPocConfigManager.instance.getConfig().configMap[#keyPath(NIMSDK2Option.appKey)] as? String {
         setupIM(appkey)
         loginWithCustomConfig(completion)
         return
@@ -173,7 +172,7 @@ class SceneDelegate: UIResponder {
           let sessionType = V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId)
           if sessionType == .CONVERSATION_TYPE_P2P {
             // 单聊传自己的 accountId
-            pushDic["sessionId"] = IMKitClient.instance.account()
+            pushDic["sessionId"] = IMKit2Client.instance.account()
             pushDic["sessionType"] = "p2p"
           } else {
             // 群聊传 teamId
@@ -187,7 +186,7 @@ class SceneDelegate: UIResponder {
           let sessionType = V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId)
           if sessionType == .CONVERSATION_TYPE_P2P {
             // 单聊传自己的 accountId
-            pushDic["sessionId"] = IMKitClient.instance.account()
+            pushDic["sessionId"] = IMKit2Client.instance.account()
             pushDic["sessionType"] = "p2p"
           } else {
             // 群聊传 teamId
@@ -221,7 +220,7 @@ class SceneDelegate: UIResponder {
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let anchor = param["anchor"] as? V2NIMMessage
+      let anchor = param["anchor"] as? V2NIM2Message
       let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
@@ -255,7 +254,7 @@ class SceneDelegate: UIResponder {
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let anchor = param["anchor"] as? V2NIMMessage
+      let anchor = param["anchor"] as? V2NIM2Message
       let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
@@ -296,13 +295,13 @@ class SceneDelegate: UIResponder {
       if let accountId = IMPocConfigManager.instance.getConfig().accountId,
          let accountIdToken = IMPocConfigManager.instance.getConfig().accountIdToken {
         NEAIUserManager.shared.setProvider(provider: self)
-        IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
+        IMKit2Client.instance.login(accountId, accountIdToken, nil) { [weak self] error in
           if let err = error {
-            NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
+            NE2ALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
             SceneDelegate.window?.makeToast(err.localizedDescription)
             self?.loginWithUI()
           } else {
-            NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+            NE2ALog.infoLog(self?.className() ?? "", desc: "login IM Success")
             self?.initConfig()
             self?.initializePage()
           }
@@ -313,7 +312,7 @@ class SceneDelegate: UIResponder {
         completion?(nil)
       }
     } catch {
-      NEALog.infoLog(className(), desc: "login poc IM error : \(error.localizedDescription)")
+      NE2ALog.infoLog(className(), desc: "login poc IM error : \(error.localizedDescription)")
       loginWithUI()
       completion?(error)
     }
@@ -323,13 +322,13 @@ class SceneDelegate: UIResponder {
     if let accountId = IMPocConfigManager.instance.getConfig().accountId,
        let accountIdToken = IMPocConfigManager.instance.getConfig().accountIdToken {
       NEAIUserManager.shared.setProvider(provider: self)
-      IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
+      IMKit2Client.instance.login(accountId, accountIdToken, nil) { [weak self] error in
         if let err = error {
-          NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
+          NE2ALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
           SceneDelegate.window?.makeToast(err.localizedDescription)
           self?.loginWithUI()
         } else {
-          NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+          NE2ALog.infoLog(self?.className() ?? "", desc: "login IM Success")
           self?.initConfig()
           self?.initializePage()
         }
@@ -373,7 +372,7 @@ extension SceneDelegate: PKPushRegistryDelegate {
       return
     }
 
-    NIMSDK.shared().updatePushKitToken(pushCredentials.token)
+    NIMSDK2.sharedSDK().updatePushKitToken(pushCredentials.token)
   }
 
   func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
@@ -405,7 +404,7 @@ extension SceneDelegate: PKPushRegistryDelegate {
 // MARK: - AIUserAgentProvider
 
 extension SceneDelegate: AIUserAgentProvider {
-  func getAISearchUser(_ users: [V2NIMAIUser]) -> V2NIMAIUser? {
+  func getAISearchUser(_ users: [V2NIM2AIUser]) -> V2NIM2AIUser? {
     for user in users {
       if user.accountId == "search" {
         return user
@@ -414,7 +413,7 @@ extension SceneDelegate: AIUserAgentProvider {
     return nil
   }
 
-  func getAITranslateUser(_ users: [V2NIMAIUser]) -> V2NIMAIUser? {
+  func getAITranslateUser(_ users: [V2NIM2AIUser]) -> V2NIM2AIUser? {
     for user in users {
       if user.accountId == "translation" {
         return user
@@ -423,22 +422,22 @@ extension SceneDelegate: AIUserAgentProvider {
     return nil
   }
 
-  func getAITranslateLangs(_ users: [V2NIMAIUser]) -> [String] {
+  func getAITranslateLangs(_ users: [V2NIM2AIUser]) -> [String] {
     ["英语", "日语", "韩语", "俄语", "法语", "德语"]
   }
 }
 
-// MARK: NEIMKitClientListener
+// MARK: NE2IMKitClientListener
 
-extension SceneDelegate: NEIMKitClientListener {
-  func onLoginFailed(_ error: V2NIMError) {
-    if error.code == userBannedCode {
+extension SceneDelegate: NE2IMKitClientListener {
+  func onLoginFailed(_ error: V2NIM2Error) {
+    if error.code == userBannedCode2 {
       SceneDelegate.window?.makeToast(localizable("account_forbidden"))
       loginWithUI()
     }
   }
 
-  func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
+  func onKickedOffline(_ detail: V2NIM2KickedOfflineDetail) {
     if detail.reason == .KICKED_OFFLINE_REASON_SERVER {
       SceneDelegate.window?.makeToast(localizable("account_kicked_offline"))
       loginWithUI()

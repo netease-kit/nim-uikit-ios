@@ -10,7 +10,7 @@ target 'app' do
   use_frameworks!
   
   # 基础库
-  pod 'NEChatKit', YXConfig.imuikit_version
+  pod 'NEChatKit_coexist', YXConfig.imuikit_version
 
   # UI 组件，YXConfig.imuikit_version = 10.9.0
   pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件

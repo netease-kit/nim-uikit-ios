@@ -5,7 +5,7 @@
 
 import Foundation
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 public class LanguageViewModel: NSObject {

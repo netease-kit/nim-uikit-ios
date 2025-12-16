@@ -5,7 +5,7 @@
 import NEChatUIKit
 import NECoreKit
 import NETeamUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UITableViewDataSource {
@@ -105,7 +105,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     let pushEnabled = CustomSettingCellModel()
     pushEnabled.cellName = "pushEnabled:是否需要推送消息"
     pushEnabled.type = SettingCellType.SettingSwitchCell.rawValue
-    pushEnabled.inputKey = #keyPath(V2NIMMessagePushConfig.pushEnabled)
+    pushEnabled.inputKey = #keyPath(V2NIM2MessagePushConfig.pushEnabled)
     pushEnabled.swichChange = { isOpen in
       pushEnabled.switchOpen = isOpen
     }
@@ -119,7 +119,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     let pushNickEnabled = CustomSettingCellModel()
     pushNickEnabled.cellName = "pushNickEnabled:是否需要推送消息发送者昵称"
     pushNickEnabled.type = SettingCellType.SettingSwitchCell.rawValue
-    pushNickEnabled.inputKey = #keyPath(V2NIMMessagePushConfig.pushNickEnabled)
+    pushNickEnabled.inputKey = #keyPath(V2NIM2MessagePushConfig.pushNickEnabled)
     pushNickEnabled.swichChange = { isOpen in
       pushNickEnabled.switchOpen = isOpen
     }
@@ -134,7 +134,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     pushContent.cellName = "pushContent"
     pushContent.placeholder = "推送文案"
     pushContent.type = SettingCellType.SettingSubtitleCell.rawValue
-    pushContent.inputKey = #keyPath(V2NIMMessagePushConfig.pushContent)
+    pushContent.inputKey = #keyPath(V2NIM2MessagePushConfig.pushContent)
     if let pushContentValue = configModel.configMap[pushContent.inputKey] as? String {
       pushContent.customInputText = pushContentValue
     }
@@ -144,7 +144,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     pushPayload.cellName = "pushPayload"
     pushPayload.placeholder = "推送数据"
     pushPayload.type = SettingCellType.SettingSubtitleCell.rawValue
-    pushPayload.inputKey = #keyPath(V2NIMMessagePushConfig.pushPayload)
+    pushPayload.inputKey = #keyPath(V2NIM2MessagePushConfig.pushPayload)
     if let pushPayloadValue = configModel.configMap[pushPayload.inputKey] as? String {
       pushPayload.customInputText = pushPayloadValue
     }
@@ -153,7 +153,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     let forcePush = CustomSettingCellModel()
     forcePush.cellName = "forcePush:强制推送，忽略用户消息提醒相关设置，仅群消息有效"
     forcePush.type = SettingCellType.SettingSwitchCell.rawValue
-    forcePush.inputKey = #keyPath(V2NIMMessagePushConfig.forcePush)
+    forcePush.inputKey = #keyPath(V2NIM2MessagePushConfig.forcePush)
     forcePush.swichChange = { isOpen in
       forcePush.switchOpen = isOpen
     }
@@ -168,7 +168,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     forcePushContent.cellName = "forcePushContent"
     forcePushContent.placeholder = "强制推送文案，仅群消息有效"
     forcePushContent.type = SettingCellType.SettingSubtitleCell.rawValue
-    forcePushContent.inputKey = #keyPath(V2NIMMessagePushConfig.forcePushContent)
+    forcePushContent.inputKey = #keyPath(V2NIM2MessagePushConfig.forcePushContent)
     if let forcePushContentValue = configModel.configMap[forcePushContent.inputKey] as? String {
       forcePushContent.customInputText = forcePushContentValue
     }
@@ -178,7 +178,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     forcePushAccountIds.cellName = "forcePushAccountIds"
     forcePushAccountIds.placeholder = "强制推送目标账号列表，仅群消息有效"
     forcePushAccountIds.type = SettingCellType.SettingSubtitleCell.rawValue
-    forcePushAccountIds.inputKey = #keyPath(V2NIMMessagePushConfig.forcePushAccountIds)
+    forcePushAccountIds.inputKey = #keyPath(V2NIM2MessagePushConfig.forcePushAccountIds)
     if let forcePushAccountIdsValue = configModel.configMap[forcePushAccountIds.inputKey] as? String {
       forcePushAccountIds.customInputText = forcePushAccountIdsValue
     }

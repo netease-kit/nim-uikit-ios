@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import UIKit
-import NIMSDK
-import NECoreIM2Kit
+import NIMSDK2
+import NECoreIM2Kit_coexist
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,11 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   
   func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    NIMSDK.shared().updateApnsToken(deviceToken)
+    NIMSDK2.sharedSDK().updateApnsToken(deviceToken)
   }
   
   func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-    NEALog.infoLog("app delegate : ", desc: error.localizedDescription)
+    NE2ALog.infoLog("app delegate : ", desc: error.localizedDescription)
   }
   
   func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {

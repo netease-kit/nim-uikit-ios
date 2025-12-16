@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -14,7 +14,7 @@ open class IMPushConfigModel: NSObject {
 
   public var customJson: String?
 
-  public var config = V2NIMMessagePushConfig()
+  public var config = V2NIM2MessagePushConfig()
 }
 
 class IMPushConfigManager: NSObject {
@@ -42,40 +42,40 @@ class IMPushConfigManager: NSObject {
   }
 
   /// 获取推送配置
-  open func getPushConfig() -> V2NIMMessagePushConfig {
+  open func getPushConfig() -> V2NIM2MessagePushConfig {
     var customMap: NSMutableDictionary? = configModel?.configMap
     if let customJson = configModel?.customJson, !customJson.isEmpty,
        let costommap = NECommonUtil.getDictionaryFromJSONString(customJson) as? NSMutableDictionary {
       customMap = costommap
     }
 
-    let pushConfig = configModel?.config ?? V2NIMMessagePushConfig()
+    let pushConfig = configModel?.config ?? V2NIM2MessagePushConfig()
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.pushEnabled)] as? Bool {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.pushEnabled)] as? Bool {
       pushConfig.pushEnabled = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.pushNickEnabled)] as? Bool {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.pushNickEnabled)] as? Bool {
       pushConfig.pushNickEnabled = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.pushContent)] as? String {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.pushContent)] as? String {
       pushConfig.pushContent = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.pushPayload)] as? String {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.pushPayload)] as? String {
       pushConfig.pushPayload = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.forcePush)] as? Bool {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.forcePush)] as? Bool {
       pushConfig.forcePush = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.forcePushContent)] as? String {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.forcePushContent)] as? String {
       pushConfig.forcePushContent = customValue
     }
 
-    if let customValue = customMap?[#keyPath(V2NIMMessagePushConfig.forcePushAccountIds)] as? [String] {
+    if let customValue = customMap?[#keyPath(V2NIM2MessagePushConfig.forcePushAccountIds)] as? [String] {
       pushConfig.forcePushAccountIds = customValue
     }
 

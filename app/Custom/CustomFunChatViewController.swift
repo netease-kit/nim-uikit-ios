@@ -4,23 +4,23 @@
 
 import NEChatUIKit
 import NERtcCallKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 class CustomFunChatViewController: FunP2PChatViewController, NERecordProvider {
   /// 话单拦截
   func onRecordSend(_ config: NERecordConfig) {
-    NEALog.infoLog(className(), desc: "call status : \(NECallEngine.sharedInstance().callStatus)")
+    NE2ALog.infoLog(className(), desc: "call status : \(NECallEngine.sharedInstance().callStatus)")
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       if NECallEngine.sharedInstance().callStatus == .calling {
         return
       }
     }
 
-    let message = V2NIMMessageCreator.createCallMessage("", type: Int(config.callType.rawValue), channelId: "", status: Int(config.callState.rawValue), durations: [])
+    let message = V2NIM2MessageCreator.createCallMessage("", type: Int(config.callType.rawValue), channelId: "", status: Int(config.callState.rawValue), durations: [])
     if let cid = V2NIMConversationIdUtil.p2pConversationId(config.accId) {
       viewModel.chatRepo.sendMessage(message: message, conversationId: cid) { [weak self] result, error, ret in
-        NEALog.infoLog(self?.className() ?? "", desc: "CustomNormalChatViewController result: \(error?.localizedDescription ?? "")")
+        NE2ALog.infoLog(self?.className() ?? "", desc: "CustomNormalChatViewController result: \(error?.localizedDescription ?? "")")
       }
     }
   }
