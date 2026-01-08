@@ -11,7 +11,7 @@
 #import <NEChatKit/NEChatKit-Swift.h>
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
-#import <NEConversationUIKit/NEConversationUIKit-Swift.h>
+#import <NELocalConversationUIKit/NELocalConversationUIKit-Swift.h>
 #import <NECoreIM2Kit/NECoreIM2Kit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
 #import <NETeamUIKit/NETeamUIKit-Swift.h>
