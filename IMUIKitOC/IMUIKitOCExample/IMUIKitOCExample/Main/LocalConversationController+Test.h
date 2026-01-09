@@ -1,13 +1,13 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
-
+#import <NELocalConversationUIKit/NELocalConversationUIKit-Swift.h>
 #import <UIKit/UIKit.h>
+#import "IMUIKitOCExample-Bridging-Header.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NENavigationController : UINavigationController
+@interface LocalConversationController (Test)
 
 @end
 

@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 #import <objc/runtime.h>
-#import "ConversationController+Test.h"
+#import "LocalConversationController+Test.h"
 
-@implementation ConversationController (Test)
+@implementation LocalConversationController (Test)
 
 + (void)initialize {
   Method originalMethod = class_getInstanceMethod(self, @selector(viewDidLoad));

@@ -4,13 +4,12 @@
 // found in the LICENSE file.
 
 #import "NETabbarController.h"
-#import "NENavigationController.h"
 
 #import <NEChatKit/NEChatKit-Swift.h>
 #import <NEChatUIKit/NEChatUIKit-Swift.h>
 #import <NECommonUIKit/NECommonUIKit-Swift.h>
 #import <NEContactUIKit/NEContactUIKit-Swift.h>
-#import <NEConversationUIKit/NEConversationUIKit-Swift.h>
+#import <NELocalConversationUIKit/NELocalConversationUIKit-Swift.h>
 #import <NECoreIM2Kit/NECoreIM2Kit-Swift.h>
 #import <NECoreKit/NECoreKit-Swift.h>
 // #import <NEQChatUIKit/NEQChatUIKit-Swift.h>
@@ -34,7 +33,7 @@
   [ChatRouter registerFun];
 
   // 会话列表页
-  ConversationController *sessionCtrl = [[ConversationController alloc] init];
+  LocalConversationController *sessionCtrl = [[LocalConversationController alloc] init];
 
   sessionCtrl.view.backgroundColor = [UIColor whiteColor];
   sessionCtrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"message", @"")
