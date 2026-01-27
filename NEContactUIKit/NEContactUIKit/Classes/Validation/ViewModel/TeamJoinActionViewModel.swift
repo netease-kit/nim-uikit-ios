@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 
 @objc
@@ -34,7 +34,7 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   /// - Parameter firstLoad: 是否是首次加载
   /// - Parameter completin: 完成回调
   open func loadTeamJoinActionList(_ firstLoad: Bool, _ completin: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     let offset = firstLoad ? 0 : offset
     if firstLoad {
@@ -47,7 +47,7 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
       return
     }
 
-    let option = V2NIMTeamJoinActionInfoQueryOption()
+    let option = V2NIM2TeamJoinActionInfoQueryOption()
     option.offset = offset
     option.limit = pageMaxLimit
 
@@ -73,10 +73,10 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   ///   - item: 入群申请
   ///   - move: 是否移动到最前
   ///   - completin: 完成回调
-  open func convertToNETeamJoinAction(_ item: V2NIMTeamJoinActionInfo,
+  open func convertToNETeamJoinAction(_ item: V2NIM2TeamJoinActionInfo,
                                       _ move: Bool = false,
                                       _ completin: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     var isExist = false
     for (index, neItem) in teamJoinActions.enumerated() {
       if neItem.isEqualTo(item) {
@@ -138,7 +138,7 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   /// 设置所有入群申请已读
   /// - Parameter completion: 完成回调
   open func setTeamJoinActionRead() {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     neTeamJoinActionReadTime = Date().timeIntervalSince1970
     UserDefaults.standard.setValue(neTeamJoinActionReadTime, forKey: keyTeamJoinActionReadTime)
@@ -155,8 +155,8 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   /// - Parameters:
   ///   - action: 申请添加入群的相关信息
   ///   - status: 入群申请的处理状态
-  open func changeTeamJoinActionStatus(_ action: V2NIMTeamJoinActionInfo,
-                                       _ status: V2NIMTeamJoinActionStatus) {
+  open func changeTeamJoinActionStatus(_ action: V2NIM2TeamJoinActionInfo,
+                                       _ status: V2NIM2TeamJoinActionStatus) {
     var changedIndex = -1
     for (index, item) in teamJoinActions.enumerated() {
       if item.isEqualTo(action, false) {
@@ -183,9 +183,9 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   /// - Parameters:
   ///   - action: 入群申请
   ///   - completion: 完成回调
-  open func agreeRequest(action: V2NIMTeamJoinActionInfo,
+  open func agreeRequest(action: V2NIM2TeamJoinActionInfo,
                          _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: action.operatorAccountId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: action.operatorAccountId))")
     if action.actionType == .TEAM_JOIN_ACTION_TYPE_APPLICATION {
       teamRepo.acceptJoinApplication(action) { [weak self] error in
         if let err = error {
@@ -211,9 +211,9 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
   /// - Parameters:
   ///   - action: 入群申请
   ///   - completion: 完成回调
-  open func refuseRequest(action: V2NIMTeamJoinActionInfo,
+  open func refuseRequest(action: V2NIM2TeamJoinActionInfo,
                           _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: action.operatorAccountId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: action.operatorAccountId))")
     if action.actionType == .TEAM_JOIN_ACTION_TYPE_APPLICATION {
       teamRepo.rejectJoinApplication(action, nil) { [weak self] error in
         if let err = error {
@@ -237,7 +237,7 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
 
   /// 清空入群申请通知
   open func clearNotification(_ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     teamRepo.clearAllTeamJoinActionInfo { [weak self] error in
       if let err = error {
         print(err.localizedDescription)
@@ -251,7 +251,7 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
 
   /// 入群操作回调
   /// - Parameter joinActionInfo： 群信息
-  public func onReceive(_ joinActionInfo: V2NIMTeamJoinActionInfo) {
+  public func onReceive(_ joinActionInfo: V2NIM2TeamJoinActionInfo) {
     convertToNETeamJoinAction(joinActionInfo, true) { error in
     }
   }

@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objc
 public protocol ConversationViewModelDelegate: NSObjectProtocol {
@@ -18,7 +18,7 @@ public protocol ConversationViewModelDelegate: NSObjectProtocol {
 public typealias ConversationCallBack = (NSError?, Bool?) -> Void
 
 @objcMembers
-open class ConversationViewModel: NSObject, NEConversationListener, NETeamListener, NEChatListener, NEContactListener, NEIMKitClientListener, AIUserPinListener, AIUserChangeListener {
+open class ConversationViewModel: NSObject, NEConversationListener, NETeamListener, NEChatListener, NEContactListener, NE2IMKitClientListener, AIUserPinListener, AIUserChangeListener {
   public weak var delegate: ConversationViewModelDelegate?
   private let className = "ConversationViewModel"
   private var networkBroken = false // 网络断开标志
@@ -58,7 +58,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   public var onlineStatusDic = [String: Bool]()
 
   override public init() {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function)
     super.init()
     NotificationCenter.default.addObserver(self, selector: #selector(atMessageChange), name: Notification.Name(AtMessageChangeNoti), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(deleteConversationNoti), name: NENotificationName.deleteConversationNotificationName, object: nil)
@@ -66,7 +66,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     ChatRepo.shared.addChatListener(self)
     TeamRepo.shared.addTeamListener(self)
     ContactRepo.shared.addContactListener(self)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
     NEAIUserPinManager.shared.addPinManagerListener(self)
     NEAIUserManager.shared.addAIUserChangeListener(listener: self)
 
@@ -76,13 +76,13 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   deinit {
-    NEALog.infoLog(ModuleName + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + className(), desc: #function)
     NotificationCenter.default.removeObserver(self)
     conversationRepo.removeConversationListener(self)
     ChatRepo.shared.removeChatListener(self)
     TeamRepo.shared.removeTeamListener(self)
     ContactRepo.shared.removeContactListener(self)
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
     NEAIUserPinManager.shared.removePinManagerListener(self)
     NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
 
@@ -92,7 +92,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func atMessageChange() {
-    NEALog.infoLog(className(), desc: "atMessageChange")
+    NE2ALog.infoLog(className(), desc: "atMessageChange")
     delegate?.reloadTableView()
   }
 
@@ -100,7 +100,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     if let conversationId = noti.object as? String {
       weak var weakSelf = self
       conversationRepo.deleteConversation(conversationId) { error in
-        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " deleteConversationNoti \(error?.localizedDescription ?? "") ")
+        NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + " deleteConversationNoti \(error?.localizedDescription ?? "") ")
       }
     }
   }
@@ -117,9 +117,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       callBack = completion
     }
 
-    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(syncFinished), timestamp: \(Date().timeIntervalSince1970)")
+    NE2ALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(syncFinished), timestamp: \(Date().timeIntervalSince1970)")
     conversationRepo.getConversationList(offset, page) { [weak self] conversations, offset, finished, error in
-      NEALog.infoLog((self?.className() ?? "") + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.syncFinished ?? false), count: \(conversations?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
+      NE2ALog.infoLog((self?.className() ?? "") + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.syncFinished ?? false), count: \(conversations?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
         if let set = offset {
           // 更新索引
@@ -130,8 +130,8 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
           // 区分置顶消息和非置顶消息
           self?.addOrUpdateConversationData(conversation)
 
-          if V2NIMConversationIdUtil.conversationType(conversation.conversationId) == .CONVERSATION_TYPE_P2P,
-             let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
+          if V2NIM2ConversationIdUtil.conversationType(conversation.conversationId) == .CONVERSATION_TYPE_P2P,
+             let accountId = V2NIM2ConversationIdUtil.conversationTargetId(conversation.conversationId) {
             self?.p2pAccountIds.insert(accountId)
           }
         }
@@ -146,7 +146,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
         DispatchQueue.global().async {
           if let p2pAccountIds = self?.p2pAccountIds, !p2pAccountIds.isEmpty {
             ContactRepo.shared.getUserListFromCloud(accountIds: Array(p2pAccountIds)) { [weak self] users, error in
-              let conversationIds = p2pAccountIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+              let conversationIds = p2pAccountIds.compactMap { V2NIM2ConversationIdUtil.p2pConversationId($0) }
               self?.conversationRepo.getConversationListByIds(conversationIds) { conversations, error in
                 if let conversations = conversations {
                   for conversation in conversations {
@@ -169,7 +169,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 添加或者更新会话
   /// - Parameter conversation 会话对象
-  open func addOrUpdateConversationData(_ conversation: V2NIMConversation,
+  open func addOrUpdateConversationData(_ conversation: V2NIM2Conversation,
                                         _ isAdd: Bool = false) {
     if let cacheModel = conversationDic[conversation.conversationId] {
       cacheModel.conversation = conversation
@@ -212,7 +212,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 删除会话
   ///  - Parameter conversation 会话对象
   ///  - Parameter completion 完成回调
-  open func deleteConversation(_ conversation: V2NIMConversation, _ completion: @escaping (NSError?) -> Void) {
+  open func deleteConversation(_ conversation: V2NIM2Conversation, _ completion: @escaping (NSError?) -> Void) {
     conversationRepo.deleteConversation(conversation.conversationId) { error in
       if let err = error {
         completion(err)
@@ -226,10 +226,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 添加置顶
   /// - Parameter conversation 会话对象
   /// - Parameter completion 完成回调
-  open func addStickTop(conversation: V2NIMConversation,
+  open func addStickTop(conversation: V2NIM2Conversation,
                         _ completion: @escaping (NSError?)
                           -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
     conversationRepo.setStickTop(conversation.conversationId, true) { error in
       completion(error)
     }
@@ -238,10 +238,10 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// 取消置顶
   /// - Parameter conversation 会话对象
   /// - Parameter completion 完成回调
-  open func removeStickTop(conversation: V2NIMConversation,
+  open func removeStickTop(conversation: V2NIM2Conversation,
                            _ completion: @escaping (NSError?)
                              -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", sessionId:" + conversation.conversationId)
     conversationRepo.setStickTop(conversation.conversationId, false) { error in
       completion(error)
     }
@@ -251,17 +251,17 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     delegate?.reloadTableView()
   }
 
-  open func updateUserInfo(_ model: NEConversationListModel, _ user: NEUserWithFriend, _ conversation: V2NIMConversation) {
+  open func updateUserInfo(_ model: NEConversationListModel, _ user: NE2UserWithFriend, _ conversation: V2NIM2Conversation) {
     model.conversation = conversation
   }
 
-  open func updateTeamInfo(_ model: NEConversationListModel, _ team: V2NIMTeam, _ conversation: V2NIMConversation) {
+  open func updateTeamInfo(_ model: NEConversationListModel, _ team: V2NIM2Team, _ conversation: V2NIM2Conversation) {
     model.conversation = conversation
   }
 
   // 创建会话回调
-  open func onConversationCreated(_ conversation: V2NIMConversation) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + conversation.conversationId)
+  open func onConversationCreated(_ conversation: V2NIM2Conversation) {
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", did add session targetId:" + conversation.conversationId)
     if checkDismissTeamNoti(conversation) {
       return
     }
@@ -270,7 +270,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
     // 订阅单聊在线状态
     if IMKitConfigCenter.shared.enableOnlineStatus,
-       let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
+       let accountId = V2NIM2ConversationIdUtil.conversationTargetId(conversation.conversationId) {
       p2pAccountIds.insert(accountId)
       subscribeOnlineStatus([accountId])
     }
@@ -280,7 +280,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 会话变更
   /// - Parameter conversations 会话列表
-  open func onConversationChanged(_ conversations: [V2NIMConversation]) {
+  open func onConversationChanged(_ conversations: [V2NIM2Conversation]) {
     for conversation in conversations {
       if let manager = NEAtMessageManager.instance {
         if conversation.unreadCount == 0, manager.isAtCurrentUser(conversationId: conversation.conversationId) {
@@ -316,28 +316,28 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 检查会话是否包含解散通知的变更
   /// - Parameter conversation: 会话
-  open func checkDismissTeamNoti(_ conversation: V2NIMConversation) -> Bool {
+  open func checkDismissTeamNoti(_ conversation: V2NIM2Conversation) -> Bool {
     if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == false {
       return false
     }
 
-    if conversation.type != V2NIMConversationType.CONVERSATION_TYPE_TEAM {
+    if conversation.type != V2NIM2ConversationType.CONVERSATION_TYPE_TEAM {
       return false
     }
     // 解散、退出群聊
     let targetId = conversation.conversationId
 
-    if conversation.lastMessage?.messageType == V2NIMMessageType.MESSAGE_TYPE_NOTIFICATION {
-      if let content = conversation.lastMessage?.attachment as? V2NIMMessageNotificationAttachment {
-        if content.type == V2NIMMessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS ||
-          (content.type == V2NIMMessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_KICK &&
-            content.targetIds?.contains(IMKitClient.instance.account()) == true) ||
-          (content.type == V2NIMMessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE &&
-            IMKitClient.instance.isMe(conversation.lastMessage?.messageRefer.senderId)) {
+    if conversation.lastMessage?.messageType == V2NIM2MessageType.MESSAGE_TYPE_NOTIFICATION {
+      if let content = conversation.lastMessage?.attachment as? V2NIM2MessageNotificationAttachment {
+        if content.type == V2NIM2MessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_DISMISS ||
+          (content.type == V2NIM2MessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_KICK &&
+            content.targetIds?.contains(IMKit2Client.instance.account()) == true) ||
+          (content.type == V2NIM2MessageNotificationType.MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE &&
+            IMKit2Client.instance.isMe(conversation.lastMessage?.messageRefer.senderId)) {
           // 群聊被解散
           // 被踢出群聊
           // 主动退出群聊
-          NEALog.infoLog(
+          NE2ALog.infoLog(
             ModuleName + " " + className,
             desc: #function + "didAdd team dismiss or leave noti " + targetId
           )
@@ -362,25 +362,25 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 加入群回调
   /// - Parameter team: 群信息
-  open func onTeamJoined(_ team: V2NIMTeam) {}
+  open func onTeamJoined(_ team: V2NIM2Team) {}
 
   /// 建群回调
   /// - Parameter team: 群信息
-  open func onTeamCreated(_ team: V2NIMTeam) {}
+  open func onTeamCreated(_ team: V2NIM2Team) {}
 
-  open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {
-    NEALog.infoLog(className(), desc: "conversation onTeamLeft team id: \(team.teamId) team name : \(team.name) isKicked : \(isKicked)")
-    if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
+  open func onTeamLeft(_ team: V2NIM2Team, isKicked: Bool) {
+    NE2ALog.infoLog(className(), desc: "conversation onTeamLeft team id: \(team.teamId) team name : \(team.name) isKicked : \(isKicked)")
+    if let cid = V2NIM2ConversationIdUtil.teamConversationId(team.teamId) {
       didDeleteConversation(cid)
     }
   }
 
   /// 群解散回调
   /// - Parameter team: 群信息
-  open func onTeamDismissed(_ team: V2NIMTeam) {
-    NEALog.infoLog(className(), desc: "onTeamDismissed team id : \(team.teamId) team name: \(team.name)")
+  open func onTeamDismissed(_ team: V2NIM2Team) {
+    NE2ALog.infoLog(className(), desc: "onTeamDismissed team id : \(team.teamId) team name: \(team.name)")
     if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation {
-      if let cid = V2NIMConversationIdUtil.teamConversationId(team.teamId) {
+      if let cid = V2NIM2ConversationIdUtil.teamConversationId(team.teamId) {
         didDeleteConversation(cid)
       }
     }
@@ -392,7 +392,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
     conversationRepo.deleteConversation(cid) { [weak self] error in
       if let err = error {
-        NEALog.infoLog(self?.className() ?? " ", desc: "onTeamDismissed delete conversation error : \(err.localizedDescription)")
+        NE2ALog.infoLog(self?.className() ?? " ", desc: "onTeamDismissed delete conversation error : \(err.localizedDescription)")
       } else {
         self?.conversationDic.removeValue(forKey: cid)
         self?.conversationListData.removeAll { model in
@@ -407,13 +407,13 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func onConversationSyncFinished() {
-    NEALog.infoLog(className() + "[Performance]", desc: #function + "  timestamp: \(Date().timeIntervalSince1970)")
+    NE2ALog.infoLog(className() + "[Performance]", desc: #function + "  timestamp: \(Date().timeIntervalSince1970)")
 
     /// 设置同步完成标识
     syncFinished = true
 
     if let completion = callBack {
-      NEALog.infoLog(className() + "[Performance]", desc: #function + " getConversationListByPage again")
+      NE2ALog.infoLog(className() + "[Performance]", desc: #function + " getConversationListByPage again")
       /// 取数据
 
       getConversationListByPage(completion)
@@ -424,7 +424,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIM2ConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }
@@ -434,7 +434,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: DispatchWorkItem(block: { [weak self] in
         // 断网重连后不会重发标记回调，需要手动拉取
         if self?.callBack == nil {
-          NEALog.infoLog(self?.className() ?? "", desc: #function + " retrieveConversationDatas")
+          NE2ALog.infoLog(self?.className() ?? "", desc: #function + " retrieveConversationDatas")
           self?.retrieveConversationDatas()
         }
       }))
@@ -470,7 +470,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
   }
 
-  open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+  open func onFriendDeleted(_ accountId: String, deletionType: V2NIM2FriendDeletionType) {
     if conversationDic.keys.contains(accountId) {
       delegate?.reloadTableView()
     }
@@ -480,14 +480,14 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     delegate?.reloadTableView()
   }
 
-  open func onConversationSyncFailed(_ error: V2NIMError) {
-    NEALog.infoLog(className(), desc: "onConversationSyncFailed : \(error.desc)")
+  open func onConversationSyncFailed(_ error: V2NIM2Error) {
+    NE2ALog.infoLog(className(), desc: "onConversationSyncFailed : \(error.desc)")
   }
 
   /// 好友信息缓存更新
   /// - Parameter friendInfo: 好友信息
-  open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
-    NEALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
+  open func onFriendInfoChanged(_ friendInfo: V2NIM2Friend) {
+    NE2ALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
     if let accountId = friendInfo.accountId,
        conversationDic.keys.contains(accountId) {
       delegate?.reloadTableView()
@@ -497,11 +497,11 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   // MARK: Pin Manager Listener
 
   open func userInfoDidChange() {
-    NEALog.infoLog(className(), desc: #function + "" + "conversaion view model userInfoDidChange")
+    NE2ALog.infoLog(className(), desc: #function + "" + "conversaion view model userInfoDidChange")
     getAIUserList()
   }
 
-  open func onAIUserChanged(aiUsers: [V2NIMAIUser]) {
+  open func onAIUserChanged(aiUsers: [V2NIM2AIUser]) {
     if !IMKitConfigCenter.shared.enableAIUser {
       return
     }
@@ -531,7 +531,7 @@ extension ConversationViewModel: NESubscribeListener {
       }
 
       if let event = NESubscribeManager.shared.getSubscribeStatus(accountId),
-         let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
+         let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(accountId) {
         onlineStatusDic[conversationId] = event.statusType == .USER_STATUS_TYPE_LOGIN
       } else {
         subscribeList.append(accountId)
@@ -553,11 +553,11 @@ extension ConversationViewModel: NESubscribeListener {
 
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
-  public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+  public func onUserStatusChanged(_ data: [V2NIM2UserStatus]) {
     var needRefresh = false
     for d in data {
       if p2pAccountIds.contains(d.accountId),
-         let conversationId = V2NIMConversationIdUtil.p2pConversationId(d.accountId) {
+         let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(d.accountId) {
         onlineStatusDic[conversationId] = d.statusType == .USER_STATUS_TYPE_LOGIN
         needRefresh = true
         break

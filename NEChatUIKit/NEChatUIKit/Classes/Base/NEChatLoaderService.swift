@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 
 @objcMembers
 public class NEChatLoaderService: NSObject {

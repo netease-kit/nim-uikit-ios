@@ -9,7 +9,7 @@
 
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import <AMapLocationKit/AMapLocationKit.h>
-#import <NEChatKit/NEChatKit-Swift.h>
+#import <NEChatKit_coexist/NEChatKit_coexist-Swift.h>
 #import <NECommonKit/NECommonKit-Swift.h>
 
 #import <NECoreKit/NECoreKit-Swift.h>

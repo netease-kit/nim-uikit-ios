@@ -2,16 +2,16 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 let PinMessageDefaultType = 1000
 
 @objcMembers
-open class NEBasePinMessageViewController: NEChatBaseViewController, UITableViewDataSource, UITableViewDelegate, PinMessageViewModelDelegate, PinMessageCellDelegate, UIDocumentInteractionControllerDelegate, NEIMKitClientListener {
+open class NEBasePinMessageViewController: NEChatBaseViewController, UITableViewDataSource, UITableViewDelegate, PinMessageViewModelDelegate, PinMessageCellDelegate, UIDocumentInteractionControllerDelegate, NE2IMKitClientListener {
   let viewModel = PinMessageViewModel()
   var audioPlayer: AVAudioPlayer? // 仅用于语音消息的播放
 
@@ -73,7 +73,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   public init(conversationId: String) {
     self.conversationId = conversationId
     super.init(nibName: nil, bundle: nil)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   public required init?(coder: NSCoder) {
@@ -81,7 +81,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   }
 
   deinit {
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
   }
 
   override open func viewWillAppear(_ animated: Bool) {
@@ -112,9 +112,9 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     viewModel.getPinitems(conversationId: cid) { error in
       weakSelf?.isLoadingData = false
       if let err = error as? NSError {
-        if V2NIMConversationIdUtil.conversationType(weakSelf?.conversationId ?? "") == .CONVERSATION_TYPE_TEAM, err.code == teamNotExistCode {
+        if V2NIM2ConversationIdUtil.conversationType(weakSelf?.conversationId ?? "") == .CONVERSATION_TYPE_TEAM, err.code == teamNotExistCode2 {
           weakSelf?.showToast(commonLocalizable("team_not_exist"))
-        } else if err.code == protocolTimeout {
+        } else if err.code == protocolTimeout2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
         } else {
           weakSelf?.showToast(err.localizedDescription)
@@ -196,9 +196,9 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     var reuseId = "\(model.chatmodel.type.rawValue)"
     if model.chatmodel.type == .custom {
       let customType = model.chatmodel.customType
-      if customType == customMultiForwardType {
+      if customType == customMultiForwardType2 {
         reuseId = "\(MessageType.multiForward.rawValue)"
-      } else if customType == customRichTextType {
+      } else if customType == customRichTextType2 {
         reuseId = "\(MessageType.richText.rawValue)"
       } else {
         reuseId = "\(NEBasePinMessageTextCell.self)"
@@ -230,7 +230,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     }
 
     let model = viewModel.items[indexPath.row]
-    if model.chatmodel.customType == customMultiForwardType {
+    if model.chatmodel.customType == customMultiForwardType2 {
       return model.cellHeight(pinContentMaxW: pin_content_maxW) - 30
     }
     return model.cellHeight(pinContentMaxW: pin_content_maxW)
@@ -336,7 +336,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 转发消息
   /// - Parameters:
   ///   - message: 转发的消息
-  open func forwardMessage(_ message: V2NIMMessage) {
+  open func forwardMessage(_ message: V2NIM2Message) {
     weak var weakSelf = self
     Router.shared.register(ForwardMultiSelectedRouter) { param in
       var items = [ForwardItem]()
@@ -392,7 +392,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 跳转视图显示控件
   /// - Parameter model: 标记对象
   open func toImageView(_ model: NEPinMessageModel?) {
-    if let object = model?.message.attachment as? V2NIMMessageImageAttachment {
+    if let object = model?.message.attachment as? V2NIM2MessageImageAttachment {
       var imageUrlString = ""
 
       if let url = object.url {
@@ -415,7 +415,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 跳转视频播放器
   /// - Parameter model: 标记对象
   open func toVideoView(_ model: NEPinMessageModel?) {
-    if let object = model?.message.attachment as? V2NIMMessageVideoAttachment {
+    if let object = model?.message.attachment as? V2NIM2MessageVideoAttachment {
       stopPlay()
       // 设置扬声器
       NEAudioSessionManager.shared.switchToSpeaker()
@@ -440,7 +440,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 跳转地图详情页
   /// - Parameter model: 标记对象
   open func toMapDetail(_ model: NEPinMessageModel?) {
-    if let title = model?.message.text, let locationObject = model?.message.attachment as? V2NIMMessageLocationAttachment {
+    if let title = model?.message.text, let locationObject = model?.message.attachment as? V2NIM2MessageLocationAttachment {
       let lng = locationObject.longitude
 
       let subTitle = locationObject.address
@@ -469,15 +469,15 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// 跳转文件查看器
   /// - Parameter model: 标记对象
   open func toFileDetail(_ model: NEPinMessageModel?) {
-    if let object = model?.message.attachment as? V2NIMMessageFileAttachment {
+    if let object = model?.message.attachment as? V2NIM2MessageFileAttachment {
       // 判断是否是文件对象
       guard let fileModel = model?.pinFileModel as? PinMessageFileModel else {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "PinMessageFileModel not exit")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "PinMessageFileModel not exit")
         return
       }
       // 判断状态，如果是下载中不能进行预览
       if fileModel.state == .Downalod {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
         return
       }
 
@@ -510,7 +510,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
     // 开始下载
     viewModel.downLoad(urlString, path) { [weak self] progress in
-      NEALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
+      NE2ALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
 
       // 根据进度设置状态
       fileModel.progress = progress
@@ -523,7 +523,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     } _: { [weak self] localPath, error in
       if let err = error {
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           self?.showToast(commonLocalizable("network_error"))
         default:
           print(err.localizedDescription)
@@ -538,11 +538,11 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// - Parameter model: 标记对象
   open func toTextViewShow(_ model: NEPinMessageModel?) {
     let customType = model?.chatmodel.customType
-    if customType == customRichTextType {
+    if customType == customRichTextType2 {
       showTextViewController(model)
 
-    } else if customType == customMultiForwardType,
-              let data = NECustomUtils.dataOfCustomMessage(model?.message.attachment) {
+    } else if customType == customMultiForwardType2,
+              let data = NE2CustomUtils.dataOfCustomMessage(model?.message.attachment) {
       let url = data["url"] as? String
       let md5 = data["md5"] as? String
 
@@ -558,7 +558,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// - Parameter model: 标记对象
   /// - Parameter cell: 内容视图显示控件
   open func didClickContent(_ model: NEPinMessageModel?, _ cell: NEBasePinMessageCell) {
-    NEALog.infoLog(className(), desc: #function + "didClickContent")
+    NE2ALog.infoLog(className(), desc: #function + "didClickContent")
 
     if model?.message.messageType == .MESSAGE_TYPE_AUDIO {
       didPlay(cell: cell, model: model)
@@ -617,7 +617,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   /// - Parameter cell: 标记列表视图对象
   /// - Parameter model: 标记对象
   private func didPlay(cell: NEBasePinMessageCell?, model: NEPinMessageModel?) {
-    guard let message = model?.message, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
+    guard let message = model?.message, let audio = message.attachment as? V2NIM2MessageAudioAttachment else {
       return
     }
 
@@ -626,7 +626,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       if let urlString = audio.url {
         viewModel.downLoad(urlString, path, nil) { [weak self] _, error in
           if error == nil {
-            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
+            NE2ALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
             self?.startPlay(cell: cell, model: model)
           } else {
             self?.showToast(error!.localizedDescription)
@@ -666,8 +666,8 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   /// 开始播放
   /// - Parameter audioMessage: 音频消息对象
-  func startPlaying(audioMessage: V2NIMMessage?) {
-    guard let message = audioMessage, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
+  func startPlaying(audioMessage: V2NIM2Message?) {
+    guard let message = audioMessage, let audio = message.attachment as? V2NIM2MessageAudioAttachment else {
       return
     }
 
@@ -675,7 +675,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
     let path = audio.path ?? ChatMessageHelper.createFilePath(message)
     if FileManager.default.fileExists(atPath: path) {
-      NEALog.infoLog(className(), desc: #function + " play path : " + path)
+      NE2ALog.infoLog(className(), desc: #function + " play path : " + path)
 
       // 创建一个URL对象，指向音频文件
       let audioURL = URL(fileURLWithPath: path)
@@ -699,7 +699,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
         print("Error loading audio: \(error.localizedDescription)")
       }
     } else {
-      NEALog.infoLog(className(), desc: #function + " audio path is empty, play url : " + (audio.url ?? ""))
+      NE2ALog.infoLog(className(), desc: #function + " audio path is empty, play url : " + (audio.url ?? ""))
       playingCell?.stopAnimation()
     }
   }
@@ -722,7 +722,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   open func showTextViewController(_ model: NEPinMessageModel?) {
     guard let model = model?.chatmodel as? MessageTextModel else { return }
 
-    let title = NECustomUtils.titleOfRichText(model.message?.attachment)
+    let title = NE2CustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
     let textViewController = getTextViewController(title: title, body: body)
     let nav = NENavigationController(rootViewController: textViewController)
@@ -752,7 +752,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
 
   // MARK: - NEIMKitClientListener
 
-  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIM2ConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }

@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -219,7 +219,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
 
     // 单聊设置-创建讨论组-人员选择页面不包含自己
     var filters = Set<String>()
-    filters.insert(IMKitClient.instance.account())
+    filters.insert(IMKit2Client.instance.account())
 
     // 单聊设置-创建讨论组-人员选择页面不包含单聊对方
     if let uid = userId {
@@ -232,7 +232,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
         parameters: [
           "nav": navigationController as Any,
           "filters": filters,
-          "limit": inviteNumberLimit,
+          "limit": inviteNumberLimit2,
           "uid": userId ?? "",
         ],
         closure: nil
@@ -243,7 +243,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
         parameters: [
           "nav": navigationController as Any,
           "filters": filters,
-          "limit": inviteNumberLimit,
+          "limit": inviteNumberLimit2,
           "uid": userId ?? "",
         ],
         closure: nil
@@ -255,7 +255,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
       weakSelf?.view.hideToastActivity()
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
+        let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamid)
 
         DispatchQueue.main.async {
           if let allControllers = weakSelf?.filterStackViewController() {
@@ -323,7 +323,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController, UserSettin
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if indexPath.row == 0,
        IMKitConfigCenter.shared.enablePinMessage {
-      if let accid = userId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
+      if let accid = userId, let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(accid) {
         let pin = getPinMessageViewController(conversationId: conversationId)
         navigationController?.pushViewController(pin, animated: true)
       }

@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import MJRefresh
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 
 @objc
 public protocol NEBaseLocalConversationControllerDelegate {
@@ -262,7 +262,7 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
     showTitleBar()
     setupSubviews()
     initialConfig()
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
@@ -383,16 +383,16 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
   }
 
   func requestData() {
-    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(viewModel.syncFinished), timestamp: \(Date().timeIntervalSince1970)")
+    NE2ALog.infoLog(className() + " [Performance]", desc: #function + " start, syncFinished:\(viewModel.syncFinished), timestamp: \(Date().timeIntervalSince1970)")
     viewModel.getConversationListByPage { [weak self] error, finished in
-      NEALog.infoLog(NEBaseLocalConversationController.className() + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.viewModel.syncFinished ?? false), timestamp: \(Date().timeIntervalSince1970)")
+      NE2ALog.infoLog(NEBaseLocalConversationController.className() + " [Performance]", desc: #function + " onSuccess, syncFinished:\(self?.viewModel.syncFinished ?? false), timestamp: \(Date().timeIntervalSince1970)")
 
       self?.viewModel.getAIUserList()
 
       if let err = error {
         self?.showToast(err.localizedDescription)
         self?.emptyView.isHidden = false
-        NEALog.errorLog(
+        NE2ALog.errorLog(
           ModuleName + " " + (self?.className ?? ""),
           desc: "CALLBACK requestData failed，error = \(error!)"
         )
@@ -519,14 +519,14 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
 
     // 创建讨论组-人员选择页面不包含自己
     var filters = Set<String>()
-    filters.insert(IMKitClient.instance.account())
+    filters.insert(IMKit2Client.instance.account())
 
     if IMKitConfigCenter.shared.enableAIUser {
       Router.shared.use(
         ContactFusionSelectRouter,
         parameters: ["nav": navigationController as Any,
                      "animated": false,
-                     "limit": inviteNumberLimit,
+                     "limit": inviteNumberLimit2,
                      "filters": filters],
         closure: nil
       )
@@ -535,7 +535,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
         ContactUserSelectRouter,
         parameters: ["nav": navigationController as Any,
                      "animated": false,
-                     "limit": inviteNumberLimit,
+                     "limit": inviteNumberLimit2,
                      "filters": filters],
         closure: nil
       )
@@ -546,7 +546,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
       print("create discuss ", param)
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        if let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid) {
+        if let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamid) {
           var params = [String: Any]()
           params["nav"] = weakSelf?.navigationController as Any
           params["conversationId"] = conversationId as Any
@@ -567,14 +567,14 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
 
     // 创建高级群-人员选择页面不包含自己
     var filters = Set<String>()
-    filters.insert(IMKitClient.instance.account())
+    filters.insert(IMKit2Client.instance.account())
 
     if IMKitConfigCenter.shared.enableAIUser {
       Router.shared.use(
         ContactFusionSelectRouter,
         parameters: ["nav": navigationController as Any,
                      "animated": false,
-                     "limit": inviteNumberLimit,
+                     "limit": inviteNumberLimit2,
                      "filters": filters],
         closure: nil
       )
@@ -583,7 +583,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
         ContactUserSelectRouter,
         parameters: ["nav": navigationController as Any,
                      "animated": false,
-                     "limit": inviteNumberLimit,
+                     "limit": inviteNumberLimit2,
                      "filters": filters],
         closure: nil
       )
@@ -594,7 +594,7 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
       print("create senior : ", param)
       if let code = param["code"] as? Int, let teamid = param["teamId"] as? String,
          code == 0 {
-        if let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid) {
+        if let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamid) {
           var params = [String: Any]()
           params["nav"] = weakSelf?.navigationController as Any
           params["conversationId"] = conversationId as Any
@@ -640,7 +640,7 @@ extension NEBaseLocalConversationController: UICollectionViewDelegate, UICollect
   open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let conversationModel = viewModel.aiUserListData[indexPath.row]
 
-    if let accountId = conversationModel.aiUser?.accountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
+    if let accountId = conversationModel.aiUser?.accountId, let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(accountId) {
       Router.shared.use(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any,
@@ -754,8 +754,8 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
         let model = viewModel.conversationListData[indexPath.row]
 
         if let conversationId = model.conversation?.conversationId,
-           V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
-          if let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+           V2NIM2ConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
+          if let accountId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
              !NESubscribeManager.shared.hasSubscribe(accountId) {
             accountIds.append(accountId)
           }
@@ -850,7 +850,7 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
   /// - Parameter indexPath: 索引
   /// - Parameter isTop: 置顶
   /// - Parameter completion: 完成回调
-  func onTopRecentAtIndexPath(conversation: V2NIMLocalConversation, indexPath: IndexPath,
+  func onTopRecentAtIndexPath(conversation: V2NIM2LocalConversation, indexPath: IndexPath,
                               isTop: Bool,
                               _ completion: @escaping (NSError?)
                                 -> Void) {
@@ -858,12 +858,12 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
     if isTop == true {
       viewModel.removeStickTop(conversation: conversation) { error in
         if let err = error {
-          NEALog.errorLog(ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"), desc: "CALLBACK removeStickTopSession failed，error = \(err)")
+          NE2ALog.errorLog(ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"), desc: "CALLBACK removeStickTopSession failed，error = \(err)")
           completion(error)
 
           return
         } else {
-          NEALog.infoLog(
+          NE2ALog.infoLog(
             ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"), desc: "✅CALLBACK removeStickTopSession SUCCESS"
           )
           weakSelf?.reloadTableView()
@@ -874,14 +874,14 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
     } else {
       viewModel.addStickTop(conversation: conversation) { error in
         if let err = error {
-          NEALog.errorLog(
+          NE2ALog.errorLog(
             ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"),
             desc: "CALLBACK addStickTopSession failed，error = \(err)"
           )
           completion(error)
           return
         } else {
-          NEALog.infoLog(ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"),
+          NE2ALog.infoLog(ModuleName + " " + (weakSelf?.className ?? "LocalConversationController"),
                          desc: "✅CALLBACK addStickTopSession callback SUCCESS")
           weakSelf?.reloadTableView()
           completion(nil)
@@ -896,7 +896,7 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
 extension NEBaseLocalConversationController {
   /// cell点击事件,可重写该事件处理自己的逻辑业务，例如跳转到指定的会话页面
   /// - Parameter conversation: 会话
-  open func onselectedTableRow(conversation: V2NIMLocalConversation) {
+  open func onselectedTableRow(conversation: V2NIM2LocalConversation) {
     let conversationId = conversation.conversationId
 
     let param = ["sessionId": conversationId]
@@ -965,10 +965,10 @@ extension NEBaseLocalConversationController: LocalConversationViewModelDelegate 
 
 // MARK: - NEIMKitClientListener
 
-extension NEBaseLocalConversationController: NEIMKitClientListener {
+extension NEBaseLocalConversationController: NE2IMKitClientListener {
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIM2ConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }

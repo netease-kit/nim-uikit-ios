@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -36,7 +36,7 @@ open class ContactViewModel: NSObject {
   var refresh: RefreshBlock?
   public init(contactHeaders: [ContactHeadItem]?) {
     super.init()
-    NEALog.infoLog(
+    NE2ALog.infoLog(
       ModuleName + " " + className(),
       desc: #function + ", contactHeaders.count: \(contactHeaders?.count ?? 0)"
     )
@@ -64,7 +64,7 @@ open class ContactViewModel: NSObject {
   }
 
   open func loadData(_ filters: Set<String>? = nil, completion: @escaping (NSError?, Int) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
       if let users = contacts {
@@ -85,7 +85,7 @@ open class ContactViewModel: NSObject {
   }
 
   open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping ([ContactSection]?, NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
     // 优选从缓存中取
     if !NEFriendUserCache.shared.isEmpty() {
@@ -97,7 +97,7 @@ open class ContactViewModel: NSObject {
 
     // 缓存中没有则远端查询, 刷新统一走缓存通知
     contactRepo.getContactList { friends, error in
-      NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
+      NE2ALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
     }
   }
 
@@ -106,7 +106,7 @@ open class ContactViewModel: NSObject {
   ///   - friends: 好友列表
   ///   - filters: 过滤列表
   /// - Returns: 格式化后的好友列表
-  open func formatData(_ friends: [NEUserWithFriend]?, _ filters: Set<String>? = nil) -> [ContactSection] {
+  open func formatData(_ friends: [NE2UserWithFriend]?, _ filters: Set<String>? = nil) -> [ContactSection] {
     var contactList: [ContactSection] = []
     if var users = friends {
       initalDict = [String: [ContactInfo]]()
@@ -127,7 +127,7 @@ open class ContactViewModel: NSObject {
       let azRegular = NSPredicate(format: "SELF MATCHES %@", "[A-Z]")
       var digitList = [ContactInfo]()
       var specialCharList = [ContactInfo]()
-      for userFriend: NEUserWithFriend in users {
+      for userFriend: NE2UserWithFriend in users {
         // get inital of name
         var name = userFriend.user?.name ?? userFriend.user?.accountId
         if let alias = userFriend.friend?.alias, !alias.isEmpty {
@@ -181,10 +181,10 @@ open class ContactViewModel: NSObject {
   /// 获取验证消息未读数，包含好友申请和入群申请
   /// - Parameter completion: 回调
   open func getValidationMessage(_ completion: ((Int, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.getUnreadApplicationCount { [weak self] count, error in
       if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
-        let option = V2NIMTeamJoinActionInfoQueryOption()
+        let option = V2NIM2TeamJoinActionInfoQueryOption()
         option.offset = 0
         option.limit = neTeamJoinActionPageLimit
         TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
@@ -201,14 +201,14 @@ open class ContactViewModel: NSObject {
   }
 
   open func headerSection(headerItem: [ContactHeadItem]?) -> ContactSection? {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", headerItem.count: \(headerItem?.count ?? 0)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", headerItem.count: \(headerItem?.count ?? 0)")
     guard let header = headerItem else {
       return nil
     }
     var infos: [ContactInfo] = []
     for item in header {
       let info = ContactInfo()
-      info.user = NEUserWithFriend(alias: item.name, avatar: item.imageName)
+      info.user = NE2UserWithFriend(alias: item.name, avatar: item.imageName)
       info.contactCellType = .ContactOthers
       info.router = item.router
       infos.append(info)
@@ -232,7 +232,7 @@ extension ContactViewModel: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     guard contactSections.count > 1 else {
       return
     }
@@ -275,7 +275,7 @@ extension ContactViewModel: NEContactListener {
 
   /// 好友添加回调
   /// - Parameter friendInfo: 好友信息
-  open func onFriendAdded(_ friendInfo: V2NIMFriend) {
+  open func onFriendAdded(_ friendInfo: V2NIM2Friend) {
     loadData { [weak self] _, _ in
       self?.delegate?.reloadTableView()
     }
@@ -286,7 +286,7 @@ extension ContactViewModel: NEContactListener {
   /// - Parameters:
   ///   - accountId: 删除的好友账号ID
   ///   - deletionType: 好友删除的类型
-  open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+  open func onFriendDeleted(_ accountId: String, deletionType: V2NIM2FriendDeletionType) {
     if NEFriendUserCache.shared.isBlockAccount(accountId) {
       return
     }
@@ -296,19 +296,19 @@ extension ContactViewModel: NEContactListener {
 
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
-  open func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
+  open func onFriendAddApplication(_ application: V2NIM2FriendAddApplication) {
     getValidationMessage(nil)
   }
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
-  open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
+  open func onFriendAddRejected(_ rejectionInfo: V2NIM2FriendAddApplication) {
     getValidationMessage(nil)
   }
 
   /// 黑名单添加回调
   /// - Parameter user: 用户信息
-  open func onBlockListAdded(_ user: V2NIMUser) {
+  open func onBlockListAdded(_ user: V2NIM2User) {
     guard let accountId = user.accountId else { return }
     removeFromContacts(accountId)
   }
@@ -330,7 +330,7 @@ extension ContactViewModel: NEContactListener {
 /// 入群操作回调
 /// - Parameter joinActionInfo： 群信息
 extension ContactViewModel: NETeamListener {
-  public func onReceive(_ joinActionInfo: V2NIMTeamJoinActionInfo) {
+  public func onReceive(_ joinActionInfo: V2NIM2TeamJoinActionInfo) {
     getValidationMessage(nil)
   }
 }
@@ -376,7 +376,7 @@ extension ContactViewModel: NESubscribeListener {
 
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
-  public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+  public func onUserStatusChanged(_ data: [V2NIM2UserStatus]) {
     var needRefresh = false
     for d in data {
       if NEFriendUserCache.shared.isFriend(d.accountId) {

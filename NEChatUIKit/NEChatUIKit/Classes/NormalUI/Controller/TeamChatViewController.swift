@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -18,14 +18,14 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
 
   /// 创建群的构造方法
   /// - Parameter sessionId: 会话id
-  public init(conversationId: String, anchor: V2NIMMessage?) {
+  public init(conversationId: String, anchor: V2NIM2Message?) {
     super.init(conversationId: conversationId)
     viewModel = TeamChatViewModel(conversationId: conversationId, anchor: anchor)
     viewModel.delegate = self
   }
 
   public init(sessionId: String) {
-    let conversationId = V2NIMConversationIdUtil.teamConversationId(sessionId) ?? ""
+    let conversationId = V2NIM2ConversationIdUtil.teamConversationId(sessionId) ?? ""
     super.init(conversationId: conversationId)
     viewModel = TeamChatViewModel(conversationId: conversationId, anchor: nil)
     viewModel.delegate = self
@@ -74,7 +74,7 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
           if let team = team {
             if IMKitConfigCenter.shared.enableDismissTeamDeleteConversation == true, team.isValidTeam == false {
               self?.showSingleAlert(message: commonLocalizable("team_not_exist")) {
-                NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIMConversationIdUtil.teamConversationId(team.teamId))
+                NotificationCenter.default.post(name: NENotificationName.deleteConversationNotificationName, object: V2NIM2ConversationIdUtil.teamConversationId(team.teamId))
                 self?.popGroupChatVC()
               }
             }
@@ -127,14 +127,14 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
 
   /// 更新群聊信息（群聊名称、群禁言状态、缓存）
   /// - Parameter team: 群聊信息
-  open func updateTeamInfo(team: V2NIMTeam) {
+  open func updateTeamInfo(team: V2NIM2Team) {
     titleContent = team.name
     setMute(team: team)
   }
 
   /// 设置群禁言/取消群禁言状态
   /// - Parameter team: 群聊信息
-  open func setMute(team: V2NIMTeam) {
+  open func setMute(team: V2NIM2Team) {
     guard let viewModel = viewModel as? TeamChatViewModel else {
       return
     }
@@ -163,10 +163,10 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
     }
   }
 
-  override open func onRecvMessages(_ messages: [V2NIMMessage], _ index: [IndexPath]) {
+  override open func onRecvMessages(_ messages: [V2NIM2Message], _ index: [IndexPath]) {
     super.onRecvMessages(messages, index)
     for message in messages {
-      if let content = message.attachment as? V2NIMMessageNotificationAttachment {
+      if let content = message.attachment as? V2NIM2MessageNotificationAttachment {
         if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_UPDATE_TINFO,
            let updatedTeamInfo = content.updatedTeamInfo {
           if let name = updatedTeamInfo.name {
@@ -175,21 +175,21 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE,
                   let targetIDs = content.targetIds,
-                  targetIDs.contains(IMKitClient.instance.account()) {
+                  targetIDs.contains(IMKit2Client.instance.account()) {
           // 被重新拉进群聊
           isLeaveTeamByOther = false
           if onCurrentPage {
             dismissAlert()
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE,
-                  message.senderId == IMKitClient.instance.account() {
+                  message.senderId == IMKit2Client.instance.account() {
           isLeaveTeamBySelf = true
           if onCurrentPage {
             popGroupChatVC()
           }
         } else if content.type == .MESSAGE_NOTIFICATION_TYPE_TEAM_KICK,
                   let targetIDs = content.targetIds,
-                  targetIDs.contains(IMKitClient.instance.account()) {
+                  targetIDs.contains(IMKit2Client.instance.account()) {
           // 被移出群聊
           isLeaveTeamByOther = true
           if onCurrentPage {
@@ -214,13 +214,13 @@ open class TeamChatViewController: NormalChatViewController, TeamChatViewModelDe
 
   /// 群聊更新回调
   /// - Parameter team: 群聊
-  open func onTeamUpdate(team: V2NIMTeam) {
+  open func onTeamUpdate(team: V2NIM2Team) {
     updateTeamInfo(team: team)
   }
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  open func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberUpdate(_ teamMembers: [V2NIM2TeamMember]) {
     if let team = NETeamUserManager.shared.getTeamInfo() {
       setMute(team: team)
     }

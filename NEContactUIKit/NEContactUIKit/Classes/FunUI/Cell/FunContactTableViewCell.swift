@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 

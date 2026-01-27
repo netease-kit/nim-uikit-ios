@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import SDWebImage
 import UIKit
 
@@ -71,7 +71,7 @@ open class NEBaseCollectionMessageImageCell: NEBaseCollectionMessageCell {
         let url = URL(string: imageUrl)
         collectionContentImageView.sd_setImage(with: url) { [weak self] image, error, type, url in
           if let err = error as? NSError, err.code == 2001,
-             let imageObject = model.message?.attachment as? V2NIMMessageImageAttachment,
+             let imageObject = model.message?.attachment as? V2NIM2MessageImageAttachment,
              let imageUrl = imageObject.url {
             let url = URL(string: imageUrl)
             let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 350, height: 350)]

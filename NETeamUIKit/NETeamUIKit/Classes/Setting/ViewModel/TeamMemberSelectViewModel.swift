@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objc
@@ -48,7 +48,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 拉取最新用户信息后刷新消息发送者信息
   /// - Parameter noti: 通知对象
   open func didTapHeader(_ noti: Notification) {
-    if let user = noti.object as? NEUserWithFriend,
+    if let user = noti.object as? NE2UserWithFriend,
        let accid = user.user?.accountId {
       if NETeamUserManager.shared.isCurrentMember(accid) {
         var isDidFind = false
@@ -98,11 +98,11 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
           weakSelf?.isRequest = false
           completion(nil)
         } else {
-          var memberLists = [V2NIMTeamMember]()
+          var memberLists = [V2NIM2TeamMember]()
 
           weakSelf?.getSelectMemberInfos(teamId, nil, &memberLists, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { ms, error in
             if error != nil {
-              NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
+              NE2ALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
               weakSelf?.isRequest = false
               completion(nil)
             } else {
@@ -146,7 +146,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
     teamInfoModel?.users.forEach { [weak self] userModel in
       if let uid = userModel.nimUser?.user?.accountId {
         temFilters.remove(uid)
-        if uid == IMKitClient.instance.account() {
+        if uid == IMKit2Client.instance.account() {
           return
         }
         if uid == self?.teamInfoModel?.team?.ownerAccountId {
@@ -185,7 +185,7 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
         if error == nil {
           self.delegate?.didNeedRefresh()
         } else {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + "memberCacheDidChange get team info error \(error?.localizedDescription ?? ""))")
+          NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + "memberCacheDidChange get team info error \(error?.localizedDescription ?? ""))")
         }
       }
     }
@@ -221,32 +221,32 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
 
   /// 群成员离开回调
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员被踢回调
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入回调
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberJoined(_ teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员变更统一处理
   /// - Parameter teamMembers: 群成员
-  private func onTeamMemberChanged(_ members: [V2NIMTeamMember]) {
+  private func onTeamMemberChanged(_ members: [V2NIM2TeamMember]) {
     var isCurrentTeam = false
     for member in members {
       if let currentTid = teamInfoModel?.team?.teamId, currentTid == member.teamId {
@@ -271,9 +271,9 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// - Parameter teamModel：群信息对象
   /// - Parameter completion:  完成后的回调
   open func getTeamMembers(_ teamInfo: NETeamInfoModel,
-                           _ queryType: V2NIMTeamMemberRoleQueryType,
+                           _ queryType: V2NIM2TeamMemberRoleQueryType,
                            _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
     guard let teamId = teamInfo.team?.teamId else {
       return
     }
@@ -283,15 +283,15 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
     if let members = NETeamUserManager.shared.getAllTeamMemberModels() {
       teamInfo.users = members
       completion(nil, teamInfo)
-      NEALog.infoLog(weakSelf?.className() ?? "", desc: "load team member from cache success.")
+      NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "load team member from cache success.")
       return
     }
 
-    var memberLists = [V2NIMTeamMember]()
+    var memberLists = [V2NIM2TeamMember]()
 
     weakSelf?.getSelectMemberInfos(teamId, nil, &memberLists, queryType) { ms, error in
       if let e = error {
-        NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
+        NE2ALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
         completion(e, nil)
       } else {
         if let members = ms {
@@ -310,12 +310,12 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// - Parameter model :           群信息
   /// - Parameter maxSizeByPage:    单页最大查询数量
   /// - Parameter completion:       完成后的回调
-  open func splitSelectMembers(_ members: [V2NIMTeamMember],
+  open func splitSelectMembers(_ members: [V2NIM2TeamMember],
                                _ model: NETeamInfoModel,
                                _ maxSizeByPage: Int = 150,
                                _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
-    var remaind = [[V2NIMTeamMember]]()
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
+    var remaind = [[V2NIM2TeamMember]]()
     remaind.append(contentsOf: members.chunk(maxSizeByPage))
     fetchSelectUsersInfo(&remaind, model, completion)
   }
@@ -324,10 +324,10 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   ///   - Parameter remainUserIds: 用户集合
   ///   - Parameter model： 群信息
   ///   - Parameter completion: 成功回调
-  open func fetchSelectUsersInfo(_ remainUserIds: inout [[V2NIMTeamMember]],
+  open func fetchSelectUsersInfo(_ remainUserIds: inout [[V2NIM2TeamMember]],
                                  _ model: NETeamInfoModel,
                                  _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       completion(nil, model)
       return
@@ -361,8 +361,8 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 获取群成员
   /// - Parameter teamId:  群ID
   /// - Parameter completion:  完成回调
-  open func getSelectMemberInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
-    let option = V2NIMTeamMemberQueryOption()
+  open func getSelectMemberInfos(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIM2TeamMember], _ queryType: V2NIM2TeamMemberRoleQueryType, _ completion: @escaping ([V2NIM2TeamMember]?, NSError?) -> Void) {
+    let option = V2NIM2TeamMemberQueryOption()
     option.limit = 1000
     option.onlyChatBanned = false
     option.direction = .QUERY_DIRECTION_ASC

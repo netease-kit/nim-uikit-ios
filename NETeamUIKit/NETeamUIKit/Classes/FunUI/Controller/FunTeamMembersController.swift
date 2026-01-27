@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -48,11 +48,11 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
           cell.ownerLabel.isHidden = false
           cell.ownerLabel.text = localizable("team_manager")
           cell.setManagerStyle()
-          if isOwner(IMKitClient.instance.account()) {
+          if isOwner(IMKit2Client.instance.account()) {
             isShowRemove = true
           }
         } else {
-          if isOwner(IMKitClient.instance.account()) || viewModel.currentMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
+          if isOwner(IMKit2Client.instance.account()) || viewModel.currentMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
             isShowRemove = true
           }
           cell.ownerLabel.isHidden = true

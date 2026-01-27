@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -47,7 +47,7 @@ open class NEBasePinMessageMultiForwardCell: NEBasePinMessageCell {
 
   override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
-    guard let data = NECustomUtils.dataOfCustomMessage(item.chatmodel.message?.attachment) else {
+    guard let data = NE2CustomUtils.dataOfCustomMessage(item.chatmodel.message?.attachment) else {
       return
     }
 

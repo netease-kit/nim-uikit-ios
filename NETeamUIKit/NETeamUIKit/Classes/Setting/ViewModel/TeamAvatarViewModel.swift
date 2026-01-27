@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -11,13 +11,13 @@ open class TeamAvatarViewModel: NSObject {
   /// 群API单例
   let teamRepo = TeamRepo.shared
   /// 当前用户群成员对象
-  var currentTeamMember: V2NIMTeamMember?
+  var currentTeamMember: V2NIM2TeamMember?
 
   /// 获取当前用户群信息
   /// - Parameter teamId 群id
   open func getCurrentUserTeamMember(_ teamId: String?, _ completion: @escaping (NSError?) -> Void) {
     if let tid = teamId {
-      let currentUserAccid = IMKitClient.instance.account()
+      let currentUserAccid = IMKit2Client.instance.account()
       teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, currentUserAccid) { member, error in
         self.currentTeamMember = member
         completion(error)
@@ -32,9 +32,9 @@ open class TeamAvatarViewModel: NSObject {
   /// - Parameter completion: 完成后的回调
   open func updateTeamAvatar(_ url: String,
                              _ teamId: String,
-                             _ antispamConfig: V2NIMAntispamConfig?,
+                             _ antispamConfig: V2NIM2AntispamConfig?,
                              _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", url:\(url)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", url:\(url)")
     teamRepo.updateTeamIcon(teamId, .TEAM_TYPE_NORMAL, url) { error in
       completion(error)
     }
@@ -44,7 +44,7 @@ open class TeamAvatarViewModel: NSObject {
   ///  - Parameter filePath  文件路径
   ///  - Parameter sceneName 场景名
   open func createTask(_ filePath: String,
-                       _ sceneName: String? = nil) -> V2NIMUploadFileTask {
+                       _ sceneName: String? = nil) -> V2NIM2UploadFileTask {
     ResourceRepo.shared.createUploadFileTask(filePath, sceneName)
   }
 
@@ -52,10 +52,10 @@ open class TeamAvatarViewModel: NSObject {
   ///   - Parameter fileTask: 文件上传任务
   ///   - Parameter progress: 进度回调
   ///   - Parameter completion: 完成回调
-  open func uploadImageFile(_ fileTask: V2NIMUploadFileTask,
+  open func uploadImageFile(_ fileTask: V2NIM2UploadFileTask,
                             _ progress: ((Float) -> Void)?,
                             _ completion: ((String?, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", taskId:\(fileTask.taskId)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", taskId:\(fileTask.taskId)")
     ResourceRepo.shared.uploadFile(fileTask, progress, completion)
   }
 }

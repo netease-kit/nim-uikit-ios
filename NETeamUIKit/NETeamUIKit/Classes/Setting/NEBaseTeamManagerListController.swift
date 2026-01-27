@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NECommonUIKit
 import UIKit
@@ -98,7 +98,7 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
     if indexPath.section == 1 {
       let model = viewmodel.managers[indexPath.row]
       if let user = model.nimUser {
-        if IMKitClient.instance.isMe(user.user?.accountId) {
+        if IMKit2Client.instance.isMe(user.user?.accountId) {
           Router.shared.use(
             MeSettingRouter,
             parameters: ["nav": navigationController as Any],

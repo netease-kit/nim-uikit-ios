@@ -4,20 +4,20 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class MessageAIStreamModel: MessageTextModel {
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .aiStreamText
 
     resetMessage(message)
   }
 
-  override public func resetMessage(_ message: V2NIMMessage?) {
+  override public func resetMessage(_ message: V2NIM2Message?) {
     self.message = message
 
     // 【服务器异常停止】模型返回可能为空

@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -147,7 +147,7 @@ open class NEBaseJoinTeamViewController: NETeamBaseViewController, UITextFieldDe
     weak var weakSelf = self
     viewModel.getTeamInfo(text) { team, error in
       weakSelf?.isRequesting = false
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         "NEBaseJoinTeamViewController",
         desc: "CALLBACK getTeamInfo " + (error?.localizedDescription ?? "no error")
       )

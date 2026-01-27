@@ -3,26 +3,26 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 /// 群详情界面 - 基类
 @objcMembers
 open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  var team: V2NIMTeam?
+  var team: V2NIM2Team?
   var className = "TeamDetailViewController"
 
   var data = [[TeamDetailItem]]()
   public let viewModel = TeamDetailViewModel()
   public var headerView = TeamDetailHeaderView()
 
-  /// 使用 V2NIMTeam 初始化
-  /// - Parameter nim_team: V2NIMTeam 对象
-  public init(nim_team: V2NIMTeam) {
+  /// 使用 V2NIM2Team 初始化
+  /// - Parameter nim_team: V2NIM2Team 对象
+  public init(nim_team: V2NIM2Team) {
     super.init(nibName: nil, bundle: nil)
     team = nim_team
   }
@@ -204,7 +204,7 @@ open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableView
       return
     }
 
-    let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId)
+    let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamId)
     Router.shared.use(
       PushTeamChatVCRouter,
       parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any, "removeTeamVC": true],
@@ -221,27 +221,27 @@ open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableView
 
     if let teamId = team?.teamId {
       viewModel.applyJoinTeam(teamId) { team, error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           self.className,
           desc: "CALLBACK addFriend " + (error?.localizedDescription ?? "no error")
         )
         if let err = error as? NSError {
-          NEALog.errorLog("TeamDetailViewController", desc: "applyJoinTeam failed :\(err)")
-          if err.code == alreadyInTeamCode {
+          NE2ALog.errorLog("TeamDetailViewController", desc: "applyJoinTeam failed :\(err)")
+          if err.code == alreadyInTeamCode2 {
             weakSelf?.toChat()
           } else {
             weakSelf?.showToast(err.localizedDescription)
           }
           switch err.code {
-          case protocolSendFailed:
+          case protocolSendFailed2:
             weakSelf?.showToast(commonLocalizable("network_error"))
-          case teamNotExistCode:
+          case teamNotExistCode2:
             weakSelf?.showToast(commonLocalizable("team_not_exist"))
-          case alreadyInTeamCode:
+          case alreadyInTeamCode2:
             weakSelf?.toChat()
-          case teamMemberLimitExceededCode:
+          case teamMemberLimitExceededCode2:
             weakSelf?.showToast(localizable("team_member_limit_exceeded"))
-          case joinedTeamLimitExceededCode:
+          case joinedTeamLimitExceededCode2:
             weakSelf?.showToast(localizable("joined_team_limit_exceeded"))
           default:
             weakSelf?.showToast(err.localizedDescription)

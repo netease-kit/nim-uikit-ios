@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -140,7 +140,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
   private func showErrorToast(_ error: Error?) {
     if let err = error as? NSError {
       switch err.code {
-      case protocolSendFailed, -1009:
+      case protocolSendFailed2, -1009:
         showToast(commonLocalizable("network_error"))
       default:
         showToast(err.localizedDescription)
@@ -169,9 +169,9 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     let key = "\(model.type.rawValue)"
     if model.type == .custom {
       let customType = model.customType
-      if customType == customMultiForwardType {
+      if customType == customMultiForwardType2 {
         reuseId = "\(MessageType.multiForward.rawValue)"
-      } else if customType == customRichTextType {
+      } else if customType == customRichTextType2 {
         reuseId = "\(MessageType.richText.rawValue)"
       } else if NEChatUIKitClient.instance.getRegisterCustomCell()["\(customType)"] != nil {
         reuseId = "\(customType)"
@@ -237,7 +237,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
 
   open func didTapMessage(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ replyIndex: Int? = nil) {
     if model?.type == .image {
-      if let imageObject = model?.message?.attachment as? V2NIMMessageImageAttachment {
+      if let imageObject = model?.message?.attachment as? V2NIM2MessageImageAttachment {
         var imageUrl = ""
 
         if let url = imageObject.url {
@@ -257,7 +257,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
         }
       }
     } else if model?.type == .video,
-              let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
+              let object = model?.message?.attachment as? V2NIM2MessageVideoAttachment {
       // 设置扬声器
       NEAudioSessionManager.shared.switchToSpeaker()
       NEAudioSessionManager.shared.stopProximityMonitoring()
@@ -291,7 +291,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
         Router.shared.use(NERouterUrl.LocationVCRouter, parameters: params)
       }
     } else if model?.type == .file,
-              let object = model?.message?.attachment as? V2NIMMessageFileAttachment {
+              let object = model?.message?.attachment as? V2NIM2MessageFileAttachment {
       let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
       if !FileManager.default.fileExists(atPath: path) {
         if let index = replyIndex, index >= 0,
@@ -311,8 +311,8 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
         }
       }
     } else if model?.type == .custom {
-      if model?.customType == customMultiForwardType,
-         let data = NECustomUtils.dataOfCustomMessage(model?.message?.attachment) {
+      if model?.customType == customMultiForwardType2,
+         let data = NE2CustomUtils.dataOfCustomMessage(model?.message?.attachment) {
         let url = data["url"] as? String
         let md5 = data["md5"] as? String
         guard let fileDirectory = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) else { return }
@@ -334,13 +334,13 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
     func downloadFile(_ cell: UITableViewCell?, _ model: MessageContentModel?, _ url: String?, _ path: String) {
       // 判断是否是视频或者文件对象
       guard let urlString = url, let fileModel = model as? MessageVideoModel else {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "MessageFileModel not exit")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "MessageFileModel not exit")
         return
       }
 
       // 判断状态，如果是下载中不能进行预览
       if fileModel.state == .Downalod {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
         return
       }
 
@@ -350,7 +350,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
       }
 
       viewModel.downLoad(urlString, path) { progress in
-        NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "downLoad file progress: \(progress)")
+        NE2ALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "downLoad file progress: \(progress)")
         fileModel.progress = progress
         fileModel.cell?.uploadProgress(progress)
 

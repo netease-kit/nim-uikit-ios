@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers

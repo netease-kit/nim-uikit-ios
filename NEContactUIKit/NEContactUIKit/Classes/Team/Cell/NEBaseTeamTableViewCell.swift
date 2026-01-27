@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objcMembers
@@ -72,7 +72,7 @@ open class NEBaseTeamTableViewCell: UITableViewCell {
   }
 
   open func setModel(_ model: Any) {
-    guard let team = model as? NETeam else {
+    guard let team = model as? NE2Team else {
       return
     }
 

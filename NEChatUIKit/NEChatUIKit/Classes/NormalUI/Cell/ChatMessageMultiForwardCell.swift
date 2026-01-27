@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -167,7 +167,7 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
-    guard let data = NECustomUtils.dataOfCustomMessage(model.message?.attachment) else {
+    guard let data = NE2CustomUtils.dataOfCustomMessage(model.message?.attachment) else {
       return
     }
 

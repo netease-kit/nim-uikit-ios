@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import MJRefresh
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objc
@@ -157,9 +157,9 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     var reuseId = "\(model.chatmodel.type.rawValue)"
     if model.chatmodel.type == .custom {
       let customType = model.chatmodel.customType
-      if customType == customMultiForwardType {
+      if customType == customMultiForwardType2 {
         reuseId = "\(MessageType.multiForward.rawValue)"
-      } else if customType == customRichTextType {
+      } else if customType == customRichTextType2 {
         reuseId = "\(MessageType.richText.rawValue)"
       } else {
         reuseId = "\(NEBaseCollectionDefaultCell.self)"
@@ -190,9 +190,9 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
 
     if model.chatmodel.type == .custom {
-      if model.chatmodel.customType == customMultiForwardType {
+      if model.chatmodel.customType == customMultiForwardType2 {
         return model.cellHeight(contenttMaxW: collection_content_maxW) - 30
-      } else if model.chatmodel.customType != customRichTextType {
+      } else if model.chatmodel.customType != customRichTextType2 {
         // 不支持的自定义消息类型，如果后续有新增富文本类型需要添加处理逻辑
         return defaultHeight
       }
@@ -257,7 +257,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 转发
   /// - Parameter message: 消息
-  open func forwardCollectionMessage(_ message: V2NIMMessage, _ conversationName: String) {
+  open func forwardCollectionMessage(_ message: V2NIM2Message, _ conversationName: String) {
     weak var weakSelf = self
     Router.shared.register(ForwardMultiSelectedRouter) { param in
       var items = [ForwardItem]()
@@ -377,7 +377,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// 跳转视图显示控件
   /// - Parameter model: 收藏对象
   open func showImageView(_ model: CollectionMessageModel?) {
-    if let object = model?.message?.attachment as? V2NIMMessageImageAttachment {
+    if let object = model?.message?.attachment as? V2NIM2MessageImageAttachment {
       var imageUrlString = ""
 
       if let url = object.url {
@@ -400,7 +400,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// 跳转视频播放器
   /// - Parameter model: 收藏对象
   open func showVideoView(_ model: CollectionMessageModel?) {
-    if let object = model?.message?.attachment as? V2NIMMessageVideoAttachment {
+    if let object = model?.message?.attachment as? V2NIM2MessageVideoAttachment {
       stopPlay()
       // 设置扬声器
       NEAudioSessionManager.shared.switchToSpeaker()
@@ -425,7 +425,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// 跳转地图详情页
   /// - Parameter model: 收藏对象
   open func showMapDetail(_ model: CollectionMessageModel?) {
-    if let title = model?.message?.text, let locationObject = model?.message?.attachment as? V2NIMMessageLocationAttachment {
+    if let title = model?.message?.text, let locationObject = model?.message?.attachment as? V2NIM2MessageLocationAttachment {
       let lng = locationObject.longitude
 
       let subTitle = locationObject.address
@@ -454,15 +454,15 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// 跳转文件查看器
   /// - Parameter model: 收藏对象
   open func showFileDetail(_ model: CollectionMessageModel?) {
-    if let object = model?.message?.attachment as? V2NIMMessageFileAttachment {
+    if let object = model?.message?.attachment as? V2NIM2MessageFileAttachment {
       // 判断是否是文件对象
       guard let fileModel = model?.fileModel as? CollectionFileModel else {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "PinMessageFileModel not exit")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "PinMessageFileModel not exit")
         return
       }
       // 判断状态，如果是下载中不能进行预览
       if fileModel.state == .Downalod {
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "downLoad state, click ingore")
         return
       }
 
@@ -495,7 +495,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
     // 开始下载
     viewModel.downloadFile(urlString, path) { [weak self] progress in
-      NEALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
+      NE2ALog.infoLog(ModuleName + " " + (self?.className() ?? ""), desc: #function + "downLoad file progress: \(progress)")
 
       // 根据进度设置状态
       fileModel.progress = progress / UInt(100.0)
@@ -505,7 +505,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     } _: { [weak self] localPath, error in
       if let err = error {
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           self?.showToast(commonLocalizable("network_error"))
         default:
           print(err.localizedDescription)
@@ -523,10 +523,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       return
     }
 
-    if customType == customRichTextType {
+    if customType == customRichTextType2 {
       showTextViewController(model)
-    } else if customType == customMultiForwardType,
-              let data = NECustomUtils.dataOfCustomMessage(message.attachment) {
+    } else if customType == customMultiForwardType2,
+              let data = NE2CustomUtils.dataOfCustomMessage(message.attachment) {
       let url = data["url"] as? String
       let md5 = data["md5"] as? String
 
@@ -542,7 +542,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// - Parameter model: 收藏对象
   /// - Parameter cell: 内容视图显示控件
   open func didClickContent(_ model: CollectionMessageModel?, _ cell: NEBaseCollectionMessageCell) {
-    NEALog.infoLog(className(), desc: #function + "didClickContent")
+    NE2ALog.infoLog(className(), desc: #function + "didClickContent")
 
     guard let message = model?.message else {
       return
@@ -605,7 +605,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   /// - Parameter cell: 收藏列表视图对象
   /// - Parameter model: 收藏对象
   private func didPlay(cell: NEBaseCollectionMessageCell?, model: CollectionMessageModel?) {
-    guard let message = model?.message, let audio = message.attachment as? V2NIMMessageAudioAttachment, let messageId = message.messageServerId else {
+    guard let message = model?.message, let audio = message.attachment as? V2NIM2MessageAudioAttachment, let messageId = message.messageServerId else {
       return
     }
 
@@ -614,7 +614,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       if let urlString = audio.url {
         if viewModel.audioDownloadSet.contains(messageId) {
           // 当前语音消息正在下载无需重新下载
-          NEALog.infoLog(className(), desc: #function + " \(messageId) message's audio file downloading, not need download")
+          NE2ALog.infoLog(className(), desc: #function + " \(messageId) message's audio file downloading, not need download")
           return
         }
         viewModel.audioDownloadSet.insert(messageId)
@@ -623,7 +623,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
         viewModel.downloadFile(urlString, path, nil) { [weak self] _, error in
           self?.viewModel.audioDownloadSet.remove(messageId)
           if error == nil {
-            NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "collection download audio CALLBACK downLoad")
+            NE2ALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "collection download audio CALLBACK downLoad")
             if self?.viewModel.lastClickAuidoMessageId == messageId {
               self?.startPlay(cell: cell, model: model)
             }
@@ -663,8 +663,8 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
   /// 开始播放
   /// - Parameter audioMessage: 音频消息对象
-  func startPlaying(audioMessage: V2NIMMessage?) {
-    guard let message = audioMessage, let audio = message.attachment as? V2NIMMessageAudioAttachment else {
+  func startPlaying(audioMessage: V2NIM2Message?) {
+    guard let message = audioMessage, let audio = message.attachment as? V2NIM2MessageAudioAttachment else {
       return
     }
 
@@ -672,7 +672,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
 
     let path = audio.path ?? ChatMessageHelper.createFilePath(message)
     if FileManager.default.fileExists(atPath: path) {
-      NEALog.infoLog(className(), desc: #function + " play path : " + path)
+      NE2ALog.infoLog(className(), desc: #function + " play path : " + path)
 
       // 创建一个URL对象，指向音频文件
       let audioURL = URL(fileURLWithPath: path)
@@ -696,7 +696,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
         print("Error loading audio: \(error.localizedDescription)")
       }
     } else {
-      NEALog.infoLog(className(), desc: #function + " audio path is empty, play url : " + (audio.url ?? ""))
+      NE2ALog.infoLog(className(), desc: #function + " audio path is empty, play url : " + (audio.url ?? ""))
       playingCell?.stopPlayAnimation()
     }
   }
@@ -715,7 +715,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   open func showTextViewController(_ model: CollectionMessageModel?) {
     guard let model = model?.chatmodel as? MessageTextModel else { return }
 
-    let title = NECustomUtils.titleOfRichText(model.message?.attachment)
+    let title = NE2CustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
     let textViewController = getTextViewController(title: title, body: body)
     let nav = NENavigationController(rootViewController: textViewController)

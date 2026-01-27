@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoModel?) -> Void
@@ -112,7 +112,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       let aiUsers = NEAIUserManager.shared.getAIChatUserList()
       aiUserMembers = aiUsers.map { user in
         let teamMember = NETeamMemberInfoModel()
-        teamMember.nimUser = NEUserWithFriend(user: user)
+        teamMember.nimUser = NE2UserWithFriend(user: user)
         return teamMember
       }
     }
@@ -126,16 +126,16 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       return
     }
 
-    guard V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_TEAM,
-          let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+    guard V2NIM2ConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_TEAM,
+          let teamId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) else {
       return
     }
 
     // 获取群成员列表
-    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
+    NE2ALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     viewModel.getTeamMembers(teamId) { [weak self] error, team in
-      NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
-      NEALog.infoLog(
+      NE2ALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+      NE2ALog.infoLog(
         ModuleName + " " + (self?.className ?? "SelectUserViewController"),
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")
       )
@@ -148,7 +148,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       var selfIndex = -1
       if !(self?.showSelf ?? true), let users = team?.users {
         for (index, user) in users.enumerated() {
-          if user.nimUser?.user?.accountId == IMKitClient.instance.account() {
+          if user.nimUser?.user?.accountId == IMKit2Client.instance.account() {
             if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
                let custom = team?.team?.serverExtension, !custom.isEmpty,
                let json = getDictionaryFromJSONString(custom),
@@ -215,7 +215,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       }
 
       self?.teamInfo = team
-      NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " reload @ tableview, timestamp: \(Date().timeIntervalSince1970)")
+      NE2ALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " reload @ tableview, timestamp: \(Date().timeIntervalSince1970)")
       self?.tableView.reloadData()
     }
   }

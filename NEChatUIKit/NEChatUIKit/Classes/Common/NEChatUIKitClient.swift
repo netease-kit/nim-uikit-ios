@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objc
@@ -66,7 +66,7 @@ open class NEChatUIKitClient: NSObject {
 
   /// 获取更多面板数据
   /// - Returns: 返回更多操作数据
-  open func getMoreActionData(sessionType: V2NIMConversationType, _ viewController: ChatViewController) -> [NEMoreItemModel] {
+  open func getMoreActionData(sessionType: V2NIM2ConversationType, _ viewController: ChatViewController) -> [NEMoreItemModel] {
     var more = [NEMoreItemModel]()
     for model in moreAction {
       if model.type != .rtc {
@@ -86,7 +86,7 @@ open class NEChatUIKitClient: NSObject {
   /// 新增聊天页针对自定义消息的cell扩展，以及现有cell样式覆盖
   open func regsiterCustomCell(_ registerDic: [String: UITableViewCell.Type]) {
     for (key, value) in registerDic {
-      NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(key), cell: \(value.className())")
+      NE2ALog.infoLog(keyCustomMessage, desc: #function + "type: \(key), cell: \(value.className())")
       customRegisterDic[key] = value
     }
   }

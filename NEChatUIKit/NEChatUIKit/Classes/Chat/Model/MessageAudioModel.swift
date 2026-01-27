@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class MessageAudioModel: MessageContentModel {
@@ -13,12 +13,12 @@ open class MessageAudioModel: MessageContentModel {
   public var isPlaying = false
   public var text: String? // 语音转文字结果
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .audio
     var audioW = 96.0
     // contentSize
-    if let obj = message?.attachment as? V2NIMMessageAudioAttachment {
+    if let obj = message?.attachment as? V2NIM2MessageAudioAttachment {
       duration = Int((Double(obj.duration) / 1000).rounded())
       if duration > 2 {
         audioW = min(Double(duration) * 8 + audioW, audio_max_width)

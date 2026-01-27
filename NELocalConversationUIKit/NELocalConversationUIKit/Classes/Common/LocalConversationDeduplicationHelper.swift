@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
-public class LocalConversationDeduplicationHelper: NSObject, NEIMKitClientListener {
+public class LocalConversationDeduplicationHelper: NSObject, NE2IMKitClientListener {
   // 单例变量
   static let instance = LocalConversationDeduplicationHelper()
   // 最多缓存数量，可外部修改
@@ -17,20 +17,20 @@ public class LocalConversationDeduplicationHelper: NSObject, NEIMKitClientListen
 
   override private init() {
     super.init()
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   deinit {
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
   }
 
-  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIM2LoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
-  open func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
+  open func onKickedOffline(_ detail: V2NIM2KickedOfflineDetail) {
     clearCache()
   }
 

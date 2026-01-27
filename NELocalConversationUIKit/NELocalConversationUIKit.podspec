@@ -24,6 +24,6 @@ Pod::Spec.new do |spec|
   YXConfig.pod_target_xcconfig(spec)
 
   spec.dependency 'NECommonUIKit'
-  spec.dependency 'NEChatKit'
+  spec.dependency 'NEChatKit_coexist'
   spec.dependency 'MJRefresh'
 end

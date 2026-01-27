@@ -4,23 +4,23 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class MessageTextModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
   public var textHeight: CGFloat = 0
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .text
 
     resetMessage(message)
   }
 
-  public func resetMessage(_ message: V2NIMMessage?) {
+  public func resetMessage(_ message: V2NIM2Message?) {
     self.message = message
 
     if let text = message?.text, !text.isEmpty {

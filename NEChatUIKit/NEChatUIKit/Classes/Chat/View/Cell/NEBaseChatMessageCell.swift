@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objc
@@ -547,7 +547,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       case .MESSAGE_SENDING_STATE_SENDING:
         activityView.messageStatus = .sending
       case .MESSAGE_SENDING_STATE_SUCCEEDED:
-        if model.message?.messageStatus.errorCode != operationSuccess {
+        if model.message?.messageStatus.errorCode != operationSuccess2 {
           activityView.messageStatus = .sendingFailed
           readView.isHidden = true
         } else {
@@ -602,7 +602,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell {
       let pinText = String(format: chatLocalizable("pin_text"), chatLocalizable("You"))
       if model.pinAccount == nil {
         pinLabel.text = pinText
-      } else if let account = model.pinAccount, account == IMKitClient.instance.account() {
+      } else if let account = model.pinAccount, account == IMKit2Client.instance.account() {
         pinLabel.text = pinText
       } else if let text = model.pinShowName {
         pinLabel.text = String(format: chatLocalizable("pin_text"), text)

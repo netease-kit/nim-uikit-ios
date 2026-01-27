@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objc
@@ -84,10 +84,10 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     }
   }
 
-  open func removePinMessage(_ message: V2NIMMessage,
+  open func removePinMessage(_ message: V2NIM2Message,
                              _ completion: @escaping (Error?)
                                -> Void) {
-    NEALog.infoLog("PinMessageViewModel", desc: #function + ", messageId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog("PinMessageViewModel", desc: #function + ", messageId: \(String(describing: message.messageClientId))")
     chatRepo.unpinMessage(messageRefer: message, serverExtension: "") { error in
       completion(error)
     }
@@ -99,8 +99,8 @@ open class PinMessageViewModel: NSObject, NEChatListener {
   ///   - type: 类型
   /// - Returns: 请求大模型的内容
   open func getAIModelCallContent(_ text: String?,
-                                  _ type: V2NIMAIModelCallContentType) -> V2NIMAIModelCallContent {
-    let content = V2NIMAIModelCallContent()
+                                  _ type: V2NIM2AIModelCallContentType) -> V2NIM2AIModelCallContent {
+    let content = V2NIM2AIModelCallContent()
     content.msg = text ?? ""
     content.type = type
     return content
@@ -111,31 +111,31 @@ open class PinMessageViewModel: NSObject, NEChatListener {
   ///   - aiUserAccid: 数字人 id
   ///   - message: 消息
   /// - Returns: 消息发送参数
-  func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+  func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIM2Message) -> V2NIM2SendMessageParams {
     let params = chatRepo.getSendMessageParams()
     guard let cid = aiUserAccid,
-          let aiAccid = V2NIMConversationIdUtil.conversationTargetId(cid),
+          let aiAccid = V2NIM2ConversationIdUtil.conversationTargetId(cid),
           NEAIUserManager.shared.isAIUser(aiAccid) else {
       return params
     }
 
-    let aiConfig = V2NIMMessageAIConfigParams()
+    let aiConfig = V2NIM2MessageAIConfigParams()
     aiConfig.accountId = aiAccid
     aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
     // 文本消
     if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
-      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
     }
 
     // 换行消息
     if message.messageType == .MESSAGE_TYPE_CUSTOM,
-       let type = NECustomUtils.typeOfCustomMessage(message.attachment),
-       type == customRichTextType {
-      let title = NECustomUtils.titleOfRichText(message.attachment)
-      let body = NECustomUtils.bodyOfRichText(message.attachment)
+       let type = NE2CustomUtils.typeOfCustomMessage(message.attachment),
+       type == customRichTextType2 {
+      let title = NE2CustomUtils.titleOfRichText(message.attachment)
+      let body = NE2CustomUtils.bodyOfRichText(message.attachment)
       let text = (title ?? "") + (body ?? "")
-      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
     }
 
     params.aiConfig = aiConfig
@@ -143,8 +143,8 @@ open class PinMessageViewModel: NSObject, NEChatListener {
     return params
   }
 
-  open func sendTextMessage(text: String, conversationId: String, _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
+  open func sendTextMessage(text: String, conversationId: String, _ completion: @escaping (V2NIM2SendMessageResult?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
     if text.count <= 0 {
       return
     }
@@ -165,11 +165,11 @@ open class PinMessageViewModel: NSObject, NEChatListener {
   ///   - conversationIds: 会话 id 列表
   ///   - comment: 留言
   ///   - completion: 完成回调
-  open func forwardMessages(_ message: V2NIMMessage,
+  open func forwardMessages(_ message: V2NIM2Message,
                             _ conversationIds: [String],
                             _ comment: String?,
-                            _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
+                            _ completion: @escaping (V2NIM2SendMessageResult?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
     for conversationId in conversationIds {
       let forwardMessage = MessageUtils.forwardMessage(message: message)
       ChatMessageHelper.clearForwardAtMark(forwardMessage)
@@ -187,16 +187,16 @@ open class PinMessageViewModel: NSObject, NEChatListener {
                      _ filePath: String,
                      _ progress: ((UInt) -> Void)?,
                      _ completion: ((String?, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
     ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
   open func getHandSetEnable() -> Bool {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     return SettingRepo.shared.getHandsetMode()
   }
 
-  func onDeleteIndexPath(_ messageRefers: [V2NIMMessageRefer?]) {
+  func onDeleteIndexPath(_ messageRefers: [V2NIM2MessageRefer?]) {
     for messageRefer in messageRefers {
       items.removeAll { $0.message.messageClientId == messageRefer?.messageClientId }
     }
@@ -208,13 +208,13 @@ open class PinMessageViewModel: NSObject, NEChatListener {
 
   /// 收到消息撤回回调
   /// - Parameter revokeNotifications: 消息撤回通知数据
-  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIM2MessageRevokeNotification]) {
     delegate?.tableViewReload(needLoad: true)
   }
 
   /// 消息pin状态回调通知
   /// - Parameter pinNotification: 消息pin状态变化通知数据
-  open func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
+  open func onMessagePinNotification(_ pinNotification: V2NIM2MessagePinNotification) {
     switch pinNotification.pinState {
     case .MESSAGE_PIN_STEATE_NOT_PINNED:
       let messageRefer = pinNotification.pin?.messageRefer
@@ -230,7 +230,7 @@ open class PinMessageViewModel: NSObject, NEChatListener {
 
   /// 消息被删除通知
   /// - Parameter messageDeletedNotification: 被删除的消息列表
-  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
+  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIM2MessageDeletedNotification]) {
     let messageRefers = messageDeletedNotification.map(\.messageRefer)
     onDeleteIndexPath(messageRefers)
   }

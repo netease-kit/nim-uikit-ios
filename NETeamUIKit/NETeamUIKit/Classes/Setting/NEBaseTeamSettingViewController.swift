@@ -5,8 +5,8 @@
 
 import NEChatUIKit
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -128,7 +128,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
         NETeamUserManager.shared.loadData(tid)
       }
 
-      viewModel.getCurrentMember(IMKitClient.instance.account(), tid) { member, error in
+      viewModel.getCurrentMember(IMKit2Client.instance.account(), tid) { member, error in
         if let currentMember = member {
           weakSelf?.requestSettingData(tid, currentMember)
         } else {
@@ -175,17 +175,17 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   }
 
   /// 获取群设置数据
-  open func requestSettingData(_ tid: String, _ member: V2NIMTeamMember) {
+  open func requestSettingData(_ tid: String, _ member: V2NIM2TeamMember) {
     weak var weakSelf = self
     viewModel.getTeamWithMembers(tid) { error in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className,
         desc: "CALLBACK getTeamInfo " + (error?.localizedDescription ?? "no error")
       )
       if let err = error {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == teamNotExistCode {
+        } else if err.code == teamNotExistCode2 {
           weakSelf?.showToast(commonLocalizable("team_not_exist"))
         } else {
           weakSelf?.showToast(err.localizedDescription)
@@ -193,7 +193,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
       } else {
         if let type = weakSelf?.viewModel.teamInfoModel?.team?.teamType {
           if type == .TEAM_TYPE_NORMAL {
-            if let custom = weakSelf?.viewModel.teamInfoModel?.team?.serverExtension, custom.contains(discussTeamKey) {
+            if let custom = weakSelf?.viewModel.teamInfoModel?.team?.serverExtension, custom.contains(discussTeamKey2) {
               weakSelf?.teamSettingType = .Discuss
               weakSelf?.isSeniorDiscuss = true
             } else {
@@ -207,7 +207,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
         weakSelf?.resetupUI()
 
         weakSelf?.viewModel.getAllTeamMemberInfos(tid, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { error in
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: "CALLBACK getAllTeamMemberInfos \(error?.localizedDescription ?? "no error")")
+          NE2ALog.infoLog(weakSelf?.className() ?? "", desc: "CALLBACK getAllTeamMemberInfos \(error?.localizedDescription ?? "no error")")
         }
       }
     }
@@ -277,7 +277,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
           param["filters"] = filters
         }
 
-        param["limit"] = (self?.viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit + filters.count) - filters.count
+        param["limit"] = (self?.viewModel.teamInfoModel?.team?.memberLimit ?? inviteNumberLimit2 + filters.count) - filters.count
 
         if IMKitConfigCenter.shared.enableAIUser {
           Router.shared.use(ContactFusionSelectRouter, parameters: param, closure: nil)
@@ -367,7 +367,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
                            didSelectItemAt indexPath: IndexPath) {
     if let member = viewModel.teamInfoModel?.users[indexPath.row],
        let nimUser = member.nimUser {
-      if IMKitClient.instance.isMe(nimUser.user?.accountId) {
+      if IMKit2Client.instance.isMe(nimUser.user?.accountId) {
         Router.shared.use(
           MeSettingRouter,
           parameters: ["nav": navigationController as Any],
@@ -459,9 +459,9 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     viewModel.inviteUsers(accids, tid) { error, members in
       if let err = error {
         weakSelf?.view.hideToastActivity()
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionInviteCode {
+        } else if err.code == noPermissionInviteCode2 {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -479,7 +479,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
       weak var weakSelf = self
       view.makeToastActivity(.center)
       viewModel.dismissTeam(tid) { error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           ModuleName + " " + self.className,
           desc: "CALLBACK dismissTeam " + (error?.localizedDescription ?? "no error")
         )
@@ -505,7 +505,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     if let tid = teamId {
       view.makeToastActivity(.center)
       viewModel.leaveTeam(tid) { [weak self] error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           ModuleName + " " + (self?.className ?? "TeamSettingViewController"),
           desc: "CALLBACK quitTeam " + (error?.localizedDescription ?? "no error")
         )
@@ -530,13 +530,13 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   open func didClickMark() {
     if let tid = teamId {
-      let conversationId = V2NIMConversationIdUtil.teamConversationId(tid)
+      let conversationId = V2NIM2ConversationIdUtil.teamConversationId(tid)
       Router.shared.use(PushPinMessageVCRouter, parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any], closure: nil)
     }
   }
 
   open func didError(_ error: NSError) {
-    if error.code == protocolSendFailed {
+    if error.code == protocolSendFailed2 {
       showToast(commonLocalizable("network_error"))
     } else {
       showToast(commonLocalizable("failed_operation"))
@@ -565,7 +565,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_MANAGER) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
       )
@@ -584,7 +584,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     weak var weakSelf = self
     weakSelf?.view.makeToastActivity(.center)
     weakSelf?.viewModel.teamRepo.updateInviteMode(weakSelf?.teamId ?? "", .TEAM_TYPE_NORMAL, .TEAM_INVITE_MODE_ALL) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
       )

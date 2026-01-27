@@ -3,14 +3,14 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 /// 群信息变更回调协议
 @objc
 public protocol NETeamInfoDelegate: NSObjectProtocol {
   /// 群信息变更
-  func teamInfoDidUpdate(_ team: V2NIMTeam)
+  func teamInfoDidUpdate(_ team: V2NIM2Team)
 }
 
 @objcMembers
@@ -22,7 +22,7 @@ open class TeamInfoViewModel: NSObject, NETeamListener {
   public let teamRepo = TeamRepo.shared
 
   /// 群
-  public var v2Team: V2NIMTeam?
+  public var v2Team: V2NIM2Team?
 
   /// 代理
   public weak var delegate: NETeamInfoDelegate?
@@ -34,9 +34,9 @@ open class TeamInfoViewModel: NSObject, NETeamListener {
 
   /// 获取群信息
   /// - Parameter team: 群
-  open func getData(_ team: V2NIMTeam?) {
+  open func getData(_ team: V2NIM2Team?) {
     v2Team = team
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(team?.teamId ?? "nil")")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(team?.teamId ?? "nil")")
     cellDatas.removeAll()
 
     let headerCell = SettingCellModel()
@@ -68,7 +68,7 @@ open class TeamInfoViewModel: NSObject, NETeamListener {
 
   /// 群信息更新
   /// - Parameter team: 群
-  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIM2Team) {
     if let teamId = v2Team?.teamId, teamId == team.teamId {
       getData(team)
       delegate?.teamInfoDidUpdate(team)

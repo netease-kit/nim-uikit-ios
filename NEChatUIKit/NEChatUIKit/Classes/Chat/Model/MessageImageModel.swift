@@ -4,23 +4,23 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 
 @objcMembers
 open class MessageImageModel: MessageContentModel {
   public var urlString: String?
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .image
-    if let imageObject = message?.attachment as? V2NIMMessageImageAttachment {
+    if let imageObject = message?.attachment as? V2NIM2MessageImageAttachment {
       if let path = imageObject.path, FileManager.default.fileExists(atPath: path) {
         urlString = path
       } else if let url = imageObject.url {
         if imageObject.ext?.lowercased() != ".gif",
            ChatUIConfig.shared.imageThumbSize > 0 {
-          urlString = V2NIMStorageUtil.imageThumbUrl(url, thumbSize: ChatUIConfig.shared.imageThumbSize)
+          urlString = V2NIM2StorageUtil.imageThumbUrl(url, thumbSize: ChatUIConfig.shared.imageThumbSize)
         } else {
           urlString = url
         }

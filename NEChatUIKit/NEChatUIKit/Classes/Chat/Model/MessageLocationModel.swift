@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -12,10 +12,10 @@ open class MessageLocationModel: MessageContentModel {
   public var title: String?
   public var subTitle: String?
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .location
-    if let locationObject = message?.attachment as? V2NIMMessageLocationAttachment {
+    if let locationObject = message?.attachment as? V2NIM2MessageLocationAttachment {
       lat = locationObject.latitude
       lng = locationObject.longitude
       subTitle = locationObject.address

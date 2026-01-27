@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -20,12 +20,12 @@ open class ContactUserViewController: NEBaseContactUserViewController {
     initNormal()
   }
 
-  override public init(nim_user: V2NIMUser) {
+  override public init(nim_user: V2NIM2User) {
     super.init(nim_user: nim_user)
     initNormal()
   }
 
-  override public init(user: NEUserWithFriend?) {
+  override public init(user: NE2UserWithFriend?) {
     super.init(user: user)
     initNormal()
   }

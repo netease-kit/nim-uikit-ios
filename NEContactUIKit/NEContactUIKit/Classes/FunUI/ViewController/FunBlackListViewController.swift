@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -42,7 +42,7 @@ open class FunBlackListViewController: NEBaseBlackListViewController {
   /// - Returns: 人员选择控制器
   override open func getContactSelectVC() -> NEBaseContactSelectedViewController {
     var filterUsers = Set<String>()
-    filterUsers.insert(IMKitClient.instance.account())
+    filterUsers.insert(IMKit2Client.instance.account())
     return FunContactSelectedViewController(filterUsers: filterUsers)
   }
 }

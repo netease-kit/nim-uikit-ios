@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -19,12 +19,12 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     initFun()
   }
 
-  override public init(nim_user: V2NIMUser) {
+  override public init(nim_user: V2NIM2User) {
     super.init(nim_user: nim_user)
     initFun()
   }
 
-  override public init(user: NEUserWithFriend?) {
+  override public init(user: NE2UserWithFriend?) {
     super.init(user: user)
     initFun()
   }
@@ -65,7 +65,7 @@ open class FunContactUserViewController: NEBaseContactUserViewController {
     FunContactAliasViewController()
   }
 
-  override open func deleteFriend(user: NEUserWithFriend?) {
+  override open func deleteFriend(user: NE2UserWithFriend?) {
     let titleAction = NECustomAlertAction(title: String(format: localizable("delete_title"), user?.showName() ?? "")) {}
     titleAction.contentText.font = .systemFont(ofSize: 13)
     titleAction.contentText.textColor = UIColor(hexString: "#8F8F8F")

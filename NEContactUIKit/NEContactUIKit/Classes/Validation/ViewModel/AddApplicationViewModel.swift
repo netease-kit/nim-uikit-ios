@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 
 @objc
@@ -34,7 +34,7 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   /// - Parameter firstLoad: 是否是首次加载
   /// - Parameter completin: 完成回调
   open func loadApplicationList(_ firstLoad: Bool, _ completin: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     let offset = firstLoad ? 0 : offset
     if firstLoad {
@@ -47,7 +47,7 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
       return
     }
 
-    let option = V2NIMFriendAddApplicationQueryOption()
+    let option = V2NIM2FriendAddApplicationQueryOption()
     option.offset = offset
     option.limit = pageMaxLimit
 
@@ -73,10 +73,10 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   ///   - item: 好友申请
   ///   - move: 是否移动到最前
   ///   - completin: 完成回调
-  open func convertToNEAddApplication(_ item: V2NIMFriendAddApplication,
+  open func convertToNEAddApplication(_ item: V2NIM2FriendAddApplication,
                                       _ move: Bool = false,
                                       _ completin: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     var isExist = false
     for (index, neItem) in friendAddApplications.enumerated() {
       if neItem.isEqualTo(item) {
@@ -106,7 +106,7 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
     var applicationAccid = friendAddApplication.v2Notification.applicantAccountId
 
     // 申请添加他人为好友
-    if friendAddApplication.v2Notification.applicantAccountId == IMKitClient.instance.account() {
+    if friendAddApplication.v2Notification.applicantAccountId == IMKit2Client.instance.account() {
       applicationAccid = friendAddApplication.v2Notification.recipientAccountId
       // 同意
       if friendAddApplication.v2Notification.status == .FRIEND_ADD_APPLICATION_STATUS_AGREED {
@@ -137,7 +137,7 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   /// 设置所有好友申请已读
   /// - Parameter completion: 完成回调
   open func setAddApplicationRead(_ completion: ((Bool, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.setAddApplicationRead { [weak self] success, error in
       self?.friendAddApplications.forEach { application in
         application.unreadCount = 0
@@ -155,8 +155,8 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 申请添加好友的相关信息
   ///   - status: 好友申请的处理状态
-  open func changeApplicationStatus(_ application: V2NIMFriendAddApplication,
-                                    _ status: V2NIMFriendAddApplicationStatus) {
+  open func changeApplicationStatus(_ application: V2NIM2FriendAddApplication,
+                                    _ status: V2NIM2FriendAddApplicationStatus) {
     var changedIndex = -1
     for (index, item) in friendAddApplications.enumerated() {
       if item.isEqualTo(application, false) {
@@ -183,14 +183,14 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 好友申请
   ///   - completion: 完成回调
-  open func agreeRequest(application: V2NIMFriendAddApplication,
+  open func agreeRequest(application: V2NIM2FriendAddApplication,
                          _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
     contactRepo.acceptAddApplication(application: application) { [weak self] error in
       if let err = error {
         print(err.localizedDescription)
       } else {
-        if let accid = application.applicantAccountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid) {
+        if let accid = application.applicantAccountId, let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(accid) {
           Router.shared.use(ChatAddFriendRouter, parameters: ["text": localizable("let_us_chat"),
                                                               "conversationId": conversationId as Any])
         }
@@ -204,9 +204,9 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
   /// - Parameters:
   ///   - application: 好友申请
   ///   - completion: 完成回调
-  open func refuseRequest(application: V2NIMFriendAddApplication,
+  open func refuseRequest(application: V2NIM2FriendAddApplication,
                           _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", operatorAccountId:\(String(describing: application.operatorAccountId))")
     contactRepo.rejectAddApplication(application: application) { [weak self] error in
       if let err = error {
         print(err.localizedDescription)
@@ -219,7 +219,7 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
 
   /// 清空好友申请通知
   open func clearNotification(_ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.clearNotification { [weak self] error in
       if let err = error {
         print(err.localizedDescription)
@@ -233,8 +233,8 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
 
   /// 收到好友添加申请回调
   /// - Parameter application: 申请添加好友信息
-  open func onFriendAddApplication(_ application: V2NIMFriendAddApplication) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  open func onFriendAddApplication(_ application: V2NIM2FriendAddApplication) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     convertToNEAddApplication(application, true) { error in
       if let err = error {
         print(err.localizedDescription)
@@ -244,11 +244,11 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
 
   /// 好友添加申请被拒绝回调
   /// - Parameter rejectionInfo: 申请添加好友拒绝信息
-  open func onFriendAddRejected(_ rejectionInfo: V2NIMFriendAddApplication) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  open func onFriendAddRejected(_ rejectionInfo: V2NIM2FriendAddApplication) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     for item in friendAddApplications {
-      if item.v2Notification.applicantAccountId == IMKitClient.instance.account(),
+      if item.v2Notification.applicantAccountId == IMKit2Client.instance.account(),
          item.v2Notification.recipientAccountId == rejectionInfo.operatorAccountId {
         item.handleStatus = .FRIEND_ADD_APPLICATION_STATUS_REJECED
         item.unreadCount = 0

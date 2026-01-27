@@ -3,13 +3,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class NEBaseConversationListCell: UITableViewCell {
   private var timeWidth: NSLayoutConstraint?
-  private var conversationType: V2NIMConversationType = .CONVERSATION_TYPE_UNKNOWN
+  private var conversationType: V2NIM2ConversationType = .CONVERSATION_TYPE_UNKNOWN
   private var sessionId = ""
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -82,7 +82,7 @@ open class NEBaseConversationListCell: UITableViewCell {
 
     if conversationModel.conversation?.type == .CONVERSATION_TYPE_P2P {
       guard let conversationId = conversationModel.conversation?.conversationId,
-            let accountId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+            let accountId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) else {
         return
       }
 
@@ -101,7 +101,7 @@ open class NEBaseConversationListCell: UITableViewCell {
       }
     } else if conversationModel.conversation?.type == .CONVERSATION_TYPE_TEAM {
       guard let conversationId = conversationModel.conversation?.conversationId,
-            let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+            let teamId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) else {
         return
       }
 
@@ -185,7 +185,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     }
   }
 
-  open func timestampDescriptionForRecentSession(recentSession: NIMRecentSession) -> TimeInterval {
+  open func timestampDescriptionForRecentSession(recentSession: NIM2RecentSession) -> TimeInterval {
     if let lastMessage = recentSession.lastMessage {
       return lastMessage.timestamp
     }
@@ -193,7 +193,7 @@ open class NEBaseConversationListCell: UITableViewCell {
     return 0
   }
 
-  open func contentForConversation(lastMessage: V2NIMLastMessage) -> String {
+  open func contentForConversation(lastMessage: V2NIM2LastMessage) -> String {
     let text = NEMessageUtil.messageContent(lastMessage.messageType, lastMessage.text, lastMessage.attachment)
     return text
   }

@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objc
 public protocol NEAIWordSearchViewModelDelegate {
@@ -38,32 +38,32 @@ open class NEAIWordSearchViewModel: NSObject {
   ///   - type: 类型
   /// - Returns: 大模型请求内容类型
   func getAIModelCallContent(_ msg: String,
-                             _ type: V2NIMAIModelCallContentType) -> V2NIMAIModelCallContent {
-    let content = V2NIMAIModelCallContent()
+                             _ type: V2NIM2AIModelCallContentType) -> V2NIM2AIModelCallContent {
+    let content = V2NIM2AIModelCallContent()
     content.msg = msg
-    content.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
+    content.type = .AI_MODEL_CONTENT_TYPE_TEXT
     return content
   }
 
   /// 获取 AI 大模型配置
   /// - Parameter temperature: 控制随机性和多样性的程度
   /// - Returns: AI 大模型配置
-  func getAIModelConfigParams(_ temperature: CGFloat) -> V2NIMAIModelConfigParams {
-    let aiConfig = V2NIMAIModelConfigParams()
+  func getAIModelConfigParams(_ temperature: CGFloat) -> V2NIM2AIModelConfigParams {
+    let aiConfig = V2NIM2AIModelConfigParams()
     aiConfig.temperature = temperature
     return aiConfig
   }
 
   /// 获取请求调用上下文内容
   /// - Returns: 请求调用上下文内容
-  func getAIMessages() -> [V2NIMAIModelCallMessage]? {
-    var aiMessages = [V2NIMAIModelCallMessage]()
+  func getAIMessages() -> [V2NIM2AIModelCallMessage]? {
+    var aiMessages = [V2NIM2AIModelCallMessage]()
     for (i, text) in searchTexts.enumerated() {
-      NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AISearch], message text\(i + 1): \(String(describing: text))")
-      let message = V2NIMAIModelCallMessage()
+      NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AISearch], message text\(i + 1): \(String(describing: text))")
+      let message = V2NIM2AIModelCallMessage()
       message.msg = text
-      message.role = .NIM_AI_MODEL_ROLE_TYPE_USER
-      message.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
+      message.role = .AI_MODEL_ROLE_TYPE_USER
+      message.type = .AI_MODEL_CONTENT_TYPE_TEXT
       aiMessages.append(message)
     }
     return aiMessages.isEmpty ? nil : aiMessages
@@ -78,9 +78,9 @@ open class NEAIWordSearchViewModel: NSObject {
   /// - Returns: Al 数字人请求参数
   func getProxyAIModelCallParams(_ accid: String,
                                  _ requestId: String,
-                                 _ content: V2NIMAIModelCallContent,
-                                 _ modelConfigParams: V2NIMAIModelConfigParams) -> V2NIMProxyAIModelCallParams {
-    let params = V2NIMProxyAIModelCallParams()
+                                 _ content: V2NIM2AIModelCallContent,
+                                 _ modelConfigParams: V2NIM2AIModelConfigParams) -> V2NIM2ProxyAIModelCallParams {
+    let params = V2NIM2ProxyAIModelCallParams()
     params.accountId = accid
     params.requestId = requestId
     params.content = content
@@ -94,7 +94,7 @@ open class NEAIWordSearchViewModel: NSObject {
   ///   - searchText: 搜索文本
   ///   - completion: 完成回调
   func loadData(_ searchText: String?, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AISearch], searchText: \(String(describing: searchText))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AISearch], searchText: \(String(describing: searchText))")
     guard let text = searchText else {
       completion(nil)
       return
@@ -103,7 +103,7 @@ open class NEAIWordSearchViewModel: NSObject {
     guard let aiUser = NEAIUserManager.shared.getAISearchUser() else { return }
     if let accid = aiUser.accountId {
       let requestId = UUID().uuidString
-      let content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      let content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
       let modelConfigParams = getAIModelConfigParams(aiModelTemperature)
       let params = getProxyAIModelCallParams(accid, requestId, content, modelConfigParams)
 
@@ -120,42 +120,42 @@ open class NEAIWordSearchViewModel: NSObject {
   }
 }
 
-// MARK: - V2NIMAIListener
+// MARK: - V2NIM2AIListener
 
-extension NEAIWordSearchViewModel: V2NIMAIListener {
+extension NEAIWordSearchViewModel: V2NIM2AIListener {
   /// 展示错误弹窗
   /// - Parameter error: 错误信息
-  func getErrorText(_ data: V2NIMAIModelCallResult) -> String {
+  func getErrorText(_ data: V2NIM2AIModelCallResult) -> String {
     switch data.code {
-    case operationSuccess:
+    case operationSuccess2:
       return data.content.msg
-    case failedOperation:
+    case failedOperation2:
       return commonLocalizable("parameter_setting_error")
-    case rateLimitExceeded:
+    case rateLimitExceeded2:
       return commonLocalizable("rate_limit_exceeded")
-    case userNotExistCode:
+    case userNotExistCode2:
       return commonLocalizable("user_not_exist")
-    case userBannedCode:
+    case userBannedCode2:
       return commonLocalizable("user_banned")
-    case userChatBannedCode:
+    case userChatBannedCode2:
       return commonLocalizable("user_chat_banned")
-    case noFriendCode:
+    case noFriendCode2:
       return commonLocalizable("friend_not_exist")
-    case messageHitAntispam1, messageHitAntispam2:
+    case messageHitAntispam12, messageHitAntispam22:
       return commonLocalizable("message_hit_antispam")
-    case teamMemberNotExist:
+    case teamMemberNotExist2:
       return commonLocalizable("team_member_not_exist")
-    case teamNormalMemberChatBanned:
+    case teamNormalMemberChatBanned2:
       return commonLocalizable("team_normal_member_chat_banned")
-    case teamMemberChatBanned:
+    case teamMemberChatBanned2:
       return commonLocalizable("team_member_chat_banned")
-    case notAIAccount:
+    case notAIAccount2:
       return commonLocalizable("not_ai_account")
-    case cannotBlockAIAccount:
+    case cannotBlockAIAccount2:
       return commonLocalizable("cannot_blocklist_ai_account")
-    case aiMessagesDisabled:
+    case aiMessagesDisabled2:
       return commonLocalizable("ai_messages_function_disabled")
-    case aiMessageRequestFailed:
+    case aiMessageRequestFailed2:
       return commonLocalizable("failed_request_to_the_LLM")
     default:
       return localizable("request_exception")
@@ -164,8 +164,8 @@ extension NEAIWordSearchViewModel: V2NIMAIListener {
 
   /// AI 透传接口的响应的回调
   /// - Parameter data: 响应内容
-  public func onProxyAIModelCall(_ data: V2NIMAIModelCallResult) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[aiSearch], data: \(data.content.msg)")
+  public func onProxyAIModelCall(_ data: V2NIM2AIModelCallResult) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[aiSearch], data: \(data.content.msg)")
 
     guard requestIds.contains(data.requestId) else { return }
 

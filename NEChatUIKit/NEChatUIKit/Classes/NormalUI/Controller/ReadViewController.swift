@@ -4,13 +4,13 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class ReadViewController: NEBaseReadViewController {
-  override public init(message: V2NIMMessage, teamId: String) {
+  override public init(message: V2NIM2Message, teamId: String) {
     super.init(message: message, teamId: teamId)
   }
 

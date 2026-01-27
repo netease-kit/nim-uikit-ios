@@ -5,7 +5,7 @@
 
 import Foundation
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class MessageRichTextModel: MessageTextModel {
@@ -13,8 +13,8 @@ open class MessageRichTextModel: MessageTextModel {
   public var titleAttributeStr: NSMutableAttributedString?
   public var titleTextHeight: CGFloat = 0
 
-  public required init(message: V2NIMMessage?) {
-    guard let data = NECustomUtils.dataOfCustomMessage(message?.attachment),
+  public required init(message: V2NIM2Message?) {
+    guard let data = NE2CustomUtils.dataOfCustomMessage(message?.attachment),
           let title = data["title"] as? String else {
       super.init(message: message)
       return
@@ -25,7 +25,7 @@ open class MessageRichTextModel: MessageTextModel {
     message?.text = body
     super.init(message: message)
     type = .richText
-    customType = customRichTextType
+    customType = customRichTextType2
 
     let font = UIFont.systemFont(ofSize: messageTextFont.pointSize, weight: .semibold)
     titleAttributeStr = NEEmotionTool.getAttWithStr(

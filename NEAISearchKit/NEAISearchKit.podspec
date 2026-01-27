@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
   spec.resource = 'NEAISearchKit/Assets/**/*'
   YXConfig.pod_target_xcconfig(spec)
 
-  spec.dependency 'NEChatKit'
+  spec.dependency 'NEChatKit_coexist'
   spec.dependency 'NECommonUIKit'
 
 end

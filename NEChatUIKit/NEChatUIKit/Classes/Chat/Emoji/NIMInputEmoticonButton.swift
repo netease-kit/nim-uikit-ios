@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objc
@@ -45,7 +45,7 @@ open class NIMInputEmoticonButton: UIButton {
 
   @objc func onIconSelected(sender: NIMInputEmoticonButton) {
     guard let data = emotionData, let id = catalogID else {
-      NEALog.errorLog(classsTag, desc: "emotionData or catalogID maybe nil")
+      NE2ALog.errorLog(classsTag, desc: "emotionData or catalogID maybe nil")
       return
     }
     delegate?.selectedEmoticon(emotion: data, catalogID: id)

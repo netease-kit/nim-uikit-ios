@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import Photos
 import UIKit
 
@@ -49,15 +49,15 @@ public class ChatUIConfig: NSObject {
 
   /// AI 助聊的数据加载器
   /// 参数分别为：上下文消息、回调
-  public var aiChatDataLoader: (([V2NIMMessage]?, @escaping ([AIChatCellModel]?, Error?) -> Void) -> Void)?
+  public var aiChatDataLoader: (([V2NIM2Message]?, @escaping ([AIChatCellModel]?, Error?) -> Void) -> Void)?
 
   /// AI 助聊入口按钮点击事件，仅在展开时回调
   /// 参数分别为：AI 助聊视图控制器、上下文消息
-  public var aiChatDidClick: ((AIChatViewController, [V2NIMMessage]?) -> Void)?
+  public var aiChatDidClick: ((AIChatViewController, [V2NIM2Message]?) -> Void)?
 
   /// AI 助聊重新加载按钮点击事件
   /// 参数分别为：AI 助聊视图控制器、上下文消息
-  public var aiChatReloadClick: ((AIChatViewController, [V2NIMMessage]?) -> Void)?
+  public var aiChatReloadClick: ((AIChatViewController, [V2NIM2Message]?) -> Void)?
 
   /*
    * 用户可自定义参数

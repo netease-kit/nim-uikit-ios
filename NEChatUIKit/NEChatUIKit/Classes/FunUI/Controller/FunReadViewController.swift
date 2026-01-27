@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers

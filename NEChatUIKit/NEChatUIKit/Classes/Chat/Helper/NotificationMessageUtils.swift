@@ -4,22 +4,23 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 public enum TeamType {
   case advanceTeam
   case discussTeam
 }
 
+@objcMembers
 open class NotificationMessageUtils: NSObject {
-  open class func textForNotification(message: V2NIMMessage) -> String {
+  open class func textForNotification(message: V2NIM2Message) -> String {
     if message.messageType != .MESSAGE_TYPE_NOTIFICATION {
       return ""
     }
-    if message.attachment is V2NIMMessageNotificationAttachment {
+    if message.attachment is V2NIM2MessageNotificationAttachment {
       let text = textForTeamNotificationMessage(message: message)
       return text
     } else {
@@ -28,17 +29,17 @@ open class NotificationMessageUtils: NSObject {
   }
 
   /// 是否是群通知
-  open class func isDiscussSeniorTeamNoti(message: V2NIMMessage) -> Bool {
-    if message.attachment is V2NIMMessageNotificationAttachment {
+  open class func isDiscussSeniorTeamNoti(message: V2NIM2Message) -> Bool {
+    if message.attachment is V2NIM2MessageNotificationAttachment {
       return true
     }
     return false
   }
 
-  open class func isTeamLeaveOrDismiss(message: V2NIMMessage) -> (isLeave: Bool, isDismiss: Bool) {
+  open class func isTeamLeaveOrDismiss(message: V2NIM2Message) -> (isLeave: Bool, isDismiss: Bool) {
     var leave = false
     var dismiss = false
-    if let content = message.attachment as? V2NIMMessageNotificationAttachment {
+    if let content = message.attachment as? V2NIM2MessageNotificationAttachment {
       switch content.type {
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_LEAVE:
         leave = true
@@ -51,12 +52,11 @@ open class NotificationMessageUtils: NSObject {
     return (leave, dismiss)
   }
 
-  open class func textForTeamNotificationMessage(message: V2NIMMessage) -> String {
+  open class func textForTeamNotificationMessage(message: V2NIM2Message) -> String {
     var text = chatLocalizable("unknown_system_message")
-    if let content = message.attachment as? V2NIMMessageNotificationAttachment {
+    if let content = message.attachment as? V2NIM2MessageNotificationAttachment {
       let fromName = fromName(message: message)
       let toNames = toName(message: message)
-      let toFirstName = "\"\(toNames.first ?? "")\""
       let teamName = teamName(message: message)
       var toNamestext = "\"\(toNames.first ?? "")\""
       if toNames.count > 1 {
@@ -85,11 +85,11 @@ open class NotificationMessageUtils: NSObject {
           text = toNamestext + chatLocalizable("team_apply")
         }
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_OWNER_TRANSFER:
-        text = fromName + chatLocalizable("transfer") + toFirstName
+        text = fromName + chatLocalizable("transfer") + toNamestext
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_ADD_MANAGER:
         text = toNamestext + chatLocalizable("added_manager")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_REMOVE_MANAGER:
-        text = toFirstName + chatLocalizable("removed_manager")
+        text = toNamestext + chatLocalizable("removed_manager")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_INVITE_ACCEPT:
         text = fromName + chatLocalizable("pass") + toNamestext + chatLocalizable("team_invitation")
       case .MESSAGE_NOTIFICATION_TYPE_TEAM_BANNED_TEAM_MEMBER:
@@ -103,9 +103,9 @@ open class NotificationMessageUtils: NSObject {
     }
   }
 
-  open class func fromName(message: V2NIMMessage) -> String {
+  open class func fromName(message: V2NIM2Message) -> String {
     if let sourceId = message.senderId {
-      if sourceId == IMKitClient.instance.account() {
+      if sourceId == IMKit2Client.instance.account() {
         return chatLocalizable("You")
       } else {
         return "\"\(NETeamUserManager.shared.getShowName(sourceId))\""
@@ -115,15 +115,15 @@ open class NotificationMessageUtils: NSObject {
     }
   }
 
-  open class func toName(message: V2NIMMessage) -> [String] {
+  open class func toName(message: V2NIM2Message) -> [String] {
     var toNames = [String]()
-    guard let content = message.attachment as? V2NIMMessageNotificationAttachment,
+    guard let content = message.attachment as? V2NIM2MessageNotificationAttachment,
           let targetIDs = content.targetIds else {
       return toNames
     }
 
     for targetID in targetIDs {
-      if targetID == IMKitClient.instance.account() {
+      if targetID == IMKit2Client.instance.account() {
         toNames.append(chatLocalizable("You"))
       } else {
         let name = NETeamUserManager.shared.getShowName(targetID)
@@ -133,7 +133,7 @@ open class NotificationMessageUtils: NSObject {
     return toNames
   }
 
-  open class func teamName(message: V2NIMMessage) -> String {
+  open class func teamName(message: V2NIM2Message) -> String {
     let teamtype = teamType(message: message)
     switch teamtype {
     case .advanceTeam:
@@ -143,7 +143,7 @@ open class NotificationMessageUtils: NSObject {
     }
   }
 
-  open class func teamType(message: V2NIMMessage) -> TeamType {
+  open class func teamType(message: V2NIM2Message) -> TeamType {
     if let team = NETeamUserManager.shared.getTeamInfo() {
       if team.isDisscuss() == true {
         return .discussTeam
@@ -154,9 +154,9 @@ open class NotificationMessageUtils: NSObject {
     return .advanceTeam
   }
 
-  private class func textOfUpdateTeam(fromName: String,
+  public class func textOfUpdateTeam(fromName: String,
                                       teamName: String,
-                                      content: V2NIMMessageNotificationAttachment) -> String {
+                                      content: V2NIM2MessageNotificationAttachment) -> String {
     let text = fromName + chatLocalizable("has_updated") + teamName
 
     guard let updatedTeamInfo = content.updatedTeamInfo else { return text }

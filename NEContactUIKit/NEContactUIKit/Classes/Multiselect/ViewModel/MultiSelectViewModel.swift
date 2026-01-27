@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objcMembers
@@ -135,10 +135,10 @@ open class MultiSelectViewModel: ContactViewModel {
   ///   - filters: 需要过滤的会话id列表
   ///   - completion: 完成回调
   open func getConversationList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.getConversationList(0, conversationLimit) { [weak self] conversations, offset, finished, error in
         if let error = error {
-          NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
+          NE2ALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
         } else if var conversations = conversations {
           // 过滤
           if let filterConvs = filters {
@@ -173,7 +173,7 @@ open class MultiSelectViewModel: ContactViewModel {
 
     conversationRepo.getConversationList(0, conversationLimit) { [weak self] conversations, offset, finished, error in
       if let error = error {
-        NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
+        NE2ALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
       } else if var conversations = conversations {
         // 过滤
         if let filterConvs = filters {
@@ -210,12 +210,12 @@ open class MultiSelectViewModel: ContactViewModel {
   ///   - filters: 需要过滤的好友id列表
   ///   - completion: 完成回调
   open func getContactList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", filters.count: \(filters?.count ?? 0)")
 
     getContactList(filters) { [weak self] result, error in
       for item in result ?? [] {
         for contact in item.contacts {
-          let conversationId = V2NIMConversationIdUtil.p2pConversationId(contact.user?.user?.accountId ?? "")
+          let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(contact.user?.user?.accountId ?? "")
           let model = MultiSelectModel()
           model.conversationId = conversationId
           model.avatar = contact.user?.user?.avatar
@@ -234,7 +234,7 @@ open class MultiSelectViewModel: ContactViewModel {
   open func getTeamList(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
     teamRepo.getTeamList { [weak self] teams, error in
       if let error = error {
-        NEALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
+        NE2ALog.errorLog(ModuleName + " " + MultiSelectViewModel.className(), desc: #function + ", error: " + error.localizedDescription)
       } else if var teams = teams {
         // 过滤
         if let filterTeams = filters {
@@ -246,7 +246,7 @@ open class MultiSelectViewModel: ContactViewModel {
         })
 
         for team in teams {
-          let conversationId = V2NIMConversationIdUtil.teamConversationId(team.teamId ?? "")
+          let conversationId = V2NIM2ConversationIdUtil.teamConversationId(team.teamId ?? "")
           let model = MultiSelectModel()
           model.conversationId = conversationId
           model.name = team.teamName

@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objc
@@ -66,7 +66,7 @@ open class InputEmoticonTabView: UIControl {
     seps.removeAll()
 
     guard let catalogs = emoticonCatalogs else {
-      NEALog.errorLog(className, desc: "emoticonCatalogs is nil")
+      NE2ALog.errorLog(className, desc: "emoticonCatalogs is nil")
       return
     }
 

@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -83,7 +83,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   override open func setupUI() {
     super.setupUI()
     view.backgroundColor = .funTeamBackgroundColor
-    teamHeaderView.layer.cornerRadius = 4.0
+    teamHeaderView.setCornerRadius(4.0)
     navigationController?.navigationBar.backgroundColor = .white
     navigationView.backgroundColor = .white
     navigationView.titleBarBottomLine.isHidden = false

@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 public let localAtAllKey = "ait_all"
 public let localYXAitMsg = "yxAitMsg"
@@ -25,7 +25,7 @@ open class LocalAtMEMessageRecord: NSObject {
 }
 
 @objcMembers
-open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
+open class NELocalAtMessageManager: NSObject, NE2IMKitClientListener, NEChatListener {
   public static var instance: NELocalAtMessageManager?
   private let workQueue = DispatchQueue(label: "AtMessageWorkQueue")
   private let lock = NSLock()
@@ -35,12 +35,12 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   override private init() {
     super.init()
     ChatRepo.shared.addChatListener(self)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   deinit {
     ChatRepo.shared.removeChatListener(self)
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
   }
 
   /// 初始化
@@ -52,10 +52,10 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 登录状态变更
   /// - Parameter status: 登录状态
-  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIM2LoginStatus) {
     if status == .LOGIN_STATUS_LOGINED {
-      NEALog.infoLog(className(), desc: "login ok")
-      currentAccid = IMKitClient.instance.account()
+      NE2ALog.infoLog(className(), desc: "login ok")
+      currentAccid = IMKit2Client.instance.account()
       weak var weakSelf = self
       let newDic = [String: LocalAtMEMessageRecord]()
       setMessageDic(newDic)
@@ -69,15 +69,15 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// - Parameter type: 同步类型
   /// - Parameter state: 同步状态
   /// - Parameter error: 错误信息
-  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+  open func onDataSync(_ type: V2NIM2DataSyncType, state: V2NIM2DataSyncState, error: V2NIM2Error?) {
     if state == .DATA_SYNC_STATE_COMPLETED {
       if currentAccid.count <= 0 {
-        currentAccid = IMKitClient.instance.account()
+        currentAccid = IMKit2Client.instance.account()
       }
     } else if state == .DATA_SYNC_STATE_SYNCING {
-      NEALog.infoLog(className(), desc: "roaming messages start")
+      NE2ALog.infoLog(className(), desc: "roaming messages start")
     } else if state == .DATA_SYNC_STATE_WAITING {
-      NEALog.infoLog(className(), desc: "roaming messages waitting")
+      NE2ALog.infoLog(className(), desc: "roaming messages waitting")
     }
   }
 
@@ -104,7 +104,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
     let dic = getMessageDic()
 
     if let model = dic[conversationId], model.isRead == false {
-      NEALog.infoLog(className(), desc: "read == false")
+      NE2ALog.infoLog(className(), desc: "read == false")
       return true
     }
     return false
@@ -113,7 +113,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// 清理at消息记录
   /// - Parameter conversationId: 会话id
   open func clearAtRecord(_ conversationId: String) {
-    NEALog.infoLog(className(), desc: "clearAtRecord session id : \(conversationId)")
+    NE2ALog.infoLog(className(), desc: "clearAtRecord session id : \(conversationId)")
     weak var weakSelf = self
     workQueue.async {
       guard let dic = weakSelf?.getMessageDic() else {
@@ -130,8 +130,8 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 过滤 at 消息
   /// - Parameter messages: 消息列表
-  open func filterAtMessage(messages: [V2NIMMessage]) {
-    NEALog.infoLog(className(), desc: "at manager filterAtMessage : \(messages.count)")
+  open func filterAtMessage(messages: [V2NIM2Message]) {
+    NE2ALog.infoLog(className(), desc: "at manager filterAtMessage : \(messages.count)")
     weak var weakSelf = self
     workQueue.async {
       if let result = weakSelf?.filterAtMessageInWorkqueue(messages: messages), result == true {
@@ -152,8 +152,8 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   }
 
   @discardableResult
-  private func filterAtMessageInWorkqueue(messages: [V2NIMMessage]) -> Bool {
-    let currentAccid = IMKitClient.instance.account()
+  private func filterAtMessageInWorkqueue(messages: [V2NIM2Message]) -> Bool {
+    let currentAccid = IMKit2Client.instance.account()
     weak var weakSelf = self
     var isExistAtMessage = false
     var temDic = getMessageDic()
@@ -179,7 +179,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   }
 
   private func startFilterRoamingMessagesTaskInWorkqueue() {
-    var conversations = [V2NIMLocalConversation]()
+    var conversations = [V2NIM2LocalConversation]()
     weak var weakSelf = self
 
     getAllConversation(&conversations) { error in
@@ -199,11 +199,11 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
         weak var weakSelf = self
         workingGroup.enter()
         workingQueue.async {
-          let option = V2NIMMessageListOption()
+          let option = V2NIM2MessageListOption()
           option.limit = 100
           option.conversationId = conversation.conversationId
           option.strictMode = false
-          ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
+          NE2ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
             messages?.forEach { message in
               if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[localYXAitMsg] as? [String: Any] {
                 if dic[localAtAllKey] != nil, message.isSelf == false {
@@ -237,7 +237,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   private func writeCacheToDocument(dictionary: [String: LocalAtMEMessageRecord]) {
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
       let filePath = documentsDirectory.appendingPathComponent(imkitDir + "\(currentAccid)_at_message.plist")
-      NEALog.infoLog(className(), desc: "writeCacheToDocument path : \(filePath)")
+      NE2ALog.infoLog(className(), desc: "writeCacheToDocument path : \(filePath)")
       do {
         var jsonObject = [String: Any]()
         for (key, value) in dictionary {
@@ -250,14 +250,14 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
         try jsonData.write(to: filePath)
         print("write cache success")
       } catch {
-        NEALog.infoLog(className(), desc: "write cache error : \(error.localizedDescription)")
+        NE2ALog.infoLog(className(), desc: "write cache error : \(error.localizedDescription)")
       }
     }
   }
 
   /// 加载本地缓存文件
   private func loadCacheFromDocument() {
-    NEALog.infoLog(className(), desc: "loadCacheFromDocument")
+    NE2ALog.infoLog(className(), desc: "loadCacheFromDocument")
     guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
       return
     }
@@ -268,14 +268,14 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
       do {
         try FileManager.default.createDirectory(at: documentDir, withIntermediateDirectories: false)
       } catch {
-        NEALog.infoLog(className(), desc: "create dir error : \(error.localizedDescription)")
+        NE2ALog.infoLog(className(), desc: "create dir error : \(error.localizedDescription)")
       }
     }
 
     let filePath = documentDir.appendingPathComponent("\(currentAccid)_at_message_local.plist")
     if FileManager.default.fileExists(atPath: filePath.path) == false {
       let success = FileManager.default.createFile(atPath: filePath.path, contents: nil)
-      NEALog.infoLog(className(), desc: "create file success:  \(success) path: \(filePath.path)")
+      NE2ALog.infoLog(className(), desc: "create file success:  \(success) path: \(filePath.path)")
     } else {
       do {
         let data = try Data(contentsOf: filePath)
@@ -299,7 +299,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
           }
         }
       } catch {
-        NEALog.infoLog(className(), desc: "convert to message data to json object error : \(error.localizedDescription)")
+        NE2ALog.infoLog(className(), desc: "convert to message data to json object error : \(error.localizedDescription)")
       }
     }
   }
@@ -307,7 +307,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// 移除at记录
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func removeRecord(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
+  private func removeRecord(message: V2NIM2Message, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
     var didRemove = false
     if let atMeRecord = record[message.conversationId ?? ""] {
       if atMeRecord.atMessages[message.messageClientId ?? ""] != nil {
@@ -324,9 +324,9 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// 添加at消息记录(有时间错比较)
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) {
+  private func addAtRecordWithCompare(message: V2NIM2Message, record: inout [String: LocalAtMEMessageRecord]) {
     guard let conversationId = message.conversationId else {
-      NEALog.infoLog(className(), desc: #function + " addAtRecord conversationId nil ")
+      NE2ALog.infoLog(className(), desc: #function + " addAtRecord conversationId nil ")
       return
     }
 
@@ -334,12 +334,12 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
     var compareTimestap: Double = 0
     LocalConversationRepo.shared.getConversationReadTime(conversationId) { [weak self] timestap, error in
       if error != nil {
-        NEALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime error : \(error?.localizedDescription ?? "")")
+        NE2ALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime error : \(error?.localizedDescription ?? "")")
       }
 
       if let t = timestap {
         compareTimestap = t
-        NEALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime time \(t)")
+        NE2ALog.infoLog(self?.className() ?? "", desc: #function + "getConversationReadTime time \(t)")
       }
       semaphore.signal()
     }
@@ -378,7 +378,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// 添加at消息记录
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func addAtRecord(message: V2NIMMessage, record: inout [String: LocalAtMEMessageRecord]) {
+  private func addAtRecord(message: V2NIM2Message, record: inout [String: LocalAtMEMessageRecord]) {
     if let atMeRecord = record[message.conversationId ?? ""] {
       let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
       if lastTime < message.createTime {
@@ -422,10 +422,10 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   ///  - Parameter conversations: 会话列表
   ///  - Parameter offset: 偏移量
   ///  - Parameter completion: 完成回调
-  private func getAllConversation(_ conversations: inout [V2NIMLocalConversation], _ offset: Int = 0, _ completion: @escaping (NSError?) -> Void) {
+  private func getAllConversation(_ conversations: inout [V2NIM2LocalConversation], _ offset: Int = 0, _ completion: @escaping (NSError?) -> Void) {
     let limit = 20
     var temConversations = conversations
-    LocalConversationProvider.shared.getConversationList(offset, limit) { [weak self] result, error in
+    NE2LocalConversationProvider.shared.getConversationList(offset, limit) { [weak self] result, error in
       if let err = error {
         completion(err)
       } else {
@@ -443,8 +443,8 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 撤回消息回调
   /// - Parameter revokeNotifications:  撤回通知
-  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
-    var messageRefers = [V2NIMMessageRefer]()
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIM2MessageRevokeNotification]) {
+    var messageRefers = [V2NIM2MessageRefer]()
     for notification in revokeNotifications {
       if let messageRefer = notification.messageRefer {
         messageRefers.append(messageRefer)
@@ -457,7 +457,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 移除at消息记录
   /// - Parameter messages: 消息列表
-  open func removeRevokeAtMessage(messages: [V2NIMMessageRefer]) {
+  open func removeRevokeAtMessage(messages: [V2NIM2MessageRefer]) {
     weak var weakSelf = self
     workQueue.async {
       weakSelf?.removeRevokeAtMessageInWorkqueue(messageRefers: messages)
@@ -466,8 +466,8 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 遍历所有撤回消息判断是否要清除at消息标识(会发送通知通知会话列表)
   /// - Parameter messageRefers: 消息索引列表
-  private func removeRevokeAtMessageInWorkqueue(messageRefers: [V2NIMMessageRefer]) {
-    let currentAccid = IMKitClient.instance.account()
+  private func removeRevokeAtMessageInWorkqueue(messageRefers: [V2NIM2MessageRefer]) {
+    let currentAccid = IMKit2Client.instance.account()
     weak var weakSelf = self
     var isAtMessageChange = false
     var temDic = getMessageDic()
@@ -490,7 +490,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
   /// 移除at记录(根据消息指针类，因为撤回的时候拿不到消息对象)
   /// - Parameter messageRefer: 消息索引
   /// - Parameter record: at 消息记录缓存
-  private func removeRecordWithMessageref(messageRefer: V2NIMMessageRefer, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
+  private func removeRecordWithMessageref(messageRefer: V2NIM2MessageRefer, record: inout [String: LocalAtMEMessageRecord]) -> Bool {
     var didRemove = false
     if let atMeRecord = record[messageRefer.conversationId ?? ""] {
       if atMeRecord.atMessages[messageRefer.messageClientId ?? ""] != nil {
@@ -506,7 +506,7 @@ open class NELocalAtMessageManager: NSObject, NEIMKitClientListener, NEChatListe
 
   /// 收到消息回调
   /// - Parameter messages: 消息列表
-  open func onReceiveMessages(_ messages: [V2NIMMessage]) {
+  open func onReceiveMessages(_ messages: [V2NIM2Message]) {
     filterAtMessage(messages: messages)
   }
 }

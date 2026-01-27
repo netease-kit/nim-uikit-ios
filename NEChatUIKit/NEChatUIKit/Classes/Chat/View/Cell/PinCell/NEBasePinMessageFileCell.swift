@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -133,7 +133,7 @@ open class NEBasePinMessageFileCell: NEBasePinMessageCell {
 
   override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
-    if let fileObject = item.message.attachment as? V2NIMMessageFileAttachment {
+    if let fileObject = item.message.attachment as? V2NIM2MessageFileAttachment {
       if let fileModel = item.pinFileModel {
         fileModel.cell = self
         if fileModel.state == .Success {

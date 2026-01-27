@@ -5,7 +5,7 @@
 
 import NEChatUIKit
 import NECommonUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -13,7 +13,7 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
   UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
   public typealias SaveCompletion = () -> Void
   public var block: SaveCompletion?
-  public var team: V2NIMTeam?
+  public var team: V2NIM2Team?
   public let repo = TeamRepo.shared
 
   /// 头像背景
@@ -149,7 +149,7 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
 
   /// 获取当前是否有修改权限
   func getChangePermission() -> Bool {
-    if let ownerId = team?.ownerAccountId, IMKitClient.instance.isMe(ownerId) {
+    if let ownerId = team?.ownerAccountId, IMKit2Client.instance.isMe(ownerId) {
       return true
     }
     if let mode = team?.updateInfoMode, mode == .TEAM_UPDATE_INFO_MODE_ALL {
@@ -208,12 +208,12 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
       view.makeToastActivity(.center)
       weak var weakSelf = self
       weakSelf?.viewModel.updateTeamAvatar(headerUrl, tid, nil) { error in
-        NEALog.infoLog(ModuleName + " " + self.className(), desc: #function + "CALLBACK " + (error?.localizedDescription ?? "no error"))
+        NE2ALog.infoLog(ModuleName + " " + self.className(), desc: #function + "CALLBACK " + (error?.localizedDescription ?? "no error"))
         weakSelf?.view.hideToastActivity()
         if let err = error {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if error?.code == noPermissionOperationCode {
+          } else if error?.code == noPermissionOperationCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))

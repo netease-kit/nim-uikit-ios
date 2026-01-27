@@ -29,7 +29,7 @@ open class NEBaseSelectedCell: NEBaseContactUnCheckCell {
     avatarImageView.configHeadData(
       headUrl: model.avatar,
       name: model.name ?? "",
-      uid: V2NIMConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""
+      uid: V2NIM2ConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""
     )
   }
 }

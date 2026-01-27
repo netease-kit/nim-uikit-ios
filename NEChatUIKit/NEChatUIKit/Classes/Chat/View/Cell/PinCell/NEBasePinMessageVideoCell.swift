@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -71,10 +71,10 @@ open class NEBasePinMessageVideoCell: NEBasePinMessageImageCell {
   override open func configure(_ item: NEPinMessageModel) {
     super.configure(item)
 
-    if let videoObject = item.chatmodel.message?.attachment as? V2NIMMessageVideoAttachment {
+    if let videoObject = item.chatmodel.message?.attachment as? V2NIM2MessageVideoAttachment {
       // 获取首帧
       let videoUrl = videoObject.url ?? ""
-      let thumbUrl = V2NIMStorageUtil.videoCoverUrl(videoUrl, offset: 0)
+      let thumbUrl = V2NIM2StorageUtil.videoCoverUrl(videoUrl, offset: 0)
       contentImageView.sd_setImage(
         with: URL(string: thumbUrl),
         placeholderImage: nil,

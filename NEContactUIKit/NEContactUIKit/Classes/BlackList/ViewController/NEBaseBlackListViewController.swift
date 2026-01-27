@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -130,7 +130,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     let contactSelectVC = getContactSelectVC()
     navigationController?.pushViewController(contactSelectVC, animated: true)
     contactSelectVC.callBack = { [weak self] selectMemberarray in
-      var users = [NEUserWithFriend]()
+      var users = [NE2UserWithFriend]()
       for memberInfo in selectMemberarray {
         if let u = memberInfo.user {
           users.append(u)
@@ -140,7 +140,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
     }
   }
 
-  open func addBlackUsers(users: [NEUserWithFriend]) {
+  open func addBlackUsers(users: [NE2UserWithFriend]) {
     viewModel.addBlackList(users: users) { [weak self] error in
       if let err = error {
         self?.showToast(err.localizedDescription)

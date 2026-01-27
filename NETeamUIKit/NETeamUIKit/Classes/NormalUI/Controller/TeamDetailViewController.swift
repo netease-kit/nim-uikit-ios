@@ -3,9 +3,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 /// 群详情页 - 协同版
@@ -15,7 +15,7 @@ open class TeamDetailViewController: NEBaseTeamDetailViewController {
     className = "TeamDetailViewController"
   }
 
-  override public init(nim_team: V2NIMTeam) {
+  override public init(nim_team: V2NIM2Team) {
     super.init(nim_team: nim_team)
     initNormal()
   }
@@ -27,5 +27,6 @@ open class TeamDetailViewController: NEBaseTeamDetailViewController {
   override open func commonUI() {
     super.commonUI()
     tableView.estimatedRowHeight = 66
+    headerView.setCornerRadius(30)
   }
 }

@@ -4,7 +4,7 @@
 
 import NEChatUIKit
 import NECommonUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers

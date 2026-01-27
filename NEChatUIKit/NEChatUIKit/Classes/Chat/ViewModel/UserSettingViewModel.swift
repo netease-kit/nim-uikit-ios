@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objc
 public protocol UserSettingViewModelDelegate: NSObjectProtocol {
@@ -23,17 +23,17 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   var localConversationRepo = LocalConversationRepo.shared
   var settingRepo = SettingRepo.shared
 
-  var userInfo: NEUserWithFriend?
+  var userInfo: NE2UserWithFriend?
 
   var cellDatas = [UserSettingCellModel]()
 
   weak var delegate: UserSettingViewModelDelegate?
 
-  public var conversation: V2NIMBaseConversation?
+  public var conversation: V2NIM2BaseConversation?
 
   override public init() {
     super.init()
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.addLocalConversationListener(self)
     } else {
       conversationRepo.addConversationListener(self)
@@ -45,7 +45,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   }
 
   deinit {
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.removeLocalConversationListener(self)
     } else {
       conversationRepo.removeConversationListener(self)
@@ -62,9 +62,9 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   /// - Parameter userId: 用户id
   /// - Parameter completion: 完成回调
   func getConversation(_ userId: String, _ completion: @escaping (NSError?) -> Void) {
-    if let cid = V2NIMConversationIdUtil.p2pConversationId(userId) {
+    if let cid = V2NIM2ConversationIdUtil.p2pConversationId(userId) {
       weak var weakSelf = self
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
         localConversationRepo.getConversation(cid) { conversation, error in
           if conversation != nil {
             weakSelf?.conversation = conversation
@@ -86,7 +86,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
   /// - Parameter userId: 用户id
   /// - Parameter completion: 完成回调
   func getUserSettingModel(_ userId: String, _ completion: @escaping () -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + userId)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + userId)
     contactRepo.getUserWithFriend(accountIds: [userId]) { [weak self] userfriends, error in
       self?.userInfo = userfriends?.first
 
@@ -110,7 +110,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
     let remind = UserSettingCellModel()
     remind.cellName = chatLocalizable("message_remind")
     if let userId = userInfo?.user?.accountId {
-      remind.switchOpen = settingRepo.getP2PMessageMuteMode(accountId: userId) == .NIM_P2P_MESSAGE_MUTE_MODE_OFF
+      remind.switchOpen = settingRepo.getP2PMessageMuteMode(accountId: userId) == .P2P_MESSAGE_MUTE_MODE_OFF
     }
 
     weak var weakSelf = self
@@ -122,7 +122,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
         return
       }
       if let uid = weakSelf?.userInfo?.user?.accountId {
-        let muteMode: V2NIMP2PMessageMuteMode = isOpen ? .NIM_P2P_MESSAGE_MUTE_MODE_OFF : .NIM_P2P_MESSAGE_MUTE_MODE_ON
+        let muteMode: V2NIM2P2PMessageMuteMode = isOpen ? .P2P_MESSAGE_MUTE_MODE_OFF : .P2P_MESSAGE_MUTE_MODE_ON
         weakSelf?.settingRepo.setP2PMessageMuteMode(accountId: uid, muteMode: muteMode) { error in
           if let err = error {
             weakSelf?.delegate?.didNeedRefreshUI()
@@ -149,8 +149,8 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
         return
       }
 
-      if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
-        if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIM2ConversationIdUtil.p2pConversationId(uid) {
+        if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
           weakSelf?.localConversationRepo.setStickTop(cid, isOpen) { error in
             print(isOpen ? "add stick : " : "remote stick : ", error as Any)
             if let err = error {
@@ -183,7 +183,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
        let account = user.accountId,
        let serverExtensions = user.serverExtension,
        let jsonObject = NECommonUtil.getDictionaryFromJSONString(serverExtensions) {
-      if jsonObject[aiUserPinKey] != nil {
+      if jsonObject[aiUserPinKey2] != nil {
         let changePin = UserSettingCellModel()
         changePin.cellName = chatLocalizable("ai_user_pin_top")
 
@@ -203,11 +203,11 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
 
           if isOpen {
             NEAIUserPinManager.shared.pinAIUser(account) { error, finish in
-              NEALog.infoLog(ModuleName, desc: #function + " pinAIUser error: \(String(describing: error)), finish: \(finish)")
+              NE2ALog.infoLog(ModuleName, desc: #function + " pinAIUser error: \(String(describing: error)), finish: \(finish)")
             }
           } else {
             NEAIUserPinManager.shared.unpinAIUser(account) { error, finish in
-              NEALog.infoLog(ModuleName, desc: #function + " unpinAIUser error: \(String(describing: error)), finish: \(finish)")
+              NE2ALog.infoLog(ModuleName, desc: #function + " unpinAIUser error: \(String(describing: error)), finish: \(finish)")
             }
           }
         }
@@ -251,7 +251,7 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
 extension UserSettingViewModel: NEConversationListener {
   /// 会话变更回调
   /// - Parameter conversations: 会话列表
-  open func onConversationChanged(_ conversations: [V2NIMConversation]) {
+  open func onConversationChanged(_ conversations: [V2NIM2Conversation]) {
     for changeConversation in conversations {
       if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
         conversation = changeConversation
@@ -268,7 +268,7 @@ extension UserSettingViewModel: NEConversationListener {
 extension UserSettingViewModel: NELocalConversationListener {
   /// 会话变更回调
   /// - Parameter conversations: 会话列表
-  public func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
+  public func onLocalConversationChanged(_ conversations: [V2NIM2LocalConversation]) {
     for changeConversation in conversations {
       if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
         conversation = changeConversation

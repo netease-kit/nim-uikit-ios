@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 /// 已读未读页面 - ViewModel
@@ -22,7 +22,7 @@ open class ReadViewModel: NSObject {
   ///   - message: 群消息
   ///   - teamId: 群 id
   ///   - completion: 完成回调
-  open func getTeamMessageReceiptDetail(_ message: V2NIMMessage, _ teamId: String, _ completion: @escaping (Error?) -> Void) {
+  open func getTeamMessageReceiptDetail(_ message: V2NIM2Message, _ teamId: String, _ completion: @escaping (Error?) -> Void) {
     chatRepo.getTeamMessageReceiptDetail(message: message, memberAccountIds: []) { [weak self] readReceiptDetail, error in
       guard let readReceiptDetail = readReceiptDetail else {
         completion(error)

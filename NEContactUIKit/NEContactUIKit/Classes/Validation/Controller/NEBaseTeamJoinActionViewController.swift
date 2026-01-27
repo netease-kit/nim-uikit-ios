@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import MJRefresh
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -81,7 +81,7 @@ open class NEBaseTeamJoinActionViewController: NEContactBaseViewController {
   open func loadData() {
     viewModel.loadTeamJoinActionList(true) { [weak self] error in
       if let err = error {
-        NEALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
       } else {
         self?.emptyView.isHidden = (self?.viewModel.teamJoinActions.count ?? 0) > 0
       }
@@ -114,7 +114,7 @@ open class NEBaseTeamJoinActionViewController: NEContactBaseViewController {
       return
     }
 
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     showAlert(message: localizable("clear_all_team_join_action")) { [weak self] in
       self?.viewModel.clearNotification { error in
         self?.emptyView.isHidden = (self?.viewModel.teamJoinActions.count ?? 0) > 0
@@ -167,24 +167,24 @@ extension NEBaseTeamJoinActionViewController: SystemNotificationCellDelegate {
 
     viewModel.agreeRequest(action: info) { error in
       if let err = error as? NSError {
-        NEALog.errorLog(ModuleName + " " + NEBaseTeamJoinActionViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseTeamJoinActionViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           weakSelf?.showToast(commonLocalizable("network_error"))
           return
-        case teamNotExistCode:
+        case teamNotExistCode2:
           weakSelf?.showToast(commonLocalizable("team_not_exist"))
-        case teamMemberNotExist:
+        case teamMemberNotExist2:
           weakSelf?.showToast(localizable("verification_processed"))
-        case alreadyInTeamCode:
+        case alreadyInTeamCode2:
           weakSelf?.showToast(localizable("already_in_the_team"))
-        case invitationExpiredCode:
+        case invitationExpiredCode2:
           weakSelf?.showToast(localizable("invitation_expired"))
-        case noPermissionOperationCode:
+        case noPermissionOperationCode2:
           weakSelf?.showToast(localizable("no_permission_tip"))
-        case teamMemberLimitExceededCode:
+        case teamMemberLimitExceededCode2:
           weakSelf?.showToast(localizable("team_member_limit_exceeded"))
-        case joinedTeamLimitExceededCode:
+        case joinedTeamLimitExceededCode2:
           weakSelf?.showToast(localizable("joined_team_limit_exceeded"))
         default:
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -212,24 +212,24 @@ extension NEBaseTeamJoinActionViewController: SystemNotificationCellDelegate {
 
     viewModel.refuseRequest(action: info) { error in
       if let err = error as? NSError {
-        NEALog.errorLog(ModuleName + " " + NEBaseTeamJoinActionViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseTeamJoinActionViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           weakSelf?.showToast(commonLocalizable("network_error"))
           return
-        case teamNotExistCode:
+        case teamNotExistCode2:
           weakSelf?.showToast(commonLocalizable("team_not_exist"))
-        case teamMemberNotExist:
+        case teamMemberNotExist2:
           weakSelf?.showToast(localizable("verification_processed"))
-        case alreadyInTeamCode:
+        case alreadyInTeamCode2:
           weakSelf?.showToast(localizable("already_in_the_team"))
-        case invitationExpiredCode:
+        case invitationExpiredCode2:
           weakSelf?.showToast(localizable("invitation_expired"))
-        case noPermissionOperationCode:
+        case noPermissionOperationCode2:
           weakSelf?.showToast(localizable("no_permission_tip"))
-        case teamMemberLimitExceededCode:
+        case teamMemberLimitExceededCode2:
           weakSelf?.showToast(localizable("team_member_limit_exceeded"))
-        case joinedTeamLimitExceededCode:
+        case joinedTeamLimitExceededCode2:
           weakSelf?.showToast(localizable("joined_team_limit_exceeded"))
         default:
           weakSelf?.showToast(commonLocalizable("failed_operation"))

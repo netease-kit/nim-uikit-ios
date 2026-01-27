@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 public class TeamKitConfigCenter: NSObject {
@@ -14,8 +14,8 @@ public class TeamKitConfigCenter: NSObject {
   }
 
   /// 被邀请人同意入群模式
-  public var teamAgreeMode: V2NIMTeamAgreeMode = .TEAM_AGREE_MODE_NO_AUTH
+  public var teamAgreeMode: V2NIM2TeamAgreeMode = .TEAM_AGREE_MODE_NO_AUTH
 
   /// 申请入群的模式
-  public var teamJoinMode: V2NIMTeamJoinMode = .TEAM_JOIN_MODE_FREE
+  public var teamJoinMode: V2NIM2TeamJoinMode = .TEAM_JOIN_MODE_FREE
 }

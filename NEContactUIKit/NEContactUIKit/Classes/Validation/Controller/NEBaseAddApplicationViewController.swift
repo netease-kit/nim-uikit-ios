@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import MJRefresh
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -83,7 +83,7 @@ open class NEBaseAddApplicationViewController: NEContactBaseViewController {
   open func loadData() {
     viewModel.loadApplicationList(true) { [weak self] error in
       if let err = error {
-        NEALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "loadApplicationList CALLBACK error: \(err.localizedDescription)")
       } else {
         self?.emptyView.isHidden = (self?.viewModel.friendAddApplications.count ?? 0) > 0
       }
@@ -116,7 +116,7 @@ open class NEBaseAddApplicationViewController: NEContactBaseViewController {
       return
     }
 
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     showAlert(message: localizable("clear_all_add_application")) { [weak self] in
       self?.viewModel.clearNotification { error in
         self?.emptyView.isHidden = (self?.viewModel.friendAddApplications.count ?? 0) > 0
@@ -164,11 +164,11 @@ extension NEBaseAddApplicationViewController: SystemNotificationCellDelegate {
 
     viewModel.agreeRequest(application: info) { error in
       if let err = error as? NSError {
-        NEALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           weakSelf?.showToast(commonLocalizable("network_error"))
-        case friendAlreadyExist:
+        case friendAlreadyExist2:
           weakSelf?.viewModel.changeApplicationStatus(info, .FRIEND_ADD_APPLICATION_STATUS_AGREED)
           weakSelf?.showToast(localizable("verification_processed"))
           weakSelf?.tableviewReload()
@@ -189,11 +189,11 @@ extension NEBaseAddApplicationViewController: SystemNotificationCellDelegate {
 
     viewModel.refuseRequest(application: info) { error in
       if let err = error as? NSError {
-        NEALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
+        NE2ALog.errorLog(ModuleName + " " + NEBaseAddApplicationViewController.className(), desc: "CALLBACK agreeRequest failed,error = \(err.localizedDescription)")
         switch err.code {
-        case protocolSendFailed:
+        case protocolSendFailed2:
           weakSelf?.showToast(commonLocalizable("network_error"))
-        case friendAlreadyExist:
+        case friendAlreadyExist2:
           weakSelf?.viewModel.changeApplicationStatus(info, .FRIEND_ADD_APPLICATION_STATUS_AGREED)
           weakSelf?.showToast(localizable("verification_processed"))
           weakSelf?.tableviewReload()

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -18,7 +18,7 @@ open class FunP2PChatViewController: FunChatViewController {
   /// 重写父类的构造方法
   /// - Parameter conversationId: 会话id
   /// - Parameter anchor: 锚点消息
-  public init(conversationId: String, anchor: V2NIMMessage?) {
+  public init(conversationId: String, anchor: V2NIM2Message?) {
     super.init(conversationId: conversationId)
     viewModel = P2PChatViewModel(conversationId: conversationId, anchor: anchor)
   }
@@ -120,7 +120,7 @@ extension FunP2PChatViewController: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,
          accid == ChatRepo.sessionId {

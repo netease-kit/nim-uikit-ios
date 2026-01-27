@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -13,10 +13,10 @@ open class MessageFileModel: MessageVideoModel {
   public var fileLength: Int64?
   public var size: Float = 0
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .file
-    if let fileObject = message?.attachment as? V2NIMMessageFileAttachment {
+    if let fileObject = message?.attachment as? V2NIM2MessageFileAttachment {
       displayName = fileObject.name
       path = fileObject.path
       fileLength = Int64(fileObject.size)

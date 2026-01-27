@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objc
@@ -28,7 +28,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   let teamRepo = TeamRepo.shared
 
-  var currentMember: V2NIMTeamMember?
+  var currentMember: V2NIM2TeamMember?
 
   /// 在线状态记录
   var onLineEventDic = [String: Bool]()
@@ -55,7 +55,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// 拉取最新用户信息后刷新群成员信息
   /// - Parameter noti: 通知对象
   @objc open func didTapHeader(_ noti: Notification) {
-    if let user = noti.object as? NEUserWithFriend,
+    if let user = noti.object as? NE2UserWithFriend,
        let accid = user.user?.accountId {
       if NETeamUserManager.shared.isCurrentMember(accid) {
         var isDidFind = false
@@ -83,7 +83,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// - Parameter completion: 完成回调
   open func getMemberInfo(_ teamId: String, _ completion: @escaping (NSError?) -> Void) {
     weak var weakSelf = self
-    teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { member, error in
+    teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, IMKit2Client.instance.account()) { member, error in
       weakSelf?.currentMember = member
       completion(error)
     }
@@ -154,11 +154,11 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 群成员信息更新
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {}
+  func onTeamMemberInfoUpdated(_ teamMembers: [V2NIM2TeamMember]) {}
 
   /// 群成员离开
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  func onTeamMemberLeft(_ teamMembers: [V2NIM2TeamMember]) {
     var isCurrentTeam = false
     for member in teamMembers {
       if let currentTid = teamId, currentTid == member.teamId {
@@ -176,7 +176,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 判断离开用户是不是当前搜索展示用户
   /// - Parameter teamMembers: 群成员信息
-  open func removeSearchData(_ teamMembers: [V2NIMTeamMember]) {
+  open func removeSearchData(_ teamMembers: [V2NIM2TeamMember]) {
     if searchDatas.count <= 0 {
       return
     }
@@ -201,12 +201,12 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 群成员加入
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {}
+  func onTeamMemberJoined(_ teamMembers: [V2NIM2TeamMember]) {}
 
   /// 群成员被踢
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员信息
-  func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIM2TeamMember]) {
     var isCurrentTeam = false
     for member in teamMembers {
       if let currentTid = teamId, currentTid == member.teamId {
@@ -224,7 +224,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 群成员信息更新统一处理方法
   /// - Parameter teamMembers: 群成员信息
-  open func changeMembers(_ teamMembers: [V2NIMTeamMember]) {
+  open func changeMembers(_ teamMembers: [V2NIM2TeamMember]) {
     guard let tid = teamId else {
       return
     }
@@ -258,7 +258,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
       model.team = team
       model.users = teamMembers
       weakSelf?.setShowDatas(model.users)
-      weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+      weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKit2Client.instance.account())
       completion(model, nil)
       return
     }
@@ -276,7 +276,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
         model.team = team
         model.users = teamMembers
         weakSelf?.setShowDatas(model.users)
-        weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+        weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKit2Client.instance.account())
         completion(model, nil)
       } else {
         completion(nil, nil)
@@ -289,13 +289,13 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// - Parameter teamModel：群信息对象
   /// - Parameter completion:  完成后的回调
   open func getTeamMembers(_ teamInfo: NETeamInfoModel,
-                           _ queryType: V2NIMTeamMemberRoleQueryType,
+                           _ queryType: V2NIM2TeamMemberRoleQueryType,
                            _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamInfo.team?.teamId ?? "")")
     if let members = NETeamUserManager.shared.getAllTeamMemberModels(), teamInfo.team?.memberCount == members.count {
       teamInfo.users = members
       completion(nil, teamInfo)
-      NEALog.infoLog(className(), desc: "load team member from cache success.")
+      NE2ALog.infoLog(className(), desc: "load team member from cache success.")
     }
   }
 
@@ -336,8 +336,8 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
-  func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
-    NEALog.infoLog(className(), desc: #function + " event count : \(data.count)")
+  func onUserStatusChanged(_ data: [V2NIM2UserStatus]) {
+    NE2ALog.infoLog(className(), desc: #function + " event count : \(data.count)")
     for d in data {
       onLineEventDic[d.accountId] = d.statusType == .USER_STATUS_TYPE_LOGIN
     }
@@ -345,7 +345,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   }
 
   open func onTeamMemberUpdate(_ accountId: String) {
-    NEALog.infoLog(className(), desc: #function + " memberCacheDidChange")
+    NE2ALog.infoLog(className(), desc: #function + " memberCacheDidChange")
     guard let tid = teamId else {
       return
     }
@@ -357,7 +357,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
           weakSelf?.setShowDatas(members)
           weakSelf?.delegate?.didNeedRefreshUI()
         } else {
-          NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " getMemberInfo error:\(String(describing: error))")
+          NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + " getMemberInfo error:\(String(describing: error))")
         }
       }
     } else {

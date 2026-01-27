@@ -4,8 +4,8 @@
 
 import CoreMedia
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 
 @objcMembers
@@ -14,22 +14,22 @@ open class ContactUserViewModel: NSObject {
   private let className = "ContactUserViewModel"
 
   open func addFriend(_ account: String, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
-    let params = V2NIMFriendAddParams()
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    let params = V2NIM2FriendAddParams()
     params.addMode = .FRIEND_MODE_TYPE_APPLAY
     contactRepo.addFriend(accountId: account, params: params, completion)
   }
 
   open func deleteFriend(account: String, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
 
-    let params = V2NIMFriendDeleteParams()
+    let params = V2NIM2FriendDeleteParams()
     params.deleteAlias = true
     contactRepo.deleteFriend(account: account, params: params, completion)
   }
 
   open func removeBlackList(account: String, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", account: " + account)
     contactRepo.removeBlockList(accountId: account, completion)
   }
 
@@ -41,16 +41,16 @@ open class ContactUserViewModel: NSObject {
   open func updateAlias(accountId: String,
                         alias: String,
                         _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: \(accountId)")
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: \(accountId)")
 
-    let params = V2NIMFriendSetParams()
+    let params = V2NIM2FriendSetParams()
     params.alias = alias
 
     contactRepo.setFriendInfo(accountId: accountId, params: params, completion)
   }
 
-  open func getUserInfo(_ uid: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
+  open func getUserInfo(_ uid: String, _ completion: @escaping (NE2UserWithFriend?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", uid: " + uid)
     contactRepo.getUserWithFriend(accountIds: [uid]) { userFriends, error in
       completion(userFriends?.first, error)
     }

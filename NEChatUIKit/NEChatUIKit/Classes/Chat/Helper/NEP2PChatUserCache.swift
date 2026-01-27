@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objc
 public protocol NEP2PChatUserCacheListener: NSObjectProtocol {
@@ -19,10 +19,10 @@ public class NEP2PChatUserCache: NSObject {
   public static let shared = NEP2PChatUserCache()
 
   /// 多代理容器
-  private let multiDelegate = MultiDelegate<NEP2PChatUserCacheListener>(strongReferences: false)
+  private let multiDelegate = MultiDelegate2<NEP2PChatUserCacheListener>(strongReferences: false)
 
   // 非好友列表,聊天页面销毁时同步清空
-  public var noUserCache = [String: NEUserWithFriend]()
+  public var noUserCache = [String: NE2UserWithFriend]()
 
   override private init() {
     super.init()
@@ -46,7 +46,7 @@ public class NEP2PChatUserCache: NSObject {
   }
 
   // 添加（更新）非好友信息
-  open func updateUserInfo(_ user: V2NIMUser?) {
+  open func updateUserInfo(_ user: V2NIM2User?) {
     guard let accid = user?.accountId else { return }
     noUserCache[accid]?.user = user
 
@@ -56,13 +56,13 @@ public class NEP2PChatUserCache: NSObject {
   }
 
   // 添加（更新）非好友信息
-  open func updateUserInfo(_ user: NEUserWithFriend?) {
+  open func updateUserInfo(_ user: NE2UserWithFriend?) {
     guard let accid = user?.user?.accountId else { return }
     noUserCache[accid] = user
   }
 
   /// 获取缓存的非好友信息
-  open func getUserInfo(_ accountId: String) -> NEUserWithFriend? {
+  open func getUserInfo(_ accountId: String) -> NE2UserWithFriend? {
     noUserCache[accountId]
   }
 
@@ -91,7 +91,7 @@ public class NEP2PChatUserCache: NSObject {
 extension NEP2PChatUserCache: NEContactListener {
   /// 用户信息变更回调
   /// - Parameter users: 用户列表
-  open func onUserProfileChanged(_ users: [V2NIMUser]) {
+  open func onUserProfileChanged(_ users: [V2NIM2User]) {
     for user in users {
       guard let accid = user.accountId else { break }
 
