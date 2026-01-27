@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
-public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
+public class ChatDeduplicationHelper: NSObject, NE2IMKitClientListener {
   // 单例变量
   static let instance = ChatDeduplicationHelper()
   // 最多缓存数量，可外部修改
@@ -24,20 +24,20 @@ public class ChatDeduplicationHelper: NSObject, NEIMKitClientListener {
 
   override private init() {
     super.init()
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   deinit {
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
   }
 
-  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIM2LoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
-  open func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
+  open func onKickedOffline(_ detail: V2NIM2KickedOfflineDetail) {
     clearCache()
   }
 

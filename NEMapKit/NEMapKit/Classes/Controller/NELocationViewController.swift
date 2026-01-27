@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NEChatUIKit
 import NECommonKit
 import NECoreKit
@@ -419,7 +419,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
       self.tableViewBottomConstraint?.constant = self.defaultTableHeight
     })
     searchTextField.text = ""
-    NEALog.infoLog(className(), desc: "toSearchCurrentUserLocation cancel earch call")
+    NE2ALog.infoLog(className(), desc: "toSearchCurrentUserLocation cancel earch call")
 
     toSearchCurrentUserLocation()
     NEMapClient.shared().setMapCenterWithMapview(mapView as Any)

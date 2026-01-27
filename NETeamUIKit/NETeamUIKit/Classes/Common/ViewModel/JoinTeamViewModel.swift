@@ -3,17 +3,17 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
 open class JoinTeamViewModel: NSObject {
   let teamRepo = TeamRepo.shared
   private let className = "JoinTeamViewModel"
 
-  open func getTeamInfo(_ text: String, _ completion: @escaping (V2NIMTeam?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
+  open func getTeamInfo(_ text: String, _ completion: @escaping (V2NIM2Team?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
 
     teamRepo.getTeamInfo(text, .TEAM_TYPE_NORMAL, completion)
   }

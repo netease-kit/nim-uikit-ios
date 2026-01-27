@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -186,7 +186,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
     NotificationCenter.default.addObserver(self, selector: #selector(clearValidationUnreadCount), name: NENotificationName.clearValidationMessageUnreadCount, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NENotificationName.friendCacheInit, object: nil)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
   }
 
   /// 清除未读数
@@ -267,9 +267,9 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
   }
 
   open func loadData() {
-    NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
+    NE2ALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     viewModel?.loadData { [weak self] error, userSectionCount in
-      NEALog.infoLog((self?.className() ?? "NEBaseContactViewController") + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+      NE2ALog.infoLog((self?.className() ?? "NEBaseContactViewController") + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
         self?.delegate?.onDataLoaded()
         self?.didRefreshTable()
@@ -524,10 +524,10 @@ extension NEBaseContactViewController {
 
 // MARK: - NEIMKitClientListener
 
-extension NEBaseContactViewController: NEIMKitClientListener {
+extension NEBaseContactViewController: NE2IMKitClientListener {
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIM2ConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }

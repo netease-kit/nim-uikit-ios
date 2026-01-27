@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 public protocol AIChatViewDelegate: NSObjectProtocol {
@@ -16,7 +16,7 @@ public protocol AIChatViewDelegate: NSObjectProtocol {
 open class AIChatViewController: UIViewController {
   public weak var delegate: AIChatViewDelegate?
   public let viewModel = AIChatViewModel()
-  public var lastMessages: [V2NIMMessage]?
+  public var lastMessages: [V2NIM2Message]?
 
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -211,7 +211,7 @@ open class AIChatViewController: UIViewController {
   /// 加载 AI 助聊语句
   /// - Parameters:
   ///   - messages: 上下文消息
-  open func loadData(_ messages: [V2NIMMessage]? = nil) {
+  open func loadData(_ messages: [V2NIM2Message]? = nil) {
     if let aiChatClick = ChatUIConfig.shared.aiChatDidClick {
       aiChatClick(self, messages)
       return
@@ -221,7 +221,7 @@ open class AIChatViewController: UIViewController {
   /// 加载 AI 助聊语句
   /// - Parameters:
   ///   - messages: 上下文消息
-  open func loadMoreData(_ messages: [V2NIMMessage]? = nil) {
+  open func loadMoreData(_ messages: [V2NIM2Message]? = nil) {
     if messages != nil {
       lastMessages = messages
     }

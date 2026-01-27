@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -114,7 +114,7 @@ open class NEBaseSystemNotificationCell: NEBaseValidationCell {
       rejectButton.isHidden = true
       titleLabelRightMargin?.constant = -90
 
-      if application.v2Notification.applicantAccountId == IMKitClient.instance.account() {
+      if application.v2Notification.applicantAccountId == IMKit2Client.instance.account() {
         // 自己申请的，不展示结果
         resultLabel.isHidden = true
         resultImage.isHidden = true

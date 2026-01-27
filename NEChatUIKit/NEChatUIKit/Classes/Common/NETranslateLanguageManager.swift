@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -18,9 +18,9 @@ open class NETranslateLanguageManager: NSObject {
 //    NEAIUserManager.shared.getAITranslateUser()?.accountId ?? ""
 //  }
 
-//  var translationAIUser: V2NIMAIUser?
+//  var translationAIUser: V2NIM2AIUser?
 
-//  open func getTranslationAIUser(_ completion: @escaping (V2NIMAIUser?) -> Void) {
+//  open func getTranslationAIUser(_ completion: @escaping (V2NIM2AIUser?) -> Void) {
 //    if translateAIUserAccountId.count <= 0 {
 //      completion(nil)
 //    }

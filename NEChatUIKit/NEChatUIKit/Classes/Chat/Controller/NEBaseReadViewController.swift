@@ -3,10 +3,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 /// 消息已读未读页面 - 基类
@@ -14,7 +14,7 @@ import UIKit
 open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
   private let viewModel = ReadViewModel()
-  private var message: V2NIMMessage
+  private var message: V2NIM2Message
   private var teamId: String
 
   /// 已读按钮
@@ -141,14 +141,14 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
     return view
   }()
 
-  public init(message: V2NIMMessage, teamId: String) {
+  public init(message: V2NIM2Message, teamId: String) {
     self.message = message
     self.teamId = teamId
     super.init(nibName: nil, bundle: nil)
   }
 
   public required init?(coder: NSCoder) {
-    message = V2NIMMessage()
+    message = V2NIM2Message()
     teamId = ""
     super.init(coder: coder)
   }
@@ -206,7 +206,7 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
   open func loadData() {
     viewModel.getTeamMessageReceiptDetail(message, teamId) { [weak self] error in
       if let err = error as? NSError {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           self?.showToast(commonLocalizable("network_error"))
         } else {
           self?.showToast(err.localizedDescription)

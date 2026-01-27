@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 @objc
 public protocol ChatViewModelDelegate: NSObjectProtocol {
@@ -28,19 +28,19 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// - Parameter result: 发送结果
   /// - Parameter error: 失败详情
   /// - Parameter progress: 发送进度
-  @objc optional func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt)
+  @objc optional func sendMessageCallback(_ result: V2NIM2SendMessageResult?, _ error: V2NIM2Error?, _ progress: UInt)
 
   /// 消息发送中，此时消息已经发送
   /// - Parameters:
   ///   - message: 消息
   ///   - index: 消息下标
-  func sending(_ message: V2NIMMessage, _ index: IndexPath)
+  func sending(_ message: V2NIM2Message, _ index: IndexPath)
 
   /// 消息发送完成，发送结果为成功或失败
   /// - Parameters:
   ///   - message: 消息
   ///   - index: 消息下标
-  func sendSuccess(_ message: V2NIMMessage, _ index: IndexPath)
+  func sendSuccess(_ message: V2NIM2Message, _ index: IndexPath)
 
   /// 消息重发成功
   /// - Parameters:
@@ -52,7 +52,7 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - indexs: 消息下标列表
-  func onRecvMessages(_ messages: [V2NIMMessage], _ indexs: [IndexPath])
+  func onRecvMessages(_ messages: [V2NIM2Message], _ indexs: [IndexPath])
 
   /// 消息加载更多完成
   /// - Parameter indexs: 消息下标列表
@@ -67,18 +67,18 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   ///   - messages: 消息列表
   ///   - deleteIndexs: 删除消息的下标列表
   ///   - reloadIndex: 需要刷新的消息的下标列表
-  func onDeleteMessage(_ messages: [V2NIMMessage], deleteIndexs: [IndexPath], reloadIndex: [IndexPath])
+  func onDeleteMessage(_ messages: [V2NIM2Message], deleteIndexs: [IndexPath], reloadIndex: [IndexPath])
 
   /// 撤回消息或收到撤回消息回调
   /// - Parameters:
   ///   - message: 消息
   ///   - atIndexs: 消息下标列表
-  func onRevokeMessage(_ message: V2NIMMessage, atIndexs: [IndexPath])
+  func onRevokeMessage(_ message: V2NIM2Message, atIndexs: [IndexPath])
 
   /// 消息状态变更
   /// - Parameter message: 消息
   /// - Parameter atIndexs: 消息下标
-  func onMessageStatusChange(_ message: V2NIMMessage?, atIndexs: [IndexPath])
+  func onMessageStatusChange(_ message: V2NIM2Message?, atIndexs: [IndexPath])
 
   /// 单聊对方正在输入中
   func remoteUserEditing()
@@ -131,34 +131,34 @@ open class ChatViewModel: NSObject {
   public weak var delegate: ChatViewModelDelegate?
 
   // 多选选中的消息
-  public var selectedMessages = [V2NIMMessage]() {
+  public var selectedMessages = [V2NIM2Message]() {
     didSet {
       delegate?.selectedMessagesChanged?(selectedMessages.count)
     }
   }
 
   // 上拉时间戳
-  private var newMsg: V2NIMMessage?
+  private var newMsg: V2NIM2Message?
   // 下拉时间戳
-  private var oldMsg: V2NIMMessage?
+  private var oldMsg: V2NIM2Message?
 
   public let chatRepo = ChatRepo.shared
   public let contactRepo = ContactRepo.shared
   public let conversationRepo = ConversationRepo.shared
   public let localConversationRepo = LocalConversationRepo.shared
   public var operationModel: MessageContentModel?
-  public var topMessage: V2NIMMessage? // 置顶消息
+  public var topMessage: V2NIM2Message? // 置顶消息
   public var isReplying = false
   public let messagPageNum: Int = 100
   public let aiMessagNum: Int = 30 // 从 aiMessagNum 条消息中取文本消息作为上下文内容
-  public var anchor: V2NIMMessage?
+  public var anchor: V2NIM2Message?
 
   public var isHistoryChat = false
 
   public var deletingMsgDic = Set<String>()
 
   /// AI 翻译 User
-  public var translationAIUser: V2NIMAIUser?
+  public var translationAIUser: V2NIM2AIUser?
 
   /// 翻译request id 记录
   public var translationLanguageRequestId = ""
@@ -175,19 +175,19 @@ open class ChatViewModel: NSObject {
   }
 
   public init(conversationId: String) {
-    NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
+    NE2ALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     ChatRepo.conversationId = conversationId
-    ChatRepo.sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
+    ChatRepo.sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) ?? ""
     anchor = nil
     super.init()
     addListener()
     getAIUserList()
   }
 
-  public init(conversationId: String, anchor: V2NIMMessage?) {
-    NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
+  public init(conversationId: String, anchor: V2NIM2Message?) {
+    NE2ALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     ChatRepo.conversationId = conversationId
-    ChatRepo.sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
+    ChatRepo.sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) ?? ""
     self.anchor = anchor
     super.init()
     if anchor != nil {
@@ -225,28 +225,28 @@ open class ChatViewModel: NSObject {
   /// 清空当前会话的未读数
   open func clearUnreadCount() {
     // 本地会话
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.clearUnreadCountByIds([ChatRepo.conversationId]) { result, error in
-        NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
+        NE2ALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
       }
       localConversationRepo.markConversationRead(ChatRepo.conversationId) { result, error in
-        NEALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
+        NE2ALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
       }
       return
     }
 
     conversationRepo.clearUnreadCountByIds([ChatRepo.conversationId]) { result, error in
-      NEALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
+      NE2ALog.infoLog(ModuleName, desc: #function + " error" + (error?.localizedDescription ?? ""))
     }
     conversationRepo.markConversationRead(ChatRepo.conversationId) { result, error in
-      NEALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
+      NE2ALog.infoLog(ModuleName, desc: #function + " makr covnersaion read error : \(error?.localizedDescription ?? "")")
     }
   }
 
   /// 加载数据
   /// - Parameter completion: 完成回调
   open func loadData(_ completion: @escaping (Error?, NSInteger, NSInteger, Int) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     // 记录可信时间戳
     if anchor == nil {
@@ -255,7 +255,7 @@ open class ChatViewModel: NSObject {
       isHistoryChat = false
 
       getHistoryMessage(order: .QUERY_DIRECTION_DESC, message: nil) { [weak self] error, count, models in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           ModuleName + " " + ChatViewModel.className(),
           desc: "CALLBACK getMessageList " + (error?.localizedDescription ?? "no error")
         )
@@ -274,8 +274,8 @@ open class ChatViewModel: NSObject {
       var moreEnd = 0
       var newEnd = 0
       var anchorIndex = 0
-      var newDatas = [V2NIMMessage]()
-      var loadMessages = [V2NIMMessage]()
+      var newDatas = [V2NIM2Message]()
+      var loadMessages = [V2NIM2Message]()
       var err: Error?
       var hasLoad = false
 
@@ -313,7 +313,7 @@ open class ChatViewModel: NSObject {
 
           group.enter()
           self?.getHistoryMessage(order: .QUERY_DIRECTION_ASC, message: self?.anchor) { error, value, models in
-            NEALog.infoLog(
+            NE2ALog.infoLog(
               ModuleName + " " + ChatViewModel.className(),
               desc: "CALLBACK pullRemoteRefresh " + (error?.localizedDescription ?? "no error")
             )
@@ -364,8 +364,8 @@ open class ChatViewModel: NSObject {
 
   /// 加载消息的更多信息（回复、标记、发送者信息）
   /// - Parameter messageArray: 消息列表
-  open func loadMoreWithMessage(_ messageArray: [V2NIMMessage]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  open func loadMoreWithMessage(_ messageArray: [V2NIM2Message]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     let group = DispatchGroup()
 
     group.enter()
@@ -430,7 +430,7 @@ open class ChatViewModel: NSObject {
       var accids = Set<String>()
       for model in self?.messages ?? [] {
         if model.message?.messageType == .MESSAGE_TYPE_NOTIFICATION,
-           let attach = model.message?.attachment as? V2NIMMessageNotificationAttachment,
+           let attach = model.message?.attachment as? V2NIM2MessageNotificationAttachment,
            let accIds = attach.targetIds {
           accids.formUnion(accIds)
         }
@@ -520,11 +520,11 @@ open class ChatViewModel: NSObject {
   ///   - order: 查询方向
   ///   - message: 锚点消息
   ///   - completion: 完成回调
-  open func getHistoryMessage(order: V2NIMQueryDirection,
-                              message: V2NIMMessage?,
-                              _ completion: @escaping (Error?, NSInteger, [V2NIMMessage])
+  open func getHistoryMessage(order: V2NIM2QueryDirection,
+                              message: V2NIM2Message?,
+                              _ completion: @escaping (Error?, NSInteger, [V2NIM2Message])
                                 -> Void) {
-    let opt = V2NIMMessageListOption()
+    let opt = V2NIM2MessageListOption()
     opt.limit = messagPageNum
     opt.anchorMessage = message
     opt.conversationId = ChatRepo.conversationId
@@ -583,9 +583,9 @@ open class ChatViewModel: NSObject {
 
   /// 下拉获取历史消息
   /// - Parameter completion: 完成回调
-  open func dropDownRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [V2NIMMessage])
+  open func dropDownRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [V2NIM2Message])
     -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     // 首次会话下拉，没有锚点消息 || 锚点消息被删除，需要手动设置锚点消息
     if oldMsg == nil || !messages.contains(where: { $0.message?.messageClientId == oldMsg?.messageClientId }) {
@@ -611,9 +611,9 @@ open class ChatViewModel: NSObject {
 
   /// 上拉获取最新消息
   /// - Parameter completion: 完成回调
-  open func pullRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [V2NIMMessage])
+  open func pullRemoteRefresh(_ completion: @escaping (Error?, NSInteger, [V2NIM2Message])
     -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     getHistoryMessage(order: .QUERY_DIRECTION_ASC, message: newMsg) { [weak self] error, count, messages in
       completion(error, count, messages)
       self?.loadMoreWithMessage(messages)
@@ -625,13 +625,13 @@ open class ChatViewModel: NSObject {
   open func downloadAudioFile(_ models: [MessageModel]) {
     DispatchQueue.global().async { [weak self] in
       for model in models {
-        if model.type == .audio, let audioAttach = model.message?.attachment as? V2NIMMessageAudioAttachment {
+        if model.type == .audio, let audioAttach = model.message?.attachment as? V2NIM2MessageAudioAttachment {
           let path = audioAttach.path ?? ChatMessageHelper.createFilePath(model.message)
           if !FileManager.default.fileExists(atPath: path) {
             if let urlString = audioAttach.url {
               self?.downLoad(urlString, path, nil) { _, error in
                 if error == nil {
-                  NEALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
+                  NE2ALog.infoLog(ModuleName + " " + ChatViewController.className(), desc: #function + "CALLBACK downLoad")
                 }
               }
             }
@@ -649,11 +649,11 @@ open class ChatViewModel: NSObject {
   ///   - message: 需要发送的消息体
   ///   - conversationId: 会话id
   ///   - completion: 回调
-  open func sendMessage(message: V2NIMMessage,
+  open func sendMessage(message: V2NIM2Message,
                         conversationId: String? = nil,
-                        params: V2NIMSendMessageParams? = nil,
-                        _ completion: @escaping (V2NIMMessage?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text: \(String(describing: message.text))")
+                        params: V2NIM2SendMessageParams? = nil,
+                        _ completion: @escaping (V2NIM2Message?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text: \(String(describing: message.text))")
 
     chatRepo.sendMessage(message: message,
                          conversationId: conversationId ?? ChatRepo.conversationId,
@@ -665,7 +665,7 @@ open class ChatViewModel: NSObject {
     }
   }
 
-  open func checkAntiSpam(result: V2NIMSendMessageResult?) {
+  open func checkAntiSpam(result: V2NIM2SendMessageResult?) {
     if let antispamResult = result?.antispamResult {
       let pattern = "\\\\*\"label\\\\*\"\\s*:\\s*(\\d+)"
       if let errorCode = NECommonUtil.extractLabelsWithRegex(from: antispamResult, pattern).first,
@@ -686,8 +686,8 @@ open class ChatViewModel: NSObject {
   ///   - type: 类型
   /// - Returns: 请求大模型的内容
   open func getAIModelCallContent(_ text: String?,
-                                  _ type: V2NIMAIModelCallContentType) -> V2NIMAIModelCallContent {
-    let content = V2NIMAIModelCallContent()
+                                  _ type: V2NIM2AIModelCallContentType) -> V2NIM2AIModelCallContent {
+    let content = V2NIM2AIModelCallContent()
     content.msg = text ?? ""
     content.type = type
     return content
@@ -695,7 +695,7 @@ open class ChatViewModel: NSObject {
 
   /// 获取上下文内容
   /// - Returns: 上下文内容
-  open func getAIMessages() -> [V2NIMAIModelCallMessage]? {
+  open func getAIMessages() -> [V2NIM2AIModelCallMessage]? {
     guard NEAIUserManager.shared.isAIUser(ChatRepo.sessionId) else {
       return nil
     }
@@ -704,7 +704,7 @@ open class ChatViewModel: NSObject {
     let aiMessageModels = messageModels.filter { $0.type == .text || $0.type == .aiStreamText || $0.type == .richText }
 
     var firstUserMessage = false // 是否找到第一条用户发的消息
-    var aiMessages = [V2NIMAIModelCallMessage]()
+    var aiMessages = [V2NIM2AIModelCallMessage]()
 
     for (i, model) in aiMessageModels.enumerated() {
       var isUserMessage = false
@@ -718,25 +718,25 @@ open class ChatViewModel: NSObject {
         continue
       }
 
-      let aiMessage = V2NIMAIModelCallMessage()
-      aiMessage.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
+      let aiMessage = V2NIM2AIModelCallMessage()
+      aiMessage.type = .AI_MODEL_CONTENT_TYPE_TEXT
 
       if isUserMessage {
-        aiMessage.role = .NIM_AI_MODEL_ROLE_TYPE_USER
+        aiMessage.role = .AI_MODEL_ROLE_TYPE_USER
       } else {
-        aiMessage.role = .NIM_AI_MODEL_ROLE_TYPE_ASSISTANT
+        aiMessage.role = .AI_MODEL_ROLE_TYPE_ASSISTANT
       }
 
       if model.type == .text || model.type == .aiStreamText,
          let text = model.message?.text, !text.isEmpty {
         aiMessage.msg = text
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], message text\(i + 1): \(text)")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], message text\(i + 1): \(text)")
         aiMessages.append(aiMessage)
       } else if model.type == .richText, let m = model as? MessageRichTextModel {
         if let title = m.titleText, !title.isEmpty {
           let text = title + (m.message?.text ?? "")
           aiMessage.msg = text
-          NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], message text\(i + 1): \(text)")
+          NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], message text\(i + 1): \(text)")
           aiMessages.append(aiMessage)
         }
       }
@@ -750,7 +750,7 @@ open class ChatViewModel: NSObject {
   ///   - aiUserAccid: 数字人 id
   ///   - message: 消息
   /// - Returns: 消息发送参数
-  open func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+  open func getSendMessageParams(_ aiUserAccid: String? = nil, _ message: V2NIM2Message) -> V2NIM2SendMessageParams {
     var aiUserAccid = aiUserAccid
     var needMessgaes = false // 是否需要上下文
     if NEAIUserManager.shared.isAIUser(ChatRepo.sessionId) {
@@ -760,13 +760,13 @@ open class ChatViewModel: NSObject {
 
     let params = chatRepo.getSendMessageParams()
     if let aiAccid = aiUserAccid {
-      let aiConfig = V2NIMMessageAIConfigParams()
+      let aiConfig = V2NIM2MessageAIConfigParams()
       aiConfig.accountId = aiAccid
       aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
-        aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+        aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
         if needMessgaes {
           aiConfig.messages = getAIMessages()
         }
@@ -774,12 +774,12 @@ open class ChatViewModel: NSObject {
 
       // 换行消息
       if message.messageType == .MESSAGE_TYPE_CUSTOM,
-         let type = NECustomUtils.typeOfCustomMessage(message.attachment),
-         type == customRichTextType {
-        let title = NECustomUtils.titleOfRichText(message.attachment)
-        let body = NECustomUtils.bodyOfRichText(message.attachment)
+         let type = NE2CustomUtils.typeOfCustomMessage(message.attachment),
+         type == customRichTextType2 {
+        let title = NE2CustomUtils.titleOfRichText(message.attachment)
+        let body = NE2CustomUtils.bodyOfRichText(message.attachment)
         let text = (title ?? "") + (body ?? "")
-        aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+        aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
         if needMessgaes {
           aiConfig.messages = getAIMessages()
         }
@@ -799,43 +799,43 @@ open class ChatViewModel: NSObject {
   ///   - message: 回复的消息
   /// - Returns: 消息发送参数
   open func getReplyMessageParams(_ aiUserAccid: String? = nil,
-                                  _ replyMessage: V2NIMMessage,
-                                  _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+                                  _ replyMessage: V2NIM2Message,
+                                  _ message: V2NIM2Message) -> V2NIM2SendMessageParams {
     let params = chatRepo.getSendMessageParams()
     if let aiAccid = aiUserAccid {
-      let aiConfig = V2NIMMessageAIConfigParams()
+      let aiConfig = V2NIM2MessageAIConfigParams()
       aiConfig.accountId = aiAccid
       aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if replyMessage.messageType == .MESSAGE_TYPE_TEXT {
-        let aiMessage = V2NIMAIModelCallMessage()
+        let aiMessage = V2NIM2AIModelCallMessage()
         aiMessage.msg = replyMessage.text ?? ""
-        aiMessage.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
-        aiMessage.role = .NIM_AI_MODEL_ROLE_TYPE_USER
+        aiMessage.type = .AI_MODEL_CONTENT_TYPE_TEXT
+        aiMessage.role = .AI_MODEL_ROLE_TYPE_USER
 
         aiConfig.messages = [aiMessage]
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], reply message text: \(replyMessage.text ?? "")")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], reply message text: \(replyMessage.text ?? "")")
       }
 
       // 换行消息
       if replyMessage.messageType == .MESSAGE_TYPE_CUSTOM,
-         let type = NECustomUtils.typeOfCustomMessage(replyMessage.attachment),
-         type == customRichTextType {
-        let title = NECustomUtils.titleOfRichText(replyMessage.attachment)
-        let body = NECustomUtils.bodyOfRichText(replyMessage.attachment)
+         let type = NE2CustomUtils.typeOfCustomMessage(replyMessage.attachment),
+         type == customRichTextType2 {
+        let title = NE2CustomUtils.titleOfRichText(replyMessage.attachment)
+        let body = NE2CustomUtils.bodyOfRichText(replyMessage.attachment)
         let text = (title ?? "") + (body ?? "")
 
-        let aiMessage = V2NIMAIModelCallMessage()
+        let aiMessage = V2NIM2AIModelCallMessage()
         aiMessage.msg = text
-        aiMessage.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
-        aiMessage.role = .NIM_AI_MODEL_ROLE_TYPE_USER
+        aiMessage.type = .AI_MODEL_CONTENT_TYPE_TEXT
+        aiMessage.role = .AI_MODEL_ROLE_TYPE_USER
 
         aiConfig.messages = [aiMessage]
-        NEALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], reply message text: \(replyMessage.text ?? "")")
+        NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "[AIChat], reply message text: \(replyMessage.text ?? "")")
       }
 
-      aiConfig.content = getAIModelCallContent(message.text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      aiConfig.content = getAIModelCallContent(message.text, .AI_MODEL_CONTENT_TYPE_TEXT)
       params.aiConfig = aiConfig
     }
 
@@ -849,26 +849,26 @@ open class ChatViewModel: NSObject {
   ///   - forwordMessage: 转发的消息
   /// - Returns: 消息发送参数
   open func getForwardMessageParams(_ aiUserAccid: String? = nil,
-                                    _ forwordMessage: V2NIMMessage) -> V2NIMSendMessageParams {
+                                    _ forwordMessage: V2NIM2Message) -> V2NIM2SendMessageParams {
     let params = chatRepo.getSendMessageParams()
     if let aiAccid = aiUserAccid {
-      let aiConfig = V2NIMMessageAIConfigParams()
+      let aiConfig = V2NIM2MessageAIConfigParams()
       aiConfig.accountId = aiAccid
       aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
       // 文本消息
       if forwordMessage.messageType == .MESSAGE_TYPE_TEXT {
-        aiConfig.content = getAIModelCallContent(forwordMessage.text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+        aiConfig.content = getAIModelCallContent(forwordMessage.text, .AI_MODEL_CONTENT_TYPE_TEXT)
       }
 
       // 换行消息
       if forwordMessage.messageType == .MESSAGE_TYPE_CUSTOM,
-         let type = NECustomUtils.typeOfCustomMessage(forwordMessage.attachment),
-         type == customRichTextType {
-        let title = NECustomUtils.titleOfRichText(forwordMessage.attachment)
-        let body = NECustomUtils.bodyOfRichText(forwordMessage.attachment)
+         let type = NE2CustomUtils.typeOfCustomMessage(forwordMessage.attachment),
+         type == customRichTextType2 {
+        let title = NE2CustomUtils.titleOfRichText(forwordMessage.attachment)
+        let body = NE2CustomUtils.bodyOfRichText(forwordMessage.attachment)
         let text = (title ?? "") + (body ?? "")
-        aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+        aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
       }
 
       params.aiConfig = aiConfig
@@ -888,8 +888,8 @@ open class ChatViewModel: NSObject {
                             conversationId: String? = nil,
                             remoteExt: [String: Any]? = nil,
                             aiUserAccid: String? = nil,
-                            _ completion: @escaping (V2NIMMessage?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
+                            _ completion: @escaping (V2NIM2Message?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
     if text.count <= 0 {
       completion(nil, nil)
       return
@@ -914,12 +914,12 @@ open class ChatViewModel: NSObject {
   ///   - body: 内容
   ///   - aiUserAccid: 数字人 accountId
   ///   - completion: 完成回调
-  open func sendRichTextMessage(message: V2NIMMessage,
+  open func sendRichTextMessage(message: V2NIM2Message,
                                 title: String? = nil,
                                 body: String? = nil,
                                 aiUserAccid: String? = nil,
-                                _ completion: @escaping (V2NIMMessage?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", title: \(String(describing: title)), body: \(String(describing: body))")
+                                _ completion: @escaping (V2NIM2Message?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", title: \(String(describing: title)), body: \(String(describing: body))")
 
     let params = getSendMessageParams(aiUserAccid, message)
     sendMessage(message: message, conversationId: ChatRepo.conversationId, params: params) { message, error, pro in
@@ -936,11 +936,11 @@ open class ChatViewModel: NSObject {
                              conversationId: String? = nil,
                              _ completion: @escaping (Error?) -> Void) {
     if ChatDeduplicationHelper.instance.isRecordAudioSended(path: filePath) == true {
-      NEALog.infoLog(ModuleName + " " + className(), desc: #function + ",duplicate send audio at filePath:" + filePath)
+      NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ",duplicate send audio at filePath:" + filePath)
       return
     }
 
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filePath:" + filePath)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", filePath:" + filePath)
 
     let message = MessageUtils.audioMessage(filePath: filePath, name: nil, sceneName: nil, duration: 0)
     let params = getSendMessageParams(nil, message)
@@ -960,7 +960,7 @@ open class ChatViewModel: NSObject {
                              height: Int32 = 0,
                              conversationId: String? = nil,
                              _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", image path: \(path)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", image path: \(path)")
 
     let message = MessageUtils.imageMessage(path: path, name: name, sceneName: nil, width: width, height: height)
     let params = getSendMessageParams(nil, message)
@@ -980,8 +980,8 @@ open class ChatViewModel: NSObject {
                              height: Int32 = 0,
                              duration: Int32 = 0,
                              conversationId: String? = nil,
-                             _ completion: @escaping (V2NIMMessage?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ",video url.path:" + url.path)
+                             _ completion: @escaping (V2NIM2Message?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ",video url.path:" + url.path)
 
     convertVideoToMP4(videoURL: url) { [weak self] url, error in
       if let path = url?.path {
@@ -991,7 +991,7 @@ open class ChatViewModel: NSObject {
           completion(message, error, pro)
         }
       } else {
-        NEALog.errorLog("chat veiw model", desc: "convert mov to mp4 failed")
+        NE2ALog.errorLog("chat veiw model", desc: "convert mov to mp4 failed")
         completion(nil, NSError(domain: "convert mov to mp4 failed", code: 414), 0)
       }
     }
@@ -1036,7 +1036,7 @@ open class ChatViewModel: NSObject {
   open func sendLocationMessage(model: ChatLocaitonModel,
                                 conversationId: String? = nil,
                                 _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", title:\(model.title), address:\(model.address)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", title:\(model.title), address:\(model.address)")
 
     let message = MessageUtils.locationMessage(lat: model.lat,
                                                lng: model.lng,
@@ -1057,8 +1057,8 @@ open class ChatViewModel: NSObject {
   open func sendFileMessage(filePath: String,
                             displayName: String?,
                             conversationId: String? = nil,
-                            _ completion: @escaping (V2NIMMessage?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", filePath:\(filePath)")
+                            _ completion: @escaping (V2NIM2Message?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", filePath:\(filePath)")
 
     let message = MessageUtils.fileMessage(filePath: filePath, displayName: displayName, sceneName: nil)
     let params = getSendMessageParams(nil, message)
@@ -1077,7 +1077,7 @@ open class ChatViewModel: NSObject {
                               rawAttachment: String,
                               conversationId: String? = nil,
                               _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
 
     let message = MessageUtils.customMessage(text: text, rawAttachment: rawAttachment)
     let params = getSendMessageParams(nil, message)
@@ -1093,7 +1093,7 @@ open class ChatViewModel: NSObject {
   open func insertTextMessage(_ text: String,
                               _ conversationId: String,
                               _ senderId: String? = nil) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
 
     let message = MessageUtils.textMessage(text: text)
     chatRepo.insertMessageToLocal(message: message, conversationId: conversationId, senderId: senderId) { [weak self] _, error in
@@ -1107,15 +1107,15 @@ open class ChatViewModel: NSObject {
     }
 
     // 本地会话
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+    if NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == false {
       localConversationRepo.createConversation(conversationId) { [weak self] conversation, error in
-        NEALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
+        NE2ALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
       }
       return
     }
 
     conversationRepo.createConversation(conversationId) { [weak self] conversation, error in
-      NEALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
+      NE2ALog.infoLog(self?.className() ?? "", desc: #function + "insertTextMessage \(error?.localizedDescription ?? "")")
     }
   }
 
@@ -1127,7 +1127,7 @@ open class ChatViewModel: NSObject {
                              _ createTime: TimeInterval? = nil,
                              _ conversationId: String? = nil,
                              _ senderId: String? = nil) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text:\(text)")
 
     let cid = conversationId ?? ChatRepo.conversationId
     let tip = MessageUtils.tipMessage(text: text)
@@ -1150,13 +1150,13 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  open func markRead(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {}
+  open func markRead(messages: [V2NIM2Message], _ completion: @escaping (Error?) -> Void) {}
 
   /// 获取消息已读未读回执
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  open func getMessageReceipts(messages: [V2NIMMessage],
+  open func getMessageReceipts(messages: [V2NIM2Message],
                                _ completion: @escaping ([IndexPath], Error?) -> Void) {}
 
   /// 删除消息
@@ -1164,10 +1164,10 @@ open class ChatViewModel: NSObject {
   open func deleteMessage(_ completion: @escaping (Error?) -> Void) {
     guard let message = operationModel?.message,
           let messageId = message.messageClientId else {
-      NEALog.errorLog(ModuleName + " " + className(), desc: #function + ", message is nil")
+      NE2ALog.errorLog(ModuleName + " " + className(), desc: #function + ", message is nil")
       return
     }
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(messageId)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(messageId)")
 
     // 已撤回的消息不能删除
     if operationModel?.isRevoked == true {
@@ -1215,10 +1215,10 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - messages: 需要删除的消息
   ///   - completion: 完成回调
-  open func deleteMessages(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", message count:\(messages.count)")
-    var localMsgs = [V2NIMMessage]()
-    var remoteMsgs = [V2NIMMessage]()
+  open func deleteMessages(messages: [V2NIM2Message], _ completion: @escaping (Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", message count:\(messages.count)")
+    var localMsgs = [V2NIM2Message]()
+    var remoteMsgs = [V2NIM2Message]()
     for msg in messages {
       guard let messageId = msg.messageClientId else {
         continue
@@ -1265,11 +1265,11 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 新生成的消息
   ///   - replyMessage: 被回复的消息
-  open func replyMessageWithoutThread(message: V2NIMMessage,
-                                      replyMessage: V2NIMMessage,
+  open func replyMessageWithoutThread(message: V2NIM2Message,
+                                      replyMessage: V2NIM2Message,
                                       aiUserAccid: String? = nil,
-                                      _ completion: @escaping (V2NIMMessage?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
+                                      _ completion: @escaping (V2NIM2Message?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
 
     let yxReplyMsg = ChatMessageHelper.createReplyDic(replyMessage)
 
@@ -1291,11 +1291,11 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 新生成的消息
   ///   - replyMessage: 被回复的消息
-  open func replyMessageWithThread(message: V2NIMMessage,
-                                   replyMessage: V2NIMMessage,
+  open func replyMessageWithThread(message: V2NIM2Message,
+                                   replyMessage: V2NIM2Message,
                                    aiUserAccid: String? = nil,
-                                   _ completion: @escaping (V2NIMMessage?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
+                                   _ completion: @escaping (V2NIM2Message?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
 
     let params = getReplyMessageParams(aiUserAccid, replyMessage, message)
     chatRepo.replyMessage(message: message, replyMessage: replyMessage, params: params) { result, error, pro in
@@ -1307,8 +1307,8 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - completion: 完成回调
-  open func revokeMessage(message: V2NIMMessage, _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
+  open func revokeMessage(message: V2NIM2Message, _ completion: @escaping (Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
 
     var muta = [String: Any]()
 
@@ -1328,15 +1328,15 @@ open class ChatViewModel: NSObject {
     }
 
     if message.messageType == .MESSAGE_TYPE_CUSTOM {
-      if let title = NECustomUtils.titleOfRichText(message.attachment), !title.isEmpty {
+      if let title = NE2CustomUtils.titleOfRichText(message.attachment), !title.isEmpty {
         muta[revokeLocalMessageTitle] = title
       }
-      if let body = NECustomUtils.bodyOfRichText(message.attachment), !body.isEmpty {
+      if let body = NE2CustomUtils.bodyOfRichText(message.attachment), !body.isEmpty {
         muta[revokeLocalMessageContent] = body
       }
     }
 
-    let revokeParams = V2NIMMessageRevokeParams()
+    let revokeParams = V2NIM2MessageRevokeParams()
     revokeParams.serverExtension = getJSONStringFromDictionary(muta)
     chatRepo.revokeMessage(message: message, params: revokeParams) { [weak self] error in
       if error == nil {
@@ -1369,7 +1369,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter model: 消息模型
   /// - Returns: 操作列表
   open func avalibleOperationsForMessage(_ model: MessageContentModel?) -> [OperationItem]? {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", pinAccount: " + (model?.pinAccount ?? "nil"))
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", pinAccount: " + (model?.pinAccount ?? "nil"))
     var items = [OperationItem]()
 
     /// 消息发送中的消息只能多选和删除（文本可复制）
@@ -1459,7 +1459,7 @@ open class ChatViewModel: NSObject {
     case .MESSAGE_TYPE_CUSTOM:
       if (model?.customType ?? 0) > 0 {
         // 换行消息可以【复制】
-        if model?.customType == customRichTextType {
+        if model?.customType == customRichTextType2 {
           items = [
             OperationItem.copyItem(),
           ]
@@ -1525,7 +1525,7 @@ open class ChatViewModel: NSObject {
     // 根据配置项移除 【标记】
     // 反垃圾命中的消息不能【标记】
     if IMKitConfigCenter.shared.enablePinMessage == false ||
-      model?.message?.messageStatus.errorCode != operationSuccess {
+      model?.message?.messageStatus.errorCode != operationSuccess2 {
       items.removeAll { item in
         item.type == .pin || item.type == .removePin
       }
@@ -1545,7 +1545,7 @@ open class ChatViewModel: NSObject {
 
   /// 消息列表添加时间
   open func addTimeForHistoryMessage() {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     for (i, model) in messages.enumerated() {
       if i == 0, let createTime = model.message?.createTime {
         // 第一条消息默认显示时间
@@ -1574,8 +1574,8 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - completion: 完成回调
-  open func modelFromMessage(message: V2NIMMessage, _ completion: @escaping (MessageModel) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+  open func modelFromMessage(message: V2NIM2Message, _ completion: @escaping (MessageModel) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     ChatMessageHelper.modelFromMessage(message: message) { [weak self] model in
       if ChatMessageHelper.isRevokeMessage(message: model.message) {
         if let content = ChatMessageHelper.getRevokeMessageContent(model: model) {
@@ -1604,8 +1604,8 @@ open class ChatViewModel: NSObject {
   /// 构建聊天页面UI显示model
   /// - Parameter message: 消息
   /// - Returns: 消息体
-  open func modelFromMessage(message: V2NIMMessage) -> MessageModel {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+  open func modelFromMessage(message: V2NIM2Message) -> MessageModel {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     let model = ChatMessageHelper.modelFromMessage(message: message)
 
     if ChatMessageHelper.isRevokeMessage(message: model.message) {
@@ -1638,8 +1638,8 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 需要查找回复的消息
   /// - Returns: 回复消息
-  open func getReplyMessage(message: V2NIMMessage) -> MessageModel? {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+  open func getReplyMessage(message: V2NIM2Message) -> MessageModel? {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     var replyId: String?
 
     // 非thread方案
@@ -1672,9 +1672,9 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 需要查找回复的消息
   ///   - completion: 完成回调
-  open func getReplyMessage(message: V2NIMMessage,
+  open func getReplyMessage(message: V2NIM2Message,
                             _ completion: @escaping (MessageModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     var replyId: String?
 
     // 非thread方案
@@ -1713,7 +1713,7 @@ open class ChatViewModel: NSObject {
   }
 
   @discardableResult
-  open func deleteMessageModel(_ message: V2NIMMessage) -> (deleteIndexs: [Int], reloadIndexs: [Int]) {
+  open func deleteMessageModel(_ message: V2NIM2Message) -> (deleteIndexs: [Int], reloadIndexs: [Int]) {
     var deleteIndexs = [Int]()
     var reloadIndexs = [Int]()
     var index = -1
@@ -1759,8 +1759,8 @@ open class ChatViewModel: NSObject {
 
   /// 删除消息更新UI
   /// - Parameter messages: 消息
-  open func deleteMessageUpdateUI(_ messages: [V2NIMMessage]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages count: \(messages.count)")
+  open func deleteMessageUpdateUI(_ messages: [V2NIM2Message]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages count: \(messages.count)")
     var deleteIndexs = Set<Int>()
     var reloadIndexs = Set<Int>()
     for message in messages {
@@ -1783,8 +1783,8 @@ open class ChatViewModel: NSObject {
 
   /// 撤回消息更新UI
   /// - Parameter message: 消息
-  open func revokeMessageUpdateUI(_ message: V2NIMMessage) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+  open func revokeMessageUpdateUI(_ message: V2NIM2Message) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     var index = -1
     var indexs = [IndexPath]()
     var hasFind = false
@@ -1834,12 +1834,12 @@ open class ChatViewModel: NSObject {
         messages[index].message?.text = content
       }
 
-      if message.senderId == IMKitClient.instance.account() {
-        messages[index].message?.aiConfig?.accountId = IMKitClient.instance.account()
+      if message.senderId == IMKit2Client.instance.account() {
+        messages[index].message?.aiConfig?.accountId = IMKit2Client.instance.account()
         (messages[index] as? MessageContentModel)?.fullNameHeight = 0
-        messages[index].avatar = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.user?.avatar
-        messages[index].shortName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.shortName()
-        messages[index].fullName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.showName()
+        messages[index].avatar = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account())?.user?.avatar
+        messages[index].shortName = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account())?.shortName()
+        messages[index].fullName = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account())?.showName()
       }
 
       indexs.append(IndexPath(row: index, section: 0))
@@ -1858,7 +1858,7 @@ open class ChatViewModel: NSObject {
                      _ filePath: String,
                      _ progress: ((UInt) -> Void)?,
                      _ completion: ((String?, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: " + urlString)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: " + urlString)
     ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
@@ -1874,7 +1874,7 @@ open class ChatViewModel: NSObject {
                             _ depth: Int,
                             _ comment: String?,
                             _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(selectedMessages.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(selectedMessages.count)")
 
     // 排序（发送时间正序）
     let forwardMessages = selectedMessages.sorted { msg1, msg2 in
@@ -1898,7 +1898,7 @@ open class ChatViewModel: NSObject {
   ///   - conversationIds: 转发的会话 id
   ///   - comment: 留言
   ///   - completion: 完成回调
-  open func forwardMessage(_ forwardMessages: [V2NIMMessage],
+  open func forwardMessage(_ forwardMessages: [V2NIM2Message],
                            _ conversationIds: [String],
                            _ comment: String?,
                            _ completion: @escaping (Error?) -> Void) {
@@ -1908,7 +1908,7 @@ open class ChatViewModel: NSObject {
         ChatMessageHelper.clearForwardAtMark(forwardMessage)
 
         var params = chatRepo.getSendMessageParams()
-        if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+        if let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
            NEAIUserManager.shared.isAIUser(sessionId) {
           params = getForwardMessageParams(sessionId, forwardMessage)
         }
@@ -1923,7 +1923,7 @@ open class ChatViewModel: NSObject {
           let message = MessageUtils.textMessage(text: text, remoteExt: nil)
 
           var params = self?.chatRepo.getSendMessageParams()
-          if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+          if let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
              NEAIUserManager.shared.isAIUser(sessionId) {
             params = self?.getForwardMessageParams(sessionId, message)
           }
@@ -1944,7 +1944,7 @@ open class ChatViewModel: NSObject {
   ///   - depth: 合并转发消息的深度
   ///   - comment: 留言
   ///   - completion: 完成回调
-  open func forwardMultiMessage(forwardMessages: [V2NIMMessage],
+  open func forwardMultiMessage(forwardMessages: [V2NIM2Message],
                                 conversationIds: [String],
                                 depth: Int = 0,
                                 comment: String?,
@@ -1955,7 +1955,7 @@ open class ChatViewModel: NSObject {
           let message = MessageUtils.textMessage(text: text, remoteExt: nil)
 
           var params = chatRepo.getSendMessageParams()
-          if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+          if let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
              NEAIUserManager.shared.isAIUser(sessionId) {
             params = getForwardMessageParams(sessionId, message)
           }
@@ -2001,7 +2001,7 @@ open class ChatViewModel: NSObject {
             }
 
             var data = [String: Any]()
-            data["sessionId"] = V2NIMConversationIdUtil.conversationTargetId(fromSession)
+            data["sessionId"] = V2NIM2ConversationIdUtil.conversationTargetId(fromSession)
             data["url"] = url
             data["md5"] = md5
             data["depth"] = depth
@@ -2011,7 +2011,7 @@ open class ChatViewModel: NSObject {
             var jsonData = [String: Any]()
             jsonData["data"] = data
             jsonData["messageType"] = "custom"
-            jsonData["type"] = customMultiForwardType
+            jsonData["type"] = customMultiForwardType2
 
             // 转发到会话
             for conversationId in conversationIds {
@@ -2019,7 +2019,7 @@ open class ChatViewModel: NSObject {
                                                        rawAttachment: getJSONStringFromDictionary(jsonData))
 
               var params = self?.chatRepo.getSendMessageParams()
-              if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+              if let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
                  NEAIUserManager.shared.isAIUser(sessionId) {
                 params = self?.getForwardMessageParams(sessionId, message)
               }
@@ -2034,7 +2034,7 @@ open class ChatViewModel: NSObject {
                   let message = MessageUtils.textMessage(text: text, remoteExt: nil)
 
                   var params = self?.chatRepo.getSendMessageParams()
-                  if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+                  if let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId),
                      NEAIUserManager.shared.isAIUser(sessionId) {
                     params = self?.getForwardMessageParams(sessionId, message)
                   }
@@ -2057,9 +2057,9 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - completion: 完成回调
-  open func addPinMessage(message: V2NIMMessage,
+  open func addPinMessage(message: V2NIM2Message,
                           _ completion: @escaping (Error?, Int) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     chatRepo.pinMessage(message: message, serverExtension: "") { [weak self] error in
       var index = -1
       if error != nil {
@@ -2068,8 +2068,8 @@ open class ChatViewModel: NSObject {
         for (i, model) in (self?.messages ?? []).enumerated() {
           if message.messageClientId == model.message?.messageClientId, !(self?.messages[i].isPined == true) {
             self?.messages[i].isPined = true
-            self?.messages[i].pinAccount = IMKitClient.instance.account()
-            self?.messages[i].pinShowName = self?.getShowName(IMKitClient.instance.account())
+            self?.messages[i].pinAccount = IMKit2Client.instance.account()
+            self?.messages[i].pinShowName = self?.getShowName(IMKit2Client.instance.account())
             index = i
             break
           }
@@ -2083,9 +2083,9 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - completion: 完成回调
-  open func removePinMessage(message: V2NIMMessage,
+  open func removePinMessage(message: V2NIM2Message,
                              _ completion: @escaping (Error?, Int) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
     chatRepo.unpinMessage(messageRefer: message, serverExtension: "") { [weak self] error in
       if error != nil {
         completion(error, -1)
@@ -2099,13 +2099,13 @@ open class ChatViewModel: NSObject {
   /// 置顶消息
   /// - Parameter completion: 回调
   open func topMessage(_ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: operationModel?.message?.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: operationModel?.message?.messageClientId))")
   }
 
   /// 取消置顶消息
   /// - Parameter completion: 回调
   open func untopMessage(_ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
   }
 
   /// 收藏消息
@@ -2119,15 +2119,15 @@ open class ChatViewModel: NSObject {
     let collectionType = message.messageType.rawValue + collectionTypeOffset
     var collectionDic = [String: Any]()
 
-    if let messageString = V2NIMMessageConverter.messageSerialization(message) {
-      if let collectionMessage = V2NIMMessageConverter.messageDeserialization(messageString) {
+    if let messageString = V2NIM2MessageConverter.messageSerialization(message) {
+      if let collectionMessage = V2NIM2MessageConverter.messageDeserialization(messageString) {
         // 移除收藏消息中的at信息
         if var remoteExt = getDictionaryFromJSONString(collectionMessage.serverExtension ?? "") as? [String: Any] {
           remoteExt.removeValue(forKey: yxAtMsg)
           let serverExtensionString = getJSONStringFromDictionary(remoteExt)
           collectionMessage.serverExtension = serverExtensionString
         }
-        if let saveMessageString = V2NIMMessageConverter.messageSerialization(collectionMessage) {
+        if let saveMessageString = V2NIM2MessageConverter.messageSerialization(collectionMessage) {
           collectionDic["message"] = saveMessageString
         }
       }
@@ -2135,7 +2135,7 @@ open class ChatViewModel: NSObject {
     collectionDic["conversationName"] = conversationName
 
     if let accountId = ChatMessageHelper.getSenderId(model.message) {
-      if let aiUser: V2NIMAIUser = NEAIUserManager.shared.getAIUserById(accountId), let senderName = aiUser.name {
+      if let aiUser: V2NIM2AIUser = NEAIUserManager.shared.getAIUserById(accountId), let senderName = aiUser.name {
         collectionDic["senderName"] = senderName
       } else if let senderName = model.fullName {
         collectionDic["senderName"] = senderName
@@ -2150,7 +2150,7 @@ open class ChatViewModel: NSObject {
 
     let content = getJSONStringFromDictionary(collectionDic)
 
-    let params = V2NIMAddCollectionParams()
+    let params = V2NIM2AddCollectionParams()
     params.collectionType = Int32(collectionType)
     params.collectionData = content
     params.uniqueId = message.messageServerId
@@ -2168,10 +2168,10 @@ open class ChatViewModel: NSObject {
   /// - Parameter model: 消息模型
   /// - Parameter completion: 完成回调
   open func voiceToText(_ model: MessageContentModel, _ completion: @escaping (String?, NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    guard let attachment = model.message?.attachment as? V2NIMMessageAudioAttachment else { return }
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
+    guard let attachment = model.message?.attachment as? V2NIM2MessageAudioAttachment else { return }
 
-    let params = V2NIMVoiceToTextParams()
+    let params = V2NIM2VoiceToTextParams()
     params.duration = TimeInterval(attachment.duration)
     if let url = attachment.url {
       params.voiceUrl = url
@@ -2199,19 +2199,19 @@ open class ChatViewModel: NSObject {
     }
   }
 
-  open func stopAIStreamMessage(_ message: V2NIMMessage) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
-    let params = V2NIMMessageAIStreamStopParams()
+  open func stopAIStreamMessage(_ message: V2NIM2Message) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
+    let params = V2NIM2MessageAIStreamStopParams()
     params.operationType = .MESSAGE_AI_STREAM_STOP_OP_DEFAULT
     chatRepo.stopAIStreamMessage(message, params) { [weak self] error in
       self?.delegate?.showErrorToast?(error, chatLocalizable("request_exception"))
     }
   }
 
-  open func regenAIMessage(_ message: V2NIMMessage) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    let params = V2NIMMessageAIRegenParams(.MESSAGE_AI_REGEN_OP_NEW)
+  open func regenAIMessage(_ message: V2NIM2Message) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
+    let params = V2NIM2MessageAIRegenParams(.MESSAGE_AI_REGEN_OP_NEW)
     chatRepo.regenAIMessage(message, params) { [weak self] error in
       self?.delegate?.showErrorToast?(error, chatLocalizable("request_exception"))
     }
@@ -2220,14 +2220,14 @@ open class ChatViewModel: NSObject {
   /// 获取听筒模式
   /// - Returns: 听筒是否外放
   open func getHandSetEnable() -> Bool {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     return SettingRepo.shared.getHandsetMode()
   }
 
   /// 设置听筒模式
   /// - Parameter ear: 是否外放
   open func setHandSetEnable(_ ear: Bool) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     SettingRepo.shared.setHandsetMode(ear)
   }
 
@@ -2235,7 +2235,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter message: 消息
   /// - Returns: 消息下标
   @discardableResult
-  open func removeLocalPinMessage(_ message: V2NIMMessage) -> Int {
+  open func removeLocalPinMessage(_ message: V2NIM2Message) -> Int {
     var index = -1
 
     for (i, model) in messages.enumerated() {
@@ -2251,12 +2251,12 @@ open class ChatViewModel: NSObject {
 
   /// 消息即将发送
   /// - Parameter message: 消息
-  open func sendingMsg(_ message: V2NIMMessage) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
+  open func sendingMsg(_ message: V2NIM2Message) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
 
     // 消息不是当前会话的消息，不处理（转发）
     if message.conversationId != ChatRepo.conversationId {
-      NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) != ChatRepo.conversationId(\(ChatRepo.conversationId)")
+      NE2ALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) != ChatRepo.conversationId(\(ChatRepo.conversationId)")
       return
     }
 
@@ -2265,7 +2265,7 @@ open class ChatViewModel: NSObject {
       if message.messageClientId == model.message?.messageClientId {
         messages[i].message = message
         delegate?.sendSuccess(message, IndexPath(row: i, section: 0))
-        NEALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already exist")
+        NE2ALog.infoLog(className(), desc: #function + "message.conversationId(\(String(describing: message.conversationId))) already exist")
         return
       }
     }
@@ -2296,8 +2296,8 @@ open class ChatViewModel: NSObject {
   /// 消息发送完成
   /// - Parameters:
   ///   - message: 消息
-  open func sendMsgSuccess(_ message: V2NIMMessage) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+  open func sendMsgSuccess(_ message: V2NIM2Message) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
 
     if message.conversationId != ChatRepo.conversationId {
       return
@@ -2349,17 +2349,17 @@ open class ChatViewModel: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - error: 错误信息
-  open func sendMsgFailed(_ message: V2NIMMessage, _ error: Error?) {
+  open func sendMsgFailed(_ message: V2NIM2Message, _ error: Error?) {
     guard let messageClientId = message.messageClientId else {
-      NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", error: \(String(describing: error))")
+      NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", error: \(String(describing: error))")
       return
     }
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId:\(messageClientId), error: \(String(describing: error))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + "messageClientId:\(messageClientId), error: \(String(describing: error))")
 
     // 判断发送失败原因是否是因为在黑名单中
     if error != nil {
       if let err = error as NSError? {
-        if err.code == inBlackListCode, let conversationId = message.conversationId {
+        if err.code == inBlackListCode2, let conversationId = message.conversationId {
           // 防重
           if ChatDeduplicationHelper.instance.isBlackTipSended(messageId: messageClientId) {
             return
@@ -2406,7 +2406,7 @@ open class ChatViewModel: NSObject {
 
   /// 数字人回复的消息错误码映射
   /// - Parameter message: 消息
-  open func setErrorText(_ message: V2NIMMessage?) {
+  open func setErrorText(_ message: V2NIM2Message?) {
     guard let message = message else { return }
     if let content = ChatMessageHelper.getAIErrorMsage(message.messageStatus.errorCode) {
       message.text = content
@@ -2434,7 +2434,7 @@ extension ChatViewModel: NEMessageListener {
   }
 
   /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
-  open func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt) {
+  open func sendMessageCallback(_ result: V2NIM2SendMessageResult?, _ error: V2NIM2Error?, _ progress: UInt) {
     delegate?.sendMessageCallback?(result, error, progress)
   }
 }
@@ -2445,7 +2445,7 @@ extension ChatViewModel: NEChatListener {
   /// 本端发送消息状态回调
   /// 来源： 发送消息， 插入消息
   /// - Parameter message: 消息
-  open func onSendMessage(_ message: V2NIMMessage) {
+  open func onSendMessage(_ message: V2NIM2Message) {
     switch message.sendingState {
     case .MESSAGE_SENDING_STATE_SENDING:
       sendingMsg(message)
@@ -2462,14 +2462,14 @@ extension ChatViewModel: NEChatListener {
   /// - Parameters:
   ///   - message: 消息
   ///   - error: 错误信息
-  open func sendMessageFailed(_ message: V2NIMMessage, _ error: NSError) {
+  open func sendMessageFailed(_ message: V2NIM2Message, _ error: NSError) {
     sendMsgFailed(message, error)
   }
 
   /// 收到消息
   /// - Parameter messages: 消息列表
-  open func onReceiveMessages(_ messages: [V2NIMMessage]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
+  open func onReceiveMessages(_ messages: [V2NIM2Message]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
 
     for msg in messages {
       guard let conversationId = msg.conversationId,
@@ -2512,11 +2512,11 @@ extension ChatViewModel: NEChatListener {
     }
   }
 
-  public func onReceiveMessagesModified(_ messages: [V2NIMMessage]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
+  public func onReceiveMessagesModified(_ messages: [V2NIM2Message]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count), first.messageID: \(messages.first?.messageClientId ?? "")")
 
     for msg in messages {
-      guard V2NIMConversationIdUtil.conversationTargetId(msg.conversationId ?? "") == ChatRepo.sessionId else {
+      guard V2NIM2ConversationIdUtil.conversationTargetId(msg.conversationId ?? "") == ChatRepo.sessionId else {
         return
       }
 
@@ -2539,8 +2539,8 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息撤回回调
   /// - Parameter revokeNotifications: 撤回通知
-  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIMMessageRevokeNotification]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", revokeNotifications.count: \(revokeNotifications.count)")
+  open func onMessageRevokeNotifications(_ revokeNotifications: [V2NIM2MessageRevokeNotification]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", revokeNotifications.count: \(revokeNotifications.count)")
     for revokeNoti in revokeNotifications {
       if revokeNoti.messageRefer?.conversationId != ChatRepo.conversationId {
         continue
@@ -2567,10 +2567,10 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息删除成功回调。当本地端或多端同步删除消息成功时会触发该回调。
   /// - Parameter messageDeletedNotification: 删除通知
-  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIMMessageDeletedNotification]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageDeletedNotification.count: \(messageDeletedNotification.count)")
+  open func onMessageDeletedNotifications(_ messageDeletedNotification: [V2NIM2MessageDeletedNotification]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageDeletedNotification.count: \(messageDeletedNotification.count)")
 
-    var deleteMessages = [V2NIMMessage]()
+    var deleteMessages = [V2NIM2Message]()
     for message in messageDeletedNotification {
       if message.messageRefer.conversationId != ChatRepo.conversationId {
         continue
@@ -2597,21 +2597,21 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息清空成功回调。当本地端或多端同步清空消息成功时会触发该回调。
   /// - Parameter clearHistoryNotification: 清空通知
-  open func onClearHistoryNotifications(_ clearHistoryNotification: [V2NIMClearHistoryNotification]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", clearHistoryNotification.count: \(clearHistoryNotification.count)")
+  open func onClearHistoryNotifications(_ clearHistoryNotification: [V2NIM2ClearHistoryNotification]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", clearHistoryNotification.count: \(clearHistoryNotification.count)")
   }
 
   /// 消息pin状态回调通知
   /// - Parameter pinNotification: 消息pin状态变化通知数据
-  open func onMessagePinNotification(_ pinNotification: V2NIMMessagePinNotification) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId:\(String(describing: pinNotification.pin?.messageRefer?.messageClientId)), pinStatus:\(pinNotification.pinState.rawValue)")
+  open func onMessagePinNotification(_ pinNotification: V2NIM2MessagePinNotification) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId:\(String(describing: pinNotification.pin?.messageRefer?.messageClientId)), pinStatus:\(pinNotification.pinState.rawValue)")
     if pinNotification.pinState == .MESSAGE_PIN_STEATE_PINNED {
       // 置顶
       var index = -1
       for (i, model) in messages.enumerated() {
         if pinNotification.pin?.messageRefer?.messageServerId == model.message?.messageServerId {
           messages[i].isPined = true
-          let pinID = pinNotification.pin?.operatorId ?? IMKitClient.instance.account()
+          let pinID = pinNotification.pin?.operatorId ?? IMKit2Client.instance.account()
           messages[i].pinAccount = pinID
 
           if let _ = ChatMessageHelper.getUserFromCache(pinID) {
@@ -2654,14 +2654,14 @@ extension ChatViewModel: NEChatListener {
 
   /// 消息评论状态回调
   /// - Parameter notification: 快捷评论通知数据
-  open func onMessageQuickCommentNotification(_ notification: V2NIMMessageQuickCommentNotification) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", quickComment.index: \(notification.quickComment.index)")
+  open func onMessageQuickCommentNotification(_ notification: V2NIM2MessageQuickCommentNotification) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", quickComment.index: \(notification.quickComment.index)")
   }
 
   /// 收到点对点已读回执
   /// - Parameter readReceipts: 已读回执
-  open func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIMP2PMessageReadReceipt]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
+  open func onReceiveP2PMessageReadReceipts(_ readReceipts: [V2NIM2P2PMessageReadReceipt]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
     var reloadIndexPaths: [IndexPath] = []
     for readReceipt in readReceipts {
       if readReceipt.conversationId != ChatRepo.conversationId {
@@ -2696,8 +2696,8 @@ extension ChatViewModel: NEChatListener {
 
   /// 收到群已读回执
   /// - Parameter readReceipts: 已读回执
-  open func onReceiveTeamMessageReadReceipts(_ readReceipts: [V2NIMTeamMessageReadReceipt]) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
+  open func onReceiveTeamMessageReadReceipts(_ readReceipts: [V2NIM2TeamMessageReadReceipt]) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", readReceipts.count: \(readReceipts.count)")
     var reloadIndexPaths: [IndexPath] = []
     for readReceipt in readReceipts {
       if readReceipt.conversationId != ChatRepo.conversationId {
@@ -2729,12 +2729,12 @@ extension ChatViewModel: NEChatListener {
 
 // MARK: AI Listener
 
-extension ChatViewModel: V2NIMAIListener {
-  open func onProxyAIModelCall(_ data: V2NIMAIModelCallResult) {
+extension ChatViewModel: V2NIM2AIListener {
+  open func onProxyAIModelCall(_ data: V2NIM2AIModelCallResult) {
     if data.code == aiUserRequestSuccess {
       if data.requestId == translationLanguageRequestId {
         delegate?.didTranslateResult?(data.content.msg)
-        NEALog.infoLog(className(), desc: #function + " ai translate result : \(data.content.msg)")
+        NE2ALog.infoLog(className(), desc: #function + " ai translate result : \(data.content.msg)")
       }
     }
   }
@@ -2745,19 +2745,19 @@ extension ChatViewModel: V2NIMAIListener {
   ///   - targetLanguage: 目标语言
   ///   - completion: 完成回调
   open func translateLanguage(_ sourceText: String, targetLanguage: String, _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(className(), desc: #function + " ai translate source : \(sourceText)")
+    NE2ALog.infoLog(className(), desc: #function + " ai translate source : \(sourceText)")
 
-    let request = V2NIMProxyAIModelCallParams()
+    let request = V2NIM2ProxyAIModelCallParams()
     translationLanguageRequestId = UUID().uuidString
     request.requestId = translationLanguageRequestId
 
-    let content = V2NIMAIModelCallContent()
+    let content = V2NIM2AIModelCallContent()
     content.msg = sourceText
-    content.type = .NIM_AI_MODEL_CONTENT_TYPE_TEXT
+    content.type = .AI_MODEL_CONTENT_TYPE_TEXT
 
     request.content = content
 
-    let configParams = V2NIMAIModelConfigParams()
+    let configParams = V2NIM2AIModelConfigParams()
     configParams.temperature = NEAIUserManager.shared.getTranslateTemperature()
     request.modelConfigParams = configParams
 

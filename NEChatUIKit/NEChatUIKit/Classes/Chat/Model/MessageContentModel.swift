@@ -5,15 +5,15 @@
 
 import CoreAudio
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
 open class MessageContentModel: NSObject, MessageModel {
   public var type: MessageType = .custom // 消息类型（文本、图片、自定义消息...）
   public var customType: Int = 0 // 自定义消息的子类型（合并转发、换行消息...）
-  public var message: V2NIMMessage?
+  public var message: V2NIM2Message?
   public weak var cell: NEBaseChatMessageCell? // 消息对应的cell
 
   public var offset: CGFloat = 0
@@ -119,14 +119,14 @@ open class MessageContentModel: NSObject, MessageModel {
   public var messageTextColor = ChatUIConfig.shared.messageProperties.selfMessageTextColor
   public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     self.message = message
     messageTextFont = UIFont.systemFont(ofSize: message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextSize : ChatUIConfig.shared.messageProperties.receiveMessageTextSize)
     messageTextColor = message?.isSelf == true ? ChatUIConfig.shared.messageProperties.selfMessageTextColor : ChatUIConfig.shared.messageProperties.receiveMessageTextColor
 
     if message?.conversationType == .CONVERSATION_TYPE_TEAM,
        let senderId = ChatMessageHelper.getSenderId(message),
-       !IMKitClient.instance.isMe(senderId) {
+       !IMKit2Client.instance.isMe(senderId) {
       fullNameHeight = ChatUIConfig.shared.messageProperties.showTeamMessageNick ? 20 : 0
     }
 

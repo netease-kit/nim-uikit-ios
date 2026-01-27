@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 
 @objcMembers
 public class NEConversationService: NSObject, ChatServiceDelegate {
@@ -24,7 +24,7 @@ public class NEConversationService: NSObject, ChatServiceDelegate {
   open func registerRouter(_ param: [String: Any]?) {
     // @功能初始化
     if IMKitConfigCenter.shared.enableAtMessage,
-       NIMSDK.shared().v2Option?.enableV2CloudConversation == true {
+       NIMSDK2.sharedSDK().v2Option?.enableV2CloudConversation == true {
       NEAtMessageManager.setupInstance()
     }
 

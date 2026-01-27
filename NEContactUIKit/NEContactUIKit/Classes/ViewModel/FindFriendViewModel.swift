@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 
 @objcMembers
@@ -12,8 +12,8 @@ open class FindFriendViewModel: NSObject {
   let contactRepo = ContactRepo.shared
   private let className = "FindFriendViewModel"
 
-  open func searchFriend(_ text: String, _ completion: @escaping (NEUserWithFriend?, Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
+  open func searchFriend(_ text: String, _ completion: @escaping (NE2UserWithFriend?, Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", text: \(text.count)")
 
     contactRepo.getUserWithFriend(accountIds: [text]) { userFriends, error in
       completion(userFriends?.first, error)

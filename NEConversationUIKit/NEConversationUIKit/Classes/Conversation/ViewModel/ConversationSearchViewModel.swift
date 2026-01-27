@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
-open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientListener {
+open class ConversationSearchViewModel: NSObject, NETeamListener, NE2IMKitClientListener {
   let conversationRepo = ConversationRepo.shared
 
   /// 群数据缓存
@@ -28,25 +28,25 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
     super.init()
     ContactRepo.shared.addContactListener(self)
     TeamRepo.shared.addTeamListener(self)
-    IMKitClient.instance.addLoginListener(self)
+    IMKit2Client.instance.addLoginListener(self)
 
     weak var weakSelf = self
     getSearchData {
-      NEALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "get data finish")
+      NE2ALog.infoLog(ModuleName + " " + (weakSelf?.className() ?? ""), desc: "get data finish")
     }
   }
 
   deinit {
     ContactRepo.shared.removeContactListener(self)
     TeamRepo.shared.removeTeamListener(self)
-    IMKitClient.instance.removeLoginListener(self)
+    IMKit2Client.instance.removeLoginListener(self)
   }
 
   /// 搜索
   /// - Parameter searchText: 搜索文案
   /// - Parameter completion: 完成回调
   open func doSearch(_ searchText: String?, _ completion: @escaping () -> Void) {
-    NEALog.infoLog(
+    NE2ALog.infoLog(
       ModuleName + " " + className,
       desc: #function + ", searchTexty: \(searchText ?? "")"
     )
@@ -71,7 +71,7 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
     for (_, value) in teamDic {
       if let showName = value.team?.getShowName() {
         if showName.contains(search) == true {
-          if let serverExtension = value.team?.serverExtension, serverExtension.contains(discussTeamKey) == true {
+          if let serverExtension = value.team?.serverExtension, serverExtension.contains(discussTeamKey2) == true {
             discussionDatas.append(value)
           } else {
             seniorDatas.append(value)
@@ -99,14 +99,14 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
         model.userInfo = userFriend
         weakSelf?.friendDic[uid] = model
       }
-      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + "conversation search get friend list ")
+      NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + "conversation search get friend list ")
       workingGroup.leave()
     }
 
     workingGroup.enter()
     workingQueue.async {
       TeamRepo.shared.getTeamList { teams, error in
-        NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + " conversation search get team list \(error?.localizedDescription ?? "")")
+        NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + " conversation search get team list \(error?.localizedDescription ?? "")")
         if removeTeamData == true {
           if error == nil {
             weakSelf?.teamDic.removeAll()
@@ -130,11 +130,11 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
     }
   }
 
-  // MARK: - V2NIMTeamListener
+  // MARK: - V2NIM2TeamListener
 
   /// 群信息更新回调
   /// - Parameter team: 群
-  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIM2Team) {
     if let model = teamDic[team.teamId] {
       model.team = team
     } else {
@@ -145,19 +145,19 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
   /// 加入群回调
   /// - Parameters:
   ///   - team: 群
-  open func onTeamJoined(_ team: V2NIMTeam) {
+  open func onTeamJoined(_ team: V2NIM2Team) {
     addTeam(team)
   }
 
   /// 创建群回调
   /// - Parameter team: 群
-  open func onTeamCreated(_ team: V2NIMTeam) {
+  open func onTeamCreated(_ team: V2NIM2Team) {
     addTeam(team)
   }
 
   /// 群解散回调
   /// - Parameter team: 群
-  open func onTeamDismissed(_ team: V2NIMTeam) {
+  open func onTeamDismissed(_ team: V2NIM2Team) {
     removeTeam(team)
   }
 
@@ -165,19 +165,19 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
   /// - Parameters:
   ///   - team: 群
   ///   - isKicked: 是否被踢
-  open func onTeamLeft(_ team: V2NIMTeam, isKicked: Bool) {
+  open func onTeamLeft(_ team: V2NIM2Team, isKicked: Bool) {
     removeTeam(team)
   }
 
   /// 移除群
   /// - Parameter team: 群
-  private func removeTeam(_ team: V2NIMTeam) {
+  private func removeTeam(_ team: V2NIM2Team) {
     teamDic.removeValue(forKey: team.teamId)
   }
 
   /// 添加群
   /// - Parameter team: 群
-  private func addTeam(_ team: V2NIMTeam) {
+  private func addTeam(_ team: V2NIM2Team) {
     let model = ConversationSearchListModel()
     model.team = team
     teamDic[team.teamId] = model
@@ -185,10 +185,10 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
 
   /// 群数据同步完成回调
   open func onTeamSyncFinished() {
-    NEALog.infoLog(className(), desc: #function + ", onTeamSyncFinished get search data")
+    NE2ALog.infoLog(className(), desc: #function + ", onTeamSyncFinished get search data")
     weak var weakSelf = self
     getSearchData(true) {
-      NEALog.infoLog(weakSelf?.className() ?? "", desc: #function + ", get data finish")
+      NE2ALog.infoLog(weakSelf?.className() ?? "", desc: #function + ", get data finish")
     }
   }
 }
@@ -199,7 +199,7 @@ extension ConversationSearchViewModel: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     guard changeType == .update else {
       return
     }

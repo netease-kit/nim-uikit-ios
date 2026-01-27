@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -157,22 +157,22 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
     var accids = [String]()
     var names = [String]()
     let group = DispatchGroup()
-    var mine: NEUserWithFriend?
+    var mine: NE2UserWithFriend?
 
-    if let mineInfo = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account()) {
+    if let mineInfo = NEFriendUserCache.shared.getFriendInfo(IMKit2Client.instance.account()) {
       mine = mineInfo
     } else {
       group.enter()
-      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKitClient.instance.account()]) { users, error in
+      ContactRepo.shared.getUserListFromCloud(accountIds: [IMKit2Client.instance.account()]) { users, error in
         mine = users?.first
         group.leave()
       }
     }
 
     group.notify(queue: .main) { [weak self] in
-      let myName = mine?.showName() ?? IMKitClient.instance.account()
+      let myName = mine?.showName() ?? IMKit2Client.instance.account()
       names.append(myName)
-      var users = [V2NIMUser]()
+      var users = [V2NIM2User]()
       self?.selectArray.forEach { model in
         accids.append(model.getAccountId())
 

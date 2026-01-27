@@ -3,17 +3,17 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 /// 用户信息界面 - 基类
 @objcMembers
 open class NEBaseContactUserViewController: NEContactBaseViewController, UITableViewDelegate,
   UITableViewDataSource {
-  var user: NEUserWithFriend?
+  var user: NE2UserWithFriend?
   var accountId: String?
   var className = "ContactUserViewController"
 
@@ -29,17 +29,17 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     self.accountId = accountId
   }
 
-  /// 使用 V2NIMUser 初始化
-  /// - Parameter nim_user: V2NIMUser 对象
-  public init(nim_user: V2NIMUser) {
+  /// 使用 V2NIM2User 初始化
+  /// - Parameter nim_user: V2NIM2User 对象
+  public init(nim_user: V2NIM2User) {
     super.init(nibName: nil, bundle: nil)
-    user = NEUserWithFriend(user: nim_user)
+    user = NE2UserWithFriend(user: nim_user)
     accountId = user?.user?.accountId
   }
 
   /// 使用 NEUserWithFriend 初始化
   /// - Parameter user: NEUserWithFriend 对象
-  public init(user: NEUserWithFriend?) {
+  public init(user: NE2UserWithFriend?) {
     super.init(nibName: nil, bundle: nil)
     self.user = user
     accountId = user?.user?.accountId
@@ -61,7 +61,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     ContactRepo.shared.addContactListener(self)
 
     // 数字人无需远端查询信息
-    if user?.user is V2NIMAIUser {
+    if user?.user is V2NIM2AIUser {
       loadData()
       return
     }
@@ -74,7 +74,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       view.makeToastActivity(.center)
       viewModel.getUserInfo(userId) { user, error in
         weakSelf?.view.hideToastActivity()
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           weakSelf?.className ?? "ContactUserViewController",
           desc: "CALLBACK getUserInfo " + (error?.localizedDescription ?? "no error")
         )
@@ -150,11 +150,11 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     guard let uid = user?.user?.accountId ?? accountId else { return }
 
     // 数字人信息从缓存中取
-    if let aiUser: NEUserWithFriend = NEAIUserManager.shared.getAIUserById(uid) {
+    if let aiUser: NE2UserWithFriend = NEAIUserManager.shared.getAIUserById(uid) {
       user = aiUser
     }
 
-    if user?.user is V2NIMAIUser {
+    if user?.user is V2NIM2AIUser {
       // 数字人仅展示【聊天】
       data = [
         [
@@ -386,12 +386,12 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
   }
 
-  open func chat(user: NEUserWithFriend?) {
+  open func chat(user: NE2UserWithFriend?) {
     guard let accid = self.user?.user?.accountId else {
       return
     }
 
-    let conversationId = V2NIMConversationIdUtil.p2pConversationId(accid)
+    let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(accid)
     Router.shared.use(
       PushP2pChatVCRouter,
       parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any, "removeUserVC": true, "animated": false],
@@ -399,7 +399,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     )
   }
 
-  open func deleteFriendAction(user: NEUserWithFriend?) {
+  open func deleteFriendAction(user: NE2UserWithFriend?) {
     weak var weakSelf = self
     if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
       weakSelf?.showToast(commonLocalizable("network_error"))
@@ -407,7 +407,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
     if let userId = user?.user?.accountId {
       viewModel.deleteFriend(account: userId) { error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           self.className,
           desc: "CALLBACK deleteFriend " + (error?.localizedDescription ?? "no error")
         )
@@ -420,7 +420,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
   }
 
-  open func deleteFriend(user: NEUserWithFriend?) {
+  open func deleteFriend(user: NE2UserWithFriend?) {
     let alertTitle = String(format: localizable("delete_title"), user?.showName() ?? "")
     let alertController = UIAlertController(
       title: alertTitle,
@@ -458,17 +458,17 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
     }
     if let account = user?.user?.accountId {
       viewModel.addFriend(account) { error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           self.className,
           desc: "CALLBACK addFriend " + (error?.localizedDescription ?? "no error")
         )
         if let err = error {
-          NEALog.errorLog("ContactUserViewController", desc: "add friend failed :\(err)")
+          NE2ALog.errorLog("ContactUserViewController", desc: "add friend failed :\(err)")
         } else {
           weakSelf?.showToast(localizable("send_friend_apply"))
           if NEFriendUserCache.shared.isBlockAccount(account) {
             weakSelf?.viewModel.removeBlackList(account: account) { err in
-              NEALog.infoLog(
+              NE2ALog.infoLog(
                 self.className,
                 desc: #function + "CALLBACK " + (err?.localizedDescription ?? "no error")
               )
@@ -486,7 +486,7 @@ extension NEBaseContactUserViewController: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     for contact in contacts {
       if contact.user?.accountId == accountId {
         user = contact

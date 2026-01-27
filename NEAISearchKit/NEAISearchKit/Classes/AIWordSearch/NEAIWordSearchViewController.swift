@@ -5,7 +5,7 @@
 
 import NECommonKit
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objcMembers
@@ -94,33 +94,33 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   func showErrorToast(_ error: Error?) {
     if let err = error as? NSError {
       switch err.code {
-      case failedOperation:
+      case failedOperation2:
         showToast(commonLocalizable("parameter_setting_error"))
-      case rateLimitExceeded:
+      case rateLimitExceeded2:
         showToast(commonLocalizable("rate_limit_exceeded"))
-      case userNotExistCode:
+      case userNotExistCode2:
         showToast(commonLocalizable("user_not_exist"))
-      case userBannedCode:
+      case userBannedCode2:
         showToast(commonLocalizable("user_banned"))
-      case userChatBannedCode:
+      case userChatBannedCode2:
         showToast(commonLocalizable("user_chat_banned"))
-      case noFriendCode:
+      case noFriendCode2:
         showToast(commonLocalizable("friend_not_exist"))
-      case messageHitAntispam1, messageHitAntispam2:
+      case messageHitAntispam12, messageHitAntispam22:
         showToast(commonLocalizable("message_hit_antispam"))
-      case teamMemberNotExist:
+      case teamMemberNotExist2:
         showToast(commonLocalizable("team_member_not_exist"))
-      case teamNormalMemberChatBanned:
+      case teamNormalMemberChatBanned2:
         showToast(commonLocalizable("team_normal_member_chat_banned"))
-      case teamMemberChatBanned:
+      case teamMemberChatBanned2:
         showToast(commonLocalizable("team_member_chat_banned"))
-      case notAIAccount:
+      case notAIAccount2:
         showToast(commonLocalizable("not_ai_account"))
-      case cannotBlockAIAccount:
+      case cannotBlockAIAccount2:
         showToast(commonLocalizable("cannot_blocklist_ai_account"))
-      case aiMessagesDisabled:
+      case aiMessagesDisabled2:
         showToast(commonLocalizable("ai_messages_function_disabled"))
-      case aiMessageRequestFailed:
+      case aiMessageRequestFailed2:
         showToast(commonLocalizable("failed_request_to_the_LLM"))
       default:
         showToast(localizable("request_exception"))

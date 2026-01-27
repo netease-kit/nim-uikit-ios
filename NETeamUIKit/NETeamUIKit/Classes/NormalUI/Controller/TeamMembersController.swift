@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -30,11 +30,11 @@ open class TeamMembersController: NEBaseTeamMembersController {
           cell.ownerLabel.isHidden = false
           cell.ownerLabel.text = localizable("team_manager")
           cell.ownerWidth?.constant = NEAppLanguageUtil.getCurrentLanguage() == .english ? 58 : 52
-          if isOwner(IMKitClient.instance.account()) {
+          if isOwner(IMKit2Client.instance.account()) {
             isShowRemove = true
           }
         } else {
-          if isOwner(IMKitClient.instance.account()) || viewModel.currentMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
+          if isOwner(IMKit2Client.instance.account()) || viewModel.currentMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
             isShowRemove = true
           }
           cell.ownerLabel.isHidden = true

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 /// 人员选择页面 - 协同版

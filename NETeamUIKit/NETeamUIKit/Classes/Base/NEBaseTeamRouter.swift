@@ -4,9 +4,9 @@
 
 import Foundation
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class TeamRouter: NSObject {
@@ -34,7 +34,7 @@ open class TeamRouter: NSObject {
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
 
-        let param = V2NIMCreateTeamParams()
+        let param = V2NIM2CreateTeamParams()
         param.name = name
         param.teamType = .TEAM_TYPE_NORMAL
         param.avatar = iconUrl
@@ -44,7 +44,7 @@ open class TeamRouter: NSObject {
         param.updateInfoMode = .TEAM_UPDATE_INFO_MODE_ALL
         param.updateExtensionMode = .TEAM_UPDATE_EXTENSION_MODE_ALL
         var disucssFlag = [String: Any]()
-        disucssFlag[discussTeamKey] = true
+        disucssFlag[discussTeamKey2] = true
         let jsonString = NECommonUtil.getJSONStringFromDictionary(disucssFlag)
         if !jsonString.isEmpty {
           param.serverExtension = jsonString
@@ -75,7 +75,7 @@ open class TeamRouter: NSObject {
         let iconUrl = (param["url"] as? String) ??
           iconUrls[Int(arc4random()) % iconUrls.count]
 
-        let param = V2NIMCreateTeamParams()
+        let param = V2NIM2CreateTeamParams()
         param.name = name
         param.avatar = iconUrl
         param.teamType = .TEAM_TYPE_NORMAL
@@ -94,8 +94,8 @@ open class TeamRouter: NSObject {
             result["teamId"] = creatResult?.team?.teamId
 
             // 先插入【成功创建群聊】消息
-            if let tid = creatResult?.team?.teamId, let cid = V2NIMConversationIdUtil.teamConversationId(tid) {
-              TeamProvider.shared.getTeamInfo(tid, .TEAM_TYPE_NORMAL) { retTeam, error in
+            if let tid = creatResult?.team?.teamId, let cid = V2NIM2ConversationIdUtil.teamConversationId(tid) {
+              NE2TeamProvider.shared.getTeamInfo(tid, .TEAM_TYPE_NORMAL) { retTeam, error in
                 var createTime: TimeInterval = 0
                 if let team = retTeam {
                   createTime = team.createTime
@@ -103,7 +103,7 @@ open class TeamRouter: NSObject {
                   createTime = Date().timeIntervalSince1970
                 }
 
-                let message = V2NIMMessageCreator.createTipsMessage(localizable("create_senior_team_noti"))
+                let message = V2NIM2MessageCreator.createTipsMessage(localizable("create_senior_team_noti"))
                 ChatRepo.shared.insertMessageToLocal(message: message,
                                                      conversationId: cid,
                                                      createTime: createTime) { _, error in

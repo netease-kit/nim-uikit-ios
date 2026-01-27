@@ -4,17 +4,17 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDelegate {
   /// 群对象
-  public var team: V2NIMTeam?
+  public var team: V2NIM2Team?
   /// 修改类型
   public var type = ChangeType.TeamName
   /// 群成员
-  public var teamMember: V2NIMTeamMember?
+  public var teamMember: V2NIM2TeamMember?
   /// 数据单例
   public var repo = TeamRepo.shared
   /// 输入长度限制
@@ -121,7 +121,7 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
     if let mode = team?.updateInfoMode, mode == .TEAM_UPDATE_INFO_MODE_ALL {
       return true
     }
-    if let ownerId = team?.ownerAccountId, IMKitClient.instance.isMe(ownerId) {
+    if let ownerId = team?.ownerAccountId, IMKit2Client.instance.isMe(ownerId) {
       return true
     }
 
@@ -179,7 +179,7 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
       repo.updateTeamName(tid, .TEAM_TYPE_NORMAL, n) { error in
         weakSelf?.view.hideToastActivity()
         if error != nil {
-          if error?.code == noPermissionOperationCode {
+          if error?.code == noPermissionOperationCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
             return
           }

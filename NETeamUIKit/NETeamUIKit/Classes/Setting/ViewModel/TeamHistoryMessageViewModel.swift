@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import NEChatUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -57,13 +57,13 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
       }
     }
 
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", searchContent:\(searchContent)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", searchContent:\(searchContent)")
     guard let teamId = teamId else {
       completion(NSError(domain: "teamId is nil", code: -1), nil)
       return
     }
 
-    let param = V2NIMMessageSearchParams()
+    let param = V2NIM2MessageSearchParams()
     param.keyword = searchContent
     param.teamIds = [teamId]
 
@@ -82,7 +82,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
               message.avatar = member.nimUser?.user?.avatar
               message.fullName = member.atNameInTeam()
               message.shortName = member.getShortName(member.showNickInTeam() ?? "")
-            } else if let aiUser: V2NIMAIUser = NEAIUserManager.shared.getAIUserById(uid) {
+            } else if let aiUser: V2NIM2AIUser = NEAIUserManager.shared.getAIUserById(uid) {
               message.avatar = aiUser.avatar
               message.fullName = aiUser.showName()
               message.shortName = aiUser.shortName()
@@ -134,7 +134,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   }
 
   /// 获取群信息
-  open func getTeamInfo(_ teamId: String?, _ completion: @escaping (V2NIMTeam?, NSError?) -> Void) {
+  open func getTeamInfo(_ teamId: String?, _ completion: @escaping (V2NIM2Team?, NSError?) -> Void) {
     guard let tid = teamId else {
       return
     }
@@ -171,7 +171,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
   /// 根据成员信息获取用户信息
   /// - Parameter members: 群成员列表
   /// - Parameter completion: 完成回调
-  open func getUsersInfo(_ members: [V2NIMTeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
+  open func getUsersInfo(_ members: [V2NIM2TeamMember], _ completion: @escaping (NSError?, [NETeamMemberInfoModel]?) -> Void) {
     var memberModels = [NETeamMemberInfoModel]()
     var accids = [String]()
 
@@ -186,7 +186,7 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
       if v2Error != nil {
         completion(nil, memberModels)
       } else {
-        var dic = [String: NEUserWithFriend]()
+        var dic = [String: NE2UserWithFriend]()
         if let us = users {
           for user in us {
             if let accid = user.user?.accountId {
@@ -208,12 +208,12 @@ open class TeamHistoryMessageViewModel: NSObject, NETeamListener {
 
   /// 群成员变更回调
   /// - parameter teamMembers: 群成员信息对象列表
-  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIM2TeamMember]) {
     guard let currentTeamId = teamInfoModel?.team?.teamId else {
       return
     }
     // 判断是否有属于当前群
-    var currentMembers = [V2NIMTeamMember]()
+    var currentMembers = [V2NIM2TeamMember]()
     for member in teamMembers {
       if member.teamId == currentTeamId {
         currentMembers.append(member)
@@ -231,7 +231,7 @@ extension TeamHistoryMessageViewModel: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     for contact in contacts {
       if let accid = contact.user?.accountId,
          memberModelCacheDic[accid] != nil {

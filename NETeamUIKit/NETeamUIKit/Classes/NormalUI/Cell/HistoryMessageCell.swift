@@ -1,5 +1,5 @@
 
-import NIMSDK
+import NIMSDK2
 
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be

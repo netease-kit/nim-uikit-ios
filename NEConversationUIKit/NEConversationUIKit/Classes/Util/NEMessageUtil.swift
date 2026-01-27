@@ -5,15 +5,15 @@
 
 import Foundation
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 
 open class NEMessageUtil {
   /// last message
   /// - Parameter message: message
   /// - Returns: result
-  open class func messageContent(_ messageType: V2NIMMessageType,
+  open class func messageContent(_ messageType: V2NIM2MessageType,
                                  _ text: String?,
-                                 _ attachment: V2NIMMessageAttachment?) -> String {
+                                 _ attachment: V2NIM2MessageAttachment?) -> String {
     switch messageType {
     case .MESSAGE_TYPE_TEXT:
       return text ?? ""
@@ -34,7 +34,7 @@ open class NEMessageUtil {
     case .MESSAGE_TYPE_CUSTOM:
       return contentOfCustomMessage(attachment)
     case .MESSAGE_TYPE_CALL:
-      if let attachment = attachment as? V2NIMMessageCallAttachment {
+      if let attachment = attachment as? V2NIM2MessageCallAttachment {
         return attachment.type == 1 ? localizable("internet_phone") : localizable("video_chat")
       }
     default:
@@ -44,13 +44,13 @@ open class NEMessageUtil {
   }
 
   /// 返回自定义消息的外显文案
-  static func contentOfCustomMessage(_ attachment: V2NIMMessageAttachment?) -> String {
-    if let customType = NECustomUtils.typeOfCustomMessage(attachment) {
-      if customType == customMultiForwardType {
+  static func contentOfCustomMessage(_ attachment: V2NIM2MessageAttachment?) -> String {
+    if let customType = NE2CustomUtils.typeOfCustomMessage(attachment) {
+      if customType == customMultiForwardType2 {
         return localizable("chat_history")
       }
-      if customType == customRichTextType {
-        if let data = NECustomUtils.dataOfCustomMessage(attachment),
+      if customType == customRichTextType2 {
+        if let data = NE2CustomUtils.dataOfCustomMessage(attachment),
            let title = data["title"] as? String {
           return title
         }

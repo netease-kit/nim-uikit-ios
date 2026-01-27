@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -52,7 +52,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     getFunInputView()?.funDelegate = self
   }
 
-  override open func getMenuView(_ conversationType: V2NIMConversationType) -> NEBaseChatInputView {
+  override open func getMenuView(_ conversationType: V2NIM2ConversationType) -> NEBaseChatInputView {
     let input = FunChatInputView(conversationType)
     input.multipleLineDelegate = self
     let gesture = UILongPressGestureRecognizer(target: self, action: #selector(holdToSpeak(gesture:)))
@@ -134,7 +134,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   override open func openPhoto() {
-    NEALog.infoLog(className(), desc: "open photo")
+    NE2ALog.infoLog(className(), desc: "open photo")
     willSelectItem(button: chatInputView.currentButton, index: showPhotoTag)
   }
 
@@ -315,8 +315,8 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         var text = chatLocalizable("operation_replay")
         if let uid = ChatMessageHelper.getSenderId(message) {
           var showName = NETeamUserManager.shared.getShowName(uid, false)
-          if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) != .CONVERSATION_TYPE_P2P,
-             !IMKitClient.instance.isMe(uid) {
+          if V2NIM2ConversationIdUtil.conversationType(ChatRepo.conversationId) != .CONVERSATION_TYPE_P2P,
+             !IMKit2Client.instance.isMe(uid) {
             addToAtUsers(addText: "@" + showName + "", isReply: true, accid: uid)
           }
 
@@ -337,7 +337,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     }
   }
 
-  override open func getReadView(_ message: V2NIMMessage, _ teamId: String) -> NEBaseReadViewController {
+  override open func getReadView(_ message: V2NIM2Message, _ teamId: String) -> NEBaseReadViewController {
     FunReadViewController(message: message, teamId: teamId)
   }
 

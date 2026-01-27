@@ -4,9 +4,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 open class ContactRouter: NSObject {}

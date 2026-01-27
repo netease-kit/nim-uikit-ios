@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objc
@@ -180,7 +180,7 @@ open class NEBaseFusionContactSelectedController: UIViewController, UITableViewD
     }
   }
 
-  open func getCellModelUser(_ cellModel: NEFusionContactCellModel) -> V2NIMUser? {
+  open func getCellModelUser(_ cellModel: NEFusionContactCellModel) -> V2NIM2User? {
     if fusionType == .FusionContactTypeUser {
       return cellModel.user?.user
     } else if fusionType == .FusionContactTypeAIUser {

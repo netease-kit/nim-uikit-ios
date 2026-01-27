@@ -84,7 +84,7 @@ open class ChatMessageRevokeCell: NormalChatMessageBaseCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
-    let isSend = IMKitClient.instance.isMe(model.message?.senderId)
+    let isSend = IMKit2Client.instance.isMe(model.message?.senderId)
 
     // 校验撤回消息可编辑时间
     let date = Date()

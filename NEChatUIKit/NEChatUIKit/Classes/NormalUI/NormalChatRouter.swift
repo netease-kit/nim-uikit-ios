@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 
 public extension ChatRouter {
   static func register() {
@@ -28,7 +28,7 @@ public extension ChatRouter {
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
-      let anchor = param["anchor"] as? V2NIMMessage
+      let anchor = param["anchor"] as? V2NIM2Message
       let p2pChatVC = P2PChatViewController(conversationId: conversationId, anchor: anchor)
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
@@ -61,7 +61,7 @@ public extension ChatRouter {
         return
       }
 
-      let anchor = param["anchor"] as? V2NIMMessage
+      let anchor = param["anchor"] as? V2NIM2Message
       let groupVC = TeamChatViewController(conversationId: conversationId, anchor: anchor)
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {

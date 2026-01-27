@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 public extension TeamRouter {
   static func register() {
@@ -21,7 +21,7 @@ public extension TeamRouter {
     Router.shared.register(TeamDetailInfoPageRouter) { param in
       if let nav = param["nav"] as? UINavigationController {
         let animated = param["animated"] as? Bool ?? true
-        if let team = param["team"] as? V2NIMTeam {
+        if let team = param["team"] as? V2NIM2Team {
           let teamInfoVC = TeamDetailViewController(nim_team: team)
           nav.pushViewController(teamInfoVC, animated: animated)
         }

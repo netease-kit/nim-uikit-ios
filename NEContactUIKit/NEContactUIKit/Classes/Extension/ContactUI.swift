@@ -7,4 +7,4 @@ import Foundation
 
 @_exported import NECommonKit
 @_exported import NECommonUIKit
-@_exported import NIMSDK
+@_exported import NIMSDK2

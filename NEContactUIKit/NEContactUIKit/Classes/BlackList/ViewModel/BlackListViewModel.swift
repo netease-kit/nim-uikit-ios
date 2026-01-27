@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 
 @objc
@@ -15,12 +15,12 @@ public protocol BlackListViewModelDelegate: NSObjectProtocol {
 @objcMembers
 open class BlackListViewModel: NSObject {
   var contactRepo = ContactRepo.shared
-  public var blockList = [NEUserWithFriend]()
+  public var blockList = [NE2UserWithFriend]()
   public weak var delegate: BlackListViewModelDelegate?
 
   override public init() {
     super.init()
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     contactRepo.addContactListener(self)
   }
 
@@ -30,7 +30,7 @@ open class BlackListViewModel: NSObject {
 
   /// 获取黑名单列表
   open func getBlackList() {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     if let blockList = NEFriendUserCache.shared.getBlocklist() {
       NEFriendUserCache.shared.loadShowName(blockList) { users in
         if let users = users {
@@ -46,10 +46,10 @@ open class BlackListViewModel: NSObject {
   ///   - account: 好友 Id
   ///   - completion: 回调
   open func removeFromBlackList(account: String, _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", account:\(account)")
     contactRepo.removeBlockList(accountId: account) { error in
       if let err = error {
-        NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
+        NE2ALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
         completion(err)
       } else {
         NEFriendUserCache.shared.removeBlockAccount(account)
@@ -62,13 +62,13 @@ open class BlackListViewModel: NSObject {
   /// - Parameters:
   ///   - users: 好友列表
   ///   - completion: 回调
-  open func addBlackList(users: [NEUserWithFriend], _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", users.count:\(users.count)")
+  open func addBlackList(users: [NE2UserWithFriend], _ completion: @escaping (NSError?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", users.count:\(users.count)")
 
     for user in users {
       contactRepo.addBlockList(accountId: user.user?.accountId ?? "") { error in
         if let err = error {
-          NEALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
+          NE2ALog.errorLog(ModuleName + " " + BlackListViewModel.className(), desc: #function + ", error:\(err)")
           completion(err)
         } else {
           completion(nil)
@@ -96,7 +96,7 @@ extension BlackListViewModel: NEContactListener {
   /// 好友信息缓存更新（包含好友信息和用户信息）
   /// - Parameter changeType: 操作类型
   /// - Parameter contacts: 好友列表
-  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NEUserWithFriend]) {
+  open func onContactChange(_ changeType: NEContactChangeType, _ contacts: [NE2UserWithFriend]) {
     for contact in contacts {
       // 添加黑名单
       if changeType == .addBlock,

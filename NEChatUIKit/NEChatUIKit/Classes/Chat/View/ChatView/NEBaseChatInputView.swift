@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NECommonUIKit
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objc
@@ -57,7 +57,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   public var nickAccidDic = [String: String]()
 
   public var chatInpuMode = ChatInputMode.normal
-  public var conversationType = V2NIMConversationType.CONVERSATION_TYPE_UNKNOWN
+  public var conversationType = V2NIM2ConversationType.CONVERSATION_TYPE_UNKNOWN
 
   // 换行输入框 标题限制字数
   public var textLimit = 20
@@ -201,7 +201,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public var multipleLineViewHeight: NSLayoutConstraint?
 
-  public init(_ conversationType: V2NIMConversationType) {
+  public init(_ conversationType: V2NIM2ConversationType) {
     super.init(frame: .zero)
     self.conversationType = conversationType
     commonUI()

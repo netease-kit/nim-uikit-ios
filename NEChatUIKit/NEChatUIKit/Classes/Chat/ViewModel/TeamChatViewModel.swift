@@ -4,29 +4,29 @@
 
 import CoreText
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objc
 public protocol TeamChatViewModelDelegate: ChatViewModelDelegate {
-  @objc optional func onTeamRemoved(team: V2NIMTeam)
-  @objc optional func onTeamUpdate(team: V2NIMTeam)
-  @objc optional func onTeamMemberUpdate(_ teamMembers: [V2NIMTeamMember])
+  @objc optional func onTeamRemoved(team: V2NIM2Team)
+  @objc optional func onTeamUpdate(team: V2NIM2Team)
+  @objc optional func onTeamMemberUpdate(_ teamMembers: [V2NIM2TeamMember])
 }
 
 @objcMembers
 open class TeamChatViewModel: ChatViewModel, NETeamListener {
   public let teamRepo = TeamRepo.shared
-  public var team: V2NIMTeam?
+  public var team: V2NIM2Team?
   /// 当前成员的群成员对象类
-  public var teamMember: V2NIMTeamMember?
+  public var teamMember: V2NIM2TeamMember?
 
   override public init(conversationId: String) {
     super.init(conversationId: conversationId)
   }
 
-  override public init(conversationId: String, anchor: V2NIMMessage?) {
+  override public init(conversationId: String, anchor: V2NIM2Message?) {
     super.init(conversationId: conversationId, anchor: anchor)
   }
 
@@ -60,7 +60,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   override open func loadShowName(_ accountIds: [String],
                                   _ teamId: String?,
                                   _ completion: @escaping () -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(String(describing: teamId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId:\(String(describing: teamId))")
     DispatchQueue.global().async {
       NETeamUserManager.shared.getTeamMembers(accountIds, false, completion)
     }
@@ -99,13 +99,13 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                 var hideClose = true
 
                 // 获取图片缩略图
-                if let attach = topMessage.attachment as? V2NIMMessageImageAttachment, let imageUrl = attach.url {
-                  thumbUrl = V2NIMStorageUtil.imageThumbUrl(imageUrl, thumbSize: ChatUIConfig.shared.imageThumbSize)
+                if let attach = topMessage.attachment as? V2NIM2MessageImageAttachment, let imageUrl = attach.url {
+                  thumbUrl = V2NIM2StorageUtil.imageThumbUrl(imageUrl, thumbSize: ChatUIConfig.shared.imageThumbSize)
                 }
 
                 // 获取视频首帧
-                if let attach = topMessage.attachment as? V2NIMMessageVideoAttachment, let videoUrl = attach.url {
-                  thumbUrl = V2NIMStorageUtil.videoCoverUrl(videoUrl, offset: 0)
+                if let attach = topMessage.attachment as? V2NIM2MessageVideoAttachment, let videoUrl = attach.url {
+                  thumbUrl = V2NIM2StorageUtil.videoCoverUrl(videoUrl, offset: 0)
                   isVideo = true
                 }
 
@@ -166,7 +166,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// 置顶消息
   /// - Parameter completion: 回调
   override open func topMessage(_ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: operationModel?.message?.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: operationModel?.message?.messageClientId))")
     guard let message = operationModel?.message else { return }
 
     let topMessageDic: [String: Any] = [
@@ -177,7 +177,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
       "to": message.conversationId as Any,
       "idServer": message.messageServerId as Any,
       "time": Int(message.createTime * 1000),
-      "operator": IMKitClient.instance.account(), // 操作者
+      "operator": IMKit2Client.instance.account(), // 操作者
       "operation": 0, // 操作: 0 - "add"; 1 - "remove";
     ]
 
@@ -193,7 +193,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
       // 校验权限
       if self?.hasTopMessagePremission() == false {
-        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode)
+        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode2)
         completion(error)
         return
       }
@@ -215,17 +215,17 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// 取消置顶消息
   /// - Parameter completion: 回调
   override open func untopMessage(_ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId \(String(describing: topMessage?.messageClientId))")
 
     guard let _ = topMessage?.messageClientId else {
-      let error = NSError(domain: commonLocalizable("failed_operation"), code: failedOperation)
+      let error = NSError(domain: commonLocalizable("failed_operation"), code: failedOperation2)
       completion(error)
       return
     }
 
     let topMessageDic: [String: Any] = [
       "idClient": topMessage?.messageClientId as Any,
-      "operator": IMKitClient.instance.account(), // 操作者
+      "operator": IMKit2Client.instance.account(), // 操作者
       "operation": 1, // 操作: 0 - "add"; 1 - "remove";
     ]
 
@@ -241,7 +241,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
       // 校验权限
       if self?.hasTopMessagePremission() == false {
-        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode)
+        let error = NSError(domain: chatLocalizable("no_permission_tip"), code: noPermissionOperationCode2)
         completion(error)
         return
       }
@@ -262,11 +262,11 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   }
 
   open func getTeamInfo(teamId: String,
-                        _ completion: @escaping (Error?, V2NIMTeam?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + teamId)
+                        _ completion: @escaping (Error?, V2NIM2Team?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + teamId)
     if let team = NETeamUserManager.shared.getTeamInfo() {
       self.team = team
-      teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+      teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKit2Client.instance.account())
       completion(nil, team)
     } else {
       teamRepo.getTeamInfo(teamId) { [weak self] team, error in
@@ -280,11 +280,11 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   /// 获取自己的群成员信息
   open func getTeamMember(_ completion: @escaping () -> Void) {
-    if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account()) {
+    if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(IMKit2Client.instance.account()) {
       self.teamMember = teamMember
       completion()
     } else {
-      teamRepo.getTeamMember(ChatRepo.sessionId, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] member, error in
+      teamRepo.getTeamMember(ChatRepo.sessionId, .TEAM_TYPE_NORMAL, IMKit2Client.instance.account()) { [weak self] member, error in
         self?.teamMember = member
         completion()
       }
@@ -295,7 +295,7 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  override open func markRead(messages: [V2NIMMessage], _ completion: @escaping ((any Error)?) -> Void) {
+  override open func markRead(messages: [V2NIM2Message], _ completion: @escaping ((any Error)?) -> Void) {
     markReadInTeam(messages: messages, completion)
   }
 
@@ -303,8 +303,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  open func markReadInTeam(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
-    var markMessages = [V2NIMMessage]()
+  open func markReadInTeam(messages: [V2NIM2Message], _ completion: @escaping (Error?) -> Void) {
+    var markMessages = [V2NIM2Message]()
     for message in messages {
       if message.messageServerId != nil,
          !message.isSelf, message.messageConfig?.readReceiptEnabled == true,
@@ -322,9 +322,9 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  override open func getMessageReceipts(messages: [V2NIMMessage],
+  override open func getMessageReceipts(messages: [V2NIM2Message],
                                         _ completion: @escaping ([IndexPath], Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
     getTeamMessageReceipts(messages: messages, completion)
   }
 
@@ -332,8 +332,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  open func getTeamMessageReceipts(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  open func getTeamMessageReceipts(messages: [V2NIM2Message], _ completion: @escaping ([IndexPath], Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     let sendMessages = messages.filter { msg in
       msg.messageServerId != nil && msg.isSelf && msg.messageType != .MESSAGE_TYPE_NOTIFICATION && msg.messageType != .MESSAGE_TYPE_TIP
     }
@@ -373,8 +373,8 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   // MARK: - NETeamListener
 
-  open func onTeamDismissed(_ team: V2NIMTeam) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + (team.teamId))
+  open func onTeamDismissed(_ team: V2NIM2Team) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamId: " + (team.teamId))
     if ChatRepo.sessionId == team.teamId {
       if let delegate = delegate as? TeamChatViewModelDelegate {
         delegate.onTeamRemoved?(team: team)
@@ -419,13 +419,13 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
 
 // MARK: - NEIMKitClientListener
 
-extension TeamChatViewModel: NEIMKitClientListener {
+extension TeamChatViewModel: NE2IMKitClientListener {
   /// 数据同步回调
   /// - Parameters:
   ///   - type: 同步的数据类型
   ///   - state: 同步状态
   ///   - error: 错误信息
-  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
+  open func onDataSync(_ type: V2NIM2DataSyncType, state: V2NIM2DataSyncState, error: V2NIM2Error?) {
     // 断网重连后，重新拉取群信息、自己的群成员信息
     if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
       getTeamInfo(teamId: ChatRepo.sessionId) { [weak self] error, team in

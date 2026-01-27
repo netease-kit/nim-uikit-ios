@@ -4,19 +4,19 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class MessageCallRecordModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .rtcCallRecord
     var isAuiodRecord = false
 
-    if let attach = message?.attachment as? V2NIMMessageCallAttachment {
+    if let attach = message?.attachment as? V2NIM2MessageCallAttachment {
       attributeStr = NSMutableAttributedString()
       let callType = attach.type
       let callStatus = attach.status

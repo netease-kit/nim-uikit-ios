@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
 public class NELocalConversationListModel: NSObject {
   /// 会话
-  public var conversation: V2NIMLocalConversation? {
+  public var conversation: V2NIM2LocalConversation? {
     didSet {
       if let lastMessage = conversation?.lastMessage,
          lastMessage.messageType == .MESSAGE_TYPE_TEXT,

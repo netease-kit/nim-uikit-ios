@@ -4,30 +4,30 @@
 // found in the LICENSE file.
 
 import Foundation
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
 public class NEAddApplication: NSObject {
   /// 申请添加好友的相关信息
-  public var v2Notification: V2NIMFriendAddApplication
+  public var v2Notification: V2NIM2FriendAddApplication
 
   /// 用于显示的用户 Id
   public var displayUserId: String?
 
   /// 用于显示的用户信息（包含好友信息）
-  public var displayUserWithFriend: NEUserWithFriend?
+  public var displayUserWithFriend: NE2UserWithFriend?
 
   /// 未读数
   public var unreadCount: Int
 
   /// 消息处理状态 修改这个属性,后台会自动更新 db 中对应的数据,SDK 调用者可以使用这个值来持久化他们对消息的处理结果,默认为 0
-  public var handleStatus: V2NIMFriendAddApplicationStatus = .FRIEND_ADD_APPLICATION_STATUS_INIT
+  public var handleStatus: V2NIM2FriendAddApplicationStatus = .FRIEND_ADD_APPLICATION_STATUS_INIT
 
   /// 操作描述
   public var detail: String = localizable("add_request")
 
-  public init(_ info: V2NIMFriendAddApplication) {
+  public init(_ info: V2NIM2FriendAddApplication) {
     v2Notification = info
     displayUserId = info.applicantAccountId
     handleStatus = info.status
@@ -35,7 +35,7 @@ public class NEAddApplication: NSObject {
   }
 
   // 是否是同一申请
-  open func isEqualTo(_ noti: V2NIMFriendAddApplication,
+  open func isEqualTo(_ noti: V2NIM2FriendAddApplication,
                       _ compareStatus: Bool = true) -> Bool {
     if v2Notification.applicantAccountId == noti.applicantAccountId,
        v2Notification.recipientAccountId == noti.recipientAccountId {

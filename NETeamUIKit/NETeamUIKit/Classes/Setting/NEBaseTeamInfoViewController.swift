@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -12,7 +12,7 @@ open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDe
   UITableViewDataSource, NETeamInfoDelegate {
   public let viewModel = TeamInfoViewModel()
 
-  public var team: V2NIMTeam?
+  public var team: V2NIM2Team?
 
   public var registerCellDic = [Int: NEBaseTeamSettingCell.Type]()
 
@@ -36,7 +36,7 @@ open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDe
     return tableView
   }()
 
-  public init(team: V2NIMTeam?) {
+  public init(team: V2NIM2Team?) {
     super.init(nibName: nil, bundle: nil)
     self.team = team
   }
@@ -47,7 +47,7 @@ open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDe
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    if team?.serverExtension?.contains(discussTeamKey) == true {
+    if team?.serverExtension?.contains(discussTeamKey2) == true {
       title = localizable("discuss_info")
     } else {
       title = localizable("group_info")
@@ -99,7 +99,7 @@ open class NEBaseTeamInfoViewController: NETeamBaseViewController, UITableViewDe
     return model.rowHeight
   }
 
-  open func teamInfoDidUpdate(_ t: V2NIMTeam) {
+  open func teamInfoDidUpdate(_ t: V2NIM2Team) {
     team = t
     contentTableView.reloadData()
   }

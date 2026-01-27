@@ -4,12 +4,12 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextViewDelegate {
-  public var team: V2NIMTeam?
+  public var team: V2NIM2Team?
   public let textLimit = 100
   public let backView = UIView()
 
@@ -63,7 +63,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
   open func setupUI() {
     navigationView.setMoreButtonTitle(localizable("save"))
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveIntr))
-    if let serverExtension = team?.serverExtension, serverExtension.contains(discussTeamKey) {
+    if let serverExtension = team?.serverExtension, serverExtension.contains(discussTeamKey2) {
       title = localizable("discuss_introduce")
     } else {
       title = localizable("team_intr")
@@ -94,7 +94,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
 
   /// 权限改变
   func getPermission() -> Bool {
-    if let ownerId = team?.ownerAccountId, IMKitClient.instance.isMe(ownerId) {
+    if let ownerId = team?.ownerAccountId, IMKit2Client.instance.isMe(ownerId) {
       return true
     }
     if let mode = team?.updateInfoMode, mode == .TEAM_UPDATE_INFO_MODE_ALL {
@@ -119,15 +119,15 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
       let text = textView.text ?? ""
       view.makeToastActivity(.center)
       viewModel.updateTeamIntroduce(teamid, text) { error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           ModuleName + " " + self.className(),
           desc: "CALLBACK updateTeamIntroduce " + (error?.localizedDescription ?? "no error")
         )
         weakSelf?.view.hideToastActivity()
         if let err = error {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if error?.code == noPermissionOperationCode {
+          } else if error?.code == noPermissionOperationCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))

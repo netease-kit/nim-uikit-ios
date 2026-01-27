@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -138,7 +138,7 @@ open class NEBaseCollectionMessageFileCell: NEBaseCollectionMessageCell {
 
   override open func configureData(_ model: CollectionMessageModel) {
     super.configureData(model)
-    if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
+    if let fileObject = model.message?.attachment as? V2NIM2MessageFileAttachment {
       if let fileModel = model.fileModel {
         fileModel.cell = self
         if fileModel.state == .Success {

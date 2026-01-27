@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -177,7 +177,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
     if indexPath.section == 0 {
       let searchModel = viewModel.friendDatas[indexPath.row]
       if let userId = searchModel.userInfo?.user?.accountId {
-        let conversationId = V2NIMConversationIdUtil.p2pConversationId(userId)
+        let conversationId = V2NIM2ConversationIdUtil.p2pConversationId(userId)
         Router.shared.use(
           PushP2pChatVCRouter,
           parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],
@@ -190,7 +190,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
       if let teamId = searchModel.team?.teamId {
         TeamRepo.shared.getTeamInfo(teamId) { team, error in
           if let err = error {
-            if err.code == protocolSendFailed {
+            if err.code == protocolSendFailed2 {
               weakSelf?.showToast(commonLocalizable("network_error"))
             } else {
               weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
@@ -200,7 +200,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
               weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
               return
             }
-            let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId)
+            let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamId)
             Router.shared.use(
               PushTeamChatVCRouter,
               parameters: ["nav": weakSelf?.navigationController as Any,
@@ -215,7 +215,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
       if let teamId = searchModel.team?.teamId {
         TeamRepo.shared.getTeamInfo(teamId) { team, error in
           if let err = error {
-            if err.code == protocolSendFailed {
+            if err.code == protocolSendFailed2 {
               weakSelf?.showToast(commonLocalizable("network_error"))
             } else {
               weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
@@ -225,7 +225,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
               weakSelf?.showSingleAlert(title: commonLocalizable("tip"), message: localizable("leave_team_desc")) {}
               return
             }
-            let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId)
+            let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamId)
             Router.shared.use(
               PushTeamChatVCRouter,
               parameters: ["nav": weakSelf?.navigationController as Any,

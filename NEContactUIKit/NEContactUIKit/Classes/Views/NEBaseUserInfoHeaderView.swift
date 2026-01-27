@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objcMembers
@@ -130,7 +130,7 @@ open class NEBaseUserInfoHeaderView: UIView {
     updateConstraintsIfNeeded()
   }
 
-  open func setData(user: NEUserWithFriend?) {
+  open func setData(user: NE2UserWithFriend?) {
     guard let userFriend = user else {
       return
     }

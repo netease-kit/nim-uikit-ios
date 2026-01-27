@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class CollectionMessageModel: NSObject {
   /// 消息对象
-  var message: V2NIMMessage? {
+  public var message: V2NIM2Message? {
     didSet {
       if let m = message {
         chatmodel = ChatMessageHelper.modelFromMessage(message: m)
@@ -25,17 +25,17 @@ open class CollectionMessageModel: NSObject {
   }
 
   /// 会话名称
-  var conversationName: String?
+  public var conversationName: String?
   /// 发送者昵称
-  var senderName: String?
+  public var senderName: String?
   /// 用户头像
-  var avatar: String?
+  public var avatar: String?
   /// 数据对象
-  var chatmodel: MessageModel = MessageTextModel(message: nil)
+  public var chatmodel: MessageModel = MessageTextModel(message: nil)
 
-  var fileModel: CollectionFileModel?
+  public var fileModel: CollectionFileModel?
 
-  var collection: V2NIMCollection?
+  public var collection: V2NIM2Collection?
 
   open func cellHeight(contenttMaxW: CGFloat) -> CGFloat {
     var height = chatmodel.contentSize.height

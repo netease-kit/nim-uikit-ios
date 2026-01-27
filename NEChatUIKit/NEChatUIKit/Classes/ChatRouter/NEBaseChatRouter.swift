@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 
 @objcMembers
@@ -16,7 +16,7 @@ open class ChatRouter: NSObject {
          let cid = param["conversationId"] as? String {
         let helloMessage = MessageUtils.textMessage(text: text)
         ChatRepo.shared.sendMessage(message: helloMessage, conversationId: cid) { result, error, pro in
-          NEALog.errorLog("ChatAddFriendRouter", desc: "send hello message error:\(error?.localizedDescription ?? "nil")")
+          NE2ALog.errorLog("ChatAddFriendRouter", desc: "send hello message error:\(error?.localizedDescription ?? "nil")")
         }
       }
     }

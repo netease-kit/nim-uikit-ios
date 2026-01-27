@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import UIKit
 
 public typealias FusionContactCallBack = (NSError?) -> Void
@@ -25,7 +25,7 @@ open class FusionContactSelectedViewModel: NSObject {
   /// 获取成员数据
   /// - Parameter filters: 过滤器
   open func loadMemberDatas(_ filters: Set<String>? = nil, _ completion: @escaping (NSError?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
 
     // 从缓存中取
     if !NEFriendUserCache.shared.isEmpty() {

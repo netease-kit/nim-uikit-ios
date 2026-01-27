@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 
 @objcMembers
 open class AIChatViewModel: NSObject {
@@ -15,7 +15,7 @@ open class AIChatViewModel: NSObject {
   /// - Parameters:
   ///   - messages: 上下文消息
   ///   - completion: 回调
-  open func loadData(_ messages: [V2NIMMessage]?,
+  open func loadData(_ messages: [V2NIM2Message]?,
                      _ completion: @escaping (Error?) -> Void) {
     if let aiChatDataLoader = ChatUIConfig.shared.aiChatDataLoader {
       aiChatDataLoader(messages) { [weak self] models, error in

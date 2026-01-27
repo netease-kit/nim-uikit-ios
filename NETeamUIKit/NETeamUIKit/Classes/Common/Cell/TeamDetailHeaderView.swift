@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -150,8 +150,12 @@ open class TeamDetailHeaderView: UIView {
     teamHeaderView.updateLayoutConstraint(firstItem: teamHeaderView, secondItem: teamHeaderView, attribute: .width, constant: wh)
     teamHeaderView.updateLayoutConstraint(firstItem: teamHeaderView, secondItem: teamHeaderView, attribute: .height, constant: wh)
   }
+  
+  open func setCornerRadius(_ cornerRadius: CGFloat) {
+    teamHeaderView.layer.cornerRadius = cornerRadius
+  }
 
-  open func setData(_ team: V2NIMTeam?, _ showOwner: Bool = true) {
+  open func setData(_ team: V2NIM2Team?, _ showOwner: Bool = true) {
     // avatar
     let url = team?.avatar
     let name = team?.name ?? ""
@@ -172,13 +176,13 @@ open class TeamDetailHeaderView: UIView {
     }
   }
 
-  open func getOwnerName(_ team: V2NIMTeam?, _ completion: @escaping (String) -> Void) {
+  open func getOwnerName(_ team: V2NIM2Team?, _ completion: @escaping (String) -> Void) {
     if let teamId = team?.teamId,
        let ownerAccountId = team?.ownerAccountId {
       var ownerName = ownerAccountId
       TeamRepo.shared.getTeamMember(teamId, .TEAM_TYPE_NORMAL, ownerAccountId) { [weak self] member, error in
         if let err = error {
-          NEALog.errorLog(self?.className() ?? "", desc: #function + "getTeamMember \(ownerAccountId) error: \(err.localizedDescription)")
+          NE2ALog.errorLog(self?.className() ?? "", desc: #function + "getTeamMember \(ownerAccountId) error: \(err.localizedDescription)")
           ownerName = ownerAccountId
           completion(ownerName)
         } else {

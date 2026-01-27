@@ -2,21 +2,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class NEPinMessageModel: NSObject {
-  var chatmodel: MessageModel = MessageTextModel(message: nil)
-  var message: V2NIMMessage
-  var item: V2NIMMessagePin
-  var conversationId: String?
-  var repo = ChatRepo.shared
-  var pinFileModel: PinMessageFileModel?
+  public var chatmodel: MessageModel = MessageTextModel(message: nil)
+  public var message: V2NIM2Message
+  public var item: V2NIM2MessagePin
+  public var conversationId: String?
+  public var repo = ChatRepo.shared
+  public var pinFileModel: PinMessageFileModel?
 
-  public init(message: V2NIMMessage, item: V2NIMMessagePin) {
+  public init(message: V2NIM2Message, item: V2NIM2MessagePin) {
     self.message = message
     conversationId = item.messageRefer?.conversationId
     self.item = item
@@ -30,7 +30,7 @@ open class NEPinMessageModel: NSObject {
     }
   }
 
-  private func modelFromMessage(message: V2NIMMessage) -> MessageModel {
+  public func modelFromMessage(message: V2NIM2Message) -> MessageModel {
     let model = ChatMessageHelper.modelFromMessage(message: message)
     let uid = ChatMessageHelper.getSenderId(message)
 

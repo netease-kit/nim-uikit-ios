@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -14,7 +14,7 @@ open class NEAISearchManager: NSObject, XKitService, IMKitPluginService {
   public static let shared = NEAISearchManager()
   public var serviceName: String = NEAISearchPlugin
   public var versionName: String = "1.0.0"
-  public var appKey: String = IMKitClient.instance.appKey()
+  public var appKey: String = IMKit2Client.instance.appKey()
 
   override private init() {
     super.init()

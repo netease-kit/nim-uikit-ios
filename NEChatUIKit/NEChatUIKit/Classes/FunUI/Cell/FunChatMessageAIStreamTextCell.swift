@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECoreKit
 import UIKit
 
@@ -113,16 +113,16 @@ open class FunChatMessageAIStreamTextCell: FunChatMessageTextCell {
       contentLabel.isHidden = true
       loadingViewLeft.isHidden = false
       loadingViewLeft.play()
-      stopStreamButton.isHidden = model.message?.threadReply?.senderId != IMKitClient.instance.account()
+      stopStreamButton.isHidden = model.message?.threadReply?.senderId != IMKit2Client.instance.account()
       regenStreamButton.isHidden = true
     } else {
       contentLabel.isHidden = false
       loadingViewLeft.isHidden = true
       loadingViewLeft.stop()
 
-      stopStreamButton.isHidden = model.message?.threadReply?.senderId != IMKitClient.instance.account() ||
+      stopStreamButton.isHidden = model.message?.threadReply?.senderId != IMKit2Client.instance.account() ||
         model.message?.aiConfig?.aiStreamStatus != .MESSAGE_AI_STREAM_STATUS_STREAMING
-      regenStreamButton.isHidden = model.message?.threadReply?.senderId != IMKitClient.instance.account() ||
+      regenStreamButton.isHidden = model.message?.threadReply?.senderId != IMKit2Client.instance.account() ||
         model.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING
     }
   }

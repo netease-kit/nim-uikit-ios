@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 public enum NIMEmoticonType: NSInteger {
@@ -121,7 +121,7 @@ open class NIMInputEmoticonManager: NSObject {
     let cataLog = NIMInputEmoticonCatalog()
 
     guard let infoDict = info, let emotions = emoticonsArray else {
-      NEALog.errorLog(classTag, desc: "info or emoticonsArray is nil")
+      NE2ALog.errorLog(classTag, desc: "info or emoticonsArray is nil")
       return cataLog
     }
     cataLog.catalogID = infoDict["id"] as? String
@@ -172,7 +172,7 @@ open class NIMInputEmoticonManager: NSObject {
     var emotion: NIMInputEmoticon?
 
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "catalogs is nil")
+      NE2ALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 
@@ -192,7 +192,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByID(emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "catalogs is nil")
+      NE2ALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 
@@ -212,7 +212,7 @@ open class NIMInputEmoticonManager: NSObject {
   open func emoticonByCatalogID(catalogID: String, emoticonID: String) -> NIMInputEmoticon? {
     var emotion: NIMInputEmoticon?
     guard let clogs = catalogs else {
-      NEALog.errorLog(classTag, desc: "catalogs is nil")
+      NE2ALog.errorLog(classTag, desc: "catalogs is nil")
       return emotion
     }
 

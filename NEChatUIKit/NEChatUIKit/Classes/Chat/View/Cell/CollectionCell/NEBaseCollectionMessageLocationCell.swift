@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
 import UIKit
 
@@ -140,7 +140,7 @@ open class NEBaseCollectionMessageLocationCell: NEBaseCollectionMessageCell {
       locationSubTitleLabel.text = m.subTitle
       if let lat = m.lat, let lng = m.lng {
         if let url = NEChatKitClient.instance.delegate?.getMapImageUrl?(lat: lat, lng: lng) {
-          NEALog.infoLog(className(), desc: #function + "location image url = \(url)")
+          NE2ALog.infoLog(className(), desc: #function + "location image url = \(url)")
           mapImageView.sd_setImage(
             with: URL(string: url),
             placeholderImage: .ne_imageNamed(name: "map_placeholder_image"),

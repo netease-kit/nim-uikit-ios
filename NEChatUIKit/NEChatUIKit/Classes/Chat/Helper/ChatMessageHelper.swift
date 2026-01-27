@@ -5,11 +5,11 @@
 
 import CommonCrypto
 import Foundation
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 
 @objcMembers
 public class ChatMessageHelper: NSObject {
@@ -54,10 +54,10 @@ public class ChatMessageHelper: NSObject {
   ///   - showAlias: 是否优先显示备注
   /// - Returns: 会话昵称
   public static func getSessionName(conversationId: String, showAlias: Bool = true) -> String {
-    guard let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
+    guard let sessionId = V2NIM2ConversationIdUtil.conversationTargetId(conversationId) else {
       return ""
     }
-    if V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
+    if V2NIM2ConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_P2P {
       let user = getUserFromCache(sessionId)
       return user?.showName(showAlias) ?? sessionId
     } else {
@@ -159,7 +159,7 @@ public class ChatMessageHelper: NSObject {
   /// 构造消息体
   /// - Parameter message: 消息
   /// - Returns: 消息体
-  public static func modelFromMessage(message: V2NIMMessage) -> MessageModel {
+  public static func modelFromMessage(message: V2NIM2Message) -> MessageModel {
     var model: MessageModel
     switch message.messageType {
     case .MESSAGE_TYPE_VIDEO:
@@ -182,22 +182,22 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_CALL:
       model = MessageCallRecordModel(message: message)
     case .MESSAGE_TYPE_CUSTOM:
-      if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
-        if type == customMultiForwardType {
+      if let type = NE2CustomUtils.typeOfCustomMessage(message.attachment) {
+        if type == customMultiForwardType2 {
           return MessageCustomModel(message: message,
                                     customType: type,
-                                    contentHeight: Int(customMultiForwardCellHeight))
+                                    contentHeight: Int(customMultiForwardCellHeight2))
         }
-        if type == customRichTextType {
+        if type == customRichTextType2 {
           return MessageRichTextModel(message: message)
         }
 
         // 注册过的自定义消息类型
         if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
-          NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
+          NE2ALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
           return MessageCustomModel(message: message,
                                     customType: type,
-                                    contentHeight: Int(customMultiForwardCellHeight))
+                                    contentHeight: Int(customMultiForwardCellHeight2))
         }
       }
       fallthrough
@@ -214,7 +214,7 @@ public class ChatMessageHelper: NSObject {
   /// - Parameters:
   ///   - message: 消息
   ///   - completion: 完成回调
-  public static func modelFromMessage(message: V2NIMMessage, _ completion: @escaping (MessageModel) -> Void) {
+  public static func modelFromMessage(message: V2NIM2Message, _ completion: @escaping (MessageModel) -> Void) {
     var model: MessageModel
     switch message.messageType {
     case .MESSAGE_TYPE_VIDEO:
@@ -236,7 +236,7 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_NOTIFICATION, .MESSAGE_TYPE_TIP:
       // 查询通知消息中 targetId 的用户信息
       if message.messageType == .MESSAGE_TYPE_NOTIFICATION,
-         let attach = message.attachment as? V2NIMMessageNotificationAttachment,
+         let attach = message.attachment as? V2NIM2MessageNotificationAttachment,
          var accIds = attach.targetIds {
         if let senderId = message.senderId {
           accIds.append(senderId)
@@ -258,30 +258,30 @@ public class ChatMessageHelper: NSObject {
       model = MessageCallRecordModel(message: message)
       completion(model)
     case .MESSAGE_TYPE_CUSTOM:
-      if let type = NECustomUtils.typeOfCustomMessage(message.attachment) {
-        if type == customMultiForwardType {
+      if let type = NE2CustomUtils.typeOfCustomMessage(message.attachment) {
+        if type == customMultiForwardType2 {
           completion(MessageCustomModel(message: message,
                                         customType: type,
-                                        contentHeight: Int(customMultiForwardCellHeight)))
+                                        contentHeight: Int(customMultiForwardCellHeight2)))
           return
         }
-        if type == customRichTextType {
+        if type == customRichTextType2 {
           completion(MessageRichTextModel(message: message))
           return
         }
 
         // 注册过的自定义消息类型
         if NEChatUIKitClient.instance.getRegisterCustomCell()["\(type)"] != nil {
-          NEALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
+          NE2ALog.infoLog(keyCustomMessage, desc: #function + "type: \(type), messageClientId: \(String(describing: message.messageClientId))")
           completion(MessageCustomModel(message: message,
                                         customType: type,
-                                        contentHeight: Int(customMultiForwardCellHeight)))
+                                        contentHeight: Int(customMultiForwardCellHeight2)))
           return
         }
       }
       fallthrough
     default:
-      NEALog.infoLog(className(), desc: #function + "message type unknown, messageClientId: \(String(describing: message.messageClientId))")
+      NE2ALog.infoLog(className(), desc: #function + "message type unknown, messageClientId: \(String(describing: message.messageClientId))")
 
       // 未识别的消息类型，默认为文本消息类型，text为未知消息体
       message.text = chatLocalizable("msg_unknown")
@@ -295,10 +295,10 @@ public class ChatMessageHelper: NSObject {
   /// - Parameter messages: 消息列表
   /// - Returns: 图片路径列表
   public static func getUrls(messages: [MessageModel]) -> [String] {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     var urls = [String]()
     for model in messages {
-      if model.type == .image, let message = model.message?.attachment as? V2NIMMessageImageAttachment {
+      if model.type == .image, let message = model.message?.attachment as? V2NIM2MessageImageAttachment {
         if let url = message.url {
           urls.append(url)
         } else {
@@ -317,11 +317,11 @@ public class ChatMessageHelper: NSObject {
   ///   - lastModel: 最后一条消息
   static func addTimeMessage(_ model: MessageModel, _ lastModel: MessageModel?) {
     guard let message = model.message else {
-      NEALog.errorLog(ModuleName + " " + className(), desc: #function + ", model.message is nil")
+      NE2ALog.errorLog(ModuleName + " " + className(), desc: #function + ", model.message is nil")
       return
     }
 
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
     if NotificationMessageUtils.isDiscussSeniorTeamNoti(message: message) {
       return
     }
@@ -338,7 +338,7 @@ public class ChatMessageHelper: NSObject {
   /// 获取消息外显文案
   /// - Parameter message: 消息
   /// - Returns: 外显文案
-  public static func contentOfMessage(_ message: V2NIMMessage?) -> String {
+  public static func contentOfMessage(_ message: V2NIM2Message?) -> String {
     switch message?.messageType {
     case .MESSAGE_TYPE_TEXT:
       if let t = message?.text {
@@ -357,19 +357,19 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_LOCATION:
       return chatLocalizable("msg_location") + " \(message?.text ?? "")"
     case .MESSAGE_TYPE_CALL:
-      if let attachment = message?.attachment as? V2NIMMessageCallAttachment {
+      if let attachment = message?.attachment as? V2NIM2MessageCallAttachment {
         return attachment.type == 1 ? chatLocalizable("msg_rtc_audio") : chatLocalizable("msg_rtc_video")
       }
       return chatLocalizable("msg_rtc_call")
     case .MESSAGE_TYPE_CUSTOM:
       // 换行消息
-      if let content = NECustomUtils.contentOfRichText(message?.attachment) {
+      if let content = NE2CustomUtils.contentOfRichText(message?.attachment) {
         return content
       }
 
       // 合并转发
-      if let customType = NECustomUtils.typeOfCustomMessage(message?.attachment),
-         customType == customMultiForwardType {
+      if let customType = NE2CustomUtils.typeOfCustomMessage(message?.attachment),
+         customType == customMultiForwardType2 {
         return "[\(chatLocalizable("chat_history"))]"
       }
 
@@ -382,35 +382,35 @@ public class ChatMessageHelper: NSObject {
   public static func getAIErrorMsage(_ errorCode: NSInteger) -> String? {
     var content: String?
     switch errorCode {
-    case failedOperation:
+    case failedOperation2:
       content = commonLocalizable("parameter_setting_error")
-    case rateLimitExceeded:
+    case rateLimitExceeded2:
       content = commonLocalizable("rate_limit_exceeded")
-    case userNotExistCode:
+    case userNotExistCode2:
       content = commonLocalizable("user_not_exist")
-    case userBannedCode:
+    case userBannedCode2:
       content = commonLocalizable("user_banned")
-    case userChatBannedCode:
+    case userChatBannedCode2:
       content = commonLocalizable("user_chat_banned")
-    case noFriendCode:
+    case noFriendCode2:
       content = commonLocalizable("friend_not_exist")
-    case messageHitAntispam1, messageHitAntispam2:
+    case messageHitAntispam12, messageHitAntispam22:
       content = commonLocalizable("message_hit_antispam")
-    case teamMemberNotExist:
+    case teamMemberNotExist2:
       content = commonLocalizable("team_member_not_exist")
-    case teamNormalMemberChatBanned:
+    case teamNormalMemberChatBanned2:
       content = commonLocalizable("team_normal_member_chat_banned")
-    case teamMemberChatBanned:
+    case teamMemberChatBanned2:
       content = commonLocalizable("team_member_chat_banned")
-    case notAIAccount:
+    case notAIAccount2:
       content = commonLocalizable("not_ai_account")
-    case cannotBlockAIAccount:
+    case cannotBlockAIAccount2:
       content = commonLocalizable("cannot_blocklist_ai_account")
-    case aiMessagesDisabled:
+    case aiMessagesDisabled2:
       content = commonLocalizable("ai_messages_function_disabled")
-    case aiMessageRequestFailed:
+    case aiMessageRequestFailed2:
       content = commonLocalizable("failed_request_to_the_LLM")
-    case aiMessageNotSupport:
+    case aiMessageNotSupport2:
       content = chatLocalizable("format_not_supported")
     default:
       break
@@ -420,7 +420,7 @@ public class ChatMessageHelper: NSObject {
 
   /// 移除消息扩展字段中的 回复、@
   /// - Parameter forwardMessage: 消息
-  public static func clearForwardAtMark(_ forwardMessage: V2NIMMessage) {
+  public static func clearForwardAtMark(_ forwardMessage: V2NIM2Message) {
     guard var remoteExt = getDictionaryFromJSONString(forwardMessage.serverExtension ?? "") as? [String: Any] else { return }
     remoteExt.removeValue(forKey: yxAtMsg)
     remoteExt.removeValue(forKey: keyReplyMsgKey)
@@ -448,7 +448,7 @@ public class ChatMessageHelper: NSObject {
   /// - Parameters:
   ///   - messages: 消息
   ///   - completion: 完成回调
-  public static func buildBody(messages: [V2NIMMessage],
+  public static func buildBody(messages: [V2NIM2Message],
                                _ completion: @escaping (String, [[String: Any]]) -> Void) {
     let enter = "\n" // 分隔符
     var body = "" // 序列化结果
@@ -465,12 +465,12 @@ public class ChatMessageHelper: NSObject {
         if let user = user {
           let senderNick = user.showName(false)
           if var remoteExt = getDictionaryFromJSONString(msg.serverExtension ?? "") as? [String: Any] {
-            remoteExt[mergedMessageNickKey] = senderNick
-            remoteExt[mergedMessageAvatarKey] = user.user?.avatar ?? NEFriendUserCache.getShortName(senderNick ?? "")
+            remoteExt[mergedMessageNickKey2] = senderNick
+            remoteExt[mergedMessageAvatarKey2] = user.user?.avatar ?? NEFriendUserCache.getShortName(senderNick ?? "")
             msg.serverExtension = getJSONStringFromDictionary(remoteExt)
           } else {
-            let remoteExt = [mergedMessageNickKey: senderNick as Any,
-                             mergedMessageAvatarKey: user.user?.avatar as Any]
+            let remoteExt = [mergedMessageNickKey2: senderNick as Any,
+                             mergedMessageAvatarKey2: user.user?.avatar as Any]
             msg.serverExtension = getJSONStringFromDictionary(remoteExt)
           }
 
@@ -482,7 +482,7 @@ public class ChatMessageHelper: NSObject {
                               "userAccId": from])
           }
         }
-        if let stringData = V2NIMMessageConverter.messageSerialization(msg) {
+        if let stringData = V2NIM2MessageConverter.messageSerialization(msg) {
           body.append(enter + stringData)
         }
       }
@@ -497,7 +497,7 @@ public class ChatMessageHelper: NSObject {
   /// 获取消息的客户端本地扩展信息（转换为[String: Any]）
   /// - Parameter message: 消息
   /// - Returns: 客户端本地扩展信息
-  public static func getMessageServerExtension(message: V2NIMMessage) -> [String: Any]? {
+  public static func getMessageServerExtension(message: V2NIM2Message) -> [String: Any]? {
     guard let localExtension = message.serverExtension else { return nil }
 
     if let localExt = getDictionaryFromJSONString(localExtension) as? [String: Any] {
@@ -509,7 +509,7 @@ public class ChatMessageHelper: NSObject {
   /// 判断消息是否已撤回
   /// - Parameter message: 消息
   /// - Returns: 是否已撤回
-  public static func isRevokeMessage(message: V2NIMMessage?) -> Bool {
+  public static func isRevokeMessage(message: V2NIM2Message?) -> Bool {
     guard let message = message else { return false }
 
     if let localExt = getMessageServerExtension(message: message),
@@ -540,7 +540,7 @@ public class ChatMessageHelper: NSObject {
   /// 生成回复信息键值对
   /// - Parameter messageRefer: 消息 refer
   /// - Returns: 回复消息 refer 组成的 map
-  public static func createReplyDic(_ messageRefer: V2NIMMessageRefer) -> [String: Any] {
+  public static func createReplyDic(_ messageRefer: V2NIM2MessageRefer) -> [String: Any] {
     let yxReplyMsg: [String: Any] = [
       "idClient": messageRefer.messageClientId as Any,
       "scene": messageRefer.conversationType.rawValue,
@@ -557,8 +557,8 @@ public class ChatMessageHelper: NSObject {
   /// 生成回复信息refer
   /// - Parameter params: 回复信息键值对
   /// - Returns: 回复消息的 refer
-  public static func createMessageRefer(_ params: [String: Any]?) -> V2NIMMessageRefer {
-    let refer = V2NIMMessageRefer()
+  public static func createMessageRefer(_ params: [String: Any]?) -> V2NIM2MessageRefer {
+    let refer = V2NIM2MessageRefer()
     refer.messageClientId = params?["idClient"] as? String
     refer.messageServerId = params?["idServer"] as? String
     refer.senderId = params?["from"] as? String
@@ -566,7 +566,7 @@ public class ChatMessageHelper: NSObject {
     refer.conversationId = params?["to"] as? String
     refer.receiverId = params?["receiverId"] as? String
     if let scene = params?["scene"] as? Int,
-       let type = V2NIMConversationType(rawValue: scene) {
+       let type = V2NIM2ConversationType(rawValue: scene) {
       refer.conversationType = type
     }
 
@@ -576,7 +576,7 @@ public class ChatMessageHelper: NSObject {
   /// 查找回复信息键值对
   /// - Parameter message: 消息
   /// - Returns: 回复消息 refer 组成的 map
-  public static func getReplyDictionary(message: V2NIMMessage) -> [String: Any]? {
+  public static func getReplyDictionary(message: V2NIM2Message) -> [String: Any]? {
     if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""),
        let yxReplyMsg = remoteExt[keyReplyMsgKey] as? [String: Any] {
       return yxReplyMsg
@@ -588,7 +588,7 @@ public class ChatMessageHelper: NSObject {
   /// 判断是否是数字人发送的消息
   /// - Parameter message: 消息
   /// - Returns: 是否是数字人发送的消息
-  public static func isAISender(_ message: V2NIMMessage?) -> Bool {
+  public static func isAISender(_ message: V2NIM2Message?) -> Bool {
     if message?.aiConfig != nil, message?.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
       return true
     }
@@ -598,7 +598,7 @@ public class ChatMessageHelper: NSObject {
   /// 获取消息发送者实际 id
   /// - Parameter message: 消息
   /// - Returns: 实际发送者的 id
-  public static func getSenderId(_ message: V2NIMMessage?) -> String? {
+  public static func getSenderId(_ message: V2NIM2Message?) -> String? {
     var senderId = message?.senderId
     // 数字人回复的消息
     if IMKitConfigCenter.shared.enableAIUser,
@@ -613,7 +613,7 @@ public class ChatMessageHelper: NSObject {
   /// 从缓存中获取用户信息
   /// - Parameter accountId: 用户 id
   /// - Returns: 用户信息
-  public static func getUserFromCache(_ accountId: String) -> NEUserWithFriend? {
+  public static func getUserFromCache(_ accountId: String) -> NE2UserWithFriend? {
     NEAIUserManager.shared.getAIUserById(accountId) ?? NEFriendUserCache.shared.getFriendInfo(accountId) ?? NEP2PChatUserCache.shared.getUserInfo(accountId) ?? NETeamUserManager.shared.getUserInfo(accountId)
   }
 
@@ -639,7 +639,7 @@ public class ChatMessageHelper: NSObject {
   ///   - message: 消息
   ///   - attributeStr: 消息富文本
   /// - Returns: 高亮 @ 后的消息富文本
-  public static func loadAtInMessage(_ message: V2NIMMessage?, _ attributeStr: NSMutableAttributedString?) -> NSMutableAttributedString? {
+  public static func loadAtInMessage(_ message: V2NIM2Message?, _ attributeStr: NSMutableAttributedString?) -> NSMutableAttributedString? {
     // 数字人回复的消息不展示高亮（serverExtension 会被带回）
     if message?.aiConfig != nil, message?.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
       return nil
@@ -763,9 +763,9 @@ public class ChatMessageHelper: NSObject {
   /// 构造消息附件的本地文件路径
   /// - Parameter message: 消息
   /// - Returns: 本地文件路径
-  public static func createFilePath(_ message: V2NIMMessage?) -> String {
+  public static func createFilePath(_ message: V2NIM2Message?) -> String {
     var path = NEPathUtils.getDirectoryForDocuments(dir: imkitDir) ?? ""
-    guard let attach = message?.attachment as? V2NIMMessageFileAttachment else {
+    guard let attach = message?.attachment as? V2NIM2MessageFileAttachment else {
       return path
     }
 

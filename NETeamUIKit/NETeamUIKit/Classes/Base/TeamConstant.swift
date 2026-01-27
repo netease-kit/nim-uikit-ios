@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 
 import Foundation
-@_exported import NEChatKit
+@_exported import NEChatKit_coexist
 @_exported import NECommonKit
 @_exported import NECommonUIKit
-@_exported import NECoreIM2Kit
+@_exported import NECoreIM2Kit_coexist
 @_exported import NECoreKit
 
 let teamCoreLoader = CommonLoader<NEBaseTeamSettingViewController>()

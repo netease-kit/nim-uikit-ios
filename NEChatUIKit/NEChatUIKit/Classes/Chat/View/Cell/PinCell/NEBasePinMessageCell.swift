@@ -4,7 +4,7 @@
 
 import NECommonKit
 import NECommonUIKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objc

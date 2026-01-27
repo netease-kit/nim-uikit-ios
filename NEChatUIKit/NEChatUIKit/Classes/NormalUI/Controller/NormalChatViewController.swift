@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -44,7 +44,7 @@ open class NormalChatViewController: ChatViewController {
     topMessageView.layer.borderWidth = 1
   }
 
-  override open func getMenuView(_ conversationType: V2NIMConversationType) -> NEBaseChatInputView {
+  override open func getMenuView(_ conversationType: V2NIM2ConversationType) -> NEBaseChatInputView {
     let chat = ChatInputView(conversationType)
     chat.multipleLineDelegate = self
     return chat

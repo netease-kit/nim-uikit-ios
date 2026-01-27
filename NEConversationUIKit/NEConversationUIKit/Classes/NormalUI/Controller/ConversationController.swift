@@ -6,7 +6,7 @@
 import NECommonKit
 import NECommonUIKit
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers

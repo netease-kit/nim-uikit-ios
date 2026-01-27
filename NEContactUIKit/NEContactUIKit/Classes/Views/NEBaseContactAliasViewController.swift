@@ -3,17 +3,17 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
 @objcMembers
 open class NEBaseContactAliasViewController: NEContactBaseViewController, UITextFieldDelegate {
-  typealias ModifyBlock = (_ user: NEUserWithFriend) -> Void
+  typealias ModifyBlock = (_ user: NE2UserWithFriend) -> Void
 
   var completion: ModifyBlock?
-  var user: NEUserWithFriend?
+  var user: NE2UserWithFriend?
   let viewmodel = ContactUserViewModel()
   let textLimit = 15
   public var aliasInputTopAnchor: NSLayoutConstraint?
@@ -89,7 +89,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
     if let uid = user?.user?.accountId, let alias = aliasInput.text {
       view.makeToastActivity(.center)
       viewmodel.updateAlias(accountId: uid, alias: alias) { error in
-        NEALog.infoLog(
+        NE2ALog.infoLog(
           "ContactAliasViewController",
           desc: "CALLBACK update " + (error?.localizedDescription ?? "no error")
         )

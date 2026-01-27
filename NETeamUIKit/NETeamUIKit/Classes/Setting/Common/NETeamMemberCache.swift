@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 /// 废弃，使用 NEChatUIKit 中的 NETeamChatUserCacheListener
@@ -17,8 +17,8 @@ import UIKit
 @objc
 @objcMembers
 @available(*, deprecated, message: "请改用 `NEChatUIKit` 中的 `NETeamUserManager` 类")
-open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, NEContactListener {
-  private let teamMemberCacheMultiDelegate = MultiDelegate<NETeamMemberCacheListener>(strongReferences: false)
+open class NETeamMemberCache: NSObject, NETeamListener, NE2IMKitClientListener, NEContactListener {
+  private let teamMemberCacheMultiDelegate = MultiDelegate2<NETeamMemberCacheListener>(strongReferences: false)
 
   public static let shared = NETeamMemberCache()
   /// 当前缓存的群id
@@ -31,7 +31,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   let contactRepo = ContactRepo.shared
 
   /// kit client 单例
-  let client = IMKitClient.instance
+  let client = IMKit2Client.instance
 
   /// 缓存
   private var cacheDic = [String: NETeamMemberInfoModel]()
@@ -85,7 +85,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// 拉取最新用户信息后刷新消息发送者信息
   /// - Parameter noti: 通知对象
   open func didTapHeader(_ noti: Notification) {
-    if let user = noti.object as? NEUserWithFriend,
+    if let user = noti.object as? NE2UserWithFriend,
        let accid = user.user?.accountId {
       cacheDic[accid]?.nimUser = user
       updateFinish()
@@ -136,21 +136,21 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 好友信息更新
   /// - Parameter friendInfo: 好友信息
-  open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
+  open func onFriendInfoChanged(_ friendInfo: V2NIM2Friend) {
     if let account = friendInfo.accountId, let model = cacheDic[account] {
-      model.nimUser = NEUserWithFriend(friend: friendInfo)
+      model.nimUser = NE2UserWithFriend(friend: friendInfo)
       updateFinish()
     }
   }
 
   /// 用户信息变更
   ///  - Parameter users: 变更用户
-  open func onUserProfileChanged(_ users: [V2NIMUser]) {
-    NEALog.infoLog(className(), desc: #function + " onUserProfileChanged count : \(users.count)")
+  open func onUserProfileChanged(_ users: [V2NIM2User]) {
+    NE2ALog.infoLog(className(), desc: #function + " onUserProfileChanged count : \(users.count)")
     var needUpdate = false
     for user in users {
       if let accout = user.accountId, let model = cacheDic[accout] {
-        model.nimUser = NEUserWithFriend(user: user)
+        model.nimUser = NE2UserWithFriend(user: user)
         needUpdate = true
       }
     }
@@ -162,7 +162,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// 好友删除
   /// - parameter accountId: 账号id
   /// - parameter deletionType: 删除类型
-  open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
+  open func onFriendDeleted(_ accountId: String, deletionType: V2NIM2FriendDeletionType) {
     if let model = cacheDic[accountId] {
       model.nimUser?.friend = nil
     }
@@ -170,14 +170,14 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 登录状态改变
   /// - Parameter status: 登录状态枚举
-  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+  open func onLoginStatus(_ status: V2NIM2LoginStatus) {
     if status == .LOGIN_STATUS_LOGOUT {
       clearCache()
     }
   }
 
   /// 加入回调
-  open func onTeamJoined(_ team: V2NIMTeam) {
+  open func onTeamJoined(_ team: V2NIM2Team) {
     if team.teamId == currentTeamId {
       clearCache()
       updateFinish()
@@ -186,32 +186,32 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 群成员离开回调
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIM2TeamMember]) {
     onMemberDidRemove(teamMembers)
   }
 
   /// 群成员被踢回调
   /// - Parameter operatorAccountId: 操作者id
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIM2TeamMember]) {
     onMemberDidRemove(teamMembers)
   }
 
   /// 群成员加入回调
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberJoined(_ teamMembers: [V2NIM2TeamMember]) {
     onMemberDidAdd(teamMembers)
   }
 
   /// 群成员更新回调
   /// - Parameter teamMembers: 群成员列表
-  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIM2TeamMember]) {
     onMemberDidChanged(teamMembers)
   }
 
   /// 群聊解散回调
   /// - Parameter team: 群对象
-  open func onTeamDismissed(_ team: V2NIMTeam) {
+  open func onTeamDismissed(_ team: V2NIM2Team) {
     if team.teamId == currentTeamId {
       clearCache()
     }
@@ -219,7 +219,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 群成员变更统一处理
   /// - Parameter members: 群成员
-  open func onMemberDidChanged(_ members: [V2NIMTeamMember]) {
+  open func onMemberDidChanged(_ members: [V2NIM2TeamMember]) {
     for member in members {
       if currentTeamId != member.teamId {
         continue
@@ -233,7 +233,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 群成员减少统一处理处理
   /// - Parameter members: 群成员
-  open func onMemberDidRemove(_ members: [V2NIMTeamMember]) {
+  open func onMemberDidRemove(_ members: [V2NIM2TeamMember]) {
     for member in members {
       if currentTeamId != member.teamId {
         continue
@@ -245,13 +245,13 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 群成员增加统一处理
   /// - Parameter members: 群成员
-  open func onMemberDidAdd(_ members: [V2NIMTeamMember]) {
-    var allMembmers = [V2NIMTeamMember]()
+  open func onMemberDidAdd(_ members: [V2NIM2TeamMember]) {
+    var allMembmers = [V2NIM2TeamMember]()
     for member in members {
       if currentTeamId != member.teamId {
         continue
       }
-      NEALog.infoLog(className(), desc: "team cache did add member \(member.teamNick ?? ""))")
+      NE2ALog.infoLog(className(), desc: "team cache did add member \(member.teamNick ?? ""))")
       let model = NETeamMemberInfoModel()
       model.teamMember = member
       cacheDic[member.accountId] = model
@@ -279,7 +279,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 定时移除缓存
   open func triggerClearCache() {
-    NEALog.infoLog(className(), desc: "triggerClearCache")
+    NE2ALog.infoLog(className(), desc: "triggerClearCache")
     clearCache()
   }
 
@@ -305,10 +305,10 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// - Parameter queryType:  查询类型
   /// - Parameter completion:  完成后的回调
   open func getAllTeamMemberInfos(_ teamId: String,
-                                  _ queryType: V2NIMTeamMemberRoleQueryType,
+                                  _ queryType: V2NIM2TeamMemberRoleQueryType,
                                   _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
-    var memberLists = [V2NIMTeamMember]()
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
+    var memberLists = [V2NIM2TeamMember]()
     weak var weakSelf = self
     getAllTeamMemberWithMaxLimit(teamId, nil, &memberLists, queryType) { members, error in
       if let err = error {
@@ -327,9 +327,9 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// 获取群成员(使用最大分页参数，防止触发频控)
   /// - Parameter teamId:  群ID
   /// - Parameter completion:  完成回调
-  open func getAllTeamMemberWithMaxLimit(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
-    NEALog.infoLog(className(), desc: #function + " teamId : \(teamId)")
-    let option = V2NIMTeamMemberQueryOption()
+  open func getAllTeamMemberWithMaxLimit(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIM2TeamMember], _ queryType: V2NIM2TeamMemberRoleQueryType, _ completion: @escaping ([V2NIM2TeamMember]?, NSError?) -> Void) {
+    NE2ALog.infoLog(className(), desc: #function + " teamId : \(teamId)")
+    let option = V2NIM2TeamMemberQueryOption()
     option.direction = .QUERY_DIRECTION_ASC
     option.limit = 1000
     option.onlyChatBanned = false
@@ -363,12 +363,12 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// - Parameter model :           群信息
   /// - Parameter maxSizeByPage:    单页最大查询数量
   /// - Parameter completion:       完成后的回调
-  open func splitMembers(_ members: [V2NIMTeamMember],
+  open func splitMembers(_ members: [V2NIM2TeamMember],
                          _ model: NETeamInfoModel,
                          _ maxSizeByPage: Int = 150,
                          _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
-    var remaind = [[V2NIMTeamMember]]()
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
+    var remaind = [[V2NIM2TeamMember]]()
     remaind.append(contentsOf: members.chunk(maxSizeByPage))
     fetchTeamMemberUserInfos(&remaind, model, completion)
   }
@@ -376,10 +376,10 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
   /// 从云信服务器批量获取用户资料
   ///   - Parameter remainUserIds:  用户集合
   ///   - Parameter completion:    成功回调
-  open func fetchTeamMemberUserInfos(_ remainUserIds: inout [[V2NIMTeamMember]],
+  open func fetchTeamMemberUserInfos(_ remainUserIds: inout [[V2NIM2TeamMember]],
                                      _ model: NETeamInfoModel,
                                      _ completion: @escaping (NSError?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", remainUserIds.count:\(remainUserIds.count)")
     guard let members = remainUserIds.first else {
       completion(nil, model)
       return
@@ -412,7 +412,7 @@ open class NETeamMemberCache: NSObject, NETeamListener, NEIMKitClientListener, N
 
   /// 群信息同步完成回调
   open func onTeamSyncFinished() {
-    NEALog.infoLog(className(), desc: #function + " onTeamSyncFinished call back happen")
+    NE2ALog.infoLog(className(), desc: #function + " onTeamSyncFinished call back happen")
     clearCache()
     updateFinish()
   }

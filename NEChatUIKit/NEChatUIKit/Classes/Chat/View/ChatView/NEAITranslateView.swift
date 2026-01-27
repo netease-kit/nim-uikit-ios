@@ -42,7 +42,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
       if oldValue != currentLanguage {
         if !currentLanguage.isEmpty {
           let userDefault = UserDefaults.standard
-          userDefault.setValue(currentLanguage, forKey: IMKitClient.instance.account() + languageSuffix)
+          userDefault.setValue(currentLanguage, forKey: IMKit2Client.instance.account() + languageSuffix)
           userDefault.synchronize()
         }
         if let first = currentLanguage.first {
@@ -284,7 +284,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
 
     statusLabel.attributedText = translateString
     let userDefault = UserDefaults.standard
-    if let cacheLanguage = userDefault.value(forKey: IMKitClient.instance.account() + languageSuffix) as? String,
+    if let cacheLanguage = userDefault.value(forKey: IMKit2Client.instance.account() + languageSuffix) as? String,
        let first = cacheLanguage.first {
       currentLanguage = cacheLanguage
       shortLanguageLabel.text = String(first)

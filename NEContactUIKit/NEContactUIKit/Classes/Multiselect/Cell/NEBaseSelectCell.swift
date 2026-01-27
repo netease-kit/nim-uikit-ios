@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -112,7 +112,7 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
 
     let url = model.avatar
     let name = NEFriendUserCache.getShortName(model.name ?? "")
-    let accountId = V2NIMConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""
+    let accountId = V2NIM2ConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""
     userHeaderView.configHeadData(headUrl: url, name: name, uid: accountId)
   }
 

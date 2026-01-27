@@ -4,8 +4,8 @@
 // found in the LICENSE file.
 
 import NECommonUIKit
-import NECoreIM2Kit
-import NIMSDK
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -77,7 +77,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
     navigationView.backgroundColor = .ne_lightBackgroundColor
     navigationController?.navigationBar.backgroundColor = .ne_lightBackgroundColor
 
-    teamHeaderView.layer.cornerRadius = 21.0
+    teamHeaderView.setCornerRadius(21.0)
     addButton.setImage(teamCoreLoader.loadImage("setting_add"), for: .normal)
     addButtonWidth = addButton.widthAnchor.constraint(equalToConstant: 36)
     addButtonWidth?.isActive = true

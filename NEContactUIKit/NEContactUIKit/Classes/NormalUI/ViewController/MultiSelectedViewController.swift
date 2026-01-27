@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 /// 转发多选-已选页面-协同版

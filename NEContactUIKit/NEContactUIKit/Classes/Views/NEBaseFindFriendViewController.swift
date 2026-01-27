@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
 import UIKit
 
@@ -139,7 +139,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
       return
     }
 
-    if IMKitClient.instance.isMe(text) {
+    if IMKit2Client.instance.isMe(text) {
       Router.shared.use(
         MeSettingRouter,
         parameters: ["nav": navigationController as Any],
@@ -155,7 +155,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
     weak var weakSelf = self
     viewModel.searchFriend(text) { user, error in
       weakSelf?.isRequesting = false
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         "NEBaseFindFriendViewController",
         desc: "CALLBACK searchFriend " + (error?.localizedDescription ?? "no error")
       )

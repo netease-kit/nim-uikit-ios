@@ -3,20 +3,20 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
 open class TeamMemberSelectVM: NSObject {
   public var teamRepo = TeamRepo.shared
   private let className = "TeamMemberSelectVM"
 
-  let teamProvider = TeamProvider.shared
+  let teamProvider = NE2TeamProvider.shared
 
   open func getTeamMembers(_ teamId: String,
                            _ completion: @escaping (Error?, NETeamInfoModel?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + teamId)
+    NE2ALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + teamId)
     if let team = NETeamUserManager.shared.getTeamInfo(),
        let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
       let model = NETeamInfoModel()

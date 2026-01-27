@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -242,7 +242,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
       bubble.image = nil
     }
 
-    if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
+    if let fileObject = model.message?.attachment as? V2NIM2MessageFileAttachment {
       if let fileModel = model as? MessageFileModel {
         weakModel?.cell = nil
         weakModel = fileModel

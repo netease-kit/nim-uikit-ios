@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -213,7 +213,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
 
     bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
 
-    if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
+    if let fileObject = model.message?.attachment as? V2NIM2MessageFileAttachment {
       if let fileModel = model as? MessageFileModel {
         weakModel?.cell = nil
         weakModel = fileModel

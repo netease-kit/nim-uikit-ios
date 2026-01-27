@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -47,7 +47,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     viewModel.delegate = self
 
     if let teamId = viewModel.teamInfoModel?.team?.teamId {
-      viewModel.getCurrentUserTeamMember(IMKitClient.instance.account(), teamId) { member, error in
+      viewModel.getCurrentUserTeamMember(IMKit2Client.instance.account(), teamId) { member, error in
       }
     }
 
@@ -149,15 +149,15 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateTeamInfoPrivilege(weakSelf?.viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_ALL) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
       )
       weakSelf?.view.hideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -176,15 +176,15 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateTeamInfoPrivilege(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_UPDATE_INFO_MODE_MANAGER) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateTeamInfoPrivilege " + (error?.localizedDescription ?? "no error")
       )
       weakSelf?.view.hideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -203,15 +203,15 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateInviteMode(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_INVITE_MODE_MANAGER) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
       )
       weakSelf?.view.hideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -234,15 +234,15 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
     weak var weakSelf = self
     view.makeToastActivity(.center)
     viewModel.updateInviteMode(viewModel.teamInfoModel?.team?.teamId ?? "", .TEAM_INVITE_MODE_ALL) { error, team in
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.className(),
         desc: "CALLBACK updateInviteMode " + (error?.localizedDescription ?? "no error")
       )
       weakSelf?.view.hideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           weakSelf?.showToast(localizable("no_permission_tip"))
         } else {
           weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -364,9 +364,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamAtAllPermission(false) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
+          } else if err.code == noPermissionCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -389,9 +389,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamAtAllPermission(true) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
+          } else if err.code == noPermissionCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -432,9 +432,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamTopMessagePermission(false) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
+          } else if err.code == noPermissionCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -457,9 +457,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamTopMessagePermission(true) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
+          if err.code == protocolSendFailed2 {
             weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
+          } else if err.code == noPermissionCode2 {
             weakSelf?.showToast(localizable("no_permission_tip"))
           } else {
             weakSelf?.showToast(commonLocalizable("failed_operation"))
@@ -494,9 +494,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
     viewModel.updateTeamAgreeMode(isOpen) { [weak self] error in
       if let err = error as? NSError {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           self?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           self?.showToast(localizable("no_permission_tip"))
         } else {
           self?.showToast(commonLocalizable("failed_operation"))
@@ -525,9 +525,9 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
     viewModel.updateTeamJoinMode(isOpen) { [weak self] error in
       if let err = error as? NSError {
-        if err.code == protocolSendFailed {
+        if err.code == protocolSendFailed2 {
           self?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
+        } else if err.code == noPermissionCode2 {
           self?.showToast(localizable("no_permission_tip"))
         } else {
           self?.showToast(commonLocalizable("failed_operation"))

@@ -3,7 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objc
@@ -17,10 +17,10 @@ open class MessageVideoModel: MessageImageModel {
   public var state = DownloadState.Success
   public var progress: UInt = 0
 
-  public required init(message: V2NIMMessage?) {
+  public required init(message: V2NIM2Message?) {
     super.init(message: message)
     type = .video
-    if let videoObject = message?.attachment as? V2NIMMessageVideoAttachment {
+    if let videoObject = message?.attachment as? V2NIM2MessageVideoAttachment {
       contentSize = ChatMessageHelper.getSizeWithMaxSize(
         chat_pic_size,
         size: CGSize(width: videoObject.width, height: videoObject.height),

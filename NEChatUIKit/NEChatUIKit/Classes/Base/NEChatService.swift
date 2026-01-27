@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import SDWebImage
 import SDWebImageSVGKitPlugin
 import SDWebImageWebPCoder
@@ -32,8 +32,8 @@ public class NEChatService: NSObject, ChatServiceDelegate, NEChatEmojProtocol {
       ChatRouter.register()
     }
 
-    NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
-    NIMKitFileLocationHelper.setStaticUserId(IMKitClient.instance.account())
+    NIMKitFileLocationHelper.setStaticAppkey(NIMSDK2.sharedSDK().appKey())
+    NIMKitFileLocationHelper.setStaticUserId(IMKit2Client.instance.account())
     let webpCoder = SDImageWebPCoder()
     SDImageCodersManager.shared.addCoder(webpCoder)
     let svgCoder = SDImageSVGKCoder.shared

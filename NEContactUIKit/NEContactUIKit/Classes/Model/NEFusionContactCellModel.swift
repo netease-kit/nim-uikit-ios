@@ -2,19 +2,19 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objcMembers
 open class NEFusionContactCellModel: NSObject {
   /// 用户信息
-  public var user: NEUserWithFriend?
+  public var user: NE2UserWithFriend?
   /// cell 类型
   public var type = 0
   /// 是否选中
   public var selected = false
   /// 机器人数据
-  public var aiUser: V2NIMAIUser?
+  public var aiUser: V2NIM2AIUser?
 
   /// 获取accid
   open func getAccountId() -> String {

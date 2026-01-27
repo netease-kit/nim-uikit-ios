@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -25,7 +25,7 @@ open class CollectionMessageViewModel: NSObject {
   /// 加载收藏数据
   /// - Parameter completion: 完成回调
   open func loadData(_ completion: @escaping (NSError?, Bool) -> Void) {
-    let option = V2NIMCollectionOption()
+    let option = V2NIM2CollectionOption()
 
     if let model = collectionDatas.last, let anchor = model.collection {
       option.anchorCollection = anchor
@@ -58,7 +58,7 @@ open class CollectionMessageViewModel: NSObject {
 
   /// 反序列化收藏的消息
   /// - Parameter collections: 收藏内容列表
-  func parseMessage(_ collections: [V2NIMCollection]) -> [CollectionMessageModel] {
+  func parseMessage(_ collections: [V2NIM2Collection]) -> [CollectionMessageModel] {
     var retArray = [CollectionMessageModel]()
     for collection in collections {
       if let dataString = collection.collectionData {
@@ -66,7 +66,7 @@ open class CollectionMessageViewModel: NSObject {
           if dataDic["message"] != nil, dataDic["conversationName"] != nil {
             let model = CollectionMessageModel()
             if let messageString = dataDic["message"] as? String {
-              if let message = V2NIMMessageConverter.messageDeserialization(messageString) {
+              if let message = V2NIM2MessageConverter.messageDeserialization(messageString) {
                 model.message = message
               }
             }
@@ -96,8 +96,8 @@ open class CollectionMessageViewModel: NSObject {
   ///   - type: 类型
   /// - Returns: 请求大模型的内容
   open func getAIModelCallContent(_ text: String?,
-                                  _ type: V2NIMAIModelCallContentType) -> V2NIMAIModelCallContent {
-    let content = V2NIMAIModelCallContent()
+                                  _ type: V2NIM2AIModelCallContentType) -> V2NIM2AIModelCallContent {
+    let content = V2NIM2AIModelCallContent()
     content.msg = text ?? ""
     content.type = type
     return content
@@ -108,29 +108,29 @@ open class CollectionMessageViewModel: NSObject {
   ///   - aiUserAccid: 数字人 id
   ///   - message: 消息
   /// - Returns: 消息发送参数
-  func getSendMessageParams(_ conversationId: String? = nil, _ message: V2NIMMessage) -> V2NIMSendMessageParams {
+  func getSendMessageParams(_ conversationId: String? = nil, _ message: V2NIM2Message) -> V2NIM2SendMessageParams {
     let params = chatRepo.getSendMessageParams()
     guard let cid = conversationId,
-          let aiAccid = V2NIMConversationIdUtil.conversationTargetId(cid),
+          let aiAccid = V2NIM2ConversationIdUtil.conversationTargetId(cid),
           NEAIUserManager.shared.isAIUser(aiAccid) else {
       return params
     }
 
-    let aiConfig = V2NIMMessageAIConfigParams()
+    let aiConfig = V2NIM2MessageAIConfigParams()
     aiConfig.accountId = aiAccid
     aiConfig.aiStream = IMKitConfigCenter.shared.enableAIStream
 
     if message.messageType == .MESSAGE_TYPE_TEXT, let text = message.text {
-      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
     }
 
     if message.messageType == .MESSAGE_TYPE_CUSTOM,
-       let type = NECustomUtils.typeOfCustomMessage(message.attachment),
-       type == customRichTextType {
-      let title = NECustomUtils.titleOfRichText(message.attachment)
-      let body = NECustomUtils.bodyOfRichText(message.attachment)
+       let type = NE2CustomUtils.typeOfCustomMessage(message.attachment),
+       type == customRichTextType2 {
+      let title = NE2CustomUtils.titleOfRichText(message.attachment)
+      let body = NE2CustomUtils.bodyOfRichText(message.attachment)
       let text = (title ?? "") + (body ?? "")
-      aiConfig.content = getAIModelCallContent(text, .NIM_AI_MODEL_CONTENT_TYPE_TEXT)
+      aiConfig.content = getAIModelCallContent(text, .AI_MODEL_CONTENT_TYPE_TEXT)
     }
 
     params.aiConfig = aiConfig
@@ -142,8 +142,8 @@ open class CollectionMessageViewModel: NSObject {
   /// - Parameter text: 文本内容
   /// - Parameter conversationId: 会话ID
   /// - Parameter completion: 完成回调
-  open func sendTextMessage(_ text: String, _ conversationId: String, _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
+  open func sendTextMessage(_ text: String, _ conversationId: String, _ completion: @escaping (V2NIM2SendMessageResult?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", text.count: \(text.count)")
     if text.count <= 0 {
       return
     }
@@ -163,11 +163,11 @@ open class CollectionMessageViewModel: NSObject {
   ///   - conversationIds: 会话 id 列表
   ///   - comment: 留言
   ///   - completion: 完成回调
-  open func forwardCollectionMessages(_ message: V2NIMMessage,
+  open func forwardCollectionMessages(_ message: V2NIM2Message,
                                       _ conversationIds: [String],
                                       _ comment: String?,
-                                      _ completion: @escaping (V2NIMSendMessageResult?, Error?, UInt) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
+                                      _ completion: @escaping (V2NIM2SendMessageResult?, Error?, UInt) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: \(String(describing: message.messageClientId))")
     for conversationId in conversationIds {
       let forwardMessage = MessageUtils.forwardMessage(message: message)
       ChatMessageHelper.clearForwardAtMark(forwardMessage)
@@ -188,21 +188,21 @@ open class CollectionMessageViewModel: NSObject {
                          _ filePath: String,
                          _ progress: ((UInt) -> Void)?,
                          _ completion: ((String?, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
     ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 
   /// 删除收藏
   /// - Parameter collection: 收藏对象
   /// - Parameter completion: 完成回调
-  open func removeCollection(_ collection: V2NIMCollection, _ completion: @escaping (NSError?) -> Void) {
+  open func removeCollection(_ collection: V2NIM2Collection, _ completion: @escaping (NSError?) -> Void) {
     chatRepo.removeCollections([collection]) { ret, error in
       completion(error)
     }
   }
 
   open func getHandSetEnable() -> Bool {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     return SettingRepo.shared.getHandsetMode()
   }
 }

@@ -4,7 +4,7 @@
 
 import NECommonUIKit
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -169,11 +169,11 @@ open class FunConversationController: NEBaseConversationController {
     if !viewModel.aiUserListData.isEmpty {
       if let headerView = tableView.tableHeaderView {
         if headerView.isKind(of: UICollectionView.self) == false {
-          NEALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
+          NE2ALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
           tableView.tableHeaderView = stickTopCollcetionView
         }
       } else {
-        NEALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
+        NE2ALog.infoLog(className(), desc: #function + " set top conversation header \(stickTopCollcetionView)")
         tableView.tableHeaderView = stickTopCollcetionView
       }
       stickTopCollcetionView.reloadData()

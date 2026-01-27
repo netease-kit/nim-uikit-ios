@@ -3,11 +3,11 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonUIKit
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -263,7 +263,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if let model = getRealModel(indexPath.row), let user = model.nimUser {
-      if IMKitClient.instance.isMe(user.user?.accountId) {
+      if IMKit2Client.instance.isMe(user.user?.accountId) {
         Router.shared.use(
           MeSettingRouter,
           parameters: ["nav": navigationController as Any],
@@ -296,7 +296,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
       if let tid = weakSelf?.teamId, let uid = model?.nimUser?.user?.accountId {
         weakSelf?.viewModel.removeTeamMember(tid, [uid]) { error in
           if let err = error {
-            if err.code == noPermissionCode {
+            if err.code == noPermissionCode2 {
               weakSelf?.view.makeToast(localizable("no_permission_tip"))
             } else {
               weakSelf?.view.makeToast(localizable("remove_failed"))

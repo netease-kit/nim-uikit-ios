@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECoreKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -120,7 +120,7 @@ open class NEBaseTeamListViewController: NEContactBaseViewController, UITableVie
       return
     }
     if let teamid = model.teamId {
-      let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
+      let conversationId = V2NIM2ConversationIdUtil.teamConversationId(teamid)
       Router.shared.use(
         PushTeamChatVCRouter,
         parameters: ["nav": navigationController as Any, "conversationId": conversationId as Any],

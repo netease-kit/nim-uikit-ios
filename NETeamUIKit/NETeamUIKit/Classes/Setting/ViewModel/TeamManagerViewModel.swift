@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
+import NEChatKit_coexist
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objc
@@ -45,14 +45,14 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// UI 分区数据
   public var sectionData = [SettingSectionModel]()
   /// 管理员数据
-  public var managerUsers = [V2NIMTeamMember]()
+  public var managerUsers = [V2NIM2TeamMember]()
 
   var isRequestData = false
 
   public weak var delegate: TeamManagerViewModelDelegate?
 
   /// 当前用户的群成员对象
-  public var teamMember: V2NIMTeamMember?
+  public var teamMember: V2NIM2TeamMember?
 
   override public init() {
     super.init()
@@ -66,7 +66,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// 获取UI分组数据
   open func getSectionData() {
     sectionData.removeAll()
-    if teamInfoModel?.team?.ownerAccountId == IMKitClient.instance.account() {
+    if teamInfoModel?.team?.ownerAccountId == IMKit2Client.instance.account() {
       sectionData.append(getFirstSection())
     }
     sectionData.append(getSecondSection())
@@ -77,7 +77,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// - Parameter userId: 用户id
   /// - Parameter teamId: 群id
   /// - Parameter completion: 完成回调
-  open func getCurrentUserTeamMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIMTeamMember?, NSError?) -> Void) {
+  open func getCurrentUserTeamMember(_ userId: String, _ teamId: String?, completion: @escaping (V2NIM2TeamMember?, NSError?) -> Void) {
     if let tid = teamId {
       teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, userId) { [weak self] member, error in
         if let currentMember = member {
@@ -107,7 +107,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
         weakSelf?.isRequestData = false
         completion(err)
       } else {
-        var memberList = [V2NIMTeamMember]()
+        var memberList = [V2NIM2TeamMember]()
         weakSelf?.getAllTeamManagers(teamId, nil, &memberList, .TEAM_MEMBER_ROLE_QUERY_TYPE_MANAGER) { members, error in
           if let err = error {
             weakSelf?.isRequestData = false
@@ -136,7 +136,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 获取顶部section(管理员数量)
   open func getFirstSection() -> SettingSectionModel {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     let model = SettingSectionModel()
     let manager = SettingCellLabelArrowModel()
@@ -154,7 +154,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 获取中间section数据(权限)
   open func getSecondSection() -> SettingSectionModel {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     let model = SettingSectionModel()
 
@@ -231,7 +231,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 获取 third section数据(进群管理)
   open func getThirdSection() -> SettingSectionModel {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     let model = SettingSectionModel()
 
@@ -371,7 +371,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       return
     }
 
-    let value: V2NIMTeamAgreeMode = isNeedAgree ? .TEAM_AGREE_MODE_AUTH : .TEAM_AGREE_MODE_NO_AUTH
+    let value: V2NIM2TeamAgreeMode = isNeedAgree ? .TEAM_AGREE_MODE_AUTH : .TEAM_AGREE_MODE_NO_AUTH
     teamRepo.updateTeamAgreeMode(tid, .TEAM_TYPE_NORMAL, value) { error, team in
       completion(error)
     }
@@ -385,7 +385,7 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
       return
     }
 
-    let value: V2NIMTeamJoinMode = isNeedAgree ? .TEAM_JOIN_MODE_APPLY : .TEAM_JOIN_MODE_FREE
+    let value: V2NIM2TeamJoinMode = isNeedAgree ? .TEAM_JOIN_MODE_APPLY : .TEAM_JOIN_MODE_FREE
     teamRepo.updateTeamJoinMode(tid, .TEAM_TYPE_NORMAL, value) { error, team in
       completion(error)
     }
@@ -393,19 +393,19 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
 
   /// 群成员离开
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberLeft(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberLeft(_ teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群成员加入
   /// - Parameter operatorAccountId: 操作者
   /// - Parameter teamMembers: 群成员
-  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberKicked(_ operatorAccountId: String, teamMembers: [V2NIM2TeamMember]) {
     onTeamMemberChanged(teamMembers)
   }
 
   /// 群信息更新
-  open func onTeamInfoUpdated(_ team: V2NIMTeam) {
+  open func onTeamInfoUpdated(_ team: V2NIM2Team) {
     updateTeamInfo(team.teamId)
   }
 
@@ -413,9 +413,9 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   ///  - Parameter  teamId :        群组ID
   ///  - Parameter  mode :          群信息修改权限
   ///  - Parameter  completion:     完成后的回调
-  open func updateTeamInfoPrivilege(_ teamId: String, _ mode: V2NIMTeamUpdateInfoMode,
-                                    _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
+  open func updateTeamInfoPrivilege(_ teamId: String, _ mode: V2NIM2TeamUpdateInfoMode,
+                                    _ completion: @escaping (NSError?, V2NIM2Team?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
     teamRepo.updateTeamInfoMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
     }
@@ -425,9 +425,9 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   ///  - Parameter  teamId:      群组ID
   ///  - Parameter  mode:  邀请模式
   ///  - Parameter  completion:  完成后的回调
-  open func updateInviteMode(_ teamId: String, _ mode: V2NIMTeamInviteMode,
-                             _ completion: @escaping (NSError?, V2NIMTeam?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
+  open func updateInviteMode(_ teamId: String, _ mode: V2NIM2TeamInviteMode,
+                             _ completion: @escaping (NSError?, V2NIM2Team?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", mode:\(mode.rawValue)")
     teamRepo.updateInviteMode(teamId, .TEAM_TYPE_NORMAL, mode) { error, team in
       completion(error, team)
     }
@@ -451,20 +451,20 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
     }
   }
 
-  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIMTeamMember]) {
+  open func onTeamMemberInfoUpdated(_ teamMembers: [V2NIM2TeamMember]) {
     print("team manage onTeamMemberInfoUpdated")
     onTeamMemberChanged(teamMembers)
   }
 
   /// 处理群成员变更
   /// - Parameter members: 群成员
-  private func onTeamMemberChanged(_ members: [V2NIMTeamMember]) {
+  private func onTeamMemberChanged(_ members: [V2NIM2TeamMember]) {
     var isCurrentTeam = false
     for member in members {
       if let currentTid = teamInfoModel?.team?.teamId, currentTid == member.teamId {
         isCurrentTeam = true
       }
-      if member.accountId == IMKitClient.instance.account() {
+      if member.accountId == IMKit2Client.instance.account() {
         teamMember = member
       }
     }
@@ -481,8 +481,8 @@ open class TeamManagerViewModel: NSObject, NETeamListener {
   /// - Parameter teamId:  群ID
   /// - Parameter nextToken: 下一页标识
   /// - Parameter completion:  完成回调
-  open func getAllTeamManagers(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIMTeamMember], _ queryType: V2NIMTeamMemberRoleQueryType, _ completion: @escaping ([V2NIMTeamMember]?, NSError?) -> Void) {
-    let option = V2NIMTeamMemberQueryOption()
+  open func getAllTeamManagers(_ teamId: String, _ nextToken: String? = nil, _ memberList: inout [V2NIM2TeamMember], _ queryType: V2NIM2TeamMemberRoleQueryType, _ completion: @escaping ([V2NIM2TeamMember]?, NSError?) -> Void) {
+    let option = V2NIM2TeamMemberQueryOption()
     option.limit = 100
     option.direction = .QUERY_DIRECTION_ASC
     option.onlyChatBanned = false

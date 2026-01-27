@@ -4,9 +4,9 @@
 
 import CoreText
 import Foundation
-import NEChatKit
-import NECoreIM2Kit
-import NIMSDK
+import NEChatKit_coexist
+import NECoreIM2Kit_coexist
+import NIMSDK2
 
 @objcMembers
 open class P2PChatViewModel: ChatViewModel {
@@ -18,7 +18,7 @@ open class P2PChatViewModel: ChatViewModel {
   }
 
   /// 重写初始化方法
-  override public init(conversationId: String, anchor: V2NIMMessage?) {
+  override public init(conversationId: String, anchor: V2NIM2Message?) {
     super.init(conversationId: conversationId, anchor: anchor)
   }
 
@@ -61,7 +61,7 @@ open class P2PChatViewModel: ChatViewModel {
   override open func loadShowName(_ accountIds: [String],
                                   _ teamId: String? = nil,
                                   _ completion: @escaping () -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", count: \(accountIds.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", count: \(accountIds.count)")
     NEFriendUserCache.shared.loadShowName(accountIds) { users in
       for user in users ?? [] {
         // 非好友，单独缓存
@@ -77,7 +77,7 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  override open func markRead(messages: [V2NIMMessage], _ completion: @escaping ((any Error)?) -> Void) {
+  override open func markRead(messages: [V2NIM2Message], _ completion: @escaping ((any Error)?) -> Void) {
     markReadInP2P(messages: messages, completion)
   }
 
@@ -85,8 +85,8 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 需要发送已读回执的消息
   ///   - completion: 完成回调
-  open func markReadInP2P(messages: [V2NIMMessage], _ completion: @escaping (Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
+  open func markReadInP2P(messages: [V2NIM2Message], _ completion: @escaping (Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
 
     let messages = messages.sorted { msg1, msg2 in
       msg1.createTime > msg2.createTime
@@ -104,9 +104,9 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  override open func getMessageReceipts(messages: [V2NIMMessage],
+  override open func getMessageReceipts(messages: [V2NIM2Message],
                                         _ completion: @escaping ([IndexPath], Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messages.count: \(messages.count)")
     getP2PMessageReceipt(messages: messages, completion)
   }
 
@@ -114,8 +114,8 @@ open class P2PChatViewModel: ChatViewModel {
   /// - Parameters:
   ///   - messages: 消息列表
   ///   - completion: 完成回调
-  open func getP2PMessageReceipt(messages: [V2NIMMessage], _ completion: @escaping ([IndexPath], Error?) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  open func getP2PMessageReceipt(messages: [V2NIM2Message], _ completion: @escaping ([IndexPath], Error?) -> Void) {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
     chatRepo.getP2PMessageReceipt(conversationId: ChatRepo.conversationId) { readReceipt, error in
       if let readReceipt = readReceipt {
         var reloadIndexs = [IndexPath]()
@@ -147,16 +147,16 @@ open class P2PChatViewModel: ChatViewModel {
 
   /// 发送正在输入中状态
   open func sendInputTypingState() {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
+    if V2NIM2ConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
       setTypingCustom(1)
     }
   }
 
   /// 发送结束输入中状态
   open func sendInputTypingEndState() {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
-    if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function)
+    if V2NIM2ConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
       setTypingCustom(0)
     }
   }
@@ -164,9 +164,9 @@ open class P2PChatViewModel: ChatViewModel {
   /// 发送输入状态
   /// - Parameter typing: 输入状态: 1-正在输入, 0-结束输入
   open func setTypingCustom(_ typing: Int) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", typing: \(typing)")
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", typing: \(typing)")
     let content = getJSONStringFromDictionary(["typing": typing])
-    let param = V2NIMSendCustomNotificationParams()
+    let param = V2NIM2SendCustomNotificationParams()
     chatRepo.sendCustomNotification(conversationId: ChatRepo.conversationId, content: content, params: param) { error in
       if let err = error {
         print("send noti success :", err)
@@ -181,14 +181,14 @@ extension P2PChatViewModel: NENotiListener {
   /// 收到自定义系统通知回调
   /// 用于展示对方输入状态
   /// - Parameter customNotifications: 自定义系统通知
-  open func onReceiveCustomNotifications(_ customNotifications: [V2NIMCustomNotification]) {
-    NEALog.infoLog(
+  open func onReceiveCustomNotifications(_ customNotifications: [V2NIM2CustomNotification]) {
+    NE2ALog.infoLog(
       ModuleName + " " + className(),
       desc: #function + ", customNotifications.count:\(customNotifications.count)"
     )
 
     // 只处理单聊的输入状态
-    if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) != .CONVERSATION_TYPE_P2P {
+    if V2NIM2ConversationIdUtil.conversationType(ChatRepo.conversationId) != .CONVERSATION_TYPE_P2P {
       return
     }
 
@@ -241,7 +241,7 @@ extension P2PChatViewModel: NESubscribeListener {
 
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
-  public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
+  public func onUserStatusChanged(_ data: [V2NIM2UserStatus]) {
     for d in data {
       if d.accountId == ChatRepo.sessionId {
         online = d.statusType == .USER_STATUS_TYPE_LOGIN
@@ -254,10 +254,10 @@ extension P2PChatViewModel: NESubscribeListener {
 
 // MARK: - NEIMKitClientListener
 
-extension P2PChatViewModel: NEIMKitClientListener {
+extension P2PChatViewModel: NE2IMKitClientListener {
   /// 登录连接状态回调
   /// - Parameter status: 连接状态
-  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+  open func onConnectStatus(_ status: V2NIM2ConnectStatus) {
     if status == .CONNECT_STATUS_WAITING {
       networkBroken = true
     }

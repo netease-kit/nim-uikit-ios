@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
-import NIMSDK
+import NEChatKit_coexist
+import NIMSDK2
 
 @objc
 public protocol MultiForwardViewModelDelegate: NSObjectProtocol {
@@ -47,7 +47,7 @@ open class MultiForwardViewModel: NSObject {
       let subStringData = strData?.components(separatedBy: "\n")
       if let msgCount = subStringData?.count, msgCount > 1 {
         for i in 1 ..< msgCount {
-          if let msgString = subStringData?[i], let msg = V2NIMMessageConverter.messageDeserialization(msgString) {
+          if let msgString = subStringData?[i], let msg = V2NIM2MessageConverter.messageDeserialization(msgString) {
             let model = modelFromMessage(message: msg)
             ChatMessageHelper.addTimeMessage(model, messages.last)
             messages.append(model)
@@ -60,7 +60,7 @@ open class MultiForwardViewModel: NSObject {
     }
   }
 
-  open func modelFromMessage(message: V2NIMMessage) -> MessageModel {
+  open func modelFromMessage(message: V2NIM2Message) -> MessageModel {
     var model: MessageModel
     switch message.messageType {
     case .MESSAGE_TYPE_AUDIO:
@@ -68,7 +68,7 @@ open class MultiForwardViewModel: NSObject {
       model = MessageTextModel(message: message)
     case .MESSAGE_TYPE_CALL:
       message.text = chatLocalizable("msg_rtc_call")
-      if let attachment = message.attachment as? V2NIMMessageCallAttachment {
+      if let attachment = message.attachment as? V2NIM2MessageCallAttachment {
         message.text = attachment.type == 1 ? chatLocalizable("msg_rtc_audio") : chatLocalizable("msg_rtc_video")
       }
       model = MessageTextModel(message: message)
@@ -77,9 +77,9 @@ open class MultiForwardViewModel: NSObject {
     }
 
     if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? "") {
-      model.fullName = remoteExt[mergedMessageNickKey] as? String
+      model.fullName = remoteExt[mergedMessageNickKey2] as? String
       model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
-      model.avatar = remoteExt[mergedMessageAvatarKey] as? String
+      model.avatar = remoteExt[mergedMessageAvatarKey2] as? String
     } else {
       model.fullName = ChatMessageHelper.getSenderId(message)
       model.shortName = NEFriendUserCache.getShortName(model.fullName ?? "")
@@ -93,7 +93,7 @@ open class MultiForwardViewModel: NSObject {
                      _ filePath: String,
                      _ progress: ((UInt) -> Void)?,
                      _ completion: ((String?, NSError?) -> Void)?) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
+    NE2ALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageId: " + urlString)
     ResourceRepo.shared.downLoadFile(urlString, filePath, progress, completion)
   }
 }

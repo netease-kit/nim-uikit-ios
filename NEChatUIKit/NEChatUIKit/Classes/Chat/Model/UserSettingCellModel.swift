@@ -12,16 +12,16 @@ public enum UserSettingType: Int {
 
 @objcMembers
 open class UserSettingCellModel: NSObject {
-  typealias SwitchChangeCompletion = (Bool) -> Void
-  typealias CellClick = () -> Void
-  var cellName: String?
-  var subTitle: String?
-//    var type = SettingCellType.SettingArrowCell.rawValue
-  var swichChange: SwitchChangeCompletion?
-  var rowHeight: CGFloat = 49
-  var cornerType = CornerType.none
-//    var headerUrl: String?
-  var cellClick: CellClick?
-  var switchOpen = false
-  var type = UserSettingType.SwitchType.rawValue
+  public typealias SwitchChangeCompletion = (Bool) -> Void
+  public typealias CellClick = () -> Void
+  public var cellName: String?
+  public var subTitle: String?
+//  var type = SettingCellType.SettingArrowCell.rawValue
+  public var swichChange: SwitchChangeCompletion?
+  public var rowHeight: CGFloat = 49
+  public var cornerType = CornerType.none
+//  var headerUrl: String?
+  public var cellClick: CellClick?
+  public var switchOpen = false
+  public var type = UserSettingType.SwitchType.rawValue
 }

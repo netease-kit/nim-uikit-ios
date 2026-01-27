@@ -3,12 +3,12 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
 open class TeamInfoViewController: NEBaseTeamInfoViewController {
-  override public init(team: V2NIMTeam?) {
+  override public init(team: V2NIM2Team?) {
     super.init(team: team)
     registerCellDic = [
       SettingCellType.SettingArrowCell.rawValue: TeamArrowSettingCell.self,

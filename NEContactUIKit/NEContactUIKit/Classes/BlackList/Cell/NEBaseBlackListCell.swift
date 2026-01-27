@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NECoreIM2Kit
+import NECoreIM2Kit_coexist
 import UIKit
 
 @objc
@@ -14,7 +14,7 @@ public protocol BlackListCellDelegate: NSObjectProtocol {
 open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
   weak var delegate: BlackListCellDelegate?
   var index = 0
-  private var model: NEUserWithFriend?
+  private var model: NE2UserWithFriend?
   var button = UIButton()
 
   private lazy var bottomLine: UIView = {
@@ -67,7 +67,7 @@ open class NEBaseBlackListCell: NEBaseTeamTableViewCell {
   }
 
   override open func setModel(_ model: Any) {
-    guard let user = model as? NEUserWithFriend else {
+    guard let user = model as? NE2UserWithFriend else {
       return
     }
     self.model = user

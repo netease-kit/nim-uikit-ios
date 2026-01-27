@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 import NECommonKit
-import NIMSDK
+import NIMSDK2
 import UIKit
 
 @objcMembers
@@ -137,7 +137,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
     isSearching = true
     weakSelf?.viewModel.searchHistoryMessages(teamId, searchText) { error, messages in
       weakSelf?.isSearching = false
-      NEALog.infoLog(
+      NE2ALog.infoLog(
         ModuleName + " " + self.tag,
         desc: "CALLBACK searchMessages " + (error?.localizedDescription ?? "no error")
       )
@@ -145,7 +145,7 @@ open class NEBaseTeamHistoryMessageController: NETeamBaseViewController, UITextF
         weakSelf?.emptyView.isHidden = messages?.isEmpty == false
         weakSelf?.tableView.reloadData()
       } else {
-        NEALog.errorLog(
+        NE2ALog.errorLog(
           ModuleName + " " + (weakSelf?.tag ?? "TeamHistoryMessageController"),
           desc: "searchMessages failed, error = \(error!)"
         )
