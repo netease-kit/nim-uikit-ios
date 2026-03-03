@@ -51,7 +51,7 @@ public class NELoginViewController: UIViewController {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitleColor(UIColor.ne_lightText, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-    button.setTitle("配置信息", for: .normal)
+    button.setTitle("智能体配置", for: .normal)
     button.addTarget(self, action: #selector(configInfoBtnClick), for: .touchUpInside)
     button.accessibilityIdentifier = "id.configInfo"
     return button
@@ -171,7 +171,7 @@ public class NELoginViewController: UIViewController {
             NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
           
           if let conversaionId = V2NIMConversationIdUtil.p2pConversationId(openclawAccount) {
-            let message = MessageUtils.textMessage(text: localizable("open_claw_hello"))
+            let message = MessageUtils.tipMessage(text: localizable("open_claw_hello"))
             if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
               LocalConversationRepo.shared.getConversation(conversaionId) { conversaion, error in
                 if conversaion == nil {

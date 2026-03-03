@@ -723,7 +723,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
+				INFOPLIST_KEY_CFBundleDisplayName = "云信智能IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";
@@ -772,7 +772,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
+				INFOPLIST_KEY_CFBundleDisplayName = "云信智能IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";

@@ -102,7 +102,7 @@ public class NEConfigInfoViewController: NEBaseViewController {
 
   // Openclaw Account
   lazy var openclawTitleLabel: UILabel = {
-    createTitleLabel("Openclaw Account")
+    createTitleLabel("OpenClaw Account")
   }()
 
   lazy var openclawTextField: UITextField = {
@@ -111,6 +111,20 @@ public class NEConfigInfoViewController: NEBaseViewController {
 
   lazy var openclawHintLabel: UILabel = {
     createHintLabel("龙虾登录账号，云信控制台\"账号数-子功能配置\"中生成")
+  }()
+
+  /// 重置配置按钮
+  lazy var resetButton: UIButton = {
+    let btn = UIButton(type: .system)
+    btn.translatesAutoresizingMaskIntoConstraints = false
+    btn.setTitle("重置配置", for: .normal)
+    btn.setTitleColor(UIColor(hexString: "FF4D4F"), for: .normal)
+    btn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+    btn.layer.borderWidth = 1
+    btn.layer.borderColor = UIColor(hexString: "FF4D4F").cgColor
+    btn.layer.cornerRadius = 8
+    btn.addTarget(self, action: #selector(resetConfig), for: .touchUpInside)
+    return btn
   }()
 
   // MARK: - Lifecycle
@@ -242,7 +256,16 @@ public class NEConfigInfoViewController: NEBaseViewController {
       openclawHintLabel.topAnchor.constraint(equalTo: openclawTextField.bottomAnchor, constant: 6),
       openclawHintLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: margin),
       openclawHintLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -margin),
-      openclawHintLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40),
+    ])
+
+    // 重置配置按钮
+    contentView.addSubview(resetButton)
+    NSLayoutConstraint.activate([
+      resetButton.topAnchor.constraint(equalTo: openclawHintLabel.bottomAnchor, constant: 40),
+      resetButton.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: margin),
+      resetButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -margin),
+      resetButton.heightAnchor.constraint(equalToConstant: 44),
+      resetButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40),
     ])
   }
 
@@ -319,6 +342,31 @@ public class NEConfigInfoViewController: NEBaseViewController {
     let alert = UIAlertController(title: "保存成功", message: "配置信息已保存，需要重新启动 App 以使配置生效。", preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "立即重启", style: .default, handler: { _ in
       exit(0)
+    }))
+    present(alert, animated: true)
+  }
+
+  // MARK: - Reset
+
+  @objc func resetConfig() {
+    let alert = UIAlertController(title: "提示", message: "确定要重置所有配置信息吗？重置后需要重新填写。", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+    alert.addAction(UIAlertAction(title: "确定重置", style: .destructive, handler: { [weak self] _ in
+      // 清空 UserDefaults
+      let ud = UserDefaults.standard
+      ud.removeObject(forKey: ConfigInfoKeys.appKey)
+      ud.removeObject(forKey: ConfigInfoKeys.account)
+      ud.removeObject(forKey: ConfigInfoKeys.token)
+      ud.removeObject(forKey: ConfigInfoKeys.openclawAccount)
+      ud.synchronize()
+
+      // 清空输入框
+      self?.appKeyTextField.text = nil
+      self?.accountTextField.text = nil
+      self?.tokenTextField.text = nil
+      self?.openclawTextField.text = nil
+
+      self?.view.makeToast("配置已重置")
     }))
     present(alert, animated: true)
   }
