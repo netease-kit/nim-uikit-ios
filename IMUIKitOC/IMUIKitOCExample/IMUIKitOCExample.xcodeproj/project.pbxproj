@@ -17,12 +17,10 @@
 		39A2F23328D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F23228D9B2C600DDCAF2 /* IMUIKitOCExampleUITests.m */; };
 		39A2F23528D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F23428D9B2C600DDCAF2 /* IMUIKitOCExampleUITestsLaunchTests.m */; };
 		39A2F24728DABC1700DDCAF2 /* NETabbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F24628DABC1700DDCAF2 /* NETabbarController.m */; };
-		39A2F24B28DABC6700DDCAF2 /* NENavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */; };
 		39EBBACA1D04C27BC1E3AEC9 /* Pods_IMUIKitOCExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F8E39DDEB8C36F0E96A1333 /* Pods_IMUIKitOCExample.framework */; };
 		39ED7B1E290FA9C700CAE608 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39ED7B20290FA9C700CAE608 /* Localizable.strings */; };
 		DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD774A7629485F6600347A9E /* CustomRouterViewController.m */; };
-		DDC1AC8929651B6C008C085A /* ConversationController+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = DDC1AC8829651B6C008C085A /* ConversationController+Test.m */; };
-		DDE8123A29E950440040E401 /* InhertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8123929E950440040E401 /* InhertViewController.swift */; };
+		DDC1AC8929651B6C008C085A /* LocalConversationController+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = DDC1AC8829651B6C008C085A /* LocalConversationController+Test.m */; };
 		DDE8123C29E9510F0040E401 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8123B29E9510F0040E401 /* TestViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,8 +61,6 @@
 		39A2F24428DAAC1500DDCAF2 /* AppKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppKey.h; sourceTree = "<group>"; };
 		39A2F24528DABC1700DDCAF2 /* NETabbarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NETabbarController.h; sourceTree = "<group>"; };
 		39A2F24628DABC1700DDCAF2 /* NETabbarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NETabbarController.m; sourceTree = "<group>"; };
-		39A2F24928DABC6700DDCAF2 /* NENavigationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NENavigationController.h; sourceTree = "<group>"; };
-		39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NENavigationController.m; sourceTree = "<group>"; };
 		39ED7B1F290FA9C700CAE608 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		39ED7B24290FAA6E00CAE608 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		39ED7B25290FAA6E00CAE608 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
@@ -72,9 +68,8 @@
 		9F8E39DDEB8C36F0E96A1333 /* Pods_IMUIKitOCExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IMUIKitOCExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD774A7529485F6600347A9E /* CustomRouterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomRouterViewController.h; sourceTree = "<group>"; };
 		DD774A7629485F6600347A9E /* CustomRouterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomRouterViewController.m; sourceTree = "<group>"; };
-		DDC1AC8729651B6C008C085A /* ConversationController+Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ConversationController+Test.h"; sourceTree = "<group>"; };
-		DDC1AC8829651B6C008C085A /* ConversationController+Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ConversationController+Test.m"; sourceTree = "<group>"; };
-		DDE8123929E950440040E401 /* InhertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InhertViewController.swift; sourceTree = "<group>"; };
+		DDC1AC8729651B6C008C085A /* LocalConversationController+Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LocalConversationController+Test.h"; sourceTree = "<group>"; };
+		DDC1AC8829651B6C008C085A /* LocalConversationController+Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LocalConversationController+Test.m"; sourceTree = "<group>"; };
 		DDE8123B29E9510F0040E401 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMUIKitOCExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		F984299B79B347145EA4AF84 /* Pods-IMUIKitOCExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IMUIKitOCExample.debug.xcconfig"; path = "Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -175,16 +170,13 @@
 				39A2F20D28D9B2C400DDCAF2 /* AppDelegate.m */,
 				39A2F24528DABC1700DDCAF2 /* NETabbarController.h */,
 				39A2F24628DABC1700DDCAF2 /* NETabbarController.m */,
-				39A2F24928DABC6700DDCAF2 /* NENavigationController.h */,
-				39A2F24A28DABC6700DDCAF2 /* NENavigationController.m */,
 				39A2F21228D9B2C400DDCAF2 /* ViewController.h */,
 				39A2F21328D9B2C400DDCAF2 /* ViewController.m */,
 				DD774A7529485F6600347A9E /* CustomRouterViewController.h */,
 				DD774A7629485F6600347A9E /* CustomRouterViewController.m */,
-				DDC1AC8729651B6C008C085A /* ConversationController+Test.h */,
-				DDC1AC8829651B6C008C085A /* ConversationController+Test.m */,
+				DDC1AC8729651B6C008C085A /* LocalConversationController+Test.h */,
+				DDC1AC8829651B6C008C085A /* LocalConversationController+Test.m */,
 				DDE8123B29E9510F0040E401 /* TestViewController.swift */,
-				DDE8123929E950440040E401 /* InhertViewController.swift */,
 				39ED7B20290FA9C700CAE608 /* Localizable.strings */,
 				DDF443AC294851D90077184F /* IMUIKitOCExample-Bridging-Header.h */,
 			);
@@ -339,9 +331,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -378,9 +374,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-IMUIKitOCExample/Pods-IMUIKitOCExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -396,11 +396,9 @@
 			files = (
 				39A2F21428D9B2C400DDCAF2 /* ViewController.m in Sources */,
 				39A2F20E28D9B2C400DDCAF2 /* AppDelegate.m in Sources */,
-				DDC1AC8929651B6C008C085A /* ConversationController+Test.m in Sources */,
-				39A2F24B28DABC6700DDCAF2 /* NENavigationController.m in Sources */,
+				DDC1AC8929651B6C008C085A /* LocalConversationController+Test.m in Sources */,
 				39A2F24728DABC1700DDCAF2 /* NETabbarController.m in Sources */,
 				39A2F21F28D9B2C500DDCAF2 /* main.m in Sources */,
-				DDE8123A29E950440040E401 /* InhertViewController.swift in Sources */,
 				DDE8123C29E9510F0040E401 /* TestViewController.swift in Sources */,
 				DD774A7729485F6600347A9E /* CustomRouterViewController.m in Sources */,
 			);

@@ -10,20 +10,21 @@ target 'app' do
   use_frameworks!
   
   # 基础库
-  pod 'NEChatKit', YXConfig.imuikit_version
+  pod 'NIMSDK_LITE', "10.9.70"
+  pod 'NEChatKit/NOS_Special', YXConfig.imuikit_version
 
   # UI 组件，YXConfig.imuikit_version = 10.9.0
-  pod 'NEChatUIKit', YXConfig.imuikit_version               # 会话（聊天）组件
-  pod 'NEContactUIKit', YXConfig.imuikit_version            # 通讯录组件
-  pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件
-  pod 'NELocalConversationUIKit', YXConfig.imuikit_version  # (本地)会话列表组件
-  pod 'NETeamUIKit', YXConfig.imuikit_version               # 群相关设置组件
+  pod 'NEChatUIKit/NOS_Special', YXConfig.imuikit_version               # 会话（聊天）组件
+  pod 'NEContactUIKit/NOS_Special', YXConfig.imuikit_version            # 通讯录组件
+  pod 'NEConversationUIKit/NOS_Special', YXConfig.imuikit_version       # (云端)会话列表组件
+  pod 'NELocalConversationUIKit/NOS_Special', YXConfig.imuikit_version  # (本地)会话列表组件
+  pod 'NETeamUIKit/NOS_Special', YXConfig.imuikit_version               # 群相关设置组件
 
   # 扩展库 - 地理位置组件
-  pod 'NEMapKit', YXConfig.imuikit_version
+  pod 'NEMapKit/NOS_Special', YXConfig.imuikit_version
 
   # 扩展库 - AI 划词搜索
-  pod 'NEAISearchKit', YXConfig.imuikit_version
+  pod 'NEAISearchKit/NOS_Special', YXConfig.imuikit_version
 
   # 扩展库 - 呼叫组件
   pod 'NERtcSDK/RtcBasic'                   #  RTC 音视频基础组件

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1804B9372F558C390064BC21 /* NEConfigInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1804B9362F558C390064BC21 /* NEConfigInfoViewController.swift */; };
 		180E81D32D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BB2D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift */; };
 		180E81D42D07D9F600151DD8 /* CustomSettingCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B92D07D9F600151DD8 /* CustomSettingCellModel.swift */; };
 		180E81D52D07D9F600151DD8 /* BirthdayDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */; };
@@ -90,6 +91,7 @@
 		01C0FC0F27BE754400C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		01C0FC1027BE754500C32949 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		0FFB4C6ED8BA51EC67B6D25B /* Pods-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app.release.xcconfig"; path = "Target Support Files/Pods-app/Pods-app.release.xcconfig"; sourceTree = "<group>"; };
+		1804B9362F558C390064BC21 /* NEConfigInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEConfigInfoViewController.swift; sourceTree = "<group>"; };
 		180E81AC2D07D9F600151DD8 /* InputPersonInfoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPersonInfoController.swift; sourceTree = "<group>"; };
 		180E81AD2D07D9F600151DD8 /* IntroduceBrandViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceBrandViewController.swift; sourceTree = "<group>"; };
 		180E81AE2D07D9F600151DD8 /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 		180E81B82D07D9F600151DD8 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				1804B9362F558C390064BC21 /* NEConfigInfoViewController.swift */,
 				18A32D662EA5E11400171E3A /* IMPocConfigViewController.swift */,
 				18A32D672EA5E11400171E3A /* IMPushConfigViewController.swift */,
 				18A32D682EA5E11400171E3A /* PocLoginViewController.swift */,
@@ -538,6 +541,7 @@
 				DD141E032A56ABFE0091318F /* AppDelegate.swift in Sources */,
 				18B3EA712ED044A900D13785 /* NEP2PSecurityWarningView.swift in Sources */,
 				181EE58B2B234C510043817F /* CustomConversationController.swift in Sources */,
+				1804B9372F558C390064BC21 /* NEConfigInfoViewController.swift in Sources */,
 				DD141E052A56ABFE0091318F /* AppKey.swift in Sources */,
 				18CF8A3C2D01B312000CF406 /* CustomConfig.swift in Sources */,
 				DD141E012A56ABFE0091318F /* UIStyleManager.swift in Sources */,
@@ -719,7 +723,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
+				INFOPLIST_KEY_CFBundleDisplayName = "云信智能IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";
@@ -768,7 +772,7 @@
 				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "云信IM";
+				INFOPLIST_KEY_CFBundleDisplayName = "云信智能IM";
 				INFOPLIST_KEY_NSCameraUsageDescription = "若不允许，你将无法导入照片上传头像。";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "是否允许获取你的位置用于发送定位信息";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "是否允许获取你的位置用于发送定位信息";

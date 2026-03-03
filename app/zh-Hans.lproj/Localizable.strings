@@ -53,7 +53,7 @@
 "display_message_detail"="通知栏显示消息详情";
 "setting"="设置";
 "real_service"="真正稳定的IM云服务";
-"appName"="云信IM";
+"appName"="云信智能IM";
 "brand_des"="网易云信";
 "im_version"="IM 版本";
 "register_login"="注册/登录";
@@ -82,3 +82,5 @@
 "account_kicked_offline"="您已被踢下线";
 
 "click_to_report"="点击举报";
+
+"open_claw_hello"="开启 OpenClaw 智能体之旅，尽情使唤你的小助理吧";
