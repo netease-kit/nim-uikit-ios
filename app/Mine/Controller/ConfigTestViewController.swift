@@ -125,6 +125,16 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     }
     model.cellModels.append(enableInsertLocalMsgWhenRevoke)
 
+    let enableClouldMessageSearch = SettingCellModel()
+    enableClouldMessageSearch.cellName = "使用云端搜索"
+    enableClouldMessageSearch.type = SettingCellType.SettingSwitchCell.rawValue
+    enableClouldMessageSearch.switchOpen = IMKitConfigCenter.shared.enableCloudMessageSearch
+    enableClouldMessageSearch.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableCloudMessageSearch = isOpen
+      UserDefaults.standard.set(isOpen, forKey: keyEnableCloudMessageSearch)
+    }
+    model.cellModels.append(enableClouldMessageSearch)
+
     let strangerCallModel = SettingCellModel()
     strangerCallModel.cellName = "陌生人能否进行音视频通话"
     strangerCallModel.type = SettingCellType.SettingSwitchCell.rawValue

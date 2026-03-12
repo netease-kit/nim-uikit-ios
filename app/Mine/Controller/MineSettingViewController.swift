@@ -134,7 +134,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
         weakSelf?.logoutButton.isEnabled = true
         if error != nil {
           NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
-          weakSelf?.view.makeToast(error?.localizedDescription)
+          weakSelf?.view.ne_makeToast(error?.localizedDescription)
         } else {
           NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
           NotificationCenter.default.post(

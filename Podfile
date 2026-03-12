@@ -29,8 +29,8 @@ target 'app' do
   pod 'NERtcSDK/RtcBasic'                   #  RTC 音视频基础组件
   pod 'NERtcSDK/Nenn'                       #  RTC 音视频神经网络组件（使用背景虚化功能需要集成）
   pod 'NERtcSDK/Segment'                    #  RTC 音视频背景分割组件（使用背景虚化功能需要集成）
-  pod 'NERtcCallKit/NOS_Special', '3.7.1'
-  pod 'NERtcCallUIKit/NOS_Special', '3.7.1' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
+  pod 'NERtcCallKit/NOS_Special', '4.1.0'
+  pod 'NERtcCallUIKit/NOS_Special', '4.1.0' # (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
   
   # 可选 - 图片选择库
   pod 'ZLPhotoBrowser'

@@ -162,7 +162,7 @@ public class NELoginViewController: UIViewController {
     IMKitClient.instance.login(account, token, option) { error in
         if let err = error {
             NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-            UIApplication.shared.keyWindow?.makeToast(err.localizedDescription)
+            UIApplication.shared.keyWindow?.neMakeToast(err.localizedDescription)
         } else {
             NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
             if let block = weakSelf?.successLogin {

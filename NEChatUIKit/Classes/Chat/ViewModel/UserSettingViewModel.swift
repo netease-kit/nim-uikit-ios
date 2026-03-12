@@ -1,0 +1,298 @@
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+import Foundation
+import NEChatKit
+import NECommonUIKit
+import NECoreIM2Kit
+import NIMSDK
+
+@objc
+public protocol UserSettingViewModelDelegate: NSObjectProtocol {
+  func didNeedRefreshUI()
+  func didError(_ error: Error)
+  func didShowErrorMsg(_ msg: String)
+  func didClickMark()
+  func didClickHistory()
+}
+
+@objcMembers
+open class UserSettingViewModel: NSObject, AIUserPinListener {
+  var chatRepo = ChatRepo.shared
+  var contactRepo = ContactRepo.shared
+  var conversationRepo = ConversationRepo.shared
+  var localConversationRepo = LocalConversationRepo.shared
+  var settingRepo = SettingRepo.shared
+
+  var userInfo: NEUserWithFriend?
+
+  var cellDatas = [UserSettingCellModel]()
+
+  weak var delegate: UserSettingViewModelDelegate?
+
+  public var conversation: V2NIMBaseConversation?
+
+  override public init() {
+    super.init()
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      localConversationRepo.addLocalConversationListener(self)
+    } else {
+      conversationRepo.addConversationListener(self)
+    }
+
+    if IMKitConfigCenter.shared.enableAIUser {
+      NEAIUserPinManager.shared.addPinManagerListener(self)
+    }
+  }
+
+  deinit {
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      localConversationRepo.removeLocalConversationListener(self)
+    } else {
+      conversationRepo.removeConversationListener(self)
+    }
+
+    if IMKitConfigCenter.shared.enableAIUser {
+      NEAIUserPinManager.shared.removePinManagerListener(self)
+    }
+  }
+
+  private let className = "UserSettingViewModel"
+
+  /// 回去单聊会话
+  /// - Parameter userId: 用户id
+  /// - Parameter completion: 完成回调
+  func getConversation(_ userId: String, _ completion: @escaping (NSError?) -> Void) {
+    if let cid = V2NIMConversationIdUtil.p2pConversationId(userId) {
+      weak var weakSelf = self
+      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+        localConversationRepo.getConversation(cid) { conversation, error in
+          if conversation != nil {
+            weakSelf?.conversation = conversation
+          }
+          completion(error)
+        }
+      } else {
+        conversationRepo.getConversation(cid) { conversation, error in
+          if conversation != nil {
+            weakSelf?.conversation = conversation
+          }
+          completion(error)
+        }
+      }
+    }
+  }
+
+  /// 获取用户设置UI显示数据模型
+  /// - Parameter userId: 用户id
+  /// - Parameter completion: 完成回调
+  func getUserSettingModel(_ userId: String, _ completion: @escaping () -> Void) {
+    NEALog.infoLog(ModuleName + " " + className, desc: #function + ", userId: " + userId)
+    contactRepo.getUserWithFriend(accountIds: [userId]) { [weak self] userfriends, error in
+      self?.userInfo = userfriends?.first
+
+      self?.getSectionDatas()
+
+      self?.delegate?.didNeedRefreshUI()
+
+      completion()
+    }
+  }
+
+  /// 拼装UI显示数据模型
+  func getSectionDatas() {
+    cellDatas.removeAll()
+
+    // 标记
+    if IMKitConfigCenter.shared.enablePinMessage {
+      let mark = UserSettingCellModel()
+      mark.cellName = chatLocalizable("operation_pin")
+      mark.type = UserSettingType.SelectType.rawValue
+      mark.cellClick = { [weak self] in
+        self?.delegate?.didClickMark()
+      }
+      cellDatas.append(mark)
+    }
+
+    // 搜索聊天记录
+    let history = UserSettingCellModel()
+    history.cellName = chatLocalizable("historical_record")
+    history.type = UserSettingType.SelectType.rawValue
+    history.cellClick = { [weak self] in
+      self?.delegate?.didClickHistory()
+    }
+    cellDatas.append(history)
+
+    // 开启消息提醒
+    let remind = UserSettingCellModel()
+    remind.cellName = chatLocalizable("message_remind")
+    cellDatas.append(remind)
+    if let userId = userInfo?.user?.accountId {
+      remind.switchOpen = settingRepo.getP2PMessageMuteMode(accountId: userId) == .NIM_P2P_MESSAGE_MUTE_MODE_OFF
+    }
+
+    weak var weakSelf = self
+    remind.swichChange = { isOpen in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+        remind.switchOpen = !isOpen
+        weakSelf?.delegate?.didNeedRefreshUI()
+        return
+      }
+      if let uid = weakSelf?.userInfo?.user?.accountId {
+        let muteMode: V2NIMP2PMessageMuteMode = isOpen ? .NIM_P2P_MESSAGE_MUTE_MODE_OFF : .NIM_P2P_MESSAGE_MUTE_MODE_ON
+        weakSelf?.settingRepo.setP2PMessageMuteMode(accountId: uid, muteMode: muteMode) { error in
+          if let err = error {
+            weakSelf?.delegate?.didNeedRefreshUI()
+            weakSelf?.delegate?.didError(err)
+          } else {
+            remind.switchOpen = isOpen
+          }
+        }
+      }
+    }
+
+    // 聊天置顶
+    let setTop = UserSettingCellModel()
+    setTop.cellName = chatLocalizable("session_set_top")
+    cellDatas.append(setTop)
+
+    if let currentConversation = conversation {
+      setTop.switchOpen = currentConversation.stickTop
+    }
+
+    setTop.swichChange = { isOpen in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+        setTop.switchOpen = !isOpen
+        weakSelf?.delegate?.didNeedRefreshUI()
+        return
+      }
+
+      if let uid = weakSelf?.userInfo?.user?.accountId, let cid = V2NIMConversationIdUtil.p2pConversationId(uid) {
+        if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+          weakSelf?.localConversationRepo.setStickTop(cid, isOpen) { error in
+            print(isOpen ? "add stick : " : "remote stick : ", error as Any)
+            if let err = error {
+              weakSelf?.delegate?.didNeedRefreshUI()
+              weakSelf?.delegate?.didError(err)
+            } else {
+              setTop.switchOpen = !isOpen
+            }
+          }
+        } else {
+          weakSelf?.conversationRepo.setStickTop(cid, isOpen) { error in
+            print(isOpen ? "add stick : " : "remote stick : ", error as Any)
+            if let err = error {
+              weakSelf?.delegate?.didNeedRefreshUI()
+              weakSelf?.delegate?.didError(err)
+            } else {
+              setTop.switchOpen = !isOpen
+            }
+          }
+        }
+      }
+    }
+
+    if let user = userInfo?.user,
+       let account = user.accountId,
+       let serverExtensions = user.serverExtension,
+       let jsonObject = NECommonUtil.getDictionaryFromJSONString(serverExtensions) {
+      if jsonObject[aiUserPinKey] != nil {
+        // PIN置顶
+        let changePin = UserSettingCellModel()
+        changePin.cellName = chatLocalizable("ai_user_pin_top")
+        cellDatas.append(changePin)
+
+        if NEAIUserPinManager.shared.checkoutUnPinAIUser(user) == true {
+          changePin.switchOpen = true
+        } else {
+          changePin.switchOpen = false
+        }
+
+        changePin.swichChange = { isOpen in
+          if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+            weakSelf?.delegate?.didShowErrorMsg(commonLocalizable("network_error"))
+            changePin.switchOpen = !isOpen
+            weakSelf?.delegate?.didNeedRefreshUI()
+            return
+          }
+
+          if isOpen {
+            NEAIUserPinManager.shared.pinAIUser(account) { error, finish in
+              NEALog.infoLog(ModuleName, desc: #function + " pinAIUser error: \(String(describing: error)), finish: \(finish)")
+            }
+          } else {
+            NEAIUserPinManager.shared.unpinAIUser(account) { error, finish in
+              NEALog.infoLog(ModuleName, desc: #function + " unpinAIUser error: \(String(describing: error)), finish: \(finish)")
+            }
+          }
+        }
+      }
+    }
+
+    setAudoType()
+  }
+
+  // 设置圆角
+  open func setAudoType() {
+    for model in cellDatas {
+      if model == cellDatas.first {
+        model.cornerType = .topLeft.union(.topRight)
+        if model == cellDatas.last {
+          model.cornerType = .topLeft.union(.topRight).union(.bottomLeft).union(.bottomRight)
+        }
+      } else if model == cellDatas.last {
+        model.cornerType = .bottomLeft.union(.bottomRight)
+      } else {
+        model.cornerType = .none
+      }
+    }
+  }
+
+  open func setFunType() {
+    for model in cellDatas {
+      model.cornerType = .none
+    }
+  }
+
+  open func userInfoDidChange() {
+    getSectionDatas()
+    delegate?.didNeedRefreshUI()
+  }
+}
+
+// MARK: - NEConversationListener
+
+extension UserSettingViewModel: NEConversationListener {
+  /// 会话变更回调
+  /// - Parameter conversations: 会话列表
+  open func onConversationChanged(_ conversations: [V2NIMConversation]) {
+    for changeConversation in conversations {
+      if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
+        conversation = changeConversation
+        getSectionDatas()
+        delegate?.didNeedRefreshUI()
+        continue
+      }
+    }
+  }
+}
+
+// MARK: - NELocalConversationListener
+
+extension UserSettingViewModel: NELocalConversationListener {
+  /// 会话变更回调
+  /// - Parameter conversations: 会话列表
+  public func onLocalConversationChanged(_ conversations: [V2NIMLocalConversation]) {
+    for changeConversation in conversations {
+      if let currentConversation = conversation, currentConversation.conversationId == changeConversation.conversationId {
+        conversation = changeConversation
+        getSectionDatas()
+        delegate?.didNeedRefreshUI()
+        continue
+      }
+    }
+  }
+}

@@ -1,0 +1,365 @@
+
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+//MAKR：message
+"press_speak"="Hold to Talk";
+"record_faild"="Whoops! Please retry.";
+"send_after_let_go"="Release to send";
+"record_too_short"="Message too short";
+"no_microphone_permission"="no micro permission";
+"choose"="select";
+"select_from_icloud"="iCloud";
+"editing"="Typing";
+"downloading"="Downloading...";
+"read"="Read by";
+"unread"="Unread by";
+
+
+//MARK: tips
+//MARK: team
+"invite"="Invite";
+"enter"="join";
+"unknown_system_message"="Unknown message";
+"You"="you";
+"dissolve"="dissolved";
+"kick"="将 ";
+"out"="remove";
+"has_updated" = "update ";
+"has_open" = "open ";
+"has_closed" = "closed ";
+"to" = "to ";
+"only_team_owner" = "Owner & Admin";
+"everyone" = "Everyone";
+
+"team_name" = "Group Name";
+"team_intro" = "Description";
+"team_anouncement" = "Notice";
+"team_avatar" = "Group Avatar";
+"team_join_mode" = "Require verification to join";
+"team_permission" = "Team Permisson";
+"team_be_invited_mode" = "Invite Mode";
+"team_be_invited_permission" = "Invite Permission";
+"team_agree_mode" = "Invitation acceptance requirement";
+"team_update_info_permission" = "Update Info Permission";
+"team_update_client_custom"="Update Permission";
+"team_at_permission"="@All Permission update to ";
+"team_top_permission"="Top Message Permission update to ";
+
+"team_custom_info" = "Custom Info";
+"not_mute" = "unmute";
+"mute" = "Mute";
+"team_has_been_removed" = "This group is disbanded";
+"team_has_been_quit" = "You have been removed";
+"team_has_quit" = "Group chat has exited";
+"join"="joined";
+"pass"="passed";
+"leave"="quit";
+"transfer"="Transferred the group leader identity to";
+"added_manager"="add to be Group administrator";
+"removed_manager"="Group administrator identity revoked";
+"team_mute"="Mute";
+"team_all_mute"="Mute everyone";
+"team_all_no_mute"="Unmute all";
+
+"pin_text"="Pinned by %@";
+
+"top_message"="Top Message";
+"untop_message"="Untop Message";
+
+"chat_setting"="Settings";
+"session_set_top"="Sticky on Top";
+"message_remind"="Notification";
+
+"open_soon"="Not open";
+"no_permission_tip"="No Permission";
+
+"team_apply"="team apply has been approved";
+"team_invitation"="team invitation has been approved";
+
+//MARK: operation
+"operation_earpiece"="Earpiece";
+"operation_speaker"="Speaker";
+"operation_copy"="Copy";
+"operation_replay"="Reply";
+"operation_forward"="Forward";
+"operation_pin"="Pin";
+"operation_cancel_pin"="Unpin";
+"operation_delete_collection"="Delete Favorite";
+"operation_select"="multi-Select";
+"operation_collection"="Favorite";
+"operation_top"="Top";
+"operation_untop"="Untop";
+"operation_delete"="Delete";
+"operation_recall"="Recall";
+"operation_to_text"="Convert to Text";
+"operation_to_text_failed"="Convert to Text Failed";
+"operation_date"="Date";
+"withdrew_message" = " withdrew this message";
+"message_reedit" = "Edit";
+"message_revoke_confirm" = "Whether to recall this message";
+"message_delete_confirm"="Whether to delete this message";
+"collection_delete_confirm"="Remove from favorite?";
+"delete_collection_success"="Deleted";
+
+
+//MARK: toast
+"collection_success"="Bookmarked";
+"no_permession"="No Permission";
+"msg_image"="[Photo]";
+"msg_audio"="[Voice]";
+"msg_video"="[Video]";
+"msg_file"="[File]";
+"msg_location"="[Location]";
+"msg_rtc_audio"="[Voice Call]";
+"msg_rtc_video"="[Video Call]";
+"msg_rtc_call"="[Call]";
+"msg_custom"="[Custom Message]";
+"msg_unknown"="[Unknown Message]";
+"message_read"="Read Status";
+"message_all_unread"="Unread by all members";
+"user_select"="Select Notification";
+"user_select_all"="All";
+
+"contact_user"="Forward to friend";
+"team"="Forward to group";
+"send_to"="Send to";
+"send"="Send";
+"session_record"="session record";
+
+"collection_message"=" Favorite Message";
+
+"chat_takePicture"="Camera";
+"chat_photo"="Album";
+"chat_rtc"="Call";
+"chat_location"="Location";
+"chat_file"="File";
+"gaode_map"="Gaode Map";
+"tencent_map"="Tencent Map";
+"search_place"="Search Location";
+"distance_inner"="inside";
+"search_result_empty"="Not Found";
+"no_map_plugin"="Map module not integrated";
+"location_not_auth"="The geographic location is not authorized. Please open it in the settings";
+"fileSize_over_limit"="File size exceeded %@MB.";
+
+"message_recalled"="Message recalled";
+
+"video_call"="Video Call";
+"audio_call"="Voice Call";
+
+"call_complete"="Call";
+"call_canceled"="Canceled";
+"call_rejected"="Declined";
+"call_timeout"="Time Out";
+"call_busy"="Line busy";
+
+"editable_time_expired"="Time Out";
+"ravokable_time_expired"="Recall time expired";
+"ravoked_failed"="Message not recalled";
+"message_not_found"="The message was removed.";
+
+"unkonw_pin_message"="unkonw message type";
+"pin_jump_detail"="jump to details";
+"cancel_pin_success"="Unpin";
+"no_pin_message"="Pin Message Empty";
+"no_collection_message"="No Favorite Message";
+
+"you_were_mentioned"="[You were mentioned]";
+// MARK: error toast
+"unpin_failed"="Unpin failed";
+"pin_limit_exceeded"="Number of pin reaches the limit.";
+
+"fun_hold_to_talk"="Hold to talk";
+
+"release_to_send"="release to send";
+"release_to_cancel"="release to cancel";
+
+"stop_record"="Recording will stop after %d";
+
+
+// MARK: Fun UI
+"fun_chat_input_placeholder"="Enter what you want to say...";
+
+"no_location"="No location information";
+
+// 多选
+"select_multi"="Combin forward";
+"select_per_item"="One-by-one forward";
+"chat_history"="Chat History";
+"chat_history_by"="`s messages";
+"leave_message"="Leave a message";
+"exist_invalid"="Some messages can\'t be forwarded. Remove them before retry?";
+"forward_failed"="Eror, forwarding failed";
+"multiForward_open_failed"="Information not retrieved.";
+"file_check_failed"="File verification failed";
+"per_item_forward_limit"="Forward one by one to limit %d messages";
+"selete_messages_limit"="Delete limits %d messages";
+"multiForward_forward_limit"="Combin forwarding limits %d messages";
+"exception_description"="Exception details";
+
+"multiple_line_placleholder"="Enter title";
+"null_message_not_support"="Empty messages are not allowed to be sent";
+
+"black_list_tip"="You are blocked. Message not sent.";
+"disable_stranger_call"="Not a contact, call failed.";
+
+"chat_collection_p2p_tip"="From Chat with %@";
+
+"chat_collection_team_tip"="From %@ ";
+
+"collection_limit"="The number of favorites has reached the limit value";
+"language_title"="Translate to";
+
+"translate_use"="Use";
+"translate_sure"="AI Translate";
+"ai_translating"="AI Translating...";
+"translate_default"="Translate to";
+"format_not_supported"="Invalid Type";
+"chat_translate"="Translate";
+"ai_user_pin_top"="PIN";
+"request_exception" = "AI error";
+"ai_request_ing" = "Thinking…";
+"server_busy" = "Sorry, the server is busy, please try again later.";
+
+"ai_chat_title" = "Reply Inspiration";
+"ai_chat_for_failure" = "Reply Inspiration Acquisition Failed";
+"ai_chat_click_retry" = "Click to Retry";
+
+"p2p_chat_online" = "(Online)";
+"p2p_chat_offline" = "(Offline)";
+
+"line_break" = "Return";
+
+"switch_ear" = "Switched to ear speaker，Move phone to ear to hear audio";
+"switch_speaker" = "Turn on speaker";
+
+/// PhotoBrowser
+"previewCamera" = "Camera";
+"previewCameraRecord" = "Record";
+"previewAlbum" = "Album";
+"cancel" = "Cancel";
+
+"originalPhoto" = "Full Image";
+"originalTotalSize" = "Total";
+"done" = "Done";
+"ok" = "OK";
+"editFinish" = "Done";
+"cameraDone" = "Done";
+"inputDone" = "Done";
+
+"back" = "Back";
+"edit" = "Edit";
+"revert" = "Undo";
+"brightness" = "Brightness";
+"contrast" = "Contrast";
+"saturation" = "Saturation";
+
+"photo" = "Photos";
+"preview" = "Preview";
+
+"noPhotoTips" = "No Photos";
+
+"hudLoading" = "Loading";
+"hudProcessing" = "Processing";
+
+"exceededMaxSelectCount" = "Max count for selection: %ld";
+"longerThanMaxVideoDuration" = "Can't select videos longer than %lds";
+"shorterThanMinVideoDuration" = "Can't select videos shorter than %lds";
+//"largerThanMaxVideoDataSize" = "Can't select videos larger than %@MB";
+"smallerThanMinVideoDataSize" = "Can't select videos smaller than %@MB";
+"exceededMaxVideoSelectCount" = "Max count for video selection: %ld";
+"lessThanMinVideoSelectCount" = "Min count for video selection: %ld";
+
+"noCameraAuthorityAlertMessage" = "Please allow %@ to access your device's camera in \"Settings\" > \"Privacy\" > \"Camera\"";
+"noPhotoLibraryAuthorityAlertMessage" = "Please allow %@ to access your album in \"Settings\" > \"Privacy\" > \"Photos\"";
+"noMicrophoneAuthorityAlertMessage" = "Unable to record audio. Go to \"Settings\" > \"%@\" and enable microphone access";
+"unableToAccessAllPhotos" = "%@ can only access selected photos. Allow permission for %@ to access \"All Photos\"";
+"noLibraryAuthTitleInThumbList" = "Unable to access photos in album";
+"noLibraryAuthDescInThumbList" = "%@ cannot access photos. Allow permission for %@ to access \"All Photos\"";
+"gotoSystemSettingInThumbList" = "Go to system settings";
+
+"cameraUnavailable" = "Camera is unavailable";
+"keepRecording" = "Keep Recording";
+"gotoSettings" = "Go to Settings";
+
+"iCloudVideoLoadFaild" = "Unable to sync from iCloud";
+"imageLoadFailed" = "loading failed";
+
+"save" = "Save";
+"saveImageError" = "Failed to save the image";
+"saveVideoError" = "Failed to save the video";
+"timeout" = "Request timed out";
+
+"customCameraTips" = "Tap to take photo and hold to record video";
+"customCameraTakePhotoTips" = "Tap to take photo";
+"customCameraRecordVideoTips" = "Hold to record video";
+"customCameraTapToRecordVideoTips" = "Tap to record video";
+"minRecordTimeTips" = "Record at least %lds";
+
+"cameraRoll" = "Recents";
+"panoramas" = "Panoramas";
+"videos" = "Videos";
+"favorites" = "Favorites";
+"timelapses" = "Time-Lapse";
+"recentlyAdded" = "Recently Added";
+"bursts" = "Bursts";
+"slomoVideos" = "Slo-mo";
+"selfPortraits" = "Selfies";
+"screenshots" = "Screenshots";
+"depthEffect" = "Portrait";
+"livePhotos" = "Live Photos";
+"animated" = "Animated";
+"myPhotoStream" = "My Photo Stream";
+
+"noTitleAlbumListPlaceholder" = "All Photos";
+"textStickerRemoveTips" = "Drag here to remove";
+
+"filter_normal" = "Normal";
+"filter_clarendon" = "Clarendon";  
+"filter_nashville" = "Nashville"; 
+"filter_apply1977" = "1977";
+"filter_toaster" = "Toaster";  
+"filter_chrome" = "Chrome";
+"filter_fade" = "Fade";
+"filter_instant" = "Instant";  
+"filter_process" = "Process"; 
+"filter_transfer" = "Transfer";  
+"filter_tone" = "Tone";
+"filter_linear" = "Linear";  
+"filter_sepia" = "Sepia";
+"filter_mono" = "Mono";
+"filter_noir" = "Noir"; 
+"filter_tonal" = "Tonal";
+
+"failed_message_reson" = "The content may involve %@. Please adjust and send.";
+"failed_message_reson_ornography" = "Pornography";
+"failed_message_reson_advertising" = "Advertising";
+"failed_message_reson_advertising_law" = "Advertising Law";
+"failed_message_reson_violence_and_terrorism" = "Violence and terrorism";
+"failed_message_reson_prohibited" = "Prohibited";
+"failed_message_reson_political_related" = "Political-related";
+"failed_message_reson_abuse" = "Abuse";
+"failed_message_reson_waterlogging" = "waterlogging";
+"failed_message_reson_others" = "Others";
+"failed_message_reson_value_related" = "value-related";
+
+"historical_record"="Search chat history";
+"search"="Chat History";
+"no_search_results"="No chat history";
+"no_search_result_image"="No image";
+"no_search_result_video"="No video";
+"no_search_result_file"="No file";
+"group_memmber"="Group Member";
+"quick_search_tips"="Quick search chat messages";
+"search_message_has_no_more"="No more content";
+"search_message_by_member"="Search by team members";
+"search_message_by_date"="Search by date";
+"choose_date_year_month"="Select Chat date";
+"search_result_find_in_chat"="find in chat";
+"search_load_more_messages"="Load more messages ";
+"search_load_immediately_upon_release"="Load immediately upon release";
+"search_loading_more_messages"="Loading more messages...";
+
+"new_message_count"=" %d new message";

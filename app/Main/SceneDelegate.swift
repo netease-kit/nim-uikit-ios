@@ -88,7 +88,7 @@ class SceneDelegate: UIResponder {
     NEKeyboardManager.shared.shouldResignOnTouchOutside = true
 
     loadService()
-    
+
     // 群聊申请邀请功能
     IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth = true
     
@@ -215,14 +215,19 @@ class SceneDelegate: UIResponder {
   /// 注册娱乐版自定义内容
   func registerFunCustom() {
     Router.shared.register(PushP2pChatVCRouter) { param in
-      print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
       let anchor = param["anchor"] as? V2NIMMessage
+      let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
       let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
+
+      // 无论如何都先设置 pendingNewMessages（如果有的话）
+      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
+        p2pChatVC.pendingNewMessages = newMsgs
+      }
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
@@ -232,14 +237,15 @@ class SceneDelegate: UIResponder {
         }
       }
 
-      let count = nav?.viewControllers.count ?? 0
+      var count = nav?.viewControllers.count ?? 0
       nav?.pushViewController(p2pChatVC, animated: animated)
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
         if let remove = param["removeUserVC"] as? Bool, remove {
-          if count > 1,
-             nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
+          while count > 1,
+                nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
             nav?.viewControllers.remove(at: count - 1)
+            count -= 1
           }
         }
       }))
@@ -249,14 +255,19 @@ class SceneDelegate: UIResponder {
   /// 注册通用版自定义内容
   func registerNormalCustom() {
     Router.shared.register(PushP2pChatVCRouter) { param in
-      print("param:\(param)")
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
         return
       }
       let anchor = param["anchor"] as? V2NIMMessage
+      let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
       let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
+
+      // 无论如何都先设置 pendingNewMessages（如果有的话）
+      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
+        p2pChatVC.pendingNewMessages = newMsgs
+      }
 
       for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
         if vc.isKind(of: ChatViewController.self) {
@@ -266,14 +277,15 @@ class SceneDelegate: UIResponder {
         }
       }
 
-      let count = nav?.viewControllers.count ?? 0
+      var count = nav?.viewControllers.count ?? 0
       nav?.pushViewController(p2pChatVC, animated: animated)
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
         if let remove = param["removeUserVC"] as? Bool, remove {
-          if count > 1,
-             nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
+          while count > 1,
+                nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
             nav?.viewControllers.remove(at: count - 1)
+            count -= 1
           }
         }
       }))
@@ -298,11 +310,11 @@ class SceneDelegate: UIResponder {
         NEAIUserManager.shared.setProvider(provider: self)
         IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
           if let err = error {
-            NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-            SceneDelegate.window?.makeToast(err.localizedDescription)
+            NEALog.infoLog(SceneDelegate.className(), desc: "login IM error : \(err.localizedDescription)")
+            SceneDelegate.window?.neMakeToast(err.localizedDescription)
             self?.loginWithUI()
           } else {
-            NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+            NEALog.infoLog(SceneDelegate.className(), desc: "login IM Success")
             self?.initConfig()
             self?.initializePage()
           }
@@ -325,11 +337,11 @@ class SceneDelegate: UIResponder {
       NEAIUserManager.shared.setProvider(provider: self)
       IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
         if let err = error {
-          NEALog.infoLog(self?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
-          SceneDelegate.window?.makeToast(err.localizedDescription)
+          NEALog.infoLog(SceneDelegate.className(), desc: "login IM error : \(err.localizedDescription)")
+          SceneDelegate.window?.neMakeToast(err.localizedDescription)
           self?.loginWithUI()
         } else {
-          NEALog.infoLog(self?.className() ?? "", desc: "login IM Success")
+          NEALog.infoLog(SceneDelegate.className(), desc: "login IM Success")
           self?.initConfig()
           self?.initializePage()
         }
@@ -347,7 +359,7 @@ class SceneDelegate: UIResponder {
     center.requestAuthorization(options: [.badge, .sound, .alert]) { grant, error in
       if grant == false {
         DispatchQueue.main.async {
-          Self.window?.makeToast(localizable("open_push"))
+          Self.window?.neMakeToast(localizable("open_push"))
         }
       }
     }
@@ -433,14 +445,14 @@ extension SceneDelegate: AIUserAgentProvider {
 extension SceneDelegate: NEIMKitClientListener {
   func onLoginFailed(_ error: V2NIMError) {
     if error.code == userBannedCode {
-      SceneDelegate.window?.makeToast(localizable("account_forbidden"))
+      SceneDelegate.window?.neMakeToast(localizable("account_forbidden"))
       loginWithUI()
     }
   }
 
   func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
     if detail.reason == .KICKED_OFFLINE_REASON_SERVER {
-      SceneDelegate.window?.makeToast(localizable("account_kicked_offline"))
+      SceneDelegate.window?.neMakeToast(localizable("account_kicked_offline"))
       loginWithUI()
     }
   }
