@@ -172,7 +172,7 @@ public class PersonInfoViewController: NEBaseViewController,
       return
     }
 
-    view.makeToastActivity(.center)
+    view.neMakeToastActivity(.center)
     if let imageData = image.jpegData(compressionQuality: 0.6) as NSData?,
        var filePath = NEPathUtils.getDirectoryForDocuments(dir: "\(imkitDir)image/") {
       filePath += "\(IMKitClient.instance.account())_avatar.jpg"
@@ -192,7 +192,7 @@ public class PersonInfoViewController: NEBaseViewController,
               desc: "CALLBACK upload image failed,error = \(error!)"
             )
           }
-          self?.view.hideToastActivity()
+          self?.view.neHideToastActivity()
         }
       }
     }

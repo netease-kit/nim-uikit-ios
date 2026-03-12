@@ -65,8 +65,8 @@ open class NEP2PSecurityWarningView: UIView {
 
     view.addSubview(warningTextView)
     NSLayoutConstraint.activate([
-      warningTextView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      warningTextView.heightAnchor.constraint(equalToConstant: 40),
+      warningTextView.topAnchor.constraint(equalTo: view.topAnchor),
+      warningTextView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       warningTextView.leftAnchor.constraint(equalTo: errorImageView.rightAnchor, constant: 0),
       warningTextView.rightAnchor.constraint(equalTo: removeButton.leftAnchor, constant: 4),
     ])

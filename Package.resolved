@@ -1,0 +1,79 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CocoaLumberjack",
+        "repositoryURL": "https://github.com/CocoaLumberjack/CocoaLumberjack.git",
+        "state": {
+          "branch": null,
+          "revision": "a9ed4b6f9bdedce7d77046f43adfb8ce1fd54114",
+          "version": "3.9.0"
+        }
+      },
+      {
+        "package": "libwebp",
+        "repositoryURL": "https://github.com/SDWebImage/libwebp-Xcode.git",
+        "state": {
+          "branch": null,
+          "revision": "0d60654eeefd5d7d2bef3835804892c40225e8b2",
+          "version": "1.5.0"
+        }
+      },
+      {
+        "package": "MJRefresh",
+        "repositoryURL": "https://github.com/CoderMJLee/MJRefresh.git",
+        "state": {
+          "branch": null,
+          "revision": "535d39c86e592d73f8b8e75f9bf1eda62ca4a4ce",
+          "version": "3.7.9"
+        }
+      },
+      {
+        "package": "SDWebImage",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImage.git",
+        "state": {
+          "branch": null,
+          "revision": "2de3a496eaf6df9a1312862adcfd54acd73c39c0",
+          "version": "5.21.7"
+        }
+      },
+      {
+        "package": "SDWebImageSVGKitPlugin",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImageSVGKitPlugin.git",
+        "state": {
+          "branch": null,
+          "revision": "fb16805b772d9a1dfa31a7665f64a557f3b52781",
+          "version": "1.4.0"
+        }
+      },
+      {
+        "package": "SDWebImageWebPCoder",
+        "repositoryURL": "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
+        "state": {
+          "branch": null,
+          "revision": "12d83edbcc795fb7b5c0c3cb74d739108d3357d2",
+          "version": "0.15.0"
+        }
+      },
+      {
+        "package": "SVGKit",
+        "repositoryURL": "https://github.com/SVGKit/SVGKit.git",
+        "state": {
+          "branch": null,
+          "revision": "58152b9f7c85eab239160b36ffdfd364aa43d666",
+          "version": "3.0.0"
+        }
+      },
+      {
+        "package": "swift-log",
+        "repositoryURL": "https://github.com/apple/swift-log",
+        "state": {
+          "branch": null,
+          "revision": "bbd81b6725ae874c69e9b8c8804d462356b55523",
+          "version": "1.10.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

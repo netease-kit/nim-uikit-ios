@@ -19,7 +19,7 @@ class CustomNormalChatViewController: P2PChatViewController, NERecordProvider {
     let message = V2NIMMessageCreator.createCallMessage("", type: Int(config.callType.rawValue), channelId: "", status: Int(config.callState.rawValue), durations: [])
     if let cid = V2NIMConversationIdUtil.p2pConversationId(config.accId) {
       viewModel.chatRepo.sendMessage(message: message, conversationId: cid) { [weak self] result, error, ret in
-        NEALog.infoLog(self?.className() ?? "", desc: "CustomNormalChatViewController result: \(error?.localizedDescription ?? "")")
+        NEALog.infoLog(CustomNormalChatViewController.className(), desc: "CustomNormalChatViewController result: \(error?.localizedDescription ?? "")")
       }
     }
   }

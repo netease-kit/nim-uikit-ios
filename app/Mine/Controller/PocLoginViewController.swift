@@ -97,7 +97,7 @@ public class PocLoginViewController: NEBaseViewController {
     guard let username = usernameTextField.text, let password = passwordTextField.text else {
       // 输入为空提示
       view.endEditing(true)
-      view.makeToast("请输入用户名和密码")
+      view.neMakeToast("请输入用户名和密码")
       return
     }
 
@@ -111,7 +111,7 @@ public class PocLoginViewController: NEBaseViewController {
       if let error = error {
         // 收回键盘
         self?.view.endEditing(true)
-        self?.view.makeToast("登录失败: \(error.localizedDescription)")
+        self?.view.neMakeToast("登录失败: \(error.localizedDescription)")
       } else {
         let config = IMPocConfigManager.instance.getConfig()
         config.accountId = username
@@ -130,7 +130,7 @@ public class PocLoginViewController: NEBaseViewController {
     alert.addAction(UIAlertAction(title: commonLocalizable("cancel"), style: .cancel, handler: nil))
     alert.addAction(UIAlertAction(title: commonLocalizable("sure"), style: .default, handler: { [weak self] _ in
       IMPocConfigManager.instance.clearConfig()
-      self?.view.makeToast("清除成功，请重新启动应用")
+      self?.view.neMakeToast("清除成功，请重新启动应用")
       self?.view.endEditing(true)
     }))
     present(alert, animated: true, completion: nil)

@@ -1,0 +1,18 @@
+// Copyright (c) 2022 NetEase, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
+// found in the LICENSE file.
+
+
+// MARK: AI 划词搜
+"operation_ai_word_search"="AI划词搜";
+
+"ok"="确认";
+"complete"="完成";
+"cancel"="取消";
+
+"ai_word_search" = "AI划词搜";
+"ai_word_searching" = "AI划词搜索中...";
+"input_more_button" = "补充信息";
+"input_more_placeholder" = "补充输入更多信息";
+"not_supported" = "暂不支持";
+"request_exception" = "模型请求异常";

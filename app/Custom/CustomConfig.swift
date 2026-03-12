@@ -35,7 +35,7 @@ public class CustomConfig {
     ChatUIConfig.shared.messageProperties.receiveMessageTextSize = 12
     ChatUIConfig.shared.messageProperties.selfMessageBgImage = UIImage(named: "copy_right")
     ChatUIConfig.shared.messageProperties.receiveMessageBgImage = UIImage(named: "copy_right")
-    ChatUIConfig.shared.messageProperties.showP2pMessageStatus = false
+    ChatUIConfig.shared.messageProperties.showP2PMessageStatus = false
     ChatUIConfig.shared.messageProperties.showTeamMessageStatus = false
     //    ChatUIConfig.shared.messageProperties.showTitleBar = false
     //    ChatUIConfig.shared.messageProperties.showTitleBarRightIcon = false
