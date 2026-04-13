@@ -21,6 +21,10 @@ open class NEMarkdownParser {
     public static let italic = NEEnabledElements(rawValue: 1 << 6)
     public static let code = NEEnabledElements(rawValue: 1 << 7)
     public static let strikethrough = NEEnabledElements(rawValue: 1 << 8)
+    public static let table = NEEnabledElements(rawValue: 1 << 9)
+    public static let orderedList = NEEnabledElements(rawValue: 1 << 10)
+    public static let horizontalRule = NEEnabledElements(rawValue: 1 << 11)
+    public static let image = NEEnabledElements(rawValue: 1 << 12)
 
     public static let disabledAutomaticLink: NEEnabledElements = [
       .header,
@@ -31,6 +35,10 @@ open class NEMarkdownParser {
       .italic,
       .code,
       .strikethrough,
+      .table,
+      .orderedList,
+      .horizontalRule,
+      .image,
     ]
 
     public static let all: NEEnabledElements = [
@@ -58,6 +66,14 @@ open class NEMarkdownParser {
   public let italic: NEMarkdownItalic
   public let code: NEMarkdownCode
   public let strikethrough: NEMarkdownStrikethrough
+  /// 表格解析 Element（GFM 表格语法）
+  public let table: NEMarkdownTable
+  /// 有序列表 Element（`1. 2. 3.`）
+  public let orderedList: NEMarkdownOrderedList
+  /// 分隔线 Element（`---` / `***` / `___`）
+  public let horizontalRule: NEMarkdownHorizontalRule
+  /// 图片 Element（`![alt](url)`）
+  public let markdownImage: NEMarkdownImage
 
   // MARK: Escaping Elements
 
@@ -107,6 +123,10 @@ open class NEMarkdownParser {
     italic = NEMarkdownItalic(font: font)
     code = NEMarkdownCode(font: font)
     strikethrough = NEMarkdownStrikethrough(font: font)
+    table = NEMarkdownTable()
+    orderedList = NEMarkdownOrderedList(font: font)
+    horizontalRule = NEMarkdownHorizontalRule()
+    markdownImage = NEMarkdownImage()
 
     escapingElements = [codeEscaping, escaping]
     unescapingElements = [code, unescaping]
@@ -139,13 +159,28 @@ open class NEMarkdownParser {
   }
 
   open func parse(_ markdown: NSAttributedString) -> NSAttributedString {
-    let attributedString = NSMutableAttributedString(attributedString: markdown)
+    // ── 第一步：如果表格功能开启，先对纯文本做表格预处理 ──
+    // 在 escapingElements 运行前处理，保证 | 字符不被转义。
+    // 表格块被替换为 NSTextAttachment 占位符；剩余文本继续走正常 parse 流程。
+    let preprocessed: NSAttributedString
+    if enabledElements.contains(.table) {
+      preprocessed = table.preprocess(markdown.string,
+                                      font: font,
+                                      color: color)
+    } else {
+      preprocessed = markdown
+    }
+
+    let attributedString = NSMutableAttributedString(attributedString: preprocessed)
     attributedString.addAttribute(.font, value: font,
                                   range: NSRange(location: 0, length: attributedString.length))
     attributedString.addAttribute(.foregroundColor, value: color,
                                   range: NSRange(location: 0, length: attributedString.length))
+
+    // ── 第二步：其余 element 正常处理（表格已替换，不会被误处理）──
+    // table element 本身不再加入 elements 列表（已在上面预处理）
     var elements: [NEMarkdownElement] = escapingElements
-    elements.append(contentsOf: defaultElements)
+    elements.append(contentsOf: defaultElements.filter { $0 !== table })
     elements.append(contentsOf: customElements)
     elements.append(contentsOf: unescapingElements)
     for element in elements {
@@ -156,9 +191,16 @@ open class NEMarkdownParser {
 
   private func updateDefaultElements() {
     let pairs: [(NEEnabledElements, NEMarkdownElement)] = [
+      // 图片必须在链接之前处理，防止 ![alt](url) 被误识别为链接
+      (.image, markdownImage),
+      // 分隔线必须在无序列表之前处理，防止 `---` 被误识别为列表标记
+      (.horizontalRule, horizontalRule),
+      // 表格必须在 bold/italic/code 之前处理，防止表格内容被提前处理
+      (.table, table),
       (.automaticLink, automaticLink),
       (.header, header),
       (.list, list),
+      (.orderedList, orderedList),
       (.quote, quote),
       (.link, link),
       (.bold, bold),

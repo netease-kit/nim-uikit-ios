@@ -2,11 +2,11 @@
 
 module YXConfig
   def self.commonuikit_version
-    "9.8.3"
+    "9.8.4"
   end
 
   def self.imuikit_version
-    "10.9.10"
+    "10.9.20"
   end
 
   def self.deployment_target

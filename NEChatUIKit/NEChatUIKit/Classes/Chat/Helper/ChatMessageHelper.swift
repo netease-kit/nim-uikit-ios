@@ -165,7 +165,12 @@ public class ChatMessageHelper: NSObject {
     case .MESSAGE_TYPE_VIDEO:
       model = MessageVideoModel(message: message)
     case .MESSAGE_TYPE_TEXT:
+      // 数字人回复的消息使用 Markdown 解析
       if message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+        return MessageAIStreamModel(message: message)
+      }
+      // 机器人回复的消息也使用 Markdown 解析（与数字人一致）
+      if let senderId = message.senderId, NEAIRobotManager.shared.isRobot(senderId) {
         return MessageAIStreamModel(message: message)
       }
       model = MessageTextModel(message: message)
@@ -221,7 +226,13 @@ public class ChatMessageHelper: NSObject {
       model = MessageVideoModel(message: message)
       completion(model)
     case .MESSAGE_TYPE_TEXT:
+      // 数字人回复的消息使用 Markdown 解析
       if message.aiConfig?.aiStatus == .MESSAGE_AI_STATUS_RESPONSE {
+        completion(MessageAIStreamModel(message: message))
+        return
+      }
+      // 机器人回复的消息也使用 Markdown 解析（与数字人一致）
+      if let senderId = message.senderId, NEAIRobotManager.shared.isRobot(senderId) {
         completion(MessageAIStreamModel(message: message))
         return
       }

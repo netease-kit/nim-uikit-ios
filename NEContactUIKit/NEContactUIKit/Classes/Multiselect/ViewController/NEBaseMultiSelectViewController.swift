@@ -28,7 +28,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   var recentContentViewHeightAnchor: NSLayoutConstraint? // 最近会话 高度约束
   public var selectedLineLeftAnchor: NSLayoutConstraint? // 已选 tab 下划线左侧约束
 
-  public var themeColor: UIColor = .ne_normalTheme // 主题颜色
+  public var themeColor: UIColor = .normalContactThemeColor // 主题颜色
   public var titleText = localizable("select") // 标题文案
   public var sureButtonText = commonLocalizable("sure") // 确定按钮文案
 
@@ -418,7 +418,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.sureButton"
     button.setTitle(sureButtonText, for: .normal)
-    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.setTitleColor(UIColor.normalContactThemeColor, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
     button.layer.cornerRadius = 4
     button.addTarget(self, action: #selector(sureButtonAction), for: .touchUpInside)

@@ -1,4 +1,3 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -15,6 +14,42 @@
 "blacklist"="黑名单";
 "my_teams"="我的群聊";
 "my_ai_user"="我的数字人";
+"my_ai_robot"="我的机器人";
+"no_ai_robot"="暂无机器人，点击右上角创建";
+"create_ai_robot"="创建机器人";
+"edit_ai_robot"="编辑机器人";
+"ai_robot_edit"="编辑";
+"ai_robot_view_config"="查看配置串";
+"ai_robot_config_title"="配置串";
+"ai_robot_refresh_token"="刷新Token";
+"ai_robot_chat"="聊天";
+"ai_robot_delete"="删除机器人";
+"ai_robot_delete_confirm"="确认删除该机器人？";
+"ai_robot_delete_confirm_title"="确认删除机器人？";
+"ai_robot_delete_confirm_desc"="删除后，正在使用的机器人将断开连接，需要重新配置";
+"ai_robot_delete_success"="删除成功";
+"delete"="删除";
+"ai_robot_refresh_token_title"="确认刷新Token？";
+"ai_robot_refresh_token_desc"="刷新后，旧Token将立即失效，正在使用的机器人需要重新配置";
+"ai_robot_token_refresh_success"="Token刷新成功";
+"ai_robot_token_refresh_failed"="刷新失败，请重试";
+"ai_robot_create_failed"="创建失败，请重试";
+"ai_robot_token_copy_success"="Token已复制";
+"ai_robot_config_copy_success"="配置串已复制";
+"ai_robot_config_copy"="复制完整配置串";
+"ai_robot_config_warning"="请妥善保管，不要泄露给他人";
+"ai_robot_bind_title"="绑定机器人";
+"ai_robot_bind_select_hint"="选择已有的机器人";
+"ai_robot_bind_confirm_title"="确认绑定该账号？";
+"ai_robot_bind_confirm_desc"="绑定后，机器人将与当前账号关联，已经配置过该账号的机器人将断开连接，需要重新配置";
+"ai_robot_bind_success"="绑定成功";
+"ai_robot_exceed_limit"="机器人数量已达上限，请选择已有机器人或去删除机器人";
+"ai_robot_detail_title"="机器人";
+"ai_robot_name"="昵称";
+"ai_robot_avatar"="头像";
+"ai_robot_name_placeholder"="请输入机器人昵称";
+"ai_robot_accid"="账号";
+"ai_robot_accid_placeholder"="请输入账号（最多32位）";
 "save"="保存";
 "input_noteName"="请输入备注名";
 "birthday"="生日";
@@ -84,3 +119,16 @@
 
 "contact_friend"="好友";
 "contact_ai_user"="数字人";
+
+"scan_qr_fail"="扫码失败，请重试";
+"done"="完成";
+
+// AI 机器人错误码描述
+"robot_error_403"="功能未开通";
+"robot_error_414"="参数错误";
+"robot_error_102404"="AI机器人账号不存在";
+"robot_error_102302"="AI机器人Token无效";
+"robot_error_102308"="不是AI机器人账号";
+"robot_error_102309"="AI机器人账号绑定码不存在";
+"robot_error_102310"="AI机器人账号不属于当前用户";
+"robot_error_102311"="该二维码已被绑定";

@@ -494,6 +494,16 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     expandMoreAction()
 
+    // P2P 会话：异步精确校验对方是否为机器人
+    // 由于 isRobot 是同步缓存读取，首次进入时缓存可能为空或过期，
+    // 通过 checkIfRobot 完成后刷新 moreItems，确保音视频按钮显示正确
+    if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
+      NEAIRobotManager.shared.checkIfRobot(ChatRepo.sessionId) { [weak self] _ in
+        // 无论结果如何，重新计算一次 moreItems（isRobot 缓存已在 checkIfRobot 中更新）
+        self?.expandMoreAction()
+      }
+    }
+
     view.addSubview(jumpDownView)
     jumpDownViewRightAncher = jumpDownView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16)
     jumpDownViewRightAncher?.isActive = true
@@ -610,6 +620,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
     NotificationCenter.default.addObserver(self, selector: #selector(reLoadMoreWithMessage), name: NENotificationName.friendCacheInit, object: nil)
 
+    // Markdown 图片下载完成后刷新对应消息 Cell
+    NotificationCenter.default.addObserver(self, selector: #selector(onMarkdownImageDidLoad(_:)), name: NEMarkdownImageDidLoadNotification, object: nil)
+
     if let pan = navigationController?.interactivePopGestureRecognizer {
       tableView.panGestureRecognizer.require(toFail: pan)
     }
@@ -650,6 +663,28 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     isCurrentPage = true
   }
 
+  /// Markdown 图片下载完成回调
+  /// 遍历消息列表找到包含该图片 URL 的 AI 流式文本消息，重算高度后刷新对应行
+  open func onMarkdownImageDidLoad(_ notification: Notification) {
+    guard let url = notification.userInfo?["url"] as? String, !url.isEmpty else { return }
+
+    var reloadIndexPaths = [IndexPath]()
+    for (index, model) in viewModel.messages.enumerated() {
+      guard model.type == .aiStreamText,
+            let textModel = model as? MessageAIStreamModel,
+            textModel.message?.text?.contains(url) == true else {
+        continue
+      }
+      // 重新解析 Markdown 并重算高度（图片已缓存，此次直接命中）
+      textModel.resetMessage(textModel.message)
+      reloadIndexPaths.append(IndexPath(row: index, section: 0))
+    }
+
+    if !reloadIndexPaths.isEmpty {
+      tableViewReloadIndexs(reloadIndexPaths)
+    }
+  }
+
   // MARK: - 子类可重写方法
 
   open func onTeamMemberChange(team: V2NIMTeam) {}
@@ -681,7 +716,21 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       )
       return
     }
-    if let uid = ChatMessageHelper.getSenderId(model?.message) {
+    guard let uid = ChatMessageHelper.getSenderId(model?.message) else { return }
+
+    // P2P 会话中，使用 checkIfRobot 精确判断对方是否为机器人：
+    // 若是机器人则以"去聊天"模式打开名片页（隐藏"添加好友"按钮）
+    if V2NIMConversationIdUtil.conversationType(ChatRepo.conversationId) == .CONVERSATION_TYPE_P2P {
+      NEAIRobotManager.shared.checkIfRobot(uid) { [weak self] isRobot in
+        guard let self = self else { return }
+        var params: [String: Any] = ["nav": self.navigationController as Any, "uid": uid]
+        if isRobot {
+          // 机器人名片：将"添加好友"替换为"去聊天"
+          params["isRobot"] = true
+        }
+        Router.shared.use(ContactUserInfoPageRouter, parameters: params, closure: nil)
+      }
+    } else {
       Router.shared.use(
         ContactUserInfoPageRouter,
         parameters: ["nav": navigationController as Any, "uid": uid],
@@ -3214,7 +3263,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       }
     }
 
-    if NEAIUserManager.shared.isAIUser(ChatRepo.sessionId) {
+    if NEAIUserManager.shared.isAIUser(ChatRepo.sessionId) ||
+      NEAIRobotManager.shared.isRobot(ChatRepo.sessionId) {
       items = items.filter { item in
         if item.type == .rtc {
           return false

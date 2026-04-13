@@ -489,7 +489,74 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
     }
     items.append(createGroup)
 
+    let scanQR = PopListItem()
+    scanQR.showName = localizable("scan_qr")
+    scanQR.image = .ne_imageNamed(name: "scan_qr")
+    scanQR.completion = {
+      weakSelf?.openScanQR()
+    }
+    items.append(scanQR)
+
     return items
+  }
+
+  /// 打开扫一扫页面，子类可 override 替换为自定义实现
+  open func openScanQR() {
+    let scanVC = getScanQRViewController()
+    // 注入扫码结果回调：返回 true 表示已处理（退出扫码页），false 表示无效（继续扫描）
+    scanVC.onScanResult = { [weak self] result in
+      self?.handleQRScanResult(result) ?? false
+    }
+    navigationController?.pushViewController(scanVC, animated: true)
+  }
+
+  /// 返回扫一扫 ViewController 实例，子类必须 override 返回对应皮肤的具体实现
+  open func getScanQRViewController() -> NEBaseScanQRViewController {
+    NEBaseScanQRViewController()
+  }
+
+  /// 处理扫一扫结果，子类可 override 自定义路由逻辑
+  /// - Parameter result: 扫码原始字符串
+  /// 处理扫码结果；返回 true 表示结果有效已处理（扫码页退出），false 表示无效（留在扫码页继续扫）
+  @discardableResult
+  open func handleQRScanResult(_ result: String) -> Bool {
+    // 解析扫码 JSON：{"qrCode":"...","expireAt":1774946965000}
+    if let data = result.data(using: .utf8),
+       let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+       let _ = dict["qrCode"] as? String {
+      // 包含 qrCode 字段：是机器人二维码，校验过期时间
+      if let expireAt = dict["expireAt"] as? TimeInterval,
+         Date(timeIntervalSince1970: expireAt / 1000) < Date() {
+        // 已过期：Toast 提示，返回上一页
+        navigationController?.topViewController?.showToast(localizable("qr_code_expired"))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+          self?.navigationController?.popViewController(animated: true)
+        }
+        return true
+      }
+      // 校验通过：先 push 绑定页（用户看到从扫码页无缝过渡到绑定页），
+      // 然后在 push 动画完成后，静默从导航栈中移除扫码页，
+      // 这样用户按返回直接回到会话列表，且扫码页在 push 时触发 viewWillDisappear 释放相机
+      Router.shared.use(ContactAIRobotBindRouter,
+                        parameters: ["nav": navigationController as Any,
+                                     "qrCode": result,
+                                     "animated": true],
+                        closure: nil)
+      // push 动画完成后，静默移除导航栈中的扫码页
+      navigationController?.transitionCoordinator?.animate(alongsideTransition: nil) { [weak self] _ in
+        guard let nav = self?.navigationController else { return }
+        var viewControllers = nav.viewControllers
+        viewControllers.removeAll { $0 is NEBaseScanQRViewController }
+        nav.setViewControllers(viewControllers, animated: false)
+      }
+      return true
+    }
+    // 不符合机器人二维码格式：提示扫码失败，返回上一页
+    navigationController?.topViewController?.showToast(localizable("scan_qr_fail"))
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+      self?.navigationController?.popViewController(animated: true)
+    }
+    return true
   }
 
   open func didClickAddBtn() {

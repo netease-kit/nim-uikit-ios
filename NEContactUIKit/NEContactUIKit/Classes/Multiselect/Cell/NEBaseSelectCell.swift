@@ -31,7 +31,7 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
   /// 名称宽度约束（受单选/多选状态影响）
   public var memberLabelWidthAnchor: NSLayoutConstraint?
   /// 搜索匹配字符颜色
-  public var searchTextColor: UIColor = .ne_normalTheme
+  public var searchTextColor: UIColor = .normalContactThemeColor
 
   /// 多选选中状态
   lazy var multiSelectImageView: UIImageView = {
