@@ -3932,7 +3932,7 @@ extension ChatViewController: ChatBaseCellDelegate {
     if let user = noti.object as? NEUserWithFriend,
        let accid = user.user?.accountId {
       if NEFriendUserCache.shared.isFriend(accid) {
-        NEFriendUserCache.shared.updateFriendInfo(friendUser: user)
+        NEFriendUserCache.shared.updateFriendInfo(user)
       } else if NETeamUserManager.shared.getUserInfo(accid) != nil {
         NETeamUserManager.shared.updateUserInfo(userWithFriend: user)
       } else if NEP2PChatUserCache.shared.getUserInfo(accid) != nil {

@@ -169,14 +169,6 @@ public class NETeamUserManager: NSObject {
   /// 获取缓存的所有群成员信息
   open func getAllTeamMembers() -> [V2NIMTeamMember]? {
     if haveLoadAllMembers {
-      var teamMemberInfoModels = [NETeamMemberInfoModel]()
-      for (accid, member) in teamMemberCache {
-        let model = NETeamMemberInfoModel()
-        model.teamMember = member
-        model.nimUser = NEFriendUserCache.shared.getFriendInfo(accid) ?? userInfoCache[accid]
-        teamMemberInfoModels.append(model)
-      }
-
       return teamMemberCache.values.map { $0 }
     }
     return nil
@@ -185,11 +177,13 @@ public class NETeamUserManager: NSObject {
   /// 获取缓存的所有群成员信息
   open func getAllTeamMemberModels() -> [NETeamMemberInfoModel]? {
     if haveLoadAllMembers {
+      // 一次性取好友缓存快照，避免循环中每个成员各自加锁（N 次 sync → 1 次 sync）
+      let friendCache = NEFriendUserCache.shared.friendCache ?? [:]
       var teamMemberInfoModels = [NETeamMemberInfoModel]()
       for (accid, member) in teamMemberCache {
         let model = NETeamMemberInfoModel()
         model.teamMember = member
-        model.nimUser = NEFriendUserCache.shared.getFriendInfo(accid) ?? userInfoCache[accid]
+        model.nimUser = friendCache[accid] ?? userInfoCache[accid]
         teamMemberInfoModels.append(model)
       }
 

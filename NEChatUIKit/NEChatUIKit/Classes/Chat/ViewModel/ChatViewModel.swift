@@ -1869,9 +1869,10 @@ open class ChatViewModel: NSObject {
       if message.senderId == IMKitClient.instance.account() {
         messages[index].message?.aiConfig?.accountId = IMKitClient.instance.account()
         (messages[index] as? MessageContentModel)?.fullNameHeight = 0
-        messages[index].avatar = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.user?.avatar
-        messages[index].shortName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.shortName(showAlias: false)
-        messages[index].fullName = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())?.showName()
+        let selfInfo = NEFriendUserCache.shared.getFriendInfo(IMKitClient.instance.account())
+        messages[index].avatar = selfInfo?.user?.avatar
+        messages[index].shortName = selfInfo?.shortName(showAlias: false)
+        messages[index].fullName = selfInfo?.showName()
       }
 
       indexs.append(IndexPath(row: index, section: 0))
