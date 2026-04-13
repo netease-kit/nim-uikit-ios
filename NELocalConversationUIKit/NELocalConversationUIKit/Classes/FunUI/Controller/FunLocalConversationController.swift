@@ -151,7 +151,20 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
     }
     items.append(createGroup)
 
+    let scanQR = LocalPopListItem()
+    scanQR.showName = localizable("scan_qr")
+    scanQR.showNameColor = .white
+    scanQR.image = .ne_imageNamed(name: "fun_scan_qr")
+    scanQR.completion = {
+      weakSelf?.openScanQR()
+    }
+    items.append(scanQR)
+
     return items
+  }
+
+  override open func getScanQRViewController() -> NEBaseLocalScanQRViewController {
+    FunLocalScanQRViewController()
   }
 
   /// 置顶cell大小

@@ -11,13 +11,13 @@ open class SelectCell: NEBaseSelectCell {
   /// 重写初始化方法
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    searchTextColor = UIColor.ne_normalTheme
+    searchTextColor = UIColor.normalContactThemeColor
   }
 
   /// 重写初始化方法
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
-    searchTextColor = UIColor.ne_normalTheme
+    searchTextColor = UIColor.normalContactThemeColor
   }
 
   /// 重写布局方法

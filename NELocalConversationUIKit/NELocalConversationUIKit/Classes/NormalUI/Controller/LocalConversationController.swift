@@ -141,4 +141,8 @@ open class LocalConversationController: NEBaseLocalConversationController {
     super.reloadTableView()
     setupNormalStickTopView()
   }
+
+  override open func getScanQRViewController() -> NEBaseLocalScanQRViewController {
+    LocalScanQRViewController()
+  }
 }

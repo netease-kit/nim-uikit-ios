@@ -6,6 +6,7 @@ import Foundation
 import NECommonKit
 
 public extension UIColor {
+  static let normalContactThemeColor = UIColor.ne_normalTheme
   // 导航栏（包含状态栏）背景色
   static let normalContactNavigationBackgroundColor = UIColor.white
 

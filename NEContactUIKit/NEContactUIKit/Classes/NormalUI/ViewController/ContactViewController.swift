@@ -53,6 +53,12 @@ open class ContactViewController: NEBaseContactViewController {
         ))
       }
 
+      contactHeaders.append(ContactHeadItem(
+        router: ContactAIRobotListRouter,
+        name: localizable("my_ai_robot"),
+        imageName: "ai_robot"
+      ))
+
       if IMKitConfigCenter.shared.enableAIUser {
         contactHeaders.append(ContactHeadItem(
           router: ContactAIUserListRouter,

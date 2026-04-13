@@ -4,6 +4,12 @@
 // found in the LICENSE file.
 
 //MAKR：common
+"scan_qr"="扫一扫";
+"scan_qr_result"="扫描结果：%@";
+"scan_qr_no_result"="未识别到有效内容";
+"scan_qr_no_camera_permission"="请在设置中开启相机权限";
+"scan_qr_fail"="扫码失败，请重试";
+"qr_code_expired"="二维码已过期";
 "add_friend"="添加好友";
 "create_discussion_group"="创建讨论组";
 "create_senior_group"="创建高级群";

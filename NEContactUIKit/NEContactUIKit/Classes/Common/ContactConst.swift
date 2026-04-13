@@ -6,6 +6,7 @@
 import CoreText
 import Foundation
 import NECommonKit
+import NECoreIM2Kit
 
 @objc
 public enum ContactCellType: Int {
@@ -22,3 +23,29 @@ func localizable(_ key: String) -> String {
 }
 
 public let ModuleName = "NEContactUIKit"
+
+/// 将 AI 机器人操作的 NSError 转换为用户友好的提示文案
+/// 优先匹配已知错误码，未匹配时降级使用 error.localizedDescription
+public func robotErrorMessage(_ error: Error) -> String {
+  let code = (error as NSError).code
+  switch code {
+  case robotFunctionNotEnabled:
+    return localizable("robot_error_403")
+  case failedOperation:
+    return localizable("robot_error_414")
+  case inValidTokenCode:
+    return localizable("robot_error_102302")
+  case userNotExistCode:
+    return localizable("robot_error_102404")
+  case robotNotAIAccount:
+    return localizable("robot_error_102308")
+  case robotBindCodeNotExist:
+    return localizable("robot_error_102309")
+  case robotNotBelongToUser:
+    return localizable("robot_error_102310")
+  case robotQRCodeAlreadyBound:
+    return localizable("robot_error_102311")
+  default:
+    return error.localizedDescription
+  }
+}

@@ -441,6 +441,16 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     }
   }
 
+  /// 登录状态变更回调
+  /// - Parameter status: 登录状态
+  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+    // 账号切换（退出登录）时清空在线状态缓存，防止旧账号的离线状态数据污染新账号的会话列表
+    if status == .LOGIN_STATUS_LOGOUT {
+      p2pAccountIds.removeAll()
+      onlineStatusDic.removeAll()
+    }
+  }
+
   /// 发生重连的情况重新获取数据
   open func retrieveConversationDatas() {
     var limit = 0
@@ -526,10 +536,14 @@ extension ConversationViewModel: NESubscribeListener {
   open func subscribeOnlineStatus(_ accoundIds: [String]) {
     var subscribeList: [String] = []
     for accountId in accoundIds {
+      // AI 数字人（V2NIMAIUser，非机器人）跳过订阅，不展示在线状态
       if NEAIUserManager.shared.isAIUser(accountId) {
         continue
       }
 
+      // 普通用户和机器人均走正常订阅流程：
+      // 先看 NESubscribeManager 缓存是否已有最新状态，有则直接使用；
+      // 否则发起订阅，等待 onUserStatusChanged 回调更新
       if let event = NESubscribeManager.shared.getSubscribeStatus(accountId),
          let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
         onlineStatusDic[conversationId] = event.statusType == .USER_STATUS_TYPE_LOGIN
@@ -556,11 +570,11 @@ extension ConversationViewModel: NESubscribeListener {
   public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
     var needRefresh = false
     for d in data {
+      // 遍历所有状态变更，不能 break，否则一批事件中只处理第一条
       if p2pAccountIds.contains(d.accountId),
          let conversationId = V2NIMConversationIdUtil.p2pConversationId(d.accountId) {
         onlineStatusDic[conversationId] = d.statusType == .USER_STATUS_TYPE_LOGIN
         needRefresh = true
-        break
       }
     }
 

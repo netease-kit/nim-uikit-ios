@@ -1,4 +1,3 @@
-
 // Copyright (c) 2022 NetEase, Inc. All rights reserved.
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
@@ -15,6 +14,42 @@
 "blacklist"="Blocklist";
 "my_teams"="My Groups";
 "my_ai_user"="My AI User";
+"my_ai_robot"="My Robot";
+"no_ai_robot"="No Robot, click create";
+"create_ai_robot"="Create Robot";
+"edit_ai_robot"="Edit Robot";
+"ai_robot_edit"="Edit";
+"ai_robot_view_config"="View Config";
+"ai_robot_config_title"="Config String";
+"ai_robot_refresh_token"="Refresh Token";
+"ai_robot_chat"="Chat";
+"ai_robot_delete"="Delete Robot";
+"ai_robot_delete_confirm"="Confirm deleting this robot?";
+"ai_robot_delete_confirm_title"="Confirm Delete Robot?";
+"ai_robot_delete_confirm_desc"="After deletion, the robot in use will be disconnected and needs to be reconfigured";
+"ai_robot_delete_success"="Deleted";
+"delete"="Delete";
+"ai_robot_refresh_token_title"="Confirm Refresh Token?";
+"ai_robot_refresh_token_desc"="After refreshing, the old Token will immediately expire and robots in use need to be reconfigured";
+"ai_robot_token_refresh_success"="Token refreshed";
+"ai_robot_token_refresh_failed"="Refresh failed, please try again";
+"ai_robot_create_failed"="Create failed, please try again";
+"ai_robot_token_copy_success"="Token copied";
+"ai_robot_config_copy_success"="Config copied";
+"ai_robot_config_copy"="Copy full config string";
+"ai_robot_config_warning"="Keep it safe, don't share with others";
+"ai_robot_bind_title"="Bind Robot";
+"ai_robot_bind_select_hint"="Select an existing robot";
+"ai_robot_bind_confirm_title"="Confirm Bind Account?";
+"ai_robot_bind_confirm_desc"="After binding, the robot will be associated with this account. Robots already configured for this account will be disconnected and need to be reconfigured";
+"ai_robot_bind_success"="Bound successfully";
+"ai_robot_exceed_limit"="Robot limit reached. Please select an existing robot or delete one";
+"ai_robot_detail_title"="Robot";
+"ai_robot_name"="Name";
+"ai_robot_avatar"="Avatar";
+"ai_robot_name_placeholder"="Enter robot name";
+"ai_robot_accid"="Account ID";
+"ai_robot_accid_placeholder"="Enter account ID (max 32 chars)";
 "save"="Save";
 "input_noteName"="Please enter nick name";
 "birthday"="Birthday";
@@ -83,3 +118,16 @@
 
 "contact_friend"="Friend";
 "contact_ai_user"="AI User";
+
+"scan_qr_fail"="Scan failed, please try again";
+"done"="Done";
+
+// AI robot error code descriptions
+"robot_error_403"="Feature not enabled";
+"robot_error_414"="Parameter error";
+"robot_error_102404"="AI robot account does not exist";
+"robot_error_102302"="AI robot token is invalid";
+"robot_error_102308"="Not an AI robot account";
+"robot_error_102309"="AI robot account bind code does not exist";
+"robot_error_102310"="AI robot account does not belong to current user";
+"robot_error_102311"="This QR code has already been bound";

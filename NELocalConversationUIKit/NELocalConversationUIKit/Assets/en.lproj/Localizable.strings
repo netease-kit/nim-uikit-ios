@@ -39,3 +39,10 @@
 // error toast
 "leave_team_desc"="You have been removed from the group chat or the group chat has been dissolved.";
 
+"scan_qr"="Scan QR";
+"scan_qr_result"="Scan result: %@";
+"scan_qr_no_result"="No valid content recognized";
+"scan_qr_no_camera_permission"="Please enable camera access in Settings";
+"scan_qr_fail"="Scan failed, please try again";
+"qr_code_expired"="QR code has expired";
+

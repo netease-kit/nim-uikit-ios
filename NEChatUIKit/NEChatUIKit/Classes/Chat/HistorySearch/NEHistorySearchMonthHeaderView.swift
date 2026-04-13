@@ -15,7 +15,7 @@ class NEHistorySearchMonthHeaderView: UICollectionReusableView {
 
   lazy var separatorView: UIView = {
     let view = UIView()
-    view.backgroundColor = UIColor(hexString: "#E5E5E5")
+    view.backgroundColor = .funChatLineBorderColor
     return view
   }()
 

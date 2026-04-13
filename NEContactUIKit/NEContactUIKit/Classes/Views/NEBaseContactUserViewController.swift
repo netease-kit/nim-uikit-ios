@@ -17,6 +17,10 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   var accountId: String?
   var className = "ContactUserViewController"
 
+  /// 是否为机器人账号（由 ChatViewController 通过 Router 参数注入）
+  /// 若为 true，则名片页展示"去聊天"而非"添加好友"
+  public var isRobot: Bool = false
+
   public let viewModel = ContactUserViewModel()
   var data = [[UserItem]]()
   public var headerView = NEBaseUserInfoHeaderView()
@@ -156,6 +160,17 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 
     if user?.user is V2NIMAIUser {
       // 数字人仅展示【聊天】
+      data = [
+        [
+          UserItem(title: commonLocalizable("chat"),
+                   detailTitle: "",
+                   value: false,
+                   textColor: UIColor(hexString: "#337EFF"),
+                   cellClass: CenterTextCell.self),
+        ],
+      ]
+    } else if isRobot || NEAIRobotManager.shared.isRobot(uid) {
+      // 机器人仅展示【去聊天】（机器人不支持添加好友）
       data = [
         [
           UserItem(title: commonLocalizable("chat"),

@@ -29,6 +29,12 @@ open class MessageAIStreamModel: MessageTextModel {
 
     let NEMarkdownParser = NEMarkdownParser(font: .systemFont(ofSize: 16))
     NEMarkdownParser.code.textHighlightColor = .black
+    // 表格宽度 = 消息最大宽度 - 气泡内边距（左右各 chat_cell_margin + 内边距 chat_content_margin）
+    let contentMaxW = chat_content_maxW - chat_content_margin * 2
+    NEMarkdownParser.table.maxWidth = contentMaxW
+    // 图片宽度不超过气泡内容区域
+    NEMarkdownParser.markdownImage.maxWidth = contentMaxW
+    NEMarkdownParser.markdownImage.maxHeight = contentMaxW
 //    NEMarkdownParser.code.font = UIFont(name: "Times New Roman", size: 16)
     let mulAttr = NEMarkdownParser.parse(message?.text ?? "")
     attributeStr = NSMutableAttributedString(attributedString: mulAttr)
