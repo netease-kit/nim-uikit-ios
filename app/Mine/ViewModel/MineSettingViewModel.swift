@@ -15,6 +15,7 @@ public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didClickSDKConfig()
   func didClickPushConfig()
   func didClickLanguage()
+  func didClickTranslationSetting()
   func didChangeConversationType(_ cancel: @escaping (Bool) -> Void)
 }
 
@@ -51,6 +52,15 @@ public class MineSettingViewModel: NSObject {
       weakSelf?.delegate?.didStyleClick()
     }
     model.cellModels.append(style)
+
+    // 翻译
+    let translation = SettingCellModel()
+    translation.cellName = localizable("translation_setting")
+    translation.type = SettingCellType.SettingArrowCell.rawValue
+    translation.cellClick = {
+      weakSelf?.delegate?.didClickTranslationSetting()
+    }
+    model.cellModels.append(translation)
 
 //        let cleanCache = SettingCellModel()
 //        cleanCache.cellName = "清理缓存"

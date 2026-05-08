@@ -252,6 +252,11 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
     navigationController?.pushViewController(configController, animated: true)
   }
 
+  func didClickTranslationSetting() {
+    let translationVC = TranslationSettingViewController()
+    navigationController?.pushViewController(translationVC, animated: true)
+  }
+
   func didChangeConversationType(_ cancel: @escaping (Bool) -> Void) {
     weak var weakSelf = self
     showAlert(message: localizable("restart_tips"),

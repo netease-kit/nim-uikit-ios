@@ -10,11 +10,12 @@ import UIKit
 ///   - 标准格式：表头行 → 分隔行 → 数据行
 ///   - 非标准格式：`## 标题| 表头 |` 和分隔行在不同行
 ///   - 无表头格式：直接 分隔行 → 数据行
+
 // MARK: - 内部辅助类型
 
 /// 表格区间描述（以分隔行为锚点）
 struct NEMarkdownTableRegion {
-  var headerLineIndex: Int       // -1 = 无独立表头行
+  var headerLineIndex: Int // -1 = 无独立表头行
   var headerCellsFromTail: [String] // 从混合行尾部提取的表头（可能为空）
   var separatorLineIndex: Int
   var dataLineIndices: [Int]
@@ -201,12 +202,16 @@ open class NEMarkdownTable: NEMarkdownElement {
       headers = (1 ... colCount).map { "列\($0)" }
     }
     // 对齐列数
-    while headers.count < colCount { headers.append("") }
+    while headers.count < colCount {
+      headers.append("")
+    }
     if headers.count > colCount { headers = Array(headers.prefix(colCount)) }
 
     let rows = region.dataLineIndices.map { idx -> [String] in
       var cells = parseCells(from: lines[idx].trimmingCharacters(in: .whitespaces))
-      while cells.count < colCount { cells.append("") }
+      while cells.count < colCount {
+        cells.append("")
+      }
       return Array(cells.prefix(colCount))
     }
 
@@ -239,11 +244,13 @@ open class NEMarkdownTable: NEMarkdownElement {
       let c = cell.trimmingCharacters(in: .whitespaces)
       let l = c.hasPrefix(":")
       let r = c.hasSuffix(":")
-      if l && r { return .center }
+      if l, r { return .center }
       if r { return .right }
       return .left
     }
-    while result.count < count { result.append(.left) }
+    while result.count < count {
+      result.append(.left)
+    }
     return Array(result.prefix(count))
   }
 

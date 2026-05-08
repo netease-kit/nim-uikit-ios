@@ -214,6 +214,10 @@
 "ai_translating"="AI处理中...";
 "translate_default"="翻译为...";
 "chat_translate"="翻译";
+"chat_translate_btn"="翻译";
+"chat_translate_hide"="隐藏";
+"chat_translate_tag"="译文";
+"chat_translate_failed"="翻译失败";
 "ai_user_pin_top"="PIN置顶";
 "format_not_supported"="暂不支持该格式";
 "request_exception" = "模型请求异常";

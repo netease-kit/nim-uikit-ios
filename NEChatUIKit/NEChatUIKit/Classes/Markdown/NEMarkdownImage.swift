@@ -24,7 +24,7 @@ open class NEMarkdownImage: NEMarkdownElement {
   public var maxHeight: CGFloat = 300
 
   /// 占位图尺寸
-  public var placeholderSize: CGSize = CGSize(width: 120, height: 80)
+  public var placeholderSize: CGSize = .init(width: 120, height: 80)
 
   public init() {}
 
@@ -89,7 +89,7 @@ open class NEMarkdownImageAttachment: NSTextAttachment {
     self.maxWidth = maxWidth
     self.maxHeight = maxHeight
     self.placeholderSize = placeholderSize
-    self.displaySize = placeholderSize
+    displaySize = placeholderSize
     super.init(data: nil, ofType: nil)
 
     // 生成占位图

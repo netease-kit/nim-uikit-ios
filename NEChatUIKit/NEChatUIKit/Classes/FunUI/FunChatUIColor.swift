@@ -67,4 +67,11 @@ public extension UIColor {
   static let funChatMultiForwardContentColor = UIColor(hexString: "#BBBBBB")
   static let funChatHistoryCellTitleTextColor = UIColor(hexString: "#737373")
   static let funChatQuickHistoryCellTitleTextColor = UIColor(hexString: "#596C96")
+
+  // 消息译文气泡背景色（接收方/发送方通用白色背景）
+  static let funChatTranslationBubbleBg = UIColor.white
+  // 译文气泡文字颜色
+  static let funChatTranslationTextColor = UIColor(hexString: "#333333")
+  // 译文标签（「译文」二字）颜色
+  static let funChatTranslationTagColor = UIColor(hexString: "#656A72")
 }

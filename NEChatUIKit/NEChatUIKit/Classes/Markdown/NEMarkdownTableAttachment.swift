@@ -23,7 +23,7 @@ open class NEMarkdownTableAttachment: NSTextAttachment {
 
   public init(tableView: NEMarkdownTableView, size: CGSize) {
     self.tableView = tableView
-    self.tableSize = size
+    tableSize = size
     super.init(data: nil, ofType: nil)
     // 预先渲染为静态图片（方案 A）
     // 必须在主线程执行 UIKit 操作
@@ -38,7 +38,7 @@ open class NEMarkdownTableAttachment: NSTextAttachment {
     }
   }
 
-  required public init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) is not supported for NEMarkdownTableAttachment")
   }
 
@@ -52,6 +52,7 @@ open class NEMarkdownTableAttachment: NSTextAttachment {
   }
 
   // MARK: - 方案 B：将表格 View 直接嵌入 UITextView（可选调用）
+
   //
   // 当 tableSize.width 超出气泡宽度时，可调用此方法将 tableView 叠加到 textView 上，
   // 并用 UIScrollView 包裹以支持横向滚动。

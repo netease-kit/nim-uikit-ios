@@ -53,4 +53,9 @@ public extension UIColor {
   // 搜索聊天记录选项背景色
   static let normalSearchMessageCellBg = UIColor(hexString: "#F9F9F9")
   static let normalSearchDateButtonBg = UIColor(hexString: "#337EFF")
+
+  // 消息译文区域分割线颜色（与气泡共色、低透明度）
+  static let normalChatTranslationDividerColor = UIColor(hexString: "#000000", 0.08)
+  // 译文标签（「译文」二字）颜色
+  static let normalChatTranslationTagColor = UIColor(hexString: "#656A72")
 }

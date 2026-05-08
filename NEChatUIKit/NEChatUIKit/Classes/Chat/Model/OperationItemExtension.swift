@@ -181,3 +181,24 @@ public extension OperationItem {
     return item
   }
 }
+
+/// 消息翻译操作项
+public extension OperationItem {
+  /// 翻译原文
+  static func translateItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("chat_translate_btn")
+    item.imageName = "chat_translation"
+    item.type = .translate
+    return item
+  }
+
+  /// 隐藏译文
+  static func hideTranslationItem() -> OperationItem {
+    let item = OperationItem()
+    item.text = chatLocalizable("chat_translate_hide")
+    item.imageName = "chat_translation"
+    item.type = .hideTranslation
+    return item
+  }
+}

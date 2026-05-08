@@ -50,6 +50,7 @@ class ViewController: UIViewController {
   }
 
   func setupUI() {
+    view.backgroundColor = .white
     view.addSubview(launchIconView)
 
     NSLayoutConstraint.activate([

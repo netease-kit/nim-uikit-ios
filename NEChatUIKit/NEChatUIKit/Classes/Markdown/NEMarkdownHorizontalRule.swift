@@ -30,7 +30,7 @@ open class NEMarkdownHorizontalRule: NEMarkdownElement {
   // MARK: - 样式配置
 
   /// 分隔线颜色
-  open var lineColor: UIColor = UIColor(red: 0.78, green: 0.78, blue: 0.78, alpha: 1)
+  open var lineColor: UIColor = .init(red: 0.78, green: 0.78, blue: 0.78, alpha: 1)
   /// 分隔线高度（pt）
   open var lineHeight: CGFloat = 1.0
   /// 分隔线上下的额外间距
