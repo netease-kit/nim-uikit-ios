@@ -15,6 +15,40 @@ open class IMPocConfigModel: NSObject {
   public var accountId: String?
 
   public var accountIdToken: String?
+
+  func dictionaryRepresentation() -> [String: Any] {
+    var dictionary = [String: Any]()
+    dictionary["configMap"] = configMap as? [String: Any] ?? [:]
+    dictionary["enableCustomConfig"] = enableCustomConfig
+    if let customJson {
+      dictionary["customJson"] = customJson
+    }
+    if let accountId {
+      dictionary["accountId"] = accountId
+    }
+    if let accountIdToken {
+      dictionary["accountIdToken"] = accountIdToken
+    }
+    return dictionary
+  }
+
+  static func model(from dictionary: [String: Any]) -> IMPocConfigModel {
+    let model = IMPocConfigModel()
+    if let configMap = dictionary["configMap"] as? [String: Any] {
+      model.configMap = NSMutableDictionary(dictionary: configMap)
+    }
+    if let customJson = dictionary["customJson"] as? String {
+      model.customJson = customJson
+    }
+    if let enableCustomConfig = dictionary["enableCustomConfig"] as? NSNumber {
+      model.enableCustomConfig = enableCustomConfig
+    } else if let enableCustomConfig = dictionary["enableCustomConfig"] as? Bool {
+      model.enableCustomConfig = NSNumber(booleanLiteral: enableCustomConfig)
+    }
+    model.accountId = dictionary["accountId"] as? String
+    model.accountIdToken = dictionary["accountIdToken"] as? String
+    return model
+  }
 }
 
 class IMPocConfigManager: NSObject {
@@ -43,9 +77,13 @@ class IMPocConfigManager: NSObject {
   func saveObjectToDisk(_ object: IMPocConfigModel, fileName: String) {
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
       let archiveURL = documentsDirectory.appendingPathComponent(fileName)
-      let data = try? NSKeyedArchiver.archivedData(withRootObject: object, requiringSecureCoding: false)
       do {
-        try data?.write(to: archiveURL)
+        let data = try PropertyListSerialization.data(
+          fromPropertyList: object.dictionaryRepresentation(),
+          format: .binary,
+          options: 0
+        )
+        try data.write(to: archiveURL, options: .atomic)
       } catch {
         print("saveObjectToDisk error: \(error)")
       }
@@ -61,11 +99,20 @@ class IMPocConfigManager: NSObject {
     if FileManager.default.fileExists(atPath: archiveURL.path) {
       do {
         let retrievedData = try Data(contentsOf: archiveURL)
-        if let object = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(retrievedData) as? IMPocConfigModel {
-          return object
+        let propertyList = try PropertyListSerialization.propertyList(from: retrievedData, options: [], format: nil)
+        if let dictionary = propertyList as? [String: Any],
+           dictionary["configMap"] != nil || dictionary["customJson"] != nil || dictionary["enableCustomConfig"] != nil ||
+           dictionary["accountId"] != nil || dictionary["accountIdToken"] != nil {
+          return IMPocConfigModel.model(from: dictionary)
         }
       } catch {
         print("loadObjectFromDisk error: \(error)")
+      }
+
+      do {
+        try FileManager.default.removeItem(at: archiveURL)
+      } catch {
+        print("remove invalid config error: \(error)")
       }
     }
 

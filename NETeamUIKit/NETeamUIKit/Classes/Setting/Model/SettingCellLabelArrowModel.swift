@@ -5,5 +5,5 @@
 import UIKit
 
 open class SettingCellLabelArrowModel: SettingCellModel {
-  var arrowLabelText = ""
+  public var arrowLabelText = ""
 }

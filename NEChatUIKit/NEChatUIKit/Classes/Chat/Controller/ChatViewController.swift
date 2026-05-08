@@ -51,6 +51,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   public var operationCellFilter: [OperationType]? // 消息长按菜单全局过滤列表
   public var cellRegisterDic = [String: UITableViewCell.Type]()
+  /// 待转发的译文内容（forwardTranslation 发起时暂存，Router 回调后清空）
+  public var pendingTranslationForwardText: String?
   private var needMarkReadMsgs = [V2NIMMessage]()
   public var onReceiveNewMsgs = [V2NIMMessage]()
   /// 从标记列表页传递过来的新消息（用于锚定跳转时显示新消息数量）
@@ -294,6 +296,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     view.addSubview(operationView)
     return operationView
   }()
+
+  /// 标记当前 operationView 是否由译文区域长按触发（用于区分复制/转发目标）
+  public var isTranslationOperation: Bool = false
 
   public init(conversationId: String) {
     viewModel = ChatViewModel(conversationId: conversationId)
@@ -745,6 +750,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     if operationView.isHidden == false {
       operationView.isHidden = true
     }
+    isTranslationOperation = false
 
     // 取消划词选中
     if cellEndEditing {
@@ -1919,6 +1925,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func onRecvMessages(_ messages: [V2NIMMessage], _ indexs: [IndexPath]) {
     removeOperationView()
     insertRows(indexs, false)
+    // D5-A 自动翻译：对新接收到的文本消息判断是否需要自动翻译
+    for message in messages {
+      if let textModel = viewModel.messages.first(where: {
+        $0.message?.messageClientId == message.messageClientId
+      }) as? MessageTextModel {
+        viewModel.autoTranslateIfNeeded(model: textModel)
+      }
+    }
 
     let messageCount = tableView.numberOfRows(inSection: 0)
     let lastIndexPath = IndexPath(row: messageCount - 2, section: 0)
@@ -1992,6 +2006,43 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
+  /// 自动翻译完成（基类默认实现：reload cell 后，若消息在可视区域底部则自动滚动展示译文）
+  open func autoTranslationDidFinish(_ index: Int) {
+    guard index >= 0 else { return }
+    let indexPath = IndexPath(row: index, section: 0)
+    let textModel = (index < viewModel.messages.count) ? viewModel.messages[index] as? MessageTextModel : nil
+    applyTranslationHeightAndReload(index: index, textModel: textModel, indexPath: indexPath)
+  }
+
+  /// 批量历史翻译完成后的统一处理：更新高度/宽度 + reload + 滚动
+  /// Normal 皮肤需 override 同时更新 contentSize.width/height；Fun 皮肤只更新 height
+  open func applyTranslationHeightAndReload(index: Int, textModel: MessageTextModel?, indexPath: IndexPath) {
+    // 基类（Fun 皮肤）：只更新 height
+    if let textModel = textModel {
+      let bubbleH = textModel.estimateTranslationBubbleHeight()
+      if bubbleH > 0, textModel.addedTranslationHeight == 0 {
+        textModel.height += bubbleH
+        textModel.addedTranslationHeight = bubbleH
+      }
+    }
+    tableViewReloadIndexs([indexPath])
+    scrollToShowTranslationIfNeeded(indexPath)
+  }
+
+  /// 翻译完成后，如果该 cell 在可视区域底部，滚动让完整内容可见
+  func scrollToShowTranslationIfNeeded(_ indexPath: IndexPath) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+      guard let self = self else { return }
+      guard let visibleRows = self.tableView.indexPathsForVisibleRows,
+            visibleRows.contains(indexPath) else { return }
+      let totalRows = self.tableView.numberOfRows(inSection: 0)
+      let isNearBottom = indexPath.row >= totalRows - 3
+      if isNearBottom || indexPath == visibleRows.last {
+        self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+      }
+    }
+  }
+
   open func onLoadMoreWithMessage(_ indexs: [IndexPath]) {
     tableViewReloadIndexs(indexs)
   }
@@ -2060,6 +2111,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func onRevokeMessage(_ message: V2NIMMessage, atIndexs: [IndexPath]) {
     if atIndexs.isEmpty {
       return
+    }
+    // Task 5.3：撤回时清除本地翻译缓存（若有），避免残留
+    if let revokedModel = viewModel.messages.first(where: {
+      $0.message?.messageClientId == message.messageClientId
+    }) as? MessageTextModel, revokedModel.translationInfo != nil {
+      revokedModel.translationInfo = nil
+      revokedModel.translationVisible = true
+      ChatRepo.shared.clearTranslationFromLocalExtension(message: message, nil)
     }
     viewModel.selectedMessages.removeAll(where: { $0.messageClientId == message.messageClientId })
     removeOperationView()
@@ -2443,6 +2502,8 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   //    MARK: - MessageOperationViewDelegate
 
   open func didSelectedItem(item: OperationItem) {
+    // 先快照标记，removeOperationView() 会将其重置为 false
+    let fromTranslation = isTranslationOperation
     removeOperationView()
 
     // 配置项拦截
@@ -2455,7 +2516,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     case .earpiece, .speaker:
       setHandsetMode(item: item)
     case .copy:
-      copyMessage()
+      if fromTranslation,
+         let translated = (viewModel.operationModel as? MessageTextModel)?.translationInfo?.translatedText,
+         !translated.isEmpty {
+        UIPasteboard.general.string = translated
+        showToast(commonLocalizable("copy_success"))
+      } else {
+        copyMessage()
+      }
     case .delete:
       deleteMessage()
     case .reply:
@@ -2465,7 +2533,13 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     case .recall:
       recallMessage()
     case .forward:
-      forwardMessage()
+      if fromTranslation,
+         let translated = (viewModel.operationModel as? MessageTextModel)?.translationInfo?.translatedText,
+         !translated.isEmpty {
+        forwardTranslation(translatedText: translated)
+      } else {
+        forwardMessage()
+      }
     case .pin:
       pinMessage()
     case .removePin:
@@ -2480,6 +2554,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       toCollectMessage()
     case .voiceToText:
       voiceToText()
+    case .translate:
+      translateMessage()
+    case .hideTranslation:
+      hideTranslationMessage()
     default:
       if let onClick = item.onClick {
         onClick(self)
@@ -2846,6 +2924,80 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
   }
 
+  // MARK: - 消息翻译操作
+
+  /// 翻译消息原文（长按菜单「翻译」点击处理）
+  open func translateMessage() {
+    // 校验网络
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+    guard let textModel = viewModel.operationModel as? MessageTextModel else { return }
+    viewModel.performTranslation(model: textModel) { [weak self] index, error in
+      guard let self = self else { return }
+      if error != nil {
+        self.showToast(chatLocalizable("chat_translate_failed"))
+        return
+      }
+      if index >= 0 {
+        let indexPath = IndexPath(row: index, section: 0)
+        self.tableViewReloadIndexs([indexPath])
+      }
+    }
+  }
+
+  /// 隐藏译文（长按菜单「隐藏译文」点击处理）
+  open func hideTranslationMessage() {
+    guard let textModel = viewModel.operationModel as? MessageTextModel else { return }
+    viewModel.hideTranslation(model: textModel) { [weak self] index in
+      guard let self = self else { return }
+      if index >= 0 {
+        self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+      }
+    }
+  }
+
+  /// 译文转发：弹出会话选择器，用户确认后发送译文文本到目标会话
+  open func forwardTranslation(translatedText: String) {
+    // 暂存译文，供 Router 回调使用
+    pendingTranslationForwardText = translatedText
+    weak var weakSelf = self
+    Router.shared.register(ForwardMultiSelectedRouter) { param in
+      guard let text = weakSelf?.pendingTranslationForwardText else { return }
+      weakSelf?.pendingTranslationForwardText = nil
+      var items = [ForwardItem]()
+      var conversationIds = [String]()
+      if let conversations = param["conversations"] as? [[String: Any]] {
+        for conversation in conversations {
+          if let conversationId = conversation["conversationId"] as? String {
+            conversationIds.append(conversationId)
+            let item = ForwardItem()
+            item.conversationId = conversationId
+            item.name = conversation["name"] as? String
+            item.avatar = conversation["avatar"] as? String
+            items.append(item)
+          }
+        }
+      }
+      let type = chatLocalizable("operation_forward")
+      weakSelf?.addForwardAlertController(items: items, type: type) { comment in
+        if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+          weakSelf?.showToast(commonLocalizable("network_error"))
+          return
+        }
+        weakSelf?.viewModel.sendTranslationForwardMessage(
+          translatedText: text,
+          comment: comment,
+          conversationIds: conversationIds
+        ) { _ in }
+      }
+    }
+    Router.shared.use(ForwardMultiSelectRouter,
+                      parameters: ["nav": navigationController as Any, "selctorMode": 0],
+                      closure: nil)
+  }
+
   /// 移除置顶消息
   open func untopMessage() {
     // 校验网络
@@ -3127,6 +3279,37 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
     if isCloseToBottom() {
       isRecvRolling = false
+    }
+  }
+
+  /// 手指抬起且无惯性滑动时触发（直接停止）
+  open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    if !decelerate {
+      triggerAutoTranslateHistory()
+    }
+  }
+
+  /// 惯性滑动减速结束时触发（等价于 SCROLL_STATE_IDLE）
+  open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    triggerAutoTranslateHistory()
+  }
+
+  /// 收集当前可见行的 MessageContentModel，调用 ViewModel 批量自动翻译
+  open func triggerAutoTranslateHistory() {
+    guard IMKitConfigCenter.shared.autoTranslationEnableTime > 0 else { return }
+    guard let visibleIndexPaths = tableView.indexPathsForVisibleRows else { return }
+    let visibleModels = visibleIndexPaths.compactMap { indexPath -> MessageContentModel? in
+      guard indexPath.row < viewModel.messages.count else { return nil }
+      return viewModel.messages[indexPath.row] as? MessageContentModel
+    }
+    guard !visibleModels.isEmpty else { return }
+    viewModel.autoTranslateVisibleHistory(visibleModels: visibleModels) { [weak self] index in
+      guard let self = self, index >= 0 else { return }
+      let indexPath = IndexPath(row: index, section: 0)
+      let textModel = (index < self.viewModel.messages.count) ? self.viewModel.messages[index] as? MessageTextModel : nil
+      DispatchQueue.main.async {
+        self.applyTranslationHeightAndReload(index: index, textModel: textModel, indexPath: indexPath)
+      }
     }
   }
 
@@ -4003,6 +4186,62 @@ extension ChatViewController: ChatBaseCellDelegate {
     didLongTouchMessageView(cell, model)
   }
 
+  /// 译文区域长按：弹出「复制 / 转发 / 隐藏」操作菜单（与消息长按菜单 UI 一致）
+  open func didLongPressTranslationView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    guard !isMutilSelect,
+          let textModel = model as? MessageTextModel,
+          let translatedText = textModel.translationInfo?.translatedText,
+          !translatedText.isEmpty else { return }
+
+    guard let index = tableView.indexPath(for: cell) else { return }
+
+    removeOperationView()
+    viewModel.operationModel = model
+    isTranslationOperation = true
+
+    // 构建三个 item：复制 / 转发 / 隐藏
+    var items: [OperationItem] = [
+      .copyItem(),
+      .forwardItem(),
+      .hideTranslationItem(),
+    ]
+
+    // 计算浮层位置（与消息长按逻辑完全一致）
+    let itemH = NEAppLanguageUtil.getCurrentLanguage() == .english ? 62.0 : 56.0
+    let w = Double(items.count) * 60.0 + 16.0
+    let h = itemH + 16.0
+
+    let rectInTableView = tableView.rectForRow(at: index)
+    let rectInView = tableView.convert(rectInTableView, to: view)
+    let topOffset = NEConstant.navigationAndStatusHeight
+
+    var operationY: Double
+    if topOffset + h + bodyTopViewHeight > rectInView.origin.y {
+      operationY = rectInView.origin.y + rectInView.size.height - chat_timeCellH
+    } else {
+      operationY = rectInView.origin.y - h
+      if model?.timeContent != nil {
+        operationY += chat_timeCellH
+      }
+    }
+
+    var frameX = 56.0
+    if let msg = model?.message, msg.isSelf {
+      frameX = kScreenWidth - w - frameX
+    }
+
+    var frame = CGRect(x: frameX, y: operationY, width: w, height: h)
+    if frame.origin.y + h < tableView.frame.origin.y {
+      frame.origin.y = tableView.frame.origin.y
+    } else if frame.origin.y + h > view.frame.size.height {
+      frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
+    }
+
+    operationView.frame = frame
+    operationView.items = items
+    operationView.isHidden = false
+  }
+
   open func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     if isMutilSelect {
       return
@@ -4249,6 +4488,11 @@ extension ChatViewController: ChatBaseCellDelegate {
       // 设置标志位，等待 tableViewReload 完成后再检查跳转按钮
       // 这样可以确保在异步加载消息详情（loadMoreWithMessage）完成后才正确判断
       needCheckJumpDownAfterReload = true
+    }
+
+    // D4-B 首次加载完毕后对当前可见消息触发一次自动翻译
+    DispatchQueue.main.async { [weak self] in
+      self?.triggerAutoTranslateHistory()
     }
   }
 

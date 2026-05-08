@@ -195,7 +195,13 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
       collectionView.topAnchor.constraint(equalTo: tipLable.bottomAnchor, constant: 24),
     ])
 
-    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: navigationView.bottomAnchor, constant: 50)
+    if navigationView.superview != nil {
+      tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: navigationView.bottomAnchor, constant: 50)
+    } else {
+      // navigationView 未添加到视图层级时（如 useSystemNav 或 showTitleBar = false），
+      // 使用 view.topAnchor + 导航栏高度作为 fallback，避免约束因无共同祖先而崩溃
+      tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant + 50)
+    }
     tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),

@@ -898,3 +898,87 @@ public class ChatMessageHelper: NSObject {
     return path
   }
 }
+
+// MARK: - @ 保留翻译工具方法
+
+public extension ChatMessageHelper {
+  /// 将消息文本按 @ 段切分为交替的「普通文本」和「@ 文本」片段。
+  ///
+  /// - iOS 的 `MessageAtInfoModel.end` 是 **exclusive**（半开区间 `[start, end)`）
+  /// - 不使用任何占位符，彻底规避翻译引擎对特殊字符的处理
+  ///
+  /// - Parameters:
+  ///   - text: 消息原始文本
+  ///   - message: 消息对象（用于读取 serverExtension 中的 yxAtMsg）
+  /// - Returns: `(parts, isAtFlags)` 两个等长数组：
+  ///   - `parts[i]`：文本片段
+  ///   - `isAtFlags[i]`：`true` = @ 段（原样保留），`false` = 普通文本（需翻译）
+  static func splitTextByAtMentions(text: String,
+                                    message: V2NIMMessage) -> (parts: [String], isAtFlags: [Bool]) {
+    guard !text.isEmpty else { return ([text], [false]) }
+
+    // 从 serverExtension 解析 yxAtMsg
+    guard let extStr = message.serverExtension,
+          let extDict = getDictionaryFromJSONString(extStr),
+          let atDict = extDict[yxAtMsg] as? [String: AnyObject] else {
+      return ([text], [false])
+    }
+
+    // 收集所有 (start, end-exclusive) 段
+    var segments: [(start: Int, end: Int)] = []
+    for (_, value) in atDict {
+      guard let block = value as? [String: AnyObject],
+            let segsAny = block[atSegmentsKey] as? [AnyObject],
+            let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: segsAny) as? [MessageAtInfoModel]
+      else { continue }
+      for model in models {
+        let s = model.start
+        // model.end 是 inclusive（与 atRangeOffset=1 的用法一致），转为 exclusive
+        let e = model.end + 1
+        guard s >= 0, e <= text.count, s < e else { continue }
+        segments.append((s, e))
+      }
+    }
+
+    guard !segments.isEmpty else { return ([text], [false]) }
+
+    // 按 start 升序排序，去重（同一 start 只取第一个）
+    let sorted = segments.sorted { $0.start < $1.start }
+    var deduped: [(start: Int, end: Int)] = []
+    var lastStart = -1
+    for seg in sorted {
+      if seg.start != lastStart {
+        deduped.append(seg)
+        lastStart = seg.start
+      }
+    }
+
+    // 按 @ 段位置切分文本
+    var parts: [String] = []
+    var isAtFlags: [Bool] = []
+    var cursor = text.startIndex
+
+    for seg in deduped {
+      let segStart = text.index(text.startIndex, offsetBy: seg.start)
+      let segEnd = text.index(text.startIndex, offsetBy: seg.end)
+
+      // @ 段前的普通文本
+      if cursor < segStart {
+        parts.append(String(text[cursor ..< segStart]))
+        isAtFlags.append(false)
+      }
+      // @ 段本身
+      parts.append(String(text[segStart ..< segEnd]))
+      isAtFlags.append(true)
+      cursor = segEnd
+    }
+
+    // 末尾剩余普通文本
+    if cursor < text.endIndex {
+      parts.append(String(text[cursor...]))
+      isAtFlags.append(false)
+    }
+
+    return (parts, isAtFlags)
+  }
+}

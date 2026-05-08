@@ -8,6 +8,7 @@ import Foundation
 import NEChatKit
 import NEChatUIKit
 import NIMSDK
+import YXLogin
 
 @objcMembers
 public class NECommonResult: NSObject {
@@ -113,12 +114,15 @@ open class AIChatDataLoader: NSObject {
     request.httpMethod = "POST"
     request.setValue(AppKey.appKey, forHTTPHeaderField: "appkey")
     request.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
-    request.setValue(account, forHTTPHeaderField: "accountId")
-    request.setValue(token, forHTTPHeaderField: "accessToken")
+    let accountId = AuthorManager.shareInstance()?.getUserInfo()?.accountId ?? ""
+    let accessToken = AuthorManager.shareInstance()?.getUserInfo()?.accessToken ?? ""
+    print("accountId : \(accountId) access token : \(accessToken)")
+    request.setValue(accountId, forHTTPHeaderField: "accountId")
+    request.setValue(accessToken, forHTTPHeaderField: "accessToken")
 
     var bodyDic: [String: Any] = [
       "style_list": ["warm", "hot", "smart"],
-      "sender_id": account,
+      "sender_id": accountId,
       "receiver_id": ChatRepo.sessionId,
     ]
 
@@ -181,6 +185,10 @@ open class AIChatDataLoader: NSObject {
   }
 
   private static func getHost() -> String {
-    "https://yiyong.netease.im/"
+    #if DEBUG
+      "https://yiyong-qa.netease.im/"
+    #else
+      "https://yiyong.netease.im/"
+    #endif
   }
 }

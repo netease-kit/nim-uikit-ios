@@ -95,7 +95,11 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     }
   }
 
-  func textFieldDidEndEditing(_ textField: UITextField) {
-    dataModel?.customInputText = textField.text
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    if let textString = textField.text as? NSString {
+      let changeString = textString.replacingCharacters(in: range, with: string)
+      dataModel?.customInputText = changeString
+    }
+    return true
   }
 }

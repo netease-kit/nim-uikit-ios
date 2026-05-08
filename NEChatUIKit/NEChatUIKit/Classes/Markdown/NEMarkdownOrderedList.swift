@@ -63,7 +63,7 @@ open class NEMarkdownOrderedList: NEMarkdownLevelElement {
     attributedString.replaceCharacters(in: range, with: replacement)
 
     // 计算悬挂缩进宽度
-    let indentPt: CGFloat = CGFloat(8 + indentDepth * 16)
+    let indentPt = CGFloat(8 + indentDepth * 16)
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.firstLineHeadIndent = indentPt
     paragraphStyle.headIndent = indentPt + 16
@@ -75,6 +75,7 @@ open class NEMarkdownOrderedList: NEMarkdownLevelElement {
   }
 
   // MARK: - NEMarkdownLevelElement match override
+
   //
   // 有序列表的正则分组与 NEMarkdownLevelElement 默认 match 不同：
   //   group(1) = 前导空格（level = 空格数）

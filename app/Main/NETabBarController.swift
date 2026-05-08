@@ -11,18 +11,18 @@ import NIMSDK
 import UIKit
 
 class NETabBarController: UITabBarController {
-  private var chat = UIViewController()
-  private var contactVC = NEBaseContactViewController()
+  private var chat: UIViewController?
+  private var contactVC: NEBaseContactViewController?
   private var meVC = MeViewController()
   private var sessionUnreadCount = 0
   private var contactUnreadCount = 0
 
   /// 是通过切换UI风格触发，需要重置会话是否同步完成标志位，因为不是首次登录，已经同步过，同步完成回调不会再触发，正常单皮肤可忽略此逻辑
-  public var isChangeUIType = false {
+  var isChangeUIType = false {
     didSet {}
   }
 
-  public init(_ isChangeUI: Bool) {
+  init(_ isChangeUI: Bool) {
     isChangeUIType = isChangeUI
     super.init(nibName: nil, bundle: nil)
   }
@@ -50,8 +50,8 @@ class NETabBarController: UITabBarController {
   }
 
   @objc func changeLanguage() {
-    chat.tabBarItem.title = localizable("message")
-    contactVC.tabBarItem.title = localizable("contact")
+    chat?.tabBarItem.title = localizable("message")
+    contactVC?.tabBarItem.title = localizable("contact")
     meVC.tabBarItem.title = localizable("mine")
   }
 
@@ -78,23 +78,23 @@ class NETabBarController: UITabBarController {
         (chat as? ConversationController)?.viewModel.syncFinished = isChangeUIType
       }
 
-      chat.tabBarItem = UITabBarItem(
+      chat?.tabBarItem = UITabBarItem(
         title: localizable("message"),
         image: UIImage(named: "chat"),
         selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
       )
-      chat.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav = NENavigationController(rootViewController: chat)
+      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
+      let chatNav = NENavigationController(rootViewController: chat!)
 
       // Contacts
       contactVC = ContactViewController()
-      contactVC.tabBarItem = UITabBarItem(
+      contactVC?.tabBarItem = UITabBarItem(
         title: localizable("contact"),
         image: UIImage(named: "contact"),
         selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
       )
-      contactVC.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav = NENavigationController(rootViewController: contactVC)
+      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
+      let contactsNav = NENavigationController(rootViewController: contactVC!)
 
       // Me
       meVC.tabBarItem = UITabBarItem(
@@ -134,23 +134,23 @@ class NETabBarController: UITabBarController {
         (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
       }
 
-      chat.tabBarItem = UITabBarItem(
+      chat?.tabBarItem = UITabBarItem(
         title: localizable("message"),
         image: UIImage(named: "funChat"),
         selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
       )
-      chat.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav = NENavigationController(rootViewController: chat)
+      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
+      let chatNav = NENavigationController(rootViewController: chat!)
 
       // Contacts
       contactVC = FunContactViewController()
-      contactVC.tabBarItem = UITabBarItem(
+      contactVC?.tabBarItem = UITabBarItem(
         title: localizable("contact"),
         image: UIImage(named: "funContact"),
         selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
       )
-      contactVC.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav = NENavigationController(rootViewController: contactVC)
+      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
+      let contactsNav = NENavigationController(rootViewController: contactVC!)
 
       // Me
       meVC.tabBarItem = UITabBarItem(
@@ -202,28 +202,32 @@ class NETabBarController: UITabBarController {
 
   // 设置通讯录未读显示状态
   func setUpContactBadgeValue() {
-    ContactRepo.shared.getUnreadApplicationCount { [weak self] count, error in
-      if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
-        let option = V2NIMTeamJoinActionInfoQueryOption()
-        option.offset = 0
-        option.limit = neTeamJoinActionPageLimit
-        TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
-          if let actions = result?.infos {
-            let unreadActions = actions.filter { $0.timestamp > neTeamJoinActionReadTime }
-            self?.contactUnreadCount = count + unreadActions.count
-          } else {
-            self?.contactUnreadCount = count
-          }
+    DispatchQueue.global().async { [weak self] in
+      ContactRepo.shared.getUnreadApplicationCount { count, error in
+        if IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
+          let option = V2NIMTeamJoinActionInfoQueryOption()
+          option.offset = 0
+          option.limit = neTeamJoinActionPageLimit
+          TeamRepo.shared.getTeamJoinActionInfoList(option) { result, error in
+            if let actions = result?.infos {
+              let unreadActions = actions.filter { $0.timestamp > neTeamJoinActionReadTime }
+              self?.contactUnreadCount = count + unreadActions.count
+            } else {
+              self?.contactUnreadCount = count
+            }
 
-          // 显示红点
-          if (self?.contactUnreadCount ?? 0) > 0 {
-            self?.tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
-          } else {
-            self?.tabBar.hideBadg(on: 1)
-          }
+            // 显示红点
+            DispatchQueue.main.async {
+              if (self?.contactUnreadCount ?? 0) > 0 {
+                self?.tabBar.showBadgOn(index: 1, tabbarItemNums: 3)
+              } else {
+                self?.tabBar.hideBadg(on: 1)
+              }
 
-          //      // 显示未读数
-          //      self?.setupContactBadge(unreadCount: contactUnreadCount)
+              //      // 显示未读数
+              //      self?.setupContactBadge(unreadCount: contactUnreadCount)
+            }
+          }
         }
       }
     }

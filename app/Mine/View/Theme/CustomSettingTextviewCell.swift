@@ -94,7 +94,11 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
     }
   }
 
-  func textViewDidChange(_ textView: UITextView) {
-    dataModel?.customInputText = textView.text
+  func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    if let textString = textView.text as? NSString {
+      let changeString = textString.replacingCharacters(in: range, with: text)
+      dataModel?.customInputText = changeString
+    }
+    return true
   }
 }

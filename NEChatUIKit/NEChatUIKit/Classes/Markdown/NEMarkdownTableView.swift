@@ -37,16 +37,16 @@ open class NEMarkdownTableView: UIView {
   /// 表格最大宽度（调用者传入，默认为屏幕宽度 - 32）
   open var maxWidth: CGFloat = UIScreen.main.bounds.width - 32
 
-  open var headerBackgroundColor: UIColor = UIColor(red: 0.90, green: 0.92, blue: 0.96, alpha: 1)
-  open var oddRowBackgroundColor: UIColor = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
+  open var headerBackgroundColor: UIColor = .init(red: 0.90, green: 0.92, blue: 0.96, alpha: 1)
+  open var oddRowBackgroundColor: UIColor = .init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)
   open var evenRowBackgroundColor: UIColor = .white
-  open var borderColor: UIColor = UIColor(red: 0.80, green: 0.82, blue: 0.86, alpha: 1)
+  open var borderColor: UIColor = .init(red: 0.80, green: 0.82, blue: 0.86, alpha: 1)
   open var borderWidth: CGFloat = 0.5
   open var cellPadding: CGFloat = 8
   open var headerFont: UIFont = .boldSystemFont(ofSize: 14)
   open var cellFont: UIFont = .systemFont(ofSize: 14)
   open var headerTextColor: UIColor = .black
-  open var cellTextColor: UIColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
+  open var cellTextColor: UIColor = .init(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
 
   // MARK: - 私有属性
 
@@ -57,11 +57,11 @@ open class NEMarkdownTableView: UIView {
   public init(data: NEMarkdownTableData, maxWidth: CGFloat) {
     super.init(frame: .zero)
     self.maxWidth = maxWidth
-    self.tableData = data
+    tableData = data
     setupTable()
   }
 
-  required public init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
@@ -124,7 +124,7 @@ open class NEMarkdownTableView: UIView {
       for (colIdx, text) in cells.enumerated() {
         let alignment = colIdx < data.alignments.count ? data.alignments[colIdx] : .left
         let cellLabel = makeCellLabel(text, font: font, textColor: textColor,
-                                     colWidth: colWidth, alignment: alignment)
+                                      colWidth: colWidth, alignment: alignment)
         cellLabel.frame = CGRect(x: currentX + cellPadding,
                                  y: currentY + cellPadding,
                                  width: colWidth - cellPadding * 2,
@@ -149,7 +149,9 @@ open class NEMarkdownTableView: UIView {
     for (i, row) in data.rows.enumerated() {
       // 补齐/截断列数
       var cells = row
-      while cells.count < colCount { cells.append("") }
+      while cells.count < colCount {
+        cells.append("")
+      }
       if cells.count > colCount { cells = Array(cells.prefix(colCount)) }
       renderRow(cells, isHeader: false, rowIndex: i)
     }
@@ -168,7 +170,7 @@ open class NEMarkdownTableView: UIView {
   // MARK: - 辅助
 
   private func makeCellLabel(_ text: String, font: UIFont, textColor: UIColor,
-                              colWidth: CGFloat, alignment: NEMarkdownTableAlignment) -> UILabel {
+                             colWidth: CGFloat, alignment: NEMarkdownTableAlignment) -> UILabel {
     let label = UILabel()
     label.text = text
     label.font = font
@@ -231,7 +233,9 @@ open class NEMarkdownTableView: UIView {
     totalHeight += rowHeight(cells: data.headers, font: headerFont) + borderWidth
     for row in data.rows {
       var cells = row
-      while cells.count < colCount { cells.append("") }
+      while cells.count < colCount {
+        cells.append("")
+      }
       totalHeight += rowHeight(cells: Array(cells.prefix(colCount)), font: cellFont) + borderWidth
     }
     totalHeight += borderWidth // 底部边框

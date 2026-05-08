@@ -83,3 +83,26 @@
 "account_kicked_offline"="Your session was revoked";
 
 "click_to_report"="Click Report";
+
+// MARK: Translation Settings
+"translation_setting"="Translate";
+"translation_target_language"="Target Language";
+"auto_translation"="Auto Translate";
+"auto_translation_tip"="Automatically translate incoming text messages";
+
+// Language names
+"lang_zh_chs"="Chinese (Simplified)";
+"lang_zh_cht"="Chinese (Traditional)";
+"lang_en"="English";
+"lang_ja"="Japanese";
+"lang_ko"="Korean";
+"lang_fr"="French";
+"lang_de"="German";
+"lang_es"="Spanish";
+"lang_it"="Italian";
+"lang_ru"="Russian";
+"lang_pt"="Portuguese";
+"lang_ar"="Arabic";
+"lang_th"="Thai";
+"lang_vi"="Vietnamese";
+"lang_id"="Indonesian";

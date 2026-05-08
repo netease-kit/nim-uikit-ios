@@ -15,6 +15,69 @@ open class IMPushConfigModel: NSObject {
   public var customJson: String?
 
   public var config = V2NIMMessagePushConfig()
+
+  func dictionaryRepresentation() -> [String: Any] {
+    var dictionary = [String: Any]()
+    dictionary["configMap"] = configMap as? [String: Any] ?? [:]
+    if let customJson {
+      dictionary["customJson"] = customJson
+    }
+
+    var configDictionary = [String: Any]()
+    configDictionary["pushEnabled"] = config.pushEnabled
+    configDictionary["pushNickEnabled"] = config.pushNickEnabled
+    if let pushContent = config.pushContent {
+      configDictionary["pushContent"] = pushContent
+    }
+    if let pushPayload = config.pushPayload {
+      configDictionary["pushPayload"] = pushPayload
+    }
+    configDictionary["forcePush"] = config.forcePush
+    if let forcePushContent = config.forcePushContent {
+      configDictionary["forcePushContent"] = forcePushContent
+    }
+    if let forcePushAccountIds = config.forcePushAccountIds, !forcePushAccountIds.isEmpty {
+      configDictionary["forcePushAccountIds"] = forcePushAccountIds
+    }
+    dictionary["config"] = configDictionary
+    return dictionary
+  }
+
+  static func model(from dictionary: [String: Any]) -> IMPushConfigModel {
+    let model = IMPushConfigModel()
+    if let configMap = dictionary["configMap"] as? [String: Any] {
+      model.configMap = NSMutableDictionary(dictionary: configMap)
+    }
+    if let customJson = dictionary["customJson"] as? String {
+      model.customJson = customJson
+    }
+    if let configDictionary = dictionary["config"] as? [String: Any] {
+      let pushConfig = V2NIMMessagePushConfig()
+      if let pushEnabled = configDictionary["pushEnabled"] as? Bool {
+        pushConfig.pushEnabled = pushEnabled
+      }
+      if let pushNickEnabled = configDictionary["pushNickEnabled"] as? Bool {
+        pushConfig.pushNickEnabled = pushNickEnabled
+      }
+      if let pushContent = configDictionary["pushContent"] as? String {
+        pushConfig.pushContent = pushContent
+      }
+      if let pushPayload = configDictionary["pushPayload"] as? String {
+        pushConfig.pushPayload = pushPayload
+      }
+      if let forcePush = configDictionary["forcePush"] as? Bool {
+        pushConfig.forcePush = forcePush
+      }
+      if let forcePushContent = configDictionary["forcePushContent"] as? String {
+        pushConfig.forcePushContent = forcePushContent
+      }
+      if let forcePushAccountIds = configDictionary["forcePushAccountIds"] as? [String] {
+        pushConfig.forcePushAccountIds = forcePushAccountIds
+      }
+      model.config = pushConfig
+    }
+    return model
+  }
 }
 
 class IMPushConfigManager: NSObject {
@@ -85,9 +148,13 @@ class IMPushConfigManager: NSObject {
   func saveObjectToDisk(_ object: IMPushConfigModel, fileName: String) {
     if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
       let archiveURL = documentsDirectory.appendingPathComponent(fileName)
-      let data = try? NSKeyedArchiver.archivedData(withRootObject: object, requiringSecureCoding: false)
       do {
-        try data?.write(to: archiveURL)
+        let data = try PropertyListSerialization.data(
+          fromPropertyList: object.dictionaryRepresentation(),
+          format: .binary,
+          options: 0
+        )
+        try data.write(to: archiveURL, options: .atomic)
       } catch {
         print("saveObjectToDisk error: \(error)")
       }
@@ -103,11 +170,19 @@ class IMPushConfigManager: NSObject {
     if FileManager.default.fileExists(atPath: archiveURL.path) {
       do {
         let retrievedData = try Data(contentsOf: archiveURL)
-        if let object = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(retrievedData) as? IMPushConfigModel {
-          return object
+        let propertyList = try PropertyListSerialization.propertyList(from: retrievedData, options: [], format: nil)
+        if let dictionary = propertyList as? [String: Any],
+           dictionary["configMap"] != nil || dictionary["customJson"] != nil || dictionary["config"] != nil {
+          return IMPushConfigModel.model(from: dictionary)
         }
       } catch {
         print("loadObjectFromDisk error: \(error)")
+      }
+
+      do {
+        try FileManager.default.removeItem(at: archiveURL)
+      } catch {
+        print("remove invalid push config error: \(error)")
       }
     }
 

@@ -122,6 +122,10 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
 
   /// 翻译结果回调
   @objc optional func didTranslateResult(_ content: String)
+
+  /// 自动翻译完成回调（实时新消息或自己发送的消息翻译完成）
+  /// - Parameter index: 消息在 messages 中的下标
+  @objc optional func autoTranslationDidFinish(_ index: Int)
 }
 
 @objcMembers
@@ -156,6 +160,9 @@ open class ChatViewModel: NSObject {
   public var isHistoryChat = false
 
   public var deletingMsgDic = Set<String>()
+
+  /// 正在翻译中的消息 ID 集合（防并发重复触发）
+  private var translatingMessageIds = Set<String>()
 
   /// AI 翻译 User
   public var translationAIUser: V2NIMAIUser?
@@ -1545,6 +1552,12 @@ open class ChatViewModel: NSObject {
       }
     }
 
+    // 文本消息：末尾始终追加【翻译】按钮（非空内容才显示）
+    if model?.message?.messageType == .MESSAGE_TYPE_TEXT,
+       let text = model?.message?.text, !text.isEmpty {
+      items.append(OperationItem.translateItem())
+    }
+
     return items
   }
 
@@ -2375,6 +2388,10 @@ open class ChatViewModel: NSObject {
 
     if indexPath.row >= 0 {
       delegate?.sendSuccess(message, indexPath)
+      // 自己发送成功后触发自动翻译
+      if let model = messages.first(where: { $0.message?.messageClientId == message.messageClientId }) as? MessageTextModel {
+        autoTranslateIfNeeded(model: model)
+      }
     }
   }
 
@@ -2476,6 +2493,213 @@ open class ChatViewModel: NSObject {
       }
     }
   }
+
+  // MARK: - 消息翻译（Translation）
+
+  /// 对文本消息执行翻译，成功后持久化缓存并通知 UI 刷新
+  /// - Parameters:
+  ///   - model: 目标文本消息 Model
+  ///   - targetLanguage: 目标语言代码，默认取全局配置
+  ///   - completion: 完成回调 (index, error)，index 为消息在 messages 中的下标，-1 表示找不到
+  open func performTranslation(model: MessageTextModel,
+                               targetLanguage: String? = nil,
+                               _ completion: @escaping (Int, Error?) -> Void) {
+    guard let message = model.message else {
+      completion(-1, nil)
+      return
+    }
+    let lang = (targetLanguage?.isEmpty == false ? targetLanguage : nil)
+      ?? IMKitConfigCenter.shared.translationTargetLanguage
+    // 缓存命中：同语言已有译文 → 直接显示，不重复请求
+    if let cached = model.translationInfo, cached.targetLanguage == lang, !cached.translatedText.isEmpty {
+      model.translationVisible = true
+      let index = messages.firstIndex(where: { $0.message?.messageClientId == message.messageClientId }) ?? -1
+      completion(index, nil)
+      return
+    }
+    // @ 保留：切分文本，对每个非 @ 片段独立翻译，全部回调后拼装写入
+    guard let msgText = message.text, !msgText.isEmpty else {
+      completion(-1, nil)
+      return
+    }
+    let (parts, isAtFlags) = ChatMessageHelper.splitTextByAtMentions(text: msgText, message: message)
+
+    // 预填槽位：@ 段直接保留原文，非 @ 段待翻译
+    var translatedSlots = [String?](repeating: nil, count: parts.count)
+    var pendingCount = 0
+    for i in 0 ..< parts.count {
+      if isAtFlags[i] || parts[i].isEmpty {
+        translatedSlots[i] = parts[i]
+      } else {
+        pendingCount += 1
+      }
+    }
+
+    // 如果全是 @ 段（无需翻译），直接拼接持久化
+    if pendingCount == 0 {
+      let restoredText = parts.joined()
+      let info = TranslationInfo(targetLanguage: lang, translatedText: restoredText)
+      model.translationInfo = info
+      model.translationVisible = true
+      ChatRepo.shared.saveTranslationToLocalExtension(message: message, info: info) { _, _ in }
+      let index = messages.firstIndex(where: { $0.message?.messageClientId == message.messageClientId }) ?? -1
+      completion(index, nil)
+      return
+    }
+
+    // 并行翻译所有非 @ 片段，全部回调后拼装
+    // slotQueue 串行队列：保护 translatedSlots 并发写入
+    let slotQueue = DispatchQueue(label: "ne.chat.translation.slots")
+    let remaining = NEAtomicInt(pendingCount)
+    let hasError = NEAtomicBool(false)
+
+    for i in 0 ..< parts.count {
+      guard !isAtFlags[i], !parts[i].isEmpty else { continue }
+      let slotIndex = i
+      let partText = parts[i]
+      ChatRepo.shared.translateTextContent(partText, targetLanguage: lang) { [weak self] translated, error in
+        guard let self = self else { return }
+        if hasError.value { return }
+        if let err = error {
+          if hasError.compareAndSet(false, to: true) {
+            let index = self.messages.firstIndex(where: { $0.message?.messageClientId == message.messageClientId }) ?? -1
+            completion(index, err)
+          }
+          return
+        }
+        // 串行写入槽位（避免并发数组竞争）
+        slotQueue.async { [weak self] in
+          guard let self = self else { return }
+          translatedSlots[slotIndex] = (translated?.isEmpty == false) ? translated : partText
+          // 全部完成后拼装写入（decrement 在串行队列内确保有序）
+          if remaining.decrement() == 0 {
+            let restoredText = translatedSlots.compactMap { $0 }.joined()
+            let info = TranslationInfo(targetLanguage: lang, translatedText: restoredText)
+            DispatchQueue.main.async {
+              model.translationInfo = info
+              model.translationVisible = true
+              ChatRepo.shared.saveTranslationToLocalExtension(message: message, info: info) { _, _ in }
+              let index = self.messages.firstIndex(where: { $0.message?.messageClientId == message.messageClientId }) ?? -1
+              completion(index, nil)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// 隐藏译文（不清除缓存，仅设置 translationVisible = false）
+  /// - Parameters:
+  ///   - model: 目标文本消息 Model
+  ///   - completion: 完成回调 (index)
+  open func hideTranslation(model: MessageTextModel,
+                            _ completion: @escaping (Int) -> Void) {
+    model.translationVisible = false
+    let index = messages.firstIndex(where: { $0.message?.messageClientId == model.message?.messageClientId }) ?? -1
+    completion(index)
+  }
+
+  /// 自动翻译：对实时新消息判断是否需要自动翻译（D5-A）
+  /// 调用时机：收到对方新消息后（自己发送的消息不自动翻译）
+  open func autoTranslateIfNeeded(model: MessageTextModel) {
+    let enableTime = IMKitConfigCenter.shared.autoTranslationEnableTime
+    guard enableTime > 0, // 自动翻译开关已开启
+          let message = model.message,
+          message.senderId != IMKitClient.instance.account(), // 只翻译对方消息
+          message.messageType == .MESSAGE_TYPE_TEXT, // 文本消息
+          let text = message.text, !text.isEmpty, // 非空内容
+          message.createTime > enableTime, // 消息创建时间 > 开关打开时刻
+          model.translationInfo == nil // 无已有翻译缓存
+    else { return }
+    let lang = IMKitConfigCenter.shared.translationTargetLanguage
+    performTranslation(model: model, targetLanguage: lang) { [weak self] index, _ in
+      guard index >= 0 else { return }
+      DispatchQueue.main.async {
+        self?.delegate?.autoTranslationDidFinish?(index)
+      }
+    }
+  }
+
+  /// 历史消息自动翻译（D4-B）
+  /// 调用时机：列表停止滚动（scrollViewDidEndDecelerating / scrollViewDidEndDragging 非 decelerate）
+  /// - Parameters:
+  ///   - visibleModels: 当前可见的消息 Model 列表（由 ViewController 传入）
+  ///   - onTranslated: 每条消息翻译完成后的回调 (index)，由 ViewController 负责刷新 cell
+  open func autoTranslateVisibleHistory(visibleModels: [MessageContentModel],
+                                        onTranslated: @escaping (Int) -> Void) {
+    let enableTime = IMKitConfigCenter.shared.autoTranslationEnableTime
+    guard enableTime > 0 else { return }
+
+    let lang = IMKitConfigCenter.shared.translationTargetLanguage
+    var count = 0
+    let maxPerBatch = 5
+
+    for model in visibleModels {
+      guard count < maxPerBatch,
+            let textModel = model as? MessageTextModel,
+            let message = textModel.message,
+            message.senderId != IMKitClient.instance.account(), // 只翻译对方消息
+            message.messageType == .MESSAGE_TYPE_TEXT,
+            let text = message.text, !text.isEmpty,
+            message.createTime > enableTime,
+            textModel.translationInfo == nil,
+            let msgId = message.messageClientId,
+            !translatingMessageIds.contains(msgId)
+      else { continue }
+
+      translatingMessageIds.insert(msgId)
+      count += 1
+
+      performTranslation(model: textModel, targetLanguage: lang) { [weak self] index, _ in
+        self?.translatingMessageIds.remove(msgId)
+        if index >= 0 {
+          onTranslated(index)
+        }
+      }
+    }
+  }
+
+  /// 译文转发：用译文文本构造新文本消息并发送到目标会话（复用转发确认弹窗流程）
+  /// - Parameters:
+  ///   - translatedText: 需要转发的译文内容
+  ///   - comment: 附言（可为 nil）
+  ///   - conversationIds: 目标会话 ID 列表
+  ///   - completion: 完成回调
+  open func sendTranslationForwardMessage(translatedText: String,
+                                          comment: String?,
+                                          conversationIds: [String],
+                                          _ completion: @escaping (Error?) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(),
+                   desc: #function + " to \(conversationIds.count) conversations")
+    guard !translatedText.isEmpty else {
+      completion(nil)
+      return
+    }
+    // 复用 forwardMessages 体系：依次发送文本消息到各目标会话
+    var lastError: Error?
+    let group = DispatchGroup()
+    for conversationId in conversationIds {
+      group.enter()
+      let textMessage = V2NIMMessageCreator.createTextMessage(translatedText)
+      let params = V2NIMSendMessageParams()
+      sendMessage(message: textMessage, conversationId: conversationId, params: params) { result, error, _ in
+        if let err = error { lastError = err }
+        // 若有附言，额外发送附言消息
+        if let note = comment, !note.isEmpty {
+          let noteMessage = V2NIMMessageCreator.createTextMessage(note)
+          let noteParams = V2NIMSendMessageParams()
+          self.sendMessage(message: noteMessage, conversationId: conversationId, params: noteParams) { _, _, _ in
+            group.leave()
+          }
+        } else {
+          group.leave()
+        }
+      }
+    }
+    group.notify(queue: .main) {
+      completion(lastError)
+    }
+  }
 }
 
 // MARK: - NEMessageListener
@@ -2570,6 +2794,10 @@ extension ChatViewModel: NEChatListener {
           if let index = self?.insertToMessages(model) {
             self?.delegate?.onRecvMessages([msg], [IndexPath(row: index, section: 0)])
             self?.loadMoreWithMessage([msg])
+            // 收到新消息时触发自动翻译（含对方消息和自己在其他端发的消息）
+            if let textModel = model as? MessageTextModel {
+              self?.autoTranslateIfNeeded(model: textModel)
+            }
           }
         }
       }

@@ -7,6 +7,7 @@ import NEChatKit
 import NEChatUIKit
 import NIMSDK
 import UIKit
+import YXLogin
 
 // import NEMapKit
 import NERtcCallKit
@@ -54,7 +55,6 @@ class SceneDelegate: UIResponder {
     v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
 
     // IM配置
-    IMKitClient.instance.config.fcsEnable = false
     IMKitClient.instance.config.shouldSyncStickTopSessionInfos = true
     IMKitClient.instance.config.teamReceiptEnabled = true
     IMKitClient.instance.config.shouldSyncUnreadCount = true
@@ -69,7 +69,7 @@ class SceneDelegate: UIResponder {
   func setupInit(_ completion: ((Error?) -> Void)?) {
     if IMPocConfigManager.instance.getConfig().enableCustomConfig.boolValue {
       // 开启自定义配置，使用自定义配置
-//      NIMSDK.shared().serverSetting = NIMServerSetting()
+      ServerAddresses.configCustomServer(IMPocConfigManager.instance.getConfig())
 
       if IMPocConfigManager.instance.getConfig().customJson?.count ?? 0 > 0 {
         loginWithAutoParseConfig(completion)
@@ -81,6 +81,9 @@ class SceneDelegate: UIResponder {
       }
     }
 
+    // 配置节点
+    ServerAddresses.configServer()
+
     setupIM()
 
     NEAIUserManager.shared.setProvider(provider: self)
@@ -89,10 +92,62 @@ class SceneDelegate: UIResponder {
 
     loadService()
 
+    // 恢复翻译配置
+    let userDefaults = UserDefaults.standard
+    let savedEnableTime = userDefaults.double(forKey: "autoTranslationEnableTime")
+    IMKitConfigCenter.shared.autoTranslationEnableTime = savedEnableTime
+    if let savedLang = userDefaults.string(forKey: "translationTargetLanguage"), !savedLang.isEmpty {
+      IMKitConfigCenter.shared.translationTargetLanguage = savedLang
+    }
+
     // 群聊申请邀请功能
     IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth = true
-    
-    loginWithUI()
+
+    let config = YXConfig()
+    config.appKey = ServerAddresses.getAppkey()
+    config.parentScope = NSNumber(integerLiteral: 2)
+    config.scope = NSNumber(integerLiteral: 7)
+    #if DEBUG
+      config.isOnline = false
+      print("debug")
+    #else
+      config.isOnline = true
+      print("release")
+    #endif
+    AuthorManager.shareInstance()?.initAuthor(with: config)
+
+    AuthorManager.shareInstance()?.autoLogin { [weak self] userInfo, error in
+      if let err = error as? NSError {
+        if err.code > 0 {
+          SceneDelegate.window?.neMakeToast(err.localizedDescription)
+        }
+        self?.loginWithUI()
+      } else if let useInfo = userInfo {
+        let option = V2NIMLoginOption()
+        option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
+        IMKitClient.instance.login(useInfo.imAccid, useInfo.imToken, option) { error in
+          if let err = error {
+            NEALog.infoLog(SceneDelegate.className(), desc: "login IM error : \(err.localizedDescription)")
+            self?.loginWithUI()
+            if err.code == inValidTokenCode {
+              SceneDelegate.window?.neMakeToast(localizable("login_token_expired"))
+            } else if err.code == userBannedCode {
+              SceneDelegate.window?.neMakeToast(localizable("account_forbidden"))
+            } else {
+              SceneDelegate.window?.neMakeToast(err.localizedDescription)
+            }
+          } else {
+            NEALog.infoLog(SceneDelegate.className(), desc: "login IM Success")
+            self?.initConfig()
+            self?.initializePage()
+          }
+          completion?(error)
+        }
+      } else {
+        self?.loginWithUI()
+        completion?(nil)
+      }
+    }
   }
 
   @objc func refreshRoot() {
@@ -120,7 +175,7 @@ class SceneDelegate: UIResponder {
 
     // 呼叫组件初始化
     DispatchQueue.global().async {
-      let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+      let setupConfig = NESetupConfig(appkey: ServerAddresses.getAppkey())
       NECallEngine.sharedInstance().setup(setupConfig)
       NECallEngine.sharedInstance().setTimeout(30)
 

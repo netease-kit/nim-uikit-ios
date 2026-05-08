@@ -49,6 +49,9 @@ public protocol ChatBaseCellDelegate: NSObjectProtocol {
 
   // 点击自动检测的链接（url、mobile、email）
   @objc optional func didTapDetectedLink(_ cell: UITableViewCell, _ model: MessageContentModel?, _ url: URL)
+
+  // 长按译文区域（弹出「复制 / 转发 / 隐藏」菜单）
+  @objc optional func didLongPressTranslationView(_ cell: UITableViewCell, _ model: MessageContentModel?)
 }
 
 @objc

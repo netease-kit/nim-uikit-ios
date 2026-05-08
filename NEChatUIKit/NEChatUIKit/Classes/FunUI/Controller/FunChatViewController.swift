@@ -383,6 +383,17 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       model.contentSize = CGSize(width: contentWidth, height: contentHeight - 2)
       model.offset = -2
     }
+
+    // Fun 皮肤：历史消息加载时，若已有译文则补入气泡高度
+    if let textModel = model as? MessageTextModel,
+       textModel.translationInfo != nil,
+       textModel.translationVisible {
+      let bubbleH = textModel.estimateTranslationBubbleHeight()
+      if bubbleH > 0, textModel.addedTranslationHeight == 0 {
+        textModel.height += bubbleH
+        textModel.addedTranslationHeight = bubbleH
+      }
+    }
   }
 
   override open func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
@@ -448,5 +459,113 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       funLanguageSelectController.currentContent = current
     }
     showLanguageContentController(funLanguageSelectController)
+  }
+
+  // MARK: - Fun 皮肤译文高度处理
+
+  // Fun 皮肤直接复用基类 autoTranslationDidFinish（基类已调用 applyTranslationHeightAndReload + 滚动）
+
+  /// 翻译成功后将气泡高度加入 model.height，再刷新 cell
+  override open func translateMessage() {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+    guard let textModel = viewModel.operationModel as? MessageTextModel else { return }
+    viewModel.performTranslation(model: textModel) { [weak self] index, error in
+      guard let self = self else { return }
+      if error != nil {
+        self.showToast(chatLocalizable("chat_translate_failed"))
+        return
+      }
+      // 先还原旧译文高度（语言切换后高度可能不同）
+      if textModel.addedTranslationHeight > 0 {
+        textModel.height -= textModel.addedTranslationHeight
+        textModel.addedTranslationHeight = 0
+      }
+      let bubbleH = textModel.estimateTranslationBubbleHeight()
+      if bubbleH > 0 {
+        textModel.height += bubbleH
+        textModel.addedTranslationHeight = bubbleH
+      }
+      if index >= 0 {
+        self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+      }
+    }
+  }
+
+  // Fun 皮肤复用基类 triggerAutoTranslateHistory（基类已调用 applyTranslationHeightAndReload + 滚动）
+
+  // MARK: - PIN 操作（Fun 皮肤重写，确保主线程刷新）
+
+  /// Fun 皮肤下 PIN 操作：基类逻辑完成后，在主线程强制刷新对应 cell
+  override open func pinMessage() {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+    guard let optModel = viewModel.operationModel, !optModel.isPined else { return }
+    if optModel.isRevoked == true { return }
+    if let message = optModel.message {
+      viewModel.addPinMessage(message: message) { [weak self] error, index in
+        DispatchQueue.main.async {
+          guard let self = self else { return }
+          if let err = error as? NSError {
+            if err.code == pinAlreadyExist { return }
+            if err.code == protocolSendFailed {
+              self.view.neMakeToast(commonLocalizable("network_error"), position: .center)
+            } else if err.code == pinLimitExceeded {
+              self.view.neMakeToast(chatLocalizable("pin_limit_exceeded"), position: .center)
+            } else {
+              self.view.neMakeToast(error?.localizedDescription, position: .center)
+            }
+          } else {
+            // 无论 index 是否有效，都强制刷新整个列表，保证 PIN 标记可见
+            self.tableView.reloadData()
+          }
+        }
+      }
+    }
+  }
+
+  /// Fun 皮肤下取消 PIN：基类逻辑完成后，在主线程强制刷新对应 cell
+  override open func removePinMessage() {
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+    guard let optModel = viewModel.operationModel, optModel.isPined else { return }
+    if let message = optModel.message {
+      viewModel.removePinMessage(message: message) { [weak self] error, index in
+        DispatchQueue.main.async {
+          guard let self = self else { return }
+          if let err = error as? NSError {
+            if err.code == pinNotExist { return }
+            if err.code == protocolSendFailed {
+              self.view.neMakeToast(commonLocalizable("network_error"), position: .center)
+            } else {
+              self.view.neMakeToast(error?.localizedDescription, position: .center)
+            }
+          } else {
+            self.tableView.reloadData()
+          }
+        }
+      }
+    }
+  }
+
+  /// 隐藏译文时还原气泡高度，再刷新 cell
+  override open func hideTranslationMessage() {
+    guard let textModel = viewModel.operationModel as? MessageTextModel else { return }
+    if textModel.addedTranslationHeight > 0 {
+      textModel.height -= textModel.addedTranslationHeight
+      textModel.addedTranslationHeight = 0
+    }
+    viewModel.hideTranslation(model: textModel) { [weak self] index in
+      guard let self = self else { return }
+      if index >= 0 {
+        self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+      }
+    }
   }
 }
