@@ -7,7 +7,6 @@ import NECommonKit
 import NECoreIM2Kit
 import NIMSDK
 import UIKit
-import YXLogin
 
 @objcMembers
 public class NELoginViewController: UIViewController {
@@ -154,55 +153,26 @@ public class NELoginViewController: UIViewController {
   }
 
   func loginBtnClick(sender: UIButton) {
-    // login to business server
-    let config = YXConfig()
-    config.appKey = ServerAddresses.getAppkey()
-    config.parentScope = NSNumber(integerLiteral: 2)
-    config.scope = NSNumber(integerLiteral: 7)
-    config.supportInternationalize = true
-    config.type = .phone
-    #if DEBUG
-      config.isOnline = false
-    #else
-      config.isOnline = true
-    #endif
-    AuthorManager.shareInstance()?.initAuthor(with: config)
-
     weak var weakSelf = self
-    AuthorManager.shareInstance()?.startLogin(completion: { user, error in
-      if let err = error {
-        print("login error : ", err)
-      } else {
-        weakSelf?.setupSuccessLogic(user)
-      }
-    })
+    print("login accid : ", account)
+    print("login token : ", token)
+    
+    let option = V2NIMLoginOption()
+    option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
+    IMKitClient.instance.login(account, token, option) { error in
+        if let err = error {
+            NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM error : \(err.localizedDescription)")
+            UIApplication.shared.keyWindow?.neMakeToast(err.localizedDescription)
+        } else {
+            NEALog.infoLog(weakSelf?.className() ?? "", desc: "login IM Success")
+            if let block = weakSelf?.successLogin {
+                block()
+            }
+        }
+    }
   }
 
   func emailLoginBtnClick(sender: UIButton) {
-    // login to business server
-    let config = YXConfig()
-    config.appKey = ServerAddresses.getAppkey()
-    config.parentScope = NSNumber(integerLiteral: 2)
-    config.scope = NSNumber(integerLiteral: 7)
-    config.supportInternationalize = false
-    config.type = .email
-    #if DEBUG
-      config.isOnline = false
-      print("debug")
-    #else
-      config.isOnline = true
-      print("release")
-    #endif
-    AuthorManager.shareInstance()?.initAuthor(with: config)
-
-    weak var weakSelf = self
-    AuthorManager.shareInstance()?.startLogin(completion: { user, error in
-      if let err = error {
-        print("login error : ", err)
-      } else {
-        weakSelf?.setupSuccessLogic(user)
-      }
-    })
   }
 
   func nodeBtnClick(sender: UIButton) {
@@ -221,29 +191,5 @@ public class NELoginViewController: UIViewController {
   func pocSettingBtnClick(sender: UIButton) {
     let pocConfigController = IMPocConfigViewController()
     navigationController?.pushViewController(pocConfigController, animated: true)
-  }
-
-  private func setupSuccessLogic(_ user: YXUserInfo?) {
-    if let token = user?.imToken, let account = user?.imAccid {
-      let option = V2NIMLoginOption()
-      option.syncLevel = .DATA_SYNC_TYPE_LEVEL_BASIC
-      IMKitClient.instance.login(account, token, option) { [weak self] error in
-        if let err = error {
-          NEALog.infoLog(NELoginViewController.className(), desc: "login IM error : \(err.localizedDescription)")
-          if err.code == inValidTokenCode {
-            self?.showToast(localizable("login_token_expired"))
-          } else if err.code == userBannedCode {
-            self?.showToast(localizable("account_forbidden"))
-          } else {
-            self?.showToast(err.localizedDescription)
-          }
-        } else {
-          NEALog.infoLog(NELoginViewController.className(), desc: "login IM Success")
-          if let block = self?.successLogin {
-            block()
-          }
-        }
-      }
-    }
   }
 }

@@ -8,7 +8,6 @@ import NECoreKit
 import NETeamUIKit
 import NIMSDK
 import UIKit
-import YXLogin
 
 /// 翻译目标语言选择页（Demo 层）
 /// 展示 15 种语言，右上角「保存」确认，退出返回放弃

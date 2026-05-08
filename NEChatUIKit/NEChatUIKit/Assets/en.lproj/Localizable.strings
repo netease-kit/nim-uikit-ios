@@ -218,6 +218,10 @@
 "translate_default"="Translate to";
 "format_not_supported"="Invalid Type";
 "chat_translate"="Translate";
+"chat_translate_btn"="Translate";
+"chat_translate_hide"="Hide";
+"chat_translate_tag"="Translation";
+"chat_translate_failed"="Translation failed";
 "ai_user_pin_top"="PIN";
 "request_exception" = "AI error";
 "ai_request_ing" = "Thinking…";

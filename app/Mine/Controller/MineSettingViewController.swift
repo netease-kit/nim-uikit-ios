@@ -8,7 +8,6 @@ import NECoreKit
 import NETeamUIKit
 import NIMSDK
 import UIKit
-import YXLogin
 
 class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UITableViewDelegate {
   private var viewModel = MineSettingViewModel()
@@ -96,23 +95,6 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
       tableView.register(value, forCellReuseIdentifier: "\(key)")
     }
 
-    let delAccountBtn = UIButton()
-    delAccountBtn.translatesAutoresizingMaskIntoConstraints = false
-    delAccountBtn.setTitleColor(UIColor.ne_lightText, for: .normal)
-    delAccountBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12.0)
-    delAccountBtn.setTitle(NSLocalizedString("account_Cancellation", comment: ""), for: .normal)
-    delAccountBtn.addTarget(self, action: #selector(delAccountBtnClick), for: .touchUpInside)
-    delAccountBtn.accessibilityIdentifier = "id.serverConfig"
-
-    view.addSubview(delAccountBtn)
-    NSLayoutConstraint.activate([
-      delAccountBtn.bottomAnchor.constraint(
-        equalTo: view.bottomAnchor,
-        constant: -10 - NEConstant.statusBarHeight
-      ),
-      delAccountBtn.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
-    ])
-
     navigationView.moreButton.isHidden = true
   }
 
@@ -145,80 +127,30 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
 
   @objc func loginOutAction() {
     weak var weakSelf = self
-    AuthorManager.shareInstance()?
-      .logout(
-        withConfirm: localizable("want_to_logout"),
-        withCompletion: { [weak self] user, error in
-          if error != nil {
-            NEALog.infoLog(MineSettingViewController.className(), desc: "logout author manager error : \(error?.localizedDescription ?? "")")
-            self?.view.neMakeToast(error?.localizedDescription)
-            NEALog.errorLog(
-              self?.tag ?? "",
-              desc: "CALLBACK logout failed,error = \(error!)"
-            )
-          } else {
-            weakSelf?.logoutButton.isEnabled = false
-            IMKitClient.instance.logoutIM { error in
-              weakSelf?.logoutButton.isEnabled = true
-              if error != nil {
-                NEALog.infoLog(MineSettingViewController.className(), desc: "logout im  error : \(error?.localizedDescription ?? "")")
-                self?.view.neMakeToast(error?.localizedDescription)
-              } else {
-                NEALog.infoLog(MineSettingViewController.className(), desc: "logout im  success ")
+    logoutButton.isEnabled = false
 
-                let config = IMPocConfigManager.instance.getConfig()
-                config.accountId = nil
-                config.accountIdToken = nil
-                IMPocConfigManager.instance.saveConfig(model: config)
+    showAlert(message: localizable("want_to_logout")) {
+      IMKitClient.instance.logoutIM { error in
+        weakSelf?.logoutButton.isEnabled = true
+        if error != nil {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  error : \(error?.localizedDescription ?? "")")
+          weakSelf?.view.ne_makeToast(error?.localizedDescription)
+        } else {
+          NEALog.infoLog(weakSelf?.className() ?? "", desc: "logout im  success ")
+          NotificationCenter.default.post(
+            name: Notification.Name("logout"),
+            object: nil
+          )
 
-                NotificationCenter.default.post(
-                  name: Notification.Name("logout"),
-                  object: nil
-                )
+          let config = IMPocConfigManager.instance.getConfig()
+          config.accountId = nil
+          config.accountIdToken = nil
+          IMPocConfigManager.instance.saveConfig(model: config)
 
-                NEFriendUserCache.shared.removeAllFriendInfo()
-                NESubscribeManager.shared.cleanCache()
-              }
-            }
-          }
+          NEFriendUserCache.shared.removeAllFriendInfo()
         }
-      )
-  }
-
-  /// 【注销】按钮点击事件，仅做演示
-  @objc func delAccountBtnClick() {
-    AuthorManager.shareInstance()?
-      .logout(
-        withConfirm: NSLocalizedString("want_to_delete_account", comment: ""),
-        withCompletion: { [weak self] user, error in
-          if error != nil {
-            self?.view.neMakeToast(error?.localizedDescription)
-            NEALog.errorLog(
-              self?.tag ?? "",
-              desc: "CALLBACK logout failed,error = \(error!)"
-            )
-          } else {
-            IMKitClient.instance.logoutIM { error in
-              if error != nil {
-                self?.view.neMakeToast(error?.localizedDescription)
-                NEALog.errorLog(
-                  self?.tag ?? "",
-                  desc: "CALLBACK logout failed,error = \(error!)"
-                )
-              } else {
-                NotificationCenter.default.post(
-                  name: Notification.Name("logout"),
-                  object: nil
-                )
-                NEALog.infoLog(
-                  self?.tag ?? "",
-                  desc: "CALLBACK logout SUCCESS"
-                )
-              }
-            }
-          }
-        }
-      )
+      }
+    }
   }
 
   // MARK: UITableViewDataSource, UITableViewDelegate

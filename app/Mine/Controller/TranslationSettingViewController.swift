@@ -8,7 +8,6 @@ import NECoreKit
 import NETeamUIKit
 import NIMSDK
 import UIKit
-import YXLogin
 
 /// 翻译设置页面（Demo 层）
 /// 提供「翻译目标语言」入口行（右侧显示当前语言）和「自动翻译」开关
