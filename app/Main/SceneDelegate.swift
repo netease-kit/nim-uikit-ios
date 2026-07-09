@@ -118,18 +118,16 @@ class SceneDelegate: UIResponder {
 //    NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
 
     // 呼叫组件初始化
-    DispatchQueue.global().async {
-      let setupConfig = NESetupConfig(appkey: AppKey.appKey)
-      NECallEngine.sharedInstance().setup(setupConfig)
-      NECallEngine.sharedInstance().setTimeout(30)
-
-      let uiConfig = NECallUIKitConfig()
-      NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
-
-      let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
-      pushRegistry.delegate = self
-      pushRegistry.desiredPushTypes = [PKPushType.voIP]
-    }
+    let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+    NECallEngine.sharedInstance().setup(setupConfig)
+    NECallEngine.sharedInstance().setTimeout(30)
+    
+    let uiConfig = NECallUIKitConfig()
+    NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+    
+    let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
+    pushRegistry.delegate = self
+    pushRegistry.desiredPushTypes = [PKPushType.voIP]
   }
 
   func initializePage(_ isLoginInit: Bool = false) {
