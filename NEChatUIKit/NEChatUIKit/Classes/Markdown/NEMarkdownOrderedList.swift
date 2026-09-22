@@ -14,7 +14,8 @@ import Foundation
 /// ```
 ///
 /// 渲染效果：保留原始序号，添加首行缩进与悬挂缩进，与 `NEMarkdownList` 无序列表风格一致。
-open class NEMarkdownOrderedList: NEMarkdownLevelElement {
+@objcMembers
+open class NEMarkdownOrderedList: NSObject, NEMarkdownLevelElement {
   // 匹配：可选前导空格（用于判断缩进级别）+ 数字 + 点 + 空格 + 内容
   // group(1)：前导空格（level 由空格数决定）
   // group(2)：数字序号（如 "1"、"2"）

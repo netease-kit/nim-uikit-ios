@@ -7,7 +7,7 @@ import CoreGraphics
 import Foundation
 import UIKit
 
-public extension UIImage {
+@objc public extension UIImage {
   class func ne_imageNamed(name: String?) -> UIImage? {
     guard let imageName = name else {
       return nil
@@ -25,7 +25,7 @@ public extension UIImage {
   }
 }
 
-public extension UIImage {
+@objc public extension UIImage {
   /// 修复图片旋转
   func fixOrientation() -> UIImage {
     // 默认方向无需旋转

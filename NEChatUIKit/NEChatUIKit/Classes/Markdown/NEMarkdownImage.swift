@@ -13,7 +13,8 @@ public let NEMarkdownImageDidLoadNotification = Notification.Name("NEMarkdownIma
 /// 支持标准 Markdown 图片语法：`![alt text](url)`
 /// 解析后将图片替换为 `NSTextAttachment`，图片宽度不超过 `maxWidth`，保持宽高比。
 /// 首次渲染使用占位图，异步下载完成后发送通知，由 Cell 层刷新。
-open class NEMarkdownImage: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownImage: NSObject, NEMarkdownElement {
   // 匹配 ![alt](url) 或 ![alt](url "title")，同时兼容 URL 被引号包裹的情况 ![alt]("url")
   public let regex = "!\\[[^\\[\\]]*\\]\\(\\s*\"?(\\S+?)\"?(?:\\s+\"[^\"]*\")?\\s*\\)"
 
@@ -26,7 +27,7 @@ open class NEMarkdownImage: NEMarkdownElement {
   /// 占位图尺寸
   public var placeholderSize: CGSize = .init(width: 120, height: 80)
 
-  public init() {}
+  override public init() {}
 
   public func regularExpression() throws -> NSRegularExpression {
     try NSRegularExpression(pattern: regex, options: [])
@@ -65,6 +66,7 @@ open class NEMarkdownImage: NEMarkdownElement {
 /// 1. 更新自身的 `image` 属性
 /// 2. 发送 `NEMarkdownImageDidLoadNotification` 通知
 /// 3. Cell 收到通知后重算高度并刷新
+@objcMembers
 open class NEMarkdownImageAttachment: NSTextAttachment {
   /// 图片 URL 字符串
   public let imageURL: String

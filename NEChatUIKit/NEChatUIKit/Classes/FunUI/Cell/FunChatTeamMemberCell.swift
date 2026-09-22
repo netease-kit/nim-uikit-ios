@@ -9,6 +9,10 @@ import UIKit
 
 @objcMembers
 open class FunChatTeamMemberCell: NEBaseChatTeamMemberCell {
+  override open var searchHighlightColor: UIColor { .ne_searchHighlight }
+  override open var nameHorizontalSpacing: CGFloat { 11 }
+  override open var nameTrailingInset: CGFloat { 29 }
+
   override open func setupUI() {
     super.setupUI()
 
@@ -20,11 +24,7 @@ open class FunChatTeamMemberCell: NEBaseChatTeamMemberCell {
       headerView.heightAnchor.constraint(equalToConstant: 40),
     ])
 
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 11.0),
-      nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -29),
-    ])
+    nameStackView.spacing = 1
 
     let line = UIView()
     line.translatesAutoresizingMaskIntoConstraints = false

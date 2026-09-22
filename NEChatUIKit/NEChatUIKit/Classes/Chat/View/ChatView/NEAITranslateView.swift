@@ -6,6 +6,7 @@ import NEChatKit
 import NEBaseUIKit
 import UIKit
 
+@objc
 public enum TranslateState: Int {
   /// 空闲
   case Idle

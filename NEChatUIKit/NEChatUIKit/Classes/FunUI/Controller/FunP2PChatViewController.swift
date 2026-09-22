@@ -44,7 +44,7 @@ open class FunP2PChatViewController: FunChatViewController {
   override public var titleContent: String {
     didSet {
       super.titleContent = titleContent
-      let text = chatLocalizable("fun_chat_input_placeholder")
+      let text = chatLocalizable("chat_input_placeholder_prompt")
       let attribute = NSMutableAttributedString(string: text)
       let style = NSMutableParagraphStyle()
       style.lineBreakMode = .byTruncatingTail

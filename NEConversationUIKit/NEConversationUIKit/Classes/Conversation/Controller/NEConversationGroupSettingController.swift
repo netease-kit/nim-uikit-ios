@@ -261,7 +261,10 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
       self.groupViewModel.removeConversations(groupId: self.group.groupId, conversationIds: [conversationId]) { [weak self] results, error in
         if let error = error {
           self?.showToast(self?.groupViewModel.groupErrorMessage(error) ?? error.localizedDescription)
-        } else if let failed = results?.first(where: { $0.error.code != 0 && $0.error.code != 200 }) {
+        } else if let failed = results?.first(where: { result in
+          guard let error = result.error as V2NIMError? else { return false }
+          return error.code != 0 && error.code != 200
+        }) {
           self?.showToast(self?.groupViewModel.groupErrorMessage(failed.error.nserror as NSError) ?? failed.error.desc)
         } else {
           if let index = self?.conversations.firstIndex(where: { $0.conversation?.conversationId == conversationId }) {

@@ -34,9 +34,11 @@ public class NETeamUserManager: NSObject {
 
   // 当前群信息,可空
   private var currentTeam: V2NIMTeam?
+  private var refreshGeneration = UUID()
 
   // 群成员信息
   private var teamMemberCache = [String: V2NIMTeamMember]()
+  private var teamMemberOrder = [String]()
 
   // 非好友的用户信息
   private var userInfoCache = [String: NEUserWithFriend]()
@@ -81,13 +83,11 @@ public class NETeamUserManager: NSObject {
 
   override private init() {
     super.init()
-    IMKitClient.instance.addLoginListener(self)
     teamRepo.addTeamListener(self)
     contactRepo.addContactListener(self)
   }
 
   deinit {
-    IMKitClient.instance.removeLoginListener(self)
     teamRepo.removeTeamListener(self)
     contactRepo.removeContactListener(self)
   }
@@ -128,32 +128,56 @@ public class NETeamUserManager: NSObject {
     }
   }
 
+  /// Invalidate pending refresh results without changing the confirmed cache.
+  open func invalidateTeamInfoRefresh(_ teamId: String) {
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in self?.invalidateTeamInfoRefresh(teamId) }
+      return
+    }
+    guard tid == teamId else { return }
+    refreshGeneration = UUID()
+  }
+
   @objc(refreshTeamInfoAndSelfMember:completion:)
   open func refreshTeamInfoAndSelfMember(_ teamId: String,
                                          completion: @escaping () -> Void) {
-    guard !teamId.isEmpty else {
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in
+        self?.refreshTeamInfoAndSelfMember(teamId, completion: completion)
+      }
+      return
+    }
+    guard !teamId.isEmpty, tid == teamId else {
       completion()
       return
     }
 
     let group = DispatchGroup()
+    refreshGeneration = UUID()
+    let generation = refreshGeneration
+    let accountId = IMKitClient.instance.account()
 
     group.enter()
-    teamRepo.getTeamInfo(teamId) { [weak self] team, error in
-      if error == nil, let team = team {
-        self?.updateTeamInfo(team)
+    teamRepo.getTeamInfoFromCloud(teamId: teamId, teamType: .TEAM_TYPE_NORMAL) { [weak self] team, error in
+      DispatchQueue.main.async {
+        if let self, self.refreshGeneration == generation,
+           IMKitClient.instance.account() == accountId, error == nil, let team {
+          self.updateTeamInfo(team)
+        }
+        group.leave()
       }
-      group.leave()
     }
 
-    let accountId = IMKitClient.instance.account()
     if !accountId.isEmpty {
       group.enter()
       teamRepo.getTeamMember(teamId, .TEAM_TYPE_NORMAL, accountId) { [weak self] teamMember, error in
-        if error == nil, let teamMember = teamMember {
-          self?.updateTeamMemberInfo(teamMember, true)
+        DispatchQueue.main.async {
+          if let self, self.refreshGeneration == generation,
+             IMKitClient.instance.account() == accountId, error == nil, let teamMember {
+            self.updateTeamMemberInfo(teamMember, true)
+          }
+          group.leave()
         }
-        group.leave()
       }
     }
 
@@ -186,6 +210,9 @@ public class NETeamUserManager: NSObject {
 
     let accid = teamMember.accountId
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", accountId:\(accid)")
+    if teamMemberCache[accid] == nil {
+      teamMemberOrder.append(accid)
+    }
     teamMemberCache[accid] = teamMember
 
     if notify {
@@ -238,7 +265,7 @@ public class NETeamUserManager: NSObject {
   /// 获取缓存的所有群成员信息
   open func getAllTeamMembers() -> [V2NIMTeamMember]? {
     if haveLoadAllMembers {
-      return teamMemberCache.values.map { $0 }
+      return orderedTeamMembers()
     }
     return nil
   }
@@ -250,10 +277,13 @@ public class NETeamUserManager: NSObject {
       let friendCache = NEFriendUserCache.shared.friendCache ?? [:]
       let userInfoCache = withUserInfoCacheLock { self.userInfoCache }
       var teamMemberInfoModels = [NETeamMemberInfoModel]()
-      for (accid, member) in teamMemberCache {
+      for member in orderedTeamMembers() {
+        let accid = member.accountId
         let model = NETeamMemberInfoModel()
         model.teamMember = member
-        model.nimUser = friendCache[accid] ?? userInfoCache[accid]
+        model.nimUser = NEAIUserManager.shared.getNEUserById(accid)
+          ?? friendCache[accid]
+          ?? userInfoCache[accid]
         teamMemberInfoModels.append(model)
       }
 
@@ -271,17 +301,20 @@ public class NETeamUserManager: NSObject {
   open func removeTeamMemberInfo(_ accountId: String) {
     if let _ = teamMemberCache[accountId] {
       teamMemberCache.removeValue(forKey: accountId)
+      teamMemberOrder.removeAll { $0 == accountId }
     }
   }
 
   /// 删除所有信息缓存
   open func removeAllTeamInfo() {
+    refreshGeneration = UUID()
     tid = nil
     currentTeam = nil
     withUserInfoCacheLock {
       userInfoCache.removeAll()
     }
     teamMemberCache.removeAll()
+    teamMemberOrder.removeAll()
     haveLoadAllMembers = false
   }
 
@@ -392,25 +425,90 @@ public class NETeamUserManager: NSObject {
   open func getAllTeamMembers(_ teamId: String,
                               _ queryType: V2NIMTeamMemberRoleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
                               _ completion: @escaping ([NEUserWithFriend]) -> Void) {
+    getAllTeamMembers(teamId, queryType, progress: nil, completion: completion)
+  }
+
+  /// 获取所有群成员信息和用户信息，并在每个用户资料批次完成后发送累计进度。
+  /// 群成员元数据仍按原有串行链路一次性获取，progress 只反映资料补齐进度。
+  open func getAllTeamMembers(_ teamId: String,
+                              _ queryType: V2NIMTeamMemberRoleQueryType = .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
+                              progress: ((NETeamMemberLoadProgress) -> Void)?,
+                              completion: @escaping ([NEUserWithFriend]) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", teamid:\(teamId)")
     NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
     var memberLists = [V2NIMTeamMember]()
     weak var weakSelf = self
     getAllTeamMemberWithMaxLimit(teamId, nil, &memberLists, queryType) { members, error in
+      guard let manager = weakSelf else {
+        DispatchQueue.main.async {
+          completion([])
+        }
+        return
+      }
       NEALog.infoLog(NETeamUserManager.className() + " [Performance]", desc: #function + " onSuccess, count:\(members?.count ?? 0), timestamp: \(Date().timeIntervalSince1970)")
       if let err = error {
         NEALog.errorLog(ModuleName + " " + NETeamUserManager.className(), desc: #function + ", err:\(err.localizedDescription)")
+        let failed = NETeamMemberLoadProgress(
+          teamId: teamId,
+          members: [],
+          totalCount: 0,
+          phase: .failed,
+          error: err
+        )
+        DispatchQueue.main.async {
+          progress?(failed)
+          if progress != nil {
+            completion([])
+          }
+        }
       } else {
         if let teamMembers = members {
+          let isCurrentTeam = manager.tid == teamId
+          if isCurrentTeam {
+            var seenAccountIds = Set<String>()
+            manager.teamMemberOrder = teamMembers.compactMap { member in
+              seenAccountIds.insert(member.accountId).inserted ? member.accountId : nil
+            }
+          }
           var notFriendMembers = [String]()
+          var readyAccountIds = Set<String>()
           for member in teamMembers {
-            weakSelf?.teamMemberCache[member.accountId] = member
-            if !NEFriendUserCache.shared.isFriend(member.accountId) {
+            if isCurrentTeam {
+              manager.teamMemberCache[member.accountId] = member
+            }
+            let hasCachedProfile = NEFriendUserCache.shared.isFriend(member.accountId)
+              || manager.getUserInfo(member.accountId) != nil
+              || NEAIUserManager.shared.isAIUser(member.accountId)
+            if hasCachedProfile {
+              readyAccountIds.insert(member.accountId)
+            } else {
               notFriendMembers.append(member.accountId)
             }
           }
 
-          weakSelf?.splitMembers(notFriendMembers, 150, completion)
+          manager.splitMembers(
+            notFriendMembers,
+            150,
+            teamMembers: teamMembers,
+            readyAccountIds: readyAccountIds,
+            progress: progress,
+            teamId: teamId,
+            completion: completion
+          )
+        } else {
+          let failed = NETeamMemberLoadProgress(
+            teamId: teamId,
+            members: [],
+            totalCount: 0,
+            phase: .failed,
+            error: NSError(domain: "NETeamUserManager", code: -1)
+          )
+          DispatchQueue.main.async {
+            progress?(failed)
+            if progress != nil {
+              completion([])
+            }
+          }
         }
       }
     }
@@ -457,54 +555,146 @@ public class NETeamUserManager: NSObject {
   /// - Parameter completion:       完成后的回调
   private func splitMembers(_ members: [String],
                             _ maxSizeByPage: Int = 150,
-                            _ completion: @escaping ([NEUserWithFriend]) -> Void) {
+                            teamMembers: [V2NIMTeamMember],
+                            readyAccountIds: Set<String>,
+                            progress: ((NETeamMemberLoadProgress) -> Void)?,
+                            teamId: String,
+                            completion: @escaping ([NEUserWithFriend]) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", members.count:\(members.count)")
-    var remaind = [[String]]()
-    remaind.append(contentsOf: members.chunk(maxSizeByPage))
+    let remaind = members.chunk(maxSizeByPage)
     let memberUsers = [NEUserWithFriend]()
     NEALog.infoLog(className() + " [Performance]", desc: "fetchTeamMemberUserInfos start, timestamp: \(Date().timeIntervalSince1970)")
 
+    let publish: (NETeamMemberLoadPhase, Set<String>, NSError?) -> Void = { [weak self] phase, readyIds, error in
+      guard let self else { return }
+      let models = self.progressModels(for: teamMembers, readyAccountIds: readyIds)
+      let update = NETeamMemberLoadProgress(
+        teamId: teamId,
+        members: models,
+        totalCount: teamMembers.count,
+        phase: phase,
+        error: error
+      )
+      DispatchQueue.main.async {
+        progress?(update)
+      }
+    }
+
+    publish(.loading, readyAccountIds, nil)
+
     weak var weakSelf = self
     DispatchQueue.global().async {
-      weakSelf?.fetchTeamMemberUserInfos(&remaind, memberUsers, completion)
+      weakSelf?.fetchTeamMemberUserInfos(
+        remaind,
+        memberUsers,
+        readyAccountIds: readyAccountIds,
+        publish: publish,
+        teamMembers: teamMembers,
+        teamId: teamId,
+        progress: progress,
+        completion: completion
+      )
     }
   }
 
   /// 从云信服务器批量获取用户资料
   ///   - Parameter remainUserIds:  用户集合
   ///   - Parameter completion:    成功回调
-  private func fetchTeamMemberUserInfos(_ remainUserIds: inout [[String]],
+  private func fetchTeamMemberUserInfos(_ remainUserIds: [[String]],
                                         _ memberUsers: [NEUserWithFriend],
-                                        _ completion: @escaping ([NEUserWithFriend]) -> Void) {
+                                        readyAccountIds: Set<String>,
+                                        publish: @escaping (NETeamMemberLoadPhase, Set<String>, NSError?) -> Void,
+                                        teamMembers: [V2NIMTeamMember],
+                                        teamId: String,
+                                        progress: ((NETeamMemberLoadProgress) -> Void)?,
+                                        completion: @escaping ([NEUserWithFriend]) -> Void) {
     guard let members = remainUserIds.first else {
-      haveLoadAllMembers = true
+      if tid == teamId {
+        haveLoadAllMembers = true
+      }
       NEALog.infoLog(className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
+      publish(.finished, readyAccountIds.union(teamMembers.map(\.accountId)), nil)
       DispatchQueue.main.async {
         completion(memberUsers)
       }
       return
     }
 
-    var temArray = remainUserIds
-    var memberUsers = memberUsers
+    let nextChunks = Array(remainUserIds.dropFirst())
+    var nextMemberUsers = memberUsers
     weak var weakSelf = self
 
     contactRepo.getUserListFromCloud(accountIds: members) { [weak self] users, v2Error in
+      guard let self else {
+        DispatchQueue.main.async {
+          completion([])
+        }
+        return
+      }
       if let err = v2Error {
         NEALog.errorLog(ModuleName + " " + NETeamUserManager.className(), desc: #function + "err:\(err.localizedDescription)")
+        publish(.failed, readyAccountIds, err)
+        DispatchQueue.main.async {
+          if progress != nil {
+            completion(memberUsers)
+          }
+        }
       } else {
         if let users = users {
           for user in users {
             if user.user?.accountId != nil {
-              self?.storeUserInfo(user, notify: false)
-              memberUsers.append(user)
+              self.storeUserInfo(user, notify: false)
+              nextMemberUsers.append(user)
             }
           }
         }
-        temArray.removeFirst()
-        weakSelf?.fetchTeamMemberUserInfos(&temArray, memberUsers, completion)
+        var nextReadyIds = readyAccountIds
+        nextReadyIds.formUnion(members)
+        publish(.loading, nextReadyIds, nil)
+        weakSelf?.fetchTeamMemberUserInfos(
+          nextChunks,
+          nextMemberUsers,
+          readyAccountIds: nextReadyIds,
+          publish: publish,
+          teamMembers: teamMembers,
+          teamId: teamId,
+          progress: progress,
+          completion: completion
+        )
       }
     }
+  }
+
+  private func progressModels(for teamMembers: [V2NIMTeamMember],
+                              readyAccountIds: Set<String>) -> [NETeamMemberInfoModel] {
+    let friendCache = NEFriendUserCache.shared.friendCache ?? [:]
+    let userInfoCache = withUserInfoCacheLock { self.userInfoCache }
+    var includedAccountIds = Set<String>()
+    return teamMembers.compactMap { member in
+      guard readyAccountIds.contains(member.accountId),
+            includedAccountIds.insert(member.accountId).inserted else {
+        return nil
+      }
+      let model = NETeamMemberInfoModel()
+      model.teamMember = member
+      model.nimUser = NEAIUserManager.shared.getNEUserById(member.accountId)
+        ?? friendCache[member.accountId]
+        ?? userInfoCache[member.accountId]
+      return model
+    }
+  }
+
+  private func orderedTeamMembers() -> [V2NIMTeamMember] {
+    var included = Set<String>()
+    let ordered = teamMemberOrder.compactMap { accountId -> V2NIMTeamMember? in
+      guard let member = teamMemberCache[accountId] else { return nil }
+      included.insert(accountId)
+      return member
+    }
+    let remaining = teamMemberCache.values
+      .filter { !included.contains($0.accountId) }
+      .sorted { $0.accountId < $1.accountId }
+    return ordered + remaining
   }
 
   @objc(updateTeamMemberInfo:)
@@ -549,6 +739,14 @@ public class NETeamUserManager: NSObject {
                                    queryType: V2NIMTeamMemberRoleQueryType,
                                    completion: @escaping ([NEUserWithFriend]) -> Void) {
     getAllTeamMembers(teamId, queryType, completion)
+  }
+
+  @objc(getAllTeamMembers:queryType:progress:completion:)
+  open func objc_getAllTeamMembers(_ teamId: String,
+                                   queryType: V2NIMTeamMemberRoleQueryType,
+                                   progress: ((NETeamMemberLoadProgress) -> Void)?,
+                                   completion: @escaping ([NEUserWithFriend]) -> Void) {
+    getAllTeamMembers(teamId, queryType, progress: progress, completion: completion)
   }
 }
 
@@ -596,17 +794,28 @@ extension NETeamUserManager: NETeamListener {
   /// 群组成员加入回调
   /// - Parameter teamMembers: 群成员
   open func onTeamMemberJoined(_ teamMembers: [V2NIMTeamMember]) {
+    guard let tid else { return }
     var notFriendMembers = [String]()
-    for member in teamMembers {
-      if member.teamId == tid {
-        updateTeamMemberInfo(member)
-        if !NEFriendUserCache.shared.isFriend(member.accountId) {
-          notFriendMembers.append(member.accountId)
-        }
+    var readyAccountIds = Set<String>()
+    let currentMembers = teamMembers.filter { $0.teamId == tid }
+    for member in currentMembers {
+      updateTeamMemberInfo(member)
+      if NEFriendUserCache.shared.isFriend(member.accountId)
+        || getUserInfo(member.accountId) != nil
+        || NEAIUserManager.shared.isAIUser(member.accountId) {
+        readyAccountIds.insert(member.accountId)
+      } else {
+        notFriendMembers.append(member.accountId)
       }
     }
 
-    splitMembers(notFriendMembers) { [weak self] userFirends in
+    splitMembers(
+      notFriendMembers,
+      teamMembers: currentMembers,
+      readyAccountIds: readyAccountIds,
+      progress: nil,
+      teamId: tid
+    ) { [weak self] userFirends in
       for userFirend in userFirends {
         self?.storeUserInfo(userFirend, notify: true)
       }
@@ -640,32 +849,6 @@ extension NETeamUserManager: NETeamListener {
     for member in teamMembers {
       if member.teamId == tid {
         removeTeamMemberInfo(member.accountId)
-      }
-    }
-  }
-}
-
-// MARK: - NEIMKitClientListener
-
-extension NETeamUserManager: NEIMKitClientListener {
-  /// 数据同步回调
-  /// - Parameters:
-  ///   - type: 同步的数据类型
-  ///   - state: 同步状态
-  ///   - error: 错误信息
-  open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
-    guard let tid = tid else { return }
-
-    // 断网重连后，重新拉取群信息、自己的群成员信息
-    if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
-      // 获取群信息
-      teamRepo.getTeamInfo(tid) { [weak self] team, error in
-        self?.updateTeamInfo(team)
-      }
-
-      // 获取自己的群成员信息
-      teamRepo.getTeamMember(tid, .TEAM_TYPE_NORMAL, IMKitClient.instance.account()) { [weak self] teamMember, error in
-        self?.updateTeamMemberInfo(teamMember)
       }
     }
   }

@@ -8,6 +8,7 @@ import UIKit
 
 @objcMembers
 open class ChatMessageTextCell: NormalChatMessageBaseCell {
+  override open var usesInlineReactionSurface: Bool { true }
   var isLongPress: Bool = false
 
   public lazy var contentLabelLeft: NEChatTextView = {
@@ -71,6 +72,8 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
   // 隐藏时强制高度为 0 的约束（激活 = 隐藏，停用 = 显示）
   private var translationAreaLeftHeightZero: NSLayoutConstraint?
   private var translationAreaRightHeightZero: NSLayoutConstraint?
+  private var translationAreaLeftTopAnchor: NSLayoutConstraint?
+  private var translationAreaRightTopAnchor: NSLayoutConstraint?
 
   private func makeTranslationArea(isSend: Bool) -> UIView {
     let container = UIView()
@@ -81,18 +84,20 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     // 将译文正文、底部译文标识行及整行空白区域统一纳入长按范围。
     let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onTranslationLongPress(_:)))
     container.addGestureRecognizer(longPress)
+    let retryTap = UITapGestureRecognizer(target: self, action: #selector(onTranslationRetryTap(_:)))
+    container.addGestureRecognizer(retryTap)
 
     // 1. 分割线
     let divider = UIView()
     divider.translatesAutoresizingMaskIntoConstraints = false
-    divider.backgroundColor = UIColor(white: 0, alpha: 0.12)
+    divider.backgroundColor = .normalChatTranslationDividerColor
 
     // 2. 译文正文
     let textLabel = UILabel()
     textLabel.translatesAutoresizingMaskIntoConstraints = false
     textLabel.numberOfLines = 0
     textLabel.font = messageTextFont // 与原文字体一致
-    textLabel.textColor = .black
+    textLabel.textColor = .ne_darkText
     textLabel.accessibilityIdentifier = "id.translationText"
     textLabel.isUserInteractionEnabled = false
 
@@ -108,7 +113,7 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     footerLabel.translatesAutoresizingMaskIntoConstraints = false
     footerLabel.text = chatLocalizable("chat_translate_tag")
     footerLabel.font = .systemFont(ofSize: 12)
-    footerLabel.textColor = UIColor(white: 0, alpha: 0.4)
+    footerLabel.textColor = .normalChatTranslationTagColor
 
     footerView.addSubview(iconView)
     footerView.addSubview(footerLabel)
@@ -160,6 +165,13 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     delegate?.didLongPressTranslationView?(self, contentModel)
   }
 
+  @objc private func onTranslationRetryTap(_ gesture: UITapGestureRecognizer) {
+    guard gesture.state == .ended,
+          let model = contentModel as? MessageTextModel,
+          model.translationFailed else { return }
+    delegate?.didTapTranslationRetryView?(self, model)
+  }
+
   func tapFunc() {
     contentModel?.selectRange = nil
     delegate?.didTextViewLoseFocus?(self, contentModel)
@@ -183,17 +195,24 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     translationAreaLeftHeightZero = translationAreaLeft.heightAnchor.constraint(equalToConstant: 0)
     translationAreaLeftHeightZero?.isActive = true
 
+    translationAreaLeftTopAnchor = translationAreaLeft.topAnchor.constraint(equalTo: contentLabelLeft.bottomAnchor)
+    reactionTopAnchorLeft?.isActive = false
+    reactionTopAnchorLeft = reactionViewLeft.topAnchor.constraint(
+      equalTo: translationAreaLeft.bottomAnchor,
+      constant: chat_content_margin
+    )
     NSLayoutConstraint.activate([
       contentLabelLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: chat_content_margin),
       contentLabelLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
       contentLabelLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor, constant: chat_content_margin),
       bottomToBubble,
 
-      // 译文区域紧接在 contentLabel 下方，bottom 撑开气泡
-      translationAreaLeft.topAnchor.constraint(equalTo: contentLabelLeft.bottomAnchor, constant: 0),
+      // A collapsed translation area keeps ordinary text spacing unchanged.
+      translationAreaLeftTopAnchor!,
       translationAreaLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: chat_content_margin),
       translationAreaLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor, constant: -chat_content_margin),
-      translationAreaLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: -chat_content_margin),
+      reactionViewLeft.bottomAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: -chat_content_margin),
+      reactionTopAnchorLeft!,
     ])
   }
 
@@ -210,16 +229,23 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     translationAreaRightHeightZero = translationAreaRight.heightAnchor.constraint(equalToConstant: 0)
     translationAreaRightHeightZero?.isActive = true
 
+    translationAreaRightTopAnchor = translationAreaRight.topAnchor.constraint(equalTo: contentLabelRight.bottomAnchor)
+    reactionTopAnchorRight?.isActive = false
+    reactionTopAnchorRight = reactionViewRight.topAnchor.constraint(
+      equalTo: translationAreaRight.bottomAnchor,
+      constant: chat_content_margin
+    )
     NSLayoutConstraint.activate([
       contentLabelRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: chat_content_margin),
       contentLabelRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin),
       contentLabelRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor, constant: chat_content_margin),
       bottomToBubble,
 
-      translationAreaRight.topAnchor.constraint(equalTo: contentLabelRight.bottomAnchor, constant: 0),
+      translationAreaRightTopAnchor!,
       translationAreaRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: chat_content_margin),
       translationAreaRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -chat_content_margin),
-      translationAreaRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: -chat_content_margin),
+      reactionViewRight.bottomAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: -chat_content_margin),
+      reactionTopAnchorRight!,
     ])
   }
 
@@ -238,13 +264,18 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     let area = isSend ? translationAreaRight : translationAreaLeft
     let textLabel = isSend ? translationTextLabelRight : translationTextLabelLeft
     let heightZero = isSend ? translationAreaRightHeightZero : translationAreaLeftHeightZero
-    let hasTranslation = model.translationInfo != nil &&
+    let hasTranslation = (model.translationFailed || model.translationInfo != nil) &&
       !(model.translationInfo?.translatedText.isEmpty ?? true) &&
       model.translationVisible &&
       !model.inMultiForward
 
-    if hasTranslation {
-      textLabel.text = model.translationInfo?.translatedText
+    let shouldShowFailure = model.translationFailed && model.translationVisible && !model.inMultiForward
+
+    if hasTranslation || shouldShowFailure {
+      textLabel.text = shouldShowFailure
+        ? chatLocalizable("chat_translate_failed_retry")
+        : model.translationInfo?.translatedText
+      textLabel.textColor = shouldShowFailure ? UIColor.ne_normalTheme : .ne_darkText
       // 停用高度为 0 的约束，让内容自然撑开
       heightZero?.isActive = false
       area.isHidden = false
@@ -271,6 +302,38 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     } else {
       contentLabel.text = model.message?.text
       contentLabel.accessibilityValue = model.message?.text
+    }
+
+    // Keep Normal/Feishu reactions below the complete text and translation body.
+    // The base cell still owns the same reaction view and callbacks; only the
+    // bubble dimensions and the two vertical anchors change here.
+    let reactionView = isSend ? reactionViewRight : reactionViewLeft
+    let hasReaction = model.reactionHeight > 0
+    // A text bubble may be visually short while its minimum height is greater
+    // than `chat_min_h`. Always measure Reaction against the available message
+    // width so short messages do not collapse into one item per row.
+    let reactionInset = reactionHorizontalInset(for: model)
+    let reactionMaxWidth = max(26, chat_content_maxW - reactionInset * 2)
+    let reactionWidth = hasReaction
+      ? min(reactionMaxWidth,
+            max(reactionView.layoutWidth(forMaxWidth: reactionMaxWidth), 26))
+      : 0
+    // `MessageTextModel.contentSize.width` includes the text view's two
+    // horizontal insets. Keep those insets when the text reaches the maximum
+    // measured width; otherwise the Reaction surface is wider than the
+    // bubble and the leading capsule can render outside the text area.
+    let bubbleMaxWidth = chat_content_maxW + reactionInset * 2
+    let bubbleWidth = hasReaction
+      ? min(bubbleMaxWidth, max(model.contentSize.width, reactionWidth + reactionInset * 2))
+      : model.contentSize.width
+    if isSend {
+      bubbleWRight?.constant = bubbleWidth
+      bubbleHRight?.constant = model.contentSize.height + (hasReaction ? model.reactionHeight : 0)
+      translationAreaRightTopAnchor?.constant = 0
+    } else {
+      bubbleWLeft?.constant = bubbleWidth
+      bubbleHLeft?.constant = model.contentSize.height + (hasReaction ? model.reactionHeight : 0)
+      translationAreaLeftTopAnchor?.constant = 0
     }
   }
 

@@ -32,6 +32,10 @@ open class TopicChatViewModel: P2PChatViewModel, NETopicListener {
   private var isRemovingCurrentTopic = false
   private var didNotifyCurrentTopicRemoved = false
 
+  override open var supportsLastReadPosition: Bool {
+    false
+  }
+
   // MARK: - Init
 
   public init(conversationId: String,
@@ -152,45 +156,13 @@ open class TopicChatViewModel: P2PChatViewModel, NETopicListener {
       return String(text.prefix(20))
     }
 
-    let summary = topicSummaryText(for: message)
+    let summary = ChatMessageHelper.conversationListSummary(message)
+      .trimmingCharacters(in: .whitespacesAndNewlines)
     if !summary.isEmpty {
-      return removingMessageSummaryBrackets(from: summary)
+      return String(summary.prefix(20))
     }
 
     return sessionName
-  }
-
-  private func topicSummaryText(for message: V2NIMMessage) -> String {
-    if message.messageType == .MESSAGE_TYPE_TEXT {
-      return message.text ?? ""
-    }
-
-    switch message.messageType {
-    case .MESSAGE_TYPE_IMAGE:
-      return chatLocalizable("msg_image")
-    case .MESSAGE_TYPE_AUDIO:
-      return chatLocalizable("msg_audio")
-    case .MESSAGE_TYPE_VIDEO:
-      return chatLocalizable("msg_video")
-    case .MESSAGE_TYPE_FILE:
-      if let fileAttachment = message.attachment as? V2NIMMessageFileAttachment,
-         !fileAttachment.name.isEmpty {
-        return "\(chatLocalizable("msg_file")) \(fileAttachment.name)"
-      }
-      return chatLocalizable("msg_file")
-    case .MESSAGE_TYPE_LOCATION:
-      return "\(chatLocalizable("msg_location")) \(message.text ?? "")".trimmingCharacters(in: .whitespacesAndNewlines)
-    default:
-      let content = ChatMessageHelper.contentOfMessage(message)
-      return content.isEmpty ? (message.text ?? "") : content
-    }
-  }
-
-  private func removingMessageSummaryBrackets(from text: String) -> String {
-    text
-      .replacingOccurrences(of: "[", with: "")
-      .replacingOccurrences(of: "]", with: "")
-      .trimmingCharacters(in: .whitespacesAndNewlines)
   }
 
   private func compactTopicText(_ text: String?) -> String {

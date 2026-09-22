@@ -141,4 +141,31 @@ open class NormalChatMessageBaseCell: NEBaseChatMessageCell {
 
     super.setModel(model, isSend)
   }
+
+  /// Media cells clear the foreground bubble image to keep their content
+  /// full-bleed. Reaction still needs the original Normal/Feishu skin behind
+  /// that content and the reaction row.
+  override open func reactionBackdropImage(isOutgoing: Bool) -> UIImage? {
+    let properties = ChatUIConfig.shared.messageProperties
+    var image = isOutgoing
+      ? properties.selfMessageBgImage
+      : properties.receiveMessageBgImage
+    image = image ?? UIImage.ne_imageNamed(name: isOutgoing
+      ? "chat_message_send"
+      : "chat_message_receive")
+    if let insets = properties.backgroundImageCapInsets {
+      return image?.resizableImage(withCapInsets: insets)
+    }
+    return image
+  }
+
+  override open func reactionTopSpacing(for model: MessageContentModel) -> CGFloat {
+    return model.type == .audio ? 0 : super.reactionTopSpacing(for: model)
+  }
+
+  override open func reactionBottomSpacing(for model: MessageContentModel) -> CGFloat {
+    return [.audio, .image, .video, .file, .location].contains(model.type)
+      ? NEBaseChatMessageCell.reactionBottomPadding
+      : super.reactionBottomSpacing(for: model)
+  }
 }

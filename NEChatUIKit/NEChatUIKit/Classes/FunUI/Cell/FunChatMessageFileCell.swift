@@ -8,6 +8,10 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageFileCell: FunChatMessageBaseCell {
+  override open func shouldCopyBubbleBackgroundToReactionBackdrop(for model: MessageContentModel) -> Bool {
+    false
+  }
+
   weak var weakModel: MessageFileModel?
 
   public lazy var imgViewLeft: UIImageView = {

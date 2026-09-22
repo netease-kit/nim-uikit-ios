@@ -224,12 +224,16 @@ open class NEBaseLocalConversationListCell: UITableViewCell {
     }
     let expectedSessionId = sessionId
     NEAIRobotManager.shared.checkIfRobot(expectedSessionId) { [weak self] isRobot in
-      guard let self,
-            self.conversationType == .CONVERSATION_TYPE_P2P,
-            self.sessionId == expectedSessionId else {
-        return
-      }
       DispatchQueue.main.async {
+        // The cell may be rebound after the robot lookup completes but before
+        // this deferred UI update runs. Recheck the conversation identity at
+        // the point where the title is written to prevent stale names from
+        // overwriting a reused cell.
+        guard let self,
+              self.conversationType == .CONVERSATION_TYPE_P2P,
+              self.sessionId == expectedSessionId else {
+          return
+        }
         self.configureTitle(displayName, isRobot: isRobot)
       }
     }

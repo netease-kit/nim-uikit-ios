@@ -448,13 +448,13 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
   }
 
   open func deleteFriend(user: NEUserWithFriend?) {
-    let alertTitle = String(format: localizable("delete_title"), user?.showName() ?? "")
+    let name = user?.showName() ?? ""
+    let alertTitle = String(format: localizable("delete_title"), name)
     let alertController = UIAlertController(
       title: alertTitle,
       message: nil,
       preferredStyle: .actionSheet
     )
-    alertController.view.findLabel(with: alertTitle)?.accessibilityIdentifier = "id.action1"
 
     let cancelAction = UIAlertAction(
       title: commonLocalizable("cancel"),
@@ -473,6 +473,26 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
 
     alertController.addAction(cancelAction)
     alertController.addAction(deleteAction)
+    let titleLabel = alertController.view.findLabel(with: alertTitle)
+    let attributedTitle = NECommonUtil.contactNameAttributedTitle(
+      alertTitle, name: name,
+      font: titleLabel?.font ?? .systemFont(ofSize: 13, weight: .semibold),
+      color: titleLabel?.textColor ?? .ne_greyText
+    )
+    alertController.setValue(attributedTitle, forKey: "attributedTitle")
+    if let titleLabel = alertController.view.findLabel(with: alertTitle) {
+      // UIAlertController may keep the title label's original single-line
+      // measurement after an attributed title is assigned. Rebind the text
+      // after enabling multiline layout so long emoji names do not clip the
+      // final line above the action buttons.
+      titleLabel.numberOfLines = 0
+      titleLabel.lineBreakMode = .byCharWrapping
+      titleLabel.attributedText = attributedTitle
+      titleLabel.setNeedsLayout()
+      alertController.view.setNeedsLayout()
+      alertController.view.layoutIfNeeded()
+      titleLabel.accessibilityIdentifier = "id.action1"
+    }
     fixAlertOnIpad(alertController)
     present(alertController, animated: true, completion: nil)
   }

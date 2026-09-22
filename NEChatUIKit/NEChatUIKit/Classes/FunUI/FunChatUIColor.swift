@@ -5,7 +5,7 @@
 import Foundation
 import NEChatKit
 
-public extension UIColor {
+@objc public extension UIColor {
   static let funChatThemeColor = UIColor.ne_funTheme
   static let funChatBackgroundColor = UIColor(hexString: "#EDEDED")
   static let funChatLineBorderColor = UIColor(hexString: "#E5E5E5")

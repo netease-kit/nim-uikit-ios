@@ -4,6 +4,7 @@
 
 import NEChatKit
 import NEChatUIKit
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -133,7 +134,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
 
   // 搜索输入框
   public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
+    let textField = NESingleLineSearchTextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.contentMode = .center
     textField.leftView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))

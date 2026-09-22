@@ -31,6 +31,7 @@ public struct NEMarkdownTableData {
 ///   - 列宽 = (totalWidth - borderWidth) / columnCount，最小 60 pt
 ///   - 单元格内文字自动换行，行高由最高的那个单元格决定
 ///   - 表头行背景色与数据行交替区分
+@objcMembers
 open class NEMarkdownTableView: UIView {
   // MARK: - 样式可配置项
 

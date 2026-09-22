@@ -7,6 +7,8 @@ import UIKit
 
 @objcMembers
 open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtocol {
+  override open var supportsReactionLongPress: Bool { false }
+
   public var messageId: String?
   public var isPlaying: Bool = false
 
@@ -28,12 +30,24 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
     return label
   }()
 
+  public lazy var audioBodyBackgroundViewLeft: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
+    view.isHidden = true
+    view.layer.cornerRadius = 4
+    return view
+  }()
+
   public lazy var contentLabelLeft: UILabel = {
     let label = UILabel()
     label.isHidden = true
     label.font = messageTextFont
     label.textColor = UIColor.ne_darkText
-    label.textAlignment = .justified
+    // Voice-to-text should keep the recognition result's natural spacing.
+    // Justified alignment expands CJK glyphs when the audio bubble is wider
+    // than the transcript and makes the text look as if spaces were inserted.
+    label.textAlignment = .left
     label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.voiceToText"
@@ -94,12 +108,21 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
     return label
   }()
 
+  public lazy var audioBodyBackgroundViewRight: UIView = {
+    let view = UIView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isUserInteractionEnabled = false
+    view.isHidden = true
+    view.layer.cornerRadius = 4
+    return view
+  }()
+
   public lazy var contentLabelRight: UILabel = {
     let label = UILabel()
     label.isHidden = true
     label.font = messageTextFont
     label.textColor = UIColor.ne_darkText
-    label.textAlignment = .justified
+    label.textAlignment = .left
     label.numberOfLines = 0
     label.translatesAutoresizingMaskIntoConstraints = false
     label.accessibilityIdentifier = "id.voiceToText"
@@ -144,6 +167,17 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
 
   override open func commonUILeft() {
     super.commonUILeft()
+    bubbleImageLeft.addSubview(audioBodyBackgroundViewLeft)
+    NSLayoutConstraint.activate([
+      audioBodyBackgroundViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor,
+                                                        constant: 4),
+      audioBodyBackgroundViewLeft.topAnchor.constraint(equalTo: replyViewLeft.bottomAnchor,
+                                                       constant: 4),
+      audioBodyBackgroundViewLeft.rightAnchor.constraint(equalTo: bubbleImageLeft.rightAnchor,
+                                                         constant: -4),
+      audioBodyBackgroundViewLeft.heightAnchor.constraint(equalToConstant: chat_min_h - 8),
+    ])
+
     bubbleImageLeft.addSubview(backViewLeft)
     NSLayoutConstraint.activate([
       backViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: 0),
@@ -155,6 +189,17 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
 
   override open func commonUIRight() {
     super.commonUIRight()
+    bubbleImageRight.addSubview(audioBodyBackgroundViewRight)
+    NSLayoutConstraint.activate([
+      audioBodyBackgroundViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor,
+                                                         constant: 4),
+      audioBodyBackgroundViewRight.topAnchor.constraint(equalTo: replyViewRight.bottomAnchor,
+                                                        constant: 4),
+      audioBodyBackgroundViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor,
+                                                          constant: -4),
+      audioBodyBackgroundViewRight.heightAnchor.constraint(equalToConstant: chat_min_h - 8),
+    ])
+
     bubbleImageRight.addSubview(backViewRight)
     NSLayoutConstraint.activate([
       backViewRight.leftAnchor.constraint(equalTo: bubbleImageRight.leftAnchor, constant: 0),
@@ -216,12 +261,37 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
         let contentWidth = max(m.audioWidth, ceil(textSize.width) + chat_cell_margin * 2)
         let contentHeight = chat_min_h + ceil(textSize.height) + chat_content_margin
         model.contentSize = CGSize(width: contentWidth, height: contentHeight)
-        model.height = model.contentSize.height + chat_content_margin * 2 + model.fullNameHeight + chat_pin_height
+        model.height = model.contentSize.height + chat_content_margin * 2 + model.fullNameHeight + chat_pin_height + model.reactionHeight
         if let time = model.timeContent, !time.isEmpty {
           model.height += chat_timeCellH
         }
       }
     }
     super.setModel(model, isSend)
+    updateAudioBodyBackgrounds()
+  }
+
+  private func updateAudioBodyBackgrounds() {
+    updateAudioBodyBackground(
+      audioBodyBackgroundViewLeft,
+      displayed: reactionViewLeft.isEnabledForDisplay,
+      color: UIColor.ne_chatReactionReceiveBackground
+    )
+    updateAudioBodyBackground(
+      audioBodyBackgroundViewRight,
+      displayed: reactionViewRight.isEnabledForDisplay,
+      color: UIColor.ne_chatReactionContentBackground
+    )
+  }
+
+  private func updateAudioBodyBackground(_ view: UIView,
+                                         displayed: Bool,
+                                         color: UIColor) {
+    view.isHidden = !displayed
+    view.backgroundColor = displayed ? color : .clear
+    view.layer.borderWidth = displayed ? 0.5 : 0
+    view.layer.borderColor = displayed
+      ? UIColor.ne_chatReactionBorder.cgColor
+      : UIColor.clear.cgColor
   }
 }

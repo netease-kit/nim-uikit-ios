@@ -15,6 +15,7 @@ import UIKit
 /// 缺点：表格内容为静态图片，不支持交互（如滚动）。
 ///
 /// 若需要支持横向滚动大表格，可改用方案 B，参见 `NEMarkdownTableAttachment.embed(into:)`。
+@objcMembers
 open class NEMarkdownTableAttachment: NSTextAttachment {
   /// 持有表格视图（供方案 B 的 embed 使用）
   public let tableView: NEMarkdownTableView
@@ -109,6 +110,7 @@ private extension UIView {
 // MARK: - 方案 B 使用的滚动包裹视图
 
 /// 包裹 `NEMarkdownTableView` 并支持横向滚动的容器（供方案 B 使用）。
+@objcMembers
 public final class NEMarkdownTableScrollWrapper: UIScrollView {
   /// 关联的 Attachment，用于 embed 时去重识别
   public weak var attachment: NEMarkdownTableAttachment?

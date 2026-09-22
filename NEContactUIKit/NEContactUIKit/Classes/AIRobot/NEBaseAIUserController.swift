@@ -12,7 +12,7 @@ open class NEBaseAIUserController: NEContactBaseViewController, UITableViewDeleg
 
   /// 输入框
   public lazy var searchAIUserTextField: UITextField = {
-    let field = UITextField()
+    let field = NESingleLineTextField()
     field.translatesAutoresizingMaskIntoConstraints = false
     field.placeholder = commonLocalizable("search")
     field.clearButtonMode = .always

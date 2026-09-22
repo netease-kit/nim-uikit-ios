@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownEscaping: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownEscaping: NSObject, NEMarkdownElement {
   fileprivate static let regex = "\\\\."
 
   open var regex: String {

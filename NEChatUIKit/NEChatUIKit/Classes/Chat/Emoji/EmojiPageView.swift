@@ -16,21 +16,23 @@ public protocol EmojiPageViewDelegate: NSObjectProtocol {
   @objc optional func pageViewScrollEnd(_ pageView: EmojiPageView?,
                                         currentIndex: Int,
                                         totolPages: Int)
-
   @objc optional func pageViewDidScroll(_ pageView: EmojiPageView?)
   @objc optional func needScrollAnimation() -> Bool
 }
 
+@objcMembers
 open class EmojiPageView: UIView {
   open weak var dataSource: EmojiPageViewDataSource?
   open weak var pageViewDelegate: EmojiPageViewDelegate?
-  private var currentPage: NSInteger = 0
-  private var pages = [AnyObject]()
-  private let className = "EmojiPageView"
+
+  private var currentPage = 0
+  private var pages = [UIView?]()
+  private var lastLayoutSize = CGSize.zero
+  private var isUserScrolling = false
 
   private lazy var scrollView: UIScrollView = {
-    let scrollView = UIScrollView(frame: self.bounds)
-    scrollView.autoresizingMask = .flexibleWidth
+    let scrollView = UIScrollView(frame: bounds)
+    scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     scrollView.showsVerticalScrollIndicator = false
     scrollView.showsHorizontalScrollIndicator = false
     scrollView.isPagingEnabled = true
@@ -39,6 +41,18 @@ open class EmojiPageView: UIView {
     return scrollView
   }()
 
+  var pageSlotCount: Int {
+    pages.count
+  }
+
+  var loadedPageIndexes: [Int] {
+    pages.indices.filter { pages[$0] != nil }
+  }
+
+  var hasActiveScrollDelegate: Bool {
+    scrollView.delegate === self
+  }
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
     setupControls()
@@ -46,228 +60,184 @@ open class EmojiPageView: UIView {
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+    setupControls()
   }
 
-  override public var frame: CGRect {
-    set {
-      let originalWidth = width
-      super.frame = newValue
-      if originalWidth != frame.size.width {
-        reloadData()
-      }
-    }
-    get {
-      super.frame
-    }
-  }
-
-  func setupControls() {
+  private func setupControls() {
     addSubview(scrollView)
   }
 
   open func scrollToPage(page: NSInteger) {
-    if currentPage != page || page == 0 {
-      currentPage = page
-      reloadData()
-    }
+    let targetPage = boundedPage(page)
+    let shouldAnimate = pageViewDelegate?.needScrollAnimation?() ?? false
+    setCurrentPage(targetPage, animated: shouldAnimate, notifyImmediately: !shouldAnimate)
+  }
+
+  func scrollToPage(page: NSInteger, animated: Bool) {
+    let targetPage = boundedPage(page)
+    setCurrentPage(targetPage, animated: animated, notifyImmediately: !animated)
   }
 
   open func reloadData() {
-    calculatePageNumbers()
-    setupInit()
-//       reloadPage()
+    reloadData(currentPage: currentPage)
+  }
+
+  func reloadData(currentPage targetPage: Int) {
+    isUserScrolling = false
+    pages.forEach { $0?.removeFromSuperview() }
+    let pageCount = max(0, dataSource?.numberOfPages?(pageView: self) ?? 0)
+    pages = Array(repeating: nil, count: pageCount)
+    currentPage = boundedPage(targetPage)
+    scrollView.delegate = self
+    updatePageFrames()
+    loadPages(around: currentPage)
+    setContentOffset(page: currentPage, animated: false)
+    raisePageIndexChangedDelegate()
   }
 
   func viewAtIndex(index: NSInteger) -> UIView? {
-    if index >= 0, index < pages.count {
-      let obj = pages[index]
-      if obj.isKind(of: UIView.self) {
-        return obj as? UIView
-      }
+    guard pages.indices.contains(index) else {
+      return nil
     }
-    return nil
+    return pages[index]
   }
 
-  func reloadPage() {
-    // reload时候记录上次位置
-//        guard let cPage = currentPage else {
-//            NEALog.errorLog(className, desc: "currentPage is nil")
-//            return
-//        }
-    if currentPage >= pages.count {
-      currentPage = pages.count - 1
+  private func boundedPage(_ page: Int) -> Int {
+    guard !pages.isEmpty else {
+      return 0
     }
-    if currentPage < 0 {
-      currentPage = 0
+    return min(max(page, 0), pages.count - 1)
+  }
+
+  private func setCurrentPage(_ page: Int, animated: Bool, notifyImmediately: Bool) {
+    let targetPage = boundedPage(page)
+    isUserScrolling = false
+    currentPage = targetPage
+    loadPages(around: targetPage)
+    setContentOffset(page: targetPage, animated: animated)
+    if notifyImmediately {
+      raisePageIndexChangedDelegate()
     }
-    loadPages(currentPage: currentPage)
+  }
+
+  private func setContentOffset(page: Int, animated: Bool) {
+    guard bounds.width > 0 else {
+      return
+    }
+    let targetOffset = CGPoint(x: CGFloat(page) * bounds.width, y: 0)
+    scrollView.setContentOffset(
+      targetOffset,
+      animated: animated
+    )
+  }
+
+  private func updatePageFrames() {
+    scrollView.frame = bounds
+    scrollView.contentSize = CGSize(
+      width: bounds.width * CGFloat(pages.count),
+      height: bounds.height
+    )
+    for index in pages.indices {
+      pages[index]?.frame = frameForPage(index)
+    }
+  }
+
+  private func frameForPage(_ index: Int) -> CGRect {
+    CGRect(
+      x: bounds.width * CGFloat(index),
+      y: 0,
+      width: bounds.width,
+      height: bounds.height
+    )
+  }
+
+  private func loadPages(around page: Int) {
+    guard !pages.isEmpty else {
+      return
+    }
+    let first = max(page - 1, 0)
+    let last = min(page + 1, pages.count - 1)
+
+    for index in pages.indices {
+      if (first ... last).contains(index) {
+        guard pages[index] == nil,
+              let pageView = dataSource?.pageView?(pageView: self, index: index) else {
+          continue
+        }
+        pageView.frame = frameForPage(index)
+        pages[index] = pageView
+        scrollView.addSubview(pageView)
+      } else if let pageView = pages[index] {
+        pageView.removeFromSuperview()
+        pages[index] = nil
+      }
+    }
+  }
+
+  private func pageForCurrentOffset() -> Int {
+    guard bounds.width > 0, !pages.isEmpty else {
+      return 0
+    }
+    let rawPage = scrollView.contentOffset.x / bounds.width
+    return boundedPage(Int(rawPage.rounded()))
+  }
+
+  private func finishScrolling() {
+    isUserScrolling = false
+    currentPage = pageForCurrentOffset()
+    loadPages(around: currentPage)
+    setContentOffset(page: currentPage, animated: false)
     raisePageIndexChangedDelegate()
-    setNeedsLayout()
   }
 
-  func calculatePageNumbers() {
-    var numberOfPages = 0
-    for obj in pages {
-      if obj.isKind(of: UIView.self) {
-        obj.removeFromSuperview()
-      }
-    }
-    numberOfPages = dataSource?.numberOfPages?(pageView: self) ?? 0
-
-    for _ in 0 ..< numberOfPages {
-      pages.append(NSNull())
-    }
-    scrollView.delegate = nil
-    let size = bounds.size
-    scrollView.contentSize = CGSize(
-      width: size.width * CGFloat(numberOfPages),
-      height: size.height
-    )
-    scrollView.delegate = nil
-  }
-
-  func pageInBound(value: NSInteger, min: NSInteger, max: NSInteger) -> NSInteger {
-    var maxUse = max
-
-    if maxUse < min {
-      maxUse = min
-    }
-    var bounded = value
-    if bounded > maxUse {
-      bounded = maxUse
-    }
-    if bounded < min {
-      bounded = min
-    }
-    return bounded
-  }
-
-  func setupInit() {
-    let count = pages.count
-    for i in 0 ..< count {
-      if let targetView = dataSource?.pageView?(pageView: self, index: i) {
-        pages[i] = targetView
-        scrollView.addSubview(targetView)
-        let size = bounds.size
-        targetView.frame = CGRect(
-          x: size.width * CGFloat(i),
-          y: 0,
-          width: size.width,
-          height: size.height
-        )
-      }
-    }
-  }
-
-  // page载入和销毁
-  func loadPages(currentPage: NSInteger?) {
-    let count = pages.count
-    if count == 0 {
-      return
-    }
-    guard let curPage = currentPage else {
-      return
-    }
-
-    let first = pageInBound(value: curPage - 1, min: 0, max: count - 1)
-    let last = pageInBound(value: curPage + 1, min: 0, max: count - 1)
-    let range = NSRange(location: first, length: last - first + 1)
-    for i in 0 ..< count {
-      if NSLocationInRange(i, range) {
-        let obj = pages[i]
-        if !obj.isKind(of: UIView.self) {
-          if let targetView = dataSource?.pageView?(pageView: self, index: i) {
-            pages[i] = targetView
-            scrollView.addSubview(targetView)
-            let size = bounds.size
-            targetView.frame = CGRect(
-              x: size.width * CGFloat(i),
-              y: 0,
-              width: size.width,
-              height: size.height
-            )
-          } else {
-            assertionFailure()
-          }
-        }
-      } else {
-        let obj = pages[i]
-        if obj.isKind(of: UIView.self) {
-          obj.removeFromSuperview()
-          pages[i] = NSNull()
-        }
-      }
-    }
-  }
-
-  override open func layoutSubviews() {
-    super.layoutSubviews()
-    let size = bounds.size
-    scrollView.contentSize = CGSize(
-      width: size.width * CGFloat(pages.count),
-      height: size.height
-    )
-
-    for i in 0 ..< pages.count {
-      let obj = pages[i]
-      if obj.isKind(of: UIView.self) {
-        (obj as! UIView).frame = CGRect(
-          x: size.width * CGFloat(i),
-          y: 0,
-          width: size.width,
-          height: size.height
-        )
-      }
-    }
-
-//        for obj in pages {
-//            if obj.isKind(of: UIView.self) {
-//              (obj as! UIView).frame = CGRect.init(x: size.width, y: 0, width: size.width, height:
-//              size.height)
-//            }
-//        }
-    let animation = pageViewDelegate?.needScrollAnimation?()
-//        if let current = currentPage {
-    scrollView.scrollRectToVisible(
-      CGRect(x: CGFloat(currentPage) * size.width, y: 0, width: size.width,
-             height: size.height),
-      animated: animation ?? false
-    )
-//        }
-  }
-
-  // MARK: 辅助方法
-
-  func raisePageIndexChangedDelegate() {
+  private func raisePageIndexChangedDelegate() {
     pageViewDelegate?.pageViewScrollEnd?(
       self,
       currentIndex: currentPage,
       totolPages: pages.count
     )
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    let sizeChanged = bounds.size != lastLayoutSize
+    lastLayoutSize = bounds.size
+    updatePageFrames()
+    if sizeChanged {
+      setContentOffset(page: currentPage, animated: false)
+      loadPages(around: currentPage)
+    }
   }
 }
 
 extension EmojiPageView: UIScrollViewDelegate {
   open func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    let width = scrollView.bounds.size.width
-    let offsetX = scrollView.contentOffset.x
-    let page = Int(abs(offsetX / width))
-    if page >= 0, page < pages.count {
-      if currentPage == page {
-        return
-      }
-      currentPage = page
-      loadPages(currentPage: currentPage)
+    let visiblePage = pageForCurrentOffset()
+    loadPages(around: visiblePage)
+    if isUserScrolling, currentPage != visiblePage {
+      currentPage = visiblePage
+      raisePageIndexChangedDelegate()
     }
-
     pageViewDelegate?.pageViewDidScroll?(self)
   }
 
+  open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    isUserScrolling = true
+  }
+
   open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-    pageViewDelegate?.pageViewScrollEnd?(
-      self,
-      currentIndex: currentPage,
-      totolPages: pages.count
-    )
+    finishScrolling()
+  }
+
+  open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    if !decelerate {
+      finishScrolling()
+    }
+  }
+
+  open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+    if !isUserScrolling {
+      finishScrolling()
+    }
   }
 }

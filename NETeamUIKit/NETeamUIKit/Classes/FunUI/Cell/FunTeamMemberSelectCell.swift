@@ -32,9 +32,9 @@ class FunTeamMemberSelectCell: NEBaseTeamMemberSelectCell {
     ])
 
     NSLayoutConstraint.activate([
-      nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 105),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      nameStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      nameStackView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 105),
+      nameStackView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
     ])
 
     NSLayoutConstraint.activate([

@@ -63,6 +63,13 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     FunChatNewMessageView()
   }
 
+  override open func getLastReadPositionView() -> NEBaseChatLastReadPositionView {
+    let view = NEBaseChatLastReadPositionView()
+    view.accentColor = .ne_funTheme
+    view.positionImageView.image = .ne_imageNamed(name: "fun_chat_jump_to_new")
+    return view
+  }
+
   /// 获取转发确认弹窗 - 通用版
   override open func getForwardAlertController() -> NEBaseForwardAlertViewController {
     FunForwardAlertViewController()
@@ -385,7 +392,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     // Fun 皮肤：历史消息加载时，若已有译文则补入气泡高度
     if let textModel = model as? MessageTextModel,
-       textModel.translationInfo != nil,
+       (textModel.translationFailed || textModel.translationInfo != nil),
        textModel.translationVisible {
       let bubbleH = textModel.estimateTranslationBubbleHeight()
       if bubbleH > 0, textModel.addedTranslationHeight == 0 {
@@ -481,7 +488,18 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
     viewModel.performTranslation(model: textModel) { [weak self] index, error in
       guard let self = self else { return }
       if error != nil {
-        self.showToast(chatLocalizable("chat_translate_failed"))
+        if textModel.addedTranslationHeight > 0 {
+          textModel.height -= textModel.addedTranslationHeight
+          textModel.addedTranslationHeight = 0
+        }
+        let failureHeight = textModel.estimateTranslationBubbleHeight()
+        if failureHeight > 0 {
+          textModel.height += failureHeight
+          textModel.addedTranslationHeight = failureHeight
+        }
+        if index >= 0 {
+          self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+        }
         return
       }
       let indexPath = index >= 0 ? IndexPath(row: index, section: 0) : nil

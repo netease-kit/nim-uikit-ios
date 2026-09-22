@@ -4,6 +4,7 @@
 
 import Foundation
 
+@objcMembers
 public class NERefreshHasNoMoreView: UIView {
   public lazy var tipLabel: UILabel = {
     let label = UILabel()

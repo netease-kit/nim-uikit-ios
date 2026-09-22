@@ -65,7 +65,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
   }
 
   override open func getSessionInfo(sessionId: String, _ completion: @escaping () -> Void) {
-    chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
+    chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("chat_input_placeholder_prompt"))
     super.getSessionInfo(sessionId: sessionId) { [weak self] in
       if let vm = self?.viewModel as? TeamChatViewModel {
         vm.getTeamInfo(teamId: sessionId) { error, team in
@@ -155,7 +155,7 @@ open class FunTeamChatViewController: FunChatViewController, TeamChatViewModelDe
     } else {
       // 解除群禁言
       isMute = false
-      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("fun_chat_input_placeholder"))
+      chatInputView.textView.attributedPlaceholder = getPlaceHolder(text: chatLocalizable("chat_input_placeholder_prompt"))
       chatInputView.isUserInteractionEnabled = true
       chatInputView.setUnMuteInputStyle()
     }

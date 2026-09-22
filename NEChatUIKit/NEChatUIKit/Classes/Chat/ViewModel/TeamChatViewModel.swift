@@ -20,6 +20,14 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   public var team: V2NIMTeam?
   /// 当前成员的群成员对象类
   public var teamMember: V2NIMTeamMember?
+  private var topMessageLoadGeneration = UUID()
+  private var teamNetworkBroken = false
+  private var teamRefreshGeneration = UUID()
+  private var teamRefreshInFlight = false
+  private var teamRefreshPending = false
+  private var chatTeamId: String {
+    V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
+  }
 
   override public init(conversationId: String) {
     super.init(conversationId: conversationId)
@@ -32,12 +40,14 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
   /// 添加子类监听
   override open func addListener() {
     super.addListener()
+    IMKitClient.instance.addLoginListener(self)
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)
-    NETeamUserManager.shared.loadData(ChatRepo.sessionId)
+    NETeamUserManager.shared.loadData(chatTeamId)
   }
 
   deinit {
+    IMKitClient.instance.removeLoginListener(self)
     teamRepo.removeTeamListener(self)
     NETeamUserManager.shared.removeListener(self)
   }
@@ -67,31 +77,40 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
   /// 加载置顶消息
   override open func loadTopMessage() {
+    topMessageLoadGeneration = UUID()
+    let generation = topMessageLoadGeneration
     // 校验配置项
     if !IMKitConfigCenter.shared.enableTopMessage {
       return
     }
 
     if let serverJson = team?.serverExtension, let extDic = getDictionaryFromJSONString(serverJson) {
+      guard extDic[keyTopMessage] is [String: Any] else {
+        topMessage = nil
+        delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
+        return
+      }
       if let topInfo = extDic[keyTopMessage] as? [String: Any] {
         if let type = topInfo["operation"] as? Int, type == 0 {
           let refer = ChatMessageHelper.createMessageRefer(topInfo)
           chatRepo.getMessageListByRefers([refer]) { [weak self] messages, error in
+            guard let self, self.topMessageLoadGeneration == generation, error == nil else { return }
             // 这里查询只是为了校验消息是否还存在（未被删除或撤回）
             if let topMessage = messages?.first,
                let senderId = ChatMessageHelper.getSenderId(topMessage) {
-              var senderName = self?.getShowName(senderId) ?? ""
+              var senderName = self.getShowName(senderId)
               let group = DispatchGroup()
 
               if senderName == senderId {
                 group.enter()
-                self?.loadShowName([senderId], ChatRepo.sessionId) {
+                self.loadShowName([senderId], ChatRepo.sessionId) { [weak self] in
                   senderName = self?.getShowName(senderId) ?? ""
                   group.leave()
                 }
               }
 
-              group.notify(queue: .main) {
+              group.notify(queue: .main) { [weak self] in
+                guard let self, self.topMessageLoadGeneration == generation else { return }
                 let content = ChatMessageHelper.contentOfMessage(topMessage)
                 var thumbUrl: String?
                 var isVideo = false
@@ -109,21 +128,21 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
                 }
 
                 // 是否隐藏移除置顶按钮
-                if self?.hasTopMessagePremission() == true {
+                if self.hasTopMessagePremission() {
                   hideClose = false
                 }
 
-                self?.delegate?.setTopValue(name: senderName,
+                self.delegate?.setTopValue(name: senderName,
                                             content: content,
                                             url: thumbUrl,
                                             isVideo: isVideo,
                                             hideClose: hideClose)
-                self?.topMessage = topMessage
+                self.topMessage = topMessage
               }
             } else {
               // 置顶消息已被删除
-              self?.topMessage = nil
-              self?.delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
+              self.topMessage = nil
+              self.delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
             }
           }
         } else {
@@ -131,6 +150,9 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
           delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
         }
       }
+    } else {
+      topMessage = nil
+      delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
     }
   }
 
@@ -417,7 +439,8 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
   /// 群信息更新
   /// - Parameter teamId: 群 id
   open func onTeamInfoUpdate(_ teamId: String) {
-    guard let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == ChatRepo.sessionId else { return }
+    guard teamId == chatTeamId,
+          let team = NETeamUserManager.shared.getTeamInfo(), team.teamId == chatTeamId else { return }
 
     self.team = team
     loadTopMessage()
@@ -432,8 +455,8 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
   open func onTeamMemberUpdate(_ accountId: String) {
     updateMessageInfo(accountId)
 
-    if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(accountId) {
-      if self.teamMember == nil || accountId == self.teamMember?.accountId {
+    if let teamMember = NETeamUserManager.shared.getTeamMemberInfo(accountId), teamMember.teamId == chatTeamId {
+      if accountId == IMKitClient.instance.account() {
         self.teamMember = teamMember
         loadTopMessage()
       }
@@ -448,22 +471,62 @@ extension TeamChatViewModel: NETeamChatUserCacheListener {
 // MARK: - NEIMKitClientListener
 
 extension TeamChatViewModel: NEIMKitClientListener {
+  open func onConnectStatus(_ status: V2NIMConnectStatus) {
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in self?.onConnectStatus(status) }
+      return
+    }
+    if status == .CONNECT_STATUS_WAITING || status == .CONNECT_STATUS_DISCONNECTED {
+      teamNetworkBroken = true
+      teamRefreshGeneration = UUID()
+      teamRefreshInFlight = false
+      teamRefreshPending = false
+      topMessageLoadGeneration = UUID()
+      NETeamUserManager.shared.invalidateTeamInfoRefresh(chatTeamId)
+    } else if status == .CONNECT_STATUS_CONNECTED, teamNetworkBroken {
+      teamNetworkBroken = false
+      refreshTeamState()
+    }
+  }
+
+  private func refreshTeamState() {
+    guard !teamNetworkBroken, !chatTeamId.isEmpty else { return }
+    if teamRefreshInFlight {
+      // Sync completion may contain newer state than the reconnect request.
+      teamRefreshPending = true
+      return
+    }
+    teamRefreshInFlight = true
+    teamRefreshGeneration = UUID()
+    let generation = teamRefreshGeneration
+    refreshTeamInfoAndSelfMember(chatTeamId) { [weak self] in
+      guard let self, self.teamRefreshGeneration == generation else { return }
+      self.teamRefreshInFlight = false
+      if self.teamRefreshPending {
+        self.teamRefreshPending = false
+        self.refreshTeamState()
+      }
+    }
+  }
+
+  open func refreshTeamInfoAndSelfMember(_ teamId: String, completion: @escaping () -> Void) {
+    NETeamUserManager.shared.refreshTeamInfoAndSelfMember(teamId, completion: completion)
+  }
+
   /// 数据同步回调
   /// - Parameters:
   ///   - type: 同步的数据类型
   ///   - state: 同步状态
   ///   - error: 错误信息
   open func onDataSync(_ type: V2NIMDataSyncType, state: V2NIMDataSyncState, error: V2NIMError?) {
-    // 断网重连后，重新拉取群信息、自己的群成员信息
-    if type == .DATA_SYNC_TYPE_TEAM_MEMBER, state == .DATA_SYNC_STATE_COMPLETED {
-      getTeamInfo(teamId: ChatRepo.sessionId) { [weak self] error, team in
-        if error == nil {
-          self?.team = team
-        }
-        self?.getTeamMember {
-          self?.loadTopMessage()
-        }
-      }
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in self?.onDataSync(type, state: state, error: error) }
+      return
+    }
+    if error == nil,
+       state == .DATA_SYNC_STATE_COMPLETED,
+       (type == .DATA_SYNC_TYPE_MAIN || type == .DATA_SYNC_TYPE_TEAM_MEMBER) {
+      refreshTeamState()
     }
   }
 }

@@ -1,5 +1,8 @@
 # NEMapKit Changelog
 
+## 10.9.60(2026-09-21)
+* 跟随 IMUIKit 发版。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 补全 NEChatKit 与 NEChatUIKit 的渠道依赖。

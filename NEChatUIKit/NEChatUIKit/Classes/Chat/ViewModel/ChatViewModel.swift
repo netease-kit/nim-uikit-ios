@@ -7,6 +7,14 @@ import NEChatKit
 import NEBaseUIKit
 import NIMSDK
 
+public enum LastReadPositionState {
+  case disabled
+  case ready
+  case visible(NELastReadPositionSnapshot)
+  case locating(NELastReadPositionSnapshot)
+  case consumed
+}
+
 @objc
 public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
@@ -58,6 +66,13 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// 消息更新回调
   /// - Parameter index: 消息下标
   func onModefiedMessage(_ index: IndexPath)
+
+  /// Reaction 更新回调
+  /// - Parameter index: 消息下标
+  @objc optional func onReactionModifiedMessage(_ index: IndexPath)
+
+  /// 首次消息附加信息加载完成
+  @objc optional func initialMessageDetailsDidLoad()
 
   /// 删除消息或收到删除消息回调
   /// - Parameters:
@@ -123,6 +138,9 @@ public protocol ChatViewModelDelegate: NSObjectProtocol {
   /// 自动翻译完成回调（实时新消息或自己发送的消息翻译完成）
   /// - Parameter index: 消息在 messages 中的下标
   @objc optional func autoTranslationDidFinish(_ index: Int)
+
+  /// 回到上次阅读位置入口状态变化
+  @objc optional func lastReadPositionStateChanged()
 }
 
 @objcMembers
@@ -130,6 +148,53 @@ open class ChatViewModel: NSObject {
   public var messages = [MessageModel]()
   public var messageClientIds = [String]()
   public weak var delegate: ChatViewModelDelegate?
+  public private(set) var conversationId = ""
+
+  @nonobjc
+  public private(set) var lastReadPositionState: LastReadPositionState = .disabled {
+    didSet {
+      delegate?.lastReadPositionStateChanged?()
+    }
+  }
+
+  /// Whether the current history anchor is before the unread range.
+  @nonobjc
+  public var isLastReadPositionSuppressed: Bool {
+    isLastReadPositionAnchorSuppressed
+  }
+
+  private var lastReadPositionGeneration = 0
+  private var didStartLastReadPositionPreparation = false
+  private var didSettleLastReadPositionPreparation = false
+  private var preparedLastReadPositionSnapshot: NELastReadPositionSnapshot?
+  private var isLastReadPositionAnchorSuppressed = false
+  private var usesLastReadPositionReadFlow: Bool?
+  private var isConversationActive = false
+  private let lastReadPositionTimeout: TimeInterval = 2
+
+  @nonobjc
+  var prepareLastReadPosition: (
+    String,
+    @escaping (NELastReadPositionSnapshot?, NSError?) -> Void
+  ) -> Void = { conversationId, completion in
+    NELastReadPositionService.shared.prepare(
+      conversationId: conversationId,
+      completion: completion
+    )
+  }
+
+  @nonobjc
+  var findFirstUnreadMessage: (
+    String,
+    TimeInterval,
+    @escaping (V2NIMMessage?, NSError?) -> Void
+  ) -> Void = { conversationId, lastReadTime, completion in
+    NELastReadPositionService.shared.findFirstUnreadMessage(
+      conversationId: conversationId,
+      lastReadTime: lastReadTime,
+      completion: completion
+    )
+  }
 
   // 多选选中的消息
   public var selectedMessages = [V2NIMMessage]() {
@@ -148,11 +213,22 @@ open class ChatViewModel: NSObject {
   public let conversationRepo = ConversationRepo.shared
   public let localConversationRepo = LocalConversationRepo.shared
   public var operationModel: MessageContentModel?
+  private let recentReplyLock = NSLock()
+  private var recentReplyTargets: [String: V2NIMMessage] = [:]
+  private var recentReplyOrder: [String] = []
   public var topMessage: V2NIMMessage? // 置顶消息
   public var isReplying = false
   public let messagPageNum: Int = 100
   public let aiMessagNum: Int = 30 // 从 aiMessagNum 条消息中取文本消息作为上下文内容
-  public var anchor: V2NIMMessage?
+  public var anchor: V2NIMMessage? {
+    didSet {
+      refreshLastReadPositionAnchorSuppression()
+    }
+  }
+
+  /// Per-chat reaction state owner. Cells and controllers consume snapshots
+  /// through this adapter instead of talking to the SDK directly.
+  public private(set) var reactionManager: MessageReactionManager?
 
   public var isHistoryChat = false
 
@@ -180,8 +256,10 @@ open class ChatViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     ChatRepo.conversationId = conversationId
     ChatRepo.sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
+    self.conversationId = conversationId
     anchor = nil
     super.init()
+    setupReactionManager(conversationId: conversationId)
     addListener()
     getAIUserList()
   }
@@ -190,8 +268,10 @@ open class ChatViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + ChatViewModel.className(), desc: #function + ", conversationId:\(conversationId)")
     ChatRepo.conversationId = conversationId
     ChatRepo.sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) ?? ""
+    self.conversationId = conversationId
     self.anchor = anchor
     super.init()
+    setupReactionManager(conversationId: conversationId)
     if anchor != nil {
       isHistoryChat = true
     }
@@ -209,13 +289,102 @@ open class ChatViewModel: NSObject {
     }
   }
 
+  private func setupReactionManager(conversationId: String) {
+    let conversationType = V2NIMConversationIdUtil.conversationType(conversationId)
+    guard IMKitConfigCenter.shared.enableEmojiReaction,
+          conversationType == .CONVERSATION_TYPE_P2P || conversationType == .CONVERSATION_TYPE_TEAM else { return }
+    let manager = MessageReactionManager(conversationId: conversationId,
+                                         currentAccountId: IMKitClient.instance.account())
+    manager.onSyncFailure = { [weak self] _, _ in
+      self?.delegate?.showErrorToast?(nil, "表情状态同步失败，请重试")
+    }
+    manager.addObserver(self)
+    manager.start()
+    reactionManager = manager
+  }
+
+  /// Reaction listeners follow the visible chat page. A controller can stop
+  /// and restart the same manager when it is pushed over and later revealed.
+  public func startReactionManager() {
+    guard let manager = reactionManager else { return }
+    manager.start()
+    loadReactions(for: messages.compactMap { $0.message })
+  }
+
+  public func stopReactionManager() {
+    reactionManager?.stop()
+  }
+
   deinit {
+    reactionManager?.removeObserver(self)
+    reactionManager?.stop()
+    lastReadPositionGeneration += 1
     chatRepo.removeChatListener(self)
     chatRepo.removeMessageSendListener(self)
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.removeAIListener(self)
     }
+  }
+
+  /// Starts a bounded, batched reaction query for the currently displayed messages.
+  public func loadReactions(for messages: [V2NIMMessage]) {
+    reactionManager?.load(messages: messages)
+  }
+
+  private func loadReactions(for messages: [V2NIMMessage], completion: @escaping () -> Void) {
+    guard let reactionManager else {
+      completion()
+      return
+    }
+    reactionManager.load(messages: messages, completion: completion)
+  }
+
+  /// Toggle is intentionally routed through the manager so every UI surface
+  /// shares pending-operation and server-confirmation semantics.
+  public func toggleReaction(message: V2NIMMessage,
+                             index: Int,
+                             completion: @escaping (V2NIMError?) -> Void) {
+    reactionManager?.toggle(message: message, index: index, completion: completion)
+  }
+
+  public func reactionSnapshot(for messageClientId: String) -> NEMessageReactionSnapshot? {
+    reactionManager?.snapshot(for: messageClientId)
+  }
+
+  public func reactionManager(_ manager: MessageReactionManager,
+                              didUpdate messageClientId: String,
+                              snapshot: NEMessageReactionSnapshot) {
+    guard let model = messages.first(where: { $0.message?.messageClientId == messageClientId }) as? MessageContentModel else { return }
+    // A late SDK notification must not resurrect a Reaction area for a
+    // revoked or unsettled message. The manager only sees SDK message data,
+    // while the ViewModel owns these presentation states.
+    let canPresentReaction = IMKitConfigCenter.shared.enableEmojiReaction &&
+      !model.isRevoked &&
+      model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED
+    guard canPresentReaction else {
+      model.reactionGroups = []
+      model.reactionHeight = 0
+      if let index = messages.firstIndex(where: { $0.message?.messageClientId == messageClientId }) {
+        notifyReactionModifiedMessage(at: index)
+      }
+      return
+    }
+    model.reactionGroups = snapshot.groups
+    model.reactionHeight = snapshot.groups.isEmpty
+      ? 0
+      : 26 + NEBaseChatMessageCell.reactionBottomPadding
+    if let index = messages.firstIndex(where: { $0.message?.messageClientId == messageClientId }) {
+      notifyReactionModifiedMessage(at: index)
+    }
+  }
+
+  private func notifyReactionModifiedMessage(at index: Int) {
+    let indexPath = IndexPath(row: index, section: 0)
+    if let _ = delegate?.onReactionModifiedMessage?(indexPath) {
+      return
+    }
+    delegate?.onModefiedMessage(indexPath)
   }
 
   open func getAIUserList() {
@@ -236,24 +405,263 @@ open class ChatViewModel: NSObject {
     NEALog.infoLog(ModuleName, desc: #function + " error: \(error?.localizedDescription ?? "")")
   }
 
-  /// 清空当前会话的未读数
-  open func clearUnreadCount() {
-    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-      localConversationRepo.clearUnreadCountByIds([ChatRepo.conversationId]) { _, error in
-        NEALog.infoLog(ModuleName, desc: #function + " error: \(error?.localizedDescription ?? "")")
+  /// 页面进入时先冻结旧 read time，再推进原有 set/clear 流程。
+  open func enterConversation() {
+    let currentConversationId = conversationId
+    guard !currentConversationId.isEmpty else {
+      return
+    }
+    isConversationActive = true
+    isLastReadPositionAnchorSuppressed = false
+
+    if didSettleLastReadPositionPreparation {
+      if case .ready = lastReadPositionState {
+        if let snapshot = preparedLastReadPositionSnapshot {
+          refreshLastReadPositionAnchorSuppression(notify: false)
+          updateLastReadPositionState(isLastReadPositionAnchorSuppressed ? .consumed : .visible(snapshot))
+        } else {
+          updateLastReadPositionState(.disabled)
+        }
       }
-      localConversationRepo.markConversationRead(ChatRepo.conversationId, completion: { _, error in
-        NEALog.infoLog(ModuleName, desc: #function + " mark conversation read error: \(error?.localizedDescription ?? "")")
-      })
+      setCurrentConversation(currentConversationId)
+      clearUnreadCount(currentConversationId)
       return
     }
 
-    conversationRepo.clearUnreadCountByIds([ChatRepo.conversationId]) { _, error in
+    guard !didStartLastReadPositionPreparation else {
+      updateLastReadPositionState(.ready)
+      return
+    }
+    didStartLastReadPositionPreparation = true
+
+    if usesLastReadPositionReadFlow == nil {
+      usesLastReadPositionReadFlow = IMKitConfigCenter.shared.enableLastReadPosition && supportsLastReadPosition
+    }
+    guard usesLastReadPositionReadFlow == true else {
+      didSettleLastReadPositionPreparation = true
+      updateLastReadPositionState(.disabled)
+      setCurrentConversation(currentConversationId)
+      clearUnreadCount(currentConversationId)
+      return
+    }
+
+    lastReadPositionGeneration += 1
+    let generation = lastReadPositionGeneration
+    updateLastReadPositionState(.ready)
+    var settled = false
+
+    let settle: (NELastReadPositionSnapshot?) -> Void = { [weak self] snapshot in
+      guard let self,
+            generation == self.lastReadPositionGeneration,
+            !settled else {
+        return
+      }
+      settled = true
+      self.didSettleLastReadPositionPreparation = true
+      if let snapshot,
+         snapshot.conversationId == currentConversationId,
+         snapshot.lastReadTime >= 0,
+         snapshot.displayCount > 0 {
+        self.preparedLastReadPositionSnapshot = snapshot
+      } else {
+        self.preparedLastReadPositionSnapshot = nil
+      }
+      self.refreshLastReadPositionAnchorSuppression(notify: false)
+
+      guard self.isConversationActive else {
+        return
+      }
+      if let snapshot = self.preparedLastReadPositionSnapshot {
+        self.updateLastReadPositionState(
+          self.isLastReadPositionAnchorSuppressed ? .consumed : .visible(snapshot)
+        )
+      } else {
+        self.updateLastReadPositionState(.disabled)
+      }
+      self.setCurrentConversation(currentConversationId)
+      self.clearUnreadCount(currentConversationId)
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + lastReadPositionTimeout) {
+      settle(nil)
+    }
+    prepareLastReadPosition(currentConversationId) { snapshot, _ in
+      DispatchQueue.main.async {
+        settle(snapshot)
+      }
+    }
+  }
+
+  /// 页面离开后取消定位；未完成的准备可在后台收敛并在返回时恢复。
+  open func leaveConversation() {
+    isConversationActive = false
+    isLastReadPositionAnchorSuppressed = false
+    // A retained controller may be entered again after the user has read more
+    // messages. Re-capture the read time for every foreground visit instead of
+    // reusing the previous frozen range.
+    didStartLastReadPositionPreparation = false
+    didSettleLastReadPositionPreparation = false
+    preparedLastReadPositionSnapshot = nil
+    switch lastReadPositionState {
+    case let .locating(snapshot):
+      lastReadPositionGeneration += 1
+      updateLastReadPositionState(.visible(snapshot))
+    default:
+      break
+    }
+    clearUnreadCount(conversationId)
+    setCurrentConversation("")
+  }
+
+  private func refreshLastReadPositionAnchorSuppression(notify: Bool = true) {
+    let wasSuppressed = isLastReadPositionSuppressed
+    if let snapshot = preparedLastReadPositionSnapshot,
+       let anchor,
+       anchor.conversationId == snapshot.conversationId {
+      isLastReadPositionAnchorSuppressed = anchor.createTime <= snapshot.lastReadTime
+    } else {
+      isLastReadPositionAnchorSuppressed = false
+    }
+    if isLastReadPositionAnchorSuppressed {
+      switch lastReadPositionState {
+      case .locating:
+        lastReadPositionGeneration += 1
+        updateLastReadPositionState(.consumed)
+        return
+      case .visible:
+        updateLastReadPositionState(.consumed)
+        return
+      case .disabled, .ready, .consumed:
+        break
+      }
+    }
+    if notify, wasSuppressed != isLastReadPositionSuppressed {
+      delegate?.lastReadPositionStateChanged?()
+    }
+  }
+
+  /// The entry is single-use for a chat visit. Once the first unread message is
+  /// visible, later scrolling must not make the entry reappear.
+  @nonobjc
+  open func updateLastReadPositionVisibility(visibleMessageIndices: Set<Int>) {
+    guard case let .visible(snapshot) = lastReadPositionState else {
+      return
+    }
+
+    let firstUnreadIndex = messages.enumerated().first { _, model in
+      guard let message = model.message,
+            message.conversationId == snapshot.conversationId,
+            message.createTime > snapshot.lastReadTime else {
+        return false
+      }
+      return true
+    }?.offset
+
+    guard let firstUnreadIndex,
+          visibleMessageIndices.contains(firstUnreadIndex) else {
+      return
+    }
+    updateLastReadPositionState(.consumed)
+  }
+
+  /// Topic 与机器人会话继续沿用旧的已读流程。
+  open var supportsLastReadPosition: Bool {
+    let type = V2NIMConversationIdUtil.conversationType(conversationId)
+    guard type == .CONVERSATION_TYPE_P2P || type == .CONVERSATION_TYPE_TEAM else {
+      return false
+    }
+    if type == .CONVERSATION_TYPE_P2P,
+       let targetId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+       NEAIRobotManager.shared.isRobot(targetId) {
+      return false
+    }
+    return true
+  }
+
+  /// 清空当前会话的未读数
+  open func clearUnreadCount() {
+    clearUnreadCount(conversationId)
+  }
+
+  /// 使用显式会话 ID 清空未读，避免异步回调依赖全局会话。
+  open func clearUnreadCount(_ conversationId: String) {
+    guard !conversationId.isEmpty else {
+      return
+    }
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      localConversationRepo.clearUnreadCountByIds([conversationId]) { _, error in
+        NEALog.infoLog(ModuleName, desc: #function + " error: \(error?.localizedDescription ?? "")")
+      }
+      return
+    }
+
+    conversationRepo.clearUnreadCountByIds([conversationId]) { _, error in
       NEALog.infoLog(ModuleName, desc: #function + " error: \(error?.localizedDescription ?? "")")
     }
-    conversationRepo.markConversationRead(ChatRepo.conversationId, completion: { _, error in
-      NEALog.infoLog(ModuleName, desc: #function + " mark conversation read error: \(error?.localizedDescription ?? "")")
-    })
+  }
+
+  /// 开始定位最早未读消息。Controller 完成可见性校验后必须调用 completeLastReadPositionLocation。
+  @nonobjc
+  open func locateLastReadPosition(
+    _ completion: @escaping (String?, Bool) -> Void
+  ) {
+    guard case let .visible(snapshot) = lastReadPositionState else {
+      return
+    }
+    updateLastReadPositionState(.locating(snapshot))
+    let generation = lastReadPositionGeneration
+
+    findFirstUnreadMessage(
+      snapshot.conversationId,
+      snapshot.lastReadTime
+    ) { [weak self] message, error in
+      DispatchQueue.main.async {
+        guard let self,
+              generation == self.lastReadPositionGeneration,
+              case let .locating(currentSnapshot) = self.lastReadPositionState,
+              currentSnapshot.conversationId == snapshot.conversationId else {
+          return
+        }
+        guard error == nil,
+              let message,
+              message.conversationId == snapshot.conversationId,
+              message.createTime > snapshot.lastReadTime,
+              let stableId = self.stableId(for: message) else {
+          self.updateLastReadPositionState(.visible(snapshot))
+          completion(nil, false)
+          return
+        }
+
+        if self.indexOfMessage(withStableId: stableId) != nil {
+          completion(stableId, false)
+          return
+        }
+        self.loadAroundLastReadAnchor(
+          message,
+          conversationId: snapshot.conversationId,
+          generation: generation,
+          completion: completion
+        )
+      }
+    }
+  }
+
+  @nonobjc
+  open func completeLastReadPositionLocation(success: Bool) {
+    guard case let .locating(snapshot) = lastReadPositionState else {
+      return
+    }
+    updateLastReadPositionState(success ? .consumed : .visible(snapshot))
+  }
+
+  @nonobjc
+  open func indexOfMessage(withStableId stableId: String) -> Int? {
+    messages.firstIndex { model in
+      guard let message = model.message else {
+        return false
+      }
+      return self.stableId(for: message) == stableId
+    }
   }
 
   /// 加载数据
@@ -273,7 +681,9 @@ open class ChatViewModel: NSObject {
           desc: "CALLBACK getMessageList " + (error?.localizedDescription ?? "no error")
         )
         completion(error, count, 0, 0)
-        self?.loadMoreWithMessage(models)
+        self?.loadMoreWithMessage(models) { [weak self] in
+          self?.delegate?.initialMessageDetailsDidLoad?()
+        }
       }
     } else {
       isHistoryChat = true
@@ -363,7 +773,7 @@ open class ChatViewModel: NSObject {
        let message = model.message {
       getReplyMessage(message: message) { replyedModel in
         if let reply = replyedModel as? MessageContentModel,
-           model.replyText != ReplyMessageUtil.textForReplyModel(model: reply) {
+           reply.message != nil, !reply.isRevoked {
           model.replyedModel = replyedModel
         } else {
           model.replyText = chatLocalizable("message_not_found")
@@ -378,23 +788,38 @@ open class ChatViewModel: NSObject {
   /// 加载消息的更多信息（回复、标记、发送者信息）
   /// - Parameter messageArray: 消息列表
   open func loadMoreWithMessage(_ messageArray: [V2NIMMessage]) {
+    loadMoreWithMessage(messageArray, completion: nil)
+  }
+
+  @nonobjc
+  private func loadMoreWithMessage(
+    _ messageArray: [V2NIMMessage],
+    conversationId: String? = nil,
+    completion: (() -> Void)?
+  ) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     let group = DispatchGroup()
+    group.enter()
+    loadReactions(for: messageArray) {
+      group.leave()
+    }
+    let requestedConversationId = conversationId ?? ChatRepo.conversationId
+    let requestedSessionId = conversationId.flatMap {
+      V2NIMConversationIdUtil.conversationTargetId($0)
+    } ?? ChatRepo.sessionId
 
     group.enter()
     DispatchQueue.global().async { [weak self] in
-      let conversationId = ChatRepo.conversationId
-
       group.enter()
       self?.getMessageReceipts(messages: messageArray) { reloadIndexs, error in
         group.enter()
-        self?.chatRepo.getPinnedMessageList(conversationId: conversationId) { [weak self] pinList, error in
+        self?.chatRepo.getPinnedMessageList(conversationId: requestedConversationId) { [weak self] pinList, error in
           var userIds: Set<String> = Set(pinList?.map(\.operatorId) ?? [])
 
           // 群聊需要获取群昵称
           userIds.formUnion(self?.messages.compactMap { $0.message?.senderId } ?? [])
           group.enter()
-          self?.loadShowName(Array(userIds), ChatRepo.sessionId) { [weak self] in
+          self?.loadShowName(Array(userIds), requestedSessionId) { [weak self] in
             for model in self?.messages ?? [] {
               // 更新头像昵称
               if let uid = ChatMessageHelper.getSenderId(model.message),
@@ -430,6 +855,7 @@ open class ChatViewModel: NSObject {
 
     group.notify(queue: .main) { [weak self] in
       self?.delegate?.tableViewReload()
+      completion?()
     }
 
     // 下载语音附件
@@ -450,7 +876,7 @@ open class ChatViewModel: NSObject {
       }
 
       if !accids.isEmpty {
-        self?.loadShowName(Array(accids), ChatRepo.sessionId) {
+        self?.loadShowName(Array(accids), requestedSessionId) {
           for model in self?.messages ?? [] {
             // 更新通知消息文案
             if let m = model as? MessageTipsModel {
@@ -463,6 +889,127 @@ open class ChatViewModel: NSObject {
           }
         }
       }
+    }
+  }
+
+  @nonobjc
+  private func loadAroundLastReadAnchor(
+    _ target: V2NIMMessage,
+    conversationId: String,
+    generation: Int,
+    completion: @escaping (String?, Bool) -> Void
+  ) {
+    let olderOption = V2NIMMessageListOption()
+    olderOption.conversationId = conversationId
+    olderOption.anchorMessage = target
+    olderOption.endTime = target.createTime
+    olderOption.direction = .QUERY_DIRECTION_DESC
+    olderOption.limit = messagPageNum
+
+    let newerOption = V2NIMMessageListOption()
+    newerOption.conversationId = conversationId
+    newerOption.anchorMessage = target
+    newerOption.beginTime = target.createTime
+    newerOption.direction = .QUERY_DIRECTION_ASC
+    newerOption.limit = messagPageNum
+
+    chatRepo.getMessageList(option: olderOption) { [weak self] olderMessages, olderError in
+      guard let self else {
+        return
+      }
+      guard olderError == nil else {
+        DispatchQueue.main.async {
+          guard generation == self.lastReadPositionGeneration,
+                case .locating = self.lastReadPositionState else {
+            return
+          }
+          self.completeLastReadPositionLocation(success: false)
+          completion(nil, false)
+        }
+        return
+      }
+
+      self.chatRepo.getMessageList(option: newerOption) { [weak self] newerMessages, newerError in
+        DispatchQueue.main.async {
+          guard let self,
+                generation == self.lastReadPositionGeneration,
+                case .locating = self.lastReadPositionState else {
+            return
+          }
+          guard newerError == nil,
+                target.conversationId == conversationId,
+                let stableId = self.stableId(for: target) else {
+            self.completeLastReadPositionLocation(success: false)
+            completion(nil, false)
+            return
+          }
+
+          let older = olderMessages ?? []
+          let newer = newerMessages ?? []
+          self.oldMsg = older.last
+          self.newMsg = newer.last
+          self.anchor = target
+          self.isHistoryChat = true
+
+          for message in older + [target] + newer {
+            if let messageClientId = message.messageClientId,
+               !self.messageClientIds.contains(messageClientId) {
+              self.messageClientIds.append(messageClientId)
+            }
+            if let messageId = self.stableId(for: message),
+               self.indexOfMessage(withStableId: messageId) == nil {
+              self.insertToMessages(self.modelFromMessage(message: message))
+            }
+          }
+          self.addTimeForHistoryMessage()
+
+          self.loadMoreWithMessage(
+            older + [target] + newer,
+            conversationId: conversationId
+          ) { [weak self] in
+            guard let self,
+                  generation == self.lastReadPositionGeneration,
+                  case .locating = self.lastReadPositionState,
+                  self.indexOfMessage(withStableId: stableId) != nil else {
+              return
+            }
+            completion(stableId, !newer.isEmpty)
+          }
+        }
+      }
+    }
+  }
+
+  @nonobjc
+  private func updateLastReadPositionState(_ state: LastReadPositionState) {
+    if Thread.isMainThread {
+      lastReadPositionState = state
+    } else {
+      DispatchQueue.main.async { [weak self] in
+        self?.lastReadPositionState = state
+      }
+    }
+  }
+
+  @nonobjc
+  private func stableId(for message: V2NIMMessage) -> String? {
+    if let clientId = message.messageClientId, !clientId.isEmpty {
+      return "client:\(clientId)"
+    }
+    if let serverId = message.messageServerId, !serverId.isEmpty {
+      return "server:\(serverId):\(message.createTime)"
+    }
+    return nil
+  }
+
+  private func containsMessage(_ message: V2NIMMessage) -> Bool {
+    messages.contains { model in
+      guard let existing = model.message else { return false }
+      if let clientId = message.messageClientId, !clientId.isEmpty,
+         clientId == existing.messageClientId { return true }
+      if let serverId = message.messageServerId, !serverId.isEmpty,
+         serverId == existing.messageServerId { return true }
+      return false
     }
   }
 
@@ -563,7 +1110,9 @@ open class ChatViewModel: NSObject {
         }
         for msg in messageArray {
           if let messageClientId = msg.messageClientId {
-            self?.messageClientIds.append(messageClientId)
+            if self?.messageClientIds.contains(messageClientId) == false {
+              self?.messageClientIds.append(messageClientId)
+            }
           }
 
           // 数字人回复的消息
@@ -572,7 +1121,7 @@ open class ChatViewModel: NSObject {
           }
 
           if let model = self?.modelFromMessage(message: msg) {
-            if self?.messages.contains(where: { $0.message?.messageClientId == model.message?.messageClientId }) == false {
+            if self?.containsMessage(msg) == false {
               self?.insertToMessages(model)
             }
           }
@@ -1326,6 +1875,11 @@ open class ChatViewModel: NSObject {
                                    _ completion: @escaping (V2NIMMessage?, Error?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId:\(String(describing: message.messageClientId))")
 
+    rememberReplyTarget(replyMessage)
+    var localExt = NECommonUtil.getDictionaryFromJSONString(message.localExtension ?? "") as? [String: Any] ?? [:]
+    localExt[keyReplyMsgKey] = ChatMessageHelper.createReplyDic(replyMessage)
+    message.localExtension = NECommonUtil.getJSONStringFromDictionary(localExt)
+
     let params = getReplyMessageParams(aiUserAccid, replyMessage, message)
     chatRepo.replyMessage(message: message, replyMessage: replyMessage, params: params) { result, error, pro in
       completion(result?.message, error)
@@ -1509,16 +2063,22 @@ open class ChatViewModel: NSObject {
         items = [
           OperationItem.deleteItem(),
           OperationItem.selectItem(),
-          OperationItem.collectionItem(),
         ]
       }
     default:
-      items = [
-        OperationItem.replayItem(),
-        pinItem,
-        OperationItem.deleteItem(),
-        OperationItem.selectItem(),
-      ]
+      if model?.unkonwMessage == true {
+        items = [
+          OperationItem.deleteItem(),
+          OperationItem.selectItem(),
+        ]
+      } else {
+        items = [
+          OperationItem.replayItem(),
+          pinItem,
+          OperationItem.deleteItem(),
+          OperationItem.selectItem(),
+        ]
+      }
     }
 
     // （未转换的）语音消息可以转文字
@@ -1530,8 +2090,7 @@ open class ChatViewModel: NSObject {
 
     // 自己发送且非未知消息可以 【撤回】
     if ChatMessageHelper.isSelf(message: model?.message) {
-      if model?.message?.messageType == .MESSAGE_TYPE_CUSTOM,
-         model?.unkonwMessage == true {
+      if model?.unkonwMessage == true {
         return items
       }
 
@@ -1671,6 +2230,45 @@ open class ChatViewModel: NSObject {
     return model
   }
 
+  func rememberReplyTarget(_ message: V2NIMMessage) {
+    guard let id = message.messageClientId, !id.isEmpty,
+          message.conversationId == conversationId,
+          !ChatMessageHelper.isRevokeMessage(message: message) else { return }
+    recentReplyLock.lock()
+    recentReplyOrder.removeAll { $0 == id }
+    recentReplyOrder.append(id)
+    recentReplyTargets[id] = message
+    if recentReplyOrder.count > 20 {
+      recentReplyTargets.removeValue(forKey: recentReplyOrder.removeFirst())
+    }
+    recentReplyLock.unlock()
+  }
+
+  private func recentReplyTarget(for id: String) -> V2NIMMessage? {
+    recentReplyLock.lock()
+    let target = recentReplyTargets[id]
+    recentReplyLock.unlock()
+    guard target?.conversationId == conversationId,
+          let target, !ChatMessageHelper.isRevokeMessage(message: target) else { return nil }
+    return target
+  }
+
+  private func forgetReplyTarget(_ id: String?) {
+    guard let id else { return }
+    recentReplyLock.lock()
+    recentReplyTargets.removeValue(forKey: id)
+    recentReplyOrder.removeAll { $0 == id }
+    recentReplyLock.unlock()
+  }
+
+  private func replyModel(for message: V2NIMMessage) -> MessageModel {
+    let model = ChatMessageHelper.modelFromMessage(message: message)
+    if let senderId = ChatMessageHelper.getSenderId(message) {
+      model.fullName = getShowName(senderId)
+    }
+    return model
+  }
+
   /// 查找回复消息，优先使用 thread 方案 (不进行远端拉取)
   /// - Parameters:
   ///   - message: 需要查找回复的消息
@@ -1696,6 +2294,10 @@ open class ChatViewModel: NSObject {
       if model.message?.messageClientId == replyId, model.isRevoked == false {
         return model
       }
+    }
+
+    if let target = recentReplyTarget(for: replyId) {
+      return replyModel(for: target)
     }
 
     let model = MessageTextModel(message: nil)
@@ -1734,6 +2336,11 @@ open class ChatViewModel: NSObject {
         completion(model)
         return
       }
+    }
+
+    if let target = recentReplyTarget(for: replyId) {
+      completion(replyModel(for: target))
+      return
     }
 
     let refer = ChatMessageHelper.createMessageRefer(replyDic)
@@ -1801,6 +2408,7 @@ open class ChatViewModel: NSObject {
 
   @discardableResult
   func deleteMessageModel(_ messageClientId: String) -> (deleteIndexs: [Int], reloadIndexs: [Int]) {
+    forgetReplyTarget(messageClientId)
     var deleteIndexs = [Int]()
     var reloadIndexs = [Int]()
 
@@ -1865,6 +2473,7 @@ open class ChatViewModel: NSObject {
   /// - Parameter message: 消息
   open func revokeMessageUpdateUI(_ message: V2NIMMessage) {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function + ", messageClientId: \(String(describing: message.messageClientId))")
+    forgetReplyTarget(message.messageClientId)
     var index = -1
     var indexs = [IndexPath]()
     var hasFind = false
@@ -2466,6 +3075,11 @@ open class ChatViewModel: NSObject {
       return
     }
 
+    // Register locally sent messages before accepting remote quick-comment
+    // notifications. The message can be reacted to immediately after send,
+    // before the next history refresh populates the reaction cache.
+    loadReactions(for: [message])
+
     var failedIndex = -1
     var index = -1
     for (i, msg) in messages.enumerated() {
@@ -2647,6 +3261,7 @@ open class ChatViewModel: NSObject {
     }
     let lang = (targetLanguage?.isEmpty == false ? targetLanguage : nil)
       ?? IMKitConfigCenter.shared.translationTargetLanguage
+    model.translationFailed = false
     // 缓存命中：同语言已有译文 → 直接显示，不重复请求
     if let cached = model.translationInfo, cached.targetLanguage == lang, !cached.translatedText.isEmpty {
       model.translationVisible = true
@@ -2700,7 +3315,11 @@ open class ChatViewModel: NSObject {
         if let err = error {
           if hasError.compareAndSet(false, to: true) {
             let index = self.messages.firstIndex(where: { $0.message?.messageClientId == message.messageClientId }) ?? -1
-            completion(index, err)
+            DispatchQueue.main.async {
+              model.translationFailed = true
+              model.translationVisible = true
+              completion(index, err)
+            }
           }
           return
         }
@@ -2713,6 +3332,7 @@ open class ChatViewModel: NSObject {
             let restoredText = translatedSlots.compactMap { $0 }.joined()
             let info = TranslationInfo(targetLanguage: lang, translatedText: restoredText)
             DispatchQueue.main.async {
+              model.translationFailed = false
               model.translationInfo = info
               model.translationVisible = true
               ChatRepo.shared.saveTranslationToLocalExtension(message: message, info: info) { _, _ in }
@@ -2732,6 +3352,7 @@ open class ChatViewModel: NSObject {
   open func hideTranslation(model: MessageTextModel,
                             _ completion: @escaping (Int) -> Void) {
     model.translationVisible = false
+    model.translationFailed = false
     let index = messages.firstIndex(where: { $0.message?.messageClientId == model.message?.messageClientId }) ?? -1
     completion(index)
   }
@@ -2791,9 +3412,7 @@ open class ChatViewModel: NSObject {
 
       performTranslation(model: textModel, targetLanguage: lang) { [weak self] index, _ in
         self?.translatingMessageIds.remove(msgId)
-        if index >= 0 {
-          onTranslated(index)
-        }
+        if index >= 0 { onTranslated(index) }
       }
     }
   }
@@ -2866,6 +3485,10 @@ extension ChatViewModel: NEMessageListener {
   }
 }
 
+// MARK: - Message reactions
+
+extension ChatViewModel: NEMessageReactionObserver {}
+
 // MARK: - NEChatListener
 
 extension ChatViewModel: NEChatListener {
@@ -2914,6 +3537,10 @@ extension ChatViewModel: NEChatListener {
         }
       }
 
+      if containsMessage(msg) {
+        continue
+      }
+
       if isHistoryChat {
         delegate?.onRecvMessages(messages, [])
         return
@@ -2930,12 +3557,18 @@ extension ChatViewModel: NEChatListener {
         ChatMessageHelper.addTimeMessage(model, self?.messages.last)
         self?.downloadAudioFile([model])
         self?.loadReply(model) {
-          if let index = self?.insertToMessages(model) {
-            self?.delegate?.onRecvMessages([msg], [IndexPath(row: index, section: 0)])
-            self?.loadMoreWithMessage([msg])
+          guard let self, !self.containsMessage(msg) else { return }
+          if let clientId = msg.messageClientId, !clientId.isEmpty,
+             !self.messageClientIds.contains(clientId) {
+            self.messageClientIds.append(clientId)
+          }
+          let index = self.insertToMessages(model)
+          if index >= 0 {
+            self.delegate?.onRecvMessages([msg], [IndexPath(row: index, section: 0)])
+            self.loadMoreWithMessage([msg])
             // 收到新消息时触发自动翻译（含对方消息和自己在其他端发的消息）
             if let textModel = model as? MessageTextModel {
-              self?.autoTranslateIfNeeded(model: textModel)
+              self.autoTranslateIfNeeded(model: textModel)
             }
           }
         }

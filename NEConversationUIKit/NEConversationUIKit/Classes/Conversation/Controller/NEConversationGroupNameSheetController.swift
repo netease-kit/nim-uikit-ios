@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import UIKit
+import NEBaseUIKit
 
 private let conversationGroupNameMaxLength = 20
 
@@ -13,7 +14,7 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
   private let style: NEConversationGroupUIStyle
   private let heightRatio: CGFloat
   private let container = UIView()
-  private let textField = UITextField()
+  private let textField = NESingleLineTextField()
   private let countLabel = UILabel()
   private let done = UIButton(type: .custom)
 
@@ -158,7 +159,7 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
 final class NEConversationGroupNameController: NEConversationBaseViewController, UITextFieldDelegate {
   private let style: NEConversationGroupUIStyle
   private let complete: (String, NEConversationGroupNameController) -> Void
-  private let textField = UITextField()
+  private let textField = NESingleLineTextField()
   private let clearButton = UIButton(type: .custom)
   private let countLabel = UILabel()
   private let maxLength = conversationGroupNameMaxLength

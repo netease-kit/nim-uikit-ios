@@ -26,7 +26,20 @@ open class NENavigationController: UINavigationController {
       viewController.hidesBottomBarWhenPushed = true
     }
 
-    super.pushViewController(viewController, animated: animated)
+    if animated {
+      super.pushViewController(viewController, animated: true)
+      return
+    }
+
+    // Some iOS 27 layouts apply implicit animations while a destination is
+    // loaded during an otherwise non-animated push. Keep the initial layout
+    // and the tab bar visibility change in the same disabled transaction.
+    UIView.performWithoutAnimation {
+      super.pushViewController(viewController, animated: false)
+      view.layoutIfNeeded()
+      tabBarController?.view.layoutIfNeeded()
+      viewController.viewIfLoaded?.layoutIfNeeded()
+    }
   }
 
   override open func popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {

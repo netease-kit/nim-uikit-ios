@@ -190,7 +190,10 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
         self.showToast(self.groupViewModel.groupErrorMessage(error))
         return
       }
-      let failedResults = results?.filter { $0.error.code != 0 && $0.error.code != 200 } ?? []
+      let failedResults = results?.filter { result in
+        guard let error = result.error as V2NIMError? else { return false }
+        return error.code != 0 && error.code != 200
+      } ?? []
       if failedResults.count == self.addViewModel.selectedIds.count {
         let firstError = failedResults.first?.error.nserror as NSError?
         self.showToast(self.groupViewModel.groupErrorMessage(firstError))

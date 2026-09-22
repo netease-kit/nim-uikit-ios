@@ -129,7 +129,11 @@ open class ChatMessageVideoCell: ChatMessageImageCell {
     let stateView = isSend ? stateViewRight : stateViewLeft
     let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
-    if model.isReply {
+    let hasReaction = IMKitConfigCenter.shared.enableEmojiReaction &&
+      !model.isRevoked &&
+      model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED &&
+      !model.reactionGroups.isEmpty
+    if model.isReply || hasReaction {
       setBubbleImage()
     } else {
       bubble.image = nil

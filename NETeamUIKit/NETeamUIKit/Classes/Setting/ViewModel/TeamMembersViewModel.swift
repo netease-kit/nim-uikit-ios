@@ -12,7 +12,7 @@ public protocol TeamMembersViewModelDelegate: NSObjectProtocol {
   func didNeedRefreshUI()
 }
 
-class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NESubscribeListener {
+class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListener, NESubscribeListener, AIUserChangeListener {
   /// 是否正在请求数据
   var isRequest = false
   /// 群id
@@ -24,6 +24,12 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
 
   /// 搜索结果数据
   var searchDatas = [NETeamMemberInfoModel]()
+  /// 当前搜索结果对应的主次名称和高亮范围
+  private(set) var searchResults = [String: NETeamMemberSearchResult]()
+  /// 成员资料是否仍在按批次补齐
+  private(set) var isLoadingMembers = false
+  private(set) var memberLoadError: NSError?
+  private var currentSearchKeyword = ""
 
   let teamRepo = TeamRepo.shared
 
@@ -36,6 +42,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
     super.init()
     teamRepo.addTeamListener(self)
     NETeamUserManager.shared.addListener(self)
+    NEAIUserManager.shared.addAIUserChangeListener(listener: self)
 //    if IMKitConfigCenter.shared.enableOnlineStatus {
 //      SubscribeRepo.shared.addListener(self)
 //    }
@@ -45,6 +52,7 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   deinit {
     teamRepo.removeTeamListener(self)
     NETeamUserManager.shared.removeListener(self)
+    NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
 //    if IMKitConfigCenter.shared.enableOnlineStatus {
 //      SubscribeRepo.shared.removeListener(self)
 //    }
@@ -119,21 +127,12 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
       datas.append(findOwner)
     }
     // managers 根据 时间排序 排序
-    managers.sort { model1, model2 in
-      if let time1 = model1.teamMember?.joinTime, let time2 = model2.teamMember?.joinTime {
-        return time2 > time1
-      }
-      return false
-    }
+    managers.sort(by: memberOrder)
     // normalMembers 根据 时间排序 排序
-    normalMembers.sort { model1, model2 in
-      if let time1 = model1.teamMember?.joinTime, let time2 = model2.teamMember?.joinTime {
-        return time2 > time1
-      }
-      return false
-    }
+    normalMembers.sort(by: memberOrder)
     datas.append(contentsOf: managers)
     datas.append(contentsOf: normalMembers)
+    searchData(currentSearchKeyword)
     delegate?.didNeedRefreshUI()
   }
 
@@ -141,10 +140,8 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
   /// - Parameter model: 成员数据
   open func removeModel(_ rmUids: [String]) {
     datas.removeAll(where: { model in
-      if let uid = model.nimUser?.user?.accountId {
-        if rmUids.contains(uid) {
-          return true
-        }
+      if let uid = model.teamMember?.accountId {
+        return rmUids.contains(uid)
       }
       return false
     })
@@ -252,12 +249,15 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
     weak var weakSelf = self
 
     if let team = NETeamUserManager.shared.getTeamInfo(),
+       team.teamId == teamId,
        let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
       let model = NETeamInfoModel()
       model.team = team
       model.users = teamMembers
       weakSelf?.setShowDatas(model.users)
       weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
+      weakSelf?.isLoadingMembers = false
+      weakSelf?.memberLoadError = nil
       completion(model, nil)
       return
     }
@@ -266,11 +266,28 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
       return
     }
     isRequest = true
+    isLoadingMembers = true
+    memberLoadError = nil
 
-    NETeamUserManager.shared.getAllTeamMembers(teamId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { _ in
+    NETeamUserManager.shared.getAllTeamMembers(
+      teamId,
+      .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
+      progress: { [weak self] progress in
+        guard let self, progress.teamId == self.teamId else { return }
+        self.isLoadingMembers = progress.phase == .loading
+        self.memberLoadError = progress.error
+        if progress.phase == .loading || progress.phase == .finished {
+          self.setShowDatas(progress.members)
+        }
+        if progress.phase == .failed {
+          self.delegate?.didNeedRefreshUI()
+        }
+      }
+    ) { _ in
       weakSelf?.isRequest = false
       let team = NETeamUserManager.shared.getTeamInfo()
-      if let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
+      if team?.teamId == teamId,
+         let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
         let model = NETeamInfoModel()
         model.team = team
         model.users = teamMembers
@@ -278,9 +295,50 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
         weakSelf?.currentMember = NETeamUserManager.shared.getTeamMemberInfo(IMKitClient.instance.account())
         completion(model, nil)
       } else {
-        completion(nil, nil)
+        weakSelf?.isLoadingMembers = false
+        completion(nil, weakSelf?.memberLoadError)
       }
     }
+  }
+
+  /// 使用共享 matcher 过滤成员，并保留基础排序。
+  open func searchData(_ keyword: String) -> [NETeamMemberInfoModel] {
+    currentSearchKeyword = keyword
+    searchResults.removeAll()
+    let normalized = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !normalized.isEmpty else {
+      searchDatas.removeAll()
+      return []
+    }
+    searchDatas = datas.filter { model in
+      let result = NETeamMemberSearchMatcher.result(
+        keyword: normalized,
+        teamNick: model.teamMember?.teamNick,
+        friendAlias: model.nimUser?.friend?.alias,
+        userNickname: model.nimUser?.user?.name,
+        accountId: model.teamMember?.accountId ?? model.nimUser?.user?.accountId
+      )
+      if let result, let accountId = model.teamMember?.accountId {
+        searchResults[accountId] = result
+        return true
+      }
+      return false
+    }
+    return searchDatas
+  }
+
+  open func searchResult(for model: NETeamMemberInfoModel) -> NETeamMemberSearchResult? {
+    guard let accountId = model.teamMember?.accountId else { return nil }
+    return searchResults[accountId]
+  }
+
+  private func memberOrder(_ left: NETeamMemberInfoModel, _ right: NETeamMemberInfoModel) -> Bool {
+    let leftTime = left.teamMember?.joinTime ?? 0
+    let rightTime = right.teamMember?.joinTime ?? 0
+    if leftTime != rightTime {
+      return leftTime < rightTime
+    }
+    return (left.teamMember?.accountId ?? "") < (right.teamMember?.accountId ?? "")
   }
 
   /// 获取群成员
@@ -341,6 +399,24 @@ class TeamMembersViewModel: NSObject, NETeamListener, NETeamChatUserCacheListene
       onLineEventDic[d.accountId] = NESubscribeManager.isOnline(d)
     }
     delegate?.didNeedRefreshUI()
+  }
+
+  func onAIUserChanged(aiUsers: [V2NIMAIUser]) {
+    let usersById: [String: NEUserWithFriend] = Dictionary(uniqueKeysWithValues: aiUsers.compactMap { user in
+      guard let accountId = user.accountId else { return nil }
+      return (accountId, NEUserWithFriend(user: user))
+    })
+    var didUpdate = false
+    for model in datas + searchDatas {
+      guard let accountId = model.teamMember?.accountId ?? model.nimUser?.user?.accountId,
+            let user = usersById[accountId] else { continue }
+      model.nimUser = user
+      didUpdate = true
+    }
+    if didUpdate {
+      searchData(currentSearchKeyword)
+      delegate?.didNeedRefreshUI()
+    }
   }
 
   open func onTeamMemberUpdate(_ accountId: String) {

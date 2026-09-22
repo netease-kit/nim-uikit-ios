@@ -6,7 +6,7 @@ import NEChatKit
 import NIMSDK
 import UIKit
 
-@objc
+@objcMembers
 open class MessageCustomModel: MessageContentModel {
   public required init(message: V2NIMMessage?) {
     super.init(message: message)

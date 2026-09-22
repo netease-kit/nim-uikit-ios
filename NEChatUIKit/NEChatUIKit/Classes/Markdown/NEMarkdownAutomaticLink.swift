@@ -4,6 +4,7 @@
 
 import Foundation
 
+@objcMembers
 open class NEMarkdownAutomaticLink: NEMarkdownLink {
   override open func regularExpression() throws -> NSRegularExpression {
     try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
@@ -11,8 +12,8 @@ open class NEMarkdownAutomaticLink: NEMarkdownLink {
 
   override open func match(_ match: NSTextCheckingResult,
                            attributedString: NSMutableAttributedString) {
-    let linkURLString = attributedString.attributedSubstring(from: match.range).string
-    formatText(attributedString, range: match.range, link: linkURLString)
-    addAttributes(attributedString, range: match.range, link: linkURLString)
+    guard let url = match.url else { return }
+    formatText(attributedString, range: match.range, link: url.absoluteString)
+    addAttributes(attributedString, range: match.range, link: url.absoluteString)
   }
 }

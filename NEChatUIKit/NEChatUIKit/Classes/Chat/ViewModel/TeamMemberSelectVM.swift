@@ -15,17 +15,30 @@ open class TeamMemberSelectVM: NSObject {
 
   open func getTeamMembers(_ teamId: String,
                            _ completion: @escaping (Error?, NETeamInfoModel?) -> Void) {
+    getTeamMembers(teamId, progress: nil, completion)
+  }
+
+  @nonobjc
+  open func getTeamMembers(_ teamId: String,
+                           progress: ((NETeamMemberLoadProgress) -> Void)?,
+                           _ completion: @escaping (Error?, NETeamInfoModel?) -> Void) {
     NEALog.infoLog(ModuleName + " " + className, desc: #function + ", teamId: " + teamId)
     if let team = NETeamUserManager.shared.getTeamInfo(),
+       team.teamId == teamId,
        let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
       let model = NETeamInfoModel()
       model.team = team
       model.users = teamMembers
       completion(nil, model)
     } else {
-      NETeamUserManager.shared.getAllTeamMembers(teamId, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { _ in
+      NETeamUserManager.shared.getAllTeamMembers(
+        teamId,
+        .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
+        progress: progress
+      ) { _ in
         let team = NETeamUserManager.shared.getTeamInfo()
-        if let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
+        if team?.teamId == teamId,
+           let teamMembers = NETeamUserManager.shared.getAllTeamMemberModels() {
           let model = NETeamInfoModel()
           model.team = team
           model.users = teamMembers

@@ -5,6 +5,7 @@
 
 import NEChatKit
 import UIKit
+import NEBaseUIKit
 
 @objcMembers
 open class NEBaseContactAliasViewController: NEContactBaseViewController, UITextFieldDelegate {
@@ -16,7 +17,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
   let textLimit = 15
   public var aliasInputTopAnchor: NSLayoutConstraint?
   public lazy var aliasInput: UITextField = {
-    let textField = UITextField()
+    let textField = NESingleLineTextField()
     textField.backgroundColor = .white
     textField.clipsToBounds = true
     textField.font = UIFont.systemFont(ofSize: 16.0)

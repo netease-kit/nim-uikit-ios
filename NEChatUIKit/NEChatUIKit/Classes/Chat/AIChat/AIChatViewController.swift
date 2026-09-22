@@ -7,6 +7,7 @@ import NEChatKit
 import NIMSDK
 import UIKit
 
+@objc
 public protocol AIChatViewDelegate: NSObjectProtocol {
   func didClickMessageItem(_ text: String)
   func didClickEditButton(_ text: String?)

@@ -159,8 +159,8 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController,
       NSLayoutConstraint.activate([
         userHeaderView.leftAnchor.constraint(equalTo: cornerBackView.leftAnchor, constant: 16),
         userHeaderView.topAnchor.constraint(equalTo: cornerBackView.topAnchor, constant: 12),
-        userHeaderView.widthAnchor.constraint(equalToConstant: fun_chat_min_h),
-        userHeaderView.heightAnchor.constraint(equalToConstant: fun_chat_min_h),
+        userHeaderView.widthAnchor.constraint(equalToConstant: chat_min_h),
+        userHeaderView.heightAnchor.constraint(equalToConstant: chat_min_h),
       ])
 
       nameLabel.font = NEConstant.defaultTextFont(12)
@@ -267,11 +267,14 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController,
         let conversationId = V2NIMConversationIdUtil.teamConversationId(teamid)
 
         DispatchQueue.main.async {
-          if let allControllers = weakSelf?.filterStackViewController() {
-            weakSelf?.navigationController?.viewControllers = allControllers
+          guard let self = weakSelf,
+                let navigationController = self.navigationController,
+                let allControllers = self.filterStackViewController() else { return }
+          navigationController.setViewControllers(allControllers, animated: false)
+          DispatchQueue.main.async {
             Router.shared.use(
               PushTeamChatVCRouter,
-              parameters: ["nav": weakSelf?.navigationController as Any,
+              parameters: ["nav": navigationController,
                            "conversationId": conversationId as Any],
               closure: nil
             )

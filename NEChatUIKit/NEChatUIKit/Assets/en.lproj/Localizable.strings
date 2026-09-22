@@ -137,10 +137,14 @@
 "msg_rtc_call"="[Call]";
 "msg_custom"="[Custom Message]";
 "msg_unknown"="[Unknown Message]";
+"tip"="[Reminder]";
+"notification"="[Tip]";
 "message_read"="Read Status";
 "message_all_unread"="Unread by all members";
 "user_select"="Select Notification";
 "user_select_all"="All";
+"user_search_placeholder"="Search";
+"user_search_empty"="No matching members";
 
 "contact_user"="Forward to friend";
 "team"="Forward to group";
@@ -191,7 +195,7 @@
 "unpin_failed"="Unpin failed";
 "pin_limit_exceeded"="Number of pin reaches the limit.";
 
-"fun_hold_to_talk"="Hold to talk";
+"chat_hold_to_talk"="Hold to talk";
 
 "release_to_send"="release to send";
 "release_to_cancel"="release to cancel";
@@ -199,8 +203,7 @@
 "stop_record"="Recording will stop after %d";
 
 
-// MARK: Fun UI
-"fun_chat_input_placeholder"="Enter what you want to say...";
+"chat_input_placeholder_prompt"="Enter what you want to say...";
 
 "no_location"="No location information";
 
@@ -242,6 +245,7 @@
 "chat_translate_hide"="Hide";
 "chat_translate_tag"="Translation";
 "chat_translate_failed"="Translation failed";
+"chat_translate_failed_retry"="Translation failed, tap to retry";
 "ai_user_pin_top"="PIN";
 "request_exception" = "AI error";
 "ai_request_ing" = "Thinking…";
@@ -387,4 +391,7 @@
 "search_loading_more_messages"="Loading more messages...";
 
 "new_message_count"=" %d new message";
+"last_read_position_count"="%d new messages";
+"last_read_position_overflow"="99+ new messages";
+"last_read_position_accessibility_hint"="Returns to the first message after your previous reading position";
 "bot_sub_session_delete_failed"="Failed to delete. Please try again";

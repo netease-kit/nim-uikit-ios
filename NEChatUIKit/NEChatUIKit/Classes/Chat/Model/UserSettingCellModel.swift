@@ -5,6 +5,7 @@
 
 import Foundation
 
+@objc
 public enum UserSettingType: Int {
   case SwitchType = 1
   case SelectType = 2

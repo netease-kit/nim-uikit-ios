@@ -53,23 +53,31 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
     discussionDatas.removeAll()
     seniorDatas.removeAll()
 
-    guard let search = searchText else {
+    guard let searchText else {
+      completion()
+      return
+    }
+    let search = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !search.isEmpty else {
       completion()
       return
     }
     for (_, value) in friendDic {
       if let user = value.userInfo {
-        let alias = user.friend?.alias ?? ""
-        let nickname = user.user?.name ?? ""
-        let accountId = user.user?.accountId ?? ""
-        if alias.contains(search) || nickname.contains(search) || accountId.contains(search) {
+        if NETeamMemberSearchMatcher.matches(
+          keyword: search,
+          teamNick: nil,
+          friendAlias: user.friend?.alias,
+          userNickname: user.user?.name,
+          accountId: user.user?.accountId ?? user.friend?.accountId
+        ) {
           friendDatas.append(value)
         }
       }
     }
     for (_, value) in teamDic {
-      if let showName = value.team?.getShowName() {
-        if showName.contains(search) == true {
+      if let team = value.team {
+        if NETeamMemberSearchMatcher.displayResult(keyword: search, text: team.name) != nil {
           if let serverExtension = value.team?.serverExtension, serverExtension.contains(discussTeamKey) == true {
             discussionDatas.append(value)
           } else {

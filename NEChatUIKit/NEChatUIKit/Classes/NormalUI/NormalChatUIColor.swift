@@ -5,7 +5,7 @@
 import Foundation
 import NEChatKit
 
-public extension UIColor {
+@objc public extension UIColor {
   // 导航栏（包含状态栏）背景色
   static let normalChatNavigationBg = UIColor.white
 

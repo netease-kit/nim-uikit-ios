@@ -44,7 +44,6 @@
 "headImage"="Avatar";
 "nickname"="Nick Name";
 "account"="ID";
-"gneder"="Sex";
 "unknown"="Unknown";
 "individuality_sign"="What's up";
 "new_message_remind"="message notification";
@@ -110,3 +109,4 @@
 "lang_th"="Thai";
 "lang_vi"="Vietnamese";
 "lang_id"="Indonesian";
+"emoji_reaction" = "Emoji reactions";

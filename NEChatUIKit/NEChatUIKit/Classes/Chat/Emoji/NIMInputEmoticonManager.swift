@@ -6,11 +6,13 @@
 import NEChatKit
 import UIKit
 
-public enum NIMEmoticonType: NSInteger {
+@objc
+public enum NIMEmoticonType: Int {
   case file = 0
   case unicode
 }
 
+@objcMembers
 open class NIMInputEmoticon: NSObject {
   public var type: NIMEmoticonType {
     if unicode?.isEmpty == false {
@@ -26,6 +28,7 @@ open class NIMInputEmoticon: NSObject {
   public var unicode: String?
 }
 
+@objcMembers
 open class NIMInputEmoticonLayout: NSObject {
   public var rows: NSInteger = 0 // 行数
   public var columes: NSInteger = 0 // 列数
@@ -51,6 +54,7 @@ open class NIMInputEmoticonLayout: NSObject {
   }
 }
 
+@objcMembers
 open class NIMInputEmoticonCatalog: NSObject {
   public var layout: NIMInputEmoticonLayout?
   public var catalogID: String?
@@ -66,10 +70,54 @@ open class NIMInputEmoticonCatalog: NSObject {
   public var pagesCount: NSInteger = 0
 }
 
+@objcMembers
+public final class NIMInputSticker: NSObject {
+  public let stickerID: String
+  public let fileURL: URL
+
+  @objc(initWithStickerID:fileURL:)
+  public init(stickerID: String, fileURL: URL) {
+    self.stickerID = stickerID
+    self.fileURL = fileURL
+    super.init()
+  }
+}
+
+@objcMembers
+public final class NIMInputStickerPackage: NSObject {
+  public let packageID: String
+  public let title: String?
+  public let normalIcon: UIImage
+  public let selectedIcon: UIImage
+  public let stickers: [NIMInputSticker]
+
+  @objc(initWithPackageID:title:normalIcon:selectedIcon:stickers:)
+  public init(packageID: String, title: String? = nil, normalIcon: UIImage,
+              selectedIcon: UIImage, stickers: [NIMInputSticker]) {
+    self.packageID = packageID
+    self.title = title
+    self.normalIcon = normalIcon
+    self.selectedIcon = selectedIcon
+    self.stickers = stickers
+    super.init()
+  }
+}
+
+@objcMembers
+public final class NIMInputStickerNotification: NSObject {
+  @objc(packagesDidChange)
+  public static var packagesDidChange: NSNotification.Name {
+    NSNotification.Name("NIMInputStickerPackagesDidChangeNotification")
+  }
+}
+
+@objcMembers
 open class NIMInputEmoticonManager: NSObject {
   public static let shared = NIMInputEmoticonManager()
   private var catalogs: [NIMInputEmoticonCatalog]?
   private var classTag = "NIMInputEmoticonManager"
+  private let stickerLock = NSLock()
+  private var registeredStickerPackages = [NIMInputStickerPackage]()
 
   /// 是否是外部资源
   private(set) var isCustomEmojResource = false
@@ -227,5 +275,106 @@ open class NIMInputEmoticonManager: NSObject {
       }
     }
     return emotion
+  }
+
+  @discardableResult
+  @objc(registerStickerPackage:)
+  open func registerStickerPackage(_ package: NIMInputStickerPackage) -> Bool {
+    guard let snapshot = validatedStickerPackage(package) else {
+      return false
+    }
+
+    stickerLock.lock()
+    if let index = registeredStickerPackages.firstIndex(where: { $0.packageID == snapshot.packageID }) {
+      registeredStickerPackages[index] = snapshot
+    } else {
+      registeredStickerPackages.append(snapshot)
+    }
+    stickerLock.unlock()
+
+    postStickerPackagesDidChange()
+    return true
+  }
+
+  @discardableResult
+  @objc(unregisterStickerPackageWithID:)
+  open func unregisterStickerPackage(withID packageID: String) -> Bool {
+    let normalizedID = packageID.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !normalizedID.isEmpty, normalizedID != NIMKit_EmojiCatalog else {
+      return false
+    }
+
+    stickerLock.lock()
+    guard let index = registeredStickerPackages.firstIndex(where: { $0.packageID == normalizedID }) else {
+      stickerLock.unlock()
+      return false
+    }
+    registeredStickerPackages.remove(at: index)
+    stickerLock.unlock()
+
+    postStickerPackagesDidChange()
+    return true
+  }
+
+  @objc(stickerPackages)
+  open func stickerPackages() -> [NIMInputStickerPackage] {
+    stickerLock.lock()
+    let snapshot = registeredStickerPackages
+    stickerLock.unlock()
+    return snapshot
+  }
+
+  private func validatedStickerPackage(_ package: NIMInputStickerPackage) -> NIMInputStickerPackage? {
+    let packageID = package.packageID.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !packageID.isEmpty,
+          packageID != NIMKit_EmojiCatalog,
+          package.normalIcon.size.width > 0,
+          package.normalIcon.size.height > 0,
+          package.selectedIcon.size.width > 0,
+          package.selectedIcon.size.height > 0 else {
+      return nil
+    }
+
+    var stickerIDs = Set<String>()
+    var validStickers = [NIMInputSticker]()
+    for sticker in package.stickers {
+      let stickerID = sticker.stickerID.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard !stickerID.isEmpty,
+            !stickerIDs.contains(stickerID),
+            sticker.fileURL.isFileURL,
+            FileManager.default.isReadableFile(atPath: sticker.fileURL.path),
+            let image = UIImage(contentsOfFile: sticker.fileURL.path),
+            image.size.width > 0,
+            image.size.height > 0 else {
+        continue
+      }
+      stickerIDs.insert(stickerID)
+      validStickers.append(NIMInputSticker(stickerID: stickerID, fileURL: sticker.fileURL))
+    }
+
+    guard !validStickers.isEmpty else {
+      return nil
+    }
+    return NIMInputStickerPackage(
+      packageID: packageID,
+      title: package.title,
+      normalIcon: package.normalIcon,
+      selectedIcon: package.selectedIcon,
+      stickers: validStickers
+    )
+  }
+
+  private func postStickerPackagesDidChange() {
+    let postNotification = { [self] in
+      NotificationCenter.default.post(
+        name: NIMInputStickerNotification.packagesDidChange,
+        object: self
+      )
+    }
+    if Thread.isMainThread {
+      postNotification()
+    } else {
+      DispatchQueue.main.async(execute: postNotification)
+    }
   }
 }

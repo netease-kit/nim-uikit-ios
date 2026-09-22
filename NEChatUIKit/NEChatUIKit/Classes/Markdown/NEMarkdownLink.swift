@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownLink: NEMarkdownLinkElement {
+@objcMembers
+open class NEMarkdownLink: NSObject, NEMarkdownLinkElement {
   fileprivate static let regex = "\\[[^\\]]+\\]\\(\\S+(?=\\))\\)"
 
   // This regex is eager if does not count even trailing Parentheses.

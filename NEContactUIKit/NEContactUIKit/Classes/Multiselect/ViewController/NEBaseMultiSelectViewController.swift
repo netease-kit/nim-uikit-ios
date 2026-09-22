@@ -5,6 +5,7 @@
 import NEChatKit
 import NIMSDK
 import UIKit
+import NEBaseUIKit
 
 /// 转发 - 选择页面 - 基类
 @objcMembers
@@ -180,18 +181,8 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   // MARK: - lazy var
 
   /// 搜索区域
-  public lazy var searchTextField1: FunSearchView = {
-    let view = FunSearchView(searchButtonLeftConstant: 16)
-    view.translatesAutoresizingMaskIntoConstraints = false
-    view.backView.backgroundColor = UIColor.ne_backcolor
-    view.searchButton.setImage(coreLoader.loadImage("fun_search"), for: .normal)
-    view.searchButton.setTitle(commonLocalizable("search"), for: .normal)
-    view.searchButton.contentHorizontalAlignment = .left
-    return view
-  }()
-
   public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
+    let textField = NESingleLineSearchTextField()
     let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
@@ -652,17 +643,6 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
   /// 确认按钮点击事件
   open func sureButtonAction() {
-    // 校验网络
-    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      showToast(commonLocalizable("network_error"))
-      // 如果是单选则从已选列表中移除
-      if !isMultiSelect {
-        selectedArray.first?.isSelected = false
-        selectedArray.removeAll()
-      }
-      return
-    }
-
     var conversationJSONs = [[String: Any]]()
     for model in selectedArray {
       var conversationJSON = [String: Any]()

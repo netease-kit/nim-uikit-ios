@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownBold: NEMarkdownCommonElement {
+@objcMembers
+open class NEMarkdownBold: NSObject, NEMarkdownCommonElement {
   fileprivate static let regex = "(.?|^)(\\*\\*|__)(?=\\S)(.+?)(?<=\\S)(\\2)"
 
   open var font: UIFont?

@@ -161,6 +161,11 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
       return
     }
 
+    guard textInputView.text.rangeOfCharacter(from: .newlines) == nil else {
+      showToast(commonLocalizable("failed_operation"))
+      return
+    }
+
     if let text = textInputView.text,
        !text.isEmpty {
       let trimText = text.trimmingCharacters(in: .whitespaces)
@@ -239,6 +244,7 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
   /// - Parameter range: 变更范围
   /// - Parameter text:  变更内容
   open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    guard text.rangeOfCharacter(from: .newlines) == nil else { return false }
     if !text.isEmpty {
       let finalStr = (textView.text as NSString).replacingCharacters(in: range, with: text)
       if finalStr.utf16.count > textLimit {

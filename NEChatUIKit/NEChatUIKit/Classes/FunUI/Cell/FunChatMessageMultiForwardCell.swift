@@ -13,6 +13,14 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   let titleLabelFontSize: CGFloat = 16
   let contentLabelFontSize: CGFloat = 12
 
+  override open func reactionTopSpacing(for model: MessageContentModel) -> CGFloat {
+    super.reactionTopSpacing(for: model) - NEBaseChatMessageCell.reactionBottomPadding
+  }
+
+  override open func reactionBottomSpacing(for model: MessageContentModel) -> CGFloat {
+    super.reactionBottomSpacing(for: model) + NEBaseChatMessageCell.reactionBottomPadding
+  }
+
   override open func commonUILeft() {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive_fun")
@@ -166,7 +174,18 @@ open class FunChatMessageMultiForwardCell: FunChatMessageBaseCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    // The Fun card owns a fixed 256pt surface. Set the model size before the
+    // base cell measures Reaction so the backdrop and capsule use that same
+    // width.
+    model.contentSize = CGSize(width: 256, height: 130)
     super.setModel(model, isSend)
+    if isSend, reactionViewRight.isEnabledForDisplay {
+      reactionBackdropRight.image = backViewRight.image
+      reactionBackdropRight.contentMode = backViewRight.contentMode
+    } else if !isSend, reactionViewLeft.isEnabledForDisplay {
+      reactionBackdropLeft.image = backViewLeft.image
+      reactionBackdropLeft.contentMode = backViewLeft.contentMode
+    }
     guard let data = NECustomUtils.dataOfCustomMessage(model.message?.attachment) else {
       return
     }

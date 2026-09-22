@@ -132,10 +132,14 @@
 "msg_rtc_call"="[音视频通话]";
 "msg_custom"="[自定义消息]";
 "msg_unknown"="[未知消息体]";
+"tip"="[提醒消息]";
+"notification"="[通知消息]";
 "message_read"="消息阅读状态";
 "message_all_unread"="全部成员未读";
 "user_select"="选择提醒";
 "user_select_all"="所有人";
+"user_search_placeholder"="搜索";
+"user_search_empty"="未找到匹配的成员";
 
 "contact_user"="转发到个人";
 "team"="转发到群组";
@@ -188,7 +192,7 @@
 "unpin_failed"="取消标记失败";
 "pin_limit_exceeded"="已超出 pin 数量上限";
 
-"fun_hold_to_talk"="按住 说话";
+"chat_hold_to_talk"="按住 说话";
 
 "release_to_send"="松开 发送";
 "release_to_cancel"="松开 取消";
@@ -196,8 +200,7 @@
 "stop_record"="%d″ 后将停止录音";
 
 
-// MARK: Fun UI
-"fun_chat_input_placeholder"="请输入您想说的...";
+"chat_input_placeholder_prompt"="请输入您想说的...";
 
 "no_location"="请选择你要发送的位置信息";
 
@@ -238,6 +241,7 @@
 "chat_translate_hide"="隐藏";
 "chat_translate_tag"="译文";
 "chat_translate_failed"="翻译失败";
+"chat_translate_failed_retry"="翻译失败，点击重试";
 "ai_user_pin_top"="PIN置顶";
 "format_not_supported"="暂不支持该格式";
 "request_exception" = "模型请求异常";
@@ -385,4 +389,7 @@
 "search_loading_more_messages"="正在加载更多消息...";
 
 "new_message_count"=" %d 条新消息";
+"last_read_position_count"="%d 条新消息";
+"last_read_position_overflow"="99+ 条新消息";
+"last_read_position_accessibility_hint"="返回上次阅读位置后的第一条消息";
 "bot_sub_session_delete_failed"="删除失败，请重试";

@@ -7,8 +7,9 @@ import Foundation
 import NEChatKit
 import NIMSDK
 
-public enum TeamType {
-  case advanceTeam
+@objc
+public enum TeamType: Int {
+  case advanceTeam = 0
   case discussTeam
 }
 

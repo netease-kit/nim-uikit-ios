@@ -38,18 +38,14 @@ public extension ChatRouter {
         if vc.isKind(of: ChatViewController.self) {
           hasChatVCInStack = true
           if vc.isKind(of: P2PChatViewController.self) {
-            // 复用栈中已有的 P2PChatViewController，不需要设置 pendingNewMessages
-            // 因为该 VC 的 onReceiveNewMsgs 已经是正确的
-            // 注意：不要在这里设置 pendingNewMessages，否则会导致数量翻倍
-            (vc as? ChatViewController)?.viewModel.anchor = anchor
-            (vc as? ChatViewController)?.loadData()
+            let chatVC = vc as? ChatViewController
+            chatVC?.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
+            chatVC?.loadData()
             nav?.popToViewController(vc, animated: animated)
           } else {
             // 栈中有其他类型的 ChatViewController，需要替换为 P2PChatViewController
-            // 此时需要传递 pendingNewMessages
-            if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-              p2pChatVC.pendingNewMessages = newMsgs
-            }
+            p2pChatVC.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
+            p2pChatVC.hidesBottomBarWhenPushed = vc.hidesBottomBarWhenPushed || i > 0
             nav?.viewControllers[i] = p2pChatVC
             nav?.popToViewController(p2pChatVC, animated: animated)
           }
@@ -57,10 +53,7 @@ public extension ChatRouter {
         }
       }
 
-      // 无论如何都先设置 pendingNewMessages（如果有的话）
-      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-        p2pChatVC.pendingNewMessages = newMsgs
-      }
+      p2pChatVC.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
 
       var count = nav?.viewControllers.count ?? 0
       nav?.pushViewController(p2pChatVC, animated: animated)
@@ -135,18 +128,13 @@ public extension ChatRouter {
         if vc.isKind(of: ChatViewController.self) {
           hasChatVCInStack = true
           if vc.isKind(of: TeamChatViewController.self) {
-            // 复用栈中已有的 TeamChatViewController，不需要设置 pendingNewMessages
-            // 因为该 VC 的 onReceiveNewMsgs 已经是正确的（调用方会在之后清空以避免重复）
-            // 注意：不要在这里设置 pendingNewMessages，否则会导致数量翻倍
-            (vc as? ChatViewController)?.viewModel.anchor = anchor
-            (vc as? ChatViewController)?.loadData()
+            let chatVC = vc as? ChatViewController
+            chatVC?.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
+            chatVC?.loadData()
             nav?.popToViewController(vc, animated: animated)
           } else {
             // 栈中有其他类型的 ChatViewController，需要替换为 TeamChatViewController
-            // 此时需要传递 pendingNewMessages
-            if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-              groupVC.pendingNewMessages = newMsgs
-            }
+            groupVC.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
             nav?.viewControllers[i] = groupVC
             nav?.popToViewController(groupVC, animated: animated)
           }
@@ -155,6 +143,7 @@ public extension ChatRouter {
       }
 
       let count = nav?.viewControllers.count ?? 0
+      groupVC.applyHistoryAnchor(anchor, transferredNewMessages: onReceiveNewMsgs ?? [])
       nav?.pushViewController(groupVC, animated: animated)
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {

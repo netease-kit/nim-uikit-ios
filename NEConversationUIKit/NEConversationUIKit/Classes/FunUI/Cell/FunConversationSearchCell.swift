@@ -34,6 +34,6 @@ open class FunConversationSearchCell: NEBaseConversationSearchCell {
   }
 
   override open func getRangeTextColor() -> UIColor {
-    UIColor.ne_funTheme
+    UIColor.ne_searchHighlight
   }
 }

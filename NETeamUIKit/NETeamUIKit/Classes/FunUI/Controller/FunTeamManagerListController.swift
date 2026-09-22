@@ -42,10 +42,8 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     cell.delegate = self
     cell.index = indexPath.row
     cell.configure(viewmodel.managers[indexPath.row])
-    if let type = viewmodel.currentMember?.memberRole, type == .TEAM_MEMBER_ROLE_MANAGER {
-      cell.removeButton.isHidden = true
-      cell.removeLabel.isHidden = true
-    }
+    let canRemove = viewmodel.currentMember?.memberRole != .TEAM_MEMBER_ROLE_MANAGER
+    cell.setRemoveControlsVisible(canRemove)
     return cell
   }
 
@@ -62,6 +60,7 @@ open class FunTeamManagerListController: NEBaseTeamManagerListController {
     if indexPath.section == 0 {
       let selectController = FunTeamMemberSelectController()
       selectController.teamId = teamId
+      selectController.title = localizable("team_member_select")
       selectController.selectCountLimit = IMKitConfigCenter.shared.teamManagerMaxCount == -1 ? Int.max : IMKitConfigCenter.shared.teamManagerMaxCount
 
       selectController.selectMemberBlock = { [weak self] datas in

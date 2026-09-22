@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import SDWebImage
 import UIKit
@@ -65,6 +66,22 @@ open class FunChatMessageImageCell: FunChatMessageBaseCell {
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
+
+    let hasReaction = IMKitConfigCenter.shared.enableEmojiReaction &&
+      !model.isRevoked &&
+      model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED &&
+      !model.reactionGroups.isEmpty
+    if hasReaction {
+      setBubbleImage()
+    } else {
+      // Image cells use the thumbnail as their foreground surface in FunUI.
+      // A reacted image temporarily restores the bubble behind it, so clear
+      // both directional surfaces when the reused cell receives a plain image.
+      bubbleImageLeft.image = nil
+      bubbleImageRight.image = nil
+      bubbleImageLeft.backgroundColor = .clear
+      bubbleImageRight.backgroundColor = .clear
+    }
 
     if let m = model as? MessageImageModel, let imageUrl = m.urlString {
       let options: SDWebImageOptions = [.retryFailed, .allowInvalidSSLCertificates]

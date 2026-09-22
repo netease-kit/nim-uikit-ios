@@ -1,5 +1,8 @@
 # NEAISearchKit Changelog
 
+## 10.9.60(2026-09-21)
+* 跟随 IMUIKit 发版。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 通用 UI 依赖切换为 NEBaseUIKit。

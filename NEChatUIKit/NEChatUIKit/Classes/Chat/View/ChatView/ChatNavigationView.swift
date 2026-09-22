@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+@objcMembers
 open class ChatNavigationView: NENavigationView {
   public lazy var earImageView: UIImageView = {
     let imageView = UIImageView()

@@ -701,9 +701,12 @@ extension TeamSettingViewModel: NEConversationListener {
     if let currentConversation = conversation {
       for changeConversation in conversations {
         if currentConversation.conversationId == changeConversation.conversationId {
+          let didChangeStickTop = currentConversation.stickTop != changeConversation.stickTop
           conversation = changeConversation
-          getData()
-          delegate?.didNeedRefreshUI()
+          if didChangeStickTop {
+            getData()
+            delegate?.didNeedRefreshUI()
+          }
           break
         }
       }
@@ -720,9 +723,12 @@ extension TeamSettingViewModel: NELocalConversationListener {
     if let currentConversation = conversation {
       for changeConversation in conversations {
         if currentConversation.conversationId == changeConversation.conversationId {
+          let didChangeStickTop = currentConversation.stickTop != changeConversation.stickTop
           conversation = changeConversation
-          getData()
-          delegate?.didNeedRefreshUI()
+          if didChangeStickTop {
+            getData()
+            delegate?.didNeedRefreshUI()
+          }
           break
         }
       }

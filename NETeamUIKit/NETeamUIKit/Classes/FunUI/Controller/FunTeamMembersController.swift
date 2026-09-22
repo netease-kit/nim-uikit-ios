@@ -8,6 +8,8 @@ import UIKit
 
 @objcMembers
 open class FunTeamMembersController: NEBaseTeamMembersController {
+  override open var memberLoadStatusTintColor: UIColor { .funTeamThemeColor }
+
   let searchGrayBackView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -16,9 +18,9 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
   }()
 
   override open func viewDidLoad() {
+    contentTableView.register(FunTeamMemberCell.self, forCellReuseIdentifier: "\(FunTeamMemberCell.self)")
     super.viewDidLoad()
     view.backgroundColor = .funTeamBackgroundColor
-    contentTableView.register(FunTeamMemberCell.self, forCellReuseIdentifier: "\(FunTeamMemberCell.self)")
     view.insertSubview(searchGrayBackView, belowSubview: backView)
     NSLayoutConstraint.activate([
       searchGrayBackView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -38,9 +40,9 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
       for: indexPath
     ) as? FunTeamMemberCell {
       if let model = getRealModel(indexPath.row) {
-        cell.configure(model)
+        let keyword = (searchTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         var isShowRemove = false
-        if isOwner(model.nimUser?.user?.accountId) {
+        if isOwner(model.teamMember?.accountId ?? model.nimUser?.user?.accountId) {
           cell.ownerLabel.isHidden = false
           cell.ownerLabel.text = localizable("team_owner")
           cell.setOwnerStyle()
@@ -59,9 +61,8 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
         }
         cell.index = indexPath.row
         cell.delegate = self
-        cell.configure(model)
-        cell.removeButton.isHidden = !isShowRemove
-        cell.removeLabel.isHidden = !isShowRemove
+        cell.configure(model, searchResult: keyword.isEmpty ? nil : viewModel.searchResult(for: model))
+        cell.setRemoveControlsVisible(isShowRemove)
 
 //        if IMKitConfigCenter.shared.enableOnlineStatus {
 //          cell.headerView.alpha = 0.5
@@ -99,7 +100,7 @@ open class FunTeamMembersController: NEBaseTeamMembersController {
   }
 
   func isLastRow(_ index: Int) -> Bool {
-    if searchTextField.text?.isEmpty == false {
+    if !(searchTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
       if viewModel.searchDatas.count - 1 == index {
         return true
       }

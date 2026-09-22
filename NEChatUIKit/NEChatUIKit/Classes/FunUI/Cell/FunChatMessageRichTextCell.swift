@@ -78,7 +78,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     replyViewLeftHeightAnchor = replyViewLeft.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     replyViewLeftHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      replyViewLeft.topAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 0),
+      replyViewLeft.topAnchor.constraint(equalTo: reactionBackdropLeft.bottomAnchor, constant: 0),
       replyViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
       replyViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
@@ -110,7 +110,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     replyViewRightHeightAnchor = replyViewRight.heightAnchor.constraint(equalToConstant: CGFloat.greatestFiniteMagnitude)
     replyViewRightHeightAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      replyViewRight.topAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 0),
+      replyViewRight.topAnchor.constraint(equalTo: reactionBackdropRight.bottomAnchor, constant: 0),
       replyViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
       replyViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
     ])
@@ -193,6 +193,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     super.setModel(model, isSend)
     let replyView = isSend ? replyTextViewRight : replyTextViewLeft
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
+    let contentLabel = isSend ? contentLabelRight : contentLabelLeft
     let titleLabelHeightAnchor = isSend ? titleLabelRightHeightAnchor : titleLabelLeftHeightAnchor
     let titleLabelBottomAnchor = isSend ? titleLabelRightBottomAnchor : titleLabelLeftBottomAnchor
     let contentLabelHeightAnchor = isSend ? contentLabelRightHeightAnchor : contentLabelLeftHeightAnchor
@@ -204,11 +205,14 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     }
 
     if let m = model as? MessageTextModel {
+      contentLabel.attributedText = m.attributeStr
+      contentLabel.isHidden = m.attributeStr == nil
       contentLabelHeightAnchor?.constant = m.textHeight
     }
 
     if let m = model as? MessageRichTextModel {
       titleLabel.attributedText = m.titleAttributeStr
+      titleLabel.textContainerInset = .zero
       if replyView.isHidden {
         titleLabel.textContainerInset = UIEdgeInsets(top: model.offset / 2, left: 0, bottom: 0, right: 0)
       }
@@ -218,6 +222,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
         titleLabel.isUserInteractionEnabled = true
         titleLabelHeightAnchor?.isActive = false
         titleLabelBottomAnchor?.isActive = true
+        titleLabelHeightAnchor?.constant = 0
       } else {
         titleLabel.isUserInteractionEnabled = false
         titleLabelBottomAnchor?.isActive = false

@@ -21,10 +21,5 @@ open class ChatTeamMemberCell: NEBaseChatTeamMemberCell {
     ])
 
     nameLabel.font = NEConstant.defaultTextFont(16.0)
-    NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
-      nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -70),
-    ])
   }
 }

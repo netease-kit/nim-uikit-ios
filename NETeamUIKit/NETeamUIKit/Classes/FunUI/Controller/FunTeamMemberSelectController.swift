@@ -6,6 +6,8 @@ import UIKit
 
 @objcMembers
 open class FunTeamMemberSelectController: NEBaseTeamMemberSelectController {
+  override open var memberLoadStatusTintColor: UIColor { .funTeamThemeColor }
+
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     cellClassDic[0] = FunTeamMemberSelectCell.self
@@ -24,7 +26,7 @@ open class FunTeamMemberSelectController: NEBaseTeamMemberSelectController {
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "\(indexPath.section)", for: indexPath) as! FunTeamMemberSelectCell
     let member = viewModel.showDatas[indexPath.row]
-    cell.configureMember(member)
+    cell.configureMember(member, searchResult: viewModel.currentSearchResult(for: member))
     return cell
   }
 

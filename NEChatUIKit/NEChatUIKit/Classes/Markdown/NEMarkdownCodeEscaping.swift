@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownCodeEscaping: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownCodeEscaping: NSObject, NEMarkdownElement {
   // 两个分支合并为一个正则，不使用 .dotMatchesLineSeparators：
   // 分支1 — 多反引号(2+)：内容可跨行（用 [\s\S]+? 匹配包含换行的任意字符）
   //         groups: (2)=backticks  (3)=content  (4)=closing backticks

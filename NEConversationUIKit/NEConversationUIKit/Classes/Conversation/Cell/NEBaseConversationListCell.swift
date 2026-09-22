@@ -116,7 +116,7 @@ open class NEBaseConversationListCell: UITableViewCell {
       // p2p nickName
       let displayName = conversationModel.conversation?.name.flatMap { $0.isEmpty ? nil : $0 } ?? accountId
       configureTitle(displayName, isRobot: NEAIRobotManager.shared.isRobot(sessionId))
-      refreshRobotIconIfNeeded(displayName: displayName)
+      refreshRobotIconIfNeeded()
     } else if conversationModel.conversation?.type == .CONVERSATION_TYPE_TEAM {
       guard let conversationId = conversationModel.conversation?.conversationId,
             let teamId = V2NIMConversationIdUtil.conversationTargetId(conversationId) else {
@@ -222,24 +222,29 @@ open class NEBaseConversationListCell: UITableViewCell {
   private func configureTitle(_ title: String, isRobot: Bool) {
     titleLabel.attributedText = nil
     titleLabel.text = title
+    configureRobotIcon(isRobot)
+  }
+
+  private func configureRobotIcon(_ isRobot: Bool) {
     robotIconView.isHidden = !isRobot
     robotIconWidthConstraint?.constant = isRobot ? 22 : 0
   }
 
-  private func refreshRobotIconIfNeeded(displayName: String) {
+  private func refreshRobotIconIfNeeded() {
     guard conversationType == .CONVERSATION_TYPE_P2P,
           !sessionId.isEmpty else {
       return
     }
     let expectedSessionId = sessionId
     NEAIRobotManager.shared.checkIfRobot(expectedSessionId) { [weak self] isRobot in
-      guard let self,
-            self.conversationType == .CONVERSATION_TYPE_P2P,
-            self.sessionId == expectedSessionId else {
-        return
-      }
-      DispatchQueue.main.async {
-        self.configureTitle(displayName, isRobot: isRobot)
+      DispatchQueue.main.async { [weak self] in
+        // The cell can be rebound between the identity callback and this UI update.
+        guard let self,
+              self.conversationType == .CONVERSATION_TYPE_P2P,
+              self.sessionId == expectedSessionId else {
+          return
+        }
+        self.configureRobotIcon(isRobot)
       }
     }
   }

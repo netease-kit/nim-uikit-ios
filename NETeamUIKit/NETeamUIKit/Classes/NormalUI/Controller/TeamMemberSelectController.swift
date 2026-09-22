@@ -24,7 +24,7 @@ open class TeamMemberSelectController: NEBaseTeamMemberSelectController {
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "\(indexPath.section)", for: indexPath) as! TeamMemberSelectCell
     let member = viewModel.showDatas[indexPath.row]
-    cell.configureMember(member)
+    cell.configureMember(member, searchResult: viewModel.currentSearchResult(for: member))
     return cell
   }
 

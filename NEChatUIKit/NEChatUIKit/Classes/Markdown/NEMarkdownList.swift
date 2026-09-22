@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownList: NEMarkdownLevelElement {
+@objcMembers
+open class NEMarkdownList: NSObject, NEMarkdownLevelElement {
   fileprivate static let regex = "^( {0,%@}[\\*\\+\\-])\\s+(.+)$"
 
   open var maxLevel: Int
