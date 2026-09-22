@@ -40,7 +40,7 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
 
   public var searchTextFieldTopAnchor: NSLayoutConstraint?
   public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
+    let textField = NESingleLineSearchTextField()
     let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
@@ -112,7 +112,9 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
     guard let searchText = textfield.text else {
       return
     }
-    if searchText.count <= 0 {
+    let normalizedSearchText = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    if normalizedSearchText.isEmpty {
+      searchStr = ""
       emptyView.isHidden = true
       viewModel.friendDatas.removeAll()
       viewModel.discussionDatas.removeAll()
@@ -124,6 +126,8 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
     let textRange = textfield.markedTextRange
     if textRange == nil || ((textRange?.isEmpty) == nil) {
       weak var weakSelf = self
+      let previousKeyword = searchStr.trimmingCharacters(in: .whitespacesAndNewlines)
+      let shouldScrollToTop = previousKeyword != normalizedSearchText
       searchStr = searchText
       viewModel.doSearch(searchText) {
         if weakSelf?.viewModel.friendDatas.count == 0, weakSelf?.viewModel.discussionDatas.count == 0, weakSelf?.viewModel.seniorDatas.count == 0 {
@@ -132,8 +136,19 @@ open class NEBaseLocalConversationSearchController: NELocalConversationBaseViewC
           weakSelf?.emptyView.isHidden = true
         }
         weakSelf?.tableView.reloadData()
+        if shouldScrollToTop {
+          weakSelf?.scrollSearchResultsToTop()
+        }
       }
     }
+  }
+
+  private func scrollSearchResultsToTop() {
+    tableView.layoutIfNeeded()
+    tableView.setContentOffset(
+      CGPoint(x: tableView.contentOffset.x, y: -tableView.adjustedContentInset.top),
+      animated: false
+    )
   }
 
   // MARK: UITableViewDelegate, UITableViewDataSource

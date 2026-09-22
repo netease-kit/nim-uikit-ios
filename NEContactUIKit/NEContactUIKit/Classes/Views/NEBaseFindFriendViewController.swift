@@ -5,6 +5,7 @@
 
 import NEChatKit
 import UIKit
+import NEBaseUIKit
 
 @objcMembers
 open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFieldDelegate {
@@ -13,7 +14,7 @@ open class NEBaseFindFriendViewController: NEContactBaseViewController, UITextFi
 
   /// 搜索输入框
   public let searchInput: UITextField = {
-    let searchInput = UITextField()
+    let searchInput = NESingleLineTextField()
     searchInput.translatesAutoresizingMaskIntoConstraints = false
     searchInput.textColor = .ne_darkText
     searchInput.placeholder = localizable("input_userId")

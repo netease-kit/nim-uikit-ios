@@ -5,6 +5,7 @@
 
 import UIKit
 
+@objcMembers
 open class NEEmotionTool: NSObject {
   /// 找出所有表情的位置集合
   /// - Parameter str: 字符串

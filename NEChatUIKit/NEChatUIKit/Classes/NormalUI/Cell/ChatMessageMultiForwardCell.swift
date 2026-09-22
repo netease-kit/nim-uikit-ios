@@ -12,6 +12,14 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
   let contentWidth: CGFloat = 234
   let titleLabelFontSize: CGFloat = 14
 
+  override open func reactionTopSpacing(for model: MessageContentModel) -> CGFloat {
+    super.reactionTopSpacing(for: model) - NEBaseChatMessageCell.reactionBottomPadding
+  }
+
+  override open func reactionBottomSpacing(for model: MessageContentModel) -> CGFloat {
+    super.reactionBottomSpacing(for: model) + NEBaseChatMessageCell.reactionBottomPadding
+  }
+
   override open func commonUILeft() {
     bubbleImageLeft.image = nil
     let image = UIImage.ne_imageNamed(name: "multiForward_message_receive")
@@ -165,6 +173,9 @@ open class ChatMessageMultiForwardCell: NormalChatMessageBaseCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    // The card owns a fixed 266pt surface. Set the model size before the base
+    // cell measures Reaction so the backdrop and capsule use that same width.
+    model.contentSize = CGSize(width: 266, height: 130)
     super.setModel(model, isSend)
     guard let data = NECustomUtils.dataOfCustomMessage(model.message?.attachment) else {
       return

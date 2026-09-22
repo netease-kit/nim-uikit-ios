@@ -26,6 +26,8 @@ open class TextBaseCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_darkText
     label.font = UIFont.systemFont(ofSize: 14)
+    label.numberOfLines = 1
+    label.lineBreakMode = .byTruncatingTail
     label.accessibilityIdentifier = "id.nickName"
     return label
   }()
@@ -35,6 +37,8 @@ open class TextBaseCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_greyText
     label.font = UIFont.systemFont(ofSize: 12)
+    label.numberOfLines = 1
+    label.lineBreakMode = .byTruncatingTail
     label.isHidden = true
     label.accessibilityIdentifier = "id.name"
     return label

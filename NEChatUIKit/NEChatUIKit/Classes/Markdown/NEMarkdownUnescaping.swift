@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownUnescaping: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownUnescaping: NSObject, NEMarkdownElement {
   fileprivate static let regex = "\\\\[0-9a-z]{4}"
 
   open var regex: String {

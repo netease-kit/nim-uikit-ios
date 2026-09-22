@@ -8,6 +8,7 @@ import UIKit
 @objcMembers
 open class FunChatMessageTextCell: FunChatMessageBaseCell {
   var isLongPress: Bool = false
+  private var adjustsReplyReaction = false
 
   // MARK: - 译文气泡（Fun 皮肤：独立白色圆角气泡，浮于原文气泡下方）
 
@@ -22,6 +23,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   private var replyViewLeftTopToTranslation: NSLayoutConstraint?
   private var replyViewRightTopToBubble: NSLayoutConstraint?
   private var replyViewRightTopToTranslation: NSLayoutConstraint?
+  private var translationBubbleWidthLeft: NSLayoutConstraint?
+  private var translationBubbleWidthRight: NSLayoutConstraint?
 
   private func makeTranslationBubble(isSend: Bool) -> UIView {
     let bubble = UIView()
@@ -30,6 +33,19 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     bubble.layer.cornerRadius = 4 // 圆角调小（原 8 → 4）
     bubble.layer.masksToBounds = true
     bubble.isHidden = true
+
+    let backgroundView = UIImageView()
+    backgroundView.translatesAutoresizingMaskIntoConstraints = false
+    backgroundView.contentMode = .scaleToFill
+    backgroundView.image = translationBubbleImage(isSend: isSend)
+    bubble.addSubview(backgroundView)
+    bubble.sendSubviewToBack(backgroundView)
+    NSLayoutConstraint.activate([
+      backgroundView.leftAnchor.constraint(equalTo: bubble.leftAnchor),
+      backgroundView.rightAnchor.constraint(equalTo: bubble.rightAnchor),
+      backgroundView.topAnchor.constraint(equalTo: bubble.topAnchor),
+      backgroundView.bottomAnchor.constraint(equalTo: bubble.bottomAnchor),
+    ])
 
     // 1. 译文正文
     let textLabel = UILabel()
@@ -41,6 +57,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onTranslationLongPress(_:)))
     textLabel.isUserInteractionEnabled = true
     textLabel.addGestureRecognizer(longPress)
+    let retryTap = UITapGestureRecognizer(target: self, action: #selector(onTranslationRetryTap(_:)))
+    textLabel.addGestureRecognizer(retryTap)
 
     // 2. 底部「图标 + 译文」footer（取代顶部 tagLabel）
     let footerView = UIView()
@@ -79,11 +97,11 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
     NSLayoutConstraint.activate([
       textLabel.topAnchor.constraint(equalTo: bubble.topAnchor, constant: 8),
-      textLabel.leftAnchor.constraint(equalTo: bubble.leftAnchor, constant: 10),
-      textLabel.rightAnchor.constraint(equalTo: bubble.rightAnchor, constant: -10),
+      textLabel.leftAnchor.constraint(equalTo: bubble.leftAnchor, constant: chat_content_margin + funMargin),
+      textLabel.rightAnchor.constraint(equalTo: bubble.rightAnchor, constant: -chat_content_margin - funMargin),
 
       footerView.topAnchor.constraint(equalTo: textLabel.bottomAnchor, constant: 6),
-      footerView.leftAnchor.constraint(equalTo: bubble.leftAnchor, constant: 10),
+      footerView.leftAnchor.constraint(equalTo: bubble.leftAnchor, constant: chat_content_margin + funMargin),
       footerView.bottomAnchor.constraint(equalTo: bubble.bottomAnchor, constant: -8),
     ])
 
@@ -98,6 +116,13 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   @objc private func onTranslationLongPress(_ gesture: UILongPressGestureRecognizer) {
     guard gesture.state == .began else { return }
     delegate?.didLongPressTranslationView?(self, contentModel)
+  }
+
+  @objc private func onTranslationRetryTap(_ gesture: UITapGestureRecognizer) {
+    guard gesture.state == .ended,
+          let model = contentModel as? MessageTextModel,
+          model.translationFailed else { return }
+    delegate?.didTapTranslationRetryView?(self, model)
   }
 
   public lazy var contentLabelLeft: NEChatTextView = {
@@ -152,11 +177,13 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
   func tapFunc() {}
 
-  /// 译文气泡 footer 最小宽度：图标(14) + 间距(4) + 文案 + 左右内边距(10+10)
+  /// Match SwiftUI's Fun translation bubble: footer plus the same 13.2pt
+  /// horizontal content inset used by the message bubble.
   private var translationBubbleMinWidth: CGFloat {
     let tag = chatLocalizable("chat_translate_tag") as NSString
     let tagW = tag.size(withAttributes: [.font: UIFont.systemFont(ofSize: 12)]).width
-    return 10 + 14 + 4 + ceil(tagW) + 10
+    let horizontalInset = chat_content_margin + funMargin
+    return horizontalInset * 2 + 14 + 4 + ceil(tagW)
   }
 
   override open func commonUILeft() {
@@ -171,7 +198,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     // 回复视图默认挂在原文气泡下方；有译文时切换到译文气泡下方。
     deactivateTopConstraints(for: replyViewLeft)
     replyViewLeftTopToBubble = replyViewLeft.topAnchor.constraint(
-      equalTo: bubbleImageLeft.bottomAnchor, constant: 0
+      equalTo: reactionBackdropLeft.bottomAnchor, constant: 0
     )
     replyViewLeftTopToTranslation = replyViewLeft.topAnchor.constraint(
       equalTo: translationBubbleLeft.bottomAnchor, constant: 0
@@ -181,11 +208,14 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     contentView.addSubview(translationBubbleLeft)
     NSLayoutConstraint.activate([
       replyViewLeftTopToBubble!,
-      translationBubbleLeft.topAnchor.constraint(equalTo: bubbleImageLeft.bottomAnchor, constant: 4),
+      translationBubbleLeft.topAnchor.constraint(equalTo: reactionBackdropLeft.bottomAnchor, constant: 4),
       translationBubbleLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
       translationBubbleLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
       translationBubbleLeft.widthAnchor.constraint(greaterThanOrEqualToConstant: translationBubbleMinWidth),
     ])
+    translationBubbleWidthLeft = translationBubbleLeft.widthAnchor.constraint(equalToConstant: translationBubbleMinWidth)
+    translationBubbleWidthLeft?.priority = .defaultHigh
+    translationBubbleWidthLeft?.isActive = true
   }
 
   override open func commonUIRight() {
@@ -200,7 +230,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     // 回复视图默认挂在原文气泡下方；有译文时切换到译文气泡下方。
     deactivateTopConstraints(for: replyViewRight)
     replyViewRightTopToBubble = replyViewRight.topAnchor.constraint(
-      equalTo: bubbleImageRight.bottomAnchor, constant: 0
+      equalTo: reactionBackdropRight.bottomAnchor, constant: 0
     )
     replyViewRightTopToTranslation = replyViewRight.topAnchor.constraint(
       equalTo: translationBubbleRight.bottomAnchor, constant: 0
@@ -210,11 +240,55 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
     contentView.addSubview(translationBubbleRight)
     NSLayoutConstraint.activate([
       replyViewRightTopToBubble!,
-      translationBubbleRight.topAnchor.constraint(equalTo: bubbleImageRight.bottomAnchor, constant: 4),
+      translationBubbleRight.topAnchor.constraint(equalTo: reactionBackdropRight.bottomAnchor, constant: 4),
       translationBubbleRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
       translationBubbleRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
       translationBubbleRight.widthAnchor.constraint(greaterThanOrEqualToConstant: translationBubbleMinWidth),
     ])
+    translationBubbleWidthRight = translationBubbleRight.widthAnchor.constraint(equalToConstant: translationBubbleMinWidth)
+    translationBubbleWidthRight?.priority = .defaultHigh
+    translationBubbleWidthRight?.isActive = true
+  }
+
+  override open func prepareForReuse() {
+    adjustsReplyReaction = false
+    super.prepareForReuse()
+  }
+
+  private func hasVisibleReply(_ model: MessageContentModel) -> Bool {
+    // The reply target can be resolved after the cell is first bound. The
+    // model's reply state is authoritative in that interval; relying only on
+    // replyText leaves the Reaction row at the old bottom spacing.
+    [MessageType.text, .aiStreamText].contains(model.type) &&
+      (model.isReply || !(model.replyText?.isEmpty ?? true)) &&
+      !model.inMultiForward
+  }
+
+  private func shouldLiftReplyReaction(_ model: MessageContentModel) -> Bool {
+    hasVisibleReply(model) && model.contentSize.height > fun_chat_min_h
+  }
+
+  override open func layoutSubviews() {
+    if let model = contentModel {
+      adjustsReplyReaction = shouldLiftReplyReaction(model)
+    }
+    super.layoutSubviews()
+  }
+
+  /// Keep the reaction row clear of the bottom edge for Fun text replies.
+  /// The spacing is redistributed so the combined bubble height is unchanged.
+  override open func reactionTopSpacing(for model: MessageContentModel) -> CGFloat {
+    guard adjustsReplyReaction, shouldLiftReplyReaction(model) else {
+      return super.reactionTopSpacing(for: model)
+    }
+    return super.reactionTopSpacing(for: model) - NEBaseChatMessageCell.reactionBottomPadding
+  }
+
+  override open func reactionBottomSpacing(for model: MessageContentModel) -> CGFloat {
+    guard adjustsReplyReaction, shouldLiftReplyReaction(model) else {
+      return super.reactionBottomSpacing(for: model)
+    }
+    return super.reactionBottomSpacing(for: model) + NEBaseChatMessageCell.reactionBottomPadding
   }
 
   private func deactivateTopConstraints(for view: UIView) {
@@ -272,15 +346,43 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       !(model.translationInfo?.translatedText.isEmpty ?? true) &&
       model.translationVisible &&
       !model.inMultiForward
-    if hasTranslation {
-      textLabel.text = model.translationInfo?.translatedText
+    let shouldShowFailure = model.translationFailed && model.translationVisible && !model.inMultiForward
+    if hasTranslation || shouldShowFailure {
+      textLabel.text = shouldShowFailure
+        ? chatLocalizable("chat_translate_failed_retry")
+        : model.translationInfo?.translatedText
+      textLabel.textColor = shouldShowFailure ? UIColor.ne_normalTheme : .funChatTranslationTextColor
       bubble.isHidden = false
+      let maxWidth = max(translationBubbleMinWidth, chat_content_maxW - funMargin)
+      let horizontalInset = chat_content_margin + funMargin
+      let measuredWidth = model.estimateTranslationTextWidth() + horizontalInset * 2
+      let width = min(maxWidth, max(translationBubbleMinWidth, measuredWidth))
+      if isSend {
+        translationBubbleWidthRight?.constant = width
+      } else {
+        translationBubbleWidthLeft?.constant = width
+      }
     } else {
       bubble.isHidden = true
     }
   }
 
+  private func translationBubbleImage(isSend: Bool) -> UIImage? {
+    let properties = ChatUIConfig.shared.messageProperties
+    var image = isSend
+      ? properties.selfMessageBgImage
+      : properties.receiveMessageBgImage
+    image = image ?? UIImage.ne_imageNamed(name: isSend
+      ? "chat_message_send_fun"
+      : "chat_message_receive_fun")
+    if let insets = properties.backgroundImageCapInsets {
+      return image?.resizableImage(withCapInsets: insets)
+    }
+    return image
+  }
+
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    adjustsReplyReaction = shouldLiftReplyReaction(model)
     super.setModel(model, isSend)
     isLongPress = false
 
@@ -294,7 +396,19 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       contentSizeToFit(contentLabel, m)
       bindTranslation(m, isSend: isSend)
     }
-    bubbleW?.constant += funMargin
+    if let m = model as? MessageTextModel {
+      let reactionView = isSend ? reactionViewRight : reactionViewLeft
+      let leadingInset = reactionLeadingInset(for: m, isOutgoing: isSend)
+      let trailingInset = reactionTrailingInset(for: m, isOutgoing: isSend)
+      let reactionMaxWidth = max(26, chat_content_maxW - leadingInset - trailingInset)
+      let reactionWidth = min(reactionMaxWidth,
+                              max(reactionView.layoutWidth(forMaxWidth: reactionMaxWidth), 26))
+      bubbleW?.constant = max(bubbleW?.constant ?? 0,
+                              m.contentSize.width + funMargin,
+                              reactionWidth + leadingInset + trailingInset)
+    } else {
+      bubbleW?.constant += funMargin
+    }
 
     updateMessageSupplementTopConstraints(
       isSend: isSend,
@@ -304,8 +418,8 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
   }
 
   private func hasVisibleTranslation(_ model: MessageTextModel) -> Bool {
-    model.translationInfo != nil &&
-      !(model.translationInfo?.translatedText.isEmpty ?? true) &&
+    (model.translationFailed || (model.translationInfo != nil &&
+      !(model.translationInfo?.translatedText.isEmpty ?? true))) &&
       model.translationVisible &&
       !model.inMultiForward
   }

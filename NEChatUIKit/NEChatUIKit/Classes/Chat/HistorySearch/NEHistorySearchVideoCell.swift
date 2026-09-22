@@ -8,6 +8,7 @@ import NIMSDK
 import SDWebImage
 import UIKit
 
+@objcMembers
 open class NEHistorySearchVideoCell: NEHistorySearchImageCell {
   public let iconImageView = UIImageView()
   public let timeLabel = UILabel()

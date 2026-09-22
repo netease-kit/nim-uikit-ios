@@ -5,7 +5,8 @@
 import CoreGraphics
 import Foundation
 
-open class NEMarkdownHeader: NEMarkdownLevelElement {
+@objcMembers
+open class NEMarkdownHeader: NSObject, NEMarkdownLevelElement {
   fileprivate static let regex = "^(#{1,%@})\\s*(.+)$"
 
   open var maxLevel: Int

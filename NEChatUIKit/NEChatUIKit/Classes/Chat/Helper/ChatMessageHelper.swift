@@ -317,20 +317,25 @@ public class ChatMessageHelper: NSObject {
     var currentIndex = 0
     for model in messages {
       if model.type == .image, let message = model.message?.attachment as? V2NIMMessageImageAttachment {
-        if !isFound,
-           model.message?.messageClientId != current?.message?.messageClientId {
-          currentIndex += 1
-        } else {
+        let url = message.url ?? message.path.flatMap {
+          FileManager.default.fileExists(atPath: $0) ? $0 : nil
+        }
+        guard let url, !url.isEmpty else { continue }
+        if !isFound, let currentId = current?.message?.messageClientId,
+           !currentId.isEmpty, model.message?.messageClientId == currentId {
           isFound = true
+          currentIndex = urls.count
         }
-
-        if let url = message.url {
-          urls.append(url)
-        } else {
-          if let path = message.path, FileManager.default.fileExists(atPath: path) {
-            urls.append(path)
-          }
-        }
+        urls.append(url)
+      }
+    }
+    if !isFound, current?.type == .image,
+       let attachment = current?.message?.attachment as? V2NIMMessageImageAttachment {
+      let url = attachment.url ?? attachment.path.flatMap {
+        FileManager.default.fileExists(atPath: $0) ? $0 : nil
+      }
+      if let url, !url.isEmpty {
+        urls.insert(url, at: 0)
       }
     }
     return (currentIndex, urls)
@@ -400,6 +405,51 @@ public class ChatMessageHelper: NSObject {
       }
 
       return chatLocalizable("msg_custom")
+    default:
+      return chatLocalizable("msg_unknown")
+    }
+  }
+
+  /// Generates the same message preview used by the ordinary conversation list.
+  public static func conversationListSummary(_ message: V2NIMMessage?) -> String {
+    guard let message else {
+      return ""
+    }
+
+    switch message.messageType {
+    case .MESSAGE_TYPE_TEXT:
+      return message.text ?? ""
+    case .MESSAGE_TYPE_TIP:
+      return chatLocalizable("tip")
+    case .MESSAGE_TYPE_AUDIO:
+      return chatLocalizable("msg_audio")
+    case .MESSAGE_TYPE_IMAGE:
+      return chatLocalizable("msg_image")
+    case .MESSAGE_TYPE_VIDEO:
+      return chatLocalizable("msg_video")
+    case .MESSAGE_TYPE_LOCATION:
+      return chatLocalizable("msg_location") + " \(message.text ?? "")"
+    case .MESSAGE_TYPE_NOTIFICATION:
+      return chatLocalizable("notification")
+    case .MESSAGE_TYPE_FILE:
+      return chatLocalizable("msg_file")
+    case .MESSAGE_TYPE_CUSTOM:
+      guard let customType = NECustomUtils.typeOfCustomMessage(message.attachment) else {
+        return chatLocalizable("msg_unknown")
+      }
+      if customType == customMultiForwardType {
+        return "[\(chatLocalizable("chat_history"))]"
+      }
+      if customType == customRichTextType,
+         let title = NECustomUtils.titleOfRichText(message.attachment) {
+        return title
+      }
+      return chatLocalizable("msg_custom")
+    case .MESSAGE_TYPE_CALL:
+      guard let attachment = message.attachment as? V2NIMMessageCallAttachment else {
+        return chatLocalizable("msg_unknown")
+      }
+      return attachment.type == 1 ? chatLocalizable("msg_rtc_audio") : chatLocalizable("msg_rtc_video")
     default:
       return chatLocalizable("msg_unknown")
     }
@@ -574,15 +624,15 @@ public class ChatMessageHelper: NSObject {
   /// - Returns: 回复消息 refer 组成的 map
   @nonobjc
   public static func createReplyDic(_ messageRefer: V2NIMMessageRefer) -> [String: Any] {
-    let yxReplyMsg: [String: Any] = [
-      "idClient": messageRefer.messageClientId as Any,
+    var yxReplyMsg: [String: Any] = [
       "scene": messageRefer.conversationType.rawValue,
-      "from": messageRefer.senderId as Any,
-      "receiverId": messageRefer.receiverId as Any,
-      "to": messageRefer.conversationId as Any,
-      "idServer": messageRefer.messageServerId as Any,
       "time": Int(messageRefer.createTime * 1000),
     ]
+    if let clientId = messageRefer.messageClientId { yxReplyMsg["idClient"] = clientId }
+    if let senderId = messageRefer.senderId { yxReplyMsg["from"] = senderId }
+    if let receiverId = messageRefer.receiverId { yxReplyMsg["receiverId"] = receiverId }
+    if let conversationId = messageRefer.conversationId { yxReplyMsg["to"] = conversationId }
+    if let serverId = messageRefer.messageServerId { yxReplyMsg["idServer"] = serverId }
 
     return yxReplyMsg
   }
@@ -612,9 +662,11 @@ public class ChatMessageHelper: NSObject {
   /// - Returns: 回复消息 refer 组成的 map
   @nonobjc
   public static func getReplyDictionary(message: V2NIMMessage) -> [String: Any]? {
-    if let remoteExt = getDictionaryFromJSONString(message.serverExtension ?? ""),
-       let yxReplyMsg = remoteExt[keyReplyMsgKey] as? [String: Any] {
-      return yxReplyMsg
+    for ext in [message.serverExtension, message.localExtension] {
+      if let dictionary = getDictionaryFromJSONString(ext ?? ""),
+         let reply = dictionary[keyReplyMsgKey] as? [String: Any] {
+        return reply
+      }
     }
 
     return nil

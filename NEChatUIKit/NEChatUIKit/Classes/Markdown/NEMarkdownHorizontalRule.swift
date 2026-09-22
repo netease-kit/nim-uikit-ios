@@ -19,7 +19,8 @@ import UIKit
 /// 渲染效果：将分隔线替换为一行视觉横线。
 /// 使用自定义 `NSTextAttachment`，在 `attachmentBounds` 中根据
 /// `proposedLineFragment` 自适应气泡宽度，不会超出右边界。
-open class NEMarkdownHorizontalRule: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownHorizontalRule: NSObject, NEMarkdownElement {
   // 匹配以 - * _ 组成的分隔线（3 个或以上，允许字符间有空格，整行只有这些字符）
   public let regex = "^[ \\t]*([\\-\\*\\_][ \\t]*){3,}[ \\t]*$"
 

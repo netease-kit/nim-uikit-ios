@@ -1,5 +1,12 @@
 # NEContactUIKit Changelog
 
+## 10.9.60(2026-09-21)
+### Behavior changes
+* 对齐共享输入、消息交互和布局策略。
+
+### Bug Fixes
+* 修复删除好友弹窗文案遮挡问题。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 通用 UI 依赖切换为 NEBaseUIKit。

@@ -128,6 +128,14 @@ open class FunChatMessageVideoCell: FunChatMessageImageCell {
     let timeLabel = isSend ? timeLabelRight : timeLabelLeft
     let stateView = isSend ? stateViewRight : stateViewLeft
 
+    let hasReaction = IMKitConfigCenter.shared.enableEmojiReaction &&
+      !model.isRevoked &&
+      model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED &&
+      !model.reactionGroups.isEmpty
+    if hasReaction {
+      setBubbleImage()
+    }
+
     if let videoObject = model.message?.attachment as? V2NIMMessageVideoAttachment {
       // 获取首帧
       let videoUrl = videoObject.url ?? ""

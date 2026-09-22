@@ -1,5 +1,10 @@
 # NEBaseUIKit Changelog
 
+## 10.9.60(2026-09-21)
+### Behavior changes
+* 隔离 NormalUI 与 FunUI 的资源和文案，完善双皮肤独立构建能力。
+* 统一多行输入、个性签名和用户搜索展示的基础 UI 行为。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 新增独立的 NEBaseUIKit 通用 UI 模块，保留原兼容模块不变。

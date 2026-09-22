@@ -36,9 +36,14 @@ open class NEAudioSessionManager: NSObject {
   }
 
   public func configureAudioSession() {
+    configureAudioSession(for: .none)
+  }
+
+  private func configureAudioSession(for port: AVAudioSession.PortOverride) {
     let session = AVAudioSession.sharedInstance()
     do {
-      try session.setCategory(.playAndRecord, mode: .voiceChat)
+      let options: AVAudioSession.CategoryOptions = port == .speaker ? [.defaultToSpeaker] : []
+      try session.setCategory(.playAndRecord, mode: .voiceChat, options: options)
       try session.setActive(true)
     } catch {
       print("[Audio] Session config error: \(error)")
@@ -46,10 +51,11 @@ open class NEAudioSessionManager: NSObject {
   }
 
   public func setAudioRoute(to port: AVAudioSession.PortOverride) {
-    configureAudioSession()
+    configureAudioSession(for: port)
     let session = AVAudioSession.sharedInstance()
     do {
-      try session.overrideOutputAudioPort(port)
+      // Default to speaker without overriding a connected headset's route.
+      try session.overrideOutputAudioPort(.none)
       try session.setPreferredOutputNumberOfChannels(1)
     } catch {
       print("[Audio] Route切换失败: \(error)")

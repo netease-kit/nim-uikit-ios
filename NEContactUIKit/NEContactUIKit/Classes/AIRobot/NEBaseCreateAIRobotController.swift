@@ -130,7 +130,7 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
 
   /// 保留为 backing store，供 viewModel 和 didTapSave 使用（不加入视图层级）
   public lazy var nameTextField: UITextField = {
-    let tf = UITextField()
+    let tf = NESingleLineTextField()
     tf.font = .systemFont(ofSize: 16)
     tf.textColor = .ne_darkText
     tf.textAlignment = .right

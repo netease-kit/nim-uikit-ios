@@ -1,5 +1,12 @@
 # NETeamUIKit Changelog
 
+## 10.9.60(2026-09-21)
+### New Features
+* 支持群成员搜索定位并统一用户搜索展示。
+
+### Bug Fixes
+* 修复群成员展示问题，避免普通收消息事件刷新群设置成员列表。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 通用 UI 依赖切换为 NEBaseUIKit，并补全渠道依赖。

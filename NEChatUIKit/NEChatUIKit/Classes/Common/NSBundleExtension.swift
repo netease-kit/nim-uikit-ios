@@ -6,7 +6,7 @@
 import Foundation
 import NEChatKit
 
-public extension Bundle {
+@objc public extension Bundle {
   class func nim_defaultEmojiBundle() -> Bundle? {
     let bundle = Bundle(for: NIMInputEmoticonManager.self)
     let url = bundle.url(forResource: "NIMKitEmoticon", withExtension: "bundle")

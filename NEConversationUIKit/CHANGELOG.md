@@ -1,5 +1,12 @@
 # NEConversationUIKit Changelog
 
+## 10.9.60(2026-09-21)
+### New Features
+* 统一用户搜索结果展示。
+
+### Bug Fixes
+* 修复会话导航、历史引用和列表刷新相关问题。
+
 ## 10.9.51(2026-08-21)
 ### Behavior changes
 * 通用 UI 依赖切换为 NEBaseUIKit。

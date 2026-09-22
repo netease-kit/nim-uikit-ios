@@ -1,0 +1,6 @@
+interface:
+  display_name: "Swift Feature Removal"
+  short_description: "Remove registered open-source Swift UI and Demo features"
+  default_prompt: "Use $swift-feature-removal to remove a registered feature from nim-uikit-ios NEChatUIKit and app using its maintained inventory."
+policy:
+  allow_implicit_invocation: true

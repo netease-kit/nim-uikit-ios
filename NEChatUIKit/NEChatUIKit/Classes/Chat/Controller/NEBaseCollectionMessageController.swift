@@ -7,7 +7,7 @@ import NEChatKit
 import NIMSDK
 import UIKit
 
-@objc
+@objcMembers
 open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableViewDelegate, UITableViewDataSource, CollectionMessageCellDelegate, UIDocumentInteractionControllerDelegate {
   var audioPlayer: AVAudioPlayer? // 仅用于语音消息的播放
 
@@ -326,12 +326,13 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
                                   conversationName: String?,
                                   _ sureBlock: ((String?) -> Void)? = nil) {
     let forwardAlert = getCollectionForwardAlertController()
-    forwardAlert.setItems(items)
     forwardAlert.forwardType = type
     forwardAlert.sureBlock = sureBlock
-    if let name = conversationName {
+    if let name = resolvedCollectionConversationName(conversationName, conversationId) {
       forwardAlert.senderName = name
+      forwardAlert.contentLabel.text = "[\(type)]\(name)\(chatLocalizable("collection_message"))"
     }
+    forwardAlert.setItems(items)
 
     addChild(forwardAlert)
     view.addSubview(forwardAlert.view)
@@ -339,6 +340,37 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
       UIApplication.shared.keyWindow?.endEditing(true)
     }))
+  }
+
+  func resolvedCollectionConversationName(_ conversationName: String?,
+                                          _ conversationId: String?) -> String? {
+    if let name = conversationName,
+       !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      return name
+    }
+    guard let conversationId = conversationId?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !conversationId.isEmpty,
+          let targetId = V2NIMConversationIdUtil.conversationTargetId(conversationId),
+          !targetId.isEmpty else {
+      return nil
+    }
+
+    switch V2NIMConversationIdUtil.conversationType(conversationId) {
+    case .CONVERSATION_TYPE_P2P:
+      let name = ChatMessageHelper.getUserFromCache(targetId)?.showName(true)
+      return name?.isEmpty == false ? name : targetId
+    case .CONVERSATION_TYPE_TEAM, .CONVERSATION_TYPE_SUPER_TEAM:
+      let teamType: V2NIMTeamType = V2NIMConversationIdUtil.conversationType(conversationId) == .CONVERSATION_TYPE_SUPER_TEAM
+        ? .TEAM_TYPE_SUPER
+        : .TEAM_TYPE_NORMAL
+      var error: NSError?
+      let name = TeamRepo.shared.getTeamInfoLocal(teamId: targetId,
+                                                  teamType: teamType,
+                                                  error: &error)?.name
+      return name?.isEmpty == false ? name : targetId
+    default:
+      return targetId
+    }
   }
 
   /// 转发消息

@@ -47,7 +47,7 @@ open class NEBaseRobotNicknameEditController: NEContactBaseViewController, UITex
   }()
 
   public lazy var textField: UITextField = {
-    let tf = UITextField()
+    let tf = NESingleLineTextField()
     tf.translatesAutoresizingMaskIntoConstraints = false
     tf.font = .systemFont(ofSize: 16)
     tf.textColor = .ne_darkText

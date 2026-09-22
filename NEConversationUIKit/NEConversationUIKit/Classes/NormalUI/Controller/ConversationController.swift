@@ -137,8 +137,8 @@ open class ConversationController: NEBaseConversationController {
     }
   }
 
-  override open func reloadTableView() {
-    super.reloadTableView()
+  override open func renderConversationList() {
+    super.renderConversationList()
     setupNormalStickTopView()
   }
 

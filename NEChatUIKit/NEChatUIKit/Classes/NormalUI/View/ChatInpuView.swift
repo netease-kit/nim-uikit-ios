@@ -7,6 +7,14 @@ import NEChatKit
 
 @objcMembers
 open class ChatInputView: NEBaseChatInputView {
+  override open var emoticonThemeColor: UIColor {
+    .ne_normalTheme
+  }
+
+  override open var emoticonContentVerticalOffset: CGFloat {
+    -10
+  }
+
   public var backViewHeightConstraint: NSLayoutConstraint?
   public var toolsBarTopMargin: NSLayoutConstraint?
   private let shouldShowAIChatButton: Bool

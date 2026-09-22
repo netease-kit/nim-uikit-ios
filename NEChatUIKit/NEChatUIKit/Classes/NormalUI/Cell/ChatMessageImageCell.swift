@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import NIMSDK
 import SDWebImage
 import UIKit
@@ -14,7 +15,7 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     view.translatesAutoresizingMaskIntoConstraints = false
     view.contentMode = .scaleAspectFill
     view.clipsToBounds = true
-    view.image = coreLoader.loadImage("fun_default_image")
+    view.image = coreLoader.loadImage("default_image")
     view.accessibilityIdentifier = "id.thumbnail"
     return view
   }()
@@ -24,7 +25,7 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     view.translatesAutoresizingMaskIntoConstraints = false
     view.contentMode = .scaleAspectFill
     view.clipsToBounds = true
-    view.image = coreLoader.loadImage("fun_default_image")
+    view.image = coreLoader.loadImage("default_image")
     view.accessibilityIdentifier = "id.thumbnail"
     return view
   }()
@@ -67,6 +68,8 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     } else {
       bubbleImageRight.image = nil
       bubbleImageLeft.image = nil
+      bubbleImageRight.backgroundColor = .clear
+      bubbleImageLeft.backgroundColor = .clear
       contentImageViewRight.addCustomCorner(
         conrners: [.topLeft, .bottomLeft, .bottomRight],
         radius: 8,
@@ -84,7 +87,14 @@ open class ChatMessageImageCell: NormalChatMessageBaseCell {
     super.setModel(model, isSend)
     let contentImageView = isSend ? contentImageViewRight : contentImageViewLeft
 
-    setCustomCorner(model.isReply)
+    // A reacted media message must keep the original Normal/Feishu bubble skin so
+    // the image and Reaction row are rendered as one surface. Without this,
+    // the base cell can only draw the skin behind a transparent media view.
+    let hasReaction = IMKitConfigCenter.shared.enableEmojiReaction &&
+      !model.isRevoked &&
+      model.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED &&
+      !model.reactionGroups.isEmpty
+    setCustomCorner(model.isReply || hasReaction)
 
     if let m = model as? MessageImageModel,
        let imageUrl = m.urlString {

@@ -4,6 +4,7 @@
 
 import NETeamUIKit
 import UIKit
+import NEBaseUIKit
 
 class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
   var subCornerType: CornerType {
@@ -19,7 +20,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
   var dataModel: CustomSettingCellModel?
 
   lazy var inputTextField: UITextField = {
-    let textField = UITextField()
+    let textField = NESingleLineTextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.font = UIFont.systemFont(ofSize: 14)
     textField.textColor = UIColor.black

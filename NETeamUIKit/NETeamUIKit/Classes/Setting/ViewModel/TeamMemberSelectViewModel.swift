@@ -28,6 +28,11 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   var selectDic = [String: NETeamMemberInfoModel]() // key 值为用户 id
   /// 是否正在发送请求
   var isRequest = false
+  /// 当前搜索结果对应的共享 matcher 结果
+  private(set) var searchResults = [String: NETeamMemberSearchResult]()
+  /// 成员资料是否仍在按批次补齐
+  private(set) var isLoadingMembers = false
+  private(set) var memberLoadError: NSError?
   var showAllMembers = false
   /// 管理员account id 存放
   var managerSet = Set<String>()
@@ -76,18 +81,24 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
     }
     weak var weakSelf = self
     isRequest = true
+    isLoadingMembers = true
+    memberLoadError = nil
     self.showAllMembers = showAllMembers
     teamRepo.getTeamInfo(teamId) { team, error in
       if let err = error {
         weakSelf?.isRequest = false
+        weakSelf?.isLoadingMembers = false
+        weakSelf?.memberLoadError = err
         completion(err)
       } else {
         let teamInfo = NETeamInfoModel()
         teamInfo.team = team
-        if var members = NETeamUserManager.shared.getAllTeamMemberModels(), team?.memberCount == members.count {
+        if NETeamUserManager.shared.getTeamInfo()?.teamId == teamId,
+           var members = NETeamUserManager.shared.getAllTeamMemberModels(),
+           team?.memberCount == members.count {
           if !showAllMembers {
             members.removeAll { model in
-              if let account = model.nimUser?.user?.accountId {
+              if let account = model.teamMember?.accountId ?? model.nimUser?.user?.accountId {
                 if NEAIUserManager.shared.isAIUser(account) {
                   return true
                 }
@@ -101,39 +112,54 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
           weakSelf?.showDatas.removeAll()
           weakSelf?.getData(showAllMembers)
           weakSelf?.isRequest = false
+          weakSelf?.isLoadingMembers = false
+          weakSelf?.memberLoadError = nil
           completion(nil)
         } else {
-          var memberLists = [V2NIMTeamMember]()
-
-          weakSelf?.getSelectMemberInfos(teamId, nil, &memberLists, .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL) { ms, error in
-            if error != nil {
-              NEALog.infoLog(ModuleName + " " + TeamMemberSelectViewModel.className(), desc: "CALLBACK fetchTeamMember \(String(describing: error))")
-              weakSelf?.isRequest = false
-              completion(nil)
-            } else {
-              if let members = ms {
-                weakSelf?.splitSelectMembers(members, teamInfo, 150) { error, model in
-                  if var users = model?.users, !users.isEmpty {
-                    users.removeAll { model in
-                      if let account = model.nimUser?.user?.accountId {
-                        if NEAIUserManager.shared.isAIUser(account) {
-                          return true
-                        }
-                      }
-                      return false
-                    }
-                    model?.users = users
-                  }
-                  weakSelf?.teamInfoModel = model
-                  weakSelf?.isRequest = false
-                  weakSelf?.getData(showAllMembers)
-                  completion(error)
-                }
-              } else {
-                weakSelf?.isRequest = false
-                completion(error)
+          NETeamUserManager.shared.getAllTeamMembers(
+            teamId,
+            .TEAM_MEMBER_ROLE_QUERY_TYPE_ALL,
+            progress: { [weak self] progress in
+              guard let self, progress.teamId == teamId else { return }
+              self.isLoadingMembers = progress.phase == .loading
+              self.memberLoadError = progress.error
+              guard progress.phase == .loading || progress.phase == .finished else {
+                self.delegate?.didNeedRefresh()
+                return
               }
+              let snapshot = NETeamInfoModel()
+              snapshot.team = team
+              snapshot.users = progress.members.filter { model in
+                guard !showAllMembers,
+                      let accountId = model.teamMember?.accountId else { return true }
+                return !NEAIUserManager.shared.isAIUser(accountId)
+              }
+              self.teamInfoModel = snapshot
+              self.datas.removeAll()
+              self.showDatas.removeAll()
+              self.getData(showAllMembers, pruneSelection: progress.phase == .finished)
+              self.delegate?.didNeedRefresh()
             }
+          ) { _ in
+            weakSelf?.isRequest = false
+            guard NETeamUserManager.shared.getTeamInfo()?.teamId == teamId,
+                  let members = NETeamUserManager.shared.getAllTeamMemberModels() else {
+              weakSelf?.isLoadingMembers = false
+              completion(weakSelf?.memberLoadError)
+              return
+            }
+            teamInfo.users = members.filter { model in
+              guard !showAllMembers,
+                    let accountId = model.teamMember?.accountId else { return true }
+              return !NEAIUserManager.shared.isAIUser(accountId)
+            }
+            weakSelf?.teamInfoModel = teamInfo
+            weakSelf?.datas.removeAll()
+            weakSelf?.showDatas.removeAll()
+            weakSelf?.getData(showAllMembers)
+            weakSelf?.isLoadingMembers = false
+            weakSelf?.memberLoadError = nil
+            completion(nil)
           }
         }
       }
@@ -142,6 +168,10 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
 
   /// 获取选择器数据
   open func getData(_ showAllMembers: Bool) {
+    getData(showAllMembers, pruneSelection: true)
+  }
+
+  private func getData(_ showAllMembers: Bool, pruneSelection: Bool) {
     var temFilters = Set<String>()
     for (key, _) in selectDic {
       temFilters.insert(key)
@@ -149,9 +179,11 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
     managerSet.removeAll()
 
     teamInfoModel?.users.forEach { [weak self] userModel in
-      if !showAllMembers,
-         let uid = userModel.nimUser?.user?.accountId {
+      if let uid = userModel.teamMember?.accountId ?? userModel.nimUser?.user?.accountId {
         temFilters.remove(uid)
+      }
+      if !showAllMembers,
+         let uid = userModel.teamMember?.accountId {
         if uid == IMKitClient.instance.account() {
           return
         }
@@ -169,11 +201,13 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
       self?.datas.append(selectMember)
       self?.showDatas.append(selectMember)
     }
-    for uid in temFilters {
-      selectDic.removeValue(forKey: uid)
+    if pruneSelection {
+      for uid in temFilters {
+        selectDic.removeValue(forKey: uid)
+      }
     }
     for member in datas {
-      if let accid = member.member?.nimUser?.user?.accountId {
+      if let accid = member.member?.teamMember?.accountId {
         if selectDic.contains(where: { (key: String, value: NETeamMemberInfoModel) in
           key == accid
         }) {
@@ -200,7 +234,13 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
   /// 搜索所有数据
   /// - Parameter searchText: 搜索关键字
   open func searchAllData(_ searchText: String) -> [NESelectTeamMember] {
-    let result = datas.filter { findContainStr(searchText, $0) }
+    searchResults.removeAll()
+    let result = datas.filter { model in
+      guard let match = searchResult(searchText, for: model),
+            let accountId = model.member?.teamMember?.accountId else { return false }
+      searchResults[accountId] = match
+      return true
+    }
     return result
   }
 
@@ -213,16 +253,28 @@ class TeamMemberSelectViewModel: NSObject, NETeamListener, NETeamChatUserCacheLi
 
   /// 判断选择器对象是否包含搜索字段
   open func findContainStr(_ text: String, _ selectModel: NESelectTeamMember) -> Bool {
-    if let uid = selectModel.member?.nimUser?.user?.accountId, uid.contains(text) {
-      return true
-    } else if let nick = selectModel.member?.nimUser?.user?.name, nick.contains(text) {
-      return true
-    } else if let alias = selectModel.member?.nimUser?.friend?.alias, alias.contains(text) {
-      return true
-    } else if let tNick = selectModel.member?.teamMember?.teamNick, tNick.contains(text) {
-      return true
+    searchResult(text, for: selectModel) != nil
+  }
+
+  open func searchResult(_ text: String, for selectModel: NESelectTeamMember) -> NETeamMemberSearchResult? {
+    NETeamMemberSearchMatcher.result(
+      keyword: text,
+      teamNick: selectModel.member?.teamMember?.teamNick,
+      friendAlias: selectModel.member?.nimUser?.friend?.alias,
+      userNickname: selectModel.member?.nimUser?.user?.name,
+      accountId: selectModel.member?.teamMember?.accountId ?? selectModel.member?.nimUser?.user?.accountId
+    )
+  }
+
+  open func currentSearchResult(for selectModel: NESelectTeamMember) -> NETeamMemberSearchResult? {
+    guard let accountId = selectModel.member?.teamMember?.accountId else {
+      return nil
     }
-    return false
+    return searchResults[accountId]
+  }
+
+  open func resetSearchResults() {
+    searchResults.removeAll()
   }
 
   /// 群成员离开回调

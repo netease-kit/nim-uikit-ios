@@ -1,0 +1,99 @@
+{
+  "emoji-reaction": {
+    "aliases": [
+      "表情评论",
+      "reaction",
+      "emoji reaction",
+      "快捷表情评论"
+    ],
+    "owned_paths": [
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/Reaction/NEMessageReactionView.swift",
+      "NEChatUIKit/NEChatUIKit/Assets/reaction_emoji",
+      "NEChatUIKit/NEChatUIKit/Assets/NEBaseChatUIKit.xcassets/operation/reaction_add_emoji.imageset",
+      "NEChatUIKit/NEChatUIKit/Assets/NEBaseChatUIKit.xcassets/operation/reaction_more_emoji.imageset",
+      "NEChatUIKit/NEChatUIKit/Assets/NEBaseChatUIKit.xcassets/operation/reaction_less_emoji.imageset"
+    ],
+    "edit_paths": [
+      "app/Mine/Controller/ConfigTestViewController.swift",
+      "app/en.lproj/Localizable.strings",
+      "app/zh-Hans.lproj/Localizable.strings",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEBaseHistorySearchController.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/Model/MessageContentModel.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/NEBaseChatMessageCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/MessageOperationView.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/ChatViewModel.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/NormalChatMessageBaseCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageTextCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageRichTextCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageAudioCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageImageCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageVideoCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageCallCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageMultiForwardCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageRevokeCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageBaseCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageTextCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageRichTextCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageAudioCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageImageCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageVideoCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageFileCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageLocationCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageCallCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageMultiForwardCell.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageRevokeCell.swift"
+    ],
+    "residual": {
+      "roots": [
+        "NEChatUIKit/NEChatUIKit",
+        "app"
+      ],
+      "patterns": [
+        "MessageReaction|NEMessageReaction",
+        "\\breaction(?:Height|Groups|View|Manager|Backdrop|Content|Top|Bottom|Horizontal|Panel|Shortcut|Reload|Error|Provider|Items)",
+        "reaction_emoji|reaction_(add|less|more)_emoji",
+        "enableEmojiReaction|emoji_reaction",
+        "configureReactions|objcConfigureReactions|supportsReaction",
+        "onReactionModifiedMessage|startReactionManager|stopReactionManager|loadReactions"
+      ],
+      "allowed_paths": []
+    }
+  },
+  "earliest-unread": {
+    "aliases": [
+      "跳转最早未读",
+      "最早未读",
+      "上次阅读位置",
+      "last read position",
+      "earliest unread"
+    ],
+    "owned_paths": [
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatLastReadPositionView.swift"
+    ],
+    "edit_paths": [
+      "app/Mine/Controller/ConfigTestViewController.swift",
+      "NEChatUIKit/NEChatUIKit/Assets/en.lproj/Localizable.strings",
+      "NEChatUIKit/NEChatUIKit/Assets/zh-Hans.lproj/Localizable.strings",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/ChatViewModel.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/TopicChatViewModel.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/Controller/FunChatViewController.swift"
+    ],
+    "residual": {
+      "roots": [
+        "NEChatUIKit/NEChatUIKit",
+        "app"
+      ],
+      "patterns": [
+        "NELastReadPosition|LastReadPosition|lastReadPosition",
+        "enableLastReadPosition|last_read_position"
+      ],
+      "allowed_paths": [
+        "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift"
+      ]
+    }
+  }
+}

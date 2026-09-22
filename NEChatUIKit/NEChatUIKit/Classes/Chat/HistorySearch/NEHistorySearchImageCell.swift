@@ -8,6 +8,7 @@ import NIMSDK
 import SDWebImage
 import UIKit
 
+@objcMembers
 open class NEHistorySearchImageCell: UICollectionViewCell {
   public let imageView = UIImageView()
 

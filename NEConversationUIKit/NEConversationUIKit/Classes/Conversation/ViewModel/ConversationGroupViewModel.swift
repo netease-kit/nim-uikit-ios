@@ -432,7 +432,10 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         completion(nil, self.featureDisabledError())
         return
       }
-      let hasSuccessfulResult = results?.contains { $0.error.code == 0 || $0.error.code == 200 } == true
+      let hasSuccessfulResult = results?.contains { result in
+        guard let error = result.error as V2NIMError? else { return true }
+        return error.code == 0 || error.code == 200
+      } == true
       if error == nil, hasSuccessfulResult {
         self.selectedCustomGroupNeedsReload = true
       }
@@ -456,7 +459,10 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         completion(nil, self.featureDisabledError())
         return
       }
-      let hasSuccessfulResult = results?.contains { $0.error.code == 0 || $0.error.code == 200 } == true
+      let hasSuccessfulResult = results?.contains { result in
+        guard let error = result.error as V2NIMError? else { return true }
+        return error.code == 0 || error.code == 200
+      } == true
       if error == nil, hasSuccessfulResult {
         self.selectedCustomGroupNeedsReload = true
       }

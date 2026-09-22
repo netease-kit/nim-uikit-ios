@@ -52,6 +52,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   public let conversationGroupViewModel = ConversationGroupViewModel()
   private var networkBroken = false // 网络断开标志
   private var renderedConversationGroupId: String?
+  private var conversationListRenderPending = false
   var conversationGroupUIStyle: NEConversationGroupUIStyle {
     .normal
   }
@@ -1067,28 +1068,23 @@ extension NEBaseConversationController {
     // 路由跳转到聊天页面
     if conversation.type == .CONVERSATION_TYPE_P2P {
       if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
-        NEAIRobotManager.shared.checkIfRobot(sessionId) { [weak self] isRobot in
-          guard let self = self else {
-            return
-          }
-          if isRobot {
-            Router.shared.use(
-              PushBotSubSessionListRouter,
-              parameters: ["nav": self.navigationController as Any,
-                           "conversationId": conversationId,
-                           "sessionId": sessionId,
-                           "animated": false],
-              closure: nil
-            )
-          } else {
-            Router.shared.use(
-              PushP2pChatVCRouter,
-              parameters: ["nav": self.navigationController as Any,
-                           "conversationId": conversationId as Any,
-                           "animated": false],
-              closure: nil
-            )
-          }
+        if NEAIRobotManager.shared.isRobot(sessionId) {
+          Router.shared.use(
+            PushBotSubSessionListRouter,
+            parameters: ["nav": navigationController as Any,
+                         "conversationId": conversationId,
+                         "sessionId": sessionId,
+                         "animated": false],
+            closure: nil
+          )
+        } else {
+          Router.shared.use(
+            PushP2pChatVCRouter,
+            parameters: ["nav": navigationController as Any,
+                         "conversationId": conversationId as Any,
+                         "animated": false],
+            closure: nil
+          )
         }
         return
       }
@@ -1142,6 +1138,10 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
   }
 
   open func reloadTableView() {
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self] in self?.reloadTableView() }
+      return
+    }
     renderedConversationGroupId = conversationGroupViewModel.selectedGroup?.groupId
     emptyView.isHidden = !displayConversationList().isEmpty
     if conversationGroupViewModel.isEnabled {
@@ -1154,6 +1154,18 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
       conversationGroupBar.configure(groups: [], selectedId: nil, style: conversationGroupUIStyle)
     }
     updateConversationListFooter()
+    guard !conversationListRenderPending else { return }
+    conversationListRenderPending = true
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      // Reset before rendering so a reentrant update schedules another pass.
+      self.conversationListRenderPending = false
+      self.renderConversationList()
+    }
+  }
+
+  /// Renders the latest list and skin-specific header once per pending refresh batch.
+  open func renderConversationList() {
     tableView.reloadData()
   }
 

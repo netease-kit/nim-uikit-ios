@@ -79,8 +79,8 @@ open class NormalChatViewController: ChatViewController {
 
     // 历史消息加载时：如已有译文且可见，同时追加气泡高度和宽度（取原文/译文最大值）
     if let textModel = model as? MessageTextModel,
-       let info = textModel.translationInfo,
-       !info.translatedText.isEmpty,
+       (textModel.translationFailed || (textModel.translationInfo != nil &&
+        !(textModel.translationInfo?.translatedText.isEmpty ?? true))),
        textModel.translationVisible,
        textModel.addedTranslationHeight == 0 {
       let bubbleH = textModel.estimateTranslationBubbleHeight()
@@ -254,7 +254,29 @@ open class NormalChatViewController: ChatViewController {
     viewModel.performTranslation(model: textModel) { [weak self] index, error in
       guard let self = self else { return }
       if error != nil {
-        self.showToast(chatLocalizable("chat_translate_failed"))
+        if textModel.addedTranslationHeight > 0 {
+          let baseWidth = textModel.translationBaseContentWidth > 0
+            ? textModel.translationBaseContentWidth
+            : textModel.contentSize.width
+          textModel.contentSize = CGSize(width: baseWidth,
+                                         height: textModel.contentSize.height - textModel.addedTranslationHeight)
+          textModel.height -= textModel.addedTranslationHeight
+          textModel.addedTranslationHeight = 0
+        }
+        let failureHeight = textModel.estimateTranslationBubbleHeight()
+        if failureHeight > 0 {
+          let failureWidth = textModel.estimateTranslationTextWidth() + chat_content_margin * 2
+          let baseWidth = textModel.translationBaseContentWidth > 0
+            ? textModel.translationBaseContentWidth
+            : textModel.contentSize.width
+          textModel.contentSize = CGSize(width: max(baseWidth, failureWidth),
+                                         height: textModel.contentSize.height + failureHeight)
+          textModel.height += failureHeight
+          textModel.addedTranslationHeight = failureHeight
+        }
+        if index >= 0 {
+          self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+        }
         return
       }
       let indexPath = index >= 0 ? IndexPath(row: index, section: 0) : nil

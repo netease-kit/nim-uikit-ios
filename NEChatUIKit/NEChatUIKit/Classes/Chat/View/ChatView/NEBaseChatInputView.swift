@@ -141,7 +141,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   public var titleField: UITextField = {
-    let textField = UITextField()
+    let textField = NESingleLineTextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.font = UIFont.systemFont(ofSize: 18.0)
     textField.textColor = .ne_darkText
@@ -165,15 +165,30 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     return button
   }()
 
+  open var emoticonThemeColor: UIColor {
+    .ne_normalTheme
+  }
+
+  open var emoticonContentVerticalOffset: CGFloat {
+    0
+  }
+
+  lazy var inputEmoticonContainerView: InputEmoticonContainerView = {
+    let view = InputEmoticonContainerView(
+      frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200),
+      accentColor: emoticonThemeColor
+    )
+    view.contentVerticalOffset = emoticonContentVerticalOffset
+    view.delegate = self
+    return view
+  }()
+
   public lazy var emojiView: UIView = {
     let backView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    let view =
-      InputEmoticonContainerView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
-    view.delegate = self
     backView.isHidden = true
 
     backView.backgroundColor = UIColor.clear
-    backView.addSubview(view)
+    backView.addSubview(inputEmoticonContainerView)
     let tap = UITapGestureRecognizer()
     backView.addGestureRecognizer(tap)
     tap.addTarget(self, action: #selector(missClickEmoj))
@@ -238,6 +253,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
     contentSubView?.isHidden = true
     contentSubView = emojiView
+    inputEmoticonContainerView.resetToFirstEmojiPage()
     contentSubView?.isHidden = false
   }
 
@@ -506,6 +522,10 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       textViewDidChange(textView)
       delegate?.textViewDidChange()
     }
+  }
+
+  open func didSelectSticker(_ sticker: NIMInputSticker) {
+    delegate?.didSelectSticker?(sticker)
   }
 
   /// 点击富文本图片

@@ -54,7 +54,7 @@ public let kScreenHeight: CGFloat = UIScreen.main.bounds.size.height
 public let kUISreenWidthScale = kScreenWidth / 375.0
 public let kUISreenHeightScale = kScreenHeight / 667.0
 public let kNavigationHeight = 44.0
-public let KStatusBarHeight = UIApplication.shared.statusBarFrame.height // 获取statusBar的高度
+public let KStatusBarHeight = NEConstant.statusBarHeight // 获取statusBar的高度
 public let ModuleName = "NEChatUIKit" // module 模块名称，用于日志输出
 
 /// 支持的文件格式，不区分大小写

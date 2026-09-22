@@ -14,6 +14,7 @@ public protocol NEP2PChatUserCacheListener: NSObjectProtocol {
 }
 
 /// 陌生人用户信息缓存，只缓存非好友单聊用户
+@objcMembers
 public class NEP2PChatUserCache: NSObject {
   public static let shared = NEP2PChatUserCache()
 

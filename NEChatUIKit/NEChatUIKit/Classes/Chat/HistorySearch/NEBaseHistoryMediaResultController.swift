@@ -612,15 +612,6 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDataSource, UIColl
                      "animated": false],
         closure: nil
       )
-      // 跳转后清空 ChatVC 的缓存，避免重复计数
-      if let nav = navigationController {
-        for vc in nav.viewControllers {
-          if let chatVC = vc as? ChatViewController {
-            chatVC.onReceiveNewMsgs.removeAll()
-            break
-          }
-        }
-      }
     } else if conversationType == .CONVERSATION_TYPE_TEAM {
       Router.shared.use(
         PushTeamChatVCRouter,
@@ -631,15 +622,6 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDataSource, UIColl
                      "animated": false],
         closure: nil
       )
-      // 跳转后清空 ChatVC 的缓存，避免重复计数
-      if let nav = navigationController {
-        for vc in nav.viewControllers {
-          if let chatVC = vc as? ChatViewController {
-            chatVC.onReceiveNewMsgs.removeAll()
-            break
-          }
-        }
-      }
     }
   }
 }

@@ -21,7 +21,8 @@ struct NEMarkdownTableRegion {
   var dataLineIndices: [Int]
 }
 
-open class NEMarkdownTable: NEMarkdownElement {
+@objcMembers
+open class NEMarkdownTable: NSObject, NEMarkdownElement {
   // MARK: - NEMarkdownElement 协议（保留兼容性，实际逻辑在 preprocess）
 
   public var regex: String { "(?!x)x" } // 永不匹配

@@ -41,6 +41,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   public var isMute = false // 是否禁言
   private var isMutilSelect = false // 是否多选模式
   private var isLoadingData = false // 是否正在加载数据
+  private var suppressHistoryPreloadUntilUserScroll = false
   private var hasFirstLoadData = false // 是否完成第一次加载数据
   private var needCheckJumpDownAfterReload = false // 首次加载数据后需要检查跳转按钮（等待 tableViewReload 触发）
   private var uploadHasNoMore = false // 上拉无更多数据
@@ -56,8 +57,21 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   public var onReceiveNewMsgs = [V2NIMMessage]()
   /// 从标记列表页传递过来的新消息（用于锚定跳转时显示新消息数量）
   public var pendingNewMessages = [V2NIMMessage]()
+  private var newMessageIndicatorCutoffAnchor: V2NIMMessage?
   private var atUsers = [NSRange]()
   private var isRecvRolling = false
+  private var bottomScrollAfterMessageInsertScheduled = false
+  private var pendingReactionReloadIndexPaths = Set<IndexPath>()
+  private var isReactionReloadScheduled = false
+  private var isReactionReloadInProgress = false
+  private var keepsBottomPinnedForPendingReactionUpdates = false
+  private var keepsBottomPinnedForInitialMessageDetails = false
+  private var isLocatingLastReadPosition: Bool {
+    if case .locating = viewModel.lastReadPositionState {
+      return true
+    }
+    return false
+  }
   public var normalOffset: CGFloat = 0
   public var bottomExanpndHeight: CGFloat = 204 // 底部展开高度
   public var normalInputHeight: CGFloat = 100
@@ -257,6 +271,19 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     return view
   }()
 
+  public var lastReadPositionTopAnchor: NSLayoutConstraint?
+  public lazy var lastReadPositionView: NEBaseChatLastReadPositionView = {
+    let view = getLastReadPositionView()
+    view.translatesAutoresizingMaskIntoConstraints = false
+    view.isHidden = true
+    let tap = UITapGestureRecognizer(
+      target: self,
+      action: #selector(jumpToLastReadPosition)
+    )
+    view.addGestureRecognizer(tap)
+    return view
+  }()
+
   public lazy var replyView: ReplyView = {
     let view = ReplyView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -300,6 +327,42 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 标记当前 operationView 是否由译文区域长按触发（用于区分复制/转发目标）
   public var isTranslationOperation: Bool = false
 
+  /// QChat keeps seven quick entries in the collection. The last one is
+  /// covered by the expand control in the long-press state and becomes visible
+  /// when the same panel is opened from the message-side add button.
+  internal static let reactionPanelQuickIndexes = [3, 5, 1, 21, 65, 19, 20]
+  internal static let reactionShortcutIndexes = Array(reactionPanelQuickIndexes.prefix(6))
+
+  /// Width required by the existing UIKit operation layout. Keep the five
+  /// item maximum on one row even when the reaction shortcut bar is present.
+  internal static func operationMenuWidth(for itemCount: Int) -> CGFloat {
+    let count = min(max(itemCount, 1), 5)
+    return CGFloat(count) * 54.0 + 8.0
+  }
+
+  /// Maps the SDK's Reaction-specific limit error to the user-facing message.
+  internal static func reactionErrorMessage(forCode code: Int32) -> String {
+    code == 107321 ? "已达 100 种表情上限" : "表情评论失败"
+  }
+
+  internal static func supportsReactionConversation(_ conversationId: String) -> Bool {
+    let conversationType = V2NIMConversationIdUtil.conversationType(conversationId)
+    if conversationType == .CONVERSATION_TYPE_P2P || conversationType == .CONVERSATION_TYPE_TEAM {
+      return true
+    }
+
+    // Some callers persist the short `p2p|target` / `team|target` form used
+    // by older UIKit samples. The SDK parser only understands canonical IDs,
+    // so retain compatibility for this unambiguous prefix without widening
+    // support to super-team, thread, or bot conversations.
+    switch conversationId.split(separator: "|", maxSplits: 1).first?.lowercased() {
+    case "p2p", "team":
+      return true
+    default:
+      return false
+    }
+  }
+
   public init(conversationId: String) {
     viewModel = ChatViewModel(conversationId: conversationId)
     super.init(nibName: nil, bundle: nil)
@@ -324,6 +387,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   open func removeListener() {
     NIMSDK.shared().mediaManager.remove(self)
     IMKitClient.instance.removeLoginListener(self)
+    viewModel.stopReactionManager()
     viewModel.delegate = nil
     viewModel.chatRepo.removeMessageSendListener(viewModel)
   }
@@ -333,8 +397,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     NEKeyboardManager.shared.enable = false
     NEKeyboardManager.shared.shouldResignOnTouchOutside = false
     isCurrentPage = true
-    viewModel.setCurrentConversation(ChatRepo.conversationId)
-    viewModel.clearUnreadCount()
+    suppressHistoryPreloadUntilUserScroll = false
+    viewModel.startReactionManager()
+    viewModel.enterConversation()
+    renderLastReadPositionState()
 
     if ChatUIConfig.shared.messageProperties.showTitleBar {
       bodyTopViewTopConstant = topConstant
@@ -380,8 +446,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     NEKeyboardManager.shared.enable = true
     NEKeyboardManager.shared.shouldResignOnTouchOutside = true
     isCurrentPage = false
-    viewModel.clearUnreadCount()
-    viewModel.setCurrentConversation("")
+    viewModel.stopReactionManager()
     removeOperationView()
     stopPlay()
 
@@ -399,6 +464,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   override open func didMove(toParent parent: UIViewController?) {
     super.didMove(toParent: parent)
     if parent == nil {
+      viewModel.leaveConversation()
       let param = ["sessionId": ChatRepo.conversationId]
       Router.shared.use("ClearAtMessageRemind", parameters: param, closure: nil)
 
@@ -517,7 +583,26 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     NSLayoutConstraint.activate([
       jumpDownView.widthAnchor.constraint(greaterThanOrEqualToConstant: 40),
       jumpDownView.heightAnchor.constraint(equalToConstant: 40),
-      jumpDownView.bottomAnchor.constraint(equalTo: bottomView.topAnchor, constant: -24),
+      jumpDownView.bottomAnchor.constraint(equalTo: bodyView.bottomAnchor, constant: -24),
+    ])
+
+    contentView.addSubview(lastReadPositionView)
+    lastReadPositionTopAnchor = lastReadPositionView.topAnchor.constraint(
+      equalTo: contentView.topAnchor,
+      constant: 16
+    )
+    lastReadPositionTopAnchor?.isActive = true
+    NSLayoutConstraint.activate([
+      lastReadPositionView.trailingAnchor.constraint(
+        equalTo: contentView.trailingAnchor,
+        constant: 16
+      ),
+      lastReadPositionView.heightAnchor.constraint(equalToConstant: 40),
+      lastReadPositionView.widthAnchor.constraint(greaterThanOrEqualToConstant: 40),
+      lastReadPositionView.widthAnchor.constraint(
+        lessThanOrEqualTo: contentView.widthAnchor,
+        constant: -32
+      ),
     ])
 
     if let customController = ChatUIConfig.shared.customController {
@@ -537,7 +622,6 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         desc: #function + "CALLBACK loadData " + (error?.localizedDescription ?? "no error")
       )
 
-      weakSelf?.isLoadingData = false
       if weakSelf?.viewModel.messages.isEmpty == false {
         weakSelf?.tableViewReload()
 
@@ -559,7 +643,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
         } else {
           // 首次拉取
           weakSelf?.removeBottomLoadMore()
-          if let last = weakSelf?.tableView.numberOfRows(inSection: 0) {
+          weakSelf?.keepsBottomPinnedForPendingReactionUpdates = true
+          weakSelf?.keepsBottomPinnedForInitialMessageDetails = true
+          weakSelf?.tableView.layoutIfNeeded()
+          if let last = weakSelf?.tableView.numberOfRows(inSection: 0), last > 0 {
             let indexPath = IndexPath(row: last - 1, section: 0)
             weakSelf?.tableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
           }
@@ -570,6 +657,58 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       }
 
       weakSelf?.loadDataFinish()
+      // 首次 reload 会展示顶部 cell，底部定位完成前需继续阻止历史消息预加载。
+      weakSelf?.isLoadingData = false
+    }
+  }
+
+  /// Applies an explicit history anchor and reconciles new-message prompts with it.
+  /// Messages at or before the selected anchor are already represented by the
+  /// destination and must not remain in the jump-to-latest count.
+  @nonobjc
+  func applyHistoryAnchor(
+    _ anchor: V2NIMMessage?,
+    transferredNewMessages: [V2NIMMessage] = []
+  ) {
+    viewModel.anchor = anchor
+    if let anchor,
+       newMessageIndicatorCutoffAnchor.map({ $0.createTime < anchor.createTime }) ?? true {
+      newMessageIndicatorCutoffAnchor = anchor
+    }
+    let messages = onReceiveNewMsgs + pendingNewMessages + transferredNewMessages
+    onReceiveNewMsgs = Self.newMessageIndicators(messages, after: newMessageIndicatorCutoffAnchor)
+    pendingNewMessages.removeAll()
+  }
+
+  @nonobjc
+  static func newMessageIndicators(
+    _ messages: [V2NIMMessage],
+    after anchor: V2NIMMessage?
+  ) -> [V2NIMMessage] {
+    var seenIds = Set<String>()
+    return messages.filter { message in
+      if let anchor,
+         (message.conversationId != anchor.conversationId ||
+           message.createTime <= anchor.createTime) {
+        return false
+      }
+      var stableIds = Set<String>()
+      if let clientId = message.messageClientId, !clientId.isEmpty {
+        stableIds.insert("client:\(clientId)")
+      }
+      if let serverId = message.messageServerId,
+         !serverId.isEmpty,
+         serverId != "0" {
+        stableIds.insert("server:\(serverId)")
+      }
+      guard !stableIds.isEmpty else {
+        return true
+      }
+      guard seenIds.isDisjoint(with: stableIds) else {
+        return false
+      }
+      seenIds.formUnion(stableIds)
+      return true
     }
   }
 
@@ -749,6 +888,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     if operationView.isHidden == false {
       operationView.isHidden = true
     }
+    operationView.onSelectReaction = nil
     isTranslationOperation = false
 
     // 取消划词选中
@@ -803,9 +943,16 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       return
     }
 
+    let reactionProvider = viewModel.reactionManager?.provider()
+    let showReaction = model?.message?.sendingState == .MESSAGE_SENDING_STATE_SUCCEEDED &&
+      IMKitConfigCenter.shared.enableEmojiReaction &&
+      Self.supportsReactionConversation(ChatRepo.conversationId) &&
+      model?.isRevoked == false &&
+      reactionProvider != nil
+
     // 插件导入
     var pluginItems: [OperationItem] = []
-    if let text = model?.selectText() {
+    if model?.unkonwMessage != true, let text = model?.selectText() {
       // 划词
       if NEAIUserManager.shared.getAISearchUser() == nil {
         // 未配置划词数字人
@@ -868,41 +1015,53 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       (viewModel.operationModel?.cell as? NEBaseChatMessageCell)?.selectAllRange()
     }
 
-    // 计算宽高
-    let itemH = NEAppLanguageUtil.getCurrentLanguage() == .english ? 62.0 : 56.0
-    let w = items.count <= 5 ? 60.0 * Double(items.count) + 16.0 : 60.0 * 5 + 16.0
-    let h = items.count <= 5 ? itemH + 16.0 : itemH * 2 + 16.0
+    let operationWidth = Self.operationMenuWidth(for: items.count)
+    let w = showReaction ? max(278.0, operationWidth) : operationWidth
+    let emojiCollectionHeight = showReaction ? 50.0 : 0
+    let h = emojiCollectionHeight + 18 + 58 * ceil(Double(items.count) / 5.0)
 
     let rectInTableView = tableView.rectForRow(at: index)
     let rectInView = tableView.convert(rectInTableView, to: view)
-    let topOffset = NEConstant.navigationAndStatusHeight
-
-    var operationY = 0.0
-    if topOffset + h + bodyTopViewHeight > rectInView.origin.y {
-      operationY = rectInView.origin.y + rectInView.size.height - chat_timeCellH
-    } else {
-      // 位于消息上方
+    let midY = kScreenHeight / 2
+    var underMessage = true
+    var operationY = rectInView.origin.y + rectInView.size.height
+    if operationY > midY {
+      underMessage = false
       operationY = rectInView.origin.y - h
       if model?.timeContent != nil {
         operationY += chat_timeCellH
       }
+    } else {
+      operationY += 8
+    }
+    var frameX = 8.0
+    if model?.message?.isSelf == true {
+      frameX = kScreenWidth - w - 8
     }
 
-    var frameX = 56.0
-    if let msg = model?.message,
-       msg.isSelf {
-      frameX = kScreenWidth - w - frameX
-    }
-
-    var frame = CGRect(x: frameX, y: operationY, width: w, height: h)
-    if frame.origin.y + h < tableView.frame.origin.y {
-      frame.origin.y = tableView.frame.origin.y
-    } else if frame.origin.y + h > view.frame.size.height {
-      frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
-    }
-
-    operationView.frame = frame
+    operationView.visibleFrame = tableView.convert(tableView.bounds, to: view)
+    operationView.frame = CGRect(x: frameX, y: operationY, width: w, height: h)
     operationView.items = items
+    operationView.oldFrameHeight = h
+    operationView.oldFrameWidth = w
+    operationView.viewUnderMessage = underMessage
+    operationView.configureReactions(
+      provider: reactionProvider,
+      quickIndexes: Self.reactionPanelQuickIndexes,
+      showEmoji: showReaction,
+      showMoreButton: true
+    )
+    operationView.onSelectReaction = { [weak self, weak model] index in
+      guard let self, let message = model?.message else { return }
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        self.showToast(commonLocalizable("network_error"))
+        return
+      }
+      self.viewModel.toggleReaction(message: message, index: index) { [weak self] error in
+        if let error { self?.showReactionError(error) }
+      }
+    }
+    operationView.showOperation()
     operationView.isHidden = false
   }
 
@@ -1082,19 +1241,61 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       chatInputView.currentButton?.isSelected = false
     }
 
-    UIView.animate(withDuration: animation) {
+    UIView.animate(withDuration: animation, animations: {
       weakSelf?.bottomViewTopAnchor?.constant = -topValue - offset
-      if scrollToBottom {
-        weakSelf?.view.layoutIfNeeded()
-        weakSelf?.jumpDownMessage()
+    }, completion: { _ in
+      guard scrollToBottom, let self = weakSelf else { return }
+      self.view.layoutIfNeeded()
+      self.tableView.layoutIfNeeded()
+      DispatchQueue.main.async {
+        if self.viewModel.isHistoryChat {
+          self.jumpDownMessage()
+        } else {
+          self.scheduleBottomScrollAfterMessageInsert()
+          self.showJumpDownMessage(-1)
+          self.markNeedReadMsg(self.onReceiveNewMsgs)
+          self.onReceiveNewMsgs.removeAll()
+        }
       }
     }
+    )
   }
 
   //    MARK: - ChatInputViewDelegate
 
   open func didTranslateResult(_ content: String) {
     translateLanguageView.setTranslateContent(content)
+  }
+
+  open func didSelectSticker(_ sticker: NIMInputSticker) {
+    let fileURL = sticker.fileURL
+    guard fileURL.isFileURL,
+          FileManager.default.isReadableFile(atPath: fileURL.path),
+          let image = UIImage(contentsOfFile: fileURL.path) else {
+      NEALog.errorLog(ModuleName + " " + className(), desc: #function + " sticker file is invalid")
+      showToast(chatLocalizable("imageLoadFailed"))
+      return
+    }
+
+    let pixelWidth = image.cgImage.map { CGFloat($0.width) } ?? image.size.width * image.scale
+    let pixelHeight = image.cgImage.map { CGFloat($0.height) } ?? image.size.height * image.scale
+    guard pixelWidth > 0,
+          pixelHeight > 0,
+          pixelWidth <= CGFloat(Int32.max),
+          pixelHeight <= CGFloat(Int32.max) else {
+      NEALog.errorLog(ModuleName + " " + className(), desc: #function + " sticker dimensions are invalid")
+      showToast(chatLocalizable("imageLoadFailed"))
+      return
+    }
+
+    viewModel.sendImageMessage(
+      path: fileURL.path,
+      name: fileURL.lastPathComponent,
+      width: Int32(pixelWidth),
+      height: Int32(pixelHeight)
+    ) { [weak self] error in
+      self?.showErrorToast(error)
+    }
   }
 
   open func sendText(text: String?, attribute: NSAttributedString?) {
@@ -1921,7 +2122,15 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// - Parameter messages: 消息列表
   open func onRecvMessages(_ messages: [V2NIMMessage], _ indexs: [IndexPath]) {
     removeOperationView()
-    insertRows(indexs, false)
+    let isUserInteracting = tableView.isDragging || tableView.isTracking || tableView.isDecelerating
+    let shouldKeepBottomPinned = isCurrentPage &&
+      presentedViewController == nil &&
+      !isUserInteracting &&
+      (isRecvRolling || isCloseToBottom() || isLatestMessageVisible())
+    insertRows(indexs, false) { [weak self] in
+      guard let self, shouldKeepBottomPinned else { return }
+      self.scheduleBottomScrollAfterMessageInsert()
+    }
     // D5-A 自动翻译：对新接收到的文本消息判断是否需要自动翻译
     for message in messages {
       if let textModel = viewModel.messages.first(where: {
@@ -1931,47 +2140,17 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       }
     }
 
-    let messageCount = tableView.numberOfRows(inSection: 0)
-    let lastIndexPath = IndexPath(row: messageCount - 2, section: 0)
-    var isLastVisible = false
-    if let lastMessageCell = tableView.cellForRow(at: lastIndexPath),
-       tableView.visibleCells.contains(lastMessageCell) {
-      isLastVisible = true
-    }
-
-    if isRecvRolling || isCloseToBottom() {
-      isLastVisible = true
-    }
-
-    if isCurrentPage,
-       presentedViewController == nil,
-       isLastVisible {
-      // 最后一条消息可见
-      if isCurrentPage == false {
-        return
-      }
-
-      // 滑动过程中
-      if tableView.isDragging == true || tableView.isDecelerating == true {
-        return
-      }
-
-      let row = tableView.numberOfRows(inSection: 0)
-      if row > 0 {
-        isRecvRolling = true
-        tableView.scrollToRow(
-          at: IndexPath(row: row - 1, section: 0),
-          at: .bottom,
-          animated: true
-        )
-      }
-    } else {
+    if !shouldKeepBottomPinned {
       if tableView.contentSize.height > tableView.bounds.height {
         for message in messages {
           if !ChatMessageHelper.isSelf(message: message) {
             onReceiveNewMsgs.append(message)
           }
         }
+        onReceiveNewMsgs = Self.newMessageIndicators(
+          onReceiveNewMsgs,
+          after: newMessageIndicatorCutoffAnchor
+        )
         if !isMutilSelect {
           showJumpDownMessage(onReceiveNewMsgs.count)
         }
@@ -2077,22 +2256,122 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   /// 消息更新回调
   /// - Parameter index: 消息下标
   public func onModefiedMessage(_ index: IndexPath) {
-    let visibleRows = tableView.indexPathsForVisibleRows
+    let wasCloseToBottom = isCloseToBottom()
 
     tableViewReloadIndexs([index])
 
-    if !(tableView.isDragging || tableView.isDecelerating),
-       let visibleRows = visibleRows,
-       visibleRows.contains(index) {
-      if visibleRows.last == index {
-        tableView.scrollToRow(at: index, at: .bottom, animated: false)
+    if !isLocatingLastReadPosition,
+       wasCloseToBottom,
+       !(tableView.isDragging || tableView.isDecelerating) {
+      scrollTableViewToBottom()
+    }
+  }
+
+  /// Reaction 更新回调
+  /// - Parameter index: 消息下标
+  public func onReactionModifiedMessage(_ index: IndexPath) {
+    guard !isLoadingData,
+          index.section >= 0,
+          index.section < tableView.numberOfSections,
+          index.row >= 0,
+          index.row < tableView.numberOfRows(inSection: index.section) else { return }
+
+    let isUserInteracting = tableView.isDragging || tableView.isTracking || tableView.isDecelerating
+    let shouldKeepBottomPinned = Self.shouldKeepBottomPinnedForMessageUpdate(
+      isAlreadyPinned: keepsBottomPinnedForPendingReactionUpdates,
+      latestMessageVisible: isLatestMessageVisible(),
+      isUserInteracting: isUserInteracting
+    )
+    if shouldKeepBottomPinned {
+      keepsBottomPinnedForPendingReactionUpdates = true
+    }
+
+    pendingReactionReloadIndexPaths.insert(index)
+    scheduleReactionReloadIfNeeded()
+  }
+
+  public func initialMessageDetailsDidLoad() {
+    guard keepsBottomPinnedForInitialMessageDetails else { return }
+    keepsBottomPinnedForInitialMessageDetails = false
+    guard !isLocatingLastReadPosition else { return }
+    guard !(tableView.isDragging || tableView.isTracking || tableView.isDecelerating) else { return }
+
+    tableView.layoutIfNeeded()
+    let rowCount = tableView.numberOfRows(inSection: 0)
+    guard rowCount > 0, rowCount == viewModel.messages.count else { return }
+    tableView.scrollToRow(
+      at: IndexPath(row: rowCount - 1, section: 0),
+      at: .bottom,
+      animated: false
+    )
+  }
+
+  private func scheduleReactionReloadIfNeeded() {
+    guard !isReactionReloadScheduled, !isReactionReloadInProgress else { return }
+    isReactionReloadScheduled = true
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
+      self.isReactionReloadScheduled = false
+      self.flushPendingReactionReloads()
+    }
+  }
+
+  private func flushPendingReactionReloads() {
+    guard !isReactionReloadInProgress else { return }
+    guard !isLoadingData else {
+      pendingReactionReloadIndexPaths.removeAll()
+      keepsBottomPinnedForPendingReactionUpdates = false
+      return
+    }
+
+    let indexPaths = pendingReactionReloadIndexPaths
+      .filter { indexPath in
+        indexPath.section >= 0 &&
+          indexPath.section < tableView.numberOfSections &&
+          indexPath.row >= 0 &&
+          indexPath.row < tableView.numberOfRows(inSection: indexPath.section)
+      }
+      .sorted { lhs, rhs in
+        lhs.section == rhs.section ? lhs.row < rhs.row : lhs.section < rhs.section
+      }
+    pendingReactionReloadIndexPaths.removeAll()
+
+    guard !indexPaths.isEmpty else {
+      finishPendingReactionReloads()
+      return
+    }
+
+    isReactionReloadInProgress = true
+    tableViewReloadIndexs(indexPaths) { [weak self] in
+      guard let self = self else { return }
+      self.isReactionReloadInProgress = false
+      if self.pendingReactionReloadIndexPaths.isEmpty {
+        self.finishPendingReactionReloads()
       } else {
-        let index = IndexPath(row: tableView.numberOfRows(inSection: 0) - 1, section: 0)
-        if visibleRows.last == index {
-          tableView.scrollToRow(at: index, at: .bottom, animated: false)
-        }
+        self.scheduleReactionReloadIfNeeded()
       }
     }
+  }
+
+  private func finishPendingReactionReloads() {
+    guard keepsBottomPinnedForPendingReactionUpdates else { return }
+    keepsBottomPinnedForPendingReactionUpdates = false
+    guard !isLocatingLastReadPosition else { return }
+    guard !(tableView.isDragging || tableView.isTracking || tableView.isDecelerating) else { return }
+
+    tableView.layoutIfNeeded()
+    let rowCount = tableView.numberOfRows(inSection: 0)
+    guard rowCount > 0, rowCount == viewModel.messages.count else { return }
+    tableView.scrollToRow(
+      at: IndexPath(row: rowCount - 1, section: 0),
+      at: .bottom,
+      animated: false
+    )
+  }
+
+  private func cancelPendingReactionBottomPinning() {
+    keepsBottomPinnedForPendingReactionUpdates = false
+    keepsBottomPinnedForInitialMessageDetails = false
   }
 
   open func onDeleteMessage(_ messages: [V2NIMMessage], deleteIndexs: [IndexPath], reloadIndex: [IndexPath]) {
@@ -2210,11 +2489,23 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       return
     }
 
+    let tableRowCount = tableView.numberOfRows(inSection: 0)
+    let dataSourceRowCount = currentDataSourceRowCount()
+    guard tableRowCount == dataSourceRowCount,
+          dataSourceRowCount == viewModel.messages.count else {
+      tableViewReload()
+      completion?()
+      return
+    }
+
+    var seenIndexPaths = Set<IndexPath>()
     let indexs = indexs.filter { index in
-      index.row >= 0 && index.row < tableView.numberOfRows(inSection: 0)
+      index.section == 0 && index.row >= 0 && index.row < tableRowCount &&
+        seenIndexPaths.insert(index).inserted
     }
 
     if indexs.isEmpty {
+      completion?()
       return
     }
 
@@ -2234,6 +2525,11 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       // 确保 tableView 布局完成后再更新向下跳转按钮的显示状态
       DispatchQueue.main.async { [weak self] in
         self?.showJumpDownView()
+        self?.refreshLastReadPositionVisibility()
+      }
+    } else {
+      DispatchQueue.main.async { [weak self] in
+        self?.refreshLastReadPositionVisibility()
       }
     }
   }
@@ -2264,6 +2560,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     } else {
       topMessageView.removeFromSuperview()
     }
+    updateLastReadPositionTopConstraint()
   }
 
   /// 更新置顶消息中的发送者昵称
@@ -2427,27 +2724,118 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func insertRows(_ indexs: [IndexPath], _ scrollToBottom: Bool) {
+    insertRows(indexs, scrollToBottom, completion: nil)
+  }
+
+  @nonobjc
+  private func insertRows(_ indexs: [IndexPath], _ scrollToBottom: Bool, completion: (() -> Void)?) {
+    let finish = { [weak self] in
+      guard let self else {
+        completion?()
+        return
+      }
+      if scrollToBottom {
+        if self.viewModel.isHistoryChat {
+          self.jumpDownMessage()
+        } else {
+          self.scheduleBottomScrollAfterMessageInsert()
+          self.showJumpDownMessage(-1)
+          self.markNeedReadMsg(self.onReceiveNewMsgs)
+          self.onReceiveNewMsgs.removeAll()
+        }
+      }
+      completion?()
+    }
+
     if !hasFirstLoadData {
+      finish()
       return
     }
 
     let oldRows = tableView.numberOfRows(inSection: 0)
-    if oldRows == 0 {
-      tableView.reloadData()
-      return
+    var seenIndexPaths = Set<IndexPath>()
+    let uniqueIndexs = indexs.filter { seenIndexPaths.insert($0).inserted }
+    let dataSourceRowCount = currentDataSourceRowCount()
+    let validIndexs = uniqueIndexs.filter { index in
+      index.section == 0 && index.row >= 0 && index.row < dataSourceRowCount
     }
-    if oldRows == viewModel.messages.count {
-      tableView.reloadData()
+
+    guard oldRows > 0,
+          dataSourceRowCount == viewModel.messages.count,
+          oldRows + validIndexs.count == dataSourceRowCount,
+          validIndexs.count == uniqueIndexs.count else {
+      reloadTableViewAfterRowCountMismatch(completion: finish)
       return
     }
 
-    if !indexs.isEmpty {
-      tableView.insertData(indexs) { [weak self] _ in
-        if scrollToBottom {
-          self?.jumpDownMessage()
-        }
+    tableView.insertData(validIndexs) { [weak self] _ in
+      guard let self = self else {
+        finish()
+        return
+      }
+      let tableRowCount = self.tableView.numberOfRows(inSection: 0)
+      let dataSourceRowCount = self.currentDataSourceRowCount()
+      guard tableRowCount == dataSourceRowCount,
+            dataSourceRowCount == self.viewModel.messages.count else {
+        self.reloadTableViewAfterRowCountMismatch(completion: finish)
+        return
+      }
+      finish()
+    }
+  }
+
+  private func currentDataSourceRowCount() -> Int {
+    tableView.dataSource?.tableView(tableView, numberOfRowsInSection: 0) ?? viewModel.messages.count
+  }
+
+  private func reloadTableViewAfterRowCountMismatch(completion: (() -> Void)? = nil) {
+    tableView.reloadData()
+    completion?()
+  }
+
+  private func scheduleBottomScrollAfterMessageInsert() {
+    guard !bottomScrollAfterMessageInsertScheduled else { return }
+    bottomScrollAfterMessageInsertScheduled = true
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      self.bottomScrollAfterMessageInsertScheduled = false
+      guard self.isCurrentPage,
+            self.presentedViewController == nil,
+            !self.tableView.isDragging,
+            !self.tableView.isTracking,
+            !self.tableView.isDecelerating else { return }
+
+      self.view.layoutIfNeeded()
+      self.tableView.layoutIfNeeded()
+      guard self.tableView.numberOfRows(inSection: 0) > 0,
+            self.tableView.numberOfRows(inSection: 0) == self.currentDataSourceRowCount(),
+            self.currentDataSourceRowCount() == self.viewModel.messages.count else { return }
+
+      self.isRecvRolling = true
+      self.tableView.setContentOffset(self.bottomContentOffset(), animated: false)
+
+      // Image/sticker cells can settle their height in the next layout pass.
+      DispatchQueue.main.async { [weak self] in
+        guard let self,
+              self.isCurrentPage,
+              self.presentedViewController == nil,
+              !self.tableView.isDragging,
+              !self.tableView.isTracking,
+              !self.tableView.isDecelerating else { return }
+        self.view.layoutIfNeeded()
+        self.tableView.layoutIfNeeded()
+        guard self.tableView.numberOfRows(inSection: 0) > 0,
+              self.tableView.numberOfRows(inSection: 0) == self.currentDataSourceRowCount(),
+              self.currentDataSourceRowCount() == self.viewModel.messages.count else { return }
+        self.tableView.setContentOffset(self.bottomContentOffset(), animated: false)
       }
     }
+  }
+
+  private func bottomContentOffset() -> CGPoint {
+    let maxOffsetY = tableView.contentSize.height - tableView.bounds.height + tableView.adjustedContentInset.bottom
+    let minOffsetY = -tableView.adjustedContentInset.top
+    return CGPoint(x: tableView.contentOffset.x, y: max(minOffsetY, maxOffsetY))
   }
 
   open func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
@@ -3006,7 +3394,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     viewModel.performTranslation(model: textModel) { [weak self] index, error in
       guard let self = self else { return }
       if error != nil {
-        self.showToast(chatLocalizable("chat_translate_failed"))
+        if index >= 0 {
+          self.tableViewReloadIndexs([IndexPath(row: index, section: 0)])
+        }
         return
       }
       if index >= 0 {
@@ -3109,6 +3499,7 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     navigationView.moreButton.setTitleColor(.ne_darkText, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(cancelMutilSelect))
     topMessageView.isHidden = true
+    lastReadPositionView.isHidden = true
     setInputView(edit: false)
     tableView.reloadData()
 
@@ -3124,6 +3515,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     if viewModel.topMessage != nil {
       topMessageView.isHidden = false
     }
+    updateLastReadPositionTopConstraint()
+    refreshLastReadPositionVisibility()
+    renderLastReadPositionState()
     setInputView(edit: true)
     tableView.reloadData()
 
@@ -3262,16 +3656,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    // cell 即将真正显示时，从 onReceiveNewMsgs 中移除对应消息
-    if indexPath.row < viewModel.messages.count {
-      let model = viewModel.messages[indexPath.row]
-      if isCurrentPage,
-         UIApplication.shared.applicationState == .active,
-         presentedViewController == nil {
-        onReceiveNewMsgs.removeAll { message in
-          message.messageClientId == model.message?.messageClientId
-        }
-      }
+    let messageCount = tableView.numberOfRows(inSection: 0)
+    let reachedIndicatorTarget = onReceiveNewMsgs.isEmpty
+      ? (indexPath.row == messageCount - 1 && isLatestMessageVisible())
+      : isLatestPendingNewMessageVisible()
+    if reachedIndicatorTarget {
+      // 列表末尾可见，或最新一条实际收到的新消息可见
+      onReceiveNewMsgs.removeAll()
+      showJumpDownMessage(-1)
     }
 
     // 无更多消息
@@ -3279,11 +3671,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
       return
     }
 
-    let messageCount = tableView.numberOfRows(inSection: 0)
-    if indexPath.row == messageCount - 1,
-       tableView.visibleCells.contains(cell) {
-      // 最后一条消息可见
-      showJumpDownMessage(-1)
+    // 定位及其后续布局期间不预加载历史消息；用户再次滚动时恢复。
+    // 分页完成后的补偿 scrollToRow 会覆盖未读锚点定位结果。
+    if isLocatingLastReadPosition || suppressHistoryPreloadUntilUserScroll {
+      return
     }
 
     // 预加载消息
@@ -3333,7 +3724,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   // MARK: - UIScrollViewDelegate
 
   open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    suppressHistoryPreloadUntilUserScroll = false
     isRecvRolling = false
+    cancelPendingReactionBottomPinning()
     removeOperationView(false)
   }
 
@@ -3341,7 +3734,9 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     // 用户正在拖拽
     // 惯性滑动中（手势释放后）
     if scrollView.isDragging || scrollView.isTracking || scrollView.isDecelerating {
+      cancelPendingReactionBottomPinning()
       showJumpDownView()
+      refreshLastReadPositionVisibility()
       layoutInputView(offset: 0)
     } else {
       // 代码触发的滚动
@@ -3349,8 +3744,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-    if isCloseToBottom() {
+    if onReceiveNewMsgs.isEmpty ? isLatestMessageVisible() : isLatestPendingNewMessageVisible() {
       isRecvRolling = false
+      onReceiveNewMsgs.removeAll()
+      showJumpDownMessage(-1)
     }
   }
 
@@ -3388,11 +3785,53 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   func isCloseToBottom() -> Bool {
     let visibleHeight = tableView.frame.height - tableView.contentInset.top - tableView.contentInset.bottom
     let y = tableView.contentOffset.y + tableView.contentInset.top
-    let threshold: CGFloat = 50 // 容错像素
-    return y + visibleHeight >= tableView.contentSize.height - threshold
+    return Self.isCloseToBottom(contentOffsetY: y,
+                                 visibleHeight: visibleHeight,
+                                 contentHeight: tableView.contentSize.height)
+  }
+
+  private func isLatestMessageVisible() -> Bool {
+    let rowCount = tableView.numberOfRows(inSection: 0)
+    guard rowCount > 0 else { return false }
+    return tableView.indexPathsForVisibleRows?.contains(
+      IndexPath(row: rowCount - 1, section: 0)
+    ) == true
+  }
+
+  private func isLatestPendingNewMessageVisible() -> Bool {
+    guard let pending = onReceiveNewMsgs.max(by: { $0.createTime < $1.createTime }),
+          let visibleIndexPaths = tableView.indexPathsForVisibleRows else { return false }
+    return visibleIndexPaths.contains { indexPath in
+      guard indexPath.row < viewModel.messages.count,
+            let visible = viewModel.messages[indexPath.row].message else { return false }
+      if visible === pending { return true }
+      if let clientId = pending.messageClientId, !clientId.isEmpty,
+         visible.messageClientId == clientId { return true }
+      if let serverId = pending.messageServerId, !serverId.isEmpty, serverId != "0",
+         visible.messageServerId == serverId { return true }
+      return false
+    }
+  }
+
+  @nonobjc
+  internal static func shouldKeepBottomPinnedForMessageUpdate(
+    isAlreadyPinned: Bool,
+    latestMessageVisible: Bool,
+    isUserInteracting: Bool
+  ) -> Bool {
+    !isUserInteracting && (isAlreadyPinned || latestMessageVisible)
+  }
+
+  internal static func isCloseToBottom(contentOffsetY: CGFloat,
+                                       visibleHeight: CGFloat,
+                                       contentHeight: CGFloat,
+                                       threshold: CGFloat = 50) -> Bool {
+    // Keep the boundary stable when UIKit produces fractional content sizes.
+    contentOffsetY + visibleHeight >= contentHeight - threshold - 1
   }
 
   open func showJumpDownView() {
+    tableView.layoutIfNeeded()
     let messageCount = tableView.numberOfRows(inSection: 0)
     guard messageCount > 0 else {
       showJumpDownMessage(-1)
@@ -3400,37 +3839,15 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
     }
 
     // 检查最后一条消息是否可见
-    let lastIndexPath = IndexPath(row: messageCount - 1, section: 0)
-    let isLastMessageVisible = tableView.cellForRow(at: lastIndexPath).flatMap {
-      tableView.visibleCells.contains($0)
-    } ?? false
+    let isLastMessageVisible = onReceiveNewMsgs.isEmpty
+      ? isLatestMessageVisible()
+      : isLatestPendingNewMessageVisible()
 
     // 如果最后一条消息可见，隐藏箭头并清空新消息队列
     if isLastMessageVisible {
       onReceiveNewMsgs.removeAll()
       showJumpDownMessage(-1)
       return
-    }
-
-    // 如果有新消息，先过滤掉已经可见的
-    if !onReceiveNewMsgs.isEmpty {
-      // 获取当前可见行的消息 ID 集合
-      var visibleMessageIds = Set<String>()
-      if let visibleIndexPaths = tableView.indexPathsForVisibleRows {
-        for indexPath in visibleIndexPaths {
-          if indexPath.row < viewModel.messages.count {
-            let model = viewModel.messages[indexPath.row]
-            if let messageId = model.message?.messageClientId {
-              visibleMessageIds.insert(messageId)
-            }
-          }
-        }
-      }
-
-      // 从 onReceiveNewMsgs 中移除已显示的消息
-      onReceiveNewMsgs.removeAll { message in
-        visibleMessageIds.contains(message.messageClientId ?? "")
-      }
     }
 
     // 显示箭头（带消息数或不带）
@@ -3492,6 +3909,123 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
   open func getJumpDownView() -> NEBaseChatNewMessageView {
     NEBaseChatNewMessageView()
+  }
+
+  open func getLastReadPositionView() -> NEBaseChatLastReadPositionView {
+    NEBaseChatLastReadPositionView()
+  }
+
+  @objc
+  open func jumpToLastReadPosition() {
+    cancelPendingReactionBottomPinning()
+    isRecvRolling = false
+    viewModel.locateLastReadPosition { [weak self] stableId, hasMoreNewer in
+      guard let self,
+            self.isCurrentPage,
+            let stableId else {
+        self?.viewModel.completeLastReadPositionLocation(success: false)
+        return
+      }
+
+      if self.tableView.numberOfRows(inSection: 0) != self.viewModel.messages.count {
+        self.tableViewReload()
+      }
+      guard self.viewModel.indexOfMessage(withStableId: stableId) != nil else {
+        self.viewModel.completeLastReadPositionLocation(success: false)
+        return
+      }
+
+      if hasMoreNewer {
+        self.addBottomLoadMore()
+      }
+      self.suppressHistoryPreloadUntilUserScroll = true
+      self.scrollToLastReadPosition(stableId: stableId, attempt: 0)
+    }
+  }
+
+  /// Scrolls after the table has settled its dynamic row heights. A reload or
+  /// message-detail callback can make the first visibility snapshot stale; a
+  /// bounded retry keeps one tap from being reported as a failed locate.
+  private func scrollToLastReadPosition(stableId: String, attempt: Int) {
+    guard isCurrentPage,
+          !tableView.isDragging,
+          !tableView.isTracking,
+          !tableView.isDecelerating,
+          let row = viewModel.indexOfMessage(withStableId: stableId),
+          row >= 0,
+          row < tableView.numberOfRows(inSection: 0) else {
+      viewModel.completeLastReadPositionLocation(success: false)
+      return
+    }
+
+    tableView.layoutIfNeeded()
+    tableView.scrollToRow(
+      at: IndexPath(row: row, section: 0),
+      at: .middle,
+      animated: false
+    )
+
+    DispatchQueue.main.async { [weak self] in
+      guard let self, self.isCurrentPage,
+            !self.tableView.isDragging,
+            !self.tableView.isTracking,
+            !self.tableView.isDecelerating,
+            let currentRow = self.viewModel.indexOfMessage(withStableId: stableId),
+            currentRow >= 0,
+            currentRow < self.tableView.numberOfRows(inSection: 0) else {
+        self?.viewModel.completeLastReadPositionLocation(success: false)
+        return
+      }
+
+      self.viewIfLoaded?.layoutIfNeeded()
+      self.tableView.layoutIfNeeded()
+      let currentIndexPath = IndexPath(row: currentRow, section: 0)
+      let isVisible = self.tableView.indexPathsForVisibleRows?.contains(currentIndexPath) == true
+
+      if isVisible {
+        self.viewModel.completeLastReadPositionLocation(success: true)
+        self.showJumpDownView()
+      } else if attempt < 2 {
+        self.scrollToLastReadPosition(stableId: stableId, attempt: attempt + 1)
+      } else {
+        self.viewModel.completeLastReadPositionLocation(success: false)
+      }
+    }
+  }
+
+  open func lastReadPositionStateChanged() {
+    refreshLastReadPositionVisibility()
+    renderLastReadPositionState()
+  }
+
+  private func renderLastReadPositionState() {
+    switch viewModel.lastReadPositionState {
+    case let .visible(snapshot):
+      lastReadPositionView.update(snapshot: snapshot, locating: false)
+      lastReadPositionView.isHidden = isMutilSelect || !isCurrentPage || viewModel.isLastReadPositionSuppressed
+    case let .locating(snapshot):
+      lastReadPositionView.update(snapshot: snapshot, locating: true)
+      lastReadPositionView.isHidden = isMutilSelect || !isCurrentPage || viewModel.isLastReadPositionSuppressed
+    case .disabled, .ready, .consumed:
+      lastReadPositionView.isHidden = true
+    }
+  }
+
+  private func refreshLastReadPositionVisibility() {
+    // Selection hides the entry, but viewing messages must still consume it.
+    guard isCurrentPage,
+          tableView.numberOfSections > 0,
+          let visibleRows = tableView.indexPathsForVisibleRows else {
+      return
+    }
+    viewModel.updateLastReadPositionVisibility(
+      visibleMessageIndices: Set(visibleRows.map(\.row))
+    )
+  }
+
+  private func updateLastReadPositionTopConstraint() {
+    let showsTopMessage = topMessageView.superview != nil && !topMessageView.isHidden
+    lastReadPositionTopAnchor?.constant = showsTopMessage ? 56 : 16
   }
 
   open func setMutilSelectBottomView() {
@@ -3647,11 +4181,14 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
 
       // 记录进入图片详情页时键盘是否弹起
       let isKeyboardActive = chatInputView.textView.isFirstResponder || chatInputView.titleField.isFirstResponder
+      let messageCountBeforePreview = viewModel.messages.count
+      chatInputView.textView.resignFirstResponder()
+      chatInputView.titleField.resignFirstResponder()
       showController.onDismiss = { [weak self] in
         guard let self = self else { return }
-        // 只有在之前键盘弹起的情况下，才滚动到底部
+        // 键盘弹起且预览期间没有新消息时才滚动到底部
         // 解决 iOS 15 等版本上键盘弹起状态下查看图片返回后消息没有滚动到底部的兼容性问题
-        if isKeyboardActive {
+        if isKeyboardActive, self.viewModel.messages.count == messageCountBeforePreview {
           self.scrollTableViewToBottom()
         }
       }
@@ -3933,6 +4470,7 @@ extension ChatViewController: TopMessageViewDelegate {
         self?.showErrorToast(err)
       } else {
         self?.topMessageView.removeFromSuperview()
+        self?.updateLastReadPositionTopConstraint()
       }
     }
   }
@@ -4170,6 +4708,97 @@ extension ChatViewController: NEMutilSelectBottomViewDelegate {
 // MARK: ChatBaseCellDelegate
 
 extension ChatViewController: ChatBaseCellDelegate {
+  open func didTapReaction(_ cell: UITableViewCell, _ model: MessageContentModel?, _ index: Int) {
+    guard let model, let message = model.message,
+          IMKitConfigCenter.shared.enableEmojiReaction,
+          Self.supportsReactionConversation(ChatRepo.conversationId) else { return }
+    if index == 0 {
+      presentReactionPanel(for: message, cell: cell, model: model)
+      return
+    }
+    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+      showToast(commonLocalizable("network_error"))
+      return
+    }
+    viewModel.toggleReaction(message: message, index: index) { [weak self] error in
+      if let error {
+        self?.showReactionError(error)
+      }
+    }
+  }
+
+  private func presentReactionPanel(for message: V2NIMMessage,
+                                    cell: UITableViewCell,
+                                    model: MessageContentModel) {
+    guard let manager = viewModel.reactionManager,
+          IMKitConfigCenter.shared.enableEmojiReaction else { return }
+
+    if chatInputView.textView.isFirstResponder || chatInputView.titleField.isFirstResponder {
+      chatInputView.textView.resignFirstResponder()
+      chatInputView.titleField.resignFirstResponder()
+      layoutInputView(offset: 0)
+    }
+    guard let indexPath = tableView.indexPath(for: cell) else { return }
+    removeOperationView()
+    viewModel.operationModel = model
+
+    let frameWidth = 278.0
+    let frameHeight = 310.0
+    let rectInTableView = tableView.rectForRow(at: indexPath)
+    let rectInView = tableView.convert(rectInTableView, to: view)
+    let midY = kScreenHeight / 2
+    var underMessage = true
+    var operationY = rectInView.origin.y + rectInView.size.height
+    if operationY > midY {
+      underMessage = false
+      operationY = rectInView.origin.y - frameHeight
+      if model.timeContent != nil {
+        operationY += chat_timeCellH
+      }
+    } else {
+      operationY += 8
+    }
+    let frameX = message.isSelf ? kScreenWidth - frameWidth - 8 : 8
+    operationView.visibleFrame = tableView.convert(tableView.bounds, to: view)
+    operationView.frame = CGRect(
+      x: frameX,
+      y: operationY,
+      width: frameWidth,
+      height: frameHeight
+    )
+    operationView.items = []
+    operationView.oldFrameHeight = frameHeight
+    operationView.oldFrameWidth = frameWidth
+    operationView.viewUnderMessage = underMessage
+    operationView.configureReactions(
+      provider: manager.provider(),
+      quickIndexes: Self.reactionPanelQuickIndexes,
+      showEmoji: true,
+      showMoreButton: false
+    )
+    operationView.onSelectReaction = { [weak self] index in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        self?.showToast(commonLocalizable("network_error"))
+        return
+      }
+      self?.viewModel.toggleReaction(message: message, index: index) { [weak self] error in
+        if let error {
+          self?.showReactionError(error)
+        }
+      }
+    }
+    operationView.showAllEmoji()
+    operationView.isHidden = false
+  }
+
+  private func showReactionError(_ error: V2NIMError) {
+    if error.code == 107321 {
+      showToast(Self.reactionErrorMessage(forCode: error.code))
+    } else {
+      showErrorToast(error.nserror, Self.reactionErrorMessage(forCode: error.code))
+    }
+  }
+
   open func didLongPressAvatar(_ cell: UITableViewCell, _ model: MessageContentModel?) {
     // 非群聊
     // 禁言
@@ -4314,7 +4943,7 @@ extension ChatViewController: ChatBaseCellDelegate {
 
     // 计算浮层位置（与消息长按逻辑完全一致）
     let itemH = NEAppLanguageUtil.getCurrentLanguage() == .english ? 62.0 : 56.0
-    let w = Double(items.count) * 60.0 + 16.0
+    let w = Self.operationMenuWidth(for: items.count)
     let h = itemH + 16.0
 
     let rectInTableView = tableView.rectForRow(at: index)
@@ -4343,9 +4972,26 @@ extension ChatViewController: ChatBaseCellDelegate {
       frame.origin.y = tableView.frame.origin.y + tableView.frame.size.height - h
     }
 
+    operationView.visibleFrame = tableView.convert(tableView.bounds, to: view)
     operationView.frame = frame
     operationView.items = items
+    operationView.oldFrameHeight = h
+    operationView.configureReactions(
+      provider: nil,
+      quickIndexes: [],
+      showEmoji: false,
+      showMoreButton: false
+    )
+    operationView.showOperation()
     operationView.isHidden = false
+  }
+
+  /// 译文失败提示点击重试，复用当前皮肤的翻译流程。
+  open func didTapTranslationRetryView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
+    guard let textModel = model as? MessageTextModel else { return }
+    viewModel.operationModel = textModel
+    isTranslationOperation = false
+    translateMessage()
   }
 
   open func didTapResendView(_ cell: UITableViewCell, _ model: MessageContentModel?) {
@@ -4608,13 +5254,24 @@ extension ChatViewController: ChatBaseCellDelegate {
       onReceiveNewMsgs.append(contentsOf: pendingNewMessages)
       pendingNewMessages.removeAll()
     }
+    onReceiveNewMsgs = Self.newMessageIndicators(
+      onReceiveNewMsgs,
+      after: newMessageIndicatorCutoffAnchor
+    )
 
     // 锚点跳转场景下，无论是否有新消息都需要调用 showJumpDownView
     // 因为需要判断最后一条消息是否可见来决定是否显示按钮
-    if viewModel.isHistoryChat || !onReceiveNewMsgs.isEmpty {
-      // 设置标志位，等待 tableViewReload 完成后再检查跳转按钮
-      // 这样可以确保在异步加载消息详情（loadMoreWithMessage）完成后才正确判断
+    if viewModel.anchor != nil || viewModel.isHistoryChat || !onReceiveNewMsgs.isEmpty {
       needCheckJumpDownAfterReload = true
+      // loadData has already reloaded the table in the common path. Schedule a
+      // fallback so the button is still refreshed when no later reload occurs.
+      DispatchQueue.main.async { [weak self] in
+        guard let self, self.needCheckJumpDownAfterReload else {
+          return
+        }
+        self.needCheckJumpDownAfterReload = false
+        self.showJumpDownView()
+      }
     }
 
     // D4-B 首次加载完毕后对当前可见消息触发一次自动翻译

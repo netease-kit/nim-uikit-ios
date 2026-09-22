@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownParser {
+@objcMembers
+open class NEMarkdownParser: NSObject {
   public struct NEEnabledElements: OptionSet {
     public let rawValue: Int
 
@@ -132,6 +133,7 @@ open class NEMarkdownParser {
     unescapingElements = [code, unescaping]
     self.customElements = customElements
     self.enabledElements = enabledElements
+    super.init()
     updateDefaultElements()
     updateEscapingElements()
     updateUnescapingElements()
@@ -154,10 +156,12 @@ open class NEMarkdownParser {
 
   // MARK: Parsing
 
+  @objc(parseString:)
   open func parse(_ markdown: String) -> NSAttributedString {
     parse(NSAttributedString(string: markdown))
   }
 
+  @objc(parseAttributedString:)
   open func parse(_ markdown: NSAttributedString) -> NSAttributedString {
     // ── 第一步：如果表格功能开启，先对纯文本做表格预处理 ──
     // 在 escapingElements 运行前处理，保证 | 字符不被转义。

@@ -14,10 +14,15 @@ public protocol TeamMemberCellDelegate: NSObjectProtocol {
 @objcMembers
 open class NEBaseTeamMemberCell: UITableViewCell {
   var currentModel: NETeamMemberInfoModel?
+  private var currentSearchResult: NETeamMemberSearchResult?
+  private var isApplyingSearchLayout = false
 
   weak var delegate: TeamMemberCellDelegate?
 
   public var ownerWidth: NSLayoutConstraint?
+  var ownerRightMargin: NSLayoutConstraint?
+  var ownerRightVisibleConstant: CGFloat = -70
+  var ownerRightHiddenConstant: CGFloat = -20
 
   public var nameLabelRightMargin: NSLayoutConstraint?
 
@@ -54,8 +59,30 @@ open class NEBaseTeamMemberCell: UITableViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = NEConstant.defaultTextFont(16.0)
     label.textColor = .ne_darkText
+    label.numberOfLines = 1
+    label.lineBreakMode = .byTruncatingTail
     label.accessibilityIdentifier = "id.userName"
     return label
+  }()
+
+  public lazy var subtitleLabel: UILabel = {
+    let label = UILabel()
+    label.font = NEConstant.defaultTextFont(13.0)
+    label.textColor = .ne_greyText
+    label.numberOfLines = 1
+    label.lineBreakMode = .byTruncatingTail
+    label.accessibilityIdentifier = "id.userSubtitle"
+    label.isHidden = true
+    return label
+  }()
+
+  public lazy var nameStackView: UIStackView = {
+    let stack = UIStackView(arrangedSubviews: [nameLabel, subtitleLabel])
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    stack.axis = .vertical
+    stack.alignment = .fill
+    stack.spacing = 1
+    return stack
   }()
 
   public lazy var removeLabel: UILabel = {
@@ -92,36 +119,128 @@ open class NEBaseTeamMemberCell: UITableViewCell {
       headerView.heightAnchor.constraint(equalToConstant: 42),
     ])
 
-    nameLabelRightMargin = nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -170 : -116)
-    contentView.addSubview(nameLabel)
+    nameLabelRightMargin = nameStackView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -170 : -116)
+    contentView.addSubview(nameStackView)
     NSLayoutConstraint.activate([
-      nameLabel.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
-      nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      nameStackView.leftAnchor.constraint(equalTo: headerView.rightAnchor, constant: 14.0),
+      nameStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       nameLabelRightMargin!,
     ])
 
     ownerWidth = ownerLabel.widthAnchor.constraint(equalToConstant: 48.0)
     contentView.addSubview(ownerLabel)
+    ownerRightVisibleConstant = NEAppLanguageUtil.getCurrentLanguage() == .english ? -90 : -70
+    ownerRightMargin = ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: ownerRightVisibleConstant)
     NSLayoutConstraint.activate([
-      ownerLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: NEAppLanguageUtil.getCurrentLanguage() == .english ? -90 : -70),
+      ownerRightMargin!,
       ownerLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       ownerLabel.heightAnchor.constraint(equalToConstant: 22.0),
       ownerWidth!,
     ])
   }
 
+  /// Keeps the role badge aligned with the trailing edge when the remove action is unavailable.
+  open func setRemoveControlsVisible(_ visible: Bool) {
+    removeButton.isHidden = !visible
+    removeLabel.isHidden = !visible
+    ownerRightMargin?.constant = visible ? ownerRightVisibleConstant : ownerRightHiddenConstant
+  }
+
   open func configure(_ model: NETeamMemberInfoModel) {
+    configure(model, searchResult: nil)
+  }
+
+  open func configure(_ model: NETeamMemberInfoModel,
+                      searchResult: NETeamMemberSearchResult?) {
     // 更新用户信息
-    if let userId = model.nimUser?.user?.accountId, let user = NEFriendUserCache.shared.getFriendInfo(userId) {
+    let accountId = model.teamMember?.accountId ?? model.nimUser?.user?.accountId ?? ""
+    if let aiUser = NEAIUserManager.shared.getNEUserById(accountId) {
+      model.nimUser = aiUser
+    } else if let user = NEFriendUserCache.shared.getFriendInfo(accountId) {
       model.nimUser = user
     }
     currentModel = model
+    currentSearchResult = searchResult
 
     let url = model.nimUser?.user?.avatar
-    let accountId = model.nimUser?.user?.accountId ?? ""
     let name = model.getShortName(model.nimUser?.showName(false) ?? accountId)
     headerView.configHeadData(headUrl: url, name: name, uid: accountId)
-    nameLabel.text = model.atNameInTeam()
+    guard let searchResult else {
+      configureName(model.atNameInTeam() ?? accountId)
+      return
+    }
+    applySearchResult(searchResult)
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    guard let currentSearchResult, !isApplyingSearchLayout else { return }
+    isApplyingSearchLayout = true
+    applySearchResult(currentSearchResult)
+    isApplyingSearchLayout = false
+  }
+
+  private func applySearchResult(_ searchResult: NETeamMemberSearchResult) {
+    let primary = NETextSearchLayout.result(
+      text: searchResult.primaryDisplayText,
+      matchRange: searchResult.primaryDisplayMatchRange,
+      font: nameLabel.font,
+      maxWidth: nameLabel.bounds.width
+    )
+    nameLabel.attributedText = highlightedText(
+      primary.text,
+      range: primary.matchRange,
+      baseColor: .ne_darkText,
+      baseFont: nameLabel.font
+    )
+    if let secondary = searchResult.secondaryDisplayText {
+      let subtitle = NETextSearchLayout.result(
+        text: secondary,
+        matchRange: searchResult.secondaryDisplayMatchRange,
+        font: subtitleLabel.font,
+        maxWidth: subtitleLabel.bounds.width
+      )
+      subtitleLabel.attributedText = highlightedText(
+        subtitle.text,
+        range: subtitle.matchRange,
+        baseColor: .ne_greyText,
+        baseFont: subtitleLabel.font
+      )
+      subtitleLabel.isHidden = false
+    } else {
+      subtitleLabel.attributedText = nil
+      subtitleLabel.text = nil
+      subtitleLabel.isHidden = true
+    }
+  }
+
+  private func configureName(_ name: String) {
+    currentSearchResult = nil
+    nameLabel.attributedText = nil
+    nameLabel.text = name
+    subtitleLabel.attributedText = nil
+    subtitleLabel.text = nil
+    subtitleLabel.isHidden = true
+  }
+
+  private func highlightedText(_ value: String,
+                               range: NSRange,
+                               baseColor: UIColor,
+                               baseFont: UIFont) -> NSAttributedString {
+    let text = NSMutableAttributedString(
+      string: value,
+      attributes: [
+        .foregroundColor: baseColor,
+        .font: baseFont,
+      ]
+    )
+    guard range.location != NSNotFound,
+          range.location >= 0,
+          NSMaxRange(range) <= text.length else {
+      return text
+    }
+    text.addAttribute(.foregroundColor, value: UIColor.ne_searchHighlight, range: range)
+    return text
   }
 
   open func setupRemoveButton() {

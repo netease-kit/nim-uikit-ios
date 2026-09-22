@@ -19,48 +19,15 @@ Pod::Spec.new do |s|
   s.author           = YXConfig.author
   s.ios.deployment_target = YXConfig.deployment_target
   s.swift_version = YXConfig.swift_version
-  
-  if ENV["USE_SOURCE_FILES"] == "true"
-    s.source = { :git => "https://github.com/netease-kit/" }
-    s.source_files = 'NETeamUIKit/Classes/**/*'
-    s.resource = 'NETeamUIKit/Assets/**/*'
-    s.dependency NEChatUIKit.name
-    s.dependency NEChatKit.name
-    s.dependency NEBaseUIKit.name
-
-  else
-    s.source = { :http => "https://yx-web-nosdn.netease.im/xkit/IMUIKit/10.9.51/NETeamUIKit_iOS_v10.9.51.framework.zip?download=NETeamUIKit_iOS_v10.9.51.framework.zip" }
-    
-    s.subspec 'NOS' do |nos|
-      nos.vendored_frameworks = 'NETeamUIKit.xcframework'
-      nos.dependency NEChatUIKit.name, YXConfig.imuikit_version
-      nos.dependency NEChatKit.NOS
-      nos.dependency NEBaseUIKit.NOS, NEBaseUIKit.version
-    end
-    
-    s.subspec 'NOS_Special' do |nos|
-      nos.vendored_frameworks = 'NETeamUIKit.xcframework'
-      nos.dependency NEChatUIKit.NOS_Special, YXConfig.imuikit_version
-      nos.dependency NEChatKit.NOS_Special
-      nos.dependency NEBaseUIKit.NOS_Special, NEBaseUIKit.version
-    end
-    
-    s.subspec 'FCS' do |fcs|
-      fcs.vendored_frameworks = 'NETeamUIKit.xcframework'
-      fcs.dependency NEChatUIKit.FCS, YXConfig.imuikit_version
-      fcs.dependency NEChatKit.FCS
-      fcs.dependency NEBaseUIKit.FCS, NEBaseUIKit.version
-    end
-    
-    s.subspec 'FCS_Special' do |fcs|
-      fcs.vendored_frameworks = 'NETeamUIKit.xcframework'
-      fcs.dependency NEChatUIKit.FCS_Special, YXConfig.imuikit_version
-      fcs.dependency NEChatKit.FCS_Special
-      fcs.dependency NEBaseUIKit.FCS_Special, NEBaseUIKit.version
-    end
-    s.default_subspecs = 'NOS'
-  end
 
   YXConfig.pod_target_xcconfig(s)
+
+  s.source = { :git => "https://github.com/netease-kit/" }
+  s.source_files = 'NETeamUIKit/Classes/**/*'
+  s.resource = 'NETeamUIKit/Assets/**/*'
+
+  s.dependency NEChatUIKit.name
+  s.dependency NEChatKit.name
+  s.dependency NEBaseUIKit.name
 
 end

@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -13,7 +14,7 @@ open class NEBaseJoinTeamViewController: NETeamBaseViewController, UITextFieldDe
 
   /// 搜索输入框
   public let searchInput: UITextField = {
-    let searchInput = UITextField()
+    let searchInput = NESingleLineTextField()
     searchInput.translatesAutoresizingMaskIntoConstraints = false
     searchInput.textColor = .ne_darkText
     searchInput.placeholder = localizable("input_team_id")

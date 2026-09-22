@@ -13,6 +13,7 @@ public protocol NEMutilSelectBottomViewDelegate: NSObjectProtocol {
   func didClickDeleteButton()
 }
 
+@objcMembers
 open class NEMutilSelectBottomView: UIView {
   public weak var delegate: NEMutilSelectBottomViewDelegate?
   public var buttonTopAnchor: NSLayoutConstraint?

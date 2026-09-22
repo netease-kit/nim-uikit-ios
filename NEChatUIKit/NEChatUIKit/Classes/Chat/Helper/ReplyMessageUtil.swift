@@ -6,6 +6,7 @@
 import Foundation
 import NEChatKit
 
+@objcMembers
 open class ReplyMessageUtil: NSObject {
   @nonobjc
   public static func textForReplyModel(model: MessageContentModel) -> String {

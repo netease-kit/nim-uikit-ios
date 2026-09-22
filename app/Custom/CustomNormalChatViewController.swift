@@ -2,35 +2,9 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
 import NEChatUIKit
-import NERtcCallKit
-import NIMSDK
-import UIKit
 
-class CustomNormalChatViewController: P2PChatViewController, NERecordProvider {
-  /// 话单拦截
-  func onRecordSend(_ config: NERecordConfig) {
-    NEALog.infoLog(className(), desc: "call status : \(NECallEngine.sharedInstance().callStatus)")
-    if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-      if NECallEngine.sharedInstance().callStatus == .calling {
-        return
-      }
-    }
-    let message = V2NIMMessageCreator.createCallMessage("", type: Int(config.callType.rawValue), channelId: "", status: Int(config.callState.rawValue), durations: [])
-    if let cid = V2NIMConversationIdUtil.p2pConversationId(config.accId) {
-      viewModel.chatRepo.sendMessage(message: message, conversationId: cid) { [weak self] result, error, ret in
-        NEALog.infoLog(CustomNormalChatViewController.className(), desc: "CustomNormalChatViewController result: \(error?.localizedDescription ?? "")")
-      }
-    }
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    NECallEngine.sharedInstance().setCall(self)
-    // Do any additional setup after loading the view.
-  }
-
+class CustomNormalChatViewController: P2PChatViewController {
   /*
    // MARK: - Navigation
 

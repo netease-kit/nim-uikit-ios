@@ -118,6 +118,25 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
     return imageView
   }()
 
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    // The map card is a sibling of the hidden directional bubble. Keep it
+    // above that bubble and its Reaction backdrop, with capsules on top.
+    contentView.bringSubviewToFront(backgroundViewLeft)
+    contentView.bringSubviewToFront(backgroundViewRight)
+    updateOutgoingReactionBackdrop()
+    contentView.bringSubviewToFront(reactionViewLeft)
+    contentView.bringSubviewToFront(reactionViewRight)
+  }
+
+  private func updateOutgoingReactionBackdrop() {
+    if reactionViewRight.isEnabledForDisplay,
+       let image = super.reactionBackdropImage(isOutgoing: true) {
+      reactionBackdropRight.image = image.withRenderingMode(.alwaysTemplate)
+      reactionBackdropRight.tintColor = .white
+    }
+  }
+
   override open func commonUILeft() {
     super.commonUILeft()
     bubbleImageLeft.isHidden = true
@@ -241,6 +260,7 @@ open class FunChatMessageLocationCell: FunChatMessageBaseCell {
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
     super.setModel(model, isSend)
+    updateOutgoingReactionBackdrop()
     let titleLabel = isSend ? titleLabelRight : titleLabelLeft
     let subTitleLabel = isSend ? subTitleLabelRight : subTitleLabelLeft
     let mapImageView = isSend ? mapImageViewRight : mapImageViewLeft

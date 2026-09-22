@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+@objcMembers
 open class NEBaseChatNewMessageView: UIView {
   public lazy var jumpDownImageView: UIImageView = {
     let imageView = UIImageView()

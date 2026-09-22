@@ -13,8 +13,8 @@ public class PocLoginViewController: NEBaseViewController {
   // 成功回调
   public var loginSuccess: (() -> Void)?
 
-  let usernameTextField = UITextField()
-  let passwordTextField = UITextField()
+  let usernameTextField = NESingleLineTextField()
+  let passwordTextField = NESingleLineTextField()
 
   // 登录状态记录
   var isLogining = false

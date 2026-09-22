@@ -7,6 +7,8 @@ import UIKit
 
 @objcMembers
 open class NEUserHeaderView: UIImageView {
+  private var avatarRequestIdentifier = UUID()
+
   public lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.font = UIFont.systemFont(ofSize: 12)
@@ -41,18 +43,45 @@ open class NEUserHeaderView: UIImageView {
   }
 
   open func configHeadData(headUrl: String?, name: String, uid: String) {
+    let requestIdentifier = UUID()
+    avatarRequestIdentifier = requestIdentifier
     if let avatar = headUrl, !avatar.isEmpty {
       setTitle("")
       DispatchQueue.main.async { [weak self] in
-        self?.sd_setImage(with: URL(string: avatar), completed: nil)
+        guard let self, self.avatarRequestIdentifier == requestIdentifier else {
+          return
+        }
+        self.sd_setImage(with: URL(string: avatar), completed: nil)
       }
       backgroundColor = .clear
     } else {
       setTitle(name.isEmpty ? uid : name)
       DispatchQueue.main.async { [weak self] in
-        self?.sd_setImage(with: nil, completed: nil)
+        guard let self, self.avatarRequestIdentifier == requestIdentifier else {
+          return
+        }
+        self.sd_setImage(with: nil, completed: nil)
       }
       backgroundColor = UIColor.colorWithString(string: uid)
+    }
+  }
+
+  open func configStaticImage(_ image: UIImage?) {
+    let requestIdentifier = UUID()
+    avatarRequestIdentifier = requestIdentifier
+    let applyImage = { [weak self] in
+      guard let self, self.avatarRequestIdentifier == requestIdentifier else {
+        return
+      }
+      self.sd_cancelCurrentImageLoad()
+      self.setTitle("")
+      self.image = image
+      self.backgroundColor = .clear
+    }
+    if Thread.isMainThread {
+      applyImage()
+    } else {
+      DispatchQueue.main.async(execute: applyImage)
     }
   }
 

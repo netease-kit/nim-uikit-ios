@@ -6,6 +6,21 @@
 import UIKit
 
 @objcMembers
+open class NESingleLineTextField: UITextField {
+  override open func insertText(_ text: String) {
+    // Forward Return to UIKit so existing send/done delegates still run.
+    guard text == "\n" || text.rangeOfCharacter(from: .newlines) == nil else { return }
+    super.insertText(text)
+  }
+
+  override open func paste(_ sender: Any?) {
+    if let text = UIPasteboard.general.string,
+       text.rangeOfCharacter(from: .newlines) != nil { return }
+    super.paste(sender)
+  }
+}
+
+@objcMembers
 open class SearchTextField: UITextField {
   public var leftViewRectX: CGFloat?
 
@@ -36,5 +51,19 @@ open class SearchTextField: UITextField {
     var rect = super.textRect(forBounds: bounds)
     rect.origin.x += 5
     return rect
+  }
+}
+
+@objcMembers
+open class NESingleLineSearchTextField: SearchTextField {
+  override open func insertText(_ text: String) {
+    guard text == "\n" || text.rangeOfCharacter(from: .newlines) == nil else { return }
+    super.insertText(text)
+  }
+
+  override open func paste(_ sender: Any?) {
+    if let text = UIPasteboard.general.string,
+       text.rangeOfCharacter(from: .newlines) != nil { return }
+    super.paste(sender)
   }
 }

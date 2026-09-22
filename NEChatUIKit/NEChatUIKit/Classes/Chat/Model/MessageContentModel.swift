@@ -74,6 +74,10 @@ open class MessageContentModel: NSObject, MessageModel {
   public var isRevoked: Bool = false {
     didSet {
       if isRevoked {
+        // A revoked message must not retain a visible Reaction area or its
+        // row-height contribution after late SDK updates.
+        reactionGroups.removeAll()
+        reactionHeight = 0
         type = .revoke
 
         // 只有文本消息，才计算可编辑按钮的宽度
@@ -83,6 +87,8 @@ open class MessageContentModel: NSObject, MessageModel {
         } else {
           contentSize = CGSize(width: 130, height: chat_min_h)
         }
+        // Normal/Feishu revoke rows use ordinary directional message geometry.
+        // Fun/WeChat controllers override revoke rows with TIP height.
         height = contentSize.height + chat_content_margin + fullNameHeight
 
         // time
@@ -105,6 +111,19 @@ open class MessageContentModel: NSObject, MessageModel {
   public var pinAccount: String?
   public var pinShowName: String?
   public var isPined: Bool = false
+
+  /// Message reactions are owned by MessageReactionManager and exposed here
+  /// only as presentation data for cells.
+  public var reactionGroups: [NEMessageReactionGroup] = []
+  public var reactionHeight: CGFloat = 0 {
+    didSet {
+      height += reactionHeight - oldValue
+    }
+  }
+
+  public var hasReaction: Bool {
+    !reactionGroups.isEmpty
+  }
 
   // 是否显示时间
   public var timeContent: String? {

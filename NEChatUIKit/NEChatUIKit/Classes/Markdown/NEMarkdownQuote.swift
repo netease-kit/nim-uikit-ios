@@ -4,7 +4,8 @@
 
 import Foundation
 
-open class NEMarkdownQuote: NEMarkdownLevelElement {
+@objcMembers
+open class NEMarkdownQuote: NSObject, NEMarkdownLevelElement {
   fileprivate static let regex = "^(\\>{1,%@})\\s*(.+)$"
 
   open var maxLevel: Int

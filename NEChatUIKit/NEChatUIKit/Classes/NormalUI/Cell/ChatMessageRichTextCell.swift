@@ -94,10 +94,16 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     bubbleImageLeft.addSubview(contentLabelLeft)
     contentLabelLeftHeightAnchor = contentLabelLeft.heightAnchor.constraint(equalToConstant: kScreenHeight)
     contentLabelLeftHeightAnchor?.isActive = true
+    reactionTopAnchorLeft?.isActive = false
+    reactionTopAnchorLeft = reactionViewLeft.topAnchor.constraint(
+      equalTo: contentLabelLeft.bottomAnchor,
+      constant: chat_content_margin
+    )
     NSLayoutConstraint.activate([
       contentLabelLeft.rightAnchor.constraint(equalTo: titleLabelLeft.rightAnchor, constant: 0),
       contentLabelLeft.leftAnchor.constraint(equalTo: titleLabelLeft.leftAnchor, constant: 0),
       contentLabelLeft.topAnchor.constraint(equalTo: titleLabelLeft.bottomAnchor, constant: chat_content_margin),
+      reactionTopAnchorLeft!,
     ])
   }
 
@@ -123,10 +129,16 @@ open class ChatMessageRichTextCell: ChatMessageTextCell {
     bubbleImageRight.addSubview(contentLabelRight)
     contentLabelRightHeightAnchor = contentLabelRight.heightAnchor.constraint(equalToConstant: kScreenHeight)
     contentLabelRightHeightAnchor?.isActive = true
+    reactionTopAnchorRight?.isActive = false
+    reactionTopAnchorRight = reactionViewRight.topAnchor.constraint(
+      equalTo: contentLabelRight.bottomAnchor,
+      constant: chat_content_margin
+    )
     NSLayoutConstraint.activate([
       contentLabelRight.rightAnchor.constraint(equalTo: titleLabelRight.rightAnchor, constant: -0),
       contentLabelRight.leftAnchor.constraint(equalTo: titleLabelRight.leftAnchor, constant: 0),
       contentLabelRight.topAnchor.constraint(equalTo: titleLabelRight.bottomAnchor, constant: chat_content_margin),
+      reactionTopAnchorRight!,
     ])
   }
 

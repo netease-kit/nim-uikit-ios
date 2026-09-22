@@ -7,9 +7,11 @@ import MJRefresh
 import NEChatKit
 import NIMSDK
 import UIKit
+import NEBaseUIKit
 
 /// 自定义 View：重写 hitTest，在触摸分发最早阶段就收起键盘
 /// 确保 bubble tap gesture 能在 firstResponder 已 resign 的状态下正常识别，解决首次点击不跳转的问题
+@objcMembers
 open class NEHistorySearchContainerView: UIView {
   weak var searchTextField: UITextField?
 
@@ -51,7 +53,7 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
 
   /// 搜索文本框
   public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
+    let textField = NESingleLineSearchTextField()
     let leftImageView = UIImageView(image: coreLoader.loadImage("textField_search_icon"))
     textField.contentMode = .center
     textField.leftView = leftImageView
@@ -148,6 +150,10 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    // Search results intentionally use the message presentation without
+    // Reaction capsules. Stop this controller's private manager before any
+    // history search can load Reaction data into the result models.
+    viewModel.stopReactionManager()
     setupSubviews()
     initialConfig()
     viewModel.delegate = self
@@ -429,15 +435,6 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
                      "animated": false],
         closure: nil
       )
-      // 跳转后清空 ChatVC 的缓存，避免重复计数
-      if let nav = navigationController {
-        for vc in nav.viewControllers {
-          if let chatVC = vc as? ChatViewController {
-            chatVC.onReceiveNewMsgs.removeAll()
-            break
-          }
-        }
-      }
     } else if conversationType == .CONVERSATION_TYPE_TEAM {
       Router.shared.use(
         PushTeamChatVCRouter,
@@ -448,15 +445,6 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
                      "animated": false],
         closure: nil
       )
-      // 跳转后清空 ChatVC 的缓存，避免重复计数
-      if let nav = navigationController {
-        for vc in nav.viewControllers {
-          if let chatVC = vc as? ChatViewController {
-            chatVC.onReceiveNewMsgs.removeAll()
-            break
-          }
-        }
-      }
     }
   }
 }

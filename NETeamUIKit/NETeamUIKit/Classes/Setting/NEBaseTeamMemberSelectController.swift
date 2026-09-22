@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -12,6 +13,11 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
 
   let viewModel = TeamMemberSelectViewModel()
 
+  private var renderedAccountIds = [String?]()
+  private var searchStartPosition: (accountId: String, relativeY: CGFloat, contentOffsetX: CGFloat)?
+
+  open var memberLoadStatusTintColor: UIColor { .ne_normalTheme }
+
   /// 群id
   var teamId: String?
 
@@ -19,7 +25,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
 
   /// 搜索输入框
   public lazy var searchInput: UITextField = {
-    let searchInput = UITextField()
+    let searchInput = NESingleLineTextField()
     searchInput.textColor = UIColor(hexString: "333333")
     searchInput.placeholder = localizable("search_member")
     searchInput.font = UIFont.systemFont(ofSize: 14.0)
@@ -72,21 +78,28 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
         if let err = error {
           self?.view.neMakeToast(err.localizedDescription)
         } else {
-          self?.didReloadTableData()
           print("获取群信息成功 : ", self?.viewModel.teamInfoModel?.users.count as Any)
         }
+        self?.didReloadTableData()
       }
+      didReloadTableData()
     }
   }
 
   /// 刷新列表
   open func didReloadTableData() {
-    if viewModel.showDatas.count <= 0 {
+    if viewModel.isLoadingMembers || viewModel.memberLoadError != nil {
+      emptyView.isHidden = true
+    } else if viewModel.showDatas.count <= 0 {
       emptyView.isHidden = false
     } else {
       emptyView.isHidden = true
     }
-    contentTableView.reloadData()
+    let canSubmit = !viewModel.isLoadingMembers && viewModel.memberLoadError == nil
+    navigationView.moreButton.isEnabled = canSubmit
+    navigationView.moreButton.alpha = canSubmit ? 1 : 0.45
+    updateMemberLoadStatus()
+    reloadPreservingTopMember()
   }
 
   let searchImageView: UIImageView = {
@@ -215,25 +228,34 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
   }
 
   open func textFieldShouldClear(_ textField: UITextField) -> Bool {
+    viewModel.resetSearchResults()
     viewModel.showDatas = viewModel.datas
     didReloadTableData()
+    restoreSearchStartPositionIfNeeded()
     return true
   }
 
   /// 文本输入变更
   open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
     let finalString = (textField.text! as NSString).replacingCharacters(in: range, with: string)
-    if string.count <= 0 {
-      if finalString.count <= 0 {
-        viewModel.showDatas = viewModel.datas
-        didReloadTableData()
-      } else {
-        viewModel.showDatas = viewModel.searchAllData(finalString)
-        didReloadTableData()
-      }
+    let previousKeyword = (textField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    let normalizedKeyword = finalString.trimmingCharacters(in: .whitespacesAndNewlines)
+    let wasSearching = !previousKeyword.isEmpty
+    let willSearch = !normalizedKeyword.isEmpty
+    if !wasSearching, willSearch {
+      searchStartPosition = currentScrollPosition()
+    }
+    if finalString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      viewModel.resetSearchResults()
+      viewModel.showDatas = viewModel.datas
     } else {
       viewModel.showDatas = viewModel.searchAllData(finalString)
-      didReloadTableData()
+    }
+    didReloadTableData()
+    if !willSearch {
+      restoreSearchStartPositionIfNeeded()
+    } else if previousKeyword != normalizedKeyword {
+      scrollSearchResultsToTop()
     }
     return true
   }
@@ -251,12 +273,137 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
 
   /// 刷新回调
   open func didNeedRefresh() {
-    contentTableView.reloadData()
+    let keyword = searchInput.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    if keyword.isEmpty {
+      viewModel.resetSearchResults()
+      viewModel.showDatas = viewModel.datas
+    } else {
+      viewModel.showDatas = viewModel.searchAllData(keyword)
+    }
+    didReloadTableData()
     didChangeSelectMember()
+  }
+
+  private func reloadPreservingTopMember() {
+    let anchor = contentTableView.indexPathsForVisibleRows?
+      .sorted()
+      .first
+      .flatMap { indexPath -> (String, CGFloat)? in
+        guard renderedAccountIds.indices.contains(indexPath.row),
+              let accountId = renderedAccountIds[indexPath.row] else {
+          return nil
+        }
+        let relativeY = contentTableView.rectForRow(at: indexPath).minY - contentTableView.contentOffset.y
+        return (accountId, relativeY)
+      }
+    let nextRenderedAccountIds = viewModel.showDatas.map {
+      $0.member?.teamMember?.accountId ?? $0.member?.nimUser?.user?.accountId
+    }
+
+    UIView.performWithoutAnimation {
+      contentTableView.reloadData()
+      contentTableView.layoutIfNeeded()
+    }
+    renderedAccountIds = nextRenderedAccountIds
+
+    guard let anchor,
+          let row = viewModel.showDatas.firstIndex(where: {
+            $0.member?.teamMember?.accountId == anchor.0
+          }) else {
+      return
+    }
+    let rect = contentTableView.rectForRow(at: IndexPath(row: row, section: 0))
+    let minimumY = -contentTableView.adjustedContentInset.top
+    let maximumY = max(
+      minimumY,
+      contentTableView.contentSize.height - contentTableView.bounds.height + contentTableView.adjustedContentInset.bottom
+    )
+    let targetY = min(max(rect.minY - anchor.1, minimumY), maximumY)
+    contentTableView.setContentOffset(CGPoint(x: contentTableView.contentOffset.x, y: targetY), animated: false)
+  }
+
+  private func scrollSearchResultsToTop() {
+    contentTableView.layoutIfNeeded()
+    contentTableView.setContentOffset(
+      CGPoint(x: contentTableView.contentOffset.x, y: -contentTableView.adjustedContentInset.top),
+      animated: false
+    )
+  }
+
+  private func currentScrollPosition() -> (accountId: String, relativeY: CGFloat, contentOffsetX: CGFloat)? {
+    guard let indexPath = contentTableView.indexPathsForVisibleRows?.sorted().first,
+          renderedAccountIds.indices.contains(indexPath.row),
+          let accountId = renderedAccountIds[indexPath.row] else {
+      return nil
+    }
+    let relativeY = contentTableView.rectForRow(at: indexPath).minY - contentTableView.contentOffset.y
+    return (accountId, relativeY, contentTableView.contentOffset.x)
+  }
+
+  private func restoreSearchStartPositionIfNeeded() {
+    guard let position = searchStartPosition else {
+      return
+    }
+    defer { searchStartPosition = nil }
+    guard let row = viewModel.showDatas.firstIndex(where: {
+      ($0.member?.teamMember?.accountId ?? $0.member?.nimUser?.user?.accountId) == position.accountId
+    }) else {
+      return
+    }
+    let rect = contentTableView.rectForRow(at: IndexPath(row: row, section: 0))
+    let minimumY = -contentTableView.adjustedContentInset.top
+    let maximumY = max(
+      minimumY,
+      contentTableView.contentSize.height - contentTableView.bounds.height + contentTableView.adjustedContentInset.bottom
+    )
+    let targetY = min(max(rect.minY - position.relativeY, minimumY), maximumY)
+    contentTableView.setContentOffset(CGPoint(x: position.contentOffsetX, y: targetY), animated: false)
+  }
+
+  private func updateMemberLoadStatus() {
+    if viewModel.isLoadingMembers {
+      let footer = UIView(frame: CGRect(x: 0, y: 0, width: contentTableView.bounds.width, height: 44))
+      let indicator = UIActivityIndicatorView(style: .medium)
+      indicator.color = memberLoadStatusTintColor
+      indicator.center = CGPoint(x: footer.bounds.midX, y: footer.bounds.midY)
+      indicator.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
+      indicator.startAnimating()
+      footer.addSubview(indicator)
+      contentTableView.tableFooterView = footer
+    } else if let error = viewModel.memberLoadError {
+      let footer = UIView(frame: CGRect(x: 0, y: 0, width: contentTableView.bounds.width, height: 52))
+      let button = UIButton(type: .system)
+      button.frame = footer.bounds
+      button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      button.tintColor = memberLoadStatusTintColor
+      button.setTitleColor(memberLoadStatusTintColor, for: .normal)
+      button.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
+      button.setTitle(error.localizedDescription, for: .normal)
+      button.titleLabel?.font = .systemFont(ofSize: 14)
+      button.titleLabel?.numberOfLines = 2
+      button.addTarget(self, action: #selector(retryMemberLoad), for: .touchUpInside)
+      footer.addSubview(button)
+      contentTableView.tableFooterView = footer
+    } else {
+      contentTableView.tableFooterView = UIView(
+        frame: CGRect(x: 0, y: 0, width: contentTableView.bounds.width, height: 12)
+      )
+    }
+  }
+
+  @objc private func retryMemberLoad() {
+    guard let teamId else { return }
+    viewModel.getTeamInfo(teamId, showAllMembers) { [weak self] error in
+      if let error {
+        self?.view.neMakeToast(error.localizedDescription)
+      }
+      self?.didReloadTableData()
+    }
   }
 
   /// 点击确定添加回调
   open func didClickSure() {
+    guard !viewModel.isLoadingMembers, viewModel.memberLoadError == nil else { return }
     if !showAllMembers,
        viewModel.selectDic.count + viewModel.managerSet.count > selectCountLimit {
       view.neMakeToast(String(format: localizable("max_managers_tip"), selectCountLimit))

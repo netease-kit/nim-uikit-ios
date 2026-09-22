@@ -71,6 +71,33 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
     }
     model.cellModels.append(showTeam)
 
+    let showConversationGroup = SettingCellModel()
+    showConversationGroup.cellName = "显示会话分组"
+    showConversationGroup.type = SettingCellType.SettingSwitchCell.rawValue
+    showConversationGroup.switchOpen = IMKitConfigCenter.shared.enableConversationGroup
+    showConversationGroup.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableConversationGroup = isOpen
+    }
+    model.cellModels.append(showConversationGroup)
+
+    let showLastReadPosition = SettingCellModel()
+    showLastReadPosition.cellName = "上次阅读消息提示"
+    showLastReadPosition.type = SettingCellType.SettingSwitchCell.rawValue
+    showLastReadPosition.switchOpen = IMKitConfigCenter.shared.enableLastReadPosition
+    showLastReadPosition.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableLastReadPosition = isOpen
+    }
+    model.cellModels.append(showLastReadPosition)
+
+    let showEmojiReaction = SettingCellModel()
+    showEmojiReaction.cellName = NSLocalizedString("emoji_reaction", comment: "Global emoji reaction switch")
+    showEmojiReaction.type = SettingCellType.SettingSwitchCell.rawValue
+    showEmojiReaction.switchOpen = IMKitConfigCenter.shared.enableEmojiReaction
+    showEmojiReaction.swichChange = { isOpen in
+      IMKitConfigCenter.shared.enableEmojiReaction = isOpen
+    }
+    model.cellModels.append(showEmojiReaction)
+
     let showTeamAction = SettingCellModel()
     showTeamAction.cellName = "群聊申请邀请功能"
     showTeamAction.type = SettingCellType.SettingSwitchCell.rawValue
@@ -106,15 +133,6 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
       IMKitConfigCenter.shared.enableTopMessage = isOpen
     }
     model.cellModels.append(showMessageTop)
-
-    let conversationGroup = SettingCellModel()
-    conversationGroup.cellName = "会话分组"
-    conversationGroup.type = SettingCellType.SettingSwitchCell.rawValue
-    conversationGroup.switchOpen = IMKitConfigCenter.shared.enableConversationGroup
-    conversationGroup.swichChange = { isOpen in
-      IMKitConfigCenter.shared.enableConversationGroup = isOpen
-    }
-    model.cellModels.append(conversationGroup)
 
     let showOnlineStatus = SettingCellModel()
     showOnlineStatus.cellName = "显示在线状态"

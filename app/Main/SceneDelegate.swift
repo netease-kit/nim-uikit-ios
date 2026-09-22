@@ -5,6 +5,7 @@
 
 import NEChatKit
 import NEChatUIKit
+import NEContactUIKit
 import NIMSDK
 import UIKit
 
@@ -12,6 +13,8 @@ import UIKit
 import NERtcCallKit
 import NERtcCallUIKit
 import PushKit
+
+private let conversationGroupDefaultEnabledMigrationKey = "nim_conversation_group_default_enabled_v2"
 
 private final class MapFallbackViewController: UIViewController {
   private let mapType: NEMapType
@@ -50,6 +53,7 @@ private final class MapFallbackViewController: UIViewController {
 
 class SceneDelegate: UIResponder {
   static var window: UIWindow?
+  private var voipPushRegistry: PKPushRegistry?
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -86,7 +90,12 @@ class SceneDelegate: UIResponder {
 
     // 设置IM SDK V2的配置项，包括是否使用旧的登录接口和是否使用云端会话
     let v2Option = V2NIMSDKOption()
-    v2Option.enableV2CloudConversation = (UserDefaults.standard.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
+    let userDefaults = UserDefaults.standard
+    if userDefaults.object(forKey: conversationGroupDefaultEnabledMigrationKey) == nil {
+      userDefaults.set(false, forKey: keyEnableCloudConversation)
+      userDefaults.set(true, forKey: conversationGroupDefaultEnabledMigrationKey)
+    }
+    v2Option.enableV2CloudConversation = (userDefaults.value(forKey: keyEnableCloudConversation) as? Bool) ?? false
 
     // IM配置
     IMKitClient.instance.config.fcsEnable = false
@@ -126,7 +135,15 @@ class SceneDelegate: UIResponder {
 
     // 群聊申请邀请功能
     IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth = true
-    
+
+    // 恢复翻译配置
+    let userDefaults = UserDefaults.standard
+    let savedEnableTime = userDefaults.double(forKey: "autoTranslationEnableTime")
+    IMKitConfigCenter.shared.autoTranslationEnableTime = savedEnableTime
+    if let savedLang = userDefaults.string(forKey: "translationTargetLanguage"), !savedLang.isEmpty {
+      IMKitConfigCenter.shared.translationTargetLanguage = savedLang
+    }
+
     loginWithUI()
   }
 
@@ -153,18 +170,35 @@ class SceneDelegate: UIResponder {
     // 地图组件初始化
 //    NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
 
-    // 呼叫组件初始化
-    DispatchQueue.global().async {
-      let setupConfig = NESetupConfig(appkey: AppKey.appKey)
-      NECallEngine.sharedInstance().setup(setupConfig)
-      NECallEngine.sharedInstance().setTimeout(30)
+    // 初始化呼叫引擎和呼叫 UI。呼叫路由会在用户点击音视频入口时使用这里的单例。
+    let setupConfig = NESetupConfig(appkey: AppKey.appKey)
+    NECallEngine.sharedInstance().setup(setupConfig)
+    NECallEngine.sharedInstance().setTimeout(30)
 
-      let uiConfig = NECallUIKitConfig()
-      NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
+    let uiConfig = NECallUIKitConfig()
+    NERtcCallUIKit.sharedInstance().setup(with: uiConfig)
 
+    // PushKit 需要持有 registry，避免初始化方法返回后停止接收来电推送。
+    if voipPushRegistry == nil {
       let pushRegistry = PKPushRegistry(queue: DispatchQueue.global())
       pushRegistry.delegate = self
       pushRegistry.desiredPushTypes = [PKPushType.voIP]
+      voipPushRegistry = pushRegistry
+    }
+
+    // 注册呼叫路由，ChatViewController 的 CallViewRouter 入口依赖此处理器。
+    Router.shared.register(CallViewRouter) { param in
+      if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
+        UIApplication.shared.keyWindow?.neMakeToast(commonLocalizable("network_error"), duration: 2, position: .center)
+        return
+      }
+
+      let callParam = NEUICallParam()
+      callParam.remoteUserAccid = param["remoteUserAccid"] as? String ?? ""
+      callParam.remoteShowName = param["remoteShowName"] as? String ?? ""
+      callParam.remoteAvatar = param["remoteAvatar"] as? String ?? ""
+      callParam.callType = (param["type"] as? NSNumber)?.intValue == 1 ? .audio : .video
+      NERtcCallUIKit.sharedInstance().call(with: callParam)
     }
   }
 
@@ -178,6 +212,7 @@ class SceneDelegate: UIResponder {
   func loadService() {
     // 注册路由
     ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
+    DemoStickerConfig.registerPackages()
     registerMapFallbackRouter()
     if NEStyleManager.instance.isNormalStyle() == false {
       registerFunCustom()

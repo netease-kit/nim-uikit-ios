@@ -172,7 +172,8 @@ open class BotSubSessionListViewModel: NSObject, NETopicListener, NEChatListener
     }
     let key = keyword.lowercased()
     displayTopicList = sortedTopics(topicList.filter { topic in
-      topicDisplayName(topic).lowercased().contains(key)
+      let name = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      return name.lowercased().contains(key)
     })
   }
 
@@ -257,37 +258,34 @@ open class BotSubSessionListViewModel: NSObject, NETopicListener, NEChatListener
         loadNext()
       }
 
-      func loadTopicSummary() {
-        let option = V2NIMTopicMessageListOption()
-        option.topic = topic
-        option.limit = 1
-        option.direction = .QUERY_DIRECTION_DESC
-        option.sortOrder = .SORT_ORDER_DESC
-        topicRepo.getTopicMessageList(option) { [weak self] result, _ in
-          guard let self,
-                currentVersion == self.summaryRequestVersion else {
-            return
-          }
-          applySummary(self.latestMessage(from: result?.replyList))
-        }
-      }
-
       guard let messageRefer = messageRefer(for: topic) else {
-        loadTopicSummary()
+        NEALog.errorLog(
+          ModuleName + " " + className(),
+          desc: #function + ", invalid root message refer, topicId: \(topic.topicId)"
+        )
+        applySummary(nil)
         return
       }
 
-      chatRepo.getLocalThreadMessageList(messageRefer: messageRefer) { [weak self] result, _ in
+      chatRepo.getLocalThreadMessageList(messageRefer: messageRefer) { [weak self] result, error in
         guard let self,
               currentVersion == self.summaryRequestVersion else {
           return
         }
-
-        if let localReplies = result?.replyList, !localReplies.isEmpty {
-          applySummary(self.latestMessage(from: localReplies))
-        } else {
-          loadTopicSummary()
+        if let error {
+          NEALog.errorLog(
+            ModuleName + " " + className(),
+            desc: #function + ", topicId: \(topic.topicId), error: \(error)"
+          )
+          applySummary(nil)
+          return
         }
+
+        var localMessages = result?.replyList ?? []
+        if let rootMessage = result?.message {
+          localMessages.append(rootMessage)
+        }
+        applySummary(self.latestMessage(from: localMessages))
       }
     }
 
@@ -324,17 +322,40 @@ open class BotSubSessionListViewModel: NSObject, NETopicListener, NEChatListener
   private func messageRefer(for topic: V2NIMTopic) -> V2NIMMessageRefer? {
     guard let messageClientId = topic.messageClientId,
           !messageClientId.isEmpty,
-          let conversationId = topic.conversationId,
-          !conversationId.isEmpty else {
+          let messageServerId = topic.messageServerId,
+          !messageServerId.isEmpty else {
+      return nil
+    }
+
+    let referConversationId = topic.conversationId.flatMap { $0.isEmpty ? nil : $0 } ?? conversationId
+    let conversationType = V2NIMConversationIdUtil.conversationType(referConversationId)
+    guard !referConversationId.isEmpty,
+          conversationType != .CONVERSATION_TYPE_UNKNOWN,
+          let senderId = conversationSenderId(referConversationId),
+          !senderId.isEmpty,
+          let receiverId = V2NIMConversationIdUtil.conversationTargetId(referConversationId),
+          !receiverId.isEmpty,
+          topic.messageTime > 0 else {
       return nil
     }
 
     let messageRefer = V2NIMMessageRefer()
     messageRefer.messageClientId = messageClientId
-    messageRefer.messageServerId = topic.messageServerId
-    messageRefer.conversationId = conversationId
-    messageRefer.conversationType = V2NIMConversationIdUtil.conversationType(conversationId)
+    messageRefer.messageServerId = messageServerId
+    messageRefer.conversationId = referConversationId
+    messageRefer.conversationType = conversationType
+    messageRefer.senderId = senderId
+    messageRefer.receiverId = receiverId
+    messageRefer.createTime = normalizedTimestamp(TimeInterval(topic.messageTime))
     return messageRefer
+  }
+
+  private func conversationSenderId(_ conversationId: String) -> String? {
+    let parts = conversationId.split(separator: "|", omittingEmptySubsequences: false)
+    guard parts.count == 3 else {
+      return nil
+    }
+    return String(parts[0])
   }
 
   private func collectTopicIds(from messages: [V2NIMMessage]) -> Set<UInt64> {
@@ -392,38 +413,11 @@ open class BotSubSessionListViewModel: NSObject, NETopicListener, NEChatListener
   }
 
   open func topicDisplayName(_ topic: V2NIMTopic) -> String {
-    if let name = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines),
-       !name.isEmpty {
-      return name
-    }
-    return chatLocalizable("bot_sub_session_new_conversation")
+    topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
   }
 
   private func summaryBaseText(for message: V2NIMMessage) -> String {
-    if message.messageType == .MESSAGE_TYPE_TEXT {
-      return message.text ?? ""
-    }
-
-    switch message.messageType {
-    case .MESSAGE_TYPE_IMAGE:
-      return chatLocalizable("msg_image")
-    case .MESSAGE_TYPE_AUDIO:
-      return chatLocalizable("msg_audio")
-    case .MESSAGE_TYPE_VIDEO:
-      return chatLocalizable("msg_video")
-    case .MESSAGE_TYPE_FILE:
-      if let fileAttachment = message.attachment as? V2NIMMessageFileAttachment,
-         !fileAttachment.name.isEmpty {
-        let name = fileAttachment.name
-        return "\(chatLocalizable("msg_file")) \(name)"
-      }
-      return chatLocalizable("msg_file")
-    case .MESSAGE_TYPE_LOCATION:
-      return chatLocalizable("msg_location")
-    default:
-      let text = ChatMessageHelper.contentOfMessage(message)
-      return text.isEmpty ? (message.text ?? chatLocalizable("msg_unknown")) : text
-    }
+    ChatMessageHelper.conversationListSummary(message)
   }
 
   open func markTopicRead(_ topic: V2NIMTopic?) {

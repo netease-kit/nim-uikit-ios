@@ -94,7 +94,7 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
   }()
 
   public lazy var searchTextField: SearchTextField = {
-    let textField = SearchTextField()
+    let textField = NESingleLineSearchTextField()
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.delegate = self
     textField.placeholder = chatLocalizable("bot_sub_session_search_hint")
@@ -467,6 +467,7 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
   }
 }
 
+@objcMembers
 open class BotSubSessionListCell: UITableViewCell {
   private var timeWidth: NSLayoutConstraint?
   private let iconContainerView = UIView()
@@ -578,16 +579,13 @@ open class BotSubSessionListCell: UITableViewCell {
                       highlightColor: UIColor = .ne_normalTheme) {
     let topic = item.topic
     let title: String
-    if let name = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines),
-       !name.isEmpty {
-      title = name
-    } else {
-      title = chatLocalizable("bot_sub_session_new_conversation")
-    }
+    title = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     titleLabel.attributedText = highlightedTitle(title,
                                                  keyword: keyword,
                                                  highlightColor: highlightColor)
-    summaryLabel.text = item.summary ?? ""
+    let summary = item.summary ?? ""
+    summaryLabel.text = summary
+    summaryLabel.isHidden = summary.isEmpty
     timeLabel.text = String.stringFromTimeInterval(time: TimeInterval(item.updateTime))
     if let text = timeLabel.text {
       let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
@@ -619,6 +617,7 @@ open class BotSubSessionListCell: UITableViewCell {
   }
 }
 
+@objcMembers
 open class BotSubSessionActionSheetController: UIViewController, UIGestureRecognizerDelegate {
   public let topicTitle: String
   public var onRename: (() -> Void)?
@@ -767,13 +766,14 @@ open class BotSubSessionActionSheetController: UIViewController, UIGestureRecogn
   }
 }
 
+@objcMembers
 open class BotSubSessionRenameDialogController: UIViewController, UITextFieldDelegate {
   public let initialName: String
   public let saveButtonBackgroundColor: UIColor
   public var onSave: ((String) -> Void)?
 
   private let contentView = UIView()
-  private let nameField = UITextField()
+  private let nameField = NESingleLineTextField()
 
   public init(name: String, saveButtonBackgroundColor: UIColor = NEConstant.hexRGB(0x337EFF)) {
     initialName = name
@@ -920,6 +920,7 @@ open class BotSubSessionRenameDialogController: UIViewController, UITextFieldDel
   }
 }
 
+@objcMembers
 open class BotSubSessionDeleteDialogController: UIViewController {
   public var onDelete: (() -> Void)?
   public let dialogTitle: String

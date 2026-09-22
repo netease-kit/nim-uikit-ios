@@ -125,6 +125,12 @@ open class ChatMessageAIStreamTextCell: ChatMessageTextCell {
       regenStreamButton.isHidden = model.message?.threadReply?.senderId != IMKitClient.instance.account() ||
         model.message?.aiConfig == nil ||
         model.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING
+      // Topic replies are robot sub-session output. The triggering user is
+      // stored in threadReply, but that must not expose the normal-chat
+      // regenerate action on the robot message.
+      if model.message?.topicRefer != nil {
+        regenStreamButton.isHidden = true
+      }
     }
 
     if singleLeft {

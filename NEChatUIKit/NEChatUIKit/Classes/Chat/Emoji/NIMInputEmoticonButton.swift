@@ -11,6 +11,7 @@ public protocol NIMInputEmoticonButtonDelegate: NSObjectProtocol {
   func selectedEmoticon(emotion: NIMInputEmoticon, catalogID: String)
 }
 
+@objcMembers
 open class NIMInputEmoticonButton: UIButton {
   public var emotionData: NIMInputEmoticon?
   public var catalogID: String?

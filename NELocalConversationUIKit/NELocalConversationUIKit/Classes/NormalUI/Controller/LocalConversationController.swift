@@ -136,8 +136,8 @@ open class LocalConversationController: NEBaseLocalConversationController {
     }
   }
 
-  override open func reloadTableView() {
-    super.reloadTableView()
+  override open func renderConversationList() {
+    super.renderConversationList()
     setupNormalStickTopView()
   }
 

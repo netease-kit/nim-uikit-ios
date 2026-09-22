@@ -69,6 +69,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     NotificationCenter.default.addObserver(self, selector: #selector(atMessageChange), name: Notification.Name(AtMessageChangeNoti), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(deleteConversationNoti), name: NENotificationName.deleteConversationNotificationName, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(robotDidRemove), name: NEAIRobotManager.robotDidRemoveNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(robotDisplayInfoDidChange), name: NEAIRobotManager.robotDisplayInfoDidChangeNotification, object: nil)
     conversationRepo.addConversationListener(self)
     ChatRepo.shared.addChatListener(self)
     TeamRepo.shared.addTeamListener(self)
@@ -122,6 +123,18 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       guard let self, self.conversationDic[conversationId] != nil else {
         return
       }
+      self.delegate?.reloadTableView()
+    }
+  }
+
+  @objc
+  private func robotDisplayInfoDidChange(_ notification: Notification) {
+    guard let accountIds = notification.object as? [String] else { return }
+    executeOnMain { [weak self] in
+      guard let self, accountIds.contains(where: { accountId in
+        guard let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) else { return false }
+        return self.conversationDic[conversationId] != nil
+      }) else { return }
       self.delegate?.reloadTableView()
     }
   }

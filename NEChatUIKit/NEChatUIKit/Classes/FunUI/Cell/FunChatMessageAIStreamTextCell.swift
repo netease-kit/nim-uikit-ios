@@ -125,6 +125,9 @@ open class FunChatMessageAIStreamTextCell: FunChatMessageTextCell {
       regenStreamButton.isHidden = model.message?.threadReply?.senderId != IMKitClient.instance.account() ||
         model.message?.aiConfig == nil ||
         model.message?.aiConfig?.aiStreamStatus == .MESSAGE_AI_STREAM_STATUS_STREAMING
+      if model.message?.topicRefer != nil {
+        regenStreamButton.isHidden = true
+      }
     }
 
     if singleLeft {

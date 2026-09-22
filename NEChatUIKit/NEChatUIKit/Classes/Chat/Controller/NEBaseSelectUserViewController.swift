@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import NIMSDK
 import UIKit
 
@@ -11,17 +12,62 @@ public typealias DidSelectedAtRow = (_ index: Int, _ model: NETeamMemberInfoMode
 
 @objcMembers
 open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableViewDelegate,
-  UITableViewDataSource {
+  UITableViewDataSource, UITextFieldDelegate {
   public var tableView = UITableView(frame: .zero, style: .plain)
   public var conversationId: String
   public var viewModel = TeamMemberSelectVM()
   public var selectedBlock: DidSelectedAtRow?
+  public var allMembers = [NETeamMemberInfoModel]()
+  public var visibleMembers = [NETeamMemberInfoModel]()
+  public var aiAccountIds = Set<String>()
+  public var searchKeyword = ""
+  public private(set) var isLoadingMembers = false
+  public private(set) var memberLoadError: NSError?
   var teamInfo: NETeamInfoModel?
+  private var loadGeneration = UUID()
+  private var searchableTeamMemberAccountIds = Set<String>()
+  private var renderedAccountIds = [String?]()
+  private var searchStartPosition: (accountId: String, relativeY: CGFloat, contentOffsetX: CGFloat)?
   //// 是否展示自己
   private var showSelf = true
   private var showTeamMembers: Bool = false
   var logClassName = "SelectUserViewController"
   var isShowAtAll = true
+
+  open var searchIconName: String { "textField_search_icon" }
+  open var searchFieldBackgroundColor: UIColor { UIColor(hexString: "#F2F4F5") }
+  open var searchFieldTextColor: UIColor { .ne_darkText }
+  open var searchFieldFont: UIFont { .systemFont(ofSize: 14) }
+  open var searchFieldCornerRadius: CGFloat { 4 }
+  open var searchFieldHorizontalInset: CGFloat { 20 }
+  open var searchFieldHeight: CGFloat { 32 }
+  open var searchEmptyImageName: String { "user_empty" }
+  open var memberLoadStatusTintColor: UIColor { .ne_normalTheme }
+
+  public lazy var searchTextField: SearchTextField = {
+    let textField = NESingleLineSearchTextField()
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    textField.leftView = UIImageView(image: coreLoader.loadImage(searchIconName))
+    textField.leftViewMode = .always
+    textField.placeholder = chatLocalizable("user_search_placeholder")
+    textField.font = searchFieldFont
+    textField.textColor = searchFieldTextColor
+    textField.backgroundColor = searchFieldBackgroundColor
+    textField.layer.cornerRadius = searchFieldCornerRadius
+    textField.clearButtonMode = .whileEditing
+    textField.returnKeyType = .search
+    textField.delegate = self
+    textField.accessibilityIdentifier = "id.search"
+    textField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
+    if let clearButton = textField.value(forKey: "_clearButton") as? UIButton {
+      clearButton.accessibilityIdentifier = "id.clear"
+    }
+    return textField
+  }()
+
+  public var isSearching: Bool {
+    !searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
 
   public init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
     self.conversationId = conversationId
@@ -77,6 +123,26 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       label.heightAnchor.constraint(equalToConstant: 50),
     ])
 
+    var listTopAnchor = label.bottomAnchor
+    var listTopSpacing: CGFloat = 0
+    if showTeamMembers {
+      view.addSubview(searchTextField)
+      NSLayoutConstraint.activate([
+        searchTextField.leadingAnchor.constraint(
+          equalTo: view.leadingAnchor,
+          constant: searchFieldHorizontalInset
+        ),
+        searchTextField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8),
+        searchTextField.trailingAnchor.constraint(
+          equalTo: view.trailingAnchor,
+          constant: -searchFieldHorizontalInset
+        ),
+        searchTextField.heightAnchor.constraint(equalToConstant: searchFieldHeight),
+      ])
+      listTopAnchor = searchTextField.bottomAnchor
+      listTopSpacing = 8
+    }
+
     /// 内容列表
     tableView.delegate = self
     tableView.dataSource = self
@@ -97,10 +163,20 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     view.addSubview(tableView)
     NSLayoutConstraint.activate([
       tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      tableView.topAnchor.constraint(equalTo: label.bottomAnchor),
+      tableView.topAnchor.constraint(equalTo: listTopAnchor, constant: listTopSpacing),
       tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       tableView.bottomAnchor
         .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+    ])
+
+    emptyView.setEmptyImage(name: searchEmptyImageName)
+    emptyView.setText(chatLocalizable("user_search_empty"))
+    view.addSubview(emptyView)
+    NSLayoutConstraint.activate([
+      emptyView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
+      emptyView.topAnchor.constraint(equalTo: tableView.topAnchor),
+      emptyView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
+      emptyView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor),
     ])
   }
 
@@ -115,13 +191,16 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
         return teamMember
       }
     }
+    aiAccountIds = Set(aiUserMembers.compactMap { $0.nimUser?.user?.accountId })
 
     if !showTeamMembers {
       let team = NETeamInfoModel()
       team.users = aiUserMembers
       teamInfo = team
+      allMembers = aiUserMembers
+      visibleMembers = aiUserMembers
       isShowAtAll = false
-      tableView.reloadData()
+      reloadSearchResults()
       return
     }
 
@@ -130,93 +209,281 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       return
     }
 
+    let generation = UUID()
+    loadGeneration = generation
+    isLoadingMembers = true
+    memberLoadError = nil
+    if allMembers.isEmpty {
+      allMembers = aiUserMembers
+      visibleMembers = aiUserMembers
+    }
+    reloadSearchResults()
+
     // 获取群成员列表
     NEALog.infoLog(className() + " [Performance]", desc: #function + " start, timestamp: \(Date().timeIntervalSince1970)")
-    viewModel.getTeamMembers(teamId) { [weak self] error, team in
+    viewModel.getTeamMembers(
+      teamId,
+      progress: { [weak self] progress in
+        guard let self,
+              self.loadGeneration == generation,
+              progress.teamId == teamId else { return }
+        self.isLoadingMembers = progress.phase == .loading
+        self.memberLoadError = progress.error
+        if progress.phase == .loading || progress.phase == .finished {
+          self.applyLoadedMembers(
+            progress.members,
+            team: NETeamUserManager.shared.getTeamInfo(),
+            aiMembers: aiUserMembers
+          )
+        } else {
+          self.reloadSearchResults()
+          if let error = progress.error {
+            self.view.neMakeToast(error.localizedDescription)
+          }
+        }
+      }
+    ) { [weak self] error, team in
+      guard let self, self.loadGeneration == generation else { return }
       NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       NEALog.infoLog(
-        ModuleName + " " + (self?.logClassName ?? "SelectUserViewController"),
+        ModuleName + " " + self.logClassName,
         desc: "CALLBACK fetchTeamMembers " + (error?.localizedDescription ?? "no error")
       )
       if error != nil {
-        self?.view.neMakeToast(error?.localizedDescription)
+        self.view.neMakeToast(error?.localizedDescription)
         return
       }
-
-      // 人员选择页面移除自己
-      var selfIndex = -1
-      if !(self?.showSelf ?? true), let users = team?.users {
-        for (index, user) in users.enumerated() {
-          if user.nimUser?.user?.accountId == IMKitClient.instance.account() {
-            if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
-               let custom = team?.team?.serverExtension, !custom.isEmpty,
-               let json = getDictionaryFromJSONString(custom),
-               let atValue = json[keyAllowAtAll] as? String, atValue == allowAtManagerValue {
-              self?.isShowAtAll = false
-            }
-            selfIndex = index
-          }
-        }
-        if selfIndex >= 0 {
-          team?.users.remove(at: selfIndex)
-        }
+      guard let team else {
+        self.isLoadingMembers = false
+        self.reloadSearchResults()
+        return
       }
-
-      // 根据身份+进群时间正序排序
-      if let users = team?.users {
-        var owner: NETeamMemberInfoModel? // 群主
-        var managers = [NETeamMemberInfoModel]() // 管理员
-        var normals = [NETeamMemberInfoModel]() // 普通成员
-
-        for user in users {
-          if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_OWNER {
-            owner = user
-          } else if user.teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
-            managers.append(user)
-          } else {
-            normals.append(user)
-          }
-        }
-
-        managers.sort(by: { m1, m2 in
-          (m1.teamMember?.joinTime ?? 0) < (m2.teamMember?.joinTime ?? 0)
-        })
-
-        normals.sort(by: { m1, m2 in
-          (m1.teamMember?.joinTime ?? 0) < (m2.teamMember?.joinTime ?? 0)
-        })
-
-        // 管理员列表过滤重复的数字人
-        managers = managers.filter { member in
-          if aiUserMembers.contains(where: { $0.nimUser?.user?.accountId == member.nimUser?.user?.accountId
-          }) {
-            return false
-          } else {
-            return true
-          }
-        }
-
-        // 普通成员列表过滤重复的数字人
-        normals = normals.filter { member in
-          if aiUserMembers.contains(where: { $0.nimUser?.user?.accountId == member.nimUser?.user?.accountId
-          }) {
-            return false
-          } else {
-            return true
-          }
-        }
-
-        if let owner = owner {
-          team?.users = aiUserMembers + [owner] + managers + normals
-        } else {
-          team?.users = aiUserMembers + managers + normals
-        }
-      }
-
-      self?.teamInfo = team
+      self.isLoadingMembers = false
+      self.memberLoadError = nil
       NEALog.infoLog(NEBaseSelectUserViewController.className() + " [Performance]", desc: #function + " reload @ tableview, timestamp: \(Date().timeIntervalSince1970)")
-      self?.tableView.reloadData()
+      self.applyLoadedMembers(team.users, team: team.team, aiMembers: aiUserMembers)
     }
+  }
+
+  private func applyLoadedMembers(_ members: [NETeamMemberInfoModel],
+                                  team: V2NIMTeam?,
+                                  aiMembers: [NETeamMemberInfoModel]) {
+    var filteredMembers = [NETeamMemberInfoModel]()
+    var memberByAccountId = [String: NETeamMemberInfoModel]()
+    for member in members {
+      let accountId = member.teamMember?.accountId ?? member.nimUser?.user?.accountId
+      guard let accountId, !accountId.isEmpty else { continue }
+      if !showSelf, accountId == IMKitClient.instance.account() {
+        if member.teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL,
+           let custom = team?.serverExtension,
+           let json = getDictionaryFromJSONString(custom),
+           let atValue = json[keyAllowAtAll] as? String,
+           atValue == allowAtManagerValue {
+          isShowAtAll = false
+        }
+        continue
+      }
+      memberByAccountId[accountId] = member
+      guard !aiAccountIds.contains(accountId) else { continue }
+      filteredMembers.append(member)
+    }
+
+    searchableTeamMemberAccountIds = Set(memberByAccountId.keys)
+    let displayAIMembers = aiMembers.map { aiMember -> NETeamMemberInfoModel in
+      aiMember.teamMember = nil
+      aiMember.nimUser?.friend = nil
+      if let accountId = aiMember.nimUser?.user?.accountId,
+         let teamMember = memberByAccountId[accountId] {
+        aiMember.teamMember = teamMember.teamMember
+        aiMember.nimUser?.friend = teamMember.nimUser?.friend
+      }
+      return aiMember
+    }
+
+    let snapshot = NETeamInfoModel()
+    snapshot.team = team
+    snapshot.users = displayAIMembers + filteredMembers
+    teamInfo = snapshot
+    allMembers = snapshot.users
+    applySearch()
+  }
+
+  public func searchTextChanged(textField: SearchTextField) {
+    let nextKeyword = textField.text ?? ""
+    let previousKeyword = searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+    let normalizedKeyword = nextKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+    let wasSearching = isSearching
+    let willSearch = !normalizedKeyword.isEmpty
+    if !wasSearching, willSearch {
+      searchStartPosition = currentScrollPosition()
+    }
+    searchKeyword = nextKeyword
+    applySearch()
+    if willSearch, previousKeyword != normalizedKeyword {
+      scrollSearchResultsToTop()
+    }
+  }
+
+  public func applySearch() {
+    let normalizedKeyword = searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+    searchTextField.clearButtonMode = normalizedKeyword.isEmpty ? .never : .whileEditing
+    guard !normalizedKeyword.isEmpty else {
+      visibleMembers = allMembers
+      reloadSearchResults()
+      restoreSearchStartPositionIfNeeded()
+      return
+    }
+
+    visibleMembers = allMembers.filter { member in
+      let accountId = member.teamMember?.accountId ?? member.nimUser?.user?.accountId
+      guard let accountId, !accountId.isEmpty,
+            !aiAccountIds.contains(accountId) || searchableTeamMemberAccountIds.contains(accountId) else {
+        return false
+      }
+      return searchResult(for: member) != nil
+    }
+    reloadSearchResults()
+  }
+
+  public func searchResult(for member: NETeamMemberInfoModel) -> NETeamMemberSearchResult? {
+    guard isSearching else {
+      return nil
+    }
+    return NETeamMemberSearchMatcher.result(
+      keyword: searchKeyword,
+      teamNick: member.teamMember?.teamNick,
+      friendAlias: member.nimUser?.friend?.alias,
+      userNickname: member.nimUser?.user?.name,
+      accountId: member.nimUser?.user?.accountId ?? member.teamMember?.accountId
+    )
+  }
+
+  open func textFieldShouldClear(_ textField: UITextField) -> Bool {
+    searchKeyword = ""
+    applySearch()
+    textField.resignFirstResponder()
+    return true
+  }
+
+  private func reloadSearchResults() {
+    reloadPreservingTopMember()
+    updateMemberLoadStatus()
+    emptyView.isHidden = !isSearching || !visibleMembers.isEmpty || isLoadingMembers || memberLoadError != nil
+  }
+
+  private func scrollSearchResultsToTop() {
+    tableView.layoutIfNeeded()
+    tableView.setContentOffset(
+      CGPoint(x: tableView.contentOffset.x, y: -tableView.adjustedContentInset.top),
+      animated: false
+    )
+  }
+
+  private func reloadPreservingTopMember() {
+    let visibleAnchor = tableView.indexPathsForVisibleRows?
+      .sorted()
+      .first(where: { $0.section == 1 })
+    let reloadAnchor = visibleAnchor.flatMap { indexPath -> (String, CGFloat)? in
+      guard renderedAccountIds.indices.contains(indexPath.row),
+            let accountId = renderedAccountIds[indexPath.row] else {
+        return nil
+      }
+      let relativeY = tableView.rectForRow(at: indexPath).minY - tableView.contentOffset.y
+      return (accountId, relativeY)
+    }
+    let nextRenderedAccountIds = visibleMembers.map {
+      $0.teamMember?.accountId ?? $0.nimUser?.user?.accountId
+    }
+
+    UIView.performWithoutAnimation {
+      tableView.reloadData()
+      tableView.layoutIfNeeded()
+    }
+    renderedAccountIds = nextRenderedAccountIds
+
+    guard let reloadAnchor,
+          let row = visibleMembers.firstIndex(where: {
+            ($0.teamMember?.accountId ?? $0.nimUser?.user?.accountId) == reloadAnchor.0
+          }) else {
+      return
+    }
+    let rect = tableView.rectForRow(at: IndexPath(row: row, section: 1))
+    let minimumY = -tableView.adjustedContentInset.top
+    let maximumY = max(
+      minimumY,
+      tableView.contentSize.height - tableView.bounds.height + tableView.adjustedContentInset.bottom
+    )
+    let targetY = min(max(rect.minY - reloadAnchor.1, minimumY), maximumY)
+    tableView.setContentOffset(CGPoint(x: tableView.contentOffset.x, y: targetY), animated: false)
+  }
+
+  private func currentScrollPosition() -> (accountId: String, relativeY: CGFloat, contentOffsetX: CGFloat)? {
+    guard let indexPath = tableView.indexPathsForVisibleRows?
+      .sorted()
+      .first(where: { $0.section == 1 }),
+      renderedAccountIds.indices.contains(indexPath.row),
+      let accountId = renderedAccountIds[indexPath.row] else {
+      return nil
+    }
+    let relativeY = tableView.rectForRow(at: indexPath).minY - tableView.contentOffset.y
+    return (accountId, relativeY, tableView.contentOffset.x)
+  }
+
+  private func restoreSearchStartPositionIfNeeded() {
+    guard let position = searchStartPosition else {
+      return
+    }
+    defer { searchStartPosition = nil }
+    guard let row = visibleMembers.firstIndex(where: {
+      ($0.teamMember?.accountId ?? $0.nimUser?.user?.accountId) == position.accountId
+    }) else {
+      return
+    }
+    let rect = tableView.rectForRow(at: IndexPath(row: row, section: 1))
+    let minimumY = -tableView.adjustedContentInset.top
+    let maximumY = max(
+      minimumY,
+      tableView.contentSize.height - tableView.bounds.height + tableView.adjustedContentInset.bottom
+    )
+    let targetY = min(max(rect.minY - position.relativeY, minimumY), maximumY)
+    tableView.setContentOffset(CGPoint(x: position.contentOffsetX, y: targetY), animated: false)
+  }
+
+  private func updateMemberLoadStatus() {
+    guard showTeamMembers else {
+      tableView.tableFooterView = UIView()
+      return
+    }
+    if isLoadingMembers {
+      let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 44))
+      let indicator = UIActivityIndicatorView(style: .medium)
+      indicator.color = memberLoadStatusTintColor
+      indicator.center = CGPoint(x: footer.bounds.midX, y: footer.bounds.midY)
+      indicator.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
+      indicator.startAnimating()
+      footer.addSubview(indicator)
+      tableView.tableFooterView = footer
+    } else if let error = memberLoadError {
+      let footer = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 52))
+      let button = UIButton(type: .system)
+      button.frame = footer.bounds
+      button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      button.tintColor = memberLoadStatusTintColor
+      button.setTitleColor(memberLoadStatusTintColor, for: .normal)
+      button.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
+      button.setTitle(error.localizedDescription, for: .normal)
+      button.titleLabel?.font = .systemFont(ofSize: 14)
+      button.titleLabel?.numberOfLines = 2
+      button.addTarget(self, action: #selector(retryMemberLoad), for: .touchUpInside)
+      footer.addSubview(button)
+      tableView.tableFooterView = footer
+    } else {
+      tableView.tableFooterView = UIView()
+    }
+  }
+
+  @objc private func retryMemberLoad() {
+    loadData()
   }
 
   open func numberOfSections(in tableView: UITableView) -> Int {
@@ -225,12 +492,9 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if section == 0 {
-      return isShowAtAll ? 1 : 0
+      return isShowAtAll && !isSearching ? 1 : 0
     }
-    if let count = teamInfo?.users.count {
-      return count
-    }
-    return 0
+    return visibleMembers.count
   }
 
   open func tableView(_ tableView: UITableView,
@@ -246,8 +510,11 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
       dismiss(animated: true, completion: nil)
       return
     }
+    guard visibleMembers.indices.contains(indexPath.row) else {
+      return
+    }
     if let block = selectedBlock {
-      block(indexPath.row, teamInfo?.users[indexPath.row])
+      block(indexPath.row, visibleMembers[indexPath.row])
     }
     dismiss(animated: true, completion: nil)
   }

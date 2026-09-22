@@ -21,6 +21,9 @@ open class MessageTextModel: MessageContentModel {
   /// 译文区域是否可见（用户手动隐藏后为 false）
   public var translationVisible: Bool = true
 
+  /// 最近一次翻译请求失败，显示内联重试提示。
+  public var translationFailed: Bool = false
+
   /// 当前已加入 height 的译文高度（用于还原），0 表示尚未加入
   public var addedTranslationHeight: CGFloat = 0
 
@@ -30,7 +33,11 @@ open class MessageTextModel: MessageContentModel {
   /// 估算译文气泡高度（Normal 皮肤内嵌用）
   /// 布局：dividerTop(8) + divider(0.5) + textTop(8) + textBlock + gap(6) + footer(20) + containerBottom(chat_content_margin)
   public func estimateTranslationBubbleHeight() -> CGFloat {
-    guard let text = translationInfo?.translatedText, !text.isEmpty, translationVisible else { return 0 }
+    guard translationVisible else { return 0 }
+    let text = translationFailed
+      ? chatLocalizable("chat_translate_failed_retry")
+      : (translationInfo?.translatedText ?? "")
+    guard !text.isEmpty else { return 0 }
     let maxWidth = chat_content_maxW - chat_content_margin * 2
     let textSize = (text as NSString).boundingRect(
       with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
@@ -56,7 +63,11 @@ open class MessageTextModel: MessageContentModel {
 
   /// 估算译文文本宽度（用于气泡宽度扩展，同时保证 footer 不被裁切）
   public func estimateTranslationTextWidth() -> CGFloat {
-    guard let text = translationInfo?.translatedText, !text.isEmpty, translationVisible else { return 0 }
+    guard translationVisible else { return 0 }
+    let text = translationFailed
+      ? chatLocalizable("chat_translate_failed_retry")
+      : (translationInfo?.translatedText ?? "")
+    guard !text.isEmpty else { return 0 }
     let maxWidth = chat_content_maxW - chat_content_margin * 2
     let textSize = (text as NSString).boundingRect(
       with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
@@ -74,6 +85,7 @@ open class MessageTextModel: MessageContentModel {
     messageText = message?.text
     // 初始化时从 localExtension 解析翻译缓存（仅解析一次）
     translationInfo = TranslationInfo.parse(from: message?.localExtension)
+    translationFailed = false
     resetMessage(message)
   }
 
@@ -97,6 +109,8 @@ open class MessageTextModel: MessageContentModel {
       }
     }
 
+    // 消息内容被 SDK 更新后，旧的失败状态不应继续显示。
+    translationFailed = false
     resetHeight()
   }
 

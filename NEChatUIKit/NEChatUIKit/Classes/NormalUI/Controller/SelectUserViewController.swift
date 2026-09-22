@@ -8,6 +8,15 @@ import UIKit
 
 @objcMembers
 open class SelectUserViewController: NEBaseSelectUserViewController {
+  override open var searchIconName: String { "textField_search_icon" }
+  override open var searchFieldBackgroundColor: UIColor { UIColor(hexString: "#F2F4F5") }
+  override open var searchFieldTextColor: UIColor { .ne_darkText }
+  override open var searchFieldFont: UIFont { .systemFont(ofSize: 14) }
+  override open var searchFieldCornerRadius: CGFloat { 4 }
+  override open var searchFieldHorizontalInset: CGFloat { 20 }
+  override open var searchFieldHeight: CGFloat { 32 }
+  override open var searchEmptyImageName: String { "user_empty" }
+
   override public init(conversationId: String, showSelf: Bool = true, showTeamMembers: Bool = false) {
     super.init(conversationId: conversationId, showSelf: showSelf, showTeamMembers: showTeamMembers)
     logClassName = "SelectUserViewController"
@@ -34,12 +43,13 @@ open class SelectUserViewController: NEBaseSelectUserViewController {
       for: indexPath
     ) as! ChatTeamMemberCell
     if indexPath.section == 0 {
-      cell.headerView.image = UIImage.ne_imageNamed(name: "chat_at_all")
-      cell.nameLabel.text = chatLocalizable("user_select_all")
+      cell.configureAll(
+        title: chatLocalizable("user_select_all"),
+        image: UIImage.ne_imageNamed(name: "chat_at_all")
+      )
     } else {
-      if let model = teamInfo?.users[indexPath.row] {
-        cell.configure(model)
-      }
+      let member = visibleMembers[indexPath.row]
+      cell.configure(member, searchResult: searchResult(for: member))
     }
     return cell
   }

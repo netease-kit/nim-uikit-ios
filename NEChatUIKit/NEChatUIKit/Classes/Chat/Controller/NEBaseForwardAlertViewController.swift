@@ -147,7 +147,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
 
   /// 留言
   public lazy var commentTextFeild: UITextField = {
-    let textFeild = UITextField()
+    let textFeild = NESingleLineTextField()
     textFeild.translatesAutoresizingMaskIntoConstraints = false
     textFeild.placeholder = chatLocalizable("leave_message")
     textFeild.layer.cornerRadius = 4

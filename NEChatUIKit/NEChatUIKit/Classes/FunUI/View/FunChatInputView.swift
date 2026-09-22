@@ -19,6 +19,10 @@ public protocol FunChatInputViewDelegate: NSObjectProtocol {
 
 @objcMembers
 open class FunChatInputView: NEBaseChatInputView {
+  override open var emoticonThemeColor: UIColor {
+    .ne_funTheme
+  }
+
   var replyViewTopConstraint: NSLayoutConstraint?
 
   weak var funDelegate: FunChatInputViewDelegate?
@@ -106,7 +110,7 @@ open class FunChatInputView: NEBaseChatInputView {
       label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
       label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
     ])
-    label.text = chatLocalizable("fun_hold_to_talk")
+    label.text = chatLocalizable("chat_hold_to_talk")
 
     return view
   }()
