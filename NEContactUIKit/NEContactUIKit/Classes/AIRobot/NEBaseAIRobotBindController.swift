@@ -265,7 +265,7 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
 
   // MARK: - 子类 override 点
 
-  open func pageBackgroundColor() -> UIColor { .funContactNavigationBackgroundColor }
+  open func pageBackgroundColor() -> UIColor { .normalContactNavigationBackgroundColor }
   open func createBotHorizontalMargin() -> CGFloat { 0 }
   open func createBotRowHeight() -> CGFloat { 60 }
   open func bindRowHeight() -> CGFloat { 60 }

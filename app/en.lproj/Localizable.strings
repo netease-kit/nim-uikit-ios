@@ -31,7 +31,6 @@
 "complete"="Complete";
 "save"="Save";
 "message_remind"="Notification";
-"style_selection"="Skin";
 "app_language"="Language";
 "app_language_zh"="中文";
 "app_language_en"="English";
@@ -65,10 +64,6 @@
 "restart"="OK";
 "exit"="Exit";
 "text_count_limit"="limit %d characters";
-
-// style
-"style_default"="Base Skin";
-"style_fun"="Common Skin";
 
 "mine_collection"="Collection";
 

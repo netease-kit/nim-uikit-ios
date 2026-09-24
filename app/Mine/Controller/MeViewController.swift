@@ -247,13 +247,8 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
         let ctrl = MineSettingViewController()
         navigationController?.pushViewController(ctrl, animated: true)
       } else if indexPath.row == 1 {
-        if NEStyleManager.instance.isNormalStyle() == true {
-          let collectionCtrl = CollectionMessageController()
-          navigationController?.pushViewController(collectionCtrl, animated: true)
-        } else {
-          let collectionCtrl = FunCollectionMessageController()
-          navigationController?.pushViewController(collectionCtrl, animated: true)
-        }
+        let collectionCtrl = CollectionMessageController()
+        navigationController?.pushViewController(collectionCtrl, animated: true)
       } else if indexPath.row == 2 {
         let ctrl = IntroduceBrandViewController()
         navigationController?.pushViewController(ctrl, animated: true)

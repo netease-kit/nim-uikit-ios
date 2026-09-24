@@ -69,7 +69,7 @@ final class NEConversationGroupBar: UIView, UICollectionViewDataSource, UICollec
   }
 
   private func backgroundColor(for style: NEConversationGroupUIStyle) -> UIColor {
-    style.isFunStyle ? .funConversationTopItemBackgroundColor : style.contentBackgroundColor
+    style.contentBackgroundColor
   }
 
   @objc private func managerAction() {

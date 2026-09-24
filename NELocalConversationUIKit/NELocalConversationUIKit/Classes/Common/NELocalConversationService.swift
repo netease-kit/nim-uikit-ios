@@ -27,10 +27,7 @@ public class NELocalConversationService: NSObject, ChatServiceDelegate {
       NELocalAtMessageManager.setupInstance()
     }
 
-    if let isFun = param?["isFun"] as? Bool, isFun {
-      LocalConversationRouter.registerFun()
-    } else {
-      LocalConversationRouter.register()
-    }
+    // Keep the legacy parameter for source compatibility.
+    LocalConversationRouter.register()
   }
 }

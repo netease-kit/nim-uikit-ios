@@ -241,15 +241,10 @@ class ConfigTestViewController: NEBaseViewController, UITableViewDelegate,
 
   func initialConfig() {
     title = "全局配置"
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-      navigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-      navigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
-    }
+    view.backgroundColor = .ne_backgroundColor
+    navigationView.backgroundColor = .ne_backgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+    navigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
   }
 
   func setupSubviews() {

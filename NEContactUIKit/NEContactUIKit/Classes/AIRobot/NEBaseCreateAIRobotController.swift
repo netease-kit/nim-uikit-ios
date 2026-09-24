@@ -84,7 +84,7 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
   public lazy var sectionDivider: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
-    v.backgroundColor = .funContactLineBorderColor
+    v.backgroundColor = .ne_greyLine
     return v
   }()
 
@@ -277,10 +277,10 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
 
   /// 页面背景色 — 子类 override
   open func pageBackgroundColor() -> UIColor {
-    .funContactNavigationBackgroundColor
+    .normalContactNavigationBackgroundColor
   }
 
-  /// 保存按钮颜色 — 子类 override（Normal: normalContactThemeColor，Fun: funContactThemeColor）
+  /// 保存按钮颜色 — 子类 override
   open func saveButtonColor() -> UIColor {
     .normalContactThemeColor
   }

@@ -95,15 +95,15 @@ open class NEBaseAIRobotBindCell: UITableViewCell {
 
   // MARK: - Override 点
 
-  /// 头像尺寸（Normal: 36，Fun: 40）
+  /// 头像尺寸（Normal: 36）
   open func avatarSize() -> CGFloat { 36 }
-  /// 头像圆角（Normal: 18 圆形，Fun: 4 方形）
+  /// 头像圆角（Normal: 18 圆形）
   open func avatarCornerRadius() -> CGFloat { 18 }
-  /// 名字字号（Normal: 14，Fun: 17）
+  /// 名字字号（Normal: 14）
   open func nameFont() -> CGFloat { 14 }
   /// 箭头右距（统一 22px，与用户需求一致）
   open func arrowRightMargin() -> CGFloat { -22 }
-  /// 分隔线颜色（Normal: .ne_greyLine，Fun: .funContactLineBorderColor）
+  /// 分隔线颜色（Normal: .ne_greyLine）
   open func separatorColor() -> UIColor { .ne_greyLine }
 
   // MARK: - 数据绑定
