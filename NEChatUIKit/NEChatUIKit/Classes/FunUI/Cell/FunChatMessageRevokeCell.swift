@@ -29,7 +29,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.setTitleColor(UIColor.ne_funTheme, for: .normal)
     button.addTarget(self, action: #selector(reeditEvent), for: .touchUpInside)
     button.accessibilityIdentifier = "id.reeditButton"
     return button

@@ -5,12 +5,9 @@
 import NETeamUIKit
 import UIKit
 
-class CustomTeamSettingHeaderCell: TeamSettingHeaderCell {
+class CustomTeamSettingHeaderCell: FunTeamSettingHeaderCell {
   override func setupUI() {
-    if NEStyleManager.instance.isNormalStyle() {
-      super.setupUI()
-    } else {
-      let whiteBgView = UIView()
+    let whiteBgView = UIView()
       whiteBgView.backgroundColor = UIColor.white
       whiteBgView.translatesAutoresizingMaskIntoConstraints = false
       contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
@@ -43,7 +40,6 @@ class CustomTeamSettingHeaderCell: TeamSettingHeaderCell {
       ])
       headerView.layer.cornerRadius = 4.0
       dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineRightMargin?.constant = 0
   }
 }

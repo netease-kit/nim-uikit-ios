@@ -52,7 +52,7 @@ private final class InputEmoticonPageIndicatorView: UIView {
   private let scrollView = UIScrollView()
   private var dots = [UIView]()
   private var currentPage = 0
-  private var accentColor: UIColor = .ne_normalTheme
+  private var accentColor: UIColor = .ne_funTheme
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -150,7 +150,7 @@ open class InputEmoticonContainerView: UIView {
 
   public weak var delegate: InputEmoticonContainerViewDelegate?
 
-  public var accentColor: UIColor = .ne_normalTheme {
+  public var accentColor: UIColor = .ne_funTheme {
     didSet {
       tabView.accentColor = accentColor
       renderSelection()

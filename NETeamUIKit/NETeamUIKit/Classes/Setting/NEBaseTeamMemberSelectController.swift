@@ -16,7 +16,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
   private var renderedAccountIds = [String?]()
   private var searchStartPosition: (accountId: String, relativeY: CGFloat, contentOffsetX: CGFloat)?
 
-  open var memberLoadStatusTintColor: UIColor { .ne_normalTheme }
+  open var memberLoadStatusTintColor: UIColor { .ne_funTheme }
 
   /// 群id
   var teamId: String?

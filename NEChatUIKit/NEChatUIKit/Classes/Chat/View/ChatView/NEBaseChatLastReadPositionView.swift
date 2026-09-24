@@ -38,7 +38,7 @@ open class NEBaseChatLastReadPositionView: UIView {
     return indicator
   }()
 
-  public var accentColor: UIColor = .ne_normalTheme {
+  public var accentColor: UIColor = .ne_funTheme {
     didSet {
       positionImageView.tintColor = accentColor
       messageCountLabel.textColor = accentColor

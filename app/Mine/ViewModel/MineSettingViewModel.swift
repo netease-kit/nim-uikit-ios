@@ -9,7 +9,6 @@ import NIMSDK
 
 public protocol MineSettingViewModelDelegate: NSObjectProtocol {
   func didMessageRemindClick()
-  func didStyleClick()
   func didClickCleanCache()
   func didClickConfigTest()
   func didClickSDKConfig()
@@ -43,15 +42,6 @@ public class MineSettingViewModel: NSObject {
       weakSelf?.delegate?.didMessageRemindClick()
     }
     model.cellModels.append(remind)
-
-    // 外观
-    let style = SettingCellModel()
-    style.cellName = localizable("style_selection")
-    style.type = SettingCellType.SettingArrowCell.rawValue
-    style.cellClick = {
-      weakSelf?.delegate?.didStyleClick()
-    }
-    model.cellModels.append(style)
 
 //        let cleanCache = SettingCellModel()
 //        cleanCache.cellName = "清理缓存"

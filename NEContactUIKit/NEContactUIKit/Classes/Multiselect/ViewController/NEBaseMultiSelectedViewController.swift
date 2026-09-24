@@ -78,7 +78,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -80),
     ])
 
-    tableView.register(SelectedListCell.self, forCellReuseIdentifier: "\(NSStringFromClass(NEBaseSelectedListCell.self))")
+    tableView.register(FunSelectedListCell.self, forCellReuseIdentifier: "\(NSStringFromClass(NEBaseSelectedListCell.self))")
 
     view.addSubview(emptyView)
     emptyView.setText(commonLocalizable("no_content"))

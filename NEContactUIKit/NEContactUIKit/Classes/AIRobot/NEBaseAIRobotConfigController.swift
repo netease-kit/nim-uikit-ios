@@ -177,8 +177,8 @@ open class NEBaseAIRobotConfigController: NEContactBaseViewController {
   /// 复制按钮圆角
   open func copyButtonCornerRadius() -> CGFloat { 4 }
 
-  /// 复制按钮背景色 — 子类 override（Normal: normalContactThemeColor，Fun: funContactThemeColor）
-  open func copyButtonColor() -> UIColor { .normalContactThemeColor }
+  /// 复制按钮背景色 — FunUI 默认颜色，保留皮肤子类可 override
+  open func copyButtonColor() -> UIColor { .funContactThemeColor }
 
   /// 卡片圆角 — 子类 override
   open func setupCardCornerRadius() {

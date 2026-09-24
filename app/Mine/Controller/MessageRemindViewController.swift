@@ -45,21 +45,12 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   /// 导航栏配置
   func initialConfig() {
     title = localizable("message_remind")
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .funChatBackgroundColor
   }
 
   /// 页面主题元素初始化以及布局
   func setupSubviews() {
     view.addSubview(tableView)
-    if NEStyleManager.instance.isNormalStyle() {
-      topConstant += 12
-    }
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),

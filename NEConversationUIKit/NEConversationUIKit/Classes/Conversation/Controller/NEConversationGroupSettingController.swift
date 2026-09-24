@@ -445,7 +445,7 @@ private final class SettingConversationCell: UITableViewCell {
     titleLabel.lineBreakMode = .byTruncatingTail
     titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     removeButton.setTitle(localizable("remove"), for: .normal)
-    removeButton.setTitleColor(.ne_normalTheme, for: .normal)
+    removeButton.setTitleColor(.ne_funTheme, for: .normal)
     removeButton.titleLabel?.font = .systemFont(ofSize: 14)
     removeButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     removeButton.layer.cornerRadius = 4

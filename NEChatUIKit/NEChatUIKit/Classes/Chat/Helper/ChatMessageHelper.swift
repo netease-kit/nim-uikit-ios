@@ -71,30 +71,18 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getChatCellRegisterDic(isFun: Bool) -> [String: UITableViewCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunChatMessageTextCell.self : ChatMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunChatMessageAIStreamTextCell.self : ChatMessageAIStreamTextCell.self,
-      "\(MessageType.rtcCallRecord.rawValue)":
-        isFun ? FunChatMessageCallCell.self : ChatMessageCallCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunChatMessageAudioCell.self : ChatMessageAudioCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunChatMessageImageCell.self : ChatMessageImageCell.self,
-      "\(MessageType.revoke.rawValue)":
-        isFun ? FunChatMessageRevokeCell.self : ChatMessageRevokeCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunChatMessageVideoCell.self : ChatMessageVideoCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunChatMessageFileCell.self : ChatMessageFileCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunChatMessageLocationCell.self : ChatMessageLocationCell.self,
-      "\(MessageType.time.rawValue)":
-        isFun ? FunChatMessageTipCell.self : ChatMessageTipCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunChatMessageMultiForwardCell.self : ChatMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunChatMessageRichTextCell.self : ChatMessageRichTextCell.self,
+      "\(MessageType.text.rawValue)": FunChatMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": FunChatMessageAIStreamTextCell.self,
+      "\(MessageType.rtcCallRecord.rawValue)": FunChatMessageCallCell.self,
+      "\(MessageType.audio.rawValue)": FunChatMessageAudioCell.self,
+      "\(MessageType.image.rawValue)": FunChatMessageImageCell.self,
+      "\(MessageType.revoke.rawValue)": FunChatMessageRevokeCell.self,
+      "\(MessageType.video.rawValue)": FunChatMessageVideoCell.self,
+      "\(MessageType.file.rawValue)": FunChatMessageFileCell.self,
+      "\(MessageType.location.rawValue)": FunChatMessageLocationCell.self,
+      "\(MessageType.time.rawValue)": FunChatMessageTipCell.self,
+      "\(MessageType.multiForward.rawValue)": FunChatMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": FunChatMessageRichTextCell.self,
     ]
   }
 
@@ -104,26 +92,16 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getPinCellRegisterDic(isFun: Bool) -> [String: NEBasePinMessageCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunPinMessageImageCell.self : PinMessageImageCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunPinMessageAudioCell.self : PinMessageAudioCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunPinMessageVideoCell.self : PinMessageVideoCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunPinMessageLocationCell.self : PinMessageLocationCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunPinMessageFileCell.self : PinMessageFileCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunPinMessageMultiForwardCell.self : PinMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunPinMessageRichTextCell.self : PinMessageRichTextCell.self,
-      "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunPinMessageDefaultCell.self : PinMessageDefaultCell.self,
+      "\(MessageType.text.rawValue)": FunPinMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": FunPinMessageTextCell.self,
+      "\(MessageType.image.rawValue)": FunPinMessageImageCell.self,
+      "\(MessageType.audio.rawValue)": FunPinMessageAudioCell.self,
+      "\(MessageType.video.rawValue)": FunPinMessageVideoCell.self,
+      "\(MessageType.location.rawValue)": FunPinMessageLocationCell.self,
+      "\(MessageType.file.rawValue)": FunPinMessageFileCell.self,
+      "\(MessageType.multiForward.rawValue)": FunPinMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": FunPinMessageRichTextCell.self,
+      "\(NEBasePinMessageTextCell.self)": FunPinMessageDefaultCell.self,
     ]
   }
 
@@ -133,27 +111,17 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getCollectionCellRegisterDic(isFun: Bool) -> [String: NEBaseCollectionMessageCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunCollectionMessageImageCell.self : CollectionMessageImageCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunCollectionMessageAudioCell.self : CollectionMessageAudioCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunCollectionMessageVideoCell.self : CollectionMessageVideoCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunCollectionMessageLocationCell.self : CollectionMessageLocationCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunCollectionMessageFileCell.self : CollectionMessageFileCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunCollectionMessageMultiForwardCell.self : CollectionMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunCollectionMessageRichTextCell.self : CollectionMessageRichTextCell.self,
-      "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunCollectionMessageDefaultCell.self : CollectionMessageDefaultCell.self,
-      "\(NEBaseCollectionDefaultCell.self)": isFun ? FunCollectionDefaultCell.self : CollectionDefaultCell.self,
+      "\(MessageType.text.rawValue)": FunCollectionMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": FunCollectionMessageTextCell.self,
+      "\(MessageType.image.rawValue)": FunCollectionMessageImageCell.self,
+      "\(MessageType.audio.rawValue)": FunCollectionMessageAudioCell.self,
+      "\(MessageType.video.rawValue)": FunCollectionMessageVideoCell.self,
+      "\(MessageType.location.rawValue)": FunCollectionMessageLocationCell.self,
+      "\(MessageType.file.rawValue)": FunCollectionMessageFileCell.self,
+      "\(MessageType.multiForward.rawValue)": FunCollectionMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": FunCollectionMessageRichTextCell.self,
+      "\(NEBasePinMessageTextCell.self)": FunCollectionMessageDefaultCell.self,
+      "\(NEBaseCollectionDefaultCell.self)": FunCollectionDefaultCell.self,
     ]
   }
 
@@ -816,7 +784,7 @@ public class ChatMessageHelper: NSObject {
                 }
 
                 if attributeStr?.length ?? 0 > end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(start, end - start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_funTheme, range: NSMakeRange(start, end - start + atRangeOffset))
                 }
               }
             }
@@ -832,7 +800,7 @@ public class ChatMessageHelper: NSObject {
             if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
               for model in models {
                 if attributeStr?.length ?? 0 > model.end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_funTheme, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
                 }
               }
             }

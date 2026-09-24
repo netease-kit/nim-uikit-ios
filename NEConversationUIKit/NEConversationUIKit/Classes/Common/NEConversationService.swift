@@ -28,10 +28,6 @@ public class NEConversationService: NSObject, ChatServiceDelegate {
       NEAtMessageManager.setupInstance()
     }
 
-    if let isFun = param?["isFun"] as? Bool, isFun {
-      ConversationRouter.registerFun()
-    } else {
-      ConversationRouter.register()
-    }
+    ConversationRouter.registerFun()
   }
 }

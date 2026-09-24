@@ -151,7 +151,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
       attachment.bounds = CGRectMake(0, -2, 10, 13)
       attributeString.append(NSAttributedString(attachment: attachment))
     }
-    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(0, attributeString.length))
+    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_funTheme, range: NSMakeRange(0, attributeString.length))
     attributeString.addAttribute(.font, value: UIFont.systemFont(ofSize: 14.0), range: NSMakeRange(0, attributeString.length))
     return attributeString
   }()
@@ -159,7 +159,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   /// AI 处理
   public var translateString: NSMutableAttributedString = {
     let attributeString = NSMutableAttributedString(string: chatLocalizable("translate_sure"))
-    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(0, attributeString.length))
+    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_funTheme, range: NSMakeRange(0, attributeString.length))
     attributeString.addAttribute(.font, value: UIFont.systemFont(ofSize: 14.0), range: NSMakeRange(0, attributeString.length))
     return attributeString
   }()
@@ -167,7 +167,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
   /// 处理中文案
   public var processingString: NSMutableAttributedString = {
     let attributeString = NSMutableAttributedString(string: chatLocalizable("ai_translating"))
-    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(0, attributeString.length))
+    attributeString.addAttribute(.foregroundColor, value: UIColor.ne_funTheme, range: NSMakeRange(0, attributeString.length))
     attributeString.addAttribute(.font, value: UIFont.systemFont(ofSize: 14.0), range: NSMakeRange(0, attributeString.length))
     return attributeString
   }()

@@ -36,24 +36,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     contentView.addSubview(titleLabel)
     contentView.addSubview(inputTextField)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
-
-      NSLayoutConstraint.activate([
-        inputTextField.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        inputTextField.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-        inputTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextField.heightAnchor.constraint(equalToConstant: 40),
-      ])
-
-    } else {
-      let whiteBgView = UIView()
+    let whiteBgView = UIView()
       whiteBgView.backgroundColor = UIColor.white
       whiteBgView.translatesAutoresizingMaskIntoConstraints = false
       contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
@@ -80,8 +63,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
       ])
 
       dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineRightMargin?.constant = 0
   }
 
   /// 绑定数据

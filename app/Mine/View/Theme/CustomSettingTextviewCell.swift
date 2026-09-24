@@ -36,24 +36,7 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
     contentView.addSubview(titleLabel)
     contentView.addSubview(inputTextView)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
-
-      NSLayoutConstraint.activate([
-        inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-        inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-      ])
-
-    } else {
-      let whiteBgView = UIView()
+    let whiteBgView = UIView()
       whiteBgView.backgroundColor = UIColor.white
       whiteBgView.translatesAutoresizingMaskIntoConstraints = false
       contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
@@ -80,8 +63,7 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
       ])
 
       dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineRightMargin?.constant = 0
   }
 
   override func configure(_ anyModel: Any) {

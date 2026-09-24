@@ -5,12 +5,9 @@
 import NETeamUIKit
 import UIKit
 
-class CustomTeamArrowSettingCell: TeamArrowSettingCell {
+class CustomTeamArrowSettingCell: FunTeamArrowSettingCell {
   override func setupUI() {
-    if NEStyleManager.instance.isNormalStyle() {
-      super.setupUI()
-    } else {
-      let whiteBgView = UIView()
+    let whiteBgView = UIView()
       whiteBgView.backgroundColor = UIColor.white
       whiteBgView.translatesAutoresizingMaskIntoConstraints = false
       contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
@@ -34,7 +31,6 @@ class CustomTeamArrowSettingCell: TeamArrowSettingCell {
         arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
       ])
       dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineRightMargin?.constant = 0
   }
 }

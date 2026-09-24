@@ -6,7 +6,7 @@
 import NEConversationUIKit
 import UIKit
 
-open class CustomConversationListCell: ConversationListCell {
+open class CustomConversationListCell: FunConversationListCell {
   // 新增 UI 元素
   private lazy var customView: UIImageView = {
     let notifyView = UIImageView()

@@ -39,7 +39,7 @@ struct NEConversationGroupUIStyle {
     navigationBackgroundColor: UIColor(hexString: "#F5F7FA"),
     contentBackgroundColor: .white,
     cardBackgroundColor: .white,
-    primaryColor: .ne_normalTheme,
+    primaryColor: .ne_funTheme,
     primaryDisabledColor: UIColor(hexString: "#337EFF", 0.5),
     selectedBackgroundColor: UIColor(hexString: "#EAF2FF"),
     titleTextColor: .ne_darkText,

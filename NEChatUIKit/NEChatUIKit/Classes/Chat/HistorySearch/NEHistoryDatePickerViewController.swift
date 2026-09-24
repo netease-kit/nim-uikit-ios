@@ -16,7 +16,7 @@ protocol NEHistoryDatePickerViewControllerDelegate: AnyObject {
 class NEHistoryDatePickerViewController: NEChatBaseViewController {
   weak var delegate: NEHistoryDatePickerViewControllerDelegate?
 
-  var selectButtonBackgroundColor = UIColor.normalSearchDateButtonBg
+  var selectButtonBackgroundColor = UIColor.ne_funTheme
 
   // MARK: - Properties
 

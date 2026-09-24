@@ -166,7 +166,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   open var emoticonThemeColor: UIColor {
-    .ne_normalTheme
+    .ne_funTheme
   }
 
   open var emoticonContentVerticalOffset: CGFloat {
@@ -285,7 +285,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         return
       }
 
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) {
+      if isEqualToColor(findColor, UIColor.ne_funTheme) {
         let string = textView.attributedText.string
         if let range = Range(findRange, in: string) {
           let text = String(string[range])
@@ -325,7 +325,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         return
       }
 
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.ne_funTheme) == false {
         return
       }
 
@@ -348,7 +348,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.ne_funTheme) == false {
         return
       }
       let findStart = findRange.location
@@ -612,7 +612,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.ne_funTheme) == false {
         return
       }
       if let range = Range(findRange, in: string) {
@@ -665,7 +665,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.ne_funTheme) == false {
         return
       }
       if let range = Range(findRange, in: string) {

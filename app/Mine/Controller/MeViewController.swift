@@ -101,7 +101,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
+    view.backgroundColor = UIColor(hexString: "#EDEDED")
 
     NotificationCenter.default.addObserver(self, selector: #selector(changeLanguage), name: NENotificationName.changeLanguage, object: nil)
 
@@ -136,11 +136,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     ])
 
     header.clipsToBounds = true
-    if NEStyleManager.instance.isNormalStyle() {
-      header.layer.cornerRadius = 30
-    } else {
-      header.layer.cornerRadius = 4
-    }
+    header.layer.cornerRadius = 4
 
     view.addSubview(nameLabel)
     NSLayoutConstraint.activate([
@@ -174,7 +170,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     view.addSubview(arrowImageView)
     view.addSubview(personInfoButton)
 
-    tableView.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor.white : UIColor.clear
+    tableView.backgroundColor = UIColor.clear
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(equalTo: divider.bottomAnchor),
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -247,13 +243,8 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
         let ctrl = MineSettingViewController()
         navigationController?.pushViewController(ctrl, animated: true)
       } else if indexPath.row == 1 {
-        if NEStyleManager.instance.isNormalStyle() == true {
-          let collectionCtrl = CollectionMessageController()
-          navigationController?.pushViewController(collectionCtrl, animated: true)
-        } else {
-          let collectionCtrl = FunCollectionMessageController()
-          navigationController?.pushViewController(collectionCtrl, animated: true)
-        }
+        let collectionCtrl = FunCollectionMessageController()
+        navigationController?.pushViewController(collectionCtrl, animated: true)
       } else if indexPath.row == 2 {
         let ctrl = IntroduceBrandViewController()
         navigationController?.pushViewController(ctrl, animated: true)

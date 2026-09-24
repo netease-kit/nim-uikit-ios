@@ -20,7 +20,7 @@ open class TeamHistoryMessageViewModel: ChatViewModel, NETeamListener {
 
   var mediaMessageModels: [MediaMessageModel] = []
 
-  public var themeColor = UIColor.ne_normalTheme
+  public var themeColor = UIColor.ne_funTheme
 
   override public init() {
     super.init(conversationId: ChatRepo.conversationId)

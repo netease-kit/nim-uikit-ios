@@ -16,7 +16,7 @@ open class NEBaseChatNewMessageView: UIView {
     let label = UILabel()
     label.translatesAutoresizingMaskIntoConstraints = false
     label.font = DefaultTextFont(14)
-    label.textColor = .ne_normalTheme
+    label.textColor = .ne_funTheme
     label.textAlignment = .center
     label.isHidden = true
     return label

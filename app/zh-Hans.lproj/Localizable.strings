@@ -31,7 +31,6 @@
 "complete"="完成";
 "save"="保存";
 "message_remind"="消息提醒";
-"style_selection"="外观";
 "app_language"="语言";
 "app_language_zh"="中文";
 "app_language_en"="English";
@@ -66,10 +65,6 @@
 "restart"="重启";
 "exit"="退出";
 "text_count_limit"="最多只能输入 %d 个字符哦";
-
-// style
-"style_default"="基础皮肤";
-"style_fun"="通用皮肤";
 
 "mine_collection"="收藏";
 

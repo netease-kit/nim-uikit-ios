@@ -46,7 +46,7 @@ open class NEBaseLanguageCell: CornerCell {
   /// - Parameter isSelect: 是否选中，选中高亮显示
   open func configureData(_ model: NElanguageCellModel) {
     languageLabel.text = model.language
-    languageLabel.textColor = model.isSelect ? UIColor.ne_normalTheme : UIColor.ne_darkText
+    languageLabel.textColor = model.isSelect ? UIColor.ne_funTheme : UIColor.ne_darkText
     selectedImageView.isHidden = !model.isSelect
     cornerType = model.cornerType
   }

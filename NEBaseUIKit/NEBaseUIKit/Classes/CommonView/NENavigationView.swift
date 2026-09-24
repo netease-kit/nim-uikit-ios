@@ -39,7 +39,7 @@ open class NENavigationView: UIView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setImage(coreLoader.loadImage("three_point"), for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
-    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.setTitleColor(UIColor.ne_funTheme, for: .normal)
     button.contentHorizontalAlignment = .right
     button.accessibilityIdentifier = "id.threePoint"
     return button
@@ -137,7 +137,7 @@ open class NENavigationView: UIView {
     backButton.addTarget(target, action: selector, for: .touchUpInside)
   }
 
-  open func setMoreButtonTitle(_ title: String, _ color: UIColor = .ne_normalTheme) {
+  open func setMoreButtonTitle(_ title: String, _ color: UIColor = .ne_funTheme) {
     moreButton.isHidden = false
     moreButton.setTitle(title, for: .normal)
     moreButton.setImage(nil, for: .normal)

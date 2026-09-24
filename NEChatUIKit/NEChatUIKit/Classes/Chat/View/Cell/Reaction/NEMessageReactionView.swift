@@ -73,7 +73,7 @@ public final class NEMessageReactionView: UIView {
       button.layer.borderWidth = 0.5
       button.layer.borderColor = UIColor.ne_chatReactionBorder.cgColor
       button.backgroundColor = reactionBackgroundColor
-      button.countLabel.textColor = group.isMine ? UIColor.ne_normalTheme : UIColor.ne_greyText
+      button.countLabel.textColor = group.isMine ? UIColor.ne_funTheme : UIColor.ne_greyText
       button.countLabel.font = group.isMine
         ? .systemFont(ofSize: 12, weight: .semibold)
         : .systemFont(ofSize: 12, weight: .medium)

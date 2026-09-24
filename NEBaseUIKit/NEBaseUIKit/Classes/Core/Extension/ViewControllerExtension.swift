@@ -22,7 +22,7 @@ public extension UIViewController {
       } else {
         let button = ExpandButton(frame: CGRect(x: 0, y: 0, width: 60, height: 44))
         self.rightNavButton = button
-        button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+        button.setTitleColor(UIColor.ne_funTheme, for: .normal)
         button.titleLabel?.font = NEConstant.defaultTextFont(16)
         return button
       }
@@ -74,7 +74,7 @@ public extension UIViewController {
     navigationItem.leftBarButtonItem = leftItem
   }
 
-  func addLeftAction(_ title: String, _ selector: Selector, _ target: Any?, _ tintColor: UIColor = UIColor.ne_normalTheme) {
+  func addLeftAction(_ title: String, _ selector: Selector, _ target: Any?, _ tintColor: UIColor = UIColor.ne_funTheme) {
     leftNavButton.addTarget(target, action: selector, for: .touchUpInside)
     leftNavButton.setTitle(title, for: .normal)
     let leftItem = UIBarButtonItem(customView: leftNavButton)
@@ -93,7 +93,7 @@ public extension UIViewController {
     navigationItem.rightBarButtonItem = rightItem
   }
 
-  func addRightAction(_ title: String, _ selector: Selector, _ target: Any?, _ tintColor: UIColor = UIColor.ne_normalTheme) {
+  func addRightAction(_ title: String, _ selector: Selector, _ target: Any?, _ tintColor: UIColor = UIColor.ne_funTheme) {
     rightNavButton.addTarget(target, action: selector, for: .touchUpInside)
     rightNavButton.setTitle(title, for: .normal)
     let rightItem = UIBarButtonItem(customView: rightNavButton)

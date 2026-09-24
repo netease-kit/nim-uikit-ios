@@ -149,7 +149,7 @@ open class NEBaseRobotNicknameEditController: NEContactBaseViewController, UITex
   open func setupTextFieldContainerStyle() {}
 
   /// 保存/完成按钮颜色，子类 override
-  open func saveButtonColor() -> UIColor { .normalContactThemeColor }
+  open func saveButtonColor() -> UIColor { .funContactThemeColor }
 
   // MARK: - 字数更新
 

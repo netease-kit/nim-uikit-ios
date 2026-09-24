@@ -122,7 +122,7 @@ open class NEBaseRobotChatCardController: NEContactBaseViewController {
   open func cardPageBackgroundColor() -> UIColor { .ne_lightBackgroundColor }
   open func cardHorizontalMargin() -> CGFloat { 20 }
   open func avatarSize() -> CGFloat { 60 }
-  open func chatButtonColor() -> UIColor { .normalContactThemeColor }
+  open func chatButtonColor() -> UIColor { .funContactThemeColor }
 
   // MARK: - Actions
 
