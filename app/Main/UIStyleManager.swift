@@ -9,9 +9,6 @@ class NEStyleManager {
   static let instance = NEStyleManager()
   let userDefault = UserDefaults.standard
   open func isNormalStyle() -> Bool {
-    if let style = userDefault.object(forKey: IMUIKit_Style_Key) as? NSNumber, style.intValue == 2 {
-      return false
-    }
     return true
   }
 
@@ -20,8 +17,4 @@ class NEStyleManager {
     userDefault.synchronize()
   }
 
-  open func setFunStyle() {
-    userDefault.set(NSNumber(integerLiteral: 2), forKey: IMUIKit_Style_Key)
-    userDefault.synchronize()
-  }
 }

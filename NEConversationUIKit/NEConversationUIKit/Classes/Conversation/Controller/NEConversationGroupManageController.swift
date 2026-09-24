@@ -176,29 +176,7 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
   }
 
   @objc private func createGroupAction() {
-    if style.isFunStyle {
-      pushCreateGroupController()
-    } else {
-      presentCreateGroupSheet()
-    }
-  }
-
-  private func pushCreateGroupController() {
-    let controller = NEConversationGroupNameController(style: style) { [weak self] name, nameController in
-      guard let self = self else {
-        return
-      }
-      self.performNetworkAction(on: nameController) {
-        self.groupViewModel.createGroup(name: name) { [weak self, weak nameController] _, error in
-          if let error = error {
-            nameController?.showToast(self?.groupViewModel.groupErrorMessage(error) ?? error.localizedDescription)
-          } else {
-            nameController?.navigationController?.popViewController(animated: true)
-          }
-        }
-      }
-    }
-    navigationController?.pushViewController(controller, animated: true)
+    presentCreateGroupSheet()
   }
 
   private func presentCreateGroupSheet() {

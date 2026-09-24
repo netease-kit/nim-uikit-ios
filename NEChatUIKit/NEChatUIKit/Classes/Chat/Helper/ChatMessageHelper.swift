@@ -71,30 +71,18 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getChatCellRegisterDic(isFun: Bool) -> [String: UITableViewCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunChatMessageTextCell.self : ChatMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunChatMessageAIStreamTextCell.self : ChatMessageAIStreamTextCell.self,
-      "\(MessageType.rtcCallRecord.rawValue)":
-        isFun ? FunChatMessageCallCell.self : ChatMessageCallCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunChatMessageAudioCell.self : ChatMessageAudioCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunChatMessageImageCell.self : ChatMessageImageCell.self,
-      "\(MessageType.revoke.rawValue)":
-        isFun ? FunChatMessageRevokeCell.self : ChatMessageRevokeCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunChatMessageVideoCell.self : ChatMessageVideoCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunChatMessageFileCell.self : ChatMessageFileCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunChatMessageLocationCell.self : ChatMessageLocationCell.self,
-      "\(MessageType.time.rawValue)":
-        isFun ? FunChatMessageTipCell.self : ChatMessageTipCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunChatMessageMultiForwardCell.self : ChatMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunChatMessageRichTextCell.self : ChatMessageRichTextCell.self,
+      "\(MessageType.text.rawValue)": ChatMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": ChatMessageAIStreamTextCell.self,
+      "\(MessageType.rtcCallRecord.rawValue)": ChatMessageCallCell.self,
+      "\(MessageType.audio.rawValue)": ChatMessageAudioCell.self,
+      "\(MessageType.image.rawValue)": ChatMessageImageCell.self,
+      "\(MessageType.revoke.rawValue)": ChatMessageRevokeCell.self,
+      "\(MessageType.video.rawValue)": ChatMessageVideoCell.self,
+      "\(MessageType.file.rawValue)": ChatMessageFileCell.self,
+      "\(MessageType.location.rawValue)": ChatMessageLocationCell.self,
+      "\(MessageType.time.rawValue)": ChatMessageTipCell.self,
+      "\(MessageType.multiForward.rawValue)": ChatMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": ChatMessageRichTextCell.self,
     ]
   }
 
@@ -104,26 +92,16 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getPinCellRegisterDic(isFun: Bool) -> [String: NEBasePinMessageCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunPinMessageImageCell.self : PinMessageImageCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunPinMessageAudioCell.self : PinMessageAudioCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunPinMessageVideoCell.self : PinMessageVideoCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunPinMessageLocationCell.self : PinMessageLocationCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunPinMessageFileCell.self : PinMessageFileCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunPinMessageMultiForwardCell.self : PinMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunPinMessageRichTextCell.self : PinMessageRichTextCell.self,
-      "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunPinMessageDefaultCell.self : PinMessageDefaultCell.self,
+      "\(MessageType.text.rawValue)": PinMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": PinMessageTextCell.self,
+      "\(MessageType.image.rawValue)": PinMessageImageCell.self,
+      "\(MessageType.audio.rawValue)": PinMessageAudioCell.self,
+      "\(MessageType.video.rawValue)": PinMessageVideoCell.self,
+      "\(MessageType.location.rawValue)": PinMessageLocationCell.self,
+      "\(MessageType.file.rawValue)": PinMessageFileCell.self,
+      "\(MessageType.multiForward.rawValue)": PinMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": PinMessageRichTextCell.self,
+      "\(NEBasePinMessageTextCell.self)": PinMessageDefaultCell.self,
     ]
   }
 
@@ -133,27 +111,17 @@ public class ChatMessageHelper: NSObject {
   @nonobjc
   public static func getCollectionCellRegisterDic(isFun: Bool) -> [String: NEBaseCollectionMessageCell.Type] {
     [
-      "\(MessageType.text.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
-      "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
-      "\(MessageType.image.rawValue)":
-        isFun ? FunCollectionMessageImageCell.self : CollectionMessageImageCell.self,
-      "\(MessageType.audio.rawValue)":
-        isFun ? FunCollectionMessageAudioCell.self : CollectionMessageAudioCell.self,
-      "\(MessageType.video.rawValue)":
-        isFun ? FunCollectionMessageVideoCell.self : CollectionMessageVideoCell.self,
-      "\(MessageType.location.rawValue)":
-        isFun ? FunCollectionMessageLocationCell.self : CollectionMessageLocationCell.self,
-      "\(MessageType.file.rawValue)":
-        isFun ? FunCollectionMessageFileCell.self : CollectionMessageFileCell.self,
-      "\(MessageType.multiForward.rawValue)":
-        isFun ? FunCollectionMessageMultiForwardCell.self : CollectionMessageMultiForwardCell.self,
-      "\(MessageType.richText.rawValue)":
-        isFun ? FunCollectionMessageRichTextCell.self : CollectionMessageRichTextCell.self,
-      "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunCollectionMessageDefaultCell.self : CollectionMessageDefaultCell.self,
-      "\(NEBaseCollectionDefaultCell.self)": isFun ? FunCollectionDefaultCell.self : CollectionDefaultCell.self,
+      "\(MessageType.text.rawValue)": CollectionMessageTextCell.self,
+      "\(MessageType.aiStreamText.rawValue)": CollectionMessageTextCell.self,
+      "\(MessageType.image.rawValue)": CollectionMessageImageCell.self,
+      "\(MessageType.audio.rawValue)": CollectionMessageAudioCell.self,
+      "\(MessageType.video.rawValue)": CollectionMessageVideoCell.self,
+      "\(MessageType.location.rawValue)": CollectionMessageLocationCell.self,
+      "\(MessageType.file.rawValue)": CollectionMessageFileCell.self,
+      "\(MessageType.multiForward.rawValue)": CollectionMessageMultiForwardCell.self,
+      "\(MessageType.richText.rawValue)": CollectionMessageRichTextCell.self,
+      "\(NEBasePinMessageTextCell.self)": CollectionMessageDefaultCell.self,
+      "\(NEBaseCollectionDefaultCell.self)": CollectionDefaultCell.self,
     ]
   }
 

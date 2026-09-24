@@ -216,11 +216,4 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
     delegate?.didClickContent(collectionModel, self)
   }
 
-  /// 设置娱乐版边距
-  open func setFunStyle() {
-    backLeftConstraint?.constant = 0
-    backRightConstraint?.constant = 0
-    backView.layer.cornerRadius = 0
-    headerView.layer.cornerRadius = 4.0
-  }
 }

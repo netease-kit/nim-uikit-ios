@@ -17,7 +17,7 @@ open class CreateAIRobotController: NEBaseCreateAIRobotController {
   }
 
   override open func pageBackgroundColor() -> UIColor {
-    .funContactNavigationBackgroundColor
+    .normalContactNavigationBackgroundColor
   }
 
   override open func saveButtonColor() -> UIColor {

@@ -31,8 +31,6 @@
 		180E81EC2D07D9F600151DD8 /* IntroduceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CA2D07D9F600151DD8 /* IntroduceViewModel.swift */; };
 		180E81ED2D07D9F600151DD8 /* PersonInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81D02D07D9F600151DD8 /* PersonInfoViewModel.swift */; };
 		180E81EE2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81BF2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift */; };
-		180E81F02D07D9F600151DD8 /* StyleSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */; };
-		180E81F12D07D9F600151DD8 /* StyleSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */; };
 		180E81F22D07D9F600151DD8 /* LanguageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81CB2D07D9F600151DD8 /* LanguageViewModel.swift */; };
 		180E81F32D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81C22D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift */; };
 		180E81F42D07D9F600151DD8 /* PersonInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */; };
@@ -53,7 +51,6 @@
 		18A32D6B2EA5E11400171E3A /* IMPocConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A32D662EA5E11400171E3A /* IMPocConfigViewController.swift */; };
 		18A32D702EA5E6DE00171E3A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A32D6E2EA5E6DE00171E3A /* SceneDelegate.swift */; };
 		18A6A9842D1E822900209FC5 /* NESecurityWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */; };
-		18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */; };
 		18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */; };
 		18B3EA712ED044A900D13785 /* NEP2PSecurityWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B3EA702ED044A900D13785 /* NEP2PSecurityWarningView.swift */; };
 		18CF8A3C2D01B312000CF406 /* CustomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF8A382D01B312000CF406 /* CustomConfig.swift */; };
@@ -105,7 +102,6 @@
 		180E81B12D07D9F600151DD8 /* MineSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineSettingViewController.swift; sourceTree = "<group>"; };
 		180E81B42D07D9F600151DD8 /* NENodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NENodeViewController.swift; sourceTree = "<group>"; };
 		180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonInfoViewController.swift; sourceTree = "<group>"; };
-		180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSelectionViewController.swift; sourceTree = "<group>"; };
 		180E81B92D07D9F600151DD8 /* CustomSettingCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSettingCellModel.swift; sourceTree = "<group>"; };
 		180E81BB2D07D9F600151DD8 /* ArrowTitleCustomTeamSettingSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowTitleCustomTeamSettingSwitchCell.swift; sourceTree = "<group>"; };
 		180E81BC2D07D9F600151DD8 /* CustomSettingInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSettingInputCell.swift; sourceTree = "<group>"; };
@@ -118,7 +114,6 @@
 		180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthdayDatePickerView.swift; sourceTree = "<group>"; };
 		180E81C52D07D9F600151DD8 /* MineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineTableViewCell.swift; sourceTree = "<group>"; };
 		180E81C62D07D9F600151DD8 /* NodeSelectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeSelectCell.swift; sourceTree = "<group>"; };
-		180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSelectionCell.swift; sourceTree = "<group>"; };
 		180E81C82D07D9F600151DD8 /* VersionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionCell.swift; sourceTree = "<group>"; };
 		180E81CA2D07D9F600151DD8 /* IntroduceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroduceViewModel.swift; sourceTree = "<group>"; };
 		180E81CB2D07D9F600151DD8 /* LanguageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewModel.swift; sourceTree = "<group>"; };
@@ -143,7 +138,6 @@
 		18A32D682EA5E11400171E3A /* PocLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocLoginViewController.swift; sourceTree = "<group>"; };
 		18A32D6E2EA5E6DE00171E3A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESecurityWarningView.swift; sourceTree = "<group>"; };
-		18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFunChatViewController.swift; sourceTree = "<group>"; };
 		18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNormalChatViewController.swift; sourceTree = "<group>"; };
 		18B3EA702ED044A900D13785 /* NEP2PSecurityWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEP2PSecurityWarningView.swift; sourceTree = "<group>"; };
 		18CF8A382D01B312000CF406 /* CustomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomConfig.swift; sourceTree = "<group>"; };
@@ -199,7 +193,6 @@
 				180E81B12D07D9F600151DD8 /* MineSettingViewController.swift */,
 				180E81B42D07D9F600151DD8 /* NENodeViewController.swift */,
 				180E81B52D07D9F600151DD8 /* PersonInfoViewController.swift */,
-				180E81B72D07D9F600151DD8 /* StyleSelectionViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -234,7 +227,6 @@
 				180E81C42D07D9F600151DD8 /* BirthdayDatePickerView.swift */,
 				180E81C52D07D9F600151DD8 /* MineTableViewCell.swift */,
 				180E81C62D07D9F600151DD8 /* NodeSelectCell.swift */,
-				180E81C72D07D9F600151DD8 /* StyleSelectionCell.swift */,
 				180E81C82D07D9F600151DD8 /* VersionCell.swift */,
 			);
 			path = View;
@@ -272,7 +264,6 @@
 				185100E62DFC0702001C470A /* AIChatDataLoader.swift */,
 				18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */,
 				18CF8A382D01B312000CF406 /* CustomConfig.swift */,
-				18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */,
 				18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */,
 				181EE57E2B234C510043817F /* CustomView.swift */,
 				181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */,
@@ -534,10 +525,8 @@
 				180E81EC2D07D9F600151DD8 /* IntroduceViewModel.swift in Sources */,
 				180E81ED2D07D9F600151DD8 /* PersonInfoViewModel.swift in Sources */,
 				180E81EE2D07D9F600151DD8 /* CustomTeamSettingHeaderCell.swift in Sources */,
-				180E81F02D07D9F600151DD8 /* StyleSelectionViewController.swift in Sources */,
 				18A32D642EA5DBB300171E3A /* IMPocConfigManager.swift in Sources */,
 				18A32D652EA5DBB300171E3A /* IMPushConfigManager.swift in Sources */,
-				180E81F12D07D9F600151DD8 /* StyleSelectionCell.swift in Sources */,
 				180E81F22D07D9F600151DD8 /* LanguageViewModel.swift in Sources */,
 				180E81F32D07D9F600151DD8 /* CustomTeamSettingSwitchCell.swift in Sources */,
 				18A32D702EA5E6DE00171E3A /* SceneDelegate.swift in Sources */,
@@ -557,7 +546,6 @@
 				56279F7F2FADB32C006A9560 /* TranslationSettingViewController.swift in Sources */,
 				DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */,
 				DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */,
-				18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */,
 				18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

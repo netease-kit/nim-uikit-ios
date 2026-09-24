@@ -26,11 +26,8 @@ public class NEChatService: NSObject, ChatServiceDelegate, NEChatEmojProtocol {
   /// 注册路由
   /// - Parameter param: 参数
   open func registerRouter(_ param: [String: Any]?) {
-    if let isFun = param?["isFun"] as? Bool, isFun {
-      ChatRouter.registerFun()
-    } else {
-      ChatRouter.register()
-    }
+    // Keep the legacy parameter for source compatibility.
+    ChatRouter.register()
 
     NIMKitFileLocationHelper.setStaticAppkey(NIMSDK.shared().appKey())
     NIMKitFileLocationHelper.setStaticUserId(IMKitClient.instance.account())

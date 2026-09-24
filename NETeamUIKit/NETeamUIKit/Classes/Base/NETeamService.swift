@@ -21,10 +21,7 @@ public class NETeamService: NSObject, ChatServiceDelegate {
   /// 注册路由
   /// - Parameter param: 参数
   open func registerRouter(_ param: [String: Any]?) {
-    if let isFun = param?["isFun"] as? Bool, isFun {
-      TeamRouter.registerFun()
-    } else {
-      TeamRouter.register()
-    }
+    // Keep the legacy parameter for source compatibility.
+    TeamRouter.register()
   }
 }

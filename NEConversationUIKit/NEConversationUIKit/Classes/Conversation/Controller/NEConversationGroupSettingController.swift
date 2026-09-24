@@ -287,7 +287,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
       message: localizable("conversation_group_delete_message"),
       sureText: localizable("delete"),
       cancelText: localizable("cancel"),
-      sureTextColor: style.isFunStyle ? style.primaryColor : style.dangerColor
+      sureTextColor: style.dangerColor
     ) { [weak self] in
       self?.performNetworkAction {
         guard let self = self else {

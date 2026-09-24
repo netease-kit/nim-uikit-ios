@@ -47,27 +47,18 @@ class LanguageViewController: NEBaseViewController, UITableViewDelegate,
   /// 导航栏配置
   func initialConfig() {
     title = localizable("app_language")
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-      navigationView.setMoreButtonTitle(localizable("save"))
-      navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-      navigationView.setMoreButtonTitle(localizable("complete"))
-      navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 34)
-      navigationView.moreButton.setTitleColor(.ne_funTheme, for: .normal)
-    }
+    view.backgroundColor = .ne_backgroundColor
+    navigationView.backgroundColor = .ne_backgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
+    navigationView.setMoreButtonTitle(localizable("save"))
+    navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveButtonAction))
   }
 
   /// 页面主题元素初始化以及布局
   func setupSubviews() {
     view.addSubview(tableView)
-    if NEStyleManager.instance.isNormalStyle() {
-      topConstant += 12
-    }
+    topConstant += 12
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),

@@ -252,12 +252,6 @@ open class UserSettingViewModel: NSObject, AIUserPinListener {
     }
   }
 
-  open func setFunType() {
-    for model in cellDatas {
-      model.cornerType = .none
-    }
-  }
-
   open func userInfoDidChange() {
     getSectionDatas()
     delegate?.didNeedRefreshUI()
