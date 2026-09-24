@@ -15,7 +15,7 @@ class NEHistorySearchMonthYearPickerView: UIView {
   var months: [Int] = []
   var selectedYear: Int = 2025
   var selectedMonth: Int = 1
-  var themeColor: UIColor = .ne_normalTheme {
+  var themeColor: UIColor = .ne_funTheme {
     didSet {
       confirmButton.setTitleColor(themeColor, for: .normal)
     }
@@ -50,7 +50,7 @@ class NEHistorySearchMonthYearPickerView: UIView {
 
   lazy var lineView: UIView = {
     let view = UIView()
-    view.backgroundColor = .normalChatNavigationDivideBg
+    view.backgroundColor = .funChatNavigationDivideBg
     return view
   }()
 

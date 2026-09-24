@@ -7,10 +7,7 @@ import UIKit
 
 class CustomTeamSettingRightCustomCell: TeamSettingRightCustomCell {
   override func setupUI() {
-    if NEStyleManager.instance.isNormalStyle() {
-      super.setupUI()
-    } else {
-      let whiteBgView = UIView()
+    let whiteBgView = UIView()
       whiteBgView.backgroundColor = UIColor.white
       whiteBgView.translatesAutoresizingMaskIntoConstraints = false
       contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
@@ -58,7 +55,6 @@ class CustomTeamSettingRightCustomCell: TeamSettingRightCustomCell {
       )
 
       dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineRightMargin?.constant = 0
   }
 }

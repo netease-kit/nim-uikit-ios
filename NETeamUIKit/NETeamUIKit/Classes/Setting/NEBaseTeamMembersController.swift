@@ -26,7 +26,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
 
   public var isSenior = false
 
-  open var memberLoadStatusTintColor: UIColor { .ne_normalTheme }
+  open var memberLoadStatusTintColor: UIColor { .ne_funTheme }
 
   public let backView = UIView()
 

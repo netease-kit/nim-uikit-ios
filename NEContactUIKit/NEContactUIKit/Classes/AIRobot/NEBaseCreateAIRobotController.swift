@@ -280,9 +280,9 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
     .funContactNavigationBackgroundColor
   }
 
-  /// 保存按钮颜色 — 子类 override（Normal: normalContactThemeColor，Fun: funContactThemeColor）
+  /// 保存按钮颜色 — FunUI 默认颜色，保留皮肤子类可 override
   open func saveButtonColor() -> UIColor {
-    .normalContactThemeColor
+    .funContactThemeColor
   }
 
   /// 卡片水平边距 — 子类 override

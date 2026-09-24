@@ -294,19 +294,11 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     label.font = UIFont.systemFont(ofSize: 16)
     footerView.addSubview(label)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        label.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 36),
-        label.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: -36),
-        label.bottomAnchor.constraint(equalTo: footerView.bottomAnchor),
-      ])
-    } else {
-      NSLayoutConstraint.activate([
-        label.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 20),
-        label.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: -20),
-        label.bottomAnchor.constraint(equalTo: footerView.bottomAnchor),
-      ])
-    }
+    NSLayoutConstraint.activate([
+      label.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 20),
+      label.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: -20),
+      label.bottomAnchor.constraint(equalTo: footerView.bottomAnchor),
+    ])
 
     label.text = "配置推送参数"
     return footerView
@@ -335,28 +327,13 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
   }
 
   open func changeParseModel() {
-    if NEStyleManager.instance.isNormalStyle() {
-      let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-      let autoAction = UIAlertAction(title: "一键自动解析", style: .default) { [weak self] _ in
-        self?.autoParse()
-      }
-      let customAction = UIAlertAction(title: "手动填写", style: .default) { [weak self] _ in
-        self?.customParse()
-      }
-      let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel, handler: nil)
-      actionSheet.addAction(autoAction)
-      actionSheet.addAction(customAction)
-      actionSheet.addAction(cancelAction)
-      present(actionSheet, animated: true, completion: nil)
-    } else {
-      let neAutoAction = NECustomAlertAction(title: "一键自动解析") { [weak self] in
-        self?.autoParse()
-      }
-      let neCustomAction = NECustomAlertAction(title: "手动填写") { [weak self] in
-        self?.customParse()
-      }
-      showCustomActionSheet([neAutoAction, neCustomAction])
+    let neAutoAction = NECustomAlertAction(title: "一键自动解析") { [weak self] in
+      self?.autoParse()
     }
+    let neCustomAction = NECustomAlertAction(title: "手动填写") { [weak self] in
+      self?.customParse()
+    }
+    showCustomActionSheet([neAutoAction, neCustomAction])
   }
 
   open func getFooterView() -> UIView {
@@ -367,13 +344,8 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     back.addSubview(button)
     button.setTitle(localizable("save"), for: .normal)
     button.setTitleColor(.white, for: .normal)
-    if NEStyleManager.instance.isNormalStyle() {
-      button.backgroundColor = UIColor.ne_normalTheme
-      button.frame = CGRectMake(20, 10, view.frame.width - 40, 40)
-    } else {
-      button.frame = CGRectMake(0, 10, view.frame.width, 40)
-      button.backgroundColor = UIColor.ne_funTheme
-    }
+    button.frame = CGRectMake(0, 10, view.frame.width, 40)
+    button.backgroundColor = UIColor.ne_funTheme
     button.addTarget(self, action: #selector(didSave), for: .touchUpInside)
     return back
   }

@@ -45,26 +45,17 @@ class TranslationLanguageViewController: NEBaseViewController, UITableViewDataSo
     super.viewDidLoad()
     title = localizable("translation_item_title")
 
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .funChatBackgroundColor
 
     // 右上角「保存」按钮（与 LanguageViewController 对齐，清除默认图标，使用文字）
     navigationView.moreButton.setImage(nil, for: .normal)
     navigationView.setMoreButtonTitle(localizable("save"))
-    if NEStyleManager.instance.isNormalStyle() {
-      navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
-    } else {
-      navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 34)
-      navigationView.moreButton.setTitleColor(.ne_funTheme, for: .normal)
-    }
+    navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 34)
+    navigationView.moreButton.setTitleColor(.ne_funTheme, for: .normal)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveAction))
 
     view.addSubview(tableView)
-    let topOffset = topConstant + (NEStyleManager.instance.isNormalStyle() ? 12 : 0)
+    let topOffset = topConstant
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -103,17 +94,10 @@ class TranslationLanguageViewController: NEBaseViewController, UITableViewDataSo
     cell.textLabel?.text = localizable(pair.nameKey)
     cell.textLabel?.font = .systemFont(ofSize: 16)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      cell.backgroundColor = .white
-      cell.textLabel?.textColor = .ne_darkText
-      cell.accessoryType = (pair.code == selectedCode) ? .checkmark : .none
-      cell.tintColor = UIColor(hexString: "0x337EFF")
-    } else {
-      cell.backgroundColor = .funChatBackgroundColor
-      cell.textLabel?.textColor = .ne_darkText
-      cell.accessoryType = (pair.code == selectedCode) ? .checkmark : .none
-      cell.tintColor = UIColor(hexString: "0x58BE6B")
-    }
+    cell.backgroundColor = .funChatBackgroundColor
+    cell.textLabel?.textColor = .ne_darkText
+    cell.accessoryType = (pair.code == selectedCode) ? .checkmark : .none
+    cell.tintColor = UIColor(hexString: "0x58BE6B")
     cell.selectionStyle = .none
     return cell
   }

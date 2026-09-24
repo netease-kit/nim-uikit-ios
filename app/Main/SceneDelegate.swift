@@ -66,7 +66,6 @@ class SceneDelegate: UIResponder {
     Self.window!.makeKeyAndVisible()
 
     NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(refreshUIStyle), name: Notification.Name(CHANGE_UI), object: nil)
 
     registerAPNS()
     setupInit { [weak self] error in
@@ -152,10 +151,6 @@ class SceneDelegate: UIResponder {
     loginWithUI()
   }
 
-  @objc func refreshUIStyle() {
-    initializePage(true)
-  }
-
   func loginWithUI() {
     weak var weakSelf = self
     let loginCtrl = NELoginViewController()
@@ -211,14 +206,10 @@ class SceneDelegate: UIResponder {
   // regist router
   func loadService() {
     // 注册路由
-    ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
+    ChatKitClient.shared.setupInit(isFun: true)
     DemoStickerConfig.registerPackages()
     registerMapFallbackRouter()
-    if NEStyleManager.instance.isNormalStyle() == false {
-      registerFunCustom()
-    } else {
-      registerNormalCustom()
-    }
+    registerFunCustom()
 
     // 会话列表顶部插入警告内容
     CustomConfig.shared.loadSecurityWarningView()
@@ -294,46 +285,6 @@ class SceneDelegate: UIResponder {
       let anchor = param["anchor"] as? V2NIMMessage
       let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
       let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
-
-      // 无论如何都先设置 pendingNewMessages（如果有的话）
-      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-        p2pChatVC.pendingNewMessages = newMsgs
-      }
-
-      for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-        if vc.isKind(of: ChatViewController.self) {
-          nav?.viewControllers[i] = p2pChatVC
-          nav?.popToViewController(p2pChatVC, animated: animated)
-          return
-        }
-      }
-
-      var count = nav?.viewControllers.count ?? 0
-      nav?.pushViewController(p2pChatVC, animated: animated)
-
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
-        if let remove = param["removeUserVC"] as? Bool, remove {
-          while count > 1,
-                nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
-            nav?.viewControllers.remove(at: count - 1)
-            count -= 1
-          }
-        }
-      }))
-    }
-  }
-
-  /// 注册通用版自定义内容
-  func registerNormalCustom() {
-    Router.shared.register(PushP2pChatVCRouter) { param in
-      let nav = param["nav"] as? UINavigationController
-      let animated = param["animated"] as? Bool ?? true
-      guard let conversationId = param["conversationId"] as? String else {
-        return
-      }
-      let anchor = param["anchor"] as? V2NIMMessage
-      let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
-      let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
 
       // 无论如何都先设置 pendingNewMessages（如果有的话）
       if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {

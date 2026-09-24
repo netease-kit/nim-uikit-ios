@@ -351,7 +351,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       textLabel.text = shouldShowFailure
         ? chatLocalizable("chat_translate_failed_retry")
         : model.translationInfo?.translatedText
-      textLabel.textColor = shouldShowFailure ? UIColor.ne_normalTheme : .funChatTranslationTextColor
+      textLabel.textColor = shouldShowFailure ? UIColor.ne_funTheme : .funChatTranslationTextColor
       bubble.isHidden = false
       let maxWidth = max(translationBubbleMinWidth, chat_content_maxW - funMargin)
       let horizontalInset = chat_content_margin + funMargin

@@ -42,7 +42,7 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
   open var searchFieldHorizontalInset: CGFloat { 20 }
   open var searchFieldHeight: CGFloat { 32 }
   open var searchEmptyImageName: String { "user_empty" }
-  open var memberLoadStatusTintColor: UIColor { .ne_normalTheme }
+  open var memberLoadStatusTintColor: UIColor { .ne_funTheme }
 
   public lazy var searchTextField: SearchTextField = {
     let textField = NESingleLineSearchTextField()

@@ -37,7 +37,7 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
 
   public var layout: UICollectionViewFlowLayout
   public var cellRegisterDic = [String: UITableViewCell.Type]()
-  public var themeColor = UIColor.ne_normalTheme
+  public var themeColor = UIColor.ne_funTheme
 
   /// 快速搜索列表
   public var collectionView: UICollectionView

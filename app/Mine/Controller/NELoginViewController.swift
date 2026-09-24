@@ -35,7 +35,7 @@ public class NELoginViewController: UIViewController {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.layer.cornerRadius = 8
-    button.backgroundColor = UIColor.ne_normalTheme
+    button.backgroundColor = UIColor.ne_funTheme
     button.setTitleColor(UIColor.white, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
     button.setTitle(localizable("register_login"), for: .normal)

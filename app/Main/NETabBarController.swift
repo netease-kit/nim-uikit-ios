@@ -76,120 +76,63 @@ class NETabBarController: UITabBarController {
   }
 
   func setUpControllers() {
-    if NEStyleManager.instance.isNormalStyle() {
-      // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-        chat = LocalConversationController()
-        (chat as? LocalConversationController)?.viewModel.syncFinished = isChangeUIType
-      } else {
-        chat = ConversationController()
-        (chat as? ConversationController)?.viewModel.syncFinished = isChangeUIType
-      }
-
-      chat?.tabBarItem = UITabBarItem(
-        title: localizable("message"),
-        image: UIImage(named: "chat"),
-        selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav = NENavigationController(rootViewController: chat!)
-
-      // Contacts
-      contactVC = ContactViewController()
-      contactVC?.tabBarItem = UITabBarItem(
-        title: localizable("contact"),
-        image: UIImage(named: "contact"),
-        selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav = NENavigationController(rootViewController: contactVC!)
-
-      // Me
-      meVC.tabBarItem = UITabBarItem(
-        title: localizable("mine"),
-        image: UIImage(named: "person"),
-        selectedImage: UIImage(named: "personSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      meVC.tabBarItem.accessibilityIdentifier = "id.mine"
-      meVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-      meVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#337EFF")], for: .selected)
-      let meNav = NENavigationController(rootViewController: meVC)
-
-      tabBar.backgroundColor = UIColor(hexString: "#F6F8FA")
-      viewControllers = [chatNav, contactsNav, meNav]
-      selectedIndex = 0
-
-      if #available(iOS 13.0, *) {
-        let appearance = UITabBarAppearance()
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#337EFF")]
-        tabBar.standardAppearance = appearance
-      } else {
-        tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
-        viewControllers?.forEach { vc in
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#337EFF")], for: .selected)
-        }
-      }
+    // Only FunUI remains.
+    // chat
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      chat = FunLocalConversationController()
+      (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
     } else {
-      // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-        chat = FunLocalConversationController()
-        (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
-      } else {
-        chat = FunConversationController()
-        (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
-      }
+      chat = FunConversationController()
+      (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
+    }
 
-      chat?.tabBarItem = UITabBarItem(
-        title: localizable("message"),
-        image: UIImage(named: "funChat"),
-        selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav = NENavigationController(rootViewController: chat!)
+    chat?.tabBarItem = UITabBarItem(
+      title: localizable("message"),
+      image: UIImage(named: "funChat"),
+      selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
+    let chatNav = NENavigationController(rootViewController: chat!)
 
-      // Contacts
-      contactVC = FunContactViewController()
-      contactVC?.tabBarItem = UITabBarItem(
-        title: localizable("contact"),
-        image: UIImage(named: "funContact"),
-        selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav = NENavigationController(rootViewController: contactVC!)
+    // Contacts
+    contactVC = FunContactViewController()
+    contactVC?.tabBarItem = UITabBarItem(
+      title: localizable("contact"),
+      image: UIImage(named: "funContact"),
+      selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
+    let contactsNav = NENavigationController(rootViewController: contactVC!)
 
-      // Me
-      meVC.tabBarItem = UITabBarItem(
-        title: localizable("mine"),
-        image: UIImage(named: "funPerson"),
-        selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      meVC.tabBarItem.accessibilityIdentifier = "id.mine"
-      let meNav = NENavigationController(rootViewController: meVC)
+    // Me
+    meVC.tabBarItem = UITabBarItem(
+      title: localizable("mine"),
+      image: UIImage(named: "funPerson"),
+      selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    meVC.tabBarItem.accessibilityIdentifier = "id.mine"
+    let meNav = NENavigationController(rootViewController: meVC)
 
-      tabBar.backgroundColor = UIColor(hexString: "#F6F6F6")
+    tabBar.backgroundColor = UIColor(hexString: "#F6F6F6")
+    tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
+    viewControllers = [chatNav, contactsNav, meNav]
+    viewControllers?.forEach { vc in
+      vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
+      vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
+    }
+    selectedIndex = 0
+
+    if #available(iOS 13.0, *) {
+      let appearance = UITabBarAppearance()
+      appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
+      appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
+      appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.ne_funTheme]
+      tabBar.standardAppearance = appearance
+    } else {
       tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
-      viewControllers = [chatNav, contactsNav, meNav]
       viewControllers?.forEach { vc in
         vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
         vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
-      }
-      selectedIndex = 0
-
-      if #available(iOS 13.0, *) {
-        let appearance = UITabBarAppearance()
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.ne_funTheme]
-        tabBar.standardAppearance = appearance
-      } else {
-        tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
-        viewControllers?.forEach { vc in
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
-        }
       }
     }
   }

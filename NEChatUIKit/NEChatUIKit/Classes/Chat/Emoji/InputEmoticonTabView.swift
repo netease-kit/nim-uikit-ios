@@ -72,7 +72,7 @@ open class InputEmoticonTabView: UIControl {
   private var separators = [UIView]()
   private var selectedIndex = 0
 
-  public var accentColor: UIColor = .ne_normalTheme {
+  public var accentColor: UIColor = .ne_funTheme {
     didSet {
       sendButton.backgroundColor = accentColor
       updateTabPresentations()

@@ -86,23 +86,13 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
     textfieldBgView.addSubview(inputView)
 
     /// 文本框白色背景
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20.0),
-        textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + topConstant),
-        textfieldBgView.heightAnchor.constraint(equalToConstant: editType == .specialSign ? 120 : 50),
-      ])
-
-    } else {
-      NSLayoutConstraint.activate([
-        textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-        textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-        textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + topConstant),
-        textfieldBgView.heightAnchor.constraint(equalToConstant: editType == .specialSign ? 120 : 50),
-      ])
-      textfieldBgView.layer.cornerRadius = 0
-    }
+    NSLayoutConstraint.activate([
+      textfieldBgView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+      textfieldBgView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+      textfieldBgView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12 + topConstant),
+      textfieldBgView.heightAnchor.constraint(equalToConstant: editType == .specialSign ? 120 : 50),
+    ])
+    textfieldBgView.layer.cornerRadius = 0
 
     /// 文本框
     NSLayoutConstraint.activate([
@@ -119,21 +109,14 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
   func initialConfig() {
     addRightAction(commonLocalizable("complete"), #selector(saveName), self)
 
-    view.backgroundColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#EFF1F4") : UIColor(hexString: "#EDEDED")
+    view.backgroundColor = UIColor(hexString: "#EDEDED")
     navigationView.setMoreButtonTitle(commonLocalizable("complete"))
     navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 60)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(saveName))
 
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-      navigationView.moreButton.setTitleColor(.ne_greyText, for: .normal)
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-      navigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
-      navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 17)
-    }
+    view.backgroundColor = .funChatBackgroundColor
+    navigationView.moreButton.setTitleColor(.funChatThemeColor, for: .normal)
+    navigationView.moreButton.titleLabel?.font = .systemFont(ofSize: 17)
   }
 
   /// 保存昵称

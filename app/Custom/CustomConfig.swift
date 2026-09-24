@@ -493,12 +493,12 @@ public class CustomConfig {
       self.securityWarningView.warningLabel.text = localizable("security_warning")
       viewController.bodyTopView.addSubview(self.securityWarningView)
       NSLayoutConstraint.activate([
-        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: NEStyleManager.instance.isNormalStyle() ? 0 : 60),
+        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: 60),
         self.securityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
         self.securityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
         self.securityWarningView.heightAnchor.constraint(equalToConstant: 56),
       ])
-      viewController.bodyTopViewHeight = NEStyleManager.instance.isNormalStyle() ? 56 : 60 + 56
+      viewController.bodyTopViewHeight = 60 + 56
     }
 
     // 本地会话
@@ -511,12 +511,12 @@ public class CustomConfig {
       self.securityWarningView.warningLabel.text = localizable("security_warning")
       viewController.bodyTopView.addSubview(self.securityWarningView)
       NSLayoutConstraint.activate([
-        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: NEStyleManager.instance.isNormalStyle() ? 0 : 60),
+        self.securityWarningView.topAnchor.constraint(equalTo: viewController.bodyTopView.topAnchor, constant: 60),
         self.securityWarningView.leftAnchor.constraint(equalTo: viewController.bodyTopView.leftAnchor),
         self.securityWarningView.rightAnchor.constraint(equalTo: viewController.bodyTopView.rightAnchor),
         self.securityWarningView.heightAnchor.constraint(equalToConstant: 56),
       ])
-      viewController.bodyTopViewHeight = NEStyleManager.instance.isNormalStyle() ? 56 : 60 + 56
+      viewController.bodyTopViewHeight = 60 + 56
     }
 
     // 聊天页面
