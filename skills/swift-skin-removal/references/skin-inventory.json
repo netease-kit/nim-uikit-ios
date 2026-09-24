@@ -1,0 +1,160 @@
+{
+  "shared_paths": [
+    "NEChatUIKit/NEChatUIKit/Classes/Base/NEChatService.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/Helper/ChatMessageHelper.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistoryDatePickerViewController.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistorySearchDateCell.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistorySearchFileCell.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistorySearchMonthHeaderView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistorySearchMonthYearPickerView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/Model/MessageContentModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/Model/MessageTextModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/CollectionCell/NEBaseCollectionMessageCell.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/NEBaseChatMessageCell.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatInputView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/ReplyView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/SelectLanguageViewModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/UserSettingViewModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Common/ChatCellConstantValue.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Common/ChatConstant.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitClient.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotBindCell.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotBindController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotConfigController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotDetailController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotListCell.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseCreateAIRobotController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseRobotChatCardController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseRobotNicknameEditController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/Base/NEContactService.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/Multiselect/Cell/NEBaseSelectCell.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/Multiselect/ViewController/NEBaseMultiSelectViewController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/Views/Cell/NEBaseContactTableViewCell.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Common/NEConversationService.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEBaseConversationController.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupAddConversationController.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupManageController.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupSettingController.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Utils/NEConversationGroupUIStyle.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/View/NEConversationGroupBar.swift",
+    "NELocalConversationUIKit/NELocalConversationUIKit/Classes/Common/NELocalConversationService.swift",
+    "NELocalConversationUIKit/NELocalConversationUIKit/Classes/Conversation/Controller/NEBaseLocalConversationController.swift",
+    "NETeamUIKit/NETeamUIKit/Classes/Base/NEBaseTeamRouter.swift",
+    "NETeamUIKit/NETeamUIKit/Classes/Base/NETeamService.swift",
+    "app.xcodeproj/project.pbxproj",
+    "app/Custom/CustomConfig.swift",
+    "app/Main/Constant.swift",
+    "app/Main/NETabBarController.swift",
+    "app/Main/SceneDelegate.swift",
+    "app/Main/UIStyleManager.swift",
+    "app/Mine/Controller/ConfigTestViewController.swift",
+    "app/Mine/Controller/IMPocConfigViewController.swift",
+    "app/Mine/Controller/IMPushConfigViewController.swift",
+    "app/Mine/Controller/InputPersonInfoController.swift",
+    "app/Mine/Controller/LanguageViewController.swift",
+    "app/Mine/Controller/MeViewController.swift",
+    "app/Mine/Controller/MessageRemindViewController.swift",
+    "app/Mine/Controller/MineSettingViewController.swift",
+    "app/Mine/Controller/PersonInfoViewController.swift",
+    "app/Mine/Controller/TranslationLanguageViewController.swift",
+    "app/Mine/Controller/TranslationSettingViewController.swift",
+    "app/Mine/View/Theme/CustomSettingInputCell.swift",
+    "app/Mine/View/Theme/CustomSettingTextviewCell.swift",
+    "app/Mine/View/Theme/CustomTeamArrowSettingCell.swift",
+    "app/Mine/View/Theme/CustomTeamSettingHeaderCell.swift",
+    "app/Mine/View/Theme/CustomTeamSettingRightCustomCell.swift",
+    "app/Mine/View/Theme/CustomTeamSettingSubtitleCell.swift",
+    "app/Mine/View/Theme/CustomTeamSettingSwitchCell.swift",
+    "app/Mine/ViewModel/MineSettingViewModel.swift",
+    "app/en.lproj/Localizable.strings",
+    "app/zh-Hans.lproj/Localizable.strings"
+  ],
+  "common_removals": [
+    "app/Mine/Controller/StyleSelectionViewController.swift",
+    "app/Mine/View/StyleSelectionCell.swift"
+  ],
+  "shared_migrations": {
+    "fun": [
+      {
+        "from": "NEBaseUIKit/NEBaseUIKit/Classes/FunUI/FunSearchView.swift",
+        "to": "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/SearchSessionBaseView.swift",
+        "reason": "SearchSessionBaseView is shared by NormalUI conversation and local-conversation search headers."
+      }
+    ],
+    "normal": []
+  },
+  "skins": {
+    "normal": {
+      "aliases": ["normal", "normalui", "飞书", "通用"],
+      "owned_paths": [
+        "NEBaseUIKit/NEBaseUIKit/Assets/NormalBaseUI.xcassets",
+        "NEChatUIKit/NEChatUIKit/Classes/NormalUI",
+        "NEChatUIKit/NEChatUIKit/Assets/NormalChatUIKit.xcassets",
+        "NEContactUIKit/NEContactUIKit/Classes/NormalUI",
+        "NEContactUIKit/NEContactUIKit/Assets/NormalContactUIKit.xcassets",
+        "NEConversationUIKit/NEConversationUIKit/Classes/NormalUI",
+        "NEConversationUIKit/NEConversationUIKit/Assets/NormalConversationUIKit.xcassets",
+        "NELocalConversationUIKit/NELocalConversationUIKit/Classes/NormalUI",
+        "NELocalConversationUIKit/NELocalConversationUIKit/Assets/NormalLocalConversationUIKit.xcassets",
+        "NETeamUIKit/NETeamUIKit/Classes/NormalUI",
+        "NETeamUIKit/NETeamUIKit/Assets/NormalTeamUIKit.xcassets",
+        "app/Custom/CustomNormalChatViewController.swift",
+        "app/Assets.xcassets/Tabbar/chat.imageset",
+        "app/Assets.xcassets/Tabbar/chatSelect.imageset",
+        "app/Assets.xcassets/Tabbar/contact.imageset",
+        "app/Assets.xcassets/Tabbar/contactSelect.imageset",
+        "app/Assets.xcassets/Tabbar/person.imageset",
+        "app/Assets.xcassets/Tabbar/personSelect.imageset",
+        "app/Assets.xcassets/Mine/clicked_normal.imageset",
+        "app/Assets.xcassets/Mine/style_normal.imageset"
+      ],
+      "markers": ["NormalUI", "NormalChat", "NormalContact", "NormalConversation", "NormalLocalConversation", "NormalTeam", "normalChat", "normalContact", "normalSearch", "CustomNormal", "registerNormalCustom", "isNormalStyle", "setNormalStyle", "ne_normalTheme", "style_normal", "clicked_normal", "style_default", "style_selection", "didStyleClick"],
+      "project_cleanup": {
+        "app.xcodeproj/project.pbxproj": [
+          "CustomNormalChatViewController.swift",
+          "StyleSelectionViewController.swift",
+          "StyleSelectionCell.swift"
+        ]
+      }
+    },
+    "fun": {
+      "aliases": ["fun", "funui", "微信", "娱乐"],
+      "extra_edit_paths": [
+        "NEContactUIKit/NEContactUIKit/Classes/NormalUI/ViewController/CreateAIRobotController.swift"
+      ],
+      "owned_paths": [
+        "NEBaseUIKit/NEBaseUIKit/Classes/FunUI",
+        "NEBaseUIKit/NEBaseUIKit/Assets/FunBaseUI.xcassets",
+        "NEChatUIKit/NEChatUIKit/Classes/FunUI",
+        "NEChatUIKit/NEChatUIKit/Assets/FunChatUIKit.xcassets",
+        "NEContactUIKit/NEContactUIKit/Classes/FunUI",
+        "NEContactUIKit/NEContactUIKit/Assets/FunContactUIKit.xcassets",
+        "NEConversationUIKit/NEConversationUIKit/Classes/FunUI",
+        "NEConversationUIKit/NEConversationUIKit/Assets/FunConversationUIKit.xcassets",
+        "NELocalConversationUIKit/NELocalConversationUIKit/Classes/FunUI",
+        "NELocalConversationUIKit/NELocalConversationUIKit/Assets/FunLocalConversationUIKit.xcassets",
+        "NETeamUIKit/NETeamUIKit/Classes/FunUI",
+        "NETeamUIKit/NETeamUIKit/Assets/FunTeamUIKit.xcassets",
+        "app/Custom/CustomFunChatViewController.swift",
+        "app/Assets.xcassets/Tabbar/funChat.imageset",
+        "app/Assets.xcassets/Tabbar/funChatSelect.imageset",
+        "app/Assets.xcassets/Tabbar/funContact.imageset",
+        "app/Assets.xcassets/Tabbar/funContactSelect.imageset",
+        "app/Assets.xcassets/Tabbar/funPerson.imageset",
+        "app/Assets.xcassets/Tabbar/funPersonSelect.imageset",
+        "app/Assets.xcassets/Mine/clicked_fun.imageset",
+        "app/Assets.xcassets/Mine/style_fun.imageset"
+      ],
+      "markers": ["FunUI", "FunChat", "FunContact", "FunConversation", "FunLocalConversation", "FunTeam", "FunSearch", "FunCollection", "FunPin", "funChat", "funContact", "funConversation", "CustomFun", "registerFunCustom", "setFunStyle", "isFunStyle", "iconUrlsFun", "fun_chat_", "fun_", "style_fun", "clicked_fun", "style_selection", "didStyleClick"],
+      "project_cleanup": {
+        "app.xcodeproj/project.pbxproj": [
+          "CustomFunChatViewController.swift",
+          "StyleSelectionViewController.swift",
+          "StyleSelectionCell.swift"
+        ]
+      }
+    }
+  }
+}
