@@ -52,7 +52,7 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
   public lazy var createBotIconView: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
-    v.backgroundColor = .ne_normalTheme
+    v.backgroundColor = .neUIKitDefaultPrimaryColor
     v.clipsToBounds = true
     return v
   }()
@@ -265,11 +265,11 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
 
   // MARK: - 子类 override 点
 
-  open func pageBackgroundColor() -> UIColor { .funContactNavigationBackgroundColor }
+  open func pageBackgroundColor() -> UIColor { .neUIKitDefaultPageBackgroundColor }
   open func createBotHorizontalMargin() -> CGFloat { 0 }
   open func createBotRowHeight() -> CGFloat { 60 }
   open func bindRowHeight() -> CGFloat { 60 }
-  open func confirmButtonColor() -> UIColor { .normalContactThemeColor }
+  open func confirmButtonColor() -> UIColor { .neUIKitDefaultPrimaryColor }
   /// 分区灰块高度（Normal: 6，Fun: 8）
   open func dividerBlockHeight() -> CGFloat { 6 }
   /// "选择已有机器人"标签字重
@@ -284,7 +284,7 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
   }
 
   open func setupCreateBotIconStyle() {
-    createBotIconView.backgroundColor = .ne_normalTheme
+    createBotIconView.backgroundColor = .neUIKitDefaultPrimaryColor
     createBotIconView.layer.cornerRadius = 18
   }
 

@@ -17,11 +17,11 @@ open class CreateAIRobotController: NEBaseCreateAIRobotController {
   }
 
   override open func pageBackgroundColor() -> UIColor {
-    .funContactNavigationBackgroundColor
+    .neUIKitDefaultPageBackgroundColor
   }
 
   override open func saveButtonColor() -> UIColor {
-    .normalContactThemeColor
+    .neUIKitDefaultPrimaryColor
   }
 
   override open func cardHorizontalMargin() -> CGFloat { 20 }
