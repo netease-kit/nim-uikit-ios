@@ -298,10 +298,10 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
   open func deleteSeparatorHeight() -> CGFloat { 0 }
   /// 删除按钮行自身高度
   open func deleteRowHeight() -> CGFloat { 50 }
-  open func chatTextColor() -> UIColor { .ne_normalTheme }
+  open func chatTextColor() -> UIColor { .neUIKitDefaultPrimaryColor }
   open func chatLabelFont() -> UIFont { .systemFont(ofSize: 16) }
   open func deleteLabelFont() -> UIFont { .systemFont(ofSize: 16, weight: .medium) }
-  open func confirmButtonColor() -> UIColor { .normalContactThemeColor }
+  open func confirmButtonColor() -> UIColor { .neUIKitDefaultPrimaryColor }
 
   open func setupHeaderStyle() {
     // Normal: 圆角8

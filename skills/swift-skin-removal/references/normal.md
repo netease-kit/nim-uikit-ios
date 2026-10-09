@@ -15,7 +15,7 @@
 - 五个 UI 服务 `NEChatService`、`NEContactService`、`NEConversationService`、`NELocalConversationService`、`NETeamService` 的 `registerRouter` 保留现有 API 但固定注册 `registerFun()`；保留会话 @ 消息初始化和聊天表情初始化等共享业务。`ChatMessageHelper.swift` 的聊天/标记/收藏三张 cell 注册表只保留 Fun 类型，兼容 `isFun` / ObjC wrapper 入参时仍返回存活的类型。
 - `NEConversationGroupUIStyle.swift` 只保留 `.fun` 所需值；其 `NEConversationGroupAddConversationController.swift`、`NEConversationGroupManageController.swift`、`NEConversationGroupSettingController.swift`、`NEConversationGroupBar.swift` 清理 `.normal` 默认值和二选一渲染；同时检查登记的 `NEBaseConversationController.swift` 初始化样式。`NEChatUIKitClient.swift` 中 Fun 图片是存活皮肤资源，勿误删。
 - `NEChatUIKit` 的日期选择/历史搜索 (`normalSearchDateButtonBg`, `normalChatNavigationDivideBg`)、`ReplyView.swift` (`normalChatReplyViewBg`) 在共享源码引用 Normal 专属颜色，需换成保留皮肤的 UI 值；共享 `ChatCellConstantValue.swift`、`MessageContentModel.swift`、`MessageTextModel.swift`、`NEBaseChatMessageCell.swift` 中的专属布局/注释须核对。
-- `NEContactUIKit` 的 AI Robot 基类和多选基类 `NEBaseSelectCell.swift` / `NEBaseMultiSelectViewController.swift` 默认引用 `normalContactThemeColor`，该颜色定义随 Normal 目录删除后必须替换为保留皮肤的颜色/稳定公共值，不能直接删基类；`NETeamUIKit/Classes/Base/NEBaseTeamRouter.swift` 的 `iconUrlsFun` 要保留。详见 JSON 列出的共享编辑文件。
+- `NEContactUIKit` 的 AI Robot 基类和多选基类 `NEBaseSelectCell.swift` / `NEBaseMultiSelectViewController.swift` 默认引用 `normalContactThemeColor`，该颜色定义随 Normal 目录删除后必须替换为稳定公共值，不能直接删基类；当前公共默认色位于 `NEBaseUIKit/Classes/CommonView/NEUIKitDefaultColors.swift`，值保持现有 `#337EFF` 不变。`NETeamUIKit/Classes/Base/NEBaseTeamRouter.swift` 的 `iconUrlsFun` 要保留。详见 JSON 列出的共享编辑文件。
 
 ## 不得删除
 
