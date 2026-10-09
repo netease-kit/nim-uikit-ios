@@ -3656,6 +3656,10 @@ open class ChatViewController: NEChatBaseViewController, UINavigationControllerD
   }
 
   open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    // Accessibility snapshots can prepare offscreen cells and invoke willDisplay.
+    // Do not mark messages as read or paginate history for those synthetic callbacks.
+    guard tableView.rectForRow(at: indexPath).intersects(tableView.bounds) else { return }
+
     let messageCount = tableView.numberOfRows(inSection: 0)
     let reachedIndicatorTarget = onReceiveNewMsgs.isEmpty
       ? (indexPath.row == messageCount - 1 && isLatestMessageVisible())
