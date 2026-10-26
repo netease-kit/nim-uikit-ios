@@ -8,8 +8,9 @@ import NEChatKit
 
 @objc
 public protocol TabNavigationViewDelegate: AnyObject {
-  func didClickAddBtn()
-  func searchAction()
+  @objc optional func didClickAddBtn()
+  @objc optional func searchAction()
+  @objc optional func brandBtnClick()
 }
 
 @objcMembers
@@ -26,6 +27,7 @@ open class TabNavigationView: UIView {
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitleColor(UIColor.black, for: .normal)
     button.titleLabel?.font = NEConstant.textFont("PingFangSC-Medium", 20)
+    button.addTarget(self, action: #selector(brandBtnClick), for: .touchUpInside)
     return button
   }()
 
@@ -139,11 +141,15 @@ open class TabNavigationView: UIView {
 }
 
 extension TabNavigationView {
+  @objc open func brandBtnClick(sender: UIButton) {
+    delegate?.brandBtnClick?()
+  }
+
   @objc open func searchBtnClick(sender: UIButton) {
-    delegate?.searchAction()
+    delegate?.searchAction?()
   }
 
   @objc open func addBtnClick(sender: UIButton) {
-    delegate?.didClickAddBtn()
+    delegate?.didClickAddBtn?()
   }
 }

@@ -14,6 +14,9 @@ public enum FileState: Int {
 
 @objcMembers
 open class FileStateView: UIView {
+  private var didSetupUI = false
+  private var currentProgress: Float = 0
+
   public lazy var circleLayer: CAShapeLayer = {
     let layer = CAShapeLayer()
     layer.isHidden = true
@@ -91,9 +94,12 @@ open class FileStateView: UIView {
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+    setupUI()
   }
 
   func setupUI() {
+    guard !didSetupUI else { return }
+    didSetupUI = true
     addSubview(FileOpenImage)
     NSLayoutConstraint.activate([
       FileOpenImage.centerXAnchor.constraint(equalTo: centerXAnchor),
@@ -126,14 +132,6 @@ open class FileStateView: UIView {
       verticalLineRight.widthAnchor.constraint(equalToConstant: 2),
     ])
 
-    let borderPath = UIBezierPath(
-      arcCenter: CGPoint(x: 16, y: 16),
-      radius: 9,
-      startAngle: 0,
-      endAngle: 2 * Double.pi,
-      clockwise: true
-    )
-    circleLayer.path = borderPath.cgPath
     circleLayer.strokeColor = UIColor.white.withAlphaComponent(0.5).cgColor
     circleLayer.fillColor = UIColor.clear.cgColor
     circleLayer.lineWidth = 2
@@ -143,14 +141,36 @@ open class FileStateView: UIView {
     layer.addSublayer(progressLayer)
   }
 
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    updateProgressLayers()
+  }
+
   open func setProgress(_ progress: Float) {
-    print("file state view set progress : ", progress)
-    if progress < 1.0, state == .FileOpen {
+    currentProgress = min(max(progress, 0), 1)
+    if currentProgress < 1.0, state == .FileOpen {
       state = .FileDownload
     }
-    let center = CGPoint(x: frame.size.width / 2.0, y: frame.size.height / 2.0)
+    updateProgressLayers()
+    if currentProgress >= 1.0, state == .FileDownload {
+      state = .FileOpen
+    }
+  }
+
+  private func updateProgressLayers() {
+    let center = CGPoint(x: bounds.midX, y: bounds.midY)
+    let borderPath = UIBezierPath(
+      arcCenter: center,
+      radius: 9,
+      startAngle: 0,
+      endAngle: 2 * Double.pi,
+      clockwise: true
+    )
+    circleLayer.frame = bounds
+    circleLayer.path = borderPath.cgPath
+
     let start = -0.5 * Float.pi
-    let end = progress * 2 * Float.pi - 0.5 * Float.pi
+    let end = currentProgress * 2 * Float.pi - 0.5 * Float.pi
 
     let progressPath = UIBezierPath(
       arcCenter: center,
@@ -159,12 +179,10 @@ open class FileStateView: UIView {
       endAngle: CGFloat(end),
       clockwise: true
     )
+    progressLayer.frame = bounds
     progressLayer.path = progressPath.cgPath
     progressLayer.strokeColor = UIColor.white.cgColor
     progressLayer.fillColor = UIColor.clear.cgColor
     progressLayer.lineWidth = 2
-    if progress >= 1.0, state == .FileDownload {
-      state = .FileOpen
-    }
   }
 }

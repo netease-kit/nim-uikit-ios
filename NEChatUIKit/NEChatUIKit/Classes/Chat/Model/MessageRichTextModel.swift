@@ -41,6 +41,7 @@ open class MessageRichTextModel: MessageTextModel {
     let contentSizeWidth = max(textWidth, textSize.width) + chat_content_margin * 2
     let contentSizeHeight = contentSize.height + titleTextHeight + (body.isEmpty ? 0 : chat_content_margin)
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
+    textHeightForViewport = contentSizeHeight
     height = contentSizeHeight + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
 

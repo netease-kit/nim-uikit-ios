@@ -6,6 +6,10 @@ import Foundation
 import NEChatKit
 
 enum NEConversationGroupLocalConfigHelper {
+  /// 本地分组配置变更通知：磁盘配置是分组顺序的唯一权威来源，
+  /// 保存后通知所有内存副本同步，避免双栏同时可见时显示旧顺序。
+  static let didChangeNotification = Notification.Name("NEConversationGroupLocalConfigDidChange")
+
   private static func key() -> String {
     let account = IMKitClient.instance.account()
     return "NEConversationGroupConfig_\(account)"
@@ -58,5 +62,6 @@ enum NEConversationGroupLocalConfigHelper {
       items.append(NEConversationGroupLocalConfigItem(groupId: group.groupId, hidden: true, order: common.count + index))
     }
     save(NEConversationGroupLocalConfig(items: items))
+    NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
   }
 }

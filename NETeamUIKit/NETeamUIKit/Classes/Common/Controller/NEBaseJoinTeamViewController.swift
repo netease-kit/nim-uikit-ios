@@ -54,6 +54,9 @@ open class NEBaseJoinTeamViewController: NETeamBaseViewController, UITextFieldDe
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
+    // 同一入口重复点击时复用该页面，避免详情栏重复入栈。
+    restorationIdentifier = "ne.page.joinTeam"
     title = commonLocalizable("join_team")
     navigationView.moreButton.isHidden = true
     emptyView.setText(localizable("no_team_find"))

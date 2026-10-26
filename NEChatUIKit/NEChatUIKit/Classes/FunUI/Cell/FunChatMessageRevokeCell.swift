@@ -114,6 +114,7 @@ open class FunChatMessageRevokeCell: FunChatMessageBaseCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    applyViewport(model.viewport)
     let isSend = IMKitClient.instance.isMe(model.message?.senderId)
     let revokeLabel = isSend ? revokeLabelRight : revokeLabelLeft
     let tipFont = UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)

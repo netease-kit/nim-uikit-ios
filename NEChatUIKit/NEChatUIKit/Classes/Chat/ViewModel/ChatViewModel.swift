@@ -17,24 +17,6 @@ public enum LastReadPositionState {
 
 @objc
 public protocol ChatViewModelDelegate: NSObjectProtocol {
-  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
-  /// 来源： 发送消息， 插入消息
-  /// - Parameter param: 消息参数，包含消息、会话 id、发送参数
-  /// - Returns: 消息参数
-  @objc optional func beforeSend(_ param: MessageSendParams) -> MessageSendParams?
-
-  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
-  /// 来源： 发送消息， 插入消息
-  /// - Parameter param: 消息参数，包含消息、会话 id、发送参数
-  /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  @objc optional func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void)
-
-  /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
-  /// - Parameter result: 发送结果
-  /// - Parameter error: 失败详情
-  /// - Parameter progress: 发送进度
-  @objc optional func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt)
-
   /// 消息发送中，此时消息已经发送
   /// - Parameters:
   ///   - message: 消息
@@ -282,7 +264,6 @@ open class ChatViewModel: NSObject {
   /// 添加监听
   open func addListener() {
     chatRepo.addChatListener(self)
-    chatRepo.addMessageSendListener(self)
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.addAIListener(self)
@@ -320,7 +301,6 @@ open class ChatViewModel: NSObject {
     reactionManager?.stop()
     lastReadPositionGeneration += 1
     chatRepo.removeChatListener(self)
-    chatRepo.removeMessageSendListener(self)
 
     if IMKitConfigCenter.shared.enableAIUser {
       AIRepo.shared.removeAIListener(self)
@@ -877,14 +857,15 @@ open class ChatViewModel: NSObject {
 
       if !accids.isEmpty {
         self?.loadShowName(Array(accids), requestedSessionId) {
-          for model in self?.messages ?? [] {
-            // 更新通知消息文案
-            if let m = model as? MessageTipsModel {
-              m.resetMessage(m.message)
-            }
-          }
-
+          // 通知消息文案会读取用户/群成员缓存并写回列表数据模型，
+          // 统一回到主线程执行，避免与缓存刷新并发读写导致崩溃。
           DispatchQueue.main.async {
+            for model in self?.messages ?? [] {
+              // 更新通知消息文案
+              if let m = model as? MessageTipsModel {
+                m.resetMessage(m.message)
+              }
+            }
             self?.delegate?.tableViewReload()
           }
         }
@@ -3457,31 +3438,6 @@ open class ChatViewModel: NSObject {
     group.notify(queue: .main) {
       completion(lastError)
     }
-  }
-}
-
-// MARK: - NEMessageListener
-
-extension ChatViewModel: NEMessageListener {
-  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
-  /// 来源： 发送消息， 插入消息
-  /// - Parameter param: 消息参数，包含消息和发送参数
-  /// - Returns: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  open func beforeSend(_ param: MessageSendParams) -> MessageSendParams? {
-    delegate?.beforeSend?(param)
-  }
-
-  /// 本端即将发送消息状态回调，此时消息还未发送，可对消息进行修改或者拦截发送
-  /// 来源： 发送消息， 插入消息
-  /// - Parameter param: 消息参数，包含消息和发送参数
-  /// - Parameter completion: （修改后的）消息参数，若消息参数为 nil，则表示拦截该消息不发送
-  open func beforeSend(_ param: MessageSendParams, _ completion: @escaping (MessageSendParams?) -> Void) {
-    delegate?.beforeSend?(param, completion)
-  }
-
-  /// 本端发送消息后的回调，为 sendMessage 接口callback，可在回调中获取消息反垃圾结果
-  open func sendMessageCallback(_ result: V2NIMSendMessageResult?, _ error: V2NIMError?, _ progress: UInt) {
-    delegate?.sendMessageCallback?(result, error, progress)
   }
 }
 

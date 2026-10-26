@@ -4,6 +4,7 @@
 
 import NEChatKit
 import NIMSDK
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -29,6 +30,8 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
 
   /// 内容controller集合
   public var contentControllers = [NEBaseFusionContactSelectedController]()
+  var pagingController: NEPagingViewController?
+  private var adaptivePagingWidth: CGFloat = 0
 
   /// 选择记录
   public var selectArray = [NEFusionContactCellModel]()
@@ -77,6 +80,17 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
     title = localizable("select")
     setupNavSureItem()
     setupPageContent()
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice,
+          let pagingController,
+          view.bounds.width > 0,
+          abs(adaptivePagingWidth - view.bounds.width) > 0.5 else { return }
+    adaptivePagingWidth = view.bounds.width
+    pagingController.menuItemSize = .fixed(width: view.bounds.width / 2, height: 40)
+    pagingController.collectionView.collectionViewLayout.invalidateLayout()
   }
 
   /// 获取page view 内容，在子类中实现

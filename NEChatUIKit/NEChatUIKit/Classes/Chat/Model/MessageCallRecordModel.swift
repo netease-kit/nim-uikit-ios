@@ -10,6 +10,7 @@ import UIKit
 @objcMembers
 open class MessageCallRecordModel: MessageContentModel {
   public var attributeStr: NSMutableAttributedString?
+  var viewportTextHeight: CGFloat?
 
   public required init(message: V2NIMMessage?) {
     super.init(message: message)
@@ -76,6 +77,7 @@ open class MessageCallRecordModel: MessageContentModel {
     }
 
     let textSize = NSAttributedString.getRealTextViewSize(attributeStr, messageTextFont, messageMaxSize)
+    viewportTextHeight = textSize.height
     let contentSizeWidth = textSize.width + chat_cell_margin * 2
     let contentSizeHeight = textSize.height + (isAuiodRecord ? 20 : 24)
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)

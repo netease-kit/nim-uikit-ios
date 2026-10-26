@@ -8,10 +8,78 @@ import Photos
 import PhotosUI
 import UIKit
 import NEChatKit
+import ObjectiveC
 
 public typealias AlertCallBack = () -> Void
 
+private var neKeyboardDismissGestureKey: UInt8 = 0
+private var neKeyboardDismissDelegateKey: UInt8 = 0
+
+/// 忽略点在输入控件上的点击，避免收起键盘的单击同时打断正在编辑的输入框。
+private final class NEKeyboardDismissGestureDelegate: NSObject, UIGestureRecognizerDelegate {
+  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                         shouldReceive touch: UITouch) -> Bool {
+    var candidate = touch.view
+    while let view = candidate {
+      if view is UITextField || view is UITextView || view is UISearchBar {
+        return false
+      }
+      candidate = view.superview
+    }
+    return true
+  }
+}
+
 public extension UIViewController {
+
+  /// 分栏/双屏布局下，选择类弹窗只覆盖当前内容栏，避免遮住相邻栏。
+  /// 普通 iPhone、iPad 上当前内容栏即整个窗口或原始 popover，展示效果不变。
+  /// - Parameters:
+  ///   - controller: 待展示的弹窗控制器
+  /// 为输入类页面提供明确的键盘收起途径：点击空白处收起键盘。
+  /// 输入框、搜索框自身以及页面内的控件点击不受影响。
+  public func ne_enableKeyboardDismissOnTap() {
+    guard objc_getAssociatedObject(self, &neKeyboardDismissGestureKey) == nil else { return }
+    let delegate = NEKeyboardDismissGestureDelegate()
+    let tap = UITapGestureRecognizer(target: self, action: #selector(ne_handleKeyboardDismissTap))
+    tap.cancelsTouchesInView = false
+    tap.delegate = delegate
+    view.addGestureRecognizer(tap)
+    objc_setAssociatedObject(self, &neKeyboardDismissGestureKey, tap, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    objc_setAssociatedObject(self, &neKeyboardDismissDelegateKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+  }
+
+  public func showInCurrentColumn(_ controller: UIViewController,
+                                  animated: Bool = true,
+                                  completion: (() -> Void)? = nil) {
+    // 官方要求 alert / sheet 由系统做窗口级呈现，由系统避开折叠区与摄像头遮挡。
+    present(controller, animated: animated, completion: completion)
+  }
+
+  /// 底部选择弹窗（微信皮肤）在双栏展开态只覆盖右侧详情栏；
+  /// 折叠外屏、普通 iPhone/iPad 和单栏布局仍按窗口级底部弹窗展示。
+  /// 飞书皮肤的系统 action sheet 继续走 `showInCurrentColumn`，不受此入口影响。
+  public func showBottomSheetInDetailColumn(_ controller: UIViewController,
+                                            animated: Bool = true,
+                                            completion: (() -> Void)? = nil) {
+    if isHostedInDetailColumn {
+      // 与列内子页面、@ 选择页保持一致：呈现上下文取当前右列，
+      // 弹窗的遮罩和卡片都只在右列范围内排版。
+      controller.modalPresentationStyle = .overCurrentContext
+      definesPresentationContext = true
+    }
+    present(controller, animated: animated, completion: completion)
+  }
+
+  /// 当前页面是否位于双栏展开态的右侧详情栏。
+  /// 单栏内容（含折叠外屏）与窗口左侧安全区对齐，右列整体位于其右侧。
+  private var isHostedInDetailColumn: Bool {
+    guard let window = viewIfLoaded?.window else { return false }
+    let frame = view.convert(view.bounds, to: window)
+    return NEAdaptiveColumnGeometry.isDetailColumn(frameInWindow: frame,
+                                                   windowWidth: window.bounds.width,
+                                                   safeAreaInsets: window.safeAreaInsets)
+  }
   var rightNavButton: ExpandButton {
     get {
       if let button = objc_getAssociatedObject(
@@ -137,7 +205,7 @@ public extension UIViewController {
       cancelAction.setValue(cancelColor, forKey: "titleTextColor")
     }
 
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showSingleAlert(title: String = commonLocalizable("tip"), message: String?,
@@ -156,7 +224,11 @@ public extension UIViewController {
     }
     sureAction.accessibilityIdentifier = "id.dialogPositive"
     alertController.addAction(sureAction)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
+  }
+
+  @objc private func ne_handleKeyboardDismissTap() {
+    view.endEditing(true)
   }
 
   func showToast(_ message: String, _ position: NEToastPosition = .center) {
@@ -183,7 +255,7 @@ public extension UIViewController {
     }
 
     alertController.fixIpadAction()
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showCustomActionSheet(_ actions: [NECustomAlertAction]) {
@@ -196,7 +268,7 @@ public extension UIViewController {
       alertController.addAction(action)
     }
     alertController.cancelAction.contentText.accessibilityIdentifier = "id.action\(actions.count + 1)"
-    present(alertController, animated: true, completion: nil)
+    showBottomSheetInDetailColumn(alertController)
   }
 
   func showBottomVideoAction(_ delegate: UIImagePickerControllerDelegate &
@@ -236,7 +308,7 @@ public extension UIViewController {
     alertController.addAction(takingPicturesAction)
     alertController.addAction(localPhotoAction)
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showCustomBottomVideoAction(_ delegate: UIImagePickerControllerDelegate &
@@ -289,7 +361,7 @@ public extension UIViewController {
     alertController.addAction(selectICloudAction)
     alertController.addAction(selectAlbumAction)
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showCustomBottomFileAction(_ delegate: UIImagePickerControllerDelegate & UIDocumentPickerDelegate &
@@ -341,7 +413,7 @@ public extension UIViewController {
     alertController.addAction(callAction)
     alertController.addAction(copyAction)
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showCustomBottomTelAction(_ url: URL) {
@@ -398,7 +470,7 @@ public extension UIViewController {
     alertController.addAction(sendAction)
     alertController.addAction(copyAction)
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   func showCustomBottomMailAction(_ url: URL) {
@@ -478,7 +550,7 @@ public extension UIViewController {
     alertController.addAction(takingPicturesAction)
     alertController.addAction(localPhotoAction)
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: presentCompletion)
+    showInCurrentColumn(alertController, completion: presentCompletion)
   }
 
   func showCustomBottomAlert(_ delegate: UIImagePickerControllerDelegate &
@@ -534,7 +606,7 @@ public extension UIViewController {
     alert.addAction(second)
     alert.addAction(cancel)
 
-    present(alert, animated: true, completion: nil)
+    showInCurrentColumn(alert)
   }
 
   func goCamera(_ delegate: UIImagePickerControllerDelegate & UINavigationControllerDelegate,

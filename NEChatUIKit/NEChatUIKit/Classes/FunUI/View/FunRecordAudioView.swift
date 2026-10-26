@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import UIKit
 
 @objc
@@ -108,9 +109,8 @@ open class FunRecordAudioView: UIView {
     return label
   }()
 
-  private var progressWidthIncreaseFactor: CGFloat = 0
-
   private var progressWidthConstraint: NSLayoutConstraint?
+  private var progressWidthIncreaseFactor: CGFloat = 0
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
@@ -122,18 +122,31 @@ open class FunRecordAudioView: UIView {
   }
 
   open func setupUI() {
-    let totalWidth = UIScreen.main.bounds.width - maxRecordProgressMargin * 2 - minRecordProgressWidth
-    let delta = CGFloat(maxDuration - lastTimeDuration)
-    progressWidthIncreaseFactor = totalWidth / delta
-
+    if !NEAdaptiveDeviceGate.isFoldableDevice {
+      let totalWidth = UIScreen.main.bounds.width - maxRecordProgressMargin * 2 - minRecordProgressWidth
+      let delta = CGFloat(maxDuration - lastTimeDuration)
+      progressWidthIncreaseFactor = totalWidth / delta
+    }
     backgroundColor = UIColor.funRecordAudioViewBg.withAlphaComponent(0.7)
     addSubview(recordGestureArea)
-    NSLayoutConstraint.activate([
+    if NEAdaptiveDeviceGate.isFoldableDevice {
+      let gestureHeight = recordGestureArea.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 128.0 / 375.0)
+      gestureHeight.priority = .defaultHigh
+      NSLayoutConstraint.activate([
+        recordGestureArea.leftAnchor.constraint(equalTo: leftAnchor),
+        recordGestureArea.rightAnchor.constraint(equalTo: rightAnchor),
+        recordGestureArea.bottomAnchor.constraint(equalTo: bottomAnchor),
+        gestureHeight,
+        recordGestureArea.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor, multiplier: 0.4),
+      ])
+    } else {
+      NSLayoutConstraint.activate([
       recordGestureArea.leftAnchor.constraint(equalTo: leftAnchor),
       recordGestureArea.rightAnchor.constraint(equalTo: rightAnchor),
       recordGestureArea.bottomAnchor.constraint(equalTo: bottomAnchor),
-      recordGestureArea.heightAnchor.constraint(equalToConstant: FunRecordAudioView.getGestureHeight()),
-    ])
+      recordGestureArea.heightAnchor.constraint(equalToConstant: Self.getGestureHeight()),
+      ])
+    }
 
     addSubview(recordCloseImage)
     NSLayoutConstraint.activate([
@@ -191,17 +204,19 @@ open class FunRecordAudioView: UIView {
     weak var weakSelf = self
     let finalWidth = UIScreen.main.bounds.width - maxRecordProgressMargin * 2
     let animDuration = TimeInterval(maxDuration - lastTimeDuration)
-//    DispatchQueue.main.async {
-//      weakSelf?.progressWidthConstraint?.constant = finalWidth
-//      UIView.animate(withDuration: animDuration) {
-//        weakSelf?.layoutSubviews()
-//      }
-//    }
-
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-      weakSelf?.progressWidthConstraint?.constant = finalWidth
+      guard NEAdaptiveDeviceGate.isFoldableDevice else {
+        weakSelf?.progressWidthConstraint?.constant = finalWidth
+        UIView.animate(withDuration: animDuration) { weakSelf?.layoutIfNeeded() }
+        return
+      }
+      guard let view = weakSelf, view.superview != nil else { return }
+      view.layoutIfNeeded()
+      view.progressWidthConstraint?.isActive = false
+      view.progressWidthConstraint = view.recordProgressView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -view.maxRecordProgressMargin * 2)
+      view.progressWidthConstraint?.isActive = true
       UIView.animate(withDuration: animDuration) {
-        weakSelf?.layoutIfNeeded()
+        view.layoutIfNeeded()
       }
     }))
 
@@ -213,8 +228,7 @@ open class FunRecordAudioView: UIView {
   }
 
   static func getGestureHeight() -> CGFloat {
-    let windowWidth = UIScreen.main.bounds.width
-    return windowWidth / 375.0 * 128.0
+    UIScreen.main.bounds.width / 375.0 * 128.0
   }
 
   open func changeToCancelStyle() {

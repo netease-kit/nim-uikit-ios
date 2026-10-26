@@ -27,6 +27,8 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
   let today = Date()
 
   var quickSelectType: QuickSelectType = .none
+  private var pendingScrollDate: Date?
+  private var applyingDateScroll = false
 
   enum QuickSelectType {
     case none
@@ -136,9 +138,7 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
     selectedDate = calendar.startOfDay(for: today)
     updateQuickButtonState(.today)
 
-    DispatchQueue.main.async {
-      self.scrollToToday(animated: false)
-    }
+    pendingScrollDate = today
   }
 
   override func viewDidLayoutSubviews() {
@@ -147,6 +147,14 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
       let width = (collectionView.bounds.width) / 7
       layout.itemSize = CGSize(width: width, height: 70)
       layout.headerReferenceSize = CGSize(width: collectionView.bounds.width, height: 50)
+    }
+    if let date = pendingScrollDate, collectionView.bounds.width > 0,
+       collectionView.numberOfSections == months.count, !months.isEmpty {
+      pendingScrollDate = nil
+      collectionView.layoutIfNeeded()
+      applyingDateScroll = true
+      scrollToDate(date, animated: false)
+      applyingDateScroll = false
     }
   }
 
@@ -298,8 +306,10 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
 
     updateQuickButtonState(type)
     selectedDate = calendar.startOfDay(for: date)
-    scrollToDate(date, animated: true)
+    pendingScrollDate = date
     collectionView.reloadData()
+    collectionView.setNeedsLayout()
+    view.setNeedsLayout()
   }
 
   @objc func monthSelectorTapped() {
@@ -322,14 +332,13 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
 
         let indexPath = IndexPath(item: item, section: section)
 
-        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: animated)
-
         if section > 0 {
           currentDisplayMonth = months[section - 1]
         } else {
           currentDisplayMonth = month
         }
         updateMonthSelectorTitle()
+        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: animated)
         return
       }
     }
@@ -520,6 +529,7 @@ extension NEHistoryDatePickerViewController: UICollectionViewDelegate {
   }
 
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard !applyingDateScroll else { return }
     guard let visibleIndexPaths = collectionView.indexPathsForVisibleItems.sorted().first else { return }
 
     let month = months[visibleIndexPaths.section]

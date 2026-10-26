@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import MJRefresh
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
@@ -54,6 +55,19 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   var cellClassDic: [String: NEBaseCollectionMessageCell.Type] = [:]
   /// 收藏列表内容最大宽度
   public var collection_content_maxW = (kScreenWidth - 72)
+  private var measuredMessageWidth: CGFloat = 0
+  private var messageHorizontalInset: CGFloat?
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    let width = contentTable.bounds.width
+    guard width > 0, width != measuredMessageWidth else { return }
+    if messageHorizontalInset == nil { messageHorizontalInset = kScreenWidth - collection_content_maxW }
+    measuredMessageWidth = width
+    collection_content_maxW = max(16, width - (messageHorizontalInset ?? 72))
+    contentTable.reloadData()
+  }
+
   /// 正在播放的cell
   var playingCell: NEBaseCollectionMessageAudioCell?
   /// 正在播放数据模型
@@ -101,7 +115,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     loadMoreData()
   }
 
-  @objc open func appEnterBackground() {
+  open func appEnterBackground() {
     viewModel.lastClickAuidoMessageId = nil
     stopPlay()
   }
@@ -334,8 +348,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     }
     forwardAlert.setItems(items)
 
-    addChild(forwardAlert)
-    view.addSubview(forwardAlert.view)
+    forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
       UIApplication.shared.keyWindow?.endEditing(true)
@@ -442,7 +455,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       if !imageUrlString.isEmpty {
         let showController = PhotoBrowserController(urls: [imageUrlString], url: imageUrlString)
         showController.modalPresentationStyle = .overFullScreen
-        present(showController, animated: false, completion: nil)
+        presentDuoPreview(showController, animated: false, completion: nil)
       }
     }
   }
@@ -464,10 +477,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       if FileManager.default.fileExists(atPath: path) == true {
         let url = URL(fileURLWithPath: path)
         player.videoUrl = url
-        present(player, animated: true, completion: nil)
+        presentDuoPreview(player, animated: true, completion: nil)
       } else if let url = object.url, let remoteUrl = URL(string: url) {
         player.videoUrl = remoteUrl
-        present(player, animated: true, completion: nil)
+        presentDuoPreview(player, animated: true, completion: nil)
       }
     }
   }
@@ -777,9 +790,8 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     let title = NECustomUtils.titleOfRichText(model.message?.attachment)
     let body = model.attributeStr
     let textViewController = getTextViewController(title: title, body: body)
-    let nav = NENavigationController(rootViewController: textViewController)
-    nav.modalPresentationStyle = .fullScreen
-    present(nav, animated: false)
+    // 列内子页面呈现：折叠时随列缩放，点击正文/空白收起。
+    textViewController.presentAsColumnChild(from: self)
   }
 
   func getTextViewController(title: String?, body: NSAttributedString?) -> TextViewController {
@@ -795,7 +807,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   }
 
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-    self
+    documentPreviewPresenter
   }
 
   open func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {

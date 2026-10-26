@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
 import NEBaseUIKit
+import NEChatKit
 import UIKit
 
 @objc
@@ -204,7 +204,9 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
       }
     }
 
-    contentWidth?.constant = model.chatmodel.contentSize.width
+    contentWidth?.constant = NEAdaptiveDeviceGate.isFoldableDevice && bounds.width > 0
+      ? min(model.chatmodel.contentSize.width, max(16, bounds.width - 72))
+      : model.chatmodel.contentSize.width
     contentHeight?.constant = model.chatmodel.contentSize.height
   }
 

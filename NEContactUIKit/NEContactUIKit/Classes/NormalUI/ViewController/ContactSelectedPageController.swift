@@ -29,6 +29,7 @@ open class ContactSelectedPageController: NEBaseContactSelectedPageController {
     super.setupPageContent()
     view.backgroundColor = .ne_backcolor
     let pagingViewController = NEPagingViewController(viewControllers: contentControllers)
+    pagingController = pagingViewController
     addChild(pagingViewController)
     view.addSubview(pagingViewController.view)
     pagingViewController.view.backgroundColor = .white

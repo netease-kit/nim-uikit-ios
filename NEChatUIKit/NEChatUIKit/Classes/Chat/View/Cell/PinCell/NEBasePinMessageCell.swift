@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
 import NEBaseUIKit
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -168,7 +168,9 @@ open class NEBasePinMessageCell: UITableViewCell {
     nameLabel.text = item.chatmodel.fullName
     timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: item.message.createTime))
 
-    contentWidth?.constant = item.chatmodel.contentSize.width
+    contentWidth?.constant = NEAdaptiveDeviceGate.isFoldableDevice && bounds.width > 0
+      ? min(item.chatmodel.contentSize.width, max(16, bounds.width - 72))
+      : item.chatmodel.contentSize.width
     contentHeight?.constant = item.chatmodel.contentSize.height
   }
 

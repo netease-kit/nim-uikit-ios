@@ -119,9 +119,31 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
     contentSizeToFit()
   }
 
+  /// The controller may be presented inside a content column instead of the
+  /// whole window (adaptive layouts), so measure the actual view rather than
+  /// the screen as soon as the presented bounds are known.
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    let availableWidth = view.bounds.width
+    guard availableWidth > 0 else { return }
+    let maxWidth = availableWidth - leftRightMargin * 2
+    guard abs(maxWidth - contentMaxWidth) > 0.5 else { return }
+    contentMaxWidth = maxWidth
+    titleLabel.preferredMaxLayoutWidth = maxWidth
+    bodyLabel.preferredMaxLayoutWidth = maxWidth
+    contentSizeToFit()
+  }
+
+  /// 作为列内子页面呈现时的关闭回调（没有 modal presenter，dismiss 无效）。
+  open var closeHandler: (() -> Void)?
+
   open func viewTap() {
     UIMenuController.shared.setMenuVisible(false, animated: true)
-    dismiss(animated: false)
+    if let closeHandler {
+      closeHandler()
+    } else {
+      dismiss(animated: false)
+    }
   }
 
   open func setupUI() {
@@ -153,7 +175,9 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
     let bodySize = NSAttributedString.getRealLabelSize(bodyLabel.attributedText, bodyFont, CGSize(width: contentMaxWidth, height: CGFloat.greatestFiniteMagnitude))
 
     let textHeight = titleSize.height + bodySize.height
-    let textViewHeight = kScreenHeight - kNavigationHeight - KStatusBarHeight
+    let textViewHeight = scrollView.bounds.height > 0
+      ? scrollView.bounds.height
+      : view.bounds.height - kNavigationHeight - KStatusBarHeight
     if textHeight <= textViewHeight {
       let offsetY = (textViewHeight - textHeight) / 2
       contentLabelTopAnchor?.constant = offsetY
@@ -161,7 +185,8 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
 
     let textWidth = max(titleSize.width, bodySize.width)
     if textWidth <= contentMaxWidth {
-      let offsetX = (kScreenWidth - textWidth) / 2
+      let availableWidth = view.bounds.width > 0 ? view.bounds.width : kScreenWidth
+      let offsetX = (availableWidth - textWidth) / 2
       contentLabelLeftAnchor?.constant = offsetX
     }
     scrollView.contentSize = CGSize(width: textWidth, height: textHeight)
@@ -197,5 +222,23 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
 
   open func didTapMailto(_ url: URL) {
     showBottomMailAction(url)
+  }
+}
+
+extension TextViewController {
+  /// 以"列内子页面"方式呈现：跟随宿主列宽缩放，折叠/展开时随列变化，
+  /// 点击正文或空白通过 closeHandler 收起。
+  func presentAsColumnChild(from parent: UIViewController) {
+    let nav = NETextDetailContainerController(rootViewController: self)
+    parent.addChild(nav)
+    nav.view.frame = parent.view.bounds
+    nav.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    parent.view.addSubview(nav.view)
+    nav.didMove(toParent: parent)
+    closeHandler = { [weak nav] in
+      nav?.willMove(toParent: nil)
+      nav?.view.removeFromSuperview()
+      nav?.removeFromParent()
+    }
   }
 }

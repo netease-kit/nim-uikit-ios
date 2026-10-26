@@ -53,6 +53,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   typealias ForwardCallBack = (String?) -> Void
   var cancelBlock: ForwardCallBack?
   var sureBlock: ForwardCallBack?
+  private weak var attachedSource: UIViewController?
 
   /// 转发会话列表
   var forwardSessions = [ForwardItem]()
@@ -179,6 +180,24 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
                                            selector: #selector(keyBoardWillHide(_:)),
                                            name: UIResponder.keyboardWillHideNotification,
                                            object: nil)
+  }
+
+  /// Attach the alert to the window root on Duo so a detail-column controller
+  /// cannot clip the confirmation panel to its right-hand column.
+  open func attach(to source: UIViewController) {
+    attachedSource = source
+    let host: UIViewController
+    if NEAdaptiveDeviceGate.isFoldableDevice,
+       let root = source.view.window?.rootViewController {
+      host = root
+    } else {
+      host = source
+    }
+    host.addChild(self)
+    host.view.addSubview(view)
+    view.frame = host.view.bounds
+    view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    didMove(toParent: host)
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
@@ -378,7 +397,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   }
 
   func removeSelf() {
-    if let parent = parent as? ChatViewController {
+    if let parent = (parent as? ChatViewController) ?? (attachedSource as? ChatViewController) {
       parent.isCurrentPage = true
     }
     view.removeFromSuperview()

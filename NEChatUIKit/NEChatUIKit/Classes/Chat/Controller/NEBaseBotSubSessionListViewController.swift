@@ -147,6 +147,7 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
     title = displaySessionName()
     navigationView.moreButton.isHidden = false
     navigationView.setMoreButtonImage(coreLoader.loadImage("three_point"))
@@ -255,6 +256,7 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
     let reuseId = "bot.sub.session.cell"
     let cell = tableView.dequeueReusableCell(withIdentifier: reuseId) as? BotSubSessionListCell ??
       BotSubSessionListCell(style: .default, reuseIdentifier: reuseId)
+    cell.ne_setLayoutMarginsManagedByContainer()
     guard let item = viewModel.item(at: indexPath.row) else {
       return cell
     }

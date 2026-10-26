@@ -3,12 +3,23 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class NEBaseConversationListCell: UITableViewCell {
+  override open func setSelected(_ selected: Bool, animated: Bool) {
+    super.setSelected(selected, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
+  override open func setHighlighted(_ highlighted: Bool, animated: Bool) {
+    super.setHighlighted(highlighted, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
   private var timeWidth: NSLayoutConstraint?
   private var conversationType: V2NIMConversationType = .CONVERSATION_TYPE_UNKNOWN
   private var sessionId = ""

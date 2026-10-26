@@ -53,7 +53,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
     weak var weakSelf = self
     viewModel.getCurrentUserTeamMember(team?.teamId) { error in
       if let err = error {
-        weakSelf?.view.neMakeToast(err.localizedDescription)
+        weakSelf?.view.neMakeToast(teamErrorToast(err))
       }
       weakSelf?.setupUI()
     }
@@ -125,13 +125,7 @@ open class NEBaseTeamIntroduceViewController: NETeamBaseViewController, UITextVi
         )
         weakSelf?.view.neHideToastActivity()
         if let err = error {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if error?.code == noPermissionOperationCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }

@@ -38,6 +38,7 @@ open class ChatMessageReplyCell: ChatMessageAIStreamTextCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    applyViewport(model.viewport)
     let replyLabel = isSend ? replyLabelRight : replyLabelLeft
 
     if var text = model.replyText,

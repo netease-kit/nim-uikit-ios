@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NIMSDK
 import UIKit
 
@@ -72,5 +73,6 @@ open class FunLocalConversationListCell: NEBaseLocalConversationListCell {
     } else {
       contentView.backgroundColor = LocalConversationUIConfig.shared.conversationProperties.itemBackground ?? .funConversationItemBackgroundColor
     }
+    ne_refreshSelectionBackground()
   }
 }

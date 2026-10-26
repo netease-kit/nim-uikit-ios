@@ -210,7 +210,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       replyViewLeftTopToBubble!,
       translationBubbleLeft.topAnchor.constraint(equalTo: reactionBackdropLeft.bottomAnchor, constant: 4),
       translationBubbleLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
-      translationBubbleLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(translationBubbleLeft.widthAnchor, inset: funMargin),
       translationBubbleLeft.widthAnchor.constraint(greaterThanOrEqualToConstant: translationBubbleMinWidth),
     ])
     translationBubbleWidthLeft = translationBubbleLeft.widthAnchor.constraint(equalToConstant: translationBubbleMinWidth)
@@ -242,7 +242,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
       replyViewRightTopToBubble!,
       translationBubbleRight.topAnchor.constraint(equalTo: reactionBackdropRight.bottomAnchor, constant: 4),
       translationBubbleRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
-      translationBubbleRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(translationBubbleRight.widthAnchor, inset: funMargin),
       translationBubbleRight.widthAnchor.constraint(greaterThanOrEqualToConstant: translationBubbleMinWidth),
     ])
     translationBubbleWidthRight = translationBubbleRight.widthAnchor.constraint(equalToConstant: translationBubbleMinWidth)
@@ -419,7 +419,7 @@ open class FunChatMessageTextCell: FunChatMessageBaseCell {
 
   private func hasVisibleTranslation(_ model: MessageTextModel) -> Bool {
     (model.translationFailed || (model.translationInfo != nil &&
-      !(model.translationInfo?.translatedText.isEmpty ?? true))) &&
+        !(model.translationInfo?.translatedText.isEmpty ?? true))) &&
       model.translationVisible &&
       !model.inMultiForward
   }

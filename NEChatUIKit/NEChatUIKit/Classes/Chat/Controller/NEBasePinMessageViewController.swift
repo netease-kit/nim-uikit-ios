@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
 import NEBaseUIKit
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -23,6 +23,19 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   var cellClassDic: [String: NEBasePinMessageCell.Type] = [:]
   /// pin 列表内容最大宽度
   public var pin_content_maxW = (kScreenWidth - 72)
+  private var measuredMessageWidth: CGFloat = 0
+  private var messageHorizontalInset: CGFloat?
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    let width = tableView.bounds.width
+    guard width > 0, width != measuredMessageWidth else { return }
+    if messageHorizontalInset == nil { messageHorizontalInset = kScreenWidth - pin_content_maxW }
+    measuredMessageWidth = width
+    pin_content_maxW = max(16, width - (messageHorizontalInset ?? 72))
+    tableView.reloadData()
+  }
+
   /// 正在播放的cell
   var playingCell: NEBasePinMessageAudioCell?
   var playingModel: MessageAudioModel?
@@ -351,8 +364,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       forwardAlert.sessionName = content
     }
 
-    addChild(forwardAlert)
-    view.addSubview(forwardAlert.view)
+    forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
       UIApplication.shared.keyWindow?.endEditing(true)
@@ -433,7 +445,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       if !imageUrlString.isEmpty {
         let showController = PhotoBrowserController(urls: [imageUrlString], url: imageUrlString)
         showController.modalPresentationStyle = .overFullScreen
-        present(showController, animated: false, completion: nil)
+        presentDuoPreview(showController, animated: false, completion: nil)
       }
     }
   }
@@ -455,10 +467,10 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
       if FileManager.default.fileExists(atPath: path) == true {
         let url = URL(fileURLWithPath: path)
         player.videoUrl = url
-        present(player, animated: true, completion: nil)
+        presentDuoPreview(player, animated: true, completion: nil)
       } else if let url = object.url, let remoteUrl = URL(string: url) {
         player.videoUrl = remoteUrl
-        present(player, animated: true, completion: nil)
+        presentDuoPreview(player, animated: true, completion: nil)
       }
     }
   }
@@ -752,7 +764,9 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
     let body = model.attributeStr
     let textViewController = getTextViewController(title: title, body: body)
     let nav = NENavigationController(rootViewController: textViewController)
-    nav.modalPresentationStyle = .fullScreen
+    // Keep the reader inside the column that hosts the pinned-message list.
+    nav.modalPresentationStyle = .overCurrentContext
+    navigationController?.definesPresentationContext = true
     present(nav, animated: false)
   }
 
@@ -769,7 +783,7 @@ open class NEBasePinMessageViewController: NEChatBaseViewController, UITableView
   }
 
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-    self
+    documentPreviewPresenter
   }
 
   open func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {

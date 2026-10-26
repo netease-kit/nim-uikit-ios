@@ -15,9 +15,50 @@ public protocol ConversationGroupViewModelDelegate: NSObjectProtocol {
 @objcMembers
 open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NEConversationListener {
   public weak var delegate: ConversationGroupViewModelDelegate?
+
+  /// 分组数据可同时被“会话列表”“分组管理”“分组设置”等多个页面消费；
+  /// 单播 delegate 会被后打开的页面抢占，导致返回列表后分组切换不再刷新。
+  /// 这里额外维护弱引用观察者集合，与 delegate 一起广播。
+  private final class WeakObserver {
+    weak var value: ConversationGroupViewModelDelegate?
+    init(_ value: ConversationGroupViewModelDelegate) { self.value = value }
+  }
+  private var observers: [WeakObserver] = []
+
+  public func addObserver(_ observer: ConversationGroupViewModelDelegate) {
+    observers.removeAll { $0.value == nil || $0.value === observer }
+    observers.append(WeakObserver(observer))
+  }
+
+  public func removeObserver(_ observer: ConversationGroupViewModelDelegate) {
+    observers.removeAll { $0.value == nil || $0.value === observer }
+  }
+
+  private func notifyDidReload() {
+    observers.removeAll { $0.value == nil }
+    delegate?.conversationGroupDidReload()
+    for observer in observers.compactMap(\.value) where observer !== delegate {
+      observer.conversationGroupDidReload()
+    }
+  }
+
+  private func notifySelectionChanged() {
+    observers.removeAll { $0.value == nil }
+    delegate?.conversationGroupSelectionChanged()
+    for observer in observers.compactMap(\.value) where observer !== delegate {
+      observer.conversationGroupSelectionChanged()
+    }
+  }
   public private(set) var commonGroups = [NEConversationGroupModel]()
   public private(set) var hiddenGroups = [NEConversationGroupModel]()
+  /// 应用本地配置期间的重入保护：监听方只读不写，防止形成回环。
+  private var isApplyingLocalConfig = false
   public private(set) var selectedGroup: NEConversationGroupModel?
+  /// 折叠屏展开态：右列仍在展示该会话时，左列当前分组需要保留它（即使已读/@ 已清除）。
+  /// 关闭详情栏（回到占位）后置空，行会按分组规则自然移除。
+  public private(set) var retainedConversationId: String?
+  /// 保留会话所属分组：只在该分组内保留，切换分组后不会把会话强塞进别的分组。
+  private var retainedConversationGroupId: String?
   public private(set) var selectedCustomData = [NEConversationListModel]()
   public private(set) var selectedCustomOffset: Int64 = 0
   public private(set) var selectedCustomFinished = true
@@ -96,7 +137,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       }
       self.rebuildGroups(groups ?? [])
       self.refreshUnreadCounts()
-      self.delegate?.conversationGroupDidReload()
+      self.notifyDidReload()
       completion?(nil)
     }
   }
@@ -121,7 +162,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       changed = true
     }
     if changed {
-      delegate?.conversationGroupDidReload()
+      notifyDidReload()
     }
   }
 
@@ -131,19 +172,23 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     }
     selectedUnreadRequestID += 1
     selectedGroup = group
+    // 先清空目标分组的旧缓存，再同步通知宿主切换：分组栏高亮与列表归属立即生效，
+    // 网络分页结果回来后再补一次刷新（否则要等网络返回才看得到切换）。
     if group.type == .custom {
       selectedCustomOffset = 0
       selectedCustomFinished = false
       selectedCustomData.removeAll()
-      loadMoreSelectedCustomGroup()
     } else if group.type == .unread {
       selectedUnreadOffset = 0
       selectedUnreadFinished = false
       selectedUnreadData.removeAll()
       selectedUnreadLoading = false
+    }
+    notifySelectionChanged()
+    if group.type == .custom {
+      loadMoreSelectedCustomGroup()
+    } else if group.type == .unread {
       loadMoreSelectedUnreadGroup()
-    } else {
-      delegate?.conversationGroupSelectionChanged()
     }
   }
 
@@ -154,11 +199,12 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     guard let selectedGroup = selectedGroup else {
       return allData
     }
+    let data: [NEConversationListModel]
     switch selectedGroup.type {
     case .all:
       return allData
     case .atMe:
-      return allData.filter { model in
+      data = allData.filter { model in
         guard let conversationId = model.conversation?.conversationId else {
           return false
         }
@@ -168,10 +214,36 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         return NEAtMessageManager.instance?.isAtCurrentUser(conversationId: conversationId) == true
       }
     case .unread:
-      return selectedUnreadData
+      data = selectedUnreadData
     case .custom:
       return selectedCustomData
     }
+    return mergingRetainedConversation(into: data, allData: allData)
+  }
+
+  /// 合并“右列仍打开的会话”：未读/@我 分组在已读或清除 @ 后会按规则移除该行，
+  /// 但展开态右列还展示着它，左列必须继续保留并高亮，避免“打开即消失”。
+  private func mergingRetainedConversation(into data: [NEConversationListModel],
+                                           allData: [NEConversationListModel]) -> [NEConversationListModel] {
+    guard let retained = retainedConversationId,
+          selectedGroup?.groupId == retainedConversationGroupId,
+          let model = allData.first(where: { $0.conversation?.conversationId == retained }),
+          !data.contains(where: { $0.conversation?.conversationId == retained }) else {
+      return data
+    }
+    var merged = data
+    merged.append(model)
+    merged.sort { lhs, rhs in ConversationListSort.comesBefore(lhs, rhs) }
+    return merged
+  }
+
+  /// 设置/清除展态保留会话，返回是否发生变化（调用方可据此决定是否刷新）。
+  @discardableResult
+  open func setRetainedConversation(_ conversationId: String?) -> Bool {
+    guard retainedConversationId != conversationId else { return false }
+    retainedConversationId = conversationId
+    retainedConversationGroupId = conversationId == nil ? nil : selectedGroup?.groupId
+    return true
   }
 
   open func loadMoreSelectedCustomGroup(_ completion: ((NSError?, Bool) -> Void)? = nil) {
@@ -203,7 +275,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         })
         self.sortSelectedCustomData()
       }
-      self.delegate?.conversationGroupSelectionChanged()
+      self.notifySelectionChanged()
       completion?(error, self.selectedCustomFinished)
     }
   }
@@ -291,7 +363,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
 
       self.selectedUnreadLoading = false
       DispatchQueue.main.async {
-        self.delegate?.conversationGroupSelectionChanged()
+        self.notifySelectionChanged()
         completion?(nil, self.selectedUnreadFinished)
       }
     }
@@ -366,7 +438,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       if let group = result?.group {
         self.insertNewVisibleGroup(group)
         self.refreshUnreadCounts()
-        self.delegate?.conversationGroupDidReload()
+        self.notifyDidReload()
         completion(group, nil)
       } else {
         completion(nil, error)
@@ -498,7 +570,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     ensureAllFirst()
     saveLocalConfig()
     resetSelectionIfNeeded()
-    delegate?.conversationGroupDidReload()
+    notifyDidReload()
   }
 
   open func moveHiddenToCommon(_ group: NEConversationGroupModel) {
@@ -510,7 +582,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     commonGroups.append(group)
     ensureAllFirst()
     saveLocalConfig()
-    delegate?.conversationGroupDidReload()
+    notifyDidReload()
   }
 
   open func updateCommonOrder(_ groups: [NEConversationGroupModel]) {
@@ -520,7 +592,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     commonGroups = groups
     ensureAllFirst()
     saveLocalConfig()
-    delegate?.conversationGroupDidReload()
+    notifyDidReload()
   }
 
   open func groupErrorMessage(_ error: NSError?) -> String {
@@ -550,7 +622,10 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       guard let groupId = group.groupId else {
         return nil
       }
-      return NEConversationGroupModel(type: .custom, groupId: groupId, name: group.name ?? "", sdkGroup: group)
+      return NEConversationGroupModel(type: .custom,
+                                      groupId: groupId,
+                                      name: resolvedCustomGroupName(group.name, groupId: groupId),
+                                      sdkGroup: group)
     }
 
     let defaults = defaultGroups()
@@ -607,6 +682,21 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     }
   }
 
+  /// 本地分组配置（顺序/隐藏）变更后，按配置重排内存副本。
+  /// 只重排既有分组、不增删成员，默认分组位次仍由 ensureAllFirst 保证。
+  /// 由页面在收到配置变更通知时调用，避免依赖 delegate 的单播特性。
+  func applyLocalConfigOrder() {
+    guard isEnabled, !isApplyingLocalConfig else { return }
+    isApplyingLocalConfig = true
+    defer { isApplyingLocalConfig = false }
+    let config = NEConversationGroupLocalConfigHelper.load()
+    let configMap = Dictionary(uniqueKeysWithValues: config.items.map { ($0.groupId, $0) })
+    commonGroups = sort(groups: commonGroups, configMap: configMap)
+    hiddenGroups = sort(groups: hiddenGroups, configMap: configMap)
+    ensureAllFirst()
+    notifyDidReload()
+  }
+
   private func ensureAllFirst() {
     if let allIndex = commonGroups.firstIndex(where: { $0.type == .all }), allIndex != 0 {
       let all = commonGroups.remove(at: allIndex)
@@ -622,7 +712,10 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     guard let groupId = group.groupId else {
       return
     }
-    let model = NEConversationGroupModel(type: .custom, groupId: groupId, name: group.name ?? "", sdkGroup: group)
+    let model = NEConversationGroupModel(type: .custom,
+                                         groupId: groupId,
+                                         name: resolvedCustomGroupName(group.name, groupId: groupId),
+                                         sdkGroup: group)
     commonGroups.removeAll { $0.groupId == groupId }
     hiddenGroups.removeAll { $0.groupId == groupId }
     commonGroups.append(model)
@@ -635,14 +728,22 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     hiddenGroups.removeAll { $0.groupId == groupId }
     saveLocalConfig()
     resetSelectionIfNeeded()
-    delegate?.conversationGroupDidReload()
+    notifyDidReload()
+  }
+
+  private func resolvedCustomGroupName(_ name: String?, groupId: String) -> String {
+    guard let name,
+          !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      return groupId
+    }
+    return name
   }
 
   private func resetSelectionIfNeeded() {
     guard let selected = selectedGroup,
           commonGroups.contains(where: { $0.groupId == selected.groupId }) else {
       selectedGroup = commonGroups.first
-      delegate?.conversationGroupSelectionChanged()
+      notifySelectionChanged()
       return
     }
   }
@@ -693,7 +794,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       group.unreadCount = unreadCount
     }
     if changed {
-      delegate?.conversationGroupDidReload()
+      notifyDidReload()
     }
   }
 
@@ -723,7 +824,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         for group in self.commonGroups + self.hiddenGroups where group.groupId == groupId {
           group.unreadCount = count
         }
-        self.delegate?.conversationGroupDidReload()
+        self.notifyDidReload()
       }
     }
   }
@@ -839,12 +940,12 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
     }
     var groupFound = false
     for model in commonGroups + hiddenGroups where model.groupId == groupId {
-      model.name = group.name ?? ""
+      model.name = resolvedCustomGroupName(group.name, groupId: groupId)
       model.sdkGroup = group
       groupFound = true
     }
     if groupFound {
-      delegate?.conversationGroupDidReload()
+      notifyDidReload()
       refreshChangedGroup(groupId)
     } else {
       loadGroups()
@@ -901,7 +1002,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         selectedUnreadData.sort { lhs, rhs in
           ConversationListSort.comesBefore(lhs, rhs)
         }
-        delegate?.conversationGroupSelectionChanged()
+        notifySelectionChanged()
       } else if selectedUnreadData.isEmpty, selectedUnreadFinished == false {
         loadMoreSelectedUnreadGroup()
       }
@@ -915,15 +1016,14 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
 
     var changed = false
     for conversation in conversations {
-      let containsCurrentGroup = conversation.groupIds?.contains(groupId) == true
       if let index = selectedCustomData.firstIndex(where: { $0.conversation?.conversationId == conversation.conversationId }) {
-        if containsCurrentGroup {
-          selectedCustomData[index].conversation = conversation
-        } else {
-          selectedCustomData.remove(at: index)
-        }
+        // `V2NIMConversation.groupIds` 是可空字段，会话变更通知不保证携带分组信息。
+        // 因此这里只更新已缓存的会话，不能把 groupIds 缺失当成"已移出分组"，
+        // 否则打开会话（读状态变更）会让该会话从自定义分组里逐条消失。
+        // 移出分组只由 onConversationsRemovedFromGroup 驱动。
+        selectedCustomData[index].conversation = conversation
         changed = true
-      } else if containsCurrentGroup {
+      } else if conversation.groupIds?.contains(groupId) == true {
         let model = NEConversationListModel()
         model.conversation = conversation
         selectedCustomData.append(model)
@@ -933,7 +1033,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
 
     if changed {
       sortSelectedCustomData()
-      delegate?.conversationGroupSelectionChanged()
+      notifySelectionChanged()
     }
   }
 
@@ -961,7 +1061,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         }
       }
       if changed {
-        self.delegate?.conversationGroupSelectionChanged()
+        self.notifySelectionChanged()
       }
     }
   }
@@ -986,7 +1086,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       } else {
         return
       }
-      self.delegate?.conversationGroupSelectionChanged()
+      self.notifySelectionChanged()
     }
   }
 
@@ -1004,7 +1104,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
         return ids.contains(conversationId)
       }
       if oldCount != selectedUnreadData.count {
-        delegate?.conversationGroupSelectionChanged()
+        notifySelectionChanged()
       }
       return
     }
@@ -1021,7 +1121,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       return ids.contains(conversationId)
     }
     if oldCount != selectedCustomData.count {
-      delegate?.conversationGroupSelectionChanged()
+      notifySelectionChanged()
     }
   }
 
@@ -1051,7 +1151,7 @@ open class ConversationGroupViewModel: NSObject, NEConversationGroupListener, NE
       for group in self.commonGroups + self.hiddenGroups where group.groupId == groupId {
         group.unreadCount = unreadCount
       }
-      self.delegate?.conversationGroupDidReload()
+      self.notifyDidReload()
     }
   }
 }

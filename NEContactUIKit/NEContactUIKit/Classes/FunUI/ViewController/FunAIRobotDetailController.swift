@@ -85,13 +85,14 @@ open class FunAIRobotDetailController: NEBaseAIRobotDetailController {
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "AIRobotDetailCell", for: indexPath)
     cell.selectionStyle = .none
+    cell.preservesSuperviewLayoutMargins = false
+    cell.layoutMargins = .zero
     cell.backgroundColor = .white
     cell.textLabel?.text = operationTitles[indexPath.row]
     cell.textLabel?.font = .systemFont(ofSize: 16)
     cell.textLabel?.textColor = .ne_darkText
-    // Fun 皮肤：显示右侧箭头（Figma Frame195 x:343 y:20 16×16，每行都有）
-    cell.accessoryType = .none
-    cell.accessoryView = makeArrowView()
+    // Fun 皮肤：箭头直接约束到当前操作卡片右边缘。
+    configureOperationArrow(in: cell)
     return cell
   }
 

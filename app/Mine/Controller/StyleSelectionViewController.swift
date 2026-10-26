@@ -34,7 +34,7 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
   public lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
-    layout.itemSize = CGSize(width: NEConstant.screenWidth / 2, height: cellSize.height)
+    layout.itemSize = CGSize(width: NEAdaptiveDeviceGate.isFoldableDevice ? 0 : NEConstant.screenWidth / 2, height: cellSize.height)
     layout.minimumLineSpacing = 0
     layout.minimumInteritemSpacing = 0
     layout.sectionInset = UIEdgeInsets(top: topMargin, left: 0, bottom: topMargin, right: 0)
@@ -49,6 +49,17 @@ open class StyleSelectionViewController: NEBaseViewController, UICollectionViewD
 
     return collectView
   }()
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+    let size = CGSize(width: collectionView.bounds.width / CGFloat(itemsInSection), height: cellSize.height)
+    if layout.itemSize != size {
+      layout.itemSize = size
+      layout.invalidateLayout()
+    }
+  }
 
   override open func viewDidLoad() {
     super.viewDidLoad()

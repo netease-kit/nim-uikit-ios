@@ -31,6 +31,7 @@ extension UIView {
 
 @objcMembers
 open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource {
+  private let operationArrowTag = 19_871
   public var viewModel: AIRobotDetailViewModel
 
   // MARK: - 顶部 header（头像 + 名称 + 箭头）
@@ -80,6 +81,11 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
     tv.estimatedSectionHeaderHeight = 0
     tv.estimatedSectionFooterHeight = 0
     tv.isScrollEnabled = false
+    // A Duo detail column can be wider than the platform readable width.
+    // Keep operation-cell accessories aligned with the card edge instead of
+    // the readable-content guide, which leaves the arrow stranded inward.
+    tv.cellLayoutMarginsFollowReadableWidth = false
+    tv.layoutMargins = .zero
     if #available(iOS 15.0, *) { tv.sectionHeaderTopPadding = 0 }
     return tv
   }()
@@ -333,14 +339,32 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
   open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "AIRobotDetailCell", for: indexPath)
     cell.selectionStyle = .none
+    cell.preservesSuperviewLayoutMargins = false
+    cell.layoutMargins = .zero
     cell.backgroundColor = .white
     cell.textLabel?.text = operationTitles[indexPath.row]
     cell.textLabel?.font = .systemFont(ofSize: 16)
     cell.textLabel?.textColor = .ne_darkText
-    // 使用系统 accessoryType，与群设置 cell 保持一致（Normal 显示，Fun 子类可 override 隐藏）
-    cell.accessoryType = .disclosureIndicator
-    cell.accessoryView = nil
+    configureOperationArrow(in: cell)
     return cell
+  }
+
+  /// Keep the disclosure arrow tied to the operation card itself. UIKit's
+  /// accessory layout may use a readable-content guide on wide Duo columns.
+  open func configureOperationArrow(in cell: UITableViewCell) {
+    cell.accessoryType = .none
+    cell.accessoryView = nil
+    cell.contentView.viewWithTag(operationArrowTag)?.removeFromSuperview()
+    let arrow = makeArrowView()
+    arrow.tag = operationArrowTag
+    arrow.translatesAutoresizingMaskIntoConstraints = false
+    cell.contentView.addSubview(arrow)
+    NSLayoutConstraint.activate([
+      arrow.rightAnchor.constraint(equalTo: cell.contentView.rightAnchor, constant: -16),
+      arrow.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor),
+      arrow.widthAnchor.constraint(equalToConstant: 16),
+      arrow.heightAnchor.constraint(equalToConstant: 16),
+    ])
   }
 
   open func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { rowHeight() }

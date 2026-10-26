@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import MJRefresh
 import NEChatKit
 import NIMSDK
@@ -15,6 +16,39 @@ public protocol NEBaseLocalConversationControllerDelegate {
 /// 会话列表页面 - 基类
 @objcMembers
 open class NEBaseLocalConversationController: UIViewController, UIGestureRecognizerDelegate {
+  open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor)
+  }
+
+  /// Host-provided selection color for a retained list beside its detail page.
+  public var listSelectionBackgroundColor: UIColor? {
+    didSet {
+      guard oldValue != listSelectionBackgroundColor, isViewLoaded else { return }
+      for cell in tableView.visibleCells { cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor) }
+      if listSelectionBackgroundColor != nil { restoreAdaptiveSelection() }
+    }
+  }
+
+  private var adaptiveSelectedConversationID: String?
+
+  private func restoreAdaptiveSelection() {
+    guard listSelectionBackgroundColor != nil, let selectedID = adaptiveSelectedConversationID,
+          let row = viewModel.conversationListData.firstIndex(where: { $0.conversation?.conversationId == selectedID }) else { return }
+    let indexPath = IndexPath(row: row, section: 0)
+    tableView.layoutIfNeeded()
+    tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+  }
+
+  open func selectConversation(conversationId: String, animated: Bool) {
+    adaptiveSelectedConversationID = conversationId
+    guard let row = viewModel.conversationListData.firstIndex(where: { $0.conversation?.conversationId == conversationId }) else { return }
+    let indexPath = IndexPath(row: row, section: 0)
+    tableView.layoutIfNeeded()
+    tableView.selectRow(at: indexPath, animated: animated, scrollPosition: .middle)
+  }
+
+  /// Final presentation boundary; capture the host weakly and set nil to unbind.
+  public var onOpenConversation: ((String, [String: Any]) -> Bool)?
   var logClassName = "NEBaseLocalConversationController"
   public var deleteButtonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
   public var topButtonBackgroundColor: UIColor = NEConstant.hexRGB(0x337EFF)
@@ -56,8 +90,6 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
     let nav = TabNavigationView(frame: CGRect.zero)
     nav.translatesAutoresizingMaskIntoConstraints = false
     nav.delegate = self
-
-    nav.brandBtn.addTarget(self, action: #selector(brandBtnClick), for: .touchUpInside)
 
     if let brandTitle = LocalConversationUIConfig.shared.titleBarTitle {
       nav.brandBtn.setTitle(brandTitle, for: .normal)
@@ -421,7 +453,7 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
 
 extension NEBaseLocalConversationController: TabNavigationViewDelegate {
   /// 标题栏左侧按钮点击事件
-  func brandBtnClick() {
+  public func brandBtnClick() {
     LocalConversationUIConfig.shared.titleBarLeftClick?(self)
   }
 
@@ -708,7 +740,7 @@ extension NEBaseLocalConversationController: UICollectionViewDelegate, UICollect
     let conversationModel = viewModel.aiUserListData[indexPath.row]
 
     if let accountId = conversationModel.aiUser?.accountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
-      Router.shared.use(
+      openConversationRoute(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -738,6 +770,7 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
 
     let reusedId = "\(model.customType)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
+    cell.ne_setLayoutMarginsManagedByContainer()
 
     if let c = cell as? NEBaseLocalConversationListCell {
       c.configureData(model)
@@ -760,6 +793,7 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
     }
 
     let conversationModel = viewModel.conversationListData[indexPath.row]
+    adaptiveSelectedConversationID = conversationModel.conversation?.conversationId
 
     if let didClick = LocalConversationUIConfig.shared.itemClick {
       didClick(self, conversationModel, indexPath)
@@ -961,6 +995,16 @@ extension NEBaseLocalConversationController: UITableViewDelegate, UITableViewDat
 // MARK: UI UIKit提供的重写方法
 
 extension NEBaseLocalConversationController {
+  private func openConversationRoute(_ route: String, parameters: [String: Any], closure: Any?) {
+    var legacyParameters = parameters
+    if Thread.isMainThread, let handler = onOpenConversation {
+      if handler(route, parameters) { return }
+      // A declined bridge is dispatched only once; the original route still runs.
+      legacyParameters["ne_conversation_presentation_declined"] = true
+    }
+    Router.shared.use(route, parameters: legacyParameters, closure: nil)
+  }
+
   /// cell点击事件,可重写该事件处理自己的逻辑业务，例如跳转到指定的会话页面
   /// - Parameter conversation: 会话
   open func onselectedTableRow(conversation: V2NIMLocalConversation) {
@@ -973,7 +1017,7 @@ extension NEBaseLocalConversationController {
     if conversation.type == .CONVERSATION_TYPE_P2P {
       if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
         if NEAIRobotManager.shared.isRobot(sessionId) {
-          Router.shared.use(
+          openConversationRoute(
             PushBotSubSessionListRouter,
             parameters: ["nav": navigationController as Any,
                          "conversationId": conversationId,
@@ -982,7 +1026,7 @@ extension NEBaseLocalConversationController {
             closure: nil
           )
         } else {
-          Router.shared.use(
+          openConversationRoute(
             PushP2pChatVCRouter,
             parameters: ["nav": navigationController as Any,
                          "conversationId": conversationId as Any,
@@ -992,7 +1036,7 @@ extension NEBaseLocalConversationController {
         }
         return
       }
-      Router.shared.use(
+      openConversationRoute(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -1000,7 +1044,7 @@ extension NEBaseLocalConversationController {
         closure: nil
       )
     } else if conversation.type == .CONVERSATION_TYPE_TEAM {
-      Router.shared.use(
+      openConversationRoute(
         PushTeamChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -1052,6 +1096,7 @@ extension NEBaseLocalConversationController: LocalConversationViewModelDelegate 
   /// Renders the latest list and skin-specific header once per pending refresh batch.
   open func renderConversationList() {
     tableView.reloadData()
+    restoreAdaptiveSelection()
   }
 
   /// 由于数据变更可能导致底部有更多数据，此方法重新使列表加载更多能力开启

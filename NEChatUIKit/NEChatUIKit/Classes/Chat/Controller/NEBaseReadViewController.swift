@@ -62,7 +62,9 @@ open class NEBaseReadViewController: NEChatBaseViewController, UITableViewDelega
       readButton.topAnchor.constraint(equalTo: view.topAnchor),
       readButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       readButton.heightAnchor.constraint(equalToConstant: 48),
-      readButton.widthAnchor.constraint(equalToConstant: kScreenWidth / 2.0),
+      // The read/unread tabs are hosted by the current detail column on Duo;
+      // derive each half from that container instead of the physical screen.
+      readButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
     ])
 
     view.addSubview(unreadButton)

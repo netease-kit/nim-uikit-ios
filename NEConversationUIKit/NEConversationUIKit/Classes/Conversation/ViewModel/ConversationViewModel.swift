@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 
@@ -95,6 +96,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
     NEAIUserManager.shared.removeAIUserChangeListener(listener: self)
 
     if IMKitConfigCenter.shared.enableOnlineStatus {
+      unsubscribeOnlineStatus()
       SubscribeRepo.shared.removeListener(self)
     }
   }
@@ -197,7 +199,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
         // 订阅单聊在线状态
         if IMKitConfigCenter.shared.enableOnlineStatus {
-          self.subscribeOnlineStatus(Array(self.p2pAccountIds))
+          self.subscribeOnlineStatus(Array(self.p2pAccountIds), notifyOnCachedChange: false)
         }
 
         self.delegate?.reloadTableView()
@@ -243,15 +245,18 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
   private func mergeConversationData(_ conversation: V2NIMConversation) {
     if let cacheModel = conversationDic[conversation.conversationId] {
+      let sortOrderChanged = cacheModel.conversation?.sortOrder != conversation.sortOrder
       cacheModel.conversation = conversation
 
+      // Keep the existing row position for presentation-only updates. Reinsert only
+      // when the SDK changed ordering (for example, a new message or pin change).
+      if NEAdaptiveDeviceGate.isFoldableDevice && !sortOrderChanged { return }
       conversationListData.removeAll(where: {
         if let sid = $0.conversation?.conversationId, sid == conversation.conversationId {
           return true
         }
         return false
       })
-
       compareToInsert(cacheModel)
     } else {
       let model = NEConversationListModel()
@@ -375,7 +380,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
       if IMKitConfigCenter.shared.enableOnlineStatus,
          let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
         self.p2pAccountIds.insert(accountId)
-        self.subscribeOnlineStatus([accountId])
+        self.subscribeOnlineStatus([accountId], notifyOnCachedChange: false)
       }
 
       self.delegate?.reloadTableView()
@@ -707,9 +712,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   }
 
   open func onFriendDeleted(_ accountId: String, deletionType: V2NIMFriendDeletionType) {
-    if conversationDic.keys.contains(accountId) {
-      delegate?.reloadTableView()
-    }
+    refreshP2PConversations(for: [accountId])
   }
 
   open func onTeamSyncFinished() {
@@ -724,9 +727,37 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
   /// - Parameter friendInfo: 好友信息
   open func onFriendInfoChanged(_ friendInfo: V2NIMFriend) {
     NEALog.infoLog(className(), desc: "onFriendInfoUpdate : \(String(describing: friendInfo.accountId))")
-    if let accountId = friendInfo.accountId,
-       conversationDic.keys.contains(accountId) {
-      delegate?.reloadTableView()
+    refreshP2PConversations(for: friendInfo.accountId.map { [$0] } ?? [])
+  }
+
+  open func onUserProfileChanged(_ users: [V2NIMUser]) {
+    refreshP2PConversations(for: users.compactMap(\.accountId))
+  }
+
+  private func refreshP2PConversations(for accountIds: [String]) {
+    let conversationIds = Array(Set(accountIds.compactMap { accountId -> String? in
+      guard !accountId.isEmpty,
+            let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId),
+            conversationDic[conversationId] != nil else {
+        return nil
+      }
+      return conversationId
+    }))
+    guard !conversationIds.isEmpty else { return }
+
+    conversationRepo.getConversationListByIds(conversationIds) { [weak self] conversations, error in
+      guard error == nil, let conversations, !conversations.isEmpty else { return }
+      self?.executeOnMain { [weak self] in
+        guard let self else { return }
+        var didUpdate = false
+        for conversation in conversations where self.conversationDic[conversation.conversationId] != nil {
+          self.mergeConversationData(conversation)
+          didUpdate = true
+        }
+        if didUpdate {
+          self.delegate?.reloadTableView()
+        }
+      }
     }
   }
 
@@ -760,8 +791,19 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 extension ConversationViewModel: NESubscribeListener {
   /// 订阅在线状态
   open func subscribeOnlineStatus(_ accoundIds: [String]) {
+    guard Thread.isMainThread else {
+      executeOnMain { [weak self] in
+        self?.subscribeOnlineStatus(accoundIds)
+      }
+      return
+    }
+    subscribeOnlineStatus(accoundIds, notifyOnCachedChange: true)
+  }
+
+  private func subscribeOnlineStatus(_ accountIds: [String], notifyOnCachedChange: Bool) {
     var subscribeList: [String] = []
-    for accountId in accoundIds {
+    var didChange = false
+    for accountId in accountIds {
       // AI 数字人（V2NIMAIUser，非机器人）跳过订阅，不展示在线状态
       if NEAIUserManager.shared.isAIUser(accountId) {
         continue
@@ -772,10 +814,18 @@ extension ConversationViewModel: NESubscribeListener {
       // 否则发起订阅，等待 onUserStatusChanged 回调更新
       if let event = NESubscribeManager.shared.getSubscribeStatus(accountId),
          let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
-        onlineStatusDic[conversationId] = NESubscribeManager.isOnline(event)
+        let isOnline = NESubscribeManager.isOnline(event)
+        if onlineStatusDic[conversationId] != isOnline {
+          onlineStatusDic[conversationId] = isOnline
+          didChange = true
+        }
       } else {
         subscribeList.append(accountId)
       }
+    }
+
+    if notifyOnCachedChange, didChange {
+      delegate?.reloadTableView()
     }
 
     if !subscribeList.isEmpty {
@@ -794,18 +844,24 @@ extension ConversationViewModel: NESubscribeListener {
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
   public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
-    var needRefresh = false
-    for d in data {
-      // 遍历所有状态变更，不能 break，否则一批事件中只处理第一条
-      if p2pAccountIds.contains(d.accountId),
-         let conversationId = V2NIMConversationIdUtil.p2pConversationId(d.accountId) {
-        onlineStatusDic[conversationId] = NESubscribeManager.isOnline(d)
-        needRefresh = true
+    executeOnMain { [weak self] in
+      guard let self else { return }
+      var needRefresh = false
+      for status in data {
+        // 遍历所有状态变更，不能 break，否则一批事件中只处理第一条
+        if self.p2pAccountIds.contains(status.accountId),
+           let conversationId = V2NIMConversationIdUtil.p2pConversationId(status.accountId) {
+          let isOnline = NESubscribeManager.isOnline(status)
+          if self.onlineStatusDic[conversationId] != isOnline {
+            self.onlineStatusDic[conversationId] = isOnline
+            needRefresh = true
+          }
+        }
       }
-    }
 
-    if needRefresh {
-      delegate?.reloadTableView()
+      if needRefresh {
+        self.delegate?.reloadTableView()
+      }
     }
   }
 }

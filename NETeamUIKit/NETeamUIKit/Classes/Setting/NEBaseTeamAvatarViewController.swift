@@ -71,7 +71,7 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
     viewModel.getCurrentUserTeamMember(team?.teamId) { error in
       weakSelf?.setupUI()
       if let err = error {
-        weakSelf?.view.neMakeToast(err.localizedDescription)
+        weakSelf?.view.neMakeToast(teamErrorToast(err))
       }
     }
   }
@@ -211,13 +211,7 @@ open class NEBaseTeamAvatarViewController: NETeamBaseViewController, UICollectio
         NEALog.infoLog(ModuleName + " " + self.className(), desc: #function + "CALLBACK " + (error?.localizedDescription ?? "no error"))
         weakSelf?.view.neHideToastActivity()
         if let err = error {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if error?.code == noPermissionOperationCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           if let completion = weakSelf?.block {
             completion()

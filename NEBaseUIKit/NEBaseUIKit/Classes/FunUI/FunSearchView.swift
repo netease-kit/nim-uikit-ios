@@ -4,7 +4,11 @@
 
 @objcMembers
 open class FunSearchSessionHeaderView: SearchSessionBaseView {
+  private var didSetupFunUI = false
+
   override open func setupUI() {
+    guard !didSetupFunUI else { return }
+    didSetupFunUI = true
     super.setupUI()
     contentView.backgroundColor = .white
     NSLayoutConstraint.activate([
@@ -22,6 +26,8 @@ open class FunSearchSessionHeaderView: SearchSessionBaseView {
 }
 
 public class FunSearchView: UIView {
+  private var didSetupSubViews = false
+
   public lazy var backView: UIView = {
     let backView = UIView()
     backView.translatesAutoresizingMaskIntoConstraints = false
@@ -60,9 +66,12 @@ public class FunSearchView: UIView {
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+    setupSubViews()
   }
 
   func setupSubViews() {
+    guard !didSetupSubViews else { return }
+    didSetupSubViews = true
     addSubview(backView)
     NSLayoutConstraint.activate([
       backView.leftAnchor.constraint(equalTo: leftAnchor),

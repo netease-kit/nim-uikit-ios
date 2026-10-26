@@ -61,7 +61,7 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
     weak var weakSelf = self
     viewModel.getCurrentUserTeamMember(team?.teamId) { error in
       if let err = error {
-        weakSelf?.view.neMakeToast(err.localizedDescription)
+        weakSelf?.view.neMakeToast(teamErrorToast(err))
       }
       DispatchQueue.main.async {
         weakSelf?.configData()
@@ -183,12 +183,8 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
       view.neMakeToastActivity(.center)
       repo.updateTeamName(tid, .TEAM_TYPE_NORMAL, n) { error in
         weakSelf?.view.neHideToastActivity()
-        if error != nil {
-          if error?.code == noPermissionOperationCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-            return
-          }
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
+        if let error {
+          weakSelf?.showToast(teamErrorToast(error))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }
@@ -198,8 +194,8 @@ open class NEBaseTeamNameViewController: NETeamBaseViewController, UITextViewDel
       view.neMakeToastActivity(.center)
       repo.updateMemberNick(tid, .TEAM_TYPE_NORMAL, uid, n) { error in
         weakSelf?.view.neHideToastActivity()
-        if error != nil {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
+        if let error {
+          weakSelf?.showToast(teamErrorToast(error))
         } else {
           weakSelf?.navigationController?.popViewController(animated: true)
         }

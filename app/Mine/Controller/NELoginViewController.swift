@@ -124,9 +124,9 @@ public class NELoginViewController: UIViewController {
     ])
 
     NSLayoutConstraint.activate([
-      loginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+      loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
       loginButton.topAnchor.constraint(equalTo: launchIconLabel.bottomAnchor, constant: 20),
-      loginButton.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth - 80),
       loginButton.heightAnchor.constraint(equalToConstant: 44),
     ])
 

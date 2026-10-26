@@ -105,15 +105,32 @@ open class LocalConversationController: NEBaseLocalConversationController {
     tableView.rowHeight = 62
 
     // 设置置顶列表宽高
-    stickTopCollcetionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width - 20.0, height: 181 - NEConstant.navigationAndStatusHeight)
+    let pinHeight = NEAdaptiveDeviceGate.isFoldableDevice ? 88.0 : 181 - NEConstant.navigationAndStatusHeight
+    stickTopCollcetionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width - 20.0, height: pinHeight)
 
     stickTopCollcetionView.addSubview(pinUserDividerLine)
-    pinUserDividerLine.frame = CGRect(x: -10, y: 180 - NEConstant.navigationAndStatusHeight, width: view.frame.size.width + 20.0, height: 1.0)
+    pinUserDividerLine.frame = CGRect(x: -10, y: pinHeight - 1, width: view.frame.size.width + 20.0, height: 1.0)
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice, tableView.bounds.width > 0 else { return }
+    let width = max(0, tableView.bounds.width - 20)
+    let height: CGFloat = 88
+    if abs(stickTopCollcetionView.frame.width - width) > 0.5 || abs(stickTopCollcetionView.frame.height - height) > 0.5 {
+      stickTopCollcetionView.frame.size.height = height
+      stickTopCollcetionView.frame.size.width = width
+      pinUserDividerLine.frame.size.width = width + 20
+      stickTopCollcetionView.collectionViewLayout.invalidateLayout()
+      if tableView.tableHeaderView === stickTopCollcetionView {
+        tableView.tableHeaderView = stickTopCollcetionView
+      }
+    }
   }
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 80, height: 181 - NEConstant.navigationAndStatusHeight)
+    CGSize(width: 80, height: NEAdaptiveDeviceGate.isFoldableDevice ? 88 : 181 - NEConstant.navigationAndStatusHeight)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)

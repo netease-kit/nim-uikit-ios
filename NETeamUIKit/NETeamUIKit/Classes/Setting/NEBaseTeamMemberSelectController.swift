@@ -76,7 +76,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
     if let tid = teamId {
       viewModel.getTeamInfo(tid, showAllMembers) { [weak self] error in
         if let err = error {
-          self?.view.neMakeToast(err.localizedDescription)
+          self?.view.neMakeToast(teamErrorToast(err))
         } else {
           print("获取群信息成功 : ", self?.viewModel.teamInfoModel?.users.count as Any)
         }
@@ -378,7 +378,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
       button.tintColor = memberLoadStatusTintColor
       button.setTitleColor(memberLoadStatusTintColor, for: .normal)
       button.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
-      button.setTitle(error.localizedDescription, for: .normal)
+      button.setTitle(teamErrorToast(error), for: .normal)
       button.titleLabel?.font = .systemFont(ofSize: 14)
       button.titleLabel?.numberOfLines = 2
       button.addTarget(self, action: #selector(retryMemberLoad), for: .touchUpInside)
@@ -395,7 +395,7 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
     guard let teamId else { return }
     viewModel.getTeamInfo(teamId, showAllMembers) { [weak self] error in
       if let error {
-        self?.view.neMakeToast(error.localizedDescription)
+        self?.view.neMakeToast(teamErrorToast(error))
       }
       self?.didReloadTableData()
     }

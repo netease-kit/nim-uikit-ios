@@ -295,36 +295,22 @@ open class TopicChatViewModel: P2PChatViewModel, NETopicListener {
 
   // MARK: - Topic History
 
-  open func loadTopicData(_ completion: @escaping (Error?, NSInteger, NSInteger, Int) -> Void) {
-    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+  private func resetTopicHistoryState() {
     messages.removeAll()
     messageClientIds.removeAll()
-    delegate?.tableViewReload()
     oldestTopicMessage = nil
     newestTopicMessage = nil
     olderTopicAnchorMessage = nil
     hasMoreOlderTopicMessages = false
     hasMoreNewerTopicMessages = false
     isHistoryChat = false
-
-    guard topic != nil else {
-      completion(nil, 0, 0, 0)
-      return
-    }
-
-    getTopicHistory(order: .QUERY_DIRECTION_DESC, anchorMessage: nil) { [weak self] error, count, loaded in
-      completion(error, count, 0, 0)
-      if count > 0 {
-        self?.loadMoreWithMessage(loaded)
-      }
-    }
   }
 
-  open func getTopicHistory(order: V2NIMQueryDirection,
-                            anchorMessage: V2NIMMessage?,
-                            _ completion: @escaping (Error?, NSInteger, [V2NIMMessage]) -> Void) {
+  private func fetchTopicHistory(order: V2NIMQueryDirection,
+                                 anchorMessage: V2NIMMessage?,
+                                 _ completion: @escaping (Error?, [V2NIMMessage], V2NIMTopicMessageListResult?) -> Void) {
     guard let currentTopic = topic else {
-      completion(nil, 0, [])
+      completion(nil, [], nil)
       return
     }
 
@@ -340,8 +326,49 @@ open class TopicChatViewModel: P2PChatViewModel, NETopicListener {
     topicRepo.getTopicMessageList(option) { [weak self] result, error in
       let rawMessages = result?.replyList ?? []
       let loaded = self?.uniqueTopicMessages(rawMessages).sorted { $0.createTime < $1.createTime } ?? []
+      completion(error, loaded, result)
+    }
+  }
+
+  open func loadTopicData(_ completion: @escaping (Error?, NSInteger, NSInteger, Int) -> Void) {
+    NEALog.infoLog(ModuleName + " " + className(), desc: #function)
+
+    guard topic != nil else {
+      resetTopicHistoryState()
+      delegate?.tableViewReload()
+      completion(nil, 0, 0, 0)
+      return
+    }
+
+    fetchTopicHistory(order: .QUERY_DIRECTION_DESC, anchorMessage: nil) { [weak self] error, loaded, result in
+      guard error == nil else {
+        completion(error, 0, 0, 0)
+        return
+      }
+      guard let self else {
+        completion(nil, 0, 0, 0)
+        return
+      }
+      self.resetTopicHistoryState()
+      self.appendTopicMessages(loaded, order: .QUERY_DIRECTION_DESC, result: result)
+      self.delegate?.tableViewReload()
+      completion(nil, loaded.count, 0, 0)
+      if !loaded.isEmpty {
+        self.loadMoreWithMessage(loaded)
+      }
+    }
+  }
+
+  open func getTopicHistory(order: V2NIMQueryDirection,
+                            anchorMessage: V2NIMMessage?,
+                            _ completion: @escaping (Error?, NSInteger, [V2NIMMessage]) -> Void) {
+    fetchTopicHistory(order: order, anchorMessage: anchorMessage) { [weak self] error, loaded, result in
+      guard error == nil else {
+        completion(error, 0, [])
+        return
+      }
       self?.appendTopicMessages(loaded, order: order, result: result)
-      completion(error, loaded.count, loaded)
+      completion(nil, loaded.count, loaded)
     }
   }
 

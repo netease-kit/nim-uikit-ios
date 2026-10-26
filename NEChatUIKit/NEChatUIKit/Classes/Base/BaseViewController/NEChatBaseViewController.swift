@@ -9,6 +9,31 @@ import UIKit
 
 @objcMembers
 open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelegate {
+  /// Presents media/file previews from the app window on Duo. A chat controller
+  /// can live in the right detail column, so presenting from that child would
+  /// otherwise make UIKit use the column as the presentation container.
+  open func presentDuoPreview(_ controller: UIViewController, animated: Bool,
+                              completion: (() -> Void)? = nil) {
+    guard NEAdaptiveDeviceGate.isFoldableDevice,
+          let root = view.window?.rootViewController,
+          root !== self else {
+      present(controller, animated: animated, completion: completion)
+      return
+    }
+    var presenter = root
+    while let presented = presenter.presentedViewController, presented !== controller {
+      presenter = presented
+    }
+    if presenter.presentedViewController === controller { return }
+    presenter.present(controller, animated: animated, completion: completion)
+  }
+
+  open var documentPreviewPresenter: UIViewController {
+    guard NEAdaptiveDeviceGate.isFoldableDevice,
+          let root = view.window?.rootViewController else { return self }
+    return root
+  }
+
   public var topConstant: CGFloat = 0 {
     didSet {
       navigationViewHeightAnchor?.constant = topConstant

@@ -3,18 +3,60 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import MJRefresh
 import NEChatKit
 import NIMSDK
 
 @objc
 public protocol NEBaseConversationControllerDelegate: NSObjectProtocol {
-  func onDataLoaded()
+  @objc optional func onDataLoaded()
 }
 
 /// 会话列表页面 - 基类
 @objcMembers
 open class NEBaseConversationController: UIViewController, UIGestureRecognizerDelegate {
+  open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor)
+  }
+
+  /// Host-provided selection color for a retained list beside its detail page.
+  public var listSelectionBackgroundColor: UIColor? {
+    didSet {
+      guard oldValue != listSelectionBackgroundColor, isViewLoaded else { return }
+      for cell in tableView.visibleCells { cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor) }
+      if listSelectionBackgroundColor != nil { restoreAdaptiveSelection() }
+    }
+  }
+
+  private var adaptiveSelectedConversationID: String?
+
+  private func restoreAdaptiveSelection() {
+    guard listSelectionBackgroundColor != nil, let selectedID = adaptiveSelectedConversationID else { return }
+    let data = displayConversationList()
+    guard let row = data.firstIndex(where: { $0.conversation?.conversationId == selectedID }) else { return }
+    let indexPath = IndexPath(row: row, section: 0)
+    tableView.layoutIfNeeded()
+    tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+  }
+
+  /// 折叠屏展开态：右列仍展示该会话时，左列当前分组保留该会话。
+  /// 关闭详情栏（回到占位）时传 nil，让该行按分组规则自然移除。
+  public func retainConversationInGroup(_ conversationId: String?) {
+    guard conversationGroupViewModel.setRetainedConversation(conversationId) else { return }
+    reloadTableView()
+  }
+
+  open func selectConversation(conversationId: String, animated: Bool) {
+    adaptiveSelectedConversationID = conversationId
+    guard let row = displayConversationList().firstIndex(where: { $0.conversation?.conversationId == conversationId }) else { return }
+    let indexPath = IndexPath(row: row, section: 0)
+    tableView.layoutIfNeeded()
+    tableView.selectRow(at: indexPath, animated: animated, scrollPosition: .middle)
+  }
+
+  /// Final presentation boundary; capture the host weakly and set nil to unbind.
+  public var onOpenConversation: ((String, [String: Any]) -> Bool)?
   var logClassName = "NEBaseConversationController"
   public var deleteButtonBackgroundColor: UIColor = NEConstant.hexRGB(0xA8ABB6)
   public var topButtonBackgroundColor: UIColor = NEConstant.hexRGB(0x337EFF)
@@ -53,12 +95,22 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   private var networkBroken = false // 网络断开标志
   private var renderedConversationGroupId: String?
   private var conversationListRenderPending = false
+  // Describes the table's rendered structure, not a second conversation data source.
+  private var renderedConversationRows: [ConversationRowIdentity]?
+  private var renderedListGroupId: String?
+  private var renderedListSelectionEnabled = false
+
+  private struct ConversationRowIdentity: Equatable {
+    let conversationId: String
+    let customType: Int
+  }
   var conversationGroupUIStyle: NEConversationGroupUIStyle {
     .normal
   }
 
   private lazy var conversationGroupBar: NEConversationGroupBar = {
-    let view = NEConversationGroupBar(frame: CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: 44))
+    let view = NEConversationGroupBar(frame: .zero)
+    view.autoresizingMask = [.flexibleWidth]
     view.delegate = self
     return view
   }()
@@ -67,8 +119,6 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     let nav = TabNavigationView(frame: CGRect.zero)
     nav.translatesAutoresizingMaskIntoConstraints = false
     nav.delegate = self
-
-    nav.brandBtn.addTarget(self, action: #selector(brandBtnClick), for: .touchUpInside)
 
     if let brandTitle = ConversationUIConfig.shared.titleBarTitle {
       nav.brandBtn.setTitle(brandTitle, for: .normal)
@@ -293,6 +343,12 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    // 双栏同时可见时，分组配置可能在另一栏被修改：直接监听配置变更，
+    // 不依赖 groupViewModel.delegate 的单播回调。
+    NotificationCenter.default.addObserver(self,
+                                          selector: #selector(handleGroupConfigDidChange),
+                                          name: NEConversationGroupLocalConfigHelper.didChangeNotification,
+                                          object: nil)
     showTitleBar()
     setupSubviews()
     initialConfig()
@@ -441,7 +497,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
       } else {
         self?.tableView.mj_footer?.endRefreshing()
       }
-      self?.delegate?.onDataLoaded()
+      self?.delegate?.onDataLoaded?()
       self?.reloadTableView()
     }
   }
@@ -474,7 +530,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
           } else {
             self?.emptyView.isHidden = true
             self?.reloadTableView()
-            self?.delegate?.onDataLoaded()
+            self?.delegate?.onDataLoaded?()
           }
         }
       }
@@ -778,7 +834,7 @@ extension NEBaseConversationController: UICollectionViewDelegate, UICollectionVi
     let conversationModel = viewModel.aiUserListData[indexPath.row]
 
     if let accountId = conversationModel.aiUser?.accountId, let conversationId = V2NIMConversationIdUtil.p2pConversationId(accountId) {
-      Router.shared.use(
+      openConversationRoute(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -813,6 +869,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
       selectedId: conversationGroupViewModel.selectedGroup?.groupId,
       style: conversationGroupUIStyle
     )
+    conversationGroupBar.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 44)
     return conversationGroupBar
   }
 
@@ -827,6 +884,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 
     let reusedId = "\(model.customType)"
     let cell = tableView.dequeueReusableCell(withIdentifier: reusedId, for: indexPath)
+    cell.ne_setLayoutMarginsManagedByContainer()
 
     if let c = cell as? NEBaseConversationListCell {
       c.configureData(model)
@@ -850,6 +908,7 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
     }
 
     let conversationModel = displayData[indexPath.row]
+    adaptiveSelectedConversationID = conversationModel.conversation?.conversationId
 
     if let didClick = ConversationUIConfig.shared.itemClick {
       didClick(self, conversationModel, indexPath)
@@ -1057,6 +1116,16 @@ extension NEBaseConversationController: UITableViewDelegate, UITableViewDataSour
 // MARK: - UI UIKit提供的重写方法
 
 extension NEBaseConversationController {
+  private func openConversationRoute(_ route: String, parameters: [String: Any], closure: Any?) {
+    var legacyParameters = parameters
+    if Thread.isMainThread, let handler = onOpenConversation {
+      if handler(route, parameters) { return }
+      // A declined bridge is dispatched only once; the original route still runs.
+      legacyParameters["ne_conversation_presentation_declined"] = true
+    }
+    Router.shared.use(route, parameters: legacyParameters, closure: nil)
+  }
+
   /// cell点击事件,可重写该事件处理自己的逻辑业务，例如跳转到指定的会话页面
   /// - Parameter conversation: 会话
   open func onselectedTableRow(conversation: V2NIMConversation) {
@@ -1069,7 +1138,7 @@ extension NEBaseConversationController {
     if conversation.type == .CONVERSATION_TYPE_P2P {
       if let sessionId = V2NIMConversationIdUtil.conversationTargetId(conversationId) {
         if NEAIRobotManager.shared.isRobot(sessionId) {
-          Router.shared.use(
+          openConversationRoute(
             PushBotSubSessionListRouter,
             parameters: ["nav": navigationController as Any,
                          "conversationId": conversationId,
@@ -1078,7 +1147,7 @@ extension NEBaseConversationController {
             closure: nil
           )
         } else {
-          Router.shared.use(
+          openConversationRoute(
             PushP2pChatVCRouter,
             parameters: ["nav": navigationController as Any,
                          "conversationId": conversationId as Any,
@@ -1088,7 +1157,7 @@ extension NEBaseConversationController {
         }
         return
       }
-      Router.shared.use(
+      openConversationRoute(
         PushP2pChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -1096,7 +1165,7 @@ extension NEBaseConversationController {
         closure: nil
       )
     } else if conversation.type == .CONVERSATION_TYPE_TEAM {
-      Router.shared.use(
+      openConversationRoute(
         PushTeamChatVCRouter,
         parameters: ["nav": navigationController as Any,
                      "conversationId": conversationId as Any,
@@ -1134,7 +1203,7 @@ extension NEBaseConversationController {
 
 extension NEBaseConversationController: ConversationViewModelDelegate {
   open func reloadData() {
-    delegate?.onDataLoaded()
+    delegate?.onDataLoaded?()
   }
 
   open func reloadTableView() {
@@ -1166,7 +1235,41 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
 
   /// Renders the latest list and skin-specific header once per pending refresh batch.
   open func renderConversationList() {
-    tableView.reloadData()
+    let data = displayConversationList()
+    let rows = data.map {
+      ConversationRowIdentity(conversationId: $0.conversation?.conversationId ?? "",
+                              customType: $0.customType)
+    }
+    let groupId = conversationGroupViewModel.isEnabled ? conversationGroupViewModel.selectedGroup?.groupId : nil
+    let selectionEnabled = listSelectionBackgroundColor != nil
+    let canRebind = selectionEnabled && renderedConversationRows == rows &&
+      renderedListGroupId == groupId && renderedListSelectionEnabled == selectionEnabled &&
+      tableView.numberOfRows(inSection: 0) == data.count
+
+    if canRebind {
+      // Read-state, group-count and lifecycle callbacks all reach this boundary.
+      // Preserve visible cells when membership, ordering and reuse types are unchanged.
+      for indexPath in tableView.indexPathsForVisibleRows ?? [] {
+        guard indexPath.section == 0, indexPath.row < data.count,
+              let cell = tableView.cellForRow(at: indexPath) as? NEBaseConversationListCell else {
+          continue
+        }
+        let model = data[indexPath.row]
+        cell.configureData(model)
+        if IMKitConfigCenter.shared.enableOnlineStatus,
+           let conversationId = model.conversation?.conversationId {
+          let online = viewModel.onlineStatusDic[conversationId] ?? false
+          model.p2pOnline = online
+          cell.setOnline(online)
+        }
+      }
+    } else {
+      tableView.reloadData()
+    }
+    renderedConversationRows = rows
+    renderedListGroupId = groupId
+    renderedListSelectionEnabled = selectionEnabled
+    restoreAdaptiveSelection()
   }
 
   /// 自定义分组使用独立分页接口，切换分组时重新同步 footer 状态。
@@ -1223,7 +1326,21 @@ extension NEBaseConversationController: ConversationViewModelDelegate {
 // MARK: - ConversationGroupViewModelDelegate
 
 extension NEBaseConversationController: ConversationGroupViewModelDelegate {
+  @objc private func handleGroupConfigDidChange() {
+    guard isViewLoaded else { return }
+    conversationGroupViewModel.applyLocalConfigOrder()
+    conversationGroupBar.configure(groups: conversationGroupViewModel.commonGroups,
+                                   selectedId: conversationGroupViewModel.selectedGroup?.groupId,
+                                   style: conversationGroupUIStyle)
+    reloadTableView()
+  }
+
   public func conversationGroupDidReload() {
+    // 分组顺序/隐藏状态可能在其它页面被修改（双栏同时可见时尤其明显），
+    // 这里同步刷新顶部 tab，而不是只刷新会话列表。
+    conversationGroupBar.configure(groups: conversationGroupViewModel.commonGroups,
+                                   selectedId: conversationGroupViewModel.selectedGroup?.groupId,
+                                   style: conversationGroupUIStyle)
     reloadTableView()
   }
 
@@ -1257,7 +1374,7 @@ extension NEBaseConversationController: NEConversationGroupBarDelegate {
 
 extension NEBaseConversationController: NEConversationListener {
   public func onConversationCreated(_ conversation: V2NIMConversation) {
-    delegate?.onDataLoaded()
+    delegate?.onDataLoaded?()
   }
 }
 

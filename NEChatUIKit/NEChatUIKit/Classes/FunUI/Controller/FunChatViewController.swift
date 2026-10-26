@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import NIMSDK
 import UIKit
 
@@ -107,7 +108,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     layoutInputView(offset: 0, true)
 
-    UIApplication.shared.keyWindow?.endEditing(true)
+    (NEAdaptiveDeviceGate.isFoldableDevice ? view.window : UIApplication.shared.keyWindow)?.endEditing(true)
   }
 
   open func didHideRecordMode() {
@@ -173,9 +174,10 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       }
     }
 
-    let keyboardRect = (notification
-      .userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
-    currentKeyboardHeight = keyboardRect.height
+    if !NEAdaptiveDeviceGate.isFoldableDevice,
+       let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+      currentKeyboardHeight = keyboardRect.height
+    }
     super.keyBoardWillShow(notification)
   }
 
@@ -217,11 +219,17 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
         }
       }
     case .changed:
-      let location = gesture.location(in: view)
-      if location.y < UIScreen.main.bounds.height - FunRecordAudioView.getGestureHeight() {
-        recordView?.changeToCancelStyle()
+      guard let recordView = recordView else { return }
+      let location = NEAdaptiveDeviceGate.isFoldableDevice
+        ? gesture.location(in: recordView)
+        : gesture.location(in: view)
+      let cancelBoundary = NEAdaptiveDeviceGate.isFoldableDevice
+        ? recordView.recordGestureArea.frame.minY
+        : UIScreen.main.bounds.height - FunRecordAudioView.getGestureHeight()
+      if location.y < cancelBoundary {
+        recordView.changeToCancelStyle()
       } else {
-        recordView?.changeToNormalStyle()
+        recordView.changeToNormalStyle()
       }
     case .ended:
       removeRecordView()
@@ -252,12 +260,23 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func showRecordView() {
+    let window = NEAdaptiveDeviceGate.isFoldableDevice ? view.window : UIApplication.shared.keyWindow
+    if NEAdaptiveDeviceGate.isFoldableDevice && window == nil { return }
     if recordView == nil {
       let recordAudio = FunRecordAudioView()
       recordAudio.delegate = self
-      recordAudio.frame = UIScreen.main.bounds
+      if NEAdaptiveDeviceGate.isFoldableDevice {
+        recordAudio.frame = window!.bounds
+        recordAudio.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      } else {
+        recordAudio.frame = UIScreen.main.bounds
+      }
       recordView = recordAudio
-      UIApplication.shared.keyWindow?.addSubview(recordAudio)
+      if NEAdaptiveDeviceGate.isFoldableDevice {
+        window?.addSubview(recordAudio)
+      } else {
+        UIApplication.shared.keyWindow?.addSubview(recordAudio)
+      }
     }
     startRecord()
   }
@@ -368,6 +387,11 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func getMessageModel(model: MessageModel) {
+    (model as? MessageTextModel)?.translationInsideBubble = false
+    if let audio = model as? MessageAudioModel {
+      audio.transcriptOutsideBubble = true
+      audio.transcriptHorizontalInset = chat_cell_margin * 2 + FunChatMessageBaseCell.bubbleTailWidth
+    }
     if model.type == .tip || model.type == .notification {
       return
     }
@@ -392,7 +416,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     // Fun 皮肤：历史消息加载时，若已有译文则补入气泡高度
     if let textModel = model as? MessageTextModel,
-       (textModel.translationFailed || textModel.translationInfo != nil),
+       textModel.translationFailed || textModel.translationInfo != nil,
        textModel.translationVisible {
       let bubbleH = textModel.estimateTranslationBubbleHeight()
       if bubbleH > 0, textModel.addedTranslationHeight == 0 {

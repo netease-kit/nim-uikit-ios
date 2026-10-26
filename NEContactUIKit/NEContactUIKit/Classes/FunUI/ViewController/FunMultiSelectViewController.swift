@@ -51,12 +51,20 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
     emptyView.setEmptyImage(name: "fun_user_empty")
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    if !searchTextField.isFirstResponder, searchTextField.text?.isEmpty == true {
+      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isFoldableDevice ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
+    }
+  }
+
   /// 设置搜索框 leftView
   open func setSearchTextFieldLeftView() {
     if !searchTextField.isFirstResponder, searchTextField.text?.isEmpty == true {
       let leftImageView = UIImageView(image: coreLoader.loadImage("fun_search"))
       searchTextField.leftView = leftImageView
-      searchTextField.leftViewRectX = (NEConstant.screenWidth) / 2 - 50
+      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isFoldableDevice ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
     } else {
       searchTextField.leftView = nil
       searchTextField.leftViewRectX = nil

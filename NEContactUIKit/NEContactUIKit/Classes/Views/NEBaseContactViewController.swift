@@ -2,17 +2,51 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import UIKit
 
 @objc
 public protocol NEBaseContactViewControllerDelegate: NSObjectProtocol {
-  func onDataLoaded()
+  @objc optional func onDataLoaded()
 }
 
 /// 通讯录页面 - 基类
 @objcMembers
 open class NEBaseContactViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TabNavigationViewDelegate, ContactViewModelDelegate {
+  open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor)
+  }
+
+  /// Host-provided selection color for a retained list beside its detail page.
+  public var listSelectionBackgroundColor: UIColor? {
+    didSet {
+      guard oldValue != listSelectionBackgroundColor, isViewLoaded else { return }
+      for cell in tableView.visibleCells { cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor) }
+      if listSelectionBackgroundColor != nil { restoreAdaptiveSelection() }
+    }
+  }
+
+  private var adaptiveSelectedContactKey: String?
+
+  private func adaptiveKey(for contact: ContactInfo) -> String {
+    let accountId = contact.user?.user?.accountId ?? ""
+    return "\(contact.contactCellType.rawValue)|\(contact.router)|\(accountId)"
+  }
+
+  private func restoreAdaptiveSelection() {
+    guard listSelectionBackgroundColor != nil, let selectedKey = adaptiveSelectedContactKey,
+          let sections = viewModel?.contactSections else { return }
+    for (section, data) in sections.enumerated() {
+      if let row = data.contacts.firstIndex(where: { adaptiveKey(for: $0) == selectedKey }) {
+        let indexPath = IndexPath(row: row, section: section)
+        tableView.layoutIfNeeded()
+        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        return
+      }
+    }
+  }
+
   public weak var delegate: NEBaseContactViewControllerDelegate?
 
   // custom ui cell
@@ -35,7 +69,12 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     }
   }
 
-  public var topConstant: CGFloat = 0
+  public var topConstant: CGFloat = 0 {
+    didSet {
+      bodyTopViewTopAnchor?.constant = topConstant
+    }
+  }
+  private var bodyTopViewTopAnchor: NSLayoutConstraint?
   private var bodyTopViewHeightAnchor: NSLayoutConstraint?
   private var bodyBottomViewHeightAnchor: NSLayoutConstraint?
   private var networkBroken = false // 网络断开标志
@@ -222,16 +261,16 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     view.addSubview(bodyView)
     view.addSubview(bodyBottomView)
 
+    navigationView.heightAnchor.constraint(equalToConstant: NEConstant.navigationAndStatusHeight).isActive = true
     NSLayoutConstraint.activate([
       navigationView.topAnchor.constraint(equalTo: view.topAnchor),
       navigationView.leftAnchor.constraint(equalTo: view.leftAnchor),
       navigationView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      navigationView.heightAnchor
-        .constraint(equalToConstant: NEConstant.navigationAndStatusHeight),
     ])
 
+    bodyTopViewTopAnchor = bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant)
+    bodyTopViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
-      bodyTopView.topAnchor.constraint(equalTo: view.topAnchor, constant: topConstant),
       bodyTopView.leftAnchor.constraint(equalTo: view.leftAnchor),
       bodyTopView.rightAnchor.constraint(equalTo: view.rightAnchor),
     ])
@@ -269,7 +308,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     viewModel?.loadData { [weak self] error, userSectionCount in
       NEALog.infoLog(NEBaseContactViewController.className() + " [Performance]", desc: #function + " onSuccess, timestamp: \(Date().timeIntervalSince1970)")
       if error == nil {
-        self?.delegate?.onDataLoaded()
+        self?.delegate?.onDataLoaded?()
         self?.didRefreshTable()
       }
     }
@@ -379,6 +418,8 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       return
     }
 
+    adaptiveSelectedContactKey = adaptiveKey(for: info)
+
     if info.contactCellType == .ContactOthers {
       if let headerItemClick = ContactUIConfig.shared.headerItemClick {
         headerItemClick(self, info, indexPath)
@@ -470,6 +511,7 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
 
   open func didRefreshTable() {
     tableView.reloadData()
+    restoreAdaptiveSelection()
     emptyView.isHidden = (viewModel?.contactSections.count ?? 0) > 1
   }
 

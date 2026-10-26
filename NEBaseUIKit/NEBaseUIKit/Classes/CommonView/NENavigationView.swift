@@ -72,7 +72,13 @@ open class NENavigationView: UIView {
     NSLayoutConstraint.activate([
       navTitle.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -bottomMargin),
       navTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      navTitle.widthAnchor.constraint(lessThanOrEqualToConstant: NEConstant.screenWidth - leftMargin * 4 - max(backButtonWidthAnchor?.constant ?? 34, moreButtonWidthAnchor?.constant ?? 34) * 2),
+      // Resolve the title width from this navigation view, not the physical
+      // screen. Settings pages can be hosted in Duo's narrower detail column.
+      navTitle.widthAnchor.constraint(
+        lessThanOrEqualTo: view.widthAnchor,
+        constant: -leftMargin * 4 - max(backButtonWidthAnchor?.constant ?? 34,
+                                        moreButtonWidthAnchor?.constant ?? 34) * 2
+      ),
     ])
 
     return view

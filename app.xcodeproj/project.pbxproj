@@ -53,8 +53,6 @@
 		18A32D6B2EA5E11400171E3A /* IMPocConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A32D662EA5E11400171E3A /* IMPocConfigViewController.swift */; };
 		18A32D702EA5E6DE00171E3A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A32D6E2EA5E6DE00171E3A /* SceneDelegate.swift */; };
 		18A6A9842D1E822900209FC5 /* NESecurityWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */; };
-		18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */; };
-		18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */; };
 		18B3EA712ED044A900D13785 /* NEP2PSecurityWarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B3EA702ED044A900D13785 /* NEP2PSecurityWarningView.swift */; };
 		18CF8A3C2D01B312000CF406 /* CustomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CF8A382D01B312000CF406 /* CustomConfig.swift */; };
 		39E9E27728D87E9800A11820 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39E9E27528D87E9800A11820 /* Localizable.strings */; };
@@ -143,8 +141,6 @@
 		18A32D682EA5E11400171E3A /* PocLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocLoginViewController.swift; sourceTree = "<group>"; };
 		18A32D6E2EA5E6DE00171E3A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESecurityWarningView.swift; sourceTree = "<group>"; };
-		18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFunChatViewController.swift; sourceTree = "<group>"; };
-		18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNormalChatViewController.swift; sourceTree = "<group>"; };
 		18B3EA702ED044A900D13785 /* NEP2PSecurityWarningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEP2PSecurityWarningView.swift; sourceTree = "<group>"; };
 		18CF8A382D01B312000CF406 /* CustomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomConfig.swift; sourceTree = "<group>"; };
 		37C88FC102DA6264EA0DE803 /* Pods_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -272,8 +268,6 @@
 				185100E62DFC0702001C470A /* AIChatDataLoader.swift */,
 				18A6A9832D1E822900209FC5 /* NESecurityWarningView.swift */,
 				18CF8A382D01B312000CF406 /* CustomConfig.swift */,
-				18B05B322BD5FD0300666AD1 /* CustomFunChatViewController.swift */,
-				18B05B332BD5FD0300666AD1 /* CustomNormalChatViewController.swift */,
 				181EE57E2B234C510043817F /* CustomView.swift */,
 				181EE57F2B234C510043817F /* CustomP2PChatViewController.swift */,
 				181EE5822B234C510043817F /* CustomConversationController.swift */,
@@ -373,7 +367,6 @@
 				4B3B9BD9277AFEE50091A74E /* Resources */,
 				39722F9327998A14007BFC8B /* Embed Frameworks */,
 				99C233E90D06E8231726B977 /* [CP] Embed Pods Frameworks */,
-				1D0071B898B4DFA3EDC2BD4B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -436,23 +429,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1D0071B898B4DFA3EDC2BD4B /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-app/Pods-app-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		99C233E90D06E8231726B977 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -557,8 +533,6 @@
 				56279F7F2FADB32C006A9560 /* TranslationSettingViewController.swift in Sources */,
 				DD141E042A56ABFE0091318F /* NETabBarController.swift in Sources */,
 				DD141DFC2A56ABFD0091318F /* Constant.swift in Sources */,
-				18B05B342BD5FD0300666AD1 /* CustomFunChatViewController.swift in Sources */,
-				18B05B352BD5FD0300666AD1 /* CustomNormalChatViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -753,7 +727,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.9.60;
+				MARKETING_VERSION = 10.9.70;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im.uikit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -802,7 +776,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 10.9.60;
+				MARKETING_VERSION = 10.9.70;
 				PRODUCT_BUNDLE_IDENTIFIER = com.netease.yunxin.app.im.uikit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

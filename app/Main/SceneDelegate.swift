@@ -9,12 +9,16 @@ import NEContactUIKit
 import NIMSDK
 import UIKit
 
-// import NEMapKit
 import NERtcCallKit
 import NERtcCallUIKit
 import PushKit
 
 private let conversationGroupDefaultEnabledMigrationKey = "nim_conversation_group_default_enabled_v2"
+
+/// Mirrors the `railWidth` passed to `NEAdaptiveShellConfiguration` in
+/// `NETabBarController`. Login pages use it to stay out of the same region
+/// before the adaptive shell exists.
+private let neDemoTrailingRailWidth: CGFloat = 72
 
 private final class MapFallbackViewController: UIViewController {
   private let mapType: NEMapType
@@ -51,6 +55,41 @@ private final class MapFallbackViewController: UIViewController {
   }
 }
 
+/// Keeps the pre-login navigation stack out of Duo's trailing tool region.
+/// The adaptive shell is created only after login, so login pages need the
+/// same trailing budget from their host container instead of relying on the
+/// shell's later layout pass.
+private final class NELoginContainerViewController: UIViewController {
+  private let loginNavigationController: NENavigationController
+
+  init(rootViewController: UIViewController) {
+    loginNavigationController = NENavigationController(rootViewController: rootViewController)
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.backgroundColor = .white
+    addChild(loginNavigationController)
+    let loginView = loginNavigationController.view!
+    loginView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(loginView)
+    let trailingInset = NEAdaptiveDeviceGate.isFoldableDevice ? neDemoTrailingRailWidth : 0
+    NSLayoutConstraint.activate([
+      loginView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      loginView.topAnchor.constraint(equalTo: view.topAnchor),
+      loginView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      loginView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -trailingInset),
+    ])
+    loginNavigationController.didMove(toParent: self)
+  }
+}
+
 class SceneDelegate: UIResponder {
   static var window: UIWindow?
   private var voipPushRegistry: PKPushRegistry?
@@ -68,7 +107,6 @@ class SceneDelegate: UIResponder {
     NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(refreshUIStyle), name: Notification.Name(CHANGE_UI), object: nil)
 
-    registerAPNS()
     setupInit { [weak self] error in
       if let remoteNotification = connectionOptions.notificationResponse?.notification.request.content.userInfo as? [String: Any] {
         self?.pushToChat(remoteNotification)
@@ -163,13 +201,10 @@ class SceneDelegate: UIResponder {
       weakSelf?.initConfig()
       weakSelf?.initializePage()
     }
-    SceneDelegate.window?.rootViewController = NENavigationController(rootViewController: loginCtrl)
+    SceneDelegate.window?.rootViewController = NELoginContainerViewController(rootViewController: loginCtrl)
   }
 
   func initConfig() {
-    // 地图组件初始化
-//    NEMapClient.shared().setupMapClient(withAppkey: AppKey.gaodeMapAppkey, withServerKey: AppKey.gaodeMapServerAppkey)
-
     // 初始化呼叫引擎和呼叫 UI。呼叫路由会在用户点击音视频入口时使用这里的单例。
     let setupConfig = NESetupConfig(appkey: AppKey.appKey)
     NECallEngine.sharedInstance().setup(setupConfig)
@@ -208,17 +243,18 @@ class SceneDelegate: UIResponder {
     SceneDelegate.window?.rootViewController = tab
   }
 
+  func windowScene(_ windowScene: UIWindowScene, didUpdate previousCoordinateSpace: UICoordinateSpace,
+                   interfaceOrientation previousInterfaceOrientation: UIInterfaceOrientation,
+                   traitCollection previousTraitCollection: UITraitCollection) {
+    (SceneDelegate.window?.rootViewController as? NETabBarController)?.adaptiveShell?.refreshWindow()
+  }
+
   // regist router
   func loadService() {
     // 注册路由
     ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
     DemoStickerConfig.registerPackages()
     registerMapFallbackRouter()
-    if NEStyleManager.instance.isNormalStyle() == false {
-      registerFunCustom()
-    } else {
-      registerNormalCustom()
-    }
 
     // 会话列表顶部插入警告内容
     CustomConfig.shared.loadSecurityWarningView()
@@ -280,86 +316,6 @@ class SceneDelegate: UIResponder {
         let me = PersonInfoViewController()
         nav.pushViewController(me, animated: true)
       }
-    }
-  }
-
-  /// 注册娱乐版自定义内容
-  func registerFunCustom() {
-    Router.shared.register(PushP2pChatVCRouter) { param in
-      let nav = param["nav"] as? UINavigationController
-      let animated = param["animated"] as? Bool ?? true
-      guard let conversationId = param["conversationId"] as? String else {
-        return
-      }
-      let anchor = param["anchor"] as? V2NIMMessage
-      let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
-      let p2pChatVC = CustomFunChatViewController(conversationId: conversationId, anchor: anchor)
-
-      // 无论如何都先设置 pendingNewMessages（如果有的话）
-      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-        p2pChatVC.pendingNewMessages = newMsgs
-      }
-
-      for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-        if vc.isKind(of: ChatViewController.self) {
-          nav?.viewControllers[i] = p2pChatVC
-          nav?.popToViewController(p2pChatVC, animated: animated)
-          return
-        }
-      }
-
-      var count = nav?.viewControllers.count ?? 0
-      nav?.pushViewController(p2pChatVC, animated: animated)
-
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
-        if let remove = param["removeUserVC"] as? Bool, remove {
-          while count > 1,
-                nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
-            nav?.viewControllers.remove(at: count - 1)
-            count -= 1
-          }
-        }
-      }))
-    }
-  }
-
-  /// 注册通用版自定义内容
-  func registerNormalCustom() {
-    Router.shared.register(PushP2pChatVCRouter) { param in
-      let nav = param["nav"] as? UINavigationController
-      let animated = param["animated"] as? Bool ?? true
-      guard let conversationId = param["conversationId"] as? String else {
-        return
-      }
-      let anchor = param["anchor"] as? V2NIMMessage
-      let onReceiveNewMsgs = param["onReceiveNewMsgs"] as? [V2NIMMessage]
-      let p2pChatVC = CustomNormalChatViewController(conversationId: conversationId, anchor: anchor)
-
-      // 无论如何都先设置 pendingNewMessages（如果有的话）
-      if let newMsgs = onReceiveNewMsgs, !newMsgs.isEmpty {
-        p2pChatVC.pendingNewMessages = newMsgs
-      }
-
-      for (i, vc) in (nav?.viewControllers ?? []).enumerated() {
-        if vc.isKind(of: ChatViewController.self) {
-          nav?.viewControllers[i] = p2pChatVC
-          nav?.popToViewController(p2pChatVC, animated: animated)
-          return
-        }
-      }
-
-      var count = nav?.viewControllers.count ?? 0
-      nav?.pushViewController(p2pChatVC, animated: animated)
-
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: DispatchWorkItem(block: {
-        if let remove = param["removeUserVC"] as? Bool, remove {
-          while count > 1,
-                nav?.viewControllers.last?.isKind(of: ChatViewController.self) == true {
-            nav?.viewControllers.remove(at: count - 1)
-            count -= 1
-          }
-        }
-      }))
     }
   }
 
@@ -558,26 +514,39 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     if let sessionId = userInfo["sessionId"] as? String,
        let sessionType = userInfo["sessionType"] as? String {
       let tabBar = SceneDelegate.window?.rootViewController as? NETabBarController
+      tabBar?.adaptiveShell?.selectSection(0)
+      let navigation = tabBar?.adaptiveShell?.sections.first ?? tabBar?.viewControllers?[tabBar?.selectedIndex ?? 0] as? UINavigationController
+      let adaptivePresentation = tabBar?.adaptiveShell != nil
       if sessionType == "p2p" {
         let cid = V2NIMConversationIdUtil.p2pConversationId(sessionId)
-        Router.shared.use(
-          PushP2pChatVCRouter,
-          parameters: ["nav": tabBar?.viewControllers?[tabBar?.selectedIndex ?? 0],
-                       "conversationId": cid,
-                       "animated": false,
-                       "anchor": nil],
-          closure: nil
-        )
+        if adaptivePresentation {
+          Router.shared.use(
+            PushP2pChatVCRouter,
+            parameters: ["nav": navigation as Any, "conversationId": cid, "animated": false],
+            closure: nil
+          )
+        } else {
+          Router.shared.use(
+            PushP2pChatVCRouter,
+            parameters: ["nav": navigation as Any, "conversationId": cid, "animated": false, "anchor": nil],
+            closure: nil
+          )
+        }
       } else if sessionType == "team" {
         let cid = V2NIMConversationIdUtil.teamConversationId(sessionId)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": tabBar?.viewControllers?[tabBar?.selectedIndex ?? 0],
-                       "conversationId": cid,
-                       "animated": false,
-                       "anchor": nil],
-          closure: nil
-        )
+        if adaptivePresentation {
+          Router.shared.use(
+            PushTeamChatVCRouter,
+            parameters: ["nav": navigation as Any, "conversationId": cid, "animated": false],
+            closure: nil
+          )
+        } else {
+          Router.shared.use(
+            PushTeamChatVCRouter,
+            parameters: ["nav": navigation as Any, "conversationId": cid, "animated": false, "anchor": nil],
+            closure: nil
+          )
+        }
       }
     }
   }

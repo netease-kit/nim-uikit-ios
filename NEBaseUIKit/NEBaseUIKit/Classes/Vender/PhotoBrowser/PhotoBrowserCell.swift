@@ -9,6 +9,10 @@ import NEChatKit
 
 @objcMembers
 open class PhotoBrowserCell: UICollectionViewCell {
+  private var didSetupUI = false
+  private var imageSize = CGSize.zero
+  private var imageRequestIdentifier = UUID()
+
   lazy var backScroll: UIScrollView = {
     let scroll =
       UIScrollView(frame: CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: NEConstant.screenHeight))
@@ -38,61 +42,62 @@ open class PhotoBrowserCell: UICollectionViewCell {
 
   var imgUrl: String? {
     didSet {
-      guard let img_url = imgUrl else {
+      imageRequestIdentifier = UUID()
+      let requestIdentifier = imageRequestIdentifier
+      imgView.sd_cancelCurrentImageLoad()
+      backScroll.setZoomScale(1, animated: false)
+      guard let imgUrl, !imgUrl.isEmpty else {
+        loading.stopAnimating()
+        imgView.image = nil
+        imageSize = .zero
         return
       }
 
       loading.startAnimating()
-      if img_url.hasPrefix("http") {
+      if imgUrl.hasPrefix("http") {
         let context: [SDWebImageContextOption: Any] = [.imageThumbnailPixelSize: CGSize(width: 1000, height: 1000)]
         imgView.sd_setImage(
-          with: URL(string: img_url),
-          placeholderImage: UIImage(contentsOfFile: img_url),
+          with: URL(string: imgUrl),
+          placeholderImage: UIImage(contentsOfFile: imgUrl),
           options: .allowInvalidSSLCertificates,
           context: context,
           progress: nil
-        ) { [weak self] img, error, _, url in
-          guard let self = self else { return }
-          guard img != nil else {
-            return
-          }
-          guard let width = img?.size.width else {
-            return
-          }
-          guard let height = img?.size.height else {
-            return
-          }
+        ) { [weak self] loadedImage, _, _, _ in
+          guard let self,
+                self.imageRequestIdentifier == requestIdentifier,
+                self.imgUrl == imgUrl else { return }
           self.loading.stopAnimating()
-          self.resizeImage()
+          guard let loadedImage else { return }
+          self.imageSize = loadedImage.size
+          self.resizeImage(for: loadedImage.size)
         }
       } else {
-        imgView.image = UIImage(contentsOfFile: img_url)
+        let loadedImage = UIImage(contentsOfFile: imgUrl)
+        imgView.image = loadedImage
         loading.stopAnimating()
-        resizeImage()
+        guard imageRequestIdentifier == requestIdentifier,
+              self.imgUrl == imgUrl,
+              let loadedImage else { return }
+        imageSize = loadedImage.size
+        resizeImage(for: loadedImage.size)
       }
     }
   }
 
   var image: UIImage? {
     didSet {
-      guard let imageV = image else {
+      imageRequestIdentifier = UUID()
+      imgView.sd_cancelCurrentImageLoad()
+      loading.stopAnimating()
+      backScroll.setZoomScale(1, animated: false)
+      guard let image else {
+        imgView.image = nil
+        imageSize = .zero
         return
       }
-      imgView.image = imageV
-      let w = NEConstant.screenWidth
-      let h = NEConstant.screenWidth / (imageV.size.width / imageV.size.height)
-
-      if h > NEConstant.screenHeight {
-//                let y = (h - kScreenHeight) / 2
-        backScroll.contentSize = CGSize(width: NEConstant.screenWidth, height: h)
-        backScroll.contentOffset = CGPoint(x: 0, y: 0)
-        imgView.frame = CGRect(x: 0, y: 0, width: w, height: h)
-      } else {
-        let y = (NEConstant.screenHeight - h) / 2
-        backScroll.contentSize = CGSize(width: NEConstant.screenWidth, height: NEConstant.screenHeight)
-        backScroll.contentOffset = CGPoint(x: 0, y: 0)
-        imgView.frame = CGRect(x: 0, y: y, width: w, height: h)
-      }
+      imgView.image = image
+      imageSize = image.size
+      resizeImage(for: image.size)
     }
   }
 
@@ -102,6 +107,17 @@ open class PhotoBrowserCell: UICollectionViewCell {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
+    setupUI()
+  }
+
+  public required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    setupUI()
+  }
+
+  private func setupUI() {
+    guard !didSetupUI else { return }
+    didSetupUI = true
     backgroundColor = .clear
     contentView.backgroundColor = .clear
     contentView.addSubview(backScroll)
@@ -118,27 +134,63 @@ open class PhotoBrowserCell: UICollectionViewCell {
     loading.widthAnchor.constraint(equalToConstant: 30).isActive = true
   }
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    backScroll.frame = contentView.bounds
+    if imageSize.width > 0, imageSize.height > 0 {
+      resizeImage(for: imageSize)
+    }
   }
 
-  private func resizeImage() {
-    let w = NEConstant.screenWidth
-    let h = NEConstant.screenWidth / (width / height)
-    if h > NEConstant.screenHeight {
-      DispatchQueue.main.async {
-        self.backScroll.contentSize = CGSize(width: NEConstant.screenWidth, height: h)
-        self.backScroll.contentOffset = CGPoint(x: 0, y: 0)
-        self.imgView.frame = CGRect(x: 0, y: 0, width: w, height: h)
-      }
+  override open func prepareForReuse() {
+    super.prepareForReuse()
+    imageRequestIdentifier = UUID()
+    imgView.sd_cancelCurrentImageLoad()
+    imgUrl = nil
+    image = nil
+    loading.stopAnimating()
+    backScroll.setZoomScale(1, animated: false)
+    backScroll.contentOffset = .zero
+    backScroll.contentSize = backScroll.bounds.size
+    imgView.frame = .zero
+    backRemoveCallBack = nil
+    tapMoveCallBack = nil
+    changeAlphaCallBack = nil
+  }
 
-    } else {
-      let y = (NEConstant.screenHeight - h) / 2
-      DispatchQueue.main.async {
-        self.backScroll.contentSize = CGSize(width: NEConstant.screenWidth, height: NEConstant.screenHeight)
-        self.backScroll.contentOffset = CGPoint(x: 0, y: 0)
-        self.imgView.frame = CGRect(x: 0, y: y, width: w, height: h)
+  private func resizeImage(for size: CGSize) {
+    let applyLayout = { [weak self] in
+      guard let self, size.width > 0, size.height > 0 else { return }
+      let viewportWidth = self.backScroll.bounds.width > 0 ? self.backScroll.bounds.width : NEConstant.screenWidth
+      let viewportHeight = self.backScroll.bounds.height > 0 ? self.backScroll.bounds.height : NEConstant.screenHeight
+      self.backScroll.contentOffset = .zero
+      if NEAdaptiveDeviceGate.isFoldableDevice {
+        // The Duo preview is presented by the app window and can be wider
+        // than the source chat column. Fit the complete image into that
+        // viewport while preserving its aspect ratio.
+        let scale = min(viewportWidth / size.width, viewportHeight / size.height)
+        let imageWidth = size.width * scale
+        let imageHeight = size.height * scale
+        self.backScroll.contentSize = CGSize(width: viewportWidth, height: viewportHeight)
+        self.imgView.frame = CGRect(x: (viewportWidth - imageWidth) / 2,
+                                    y: (viewportHeight - imageHeight) / 2,
+                                    width: imageWidth, height: imageHeight)
+      } else {
+        let imageHeight = viewportWidth * size.height / size.width
+        if imageHeight > viewportHeight {
+          self.backScroll.contentSize = CGSize(width: viewportWidth, height: imageHeight)
+          self.imgView.frame = CGRect(x: 0, y: 0, width: viewportWidth, height: imageHeight)
+        } else {
+          let originY = (viewportHeight - imageHeight) / 2
+          self.backScroll.contentSize = CGSize(width: viewportWidth, height: viewportHeight)
+          self.imgView.frame = CGRect(x: 0, y: originY, width: viewportWidth, height: imageHeight)
+        }
       }
+    }
+    if Thread.isMainThread {
+      applyLayout()
+    } else {
+      DispatchQueue.main.async(execute: applyLayout)
     }
   }
 }

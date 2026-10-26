@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import Foundation
+import NEBaseUIKit
 
 extension UIViewController {
   typealias AlertCallBack = () -> Void
@@ -27,6 +28,6 @@ extension UIViewController {
       sureBack()
     }
     alertController.addAction(sureAction)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 }

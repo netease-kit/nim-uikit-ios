@@ -455,8 +455,19 @@ open class NELottieAnimationView: NELottieAnimationViewBase {
   }
 
   /// Returns `true` if the animation is currently playing.
-  public var isAnimationPlaying: Bool {
+  @objc public var isAnimationPlaying: Bool {
     lottieAnimationLayer.isAnimationPlaying
+  }
+
+  /// Compatibility with the writable Objective-C animationPlaying entry point.
+  @objc(setAnimationPlaying:)
+  public func setAnimationPlaying(_ playing: Bool) {
+    guard playing != isAnimationPlaying else { return }
+    if playing {
+      play()
+    } else {
+      pause()
+    }
   }
 
   /// Returns `true` if the animation will start playing when this view is added to a window.

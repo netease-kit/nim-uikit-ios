@@ -5,6 +5,10 @@
 
 "open_push"="请到设置中开启推送功能";
 "message"="消息";
+"adaptive_back"="返回";
+"adaptive_empty_conversation"="请选择会话";
+"adaptive_empty_contact"="请选择联系人";
+"adaptive_empty_mine"="请选择功能";
 "qchat"="圈组";
 "contact"="通讯录";
 "mine"="我";

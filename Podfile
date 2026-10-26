@@ -15,9 +15,7 @@ target 'app' do
 #  pod 'NEConversationUIKit', YXConfig.imuikit_version       # (云端)会话列表组件
 #  pod 'NELocalConversationUIKit', YXConfig.imuikit_version  # (本地)会话列表组件
 #  pod 'NETeamUIKit', YXConfig.imuikit_version               # 群相关设置组件
-#
-#  # 扩展库 - 地理位置组件
-#  pod 'NEMapKit', YXConfig.imuikit_version
+#  pod 'NEAdaptiveUIKit', YXConfig.imuikit_version           # 自适应呈现组件（折叠屏双栏）
 #
 #  # 扩展库 - AI 划词搜索
 #  pod 'NEAISearchKit', YXConfig.imuikit_version
@@ -34,12 +32,12 @@ target 'app' do
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖(不包含呼叫组件)，打开下面的本地依赖
   pod 'NEBaseUIKit', :path => 'NEBaseUIKit/NEBaseUIKit.podspec'
+  pod 'NEAdaptiveUIKit', :path => 'NEAdaptiveUIKit/NEAdaptiveUIKit.podspec'
   pod 'NEChatUIKit', :path => 'NEChatUIKit/NEChatUIKit.podspec'
   pod 'NEContactUIKit', :path => 'NEContactUIKit/NEContactUIKit.podspec'
   pod 'NEConversationUIKit', :path => 'NEConversationUIKit/NEConversationUIKit.podspec'
   pod 'NELocalConversationUIKit', :path => 'NELocalConversationUIKit/NELocalConversationUIKit.podspec'
   pod 'NETeamUIKit', :path => 'NETeamUIKit/NETeamUIKit.podspec'
-  pod 'NEMapKit', :path => 'NEMapKit/NEMapKit.podspec'
   pod 'NEAISearchKit', :path => 'NEAISearchKit/NEAISearchKit.podspec'
   
 end

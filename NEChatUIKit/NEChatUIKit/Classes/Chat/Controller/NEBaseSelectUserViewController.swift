@@ -116,9 +116,12 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     label.textAlignment = .center
     label.textColor = .ne_darkText
     view.addSubview(label)
+    // 页面以整窗方式呈现（`.overCurrentContext`）时视图从屏幕顶端开始、会覆盖状态栏，
+    // 标题必须与左侧箭头一样使用顶部安全区，否则标题落进状态栏且与箭头不在同一行；
+    // 折叠屏列内呈现时该安全区为 0，布局与原先一致。
     NSLayoutConstraint.activate([
       label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-      label.topAnchor.constraint(equalTo: view.topAnchor),
+      label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
       label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
       label.heightAnchor.constraint(equalToConstant: 50),
     ])

@@ -64,14 +64,20 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 登录状态变更
   /// - Parameter status: 登录状态
   open func onLoginStatus(_ status: V2NIMLoginStatus) {
-    if status == .LOGIN_STATUS_LOGINED {
-      NEALog.infoLog(className(), desc: "login ok")
-      currentAccid = IMKitClient.instance.account()
-      weak var weakSelf = self
-      let newDic = [String: AtMEMessageRecord]()
-      setMessageDic(newDic)
-      workQueue.async {
-        weakSelf?.loadCacheFromDocument()
+    workQueue.async { [weak self] in
+      guard let self else { return }
+      if status == .LOGIN_STATUS_LOGINED {
+        NEALog.infoLog(self.className(), desc: "login ok")
+        self.currentAccid = IMKitClient.instance.account()
+        self.setMessageDic([:])
+        self.loadCacheFromDocument()
+      } else if status == .LOGIN_STATUS_LOGOUT {
+        let hadRecords = !self.getMessageDic().isEmpty
+        self.currentAccid = ""
+        self.setMessageDic([:])
+        if hadRecords {
+          self.atMessageChangeNoti()
+        }
       }
     }
   }
@@ -96,6 +102,20 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   private func getMessageDic() -> [String: AtMEMessageRecord] {
     lock.lock()
     let result = atMessageDic
+    lock.unlock()
+    return result
+  }
+
+  private func copiedMessageDic() -> [String: AtMEMessageRecord] {
+    lock.lock()
+    var result = [String: AtMEMessageRecord]()
+    for (conversationId, record) in atMessageDic {
+      let recordCopy = AtMEMessageRecord()
+      recordCopy.isRead = record.isRead
+      recordCopy.lastTime = record.lastTime
+      recordCopy.atMessages = record.atMessages
+      result[conversationId] = recordCopy
+    }
     lock.unlock()
     return result
   }
@@ -127,14 +147,15 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     NEALog.infoLog(className(), desc: "clearAtRecord session id : \(conversationId)")
     weak var weakSelf = self
     workQueue.async {
-      guard let dic = weakSelf?.getMessageDic() else {
+      guard let dic = weakSelf?.copiedMessageDic() else {
         return
       }
-      if let model = dic[conversationId] {
+      if let model = dic[conversationId], !model.isRead || !model.atMessages.isEmpty {
         model.isRead = true
         model.atMessages.removeAll()
         weakSelf?.setMessageDic(dic)
         weakSelf?.writeCacheToDocument(dictionary: dic)
+        weakSelf?.atMessageChangeNoti()
       }
     }
   }
@@ -143,6 +164,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// - Parameter messages: 消息列表
   open func filterAtMessage(messages: [V2NIMMessage]) {
     NEALog.infoLog(className(), desc: "at manager filterAtMessage : \(messages.count)")
+    guard IMKitConfigCenter.shared.enableAtMessage, !messages.isEmpty else { return }
     weak var weakSelf = self
     workQueue.async {
       if let result = weakSelf?.filterAtMessageInWorkqueue(messages: messages), result == true {
@@ -167,20 +189,22 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     let currentAccid = IMKitClient.instance.account()
     weak var weakSelf = self
     var isExistAtMessage = false
-    var temDic = getMessageDic()
+    var temDic = copiedMessageDic()
 
     for message in messages {
       if let serverExtension = message.serverExtension,
          let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension),
-         let dic = remoteExt[yxAitMsg] as? [String: Any] {
+        let dic = remoteExt[yxAitMsg] as? [String: Any] {
         if dic[atAllKey] != nil, message.senderId != currentAccid {
-          weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
-          isExistAtMessage = true
+          if weakSelf?.addAtRecordWithCompare(message: message, record: &temDic) == true {
+            isExistAtMessage = true
+          }
           continue
         }
         if dic[currentAccid] != nil {
-          weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
-          isExistAtMessage = true
+          if weakSelf?.addAtRecordWithCompare(message: message, record: &temDic) == true {
+            isExistAtMessage = true
+          }
           continue
         }
       }
@@ -190,13 +214,13 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   }
 
   private func startFilterRoamingMessagesTaskInWorkqueue() {
-    var conversations = [V2NIMConversation]()
     weak var weakSelf = self
 
-    getAllConversation(&conversations) { error in
+    getAllConversation { conversations, error in
+      guard error == nil else { return }
       let workingGroup = DispatchGroup()
       let workingQueue = DispatchQueue(label: "at_message_queue")
-      guard var temDic = weakSelf?.getMessageDic() else {
+      guard var temDic = weakSelf?.copiedMessageDic() else {
         return
       }
       guard let accid = weakSelf?.currentAccid else {
@@ -205,39 +229,41 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
       var isExistAtMessage = false
       for conversation in conversations {
         if conversation.type != .CONVERSATION_TYPE_TEAM {
-          break
+          continue
         }
-        weak var weakSelf = self
         workingGroup.enter()
-        workingQueue.async {
-          let option = V2NIMMessageListOption()
-          option.limit = 100
-          option.conversationId = conversation.conversationId
-          option.strictMode = false
-          ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
+        let option = V2NIMMessageListOption()
+        option.limit = 100
+        option.conversationId = conversation.conversationId
+        option.strictMode = false
+        ChatProvider.shared.getMessageList(option: option) { messages, v2Error in
+          workingQueue.async {
+            defer { workingGroup.leave() }
+            guard v2Error == nil else { return }
             messages?.forEach { message in
               if let serverExtension = message.serverExtension, let remoteExt = NECommonUtil.getDictionaryFromJSONString(serverExtension), let dic = remoteExt[yxAitMsg] as? [String: Any] {
                 if dic[atAllKey] != nil, message.isSelf == false {
-                  weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
-                  isExistAtMessage = true
+                  if weakSelf?.addAtRecordWithCompare(message: message, record: &temDic) == true {
+                    isExistAtMessage = true
+                  }
                   return
                 }
                 if dic[accid] != nil {
-                  weakSelf?.addAtRecordWithCompare(message: message, record: &temDic)
-                  isExistAtMessage = true
+                  if weakSelf?.addAtRecordWithCompare(message: message, record: &temDic) == true {
+                    isExistAtMessage = true
+                  }
                   return
                 }
               }
             }
-            workingGroup.leave()
           }
         }
       }
 
-      workingGroup.notify(queue: workingQueue) {
+      workingGroup.notify(queue: weakSelf?.workQueue ?? workingQueue) {
         if isExistAtMessage == true {
-          weakSelf?.writeCacheToDocument(dictionary: temDic)
           weakSelf?.setMessageDic(temDic)
+          weakSelf?.writeCacheToDocument(dictionary: temDic)
           weakSelf?.atMessageChangeNoti()
         }
       }
@@ -303,7 +329,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
         return
       }
       if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String: Any]] {
-        var temdDic = weakSelf?.getMessageDic()
+        var temdDic = weakSelf?.copiedMessageDic()
         for (key, value) in jsonObject {
           if let model = AtMEMessageRecord.yx_model(with: value) {
             temdDic?[key] = model
@@ -338,9 +364,12 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     if let atMeRecord = record[message.conversationId ?? ""] {
       if atMeRecord.atMessages[message.messageClientId ?? ""] != nil {
         atMeRecord.atMessages.removeValue(forKey: message.messageClientId ?? "")
+        didRemove = true
         if atMeRecord.atMessages.count <= 0 {
           atMeRecord.isRead = true
-          didRemove = true
+          atMeRecord.lastTime = nil
+        } else {
+          atMeRecord.lastTime = atMeRecord.atMessages.values.max { $0.doubleValue < $1.doubleValue }
         }
       }
     }
@@ -350,10 +379,12 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   /// 添加at消息记录(有时间错比较)
   /// - Parameter message: 消息
   /// - Parameter record: at 消息记录缓存
-  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) {
-    guard let conversationId = message.conversationId else {
+  private func addAtRecordWithCompare(message: V2NIMMessage, record: inout [String: AtMEMessageRecord]) -> Bool {
+    guard let conversationId = message.conversationId,
+          let messageClientId = message.messageClientId,
+          !messageClientId.isEmpty else {
       NEALog.infoLog(className(), desc: #function + " addAtRecord conversationId nil ")
-      return
+      return false
     }
 
     let semaphore = DispatchSemaphore(value: 0)
@@ -372,33 +403,15 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
 
     semaphore.wait()
 
-    if message.createTime > compareTimestap {
-      if let atMeRecord = record[message.conversationId ?? ""] {
-        let lastTime = atMeRecord.lastTime?.doubleValue ?? 0
-        if lastTime < message.createTime {
-          let atMessage = AtMessageModel()
-          atMeRecord.isRead = false
-          atMessage.messageId = message.messageClientId
-          atMeRecord.lastTime = NSNumber(value: message.createTime)
-          atMessage.messageTime = NSNumber(value: message.createTime)
-          atMeRecord.atMessages[message.messageClientId ?? ""] = NSNumber(value: message.createTime)
-          if let conversationId = message.conversationId {
-            record[conversationId] = atMeRecord
-          }
-        }
-      } else {
-        let atMeRecord = AtMEMessageRecord()
-        let atMessage = AtMessageModel()
-        atMeRecord.isRead = false
-        atMessage.messageId = message.messageClientId
-        atMeRecord.lastTime = NSNumber(value: message.createTime)
-        atMessage.messageTime = NSNumber(value: message.createTime)
-        atMeRecord.atMessages[message.messageClientId ?? ""] = NSNumber(value: message.createTime)
-        if let conversationId = message.conversationId {
-          record[conversationId] = atMeRecord
-        }
-      }
-    }
+    guard message.createTime > compareTimestap else { return false }
+
+    let atMeRecord = record[conversationId] ?? AtMEMessageRecord()
+    guard atMeRecord.atMessages[messageClientId] == nil else { return false }
+    atMeRecord.isRead = false
+    atMeRecord.atMessages[messageClientId] = NSNumber(value: message.createTime)
+    atMeRecord.lastTime = NSNumber(value: max(atMeRecord.lastTime?.doubleValue ?? 0, message.createTime))
+    record[conversationId] = atMeRecord
+    return true
   }
 
   /// 添加at消息记录
@@ -448,20 +461,22 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
   ///  - Parameter conversations: 会话列表
   ///  - Parameter offset: 偏移量
   ///  - Parameter completion: 完成回调
-  private func getAllConversation(_ conversations: inout [V2NIMConversation], _ offset: Int64 = 0, _ completion: @escaping (NSError?) -> Void) {
+  private func getAllConversation(_ conversations: [V2NIMConversation] = [],
+                                  _ offset: Int64 = 0,
+                                  _ completion: @escaping ([V2NIMConversation], NSError?) -> Void) {
     let limit = 20
     var temConversations = conversations
     ConversationProvider.shared.getConversationList(offset, limit) { [weak self] result, error in
       if let err = error {
-        completion(err)
+        completion(temConversations, err)
       } else {
         if let datas = result?.conversationList {
           temConversations.append(contentsOf: datas)
         }
         if result?.finished == false, let nextToken = result?.offset {
-          self?.getAllConversation(&temConversations, nextToken, completion)
+          self?.getAllConversation(temConversations, nextToken, completion)
         } else {
-          completion(nil)
+          completion(temConversations, nil)
         }
       }
     }
@@ -496,7 +511,7 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     let currentAccid = IMKitClient.instance.account()
     weak var weakSelf = self
     var isAtMessageChange = false
-    var temDic = getMessageDic()
+    var temDic = copiedMessageDic()
     for messageRefer in messageRefers {
       if messageRefer.senderId != currentAccid {
         let removeRetResult = weakSelf?.removeRecordWithMessageref(messageRefer: messageRefer, record: &temDic)
@@ -506,10 +521,9 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
       }
     }
     if isAtMessageChange == true {
+      setMessageDic(temDic)
       atMessageChangeNoti()
-      DispatchQueue.global().async {
-        weakSelf?.writeCacheToDocument(dictionary: temDic)
-      }
+      weakSelf?.writeCacheToDocument(dictionary: temDic)
     }
   }
 
@@ -521,9 +535,12 @@ open class NEAtMessageManager: NSObject, NEIMKitClientListener, NEChatListener {
     if let atMeRecord = record[messageRefer.conversationId ?? ""] {
       if atMeRecord.atMessages[messageRefer.messageClientId ?? ""] != nil {
         atMeRecord.atMessages.removeValue(forKey: messageRefer.messageClientId ?? "")
+        didRemove = true
         if atMeRecord.atMessages.count <= 0 {
           atMeRecord.isRead = true
-          didRemove = true
+          atMeRecord.lastTime = nil
+        } else {
+          atMeRecord.lastTime = atMeRecord.atMessages.values.max { $0.doubleValue < $1.doubleValue }
         }
       }
     }

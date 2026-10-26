@@ -31,6 +31,9 @@ open class AddApplicationViewController: NEBaseAddApplicationViewController {
 extension AddApplicationViewController {
   override open func tableView(_ tableView: UITableView,
                                cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    guard viewModel.friendAddApplications.indices.contains(indexPath.row) else {
+      return UITableViewCell()
+    }
     let noti = viewModel.friendAddApplications[indexPath.row]
     let reuseIdentifier = "\(SystemNotificationCell.self)"
     let cell = tableView.dequeueReusableCell(

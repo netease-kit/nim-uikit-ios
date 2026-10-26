@@ -4,6 +4,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import NIMSDK
 import UIKit
 
@@ -144,7 +145,9 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       headerView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
       headerView.topAnchor.constraint(equalTo: tableView.topAnchor),
       headerView.heightAnchor.constraint(equalToConstant: 113),
-      headerView.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth),
+      NEAdaptiveDeviceGate.isFoldableDevice
+        ? headerView.widthAnchor.constraint(equalTo: tableView.widthAnchor)
+        : headerView.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth),
     ])
   }
 
@@ -494,7 +497,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       titleLabel.accessibilityIdentifier = "id.action1"
     }
     fixAlertOnIpad(alertController)
-    present(alertController, animated: true, completion: nil)
+    showInCurrentColumn(alertController)
   }
 
   open func addFriend() {

@@ -23,6 +23,9 @@ public extension ChatRouter {
 
     // p2p
     Router.shared.register(PushP2pChatVCRouter) { param in
+      if presentConversationIfHandled(route: PushP2pChatVCRouter, parameters: param) {
+        return
+      }
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {
@@ -70,6 +73,9 @@ public extension ChatRouter {
     }
 
     Router.shared.register(PushBotSubSessionListRouter) { param in
+      if presentConversationIfHandled(route: PushBotSubSessionListRouter, parameters: param) {
+        return
+      }
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String,
@@ -95,6 +101,9 @@ public extension ChatRouter {
     }
 
     Router.shared.register(PushBotSubSessionChatRouter) { param in
+      if presentConversationIfHandled(route: PushBotSubSessionChatRouter, parameters: param) {
+        return
+      }
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String,
@@ -112,6 +121,9 @@ public extension ChatRouter {
 
     // group
     Router.shared.register(PushTeamChatVCRouter) { param in
+      if presentConversationIfHandled(route: PushTeamChatVCRouter, parameters: param) {
+        return
+      }
       let nav = param["nav"] as? UINavigationController
       let animated = param["animated"] as? Bool ?? true
       guard let conversationId = param["conversationId"] as? String else {

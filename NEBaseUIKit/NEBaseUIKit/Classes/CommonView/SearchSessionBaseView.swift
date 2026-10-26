@@ -6,6 +6,8 @@ import UIKit
 
 @objcMembers
 open class SearchSessionBaseView: UITableViewHeaderFooterView {
+  private var didSetupUI = false
+
   override public init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
     setupUI()
@@ -13,9 +15,12 @@ open class SearchSessionBaseView: UITableViewHeaderFooterView {
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+    setupUI()
   }
 
   open func setupUI() {
+    guard !didSetupUI else { return }
+    didSetupUI = true
     contentView.addSubview(titleLabel)
     contentView.addSubview(bottomLine)
   }

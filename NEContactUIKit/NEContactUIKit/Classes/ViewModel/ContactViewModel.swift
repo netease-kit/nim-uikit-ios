@@ -57,7 +57,16 @@ open class ContactViewModel: NSObject {
     TeamRepo.shared.removeTeamListener(self)
 
     if IMKitConfigCenter.shared.enableOnlineStatus {
+      unsubscribeOnlineStatus()
       SubscribeRepo.shared.removeListener(self)
+    }
+  }
+
+  private func executeOnMain(_ work: @escaping () -> Void) {
+    if Thread.isMainThread {
+      work()
+    } else {
+      DispatchQueue.main.async(execute: work)
     }
   }
 
@@ -65,19 +74,22 @@ open class ContactViewModel: NSObject {
     NEALog.infoLog(ModuleName + " " + className(), desc: #function)
     weak var weakSelf = self
     getContactList(filters) { contacts, error in
-      if let users = contacts {
-        weakSelf?.contactSections.removeAll()
-        if let contactHeaders = weakSelf?.contactHeaders {
-          weakSelf?.contactSections.append(contactHeaders)
+      weakSelf?.executeOnMain {
+        guard let self = weakSelf else { return }
+        if let users = contacts {
+          self.contactSections.removeAll()
+          if let contactHeaders = self.contactHeaders {
+            self.contactSections.append(contactHeaders)
+          }
+          self.contactSections.append(contentsOf: users)
+          self.indexs = self.getIndexs(contactSections: users)
+          if IMKitConfigCenter.shared.enableOnlineStatus {
+            self.subscribeOnlineStatus(notifyOnCachedChange: false)
+          }
+          completion(nil, users.count)
+        } else {
+          completion(error, 0)
         }
-        weakSelf?.contactSections.append(contentsOf: users)
-        weakSelf?.indexs = self.getIndexs(contactSections: users)
-        completion(nil, users.count)
-        if IMKitConfigCenter.shared.enableOnlineStatus {
-          weakSelf?.subscribeOnlineStatus()
-        }
-      } else {
-        completion(nil, 0)
       }
     }
   }
@@ -93,9 +105,20 @@ open class ContactViewModel: NSObject {
       return
     }
 
-    // 缓存中没有则远端查询, 刷新统一走缓存通知
-    contactRepo.getContactList { friends, error in
+    // 缓存中没有则远端查询，并保证本次请求自身完成回调。
+    contactRepo.getContactList { [weak self] friends, error in
       NEALog.infoLog("contact bar getFriendList", desc: "friend count:\(String(describing: friends?.count))")
+      guard let self else {
+        completion(nil, error)
+        return
+      }
+      self.executeOnMain {
+        guard let friends else {
+          completion(nil, error)
+          return
+        }
+        completion(self.formatData(friends, filters), error)
+      }
     }
   }
 
@@ -194,6 +217,9 @@ open class ContactViewModel: NSObject {
           }
           completion?(self?.unreadCount ?? count, error)
         }
+      } else {
+        self?.unreadCount = count
+        completion?(count, error)
       }
     }
   }
@@ -338,17 +364,36 @@ extension ContactViewModel: NETeamListener {
 extension ContactViewModel: NESubscribeListener {
   /// 订阅在线状态
   open func subscribeOnlineStatus() {
+    guard Thread.isMainThread else {
+      executeOnMain { [weak self] in
+        self?.subscribeOnlineStatus()
+      }
+      return
+    }
+    subscribeOnlineStatus(notifyOnCachedChange: true)
+  }
+
+  private func subscribeOnlineStatus(notifyOnCachedChange: Bool) {
     var subscribeList: [String] = []
+    var didChange = false
     for section in contactSections {
       for contact in section.contacts {
         if let accountId = contact.user?.user?.accountId {
           if let event = NESubscribeManager.shared.getSubscribeStatus(accountId) {
-            onlineStatusDic[accountId] = NESubscribeManager.isOnline(event)
+            let isOnline = NESubscribeManager.isOnline(event)
+            if onlineStatusDic[accountId] != isOnline {
+              onlineStatusDic[accountId] = isOnline
+              didChange = true
+            }
           } else {
             subscribeList.append(accountId)
           }
         }
       }
+    }
+
+    if notifyOnCachedChange, didChange {
+      delegate?.reloadTableView()
     }
 
     if !subscribeList.isEmpty {
@@ -375,17 +420,20 @@ extension ContactViewModel: NESubscribeListener {
   /// 用户状态变更
   /// - Parameter data: 用户状态列表
   public func onUserStatusChanged(_ data: [V2NIMUserStatus]) {
-    var needRefresh = false
-    for d in data {
-      if NEFriendUserCache.shared.isFriend(d.accountId) {
-        onlineStatusDic[d.accountId] = NESubscribeManager.isOnline(d)
-        needRefresh = true
-        break
+    executeOnMain { [weak self] in
+      guard let self else { return }
+      var needRefresh = false
+      for status in data where NEFriendUserCache.shared.isFriend(status.accountId) {
+        let isOnline = NESubscribeManager.isOnline(status)
+        if self.onlineStatusDic[status.accountId] != isOnline {
+          self.onlineStatusDic[status.accountId] = isOnline
+          needRefresh = true
+        }
       }
-    }
 
-    if needRefresh {
-      delegate?.reloadTableView()
+      if needRefresh {
+        self.delegate?.reloadTableView()
+      }
     }
   }
 }

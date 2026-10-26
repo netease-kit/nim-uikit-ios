@@ -5,6 +5,10 @@
 
 "open_push"="Please open the push in the setting";
 "message"="Message";
+"adaptive_back"="Back";
+"adaptive_empty_conversation"="Please select a conversation";
+"adaptive_empty_contact"="Please select a contact";
+"adaptive_empty_mine"="Please select a function";
 "qchat"="QChat";
 "contact"="Contacts";
 "mine"="Me";

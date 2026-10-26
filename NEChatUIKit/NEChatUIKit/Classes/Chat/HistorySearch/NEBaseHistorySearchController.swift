@@ -4,10 +4,10 @@
 // found in the LICENSE file.
 
 import MJRefresh
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
-import NEBaseUIKit
 
 /// 自定义 View：重写 hitTest，在触摸分发最早阶段就收起键盘
 /// 确保 bubble tap gesture 能在 firstResponder 已 resign 的状态下正常识别，解决首次点击不跳转的问题
@@ -27,6 +27,19 @@ open class NEHistorySearchContainerView: UIView {
 
 @objcMembers
 open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldDelegate {
+  private var measuredMessageWidth: CGFloat = 0
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    let width = tableView.bounds.width
+    guard width > 0, width != measuredMessageWidth else { return }
+    measuredMessageWidth = width
+    for case let model as MessageContentModel in viewModel.messages {
+      model.applyViewport(NEChatViewport(contentWidth: width))
+    }
+    tableView.reloadData()
+  }
+
   var tag = "NEBaseHistoryMessageController"
   public var viewModel: TeamHistoryMessageViewModel
   public var conversationId: String?
@@ -589,6 +602,7 @@ extension NEBaseHistorySearchController: UITableViewDelegate, UITableViewDataSou
 
       return c
     } else if let c = cell as? NEChatBaseCell, let m = model as? MessageContentModel {
+      c.applyViewport(m.viewport)
       c.setModel(m, false)
       return cell
     } else {
@@ -600,6 +614,9 @@ extension NEBaseHistorySearchController: UITableViewDelegate, UITableViewDataSou
                       heightForRowAt indexPath: IndexPath) -> CGFloat {
     guard indexPath.row < viewModel.messages.count else { return 0 }
     let model = viewModel.messages[indexPath.row]
+    if NEAdaptiveDeviceGate.isFoldableDevice {
+      (model as? MessageContentModel)?.applyViewport(NEChatViewport(contentWidth: tableView.bounds.width))
+    }
     return model.cellHeight() - chat_content_margin
   }
 

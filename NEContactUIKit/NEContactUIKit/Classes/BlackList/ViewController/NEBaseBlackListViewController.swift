@@ -5,6 +5,7 @@
 
 import NEChatKit
 import UIKit
+import NEBaseUIKit
 
 @objcMembers
 open class NEBaseBlackListViewController: NEContactBaseViewController, UITableViewDelegate, UITableViewDataSource,
@@ -13,15 +14,24 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   public var tableViewTopAnchor: NSLayoutConstraint?
 
   public lazy var headView: UIView = {
-    let headView =
-      UIView(frame: CGRect(x: 0, y: 0, width: Int(NEConstant.screenWidth), height: 40))
+    let headView = UIView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? 0 : NEConstant.screenWidth, height: 40))
+    if NEAdaptiveDeviceGate.isFoldableDevice { headView.autoresizingMask = [.flexibleWidth] }
     headView.addSubview(contentLabel)
+    if NEAdaptiveDeviceGate.isFoldableDevice {
+      contentLabel.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      contentLabel.leadingAnchor.constraint(equalTo: headView.leadingAnchor, constant: 20),
+      contentLabel.trailingAnchor.constraint(equalTo: headView.trailingAnchor),
+      contentLabel.topAnchor.constraint(equalTo: headView.topAnchor),
+      contentLabel.bottomAnchor.constraint(equalTo: headView.bottomAnchor),
+      ])
+    }
     return headView
   }()
 
   public lazy var contentLabel: UILabel = {
-    let contentLabel =
-      UILabel(frame: CGRect(x: 20, y: 0, width: Int(NEConstant.screenWidth) - 20, height: 40))
+    let contentLabel = UILabel(frame: NEAdaptiveDeviceGate.isFoldableDevice
+      ? .zero : CGRect(x: 20, y: 0, width: NEConstant.screenWidth - 20, height: 40))
     contentLabel.text = localizable("black_tip")
     contentLabel.textColor = UIColor.ne_emptyTitleColor
     contentLabel.font = UIFont.systemFont(ofSize: 14)
