@@ -62,11 +62,11 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
   }
 
   open var emptyActionBackgroundColor: UIColor {
-    .ne_normalTheme
+    .neUIKitDefaultPrimaryColor
   }
 
   open var searchHighlightColor: UIColor {
-    .ne_normalTheme
+    .neUIKitDefaultPrimaryColor
   }
 
   public lazy var emptyActionButton: UIButton = {
@@ -578,7 +578,7 @@ open class BotSubSessionListCell: UITableViewCell {
   open func configure(item: BotSubSessionItem,
                       sessionName: String,
                       keyword: String = "",
-                      highlightColor: UIColor = .ne_normalTheme) {
+                      highlightColor: UIColor = .neUIKitDefaultPrimaryColor) {
     let topic = item.topic
     let title: String
     title = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

@@ -359,7 +359,7 @@ class IMPocConfigViewController: NEBaseViewController, UITableViewDelegate, UITa
     button.setTitle(localizable("save"), for: .normal)
     button.setTitleColor(.white, for: .normal)
     if NEStyleManager.instance.isNormalStyle() {
-      button.backgroundColor = UIColor.ne_normalTheme
+      button.backgroundColor = UIColor.neUIKitDefaultPrimaryColor
       button.frame = CGRectMake(20, 10, view.frame.width - 40, 40)
     } else {
       button.frame = CGRectMake(0, 10, view.frame.width, 40)

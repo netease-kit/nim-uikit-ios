@@ -56,7 +56,7 @@ class TranslationLanguageViewController: NEBaseViewController, UITableViewDataSo
     navigationView.moreButton.setImage(nil, for: .normal)
     navigationView.setMoreButtonTitle(localizable("save"))
     if NEStyleManager.instance.isNormalStyle() {
-      navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
+      navigationView.moreButton.setTitleColor(.neUIKitDefaultPrimaryColor, for: .normal)
     } else {
       navigationView.setMoreButtonWidth(NEAppLanguageUtil.getCurrentLanguage() == .english ? 80 : 34)
       navigationView.moreButton.setTitleColor(.ne_funTheme, for: .normal)

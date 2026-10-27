@@ -11,4 +11,8 @@ public extension UIColor {
   static let neUIKitDefaultPageBackgroundColor = UIColor(hexString: "#EDEDED")
   /// Shared separator/line color. Preserves the previous skin line color (#E5E5E5).
   static let neUIKitDefaultLineColor = UIColor(hexString: "#E5E5E5")
+  /// Shared navigation divider color. Preserves the previous skin value (#E9EFF5).
+  static let neUIKitDefaultNavigationDividerColor = UIColor(hexString: "#E9EFF5")
+  /// Shared reply-bar background color. Preserves the previous skin value (#EFF1F2).
+  static let neUIKitDefaultReplyBackgroundColor = UIColor(hexString: "#EFF1F2")
 }

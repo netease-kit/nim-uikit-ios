@@ -52,7 +52,7 @@ class LanguageViewController: NEBaseViewController, UITableViewDelegate,
       navigationView.backgroundColor = .ne_backgroundColor
       navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
       navigationView.setMoreButtonTitle(localizable("save"))
-      navigationView.moreButton.setTitleColor(.ne_normalTheme, for: .normal)
+      navigationView.moreButton.setTitleColor(.neUIKitDefaultPrimaryColor, for: .normal)
     } else {
       view.backgroundColor = .funChatBackgroundColor
       navigationView.setMoreButtonTitle(localizable("complete"))

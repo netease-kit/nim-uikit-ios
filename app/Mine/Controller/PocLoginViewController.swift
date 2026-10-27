@@ -83,8 +83,8 @@ public class PocLoginViewController: NEBaseViewController {
       clearConfigButton.heightAnchor.constraint(equalToConstant: 40),
     ])
 
-    loginButton.backgroundColor = .ne_normalTheme
-    clearConfigButton.backgroundColor = .ne_normalTheme
+    loginButton.backgroundColor = .neUIKitDefaultPrimaryColor
+    clearConfigButton.backgroundColor = .neUIKitDefaultPrimaryColor
   }
 
   // 登录
