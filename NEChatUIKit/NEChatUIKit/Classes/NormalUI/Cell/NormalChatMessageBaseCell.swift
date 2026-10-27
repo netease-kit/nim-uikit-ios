@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -101,6 +102,7 @@ open class NormalChatMessageBaseCell: NEBaseChatMessageCell {
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    applyViewport(model.viewport)
     let replyLabel = isSend ? replyLabelRight : replyLabelLeft
     let replyView = isSend ? replyViewRight : replyViewLeft
     let replyViewHeightAnchor = isSend ? replyViewRightHeightAnchor : replyViewLeftHeightAnchor
@@ -123,9 +125,13 @@ open class NormalChatMessageBaseCell: NEBaseChatMessageCell {
         let textSize = NSAttributedString.getRealLabelSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
 
         if let _ = model as? MessageTextModel {
-          model.contentSize.width = max(textSize.width, model.textWidth) + chat_content_margin * 2
+          model.contentSize.width = NEAdaptiveDeviceGate.isFoldableDevice
+            ? min(chat_content_maxW, max(textSize.width, min(model.textWidth, chat_text_maxW)) + chat_content_margin * 2)
+            : max(textSize.width, model.textWidth) + chat_content_margin * 2
         } else {
-          model.contentSize.width = max(textSize.width + chat_content_margin * 2, model.contentSize.width)
+          model.contentSize.width = NEAdaptiveDeviceGate.isFoldableDevice
+            ? min(chat_content_maxW, max(textSize.width + chat_content_margin * 2, model.contentSize.width))
+            : max(textSize.width + chat_content_margin * 2, model.contentSize.width)
         }
 
         replyViewHeightAnchor?.constant = replyViewHeight

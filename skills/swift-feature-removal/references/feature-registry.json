@@ -1,4 +1,28 @@
 {
+  "adaptive-shell": {
+    "aliases": ["自适应外壳", "折叠屏外壳", "Duo UI", "foldable shell"],
+    "owned_paths": [],
+    "edit_paths": [
+      "app/Main/NETabBarController.swift",
+      "app/Main/SceneDelegate.swift",
+      "app/en.lproj/Localizable.strings",
+      "app/zh-Hans.lproj/Localizable.strings",
+      "NEChatUIKit/NEChatUIKit.podspec",
+      "NEChatUIKit/NEChatUIKit/Classes/ChatRouter/NEBaseChatRouter.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/NormalUI/NormalChatRouter.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/FunUI/FunChatRouter.swift"
+    ],
+    "residual": {
+      "roots": ["NEChatUIKit", "app"],
+      "patterns": [
+        "NEAdaptiveUIKit|NEAdaptiveShell|NEConversationOpenIntent",
+        "adaptiveShell|installAdaptiveShell|restoreLegacyShell|makeAdaptiveConversation|makeAdaptiveEmptyDetail|NEAdaptiveDemoNavigationController|presentSectionChild",
+        "disableAdaptiveUIKit|adaptive_back",
+        "ConversationPresentationHandler|ConversationPresentationBlock|conversationPresentationKey|presentConversationIfHandled|applyPresentationParameters|ne_conversation_presentation_declined"
+      ],
+      "allowed_paths": []
+    }
+  },
   "emoji-reaction": {
     "aliases": [
       "表情评论",

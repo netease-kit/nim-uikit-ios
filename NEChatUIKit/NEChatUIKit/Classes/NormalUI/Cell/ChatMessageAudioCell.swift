@@ -243,6 +243,7 @@ open class ChatMessageAudioCell: NormalChatMessageBaseCell, ChatAudioCellProtoco
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    applyViewport(model.viewport)
     if let m = model as? MessageAudioModel {
       contentModel = m
       let timeLabel = isSend ? timeLabelRight : timeLabelLeft

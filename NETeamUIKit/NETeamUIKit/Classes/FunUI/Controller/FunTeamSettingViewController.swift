@@ -13,7 +13,7 @@ open class FunTeamSettingViewController: NEBaseTeamSettingViewController {
   /// 顶部背景视图
   lazy var backView: UIView = {
     let backView = UIView()
-    backView.frame = CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: 188)
+    backView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 188)
     return backView
   }()
 

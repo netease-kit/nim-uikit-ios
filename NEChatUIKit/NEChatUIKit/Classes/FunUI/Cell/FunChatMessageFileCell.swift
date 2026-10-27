@@ -4,6 +4,7 @@
 
 import NEChatKit
 import NIMSDK
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -215,7 +216,9 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let sizeLabel = isSend ? sizeLabelRight : sizeLabelLeft
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
 
-    bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
+    bubbleW?.constant = NEAdaptiveDeviceGate.isFoldableDevice
+      ? min(chat_content_maxW, chatContainerWidth <= 320 ? 222 : 242)
+      : (kScreenWidth <= 320 ? 222 : 242)
 
     if let fileObject = model.message?.attachment as? V2NIMMessageFileAttachment {
       if let fileModel = model as? MessageFileModel {

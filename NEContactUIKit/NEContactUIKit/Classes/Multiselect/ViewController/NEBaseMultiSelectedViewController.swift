@@ -37,15 +37,20 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
   }
 
   /// 设置标题
+  ///
+  /// 已选页在选择页内以整窗方式呈现（`.overCurrentContext`），视图从屏幕顶端开始、
+  /// 会覆盖状态栏，标题栏必须使用顶部安全区；折叠屏列内呈现时该安全区为 0。
   open func setupTitle() {
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
+
+    let titleTopAnchor = view.safeAreaLayoutGuide.topAnchor
 
     // 取消按钮
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+      cancelButton.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
       cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
@@ -59,7 +64,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     titleLabel.textColor = .ne_darkText
     view.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+      titleLabel.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       titleLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
@@ -70,7 +75,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     setupTitle()
 
     view.addSubview(tableView)
-    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 58)
+    tableViewTopAnchor = tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 58)
     tableViewTopAnchor?.isActive = true
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -122,9 +127,16 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
 
   // MARK: - Action
 
+  /// 作为列内子页面呈现时的关闭回调（没有 modal presenter，dismiss 无效）。
+  open var closeHandler: (() -> Void)?
+
   /// 取消按钮点击事件
   open func cancelButtonClick() {
-    dismiss(animated: true, completion: nil)
+    if let closeHandler {
+      closeHandler()
+    } else {
+      dismiss(animated: true, completion: nil)
+    }
   }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

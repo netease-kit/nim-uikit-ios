@@ -23,6 +23,7 @@ description: 按维护清单完整移除 nim-uikit-ios Swift 开源 UI 组件和
 
 - 表情评论 / Emoji Reaction / Reaction：`references/features/emoji-reaction.md`
 - 跳转最早未读 / 上次阅读位置：`references/features/earliest-unread.md`
+- 自适应外壳 / 折叠屏外壳 / Duo UI：`references/features/adaptive-shell.md`（仅可选接线，外部组件边界见清单）
 
 结构化审计数据位于 `references/feature-registry.json`。运行：
 

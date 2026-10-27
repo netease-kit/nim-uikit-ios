@@ -48,6 +48,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
   private var isLoadingMembers = false
   private var isDeletingGroup = false
   private var didReturnAfterDeletingGroup = false
+  private weak var groupNameSheet: NEConversationGroupNameSheetController?
 
   init(group: NEConversationGroupModel, viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .normal) {
     self.group = group
@@ -68,7 +69,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
     navigationView.backgroundColor = style.navigationBackgroundColor
     navigationView.setMoreButtonTitle(localizable("delete"), style.primaryColor)
     navigationView.addMoreButtonTarget(target: self, selector: #selector(deleteGroupAction))
-    groupViewModel.delegate = self
+    groupViewModel.addObserver(self)
     setupTable()
     loadMembers()
   }
@@ -205,10 +206,13 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
 
   @objc private func editGroupNameAction() {
     guard checkNetwork() else { return }
-    let controller = NEConversationGroupNameSheetController(title: localizable("conversation_group_edit_name"), initialName: group.name, style: style) { [weak self] name in
+    let controller = NEConversationGroupNameSheetController(title: localizable("conversation_group_edit_name"), initialName: group.name, style: style, cardWidth: view.bounds.width) { [weak self] name in
       self?.updateName(name)
     }
-    present(controller, animated: true)
+    // 表单以列内子页面（addChild）呈现，没有 modal presenter，dismiss 无效。
+    // 改由 closeSheet 收起，与新建分组表单保持一致。
+    groupNameSheet = controller
+    controller.presentAsColumnSheet(in: self)
   }
 
   @objc private func addConversationAction() {
@@ -240,10 +244,16 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
       }
       self.groupViewModel.updateGroupName(groupId: self.group.groupId, name: name) { [weak self] error in
         if let error = error {
-          self?.showToast(self?.groupViewModel.groupErrorMessage(error) ?? error.localizedDescription)
+          // 错误提示需要挂在表单上，否则会被表单遮罩挡住，表现为点击"确定"无反馈。
+          let message = self?.groupViewModel.groupErrorMessage(error) ?? error.localizedDescription
+          if let sheet = self?.groupNameSheet {
+            sheet.showToast(message)
+          } else {
+            self?.showToast(message)
+          }
         } else {
           self?.group.name = name
-          self?.dismiss(animated: true)
+          self?.groupNameSheet?.closeSheet(animated: true)
           self?.groupNameCell.configure(title: localizable("conversation_group_name"), detail: name, showIcon: false, showDisclosure: true, style: self?.style ?? .normal)
         }
       }
@@ -370,14 +380,24 @@ private final class SettingActionCell: UITableViewCell {
   private let iconView = UIImageView()
   private let titleLabel = UILabel()
   private let detailLabel = UILabel()
+  private let arrowView = UIImageView()
   private var titleLeftToContent: NSLayoutConstraint?
   private var titleLeftToIcon: NSLayoutConstraint?
+  private var detailRightToArrow: NSLayoutConstraint?
+  private var detailRightToContent: NSLayoutConstraint?
+  private var arrowWidthConstraint: NSLayoutConstraint?
+  private var showDisclosure = false
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
-    accessoryType = .disclosureIndicator
-    for item in [iconView, titleLabel, detailLabel] {
+    // The cell is laid out outside a table view, so the system accessory would
+    // sit at the table's inset position instead of the trailing edge. Use an
+    // explicit chevron pinned to the content view, matching the OC title row.
+    accessoryType = .none
+    arrowView.image = UIImage(systemName: "chevron.right")
+    arrowView.tintColor = .ne_lightText
+    for item in [iconView, titleLabel, detailLabel, arrowView] {
       item.translatesAutoresizingMaskIntoConstraints = false
       contentView.addSubview(item)
     }
@@ -390,24 +410,43 @@ private final class SettingActionCell: UITableViewCell {
     detailLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     titleLeftToContent = titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 24)
     titleLeftToIcon = titleLabel.leftAnchor.constraint(equalTo: iconView.rightAnchor, constant: 24)
+    detailRightToArrow = detailLabel.rightAnchor.constraint(equalTo: arrowView.leftAnchor, constant: -8)
+    detailRightToContent = detailLabel.rightAnchor.constraint(equalTo: arrowView.rightAnchor)
+    arrowWidthConstraint = arrowView.widthAnchor.constraint(equalToConstant: 0)
     NSLayoutConstraint.activate([
       iconView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 24),
       iconView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       iconView.widthAnchor.constraint(equalToConstant: 36),
       iconView.heightAnchor.constraint(equalToConstant: 36),
       titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      detailLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      arrowView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
+      arrowView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+      arrowWidthConstraint!,
+      detailRightToContent!,
       detailLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       titleLabel.rightAnchor.constraint(lessThanOrEqualTo: detailLabel.leftAnchor, constant: -12),
     ])
+    updateDisclosureConstraints()
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    // These rows live directly in the page instead of a table view. UIKit still
+    // insets their content view by the host window's trailing safe area, which
+    // on foldables belongs to the side rail, so the chevron stops short of the
+    // page edge. The row already spans the page; keep its content full-sized.
+    if contentView.frame != bounds {
+      contentView.frame = bounds
+    }
+  }
+
   func configure(title: String, detail: String?, showIcon: Bool, showDisclosure: Bool, style: NEConversationGroupUIStyle) {
-    accessoryType = showDisclosure ? .disclosureIndicator : .none
+    self.showDisclosure = showDisclosure
+    updateDisclosureConstraints()
     titleLabel.text = title
     detailLabel.text = detail
     titleLabel.textColor = style.titleTextColor
@@ -422,6 +461,13 @@ private final class SettingActionCell: UITableViewCell {
       titleLeftToContent?.isActive = true
     }
     titleLabel.superview?.backgroundColor = style.cardBackgroundColor
+  }
+
+  private func updateDisclosureConstraints() {
+    arrowView.isHidden = showDisclosure == false
+    arrowWidthConstraint?.constant = showDisclosure ? 8 : 0
+    detailRightToArrow?.isActive = showDisclosure
+    detailRightToContent?.isActive = showDisclosure == false
   }
 }
 

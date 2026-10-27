@@ -12,6 +12,10 @@ open class MessageTextModel: MessageContentModel {
   public var messageText: String?
   public var attributeStr: NSMutableAttributedString?
   public var textHeight: CGFloat = 0
+  /// Last undecorated body height, used for width-only layout updates.
+  var textHeightForViewport: CGFloat?
+  /// The skin defines whether translation contributes to the original bubble.
+  var translationInsideBubble = true
 
   // MARK: - 翻译相关字段
 
@@ -38,7 +42,7 @@ open class MessageTextModel: MessageContentModel {
       ? chatLocalizable("chat_translate_failed_retry")
       : (translationInfo?.translatedText ?? "")
     guard !text.isEmpty else { return 0 }
-    let maxWidth = chat_content_maxW - chat_content_margin * 2
+    let maxWidth = viewport?.maximumTextWidth ?? chat_content_maxW - chat_content_margin * 2
     let textSize = (text as NSString).boundingRect(
       with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
       options: [.usesLineFragmentOrigin, .usesFontLeading],
@@ -68,7 +72,7 @@ open class MessageTextModel: MessageContentModel {
       ? chatLocalizable("chat_translate_failed_retry")
       : (translationInfo?.translatedText ?? "")
     guard !text.isEmpty else { return 0 }
-    let maxWidth = chat_content_maxW - chat_content_margin * 2
+    let maxWidth = viewport?.maximumTextWidth ?? chat_content_maxW - chat_content_margin * 2
     let textSize = (text as NSString).boundingRect(
       with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
       options: [.usesLineFragmentOrigin, .usesFontLeading],
@@ -125,6 +129,7 @@ open class MessageTextModel: MessageContentModel {
     let contentSizeWidth = textWidth + chat_content_margin * 2
     let contentSizeHeight = textHeight + chat_content_margin * 2
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
+    textHeightForViewport = contentSizeHeight
     translationBaseContentWidth = contentSizeWidth
     height = contentSizeHeight + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }
@@ -135,6 +140,7 @@ open class MessageTextModel: MessageContentModel {
     let contentSizeWidth = textWidth + chat_content_margin * 2
     let contentSizeHeight = textHeight + chat_content_margin * 2
     contentSize = CGSize(width: contentSizeWidth, height: contentSizeHeight)
+    textHeightForViewport = contentSizeHeight
     translationBaseContentWidth = contentSizeWidth
     self.height = contentSizeHeight + chat_content_margin * 2 + fullNameHeight + chat_pin_height
   }

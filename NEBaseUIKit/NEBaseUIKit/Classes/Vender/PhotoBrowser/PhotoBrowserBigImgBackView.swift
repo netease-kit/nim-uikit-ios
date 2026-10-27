@@ -48,6 +48,27 @@ open class PhotoBrowserBigImgBackView: UIView {
 
   var urlArray: [String] = []
   var imgArray: [UIImage] = []
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice,
+          let container = superview,
+          container.bounds.width > 0,
+          container.bounds.height > 0 else { return }
+    let index = currentIndex()
+    frame = container.bounds
+    collectionView.frame = bounds
+    if let flow = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+      flow.itemSize = bounds.size
+      flow.invalidateLayout()
+    }
+    pageControl.frame = CGRect(x: 0, y: max(0, bounds.height - 80),
+                               width: bounds.width, height: 30)
+    let target = CGFloat(index) * bounds.width
+    if abs(collectionView.contentOffset.x - target) > 0.5 {
+      collectionView.setContentOffset(CGPoint(x: target, y: 0), animated: false)
+    }
+  }
   /// URL初始化
   public init(urlArr: [String], number: Int) {
     super.init(frame: .zero)
@@ -102,7 +123,8 @@ open class PhotoBrowserBigImgBackView: UIView {
   }
 
   public func currentIndex() -> Int {
-    Int(collectionView.contentOffset.x / NEConstant.screenWidth)
+    let width = NEAdaptiveDeviceGate.isFoldableDevice ? max(1, bounds.width) : NEConstant.screenWidth
+    return Int(collectionView.contentOffset.x / width)
   }
 
   public func currentImageData() {}

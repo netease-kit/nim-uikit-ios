@@ -154,13 +154,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       )
       weakSelf?.view.neHideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          weakSelf?.showToast(localizable("no_permission_tip"))
-        } else {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
         model.subTitle = localizable("team_all")
@@ -181,13 +175,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       )
       weakSelf?.view.neHideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          weakSelf?.showToast(localizable("no_permission_tip"))
-        } else {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
         model.subTitle = localizable("team_owner_and_manager")
@@ -208,13 +196,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       )
       weakSelf?.view.neHideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          weakSelf?.showToast(localizable("no_permission_tip"))
-        } else {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
         model.subTitle = localizable("team_owner_and_manager")
@@ -239,13 +221,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       )
       weakSelf?.view.neHideToastActivity()
       if let err = error {
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          weakSelf?.showToast(localizable("no_permission_tip"))
-        } else {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         weakSelf?.viewModel.teamInfoModel?.team = team
         model.subTitle = localizable("team_all")
@@ -363,13 +339,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamAtAllPermission(false) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           model.subTitle = localizable("team_all")
           weakSelf?.contentTableView.reloadData()
@@ -388,13 +358,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamAtAllPermission(true) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           model.subTitle = localizable("team_owner_and_manager")
           weakSelf?.contentTableView.reloadData()
@@ -431,13 +395,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamTopMessagePermission(false) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           model.subTitle = localizable("team_all")
           weakSelf?.contentTableView.reloadData()
@@ -456,13 +414,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
       }
       weakSelf?.viewModel.updateTeamTopMessagePermission(true) { error in
         if let err = error as? NSError {
-          if err.code == protocolSendFailed {
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          } else if err.code == noPermissionCode {
-            weakSelf?.showToast(localizable("no_permission_tip"))
-          } else {
-            weakSelf?.showToast(commonLocalizable("failed_operation"))
-          }
+          weakSelf?.showToast(teamErrorToast(err))
         } else {
           model.subTitle = localizable("team_owner_and_manager")
           weakSelf?.contentTableView.reloadData()
@@ -493,13 +445,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
     viewModel.updateTeamAgreeMode(isOpen) { [weak self] error in
       if let err = error as? NSError {
-        if err.code == protocolSendFailed {
-          self?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          self?.showToast(localizable("no_permission_tip"))
-        } else {
-          self?.showToast(commonLocalizable("failed_operation"))
-        }
+        self?.showToast(teamErrorToast(err))
         model.switchOpen = !isOpen
       } else {
         model.switchOpen = isOpen
@@ -524,13 +470,7 @@ open class NEBaseTeamManagerController: NETeamBaseViewController, UITableViewDel
 
     viewModel.updateTeamJoinMode(isOpen) { [weak self] error in
       if let err = error as? NSError {
-        if err.code == protocolSendFailed {
-          self?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionCode {
-          self?.showToast(localizable("no_permission_tip"))
-        } else {
-          self?.showToast(commonLocalizable("failed_operation"))
-        }
+        self?.showToast(teamErrorToast(err))
         model.switchOpen = !isOpen
       } else {
         model.switchOpen = isOpen

@@ -116,6 +116,11 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     }
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    synchronizeTableSupplementaryWidths()
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     title = localizable("setting")
@@ -133,7 +138,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
           weakSelf?.requestSettingData(tid, currentMember)
         } else {
           if let err = error {
-            weakSelf?.showToast(err.localizedDescription)
+            weakSelf?.showToast(teamErrorToast(err))
           }
         }
       }
@@ -183,13 +188,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
         desc: "CALLBACK getTeamInfo " + (error?.localizedDescription ?? "no error")
       )
       if let err = error {
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == teamNotExistCode {
-          weakSelf?.showToast(commonLocalizable("team_not_exist"))
-        } else {
-          weakSelf?.showToast(err.localizedDescription)
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         if let type = weakSelf?.viewModel.teamInfoModel?.team?.teamType {
           if type == .TEAM_TYPE_NORMAL {
@@ -217,8 +216,14 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   open func resetupUI() {
     reloadSectionData()
     checkoutAddShowOrHide()
-    contentTableView.tableHeaderView = getHeaderView()
-    contentTableView.tableFooterView = getFooterView()
+    let header = getHeaderView()
+    synchronizeSupplementaryWidth(header, tableView: contentTableView)
+    contentTableView.tableHeaderView = header
+    let footer = getFooterView()
+    if let footer {
+      synchronizeSupplementaryWidth(footer, tableView: contentTableView)
+    }
+    contentTableView.tableFooterView = footer
     contentTableView.reloadData()
     didRefreshUserinfoCollection()
   }
@@ -229,6 +234,28 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
 
   open func getFooterView() -> UIView? {
     nil
+  }
+
+  /// UITableView header/footer frames are not constrained to the table. Duo
+  /// can resize the detail column after this page is created.
+  private func synchronizeTableSupplementaryWidths() {
+    let width = contentTableView.bounds.width
+    guard width > 0 else { return }
+    if let header = contentTableView.tableHeaderView, abs(header.frame.width - width) > 0.5 {
+      synchronizeSupplementaryWidth(header, tableView: contentTableView)
+      contentTableView.tableHeaderView = header
+    }
+    if let footer = contentTableView.tableFooterView, abs(footer.frame.width - width) > 0.5 {
+      synchronizeSupplementaryWidth(footer, tableView: contentTableView)
+      contentTableView.tableFooterView = footer
+    }
+  }
+
+  private func synchronizeSupplementaryWidth(_ supplementary: UIView, tableView: UITableView) {
+    guard tableView.bounds.width > 0 else { return }
+    var frame = supplementary.frame
+    frame.size.width = tableView.bounds.width
+    supplementary.frame = frame
   }
 
   open func getBottomText() -> String? {
@@ -459,13 +486,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
     viewModel.inviteUsers(accids, tid) { error, members in
       if let err = error {
         weakSelf?.view.neHideToastActivity()
-        if err.code == protocolSendFailed {
-          weakSelf?.showToast(commonLocalizable("network_error"))
-        } else if err.code == noPermissionInviteCode {
-          weakSelf?.showToast(localizable("no_permission_tip"))
-        } else {
-          weakSelf?.showToast(commonLocalizable("failed_operation"))
-        }
+        weakSelf?.showToast(teamErrorToast(err))
       } else {
         print("add users success : ", members as Any)
         weakSelf?.view.neHideToastActivity()
@@ -536,11 +557,7 @@ open class NEBaseTeamSettingViewController: NETeamBaseViewController, UICollecti
   }
 
   open func didError(_ error: NSError) {
-    if error.code == protocolSendFailed {
-      showToast(commonLocalizable("network_error"))
-    } else {
-      showToast(commonLocalizable("failed_operation"))
-    }
+    showToast(teamErrorToast(error))
   }
 
   open func didShowNoNetworkToast() {

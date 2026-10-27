@@ -306,8 +306,7 @@ open class NEBaseHistoryMediaResultController: NEChatBaseViewController {
     let content = ChatMessageHelper.getSessionName(conversationId: ChatRepo.conversationId)
     forwardAlert.sessionName = content
 
-    addChild(forwardAlert)
-    view.addSubview(forwardAlert.view)
+    forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
       UIApplication.shared.keyWindow?.endEditing(true)
@@ -509,7 +508,7 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDataSource, UIColl
 
     let showController = PhotoBrowserController(urls: showImages, url: url, currentNumber)
     showController.modalPresentationStyle = .overFullScreen
-    present(showController, animated: false, completion: nil)
+    presentDuoPreview(showController, animated: false, completion: nil)
   }
 
   open func didTapVideoMessage(_ model: MessageImageModel,
@@ -530,7 +529,7 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDataSource, UIColl
       videoPlayer.modalPresentationStyle = .overFullScreen
       videoPlayer.videoUrl = url
       videoPlayer.totalTime = Int(object.duration)
-      present(videoPlayer, animated: true, completion: nil)
+      presentDuoPreview(videoPlayer, animated: true, completion: nil)
     } else {
       downloadFile(model, object.url, path)
     }
@@ -645,7 +644,7 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDelegateFlowLayout
 
 extension NEBaseHistoryMediaResultController: UIDocumentInteractionControllerDelegate {
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-    self
+    documentPreviewPresenter
   }
 
   open func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {

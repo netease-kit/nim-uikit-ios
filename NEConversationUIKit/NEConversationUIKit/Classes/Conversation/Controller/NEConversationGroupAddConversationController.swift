@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import NEChatKit
+import NEBaseUIKit
 import UIKit
 
 open class NEConversationGroupAddConversationController: NEConversationBaseViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
@@ -42,6 +43,9 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
+    // 同一入口重复点击时复用该页面，避免详情栏重复入栈。
+    restorationIdentifier = "ne.page.groupAddConversation"
     updateDoneTitle()
     view.backgroundColor = style.pageBackgroundColor
     navigationView.backgroundColor = style.navigationBackgroundColor
@@ -63,6 +67,10 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
     searchBar.backgroundColor = style.contentBackgroundColor
     searchBar.backgroundImage = UIImage()
     searchBar.searchBarStyle = .minimal
+    // UISearchBar insets its text field by the window's trailing safe area. On
+    // foldables that region belongs to the side rail, while this page already
+    // lays out inside the content column, so the field stops short of the page.
+    searchBar.insetsLayoutMarginsFromSafeArea = false
     if #available(iOS 13.0, *) {
       searchBar.searchTextField.backgroundColor = .white
     }

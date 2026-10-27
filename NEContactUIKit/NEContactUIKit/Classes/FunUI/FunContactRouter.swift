@@ -43,7 +43,9 @@ public extension ContactRouter {
       let animated = param["animated"] as? Bool ?? true
       let filters = param["filters"] as? Set<String>
       let contactSelectVC = FunMultiSelectViewController(filterUsers: filters)
-      contactSelectVC.modalPresentationStyle = .formSheet
+      // 打开自适应容器呈现：转发"已选"子页面改为当前列内呈现，避免覆盖右侧工具栏
+      contactSelectVC.usesAdaptiveContainerPresentation = true
+      contactSelectVC.modalPresentationStyle = .overCurrentContext
       if let limit = param["limit"] as? Int, limit > 0 {
         contactSelectVC.limit = limit
       }

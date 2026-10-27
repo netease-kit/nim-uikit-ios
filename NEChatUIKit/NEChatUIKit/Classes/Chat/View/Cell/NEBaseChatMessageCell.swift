@@ -159,7 +159,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell, NEMessageReactionViewDelegate 
   private var tapGesture: UITapGestureRecognizer?
 
   public var messageTextFont = UIFont.systemFont(ofSize: 16)
-  public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
+  public var messageMaxSize: CGSize { CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude) }
 
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -666,6 +666,7 @@ open class NEBaseChatMessageCell: NEChatBaseCell, NEMessageReactionViewDelegate 
   }
 
   override open func setModel(_ model: MessageContentModel, _ isSend: Bool) {
+    applyViewport(model.viewport)
     // Reaction expands the current bubble and must never replace its skin.
     // Clear only supplemental surfaces from the previous model; subclasses
     // may install a custom card image again after this call.
@@ -1152,12 +1153,12 @@ open class NEBaseChatMessageCell: NEChatBaseCell, NEMessageReactionViewDelegate 
   /// Direction-aware insets let Fun/WeChat keep the Reaction capsules aligned
   /// with the actual text column (the tail adds margin on only one side).
   open func reactionLeadingInset(for model: MessageContentModel,
-                                isOutgoing: Bool) -> CGFloat {
+                                 isOutgoing: Bool) -> CGFloat {
     reactionHorizontalInset(for: model) + reactionBodyPadding(for: model)
   }
 
   open func reactionTrailingInset(for model: MessageContentModel,
-                                 isOutgoing: Bool) -> CGFloat {
+                                  isOutgoing: Bool) -> CGFloat {
     reactionHorizontalInset(for: model) + reactionBodyPadding(for: model)
   }
 

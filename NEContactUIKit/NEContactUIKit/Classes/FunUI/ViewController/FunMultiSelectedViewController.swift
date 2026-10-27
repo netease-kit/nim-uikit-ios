@@ -24,7 +24,15 @@ open class FunMultiSelectedViewController: NEBaseMultiSelectedViewController {
     view.layer.cornerRadius = 8
     view.layer.borderWidth = 0.5
     view.layer.borderColor = UIColor.lightGray.cgColor
-    view.frame = CGRect(x: 0, y: NEConstant.screenHeight - 380, width: NEConstant.screenWidth, height: 380)
+    // 跟随所在列（转发选择页）的尺寸，而不是整屏尺寸：
+    // 双屏展开时只占右列，折叠时占满内容区，均不会侵入右侧工具栏。
+    if let host = view.superview {
+      view.frame = CGRect(x: 0, y: host.bounds.height - min(380, host.bounds.height),
+                          width: host.bounds.width, height: min(380, host.bounds.height))
+    } else {
+      view.frame = CGRect(x: 0, y: NEConstant.screenHeight - 380,
+                          width: NEConstant.screenWidth, height: 380)
+    }
 
     // 父视图添加单击手势，点击背景区域 dismiss
     let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))

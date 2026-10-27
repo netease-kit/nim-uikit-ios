@@ -5,6 +5,7 @@
 
 import NEChatKit
 import NIMSDK
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
@@ -234,7 +235,9 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
     let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
-    bubbleW?.constant = kScreenWidth <= 320 ? 222 : 242 // 适配小屏幕
+    bubbleW?.constant = NEAdaptiveDeviceGate.isFoldableDevice
+      ? min(chat_content_maxW, chatContainerWidth <= 320 ? 222 : 242)
+      : (kScreenWidth <= 320 ? 222 : 242)
 
     if model.isReply {
       setBubbleImage()

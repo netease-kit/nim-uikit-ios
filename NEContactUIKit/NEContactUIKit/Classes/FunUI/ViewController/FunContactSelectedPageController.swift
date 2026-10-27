@@ -29,6 +29,7 @@ open class FunContactSelectedPageController: NEBaseContactSelectedPageController
     collectionBackViewTopMargin = 12
     super.setupPageContent()
     let pagingViewController = NEPagingViewController(viewControllers: contentControllers)
+    pagingController = pagingViewController
     addChild(pagingViewController)
     view.addSubview(pagingViewController.view)
     pagingViewController.view.backgroundColor = .white

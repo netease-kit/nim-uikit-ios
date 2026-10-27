@@ -6,7 +6,8 @@ import UIKit
 
 @objcMembers
 open class FunChatMessageBaseCell: NEBaseChatMessageCell {
-  public let funMargin: CGFloat = 5.2
+  public static let bubbleTailWidth: CGFloat = 5.2
+  public let funMargin: CGFloat = FunChatMessageBaseCell.bubbleTailWidth
   public let replyHeight: CGFloat = 52
 
   public lazy var replyLabelLeft: UILabel = {
@@ -127,7 +128,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     NSLayoutConstraint.activate([
       replyViewLeft.topAnchor.constraint(equalTo: reactionBackdropLeft.bottomAnchor, constant: 0),
       replyViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
-      replyViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(replyViewLeft.widthAnchor, inset: funMargin),
     ])
   }
 
@@ -138,7 +139,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
     NSLayoutConstraint.activate([
       replyViewRight.topAnchor.constraint(equalTo: reactionBackdropRight.bottomAnchor, constant: 0),
       replyViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
-      replyViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(replyViewRight.widthAnchor, inset: funMargin),
     ])
   }
 
@@ -274,7 +275,7 @@ open class FunChatMessageBaseCell: NEBaseChatMessageCell {
   }
 
   override open func reactionBackdropTailInset(for model: MessageContentModel,
-                                                isOutgoing: Bool) -> CGFloat {
+                                               isOutgoing: Bool) -> CGFloat {
     usesFixedReactionSurface(for: model) ? funMargin : 0
   }
 

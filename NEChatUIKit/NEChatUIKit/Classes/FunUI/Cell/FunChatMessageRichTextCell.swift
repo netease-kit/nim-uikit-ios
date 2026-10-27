@@ -80,7 +80,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     NSLayoutConstraint.activate([
       replyViewLeft.topAnchor.constraint(equalTo: reactionBackdropLeft.bottomAnchor, constant: 0),
       replyViewLeft.leftAnchor.constraint(equalTo: bubbleImageLeft.leftAnchor, constant: funMargin),
-      replyViewLeft.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(replyViewLeft.widthAnchor, inset: funMargin),
     ])
 
     bubbleImageLeft.addSubview(titleLabelLeft)
@@ -112,7 +112,7 @@ open class FunChatMessageRichTextCell: FunChatMessageTextCell {
     NSLayoutConstraint.activate([
       replyViewRight.topAnchor.constraint(equalTo: reactionBackdropRight.bottomAnchor, constant: 0),
       replyViewRight.rightAnchor.constraint(equalTo: bubbleImageRight.rightAnchor, constant: -funMargin),
-      replyViewRight.widthAnchor.constraint(lessThanOrEqualToConstant: chat_content_maxW - funMargin),
+      messageWidthConstraint(replyViewRight.widthAnchor, inset: funMargin),
     ])
 
     bubbleImageRight.addSubview(titleLabelRight)

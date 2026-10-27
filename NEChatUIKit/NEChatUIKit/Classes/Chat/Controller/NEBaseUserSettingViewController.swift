@@ -78,6 +78,11 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController,
     contentTableTopAnchor?.constant = topConstant
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    synchronizeTableSupplementaryWidths()
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     viewModel.delegate = self
@@ -138,7 +143,7 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController,
     NSLayoutConstraint.activate([
       cornerBackView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -12),
       cornerBackView.leftAnchor.constraint(equalTo: headerView.leftAnchor, constant: 20),
-      cornerBackView.widthAnchor.constraint(equalToConstant: kScreenWidth - 40),
+      cornerBackView.rightAnchor.constraint(equalTo: headerView.rightAnchor, constant: -20),
       cornerBackView.heightAnchor.constraint(equalToConstant: 86.0),
     ])
 
@@ -198,6 +203,25 @@ open class NEBaseUserSettingViewController: NEChatBaseViewController,
     }
 
     return headerView
+  }
+
+  /// UITableView supplementary views keep their frame when the hosted detail
+  /// column changes width. Update only the width of existing instances.
+  private func synchronizeTableSupplementaryWidths() {
+    let width = contentTable.bounds.width
+    guard width > 0 else { return }
+    if let header = contentTable.tableHeaderView, abs(header.frame.width - width) > 0.5 {
+      var frame = header.frame
+      frame.size.width = width
+      header.frame = frame
+      contentTable.tableHeaderView = header
+    }
+    if let footer = contentTable.tableFooterView, abs(footer.frame.width - width) > 0.5 {
+      var frame = footer.frame
+      frame.size.width = width
+      footer.frame = frame
+      contentTable.tableFooterView = footer
+    }
   }
 
   open func filterStackViewController() -> [UIViewController]? {

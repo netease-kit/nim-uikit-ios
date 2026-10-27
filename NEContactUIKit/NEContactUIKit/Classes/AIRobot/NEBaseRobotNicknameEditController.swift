@@ -75,6 +75,7 @@ open class NEBaseRobotNicknameEditController: NEContactBaseViewController, UITex
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
     title = localizable("ai_robot_name")
     view.backgroundColor = .ne_lightBackgroundColor
 

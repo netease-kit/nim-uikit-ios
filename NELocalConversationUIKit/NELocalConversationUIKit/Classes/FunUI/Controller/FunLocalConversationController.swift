@@ -101,7 +101,23 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
 
     tableView.rowHeight = 72
 
-    stickTopCollcetionView.frame = CGRect(x: 4, y: 0, width: view.frame.size.width - 8.0, height: 104)
+    stickTopCollcetionView.frame = CGRect(x: 4, y: 0, width: view.frame.size.width - 8.0,
+                                         height: NEAdaptiveDeviceGate.isFoldableDevice ? 96 : 104)
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice, tableView.bounds.width > 0 else { return }
+    let width = max(0, tableView.bounds.width - 8)
+    let height: CGFloat = 96
+    if abs(stickTopCollcetionView.frame.width - width) > 0.5 || abs(stickTopCollcetionView.frame.height - height) > 0.5 {
+      stickTopCollcetionView.frame.size.height = height
+      stickTopCollcetionView.frame.size.width = width
+      stickTopCollcetionView.collectionViewLayout.invalidateLayout()
+      if tableView.tableHeaderView === stickTopCollcetionView {
+        tableView.tableHeaderView = stickTopCollcetionView
+      }
+    }
   }
 
   override open func getPopListItems() -> [LocalPopListItem] {
@@ -169,7 +185,7 @@ open class FunLocalConversationController: NEBaseLocalConversationController {
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 80, height: 104)
+    CGSize(width: 80, height: NEAdaptiveDeviceGate.isFoldableDevice ? 96 : 104)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)

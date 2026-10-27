@@ -21,16 +21,53 @@ open class TeamRouter: NSObject {
                                    "https://nim-nosdn.netease.im/MjYxNDkzNzE=/bmltYV8xNDIxMTk0NzAzMzhfMTY4NDgyNzc0MTczNV80NTQxMDhhNy1mNWMzLTQxMzMtOWU3NS1hNThiN2FiNjI5MWY=",
                                    "https://nim-nosdn.netease.im/MjYxNDkzNzE=/bmltYV8xNDIxMTk0NzAzMzhfMTY4NDgyNzc0MTczNV8wMGVlNWUyOS0wYzg3LTQxMzUtYmVjOS00YjI1MjcxMDhhNTM="]
 
+  private static func isBlank(_ value: String?) -> Bool {
+    guard let value else { return true }
+    return value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  }
+
+  private static func generatedTeamName(_ users: [V2NIMUser], fallback: String) -> String {
+    var names = [String]()
+    let myAccount = IMKitClient.instance.account()
+    if !isBlank(myAccount) {
+      let cachedName = NEFriendUserCache.shared.getFriendInfo(myAccount)?.showName()
+      names.append(isBlank(cachedName) ? myAccount : cachedName ?? myAccount)
+    }
+
+    for user in users {
+      let displayName = isBlank(user.name) ? user.accountId : user.name
+      if !isBlank(displayName), let displayName {
+        names.append(displayName)
+      }
+    }
+
+    return names.isEmpty ? fallback : names.joined(separator: "、")
+  }
+
+  private static func teamName(_ name: Any?, users: [V2NIMUser], fallback: String) -> String {
+    var result = name as? String
+    if isBlank(result) {
+      result = generatedTeamName(users, fallback: fallback)
+    }
+    if isBlank(result) {
+      result = fallback
+    }
+    return String((result ?? "").prefix(30))
+  }
+
+  private static func teamIconUrl(_ value: Any?, candidates: [String]) -> String {
+    if let value = value as? String, !isBlank(value) {
+      return value
+    }
+    return candidates.randomElement() ?? ""
+  }
+
   public static func registerCommon(icUrls: [String]) {
     Router.shared.register(TeamCreateDisuss) { param in
-      if let accids = param["accids"] as? [String] {
-        var name = (param["names"] as? String) ?? localizable("normal_team")
-        if name.utf16.count > 30 {
-          name = String(name.prefix(30))
-        }
-
-        let iconUrl = (param["url"] as? String) ??
-          iconUrls[Int(arc4random()) % iconUrls.count]
+      if let accids = param["accids"] as? [String], !accids.isEmpty {
+        let users = (param["im_user"] as? [V2NIMUser]) ?? []
+        let name = teamName(param["names"], users: users, fallback: localizable("normal_team"))
+        let iconUrl = teamIconUrl(param["url"], candidates: icUrls)
 
         let param = V2NIMCreateTeamParams()
         param.name = name
@@ -52,7 +89,7 @@ open class TeamRouter: NSObject {
           var result = [String: Any]()
           if let err = error as? NSError {
             result["code"] = err.code
-            result["msg"] = err.localizedDescription
+            result["msg"] = teamErrorToast(err)
           } else {
             result["code"] = 0
             result["msg"] = "ok"
@@ -64,14 +101,10 @@ open class TeamRouter: NSObject {
     }
 
     Router.shared.register(TeamCreateSenior) { param in
-      if let accids = param["accids"] as? [String] {
-        var name = (param["names"] as? String) ?? localizable("senior_team")
-        if name.utf16.count > 30 {
-          name = String(name.prefix(30))
-        }
-
-        let iconUrl = (param["url"] as? String) ??
-          iconUrls[Int(arc4random()) % iconUrls.count]
+      if let accids = param["accids"] as? [String], !accids.isEmpty {
+        let users = (param["im_user"] as? [V2NIMUser]) ?? []
+        let name = teamName(param["names"], users: users, fallback: localizable("senior_team"))
+        let iconUrl = teamIconUrl(param["url"], candidates: icUrls)
 
         let param = V2NIMCreateTeamParams()
         param.name = name
@@ -85,7 +118,7 @@ open class TeamRouter: NSObject {
           var result = [String: Any]()
           if let err = error as? NSError {
             result["code"] = err.code
-            result["msg"] = err.localizedDescription
+            result["msg"] = teamErrorToast(err)
           } else {
             result["code"] = 0
             result["msg"] = "ok"

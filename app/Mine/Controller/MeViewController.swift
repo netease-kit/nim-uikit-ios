@@ -10,6 +10,28 @@ import NIMSDK
 import UIKit
 
 class MeViewController: UIViewController, UIGestureRecognizerDelegate {
+  open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor)
+  }
+
+  /// Host-provided selection color for a retained list beside its detail page.
+  public var listSelectionBackgroundColor: UIColor? {
+    didSet {
+      guard oldValue != listSelectionBackgroundColor, isViewLoaded else { return }
+      for cell in tableView.visibleCells { cell.ne_setSelectionBackgroundColor(listSelectionBackgroundColor) }
+      if listSelectionBackgroundColor != nil { restoreAdaptiveSelection() }
+    }
+  }
+
+  /// 左列高亮由宿主持有选中色时恢复：宿主关闭高亮会 deselect，这里保存用户点过的行。
+  private var adaptiveSelectedRow: IndexPath?
+
+  private func restoreAdaptiveSelection() {
+    guard listSelectionBackgroundColor != nil, let selected = adaptiveSelectedRow,
+          selected.row < tableView.numberOfRows(inSection: selected.section) else { return }
+    tableView.selectRow(at: selected, animated: false, scrollPosition: .none)
+  }
+
   private let viewModel = MeViewModel()
 
   private lazy var tableView: UITableView = {
@@ -120,6 +142,7 @@ class MeViewController: UIViewController, UIGestureRecognizerDelegate {
     updateUserInfo()
     viewModel.getData()
     tableView.reloadData()
+    restoreAdaptiveSelection()
   }
 
   func setupSubviews() {
@@ -242,6 +265,7 @@ extension MeViewController: UITableViewDelegate, UITableViewDataSource {
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    adaptiveSelectedRow = indexPath
     if IMKitConfigCenter.shared.enableCollectionMessage {
       if indexPath.row == 0 {
         let ctrl = MineSettingViewController()

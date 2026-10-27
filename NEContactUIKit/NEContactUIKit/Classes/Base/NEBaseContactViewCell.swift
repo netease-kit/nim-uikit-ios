@@ -3,10 +3,21 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import UIKit
 
 @objcMembers
 open class NEBaseContactViewCell: UITableViewCell {
+  override open func setSelected(_ selected: Bool, animated: Bool) {
+    super.setSelected(selected, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
+  override open func setHighlighted(_ highlighted: Bool, animated: Bool) {
+    super.setHighlighted(highlighted, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
   // 头像
   public lazy var userHeaderView: NEUserHeaderView = {
     let imageView = NEUserHeaderView(frame: .zero)

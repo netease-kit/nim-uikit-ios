@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import AVFoundation
+import CoreImage
 import NEBaseUIKit
 import UIKit
 
@@ -104,7 +105,7 @@ open class NEScanBeamView: UIView {
 
 /// 扫一扫基类 ViewController，负责相机授权检查、扫码逻辑及结果回调
 @objcMembers
-open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOutputObjectsDelegate {
+open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOutputObjectsDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
   // MARK: - Public properties
 
   /// 扫描结果回调，返回识别到的字符串；返回 true 表示结果已处理（扫码页可退出），false 表示无效需继续扫描
@@ -132,6 +133,16 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
 
   private var captureSession: AVCaptureSession?
   private var previewLayer: AVCaptureVideoPreviewLayer?
+  private var videoDataOutput: AVCaptureVideoDataOutput?
+  private let scanQueue = DispatchQueue(label: "com.netease.nim.conversation.scan.qr")
+  private let scanStateLock = NSLock()
+  private var isHandlingScanResult = false
+  private var lastFrameDetectionTime: CFTimeInterval = 0
+  private lazy var qrDetector = CIDetector(
+    ofType: CIDetectorTypeQRCode,
+    context: nil,
+    options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]
+  )
 
   /// 光束容器 topAnchor 约束，用于驱动从上到下的动画
   private var scanBeamTopConstraint: NSLayoutConstraint?
@@ -176,6 +187,7 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    resetScanResultHandling()
     startRunning()
     if isAnimationStarted {
       startScanAnimation()
@@ -186,6 +198,14 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
     super.viewWillDisappear(animated)
     stopRunning()
     stopScanAnimation()
+  }
+
+  override open var preferredStatusBarStyle: UIStatusBarStyle {
+    .lightContent
+  }
+
+  deinit {
+    videoDataOutput?.setSampleBufferDelegate(nil, queue: nil)
   }
 
   // MARK: - UI Setup
@@ -334,6 +354,17 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
     // 全屏识别区域（光束仅作视觉引导，实际识别不限区域）
     output.rectOfInterest = CGRect(x: 0, y: 0, width: 1, height: 1)
 
+    let videoOutput = AVCaptureVideoDataOutput()
+    videoOutput.alwaysDiscardsLateVideoFrames = true
+    videoOutput.videoSettings = [
+      kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+    ]
+    if session.canAddOutput(videoOutput) {
+      session.addOutput(videoOutput)
+      videoOutput.setSampleBufferDelegate(self, queue: scanQueue)
+      videoDataOutput = videoOutput
+    }
+
     startRunning()
   }
 
@@ -356,12 +387,36 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
   public func metadataOutput(_ output: AVCaptureMetadataOutput,
                              didOutput metadataObjects: [AVMetadataObject],
                              from connection: AVCaptureConnection) {
-    guard let obj = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-          let value = obj.stringValue, !value.isEmpty else { return }
+    for metadataObject in metadataObjects {
+      guard let object = metadataObject as? AVMetadataMachineReadableCodeObject,
+            let value = object.stringValue,
+            !value.isEmpty else { continue }
+      handleDetectedCode(value)
+      return
+    }
+  }
 
-    stopRunning()
-    UINotificationFeedbackGenerator().notificationOccurred(.success)
-    handleScanResult(value)
+  public func captureOutput(_ output: AVCaptureOutput,
+                            didOutput sampleBuffer: CMSampleBuffer,
+                            from connection: AVCaptureConnection) {
+    guard !scanResultHandlingInProgress() else { return }
+
+    let now = CACurrentMediaTime()
+    guard now - lastFrameDetectionTime >= 0.25 else { return }
+    lastFrameDetectionTime = now
+
+    guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+          let features = qrDetector?.features(in: CIImage(cvPixelBuffer: imageBuffer)) else { return }
+
+    for feature in features {
+      guard let qrFeature = feature as? CIQRCodeFeature,
+            let value = qrFeature.messageString,
+            !value.isEmpty else { continue }
+      DispatchQueue.main.async { [weak self] in
+        self?.handleDetectedCode(value)
+      }
+      return
+    }
   }
 
   // MARK: - Result handling
@@ -374,6 +429,7 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
       let handled = callback(result)
       if !handled {
         // 结果无效：重新启动摄像头，允许继续扫描
+        resetScanResultHandling()
         startRunning()
       }
     } else {
@@ -382,5 +438,32 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
         self?.navigationController?.popViewController(animated: true)
       }
     }
+  }
+
+  private func handleDetectedCode(_ value: String) {
+    guard !value.isEmpty, beginHandlingScanResult() else { return }
+    stopRunning()
+    UINotificationFeedbackGenerator().notificationOccurred(.success)
+    handleScanResult(value)
+  }
+
+  private func beginHandlingScanResult() -> Bool {
+    scanStateLock.lock()
+    defer { scanStateLock.unlock() }
+    guard !isHandlingScanResult else { return false }
+    isHandlingScanResult = true
+    return true
+  }
+
+  private func resetScanResultHandling() {
+    scanStateLock.lock()
+    isHandlingScanResult = false
+    scanStateLock.unlock()
+  }
+
+  private func scanResultHandlingInProgress() -> Bool {
+    scanStateLock.lock()
+    defer { scanStateLock.unlock() }
+    return isHandlingScanResult
   }
 }

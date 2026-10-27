@@ -77,6 +77,9 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
+    // 同一入口重复点击时复用该页面，避免详情栏重复入栈。
+    restorationIdentifier = "ne.page.conversationSearch"
     initialConfig()
     setupSubviews()
 

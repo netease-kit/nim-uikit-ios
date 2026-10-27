@@ -24,7 +24,7 @@ open class TeamSettingViewController: NEBaseTeamSettingViewController {
   /// 背景视图
   public lazy var backView: UIView = {
     let backView = UIView()
-    backView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 172)
+    backView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 172)
     return backView
   }()
 

@@ -52,7 +52,7 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
       viewmodel.getCurrentMember(tid)
       viewmodel.getManagerDatas(tid) { [weak self] error in
         if let err = error {
-          self?.view.neMakeToast(err.localizedDescription)
+          self?.view.neMakeToast(teamErrorToast(err))
         } else {
           self?.sortAndReloadData()
         }
@@ -130,8 +130,8 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
         }
       }
       viewmodel.addTeamManager(tid, uids) { [weak self] error in
-        if error != nil {
-          self?.view.neMakeToast(commonLocalizable("failed_operation"))
+        if let error {
+          self?.view.neMakeToast(teamErrorToast(error))
         } else {
           self?.viewmodel.managers.insert(contentsOf: managers, at: 0)
           self?.sortAndReloadData()
@@ -156,7 +156,7 @@ open class NEBaseTeamManagerListController: NETeamBaseViewController, UITableVie
       if let tid = weakSelf?.teamId, let uid = model?.nimUser?.user?.accountId {
         weakSelf?.viewmodel.removeTeamManager(tid, [uid]) { error in
           if let err = error {
-            weakSelf?.view.neMakeToast(err.localizedDescription)
+            weakSelf?.view.neMakeToast(teamErrorToast(err))
           } else {
             if weakSelf?.viewmodel.managers.count ?? 0 > index {
               weakSelf?.viewmodel.managers.remove(at: index)

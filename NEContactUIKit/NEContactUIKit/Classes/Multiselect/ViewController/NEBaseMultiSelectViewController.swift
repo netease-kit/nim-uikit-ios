@@ -27,6 +27,11 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   var recentContentViewHeightAnchor: NSLayoutConstraint? // 最近会话 高度约束
   public var selectedLineLeftAnchor: NSLayoutConstraint? // 已选 tab 下划线左侧约束
 
+  /// The host can opt into a bounded presentation for Duo compact content
+  /// columns. It is disabled by default so legacy presentation remains
+  /// unchanged on ordinary screens and paired layouts.
+  public var usesAdaptiveContainerPresentation = false
+
   public var themeColor: UIColor = .normalContactThemeColor // 主题颜色
   public var titleText = localizable("select") // 标题文案
   public var sureButtonText = commonLocalizable("sure") // 确定按钮文案
@@ -54,6 +59,38 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     setupUI()
     currentTableView = recentTableView
     loadAllData()
+  }
+
+  override open func present(_ viewControllerToPresent: UIViewController,
+                             animated flag: Bool,
+                             completion: (() -> Void)? = nil) {
+    let isSelectedPage = usesAdaptiveContainerPresentation && viewControllerToPresent is NEBaseMultiSelectedViewController
+    if isSelectedPage {
+      definesPresentationContext = true
+      viewControllerToPresent.modalPresentationStyle = .overCurrentContext
+    }
+    super.present(viewControllerToPresent, animated: flag) { [weak self] in
+      completion?()
+      guard let self, isSelectedPage else { return }
+      // 呈现结束后把已选页铺满当前选择页，避免它按旧的中间宽度自我布局。
+      viewControllerToPresent.view.frame = self.view.bounds
+      viewControllerToPresent.view.setNeedsLayout()
+      viewControllerToPresent.view.layoutIfNeeded()
+    }
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // 已选页以列内呈现方式打开时，强制其视图铺满当前转发选择页，
+    // 保证展开/折叠下宽度都与选择页严格一致。
+    if let presented = presentedViewController, presented.isViewLoaded {
+      let target = view.bounds
+      if presented.view.frame != target {
+        presented.view.frame = target
+        presented.view.setNeedsLayout()
+        presented.view.layoutIfNeeded()
+      }
+    }
   }
 
   /// 加载所有数据
@@ -88,15 +125,21 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   }
 
   /// 设置标题
+  ///
+  /// 页面以整窗方式呈现（`.overCurrentContext`）时视图从屏幕顶端开始，会覆盖状态栏，
+  /// 标题栏不能再用 `view.topAnchor`，否则顶部按钮落在状态栏内无法点击。
+  /// 折叠屏列内呈现时视图本身就在安全区内、顶部安全区为 0，布局与原先一致。
   open func setupTitle() {
     navigationController?.isNavigationBarHidden = true
     navigationView.isHidden = true
+
+    let titleTopAnchor = view.safeAreaLayoutGuide.topAnchor
 
     // 取消按钮
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+      cancelButton.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
       cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
@@ -110,7 +153,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     titleLabel.textColor = .ne_darkText
     view.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+      titleLabel.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       titleLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
@@ -119,7 +162,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     view.addSubview(multiSelectButton)
     NSLayoutConstraint.activate([
       multiSelectButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-      multiSelectButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+      multiSelectButton.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       multiSelectButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 100 : 40),
       multiSelectButton.heightAnchor.constraint(equalToConstant: 18),
     ])
@@ -139,10 +182,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     // 设置标题
     setupTitle()
 
-    // 搜索
+    // 搜索（与标题栏共用同一顶部基准，整窗呈现时一起避开状态栏）
     view.addSubview(searchTextField)
     NSLayoutConstraint.activate([
-      searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 58),
+      searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 58),
       searchTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       searchTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
       searchTextField.heightAnchor.constraint(equalToConstant: 32),
@@ -422,14 +465,16 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     view.translatesAutoresizingMaskIntoConstraints = false
     view.backgroundColor = .clear
 
-    let tabButtonWidth = IMKitConfigCenter.shared.enableTeam ? NEConstant.screenWidth / 3.0 : NEConstant.screenWidth / 2.0
+    let tabWidthRatio: CGFloat = IMKitConfigCenter.shared.enableTeam ? 1.0 / 3.0 : 1.0 / 2.0
 
     view.addSubview(recentButton)
     NSLayoutConstraint.activate([
       recentButton.topAnchor.constraint(equalTo: view.topAnchor),
       recentButton.leftAnchor.constraint(equalTo: view.leftAnchor),
       recentButton.heightAnchor.constraint(equalToConstant: 48),
-      recentButton.widthAnchor.constraint(equalToConstant: tabButtonWidth),
+      NEAdaptiveDeviceGate.isFoldableDevice
+        ? recentButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: tabWidthRatio)
+        : recentButton.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth * tabWidthRatio),
     ])
 
     view.addSubview(friendButton)
@@ -680,7 +725,14 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   /// - Parameter index: tab 下标
   open func setTabButtonLine(_ index: Int) {
     tabIndex = index
-    selectedLineLeftAnchor?.constant = recentButton.width * CGFloat(index)
+    if !NEAdaptiveDeviceGate.isFoldableDevice {
+      selectedLineLeftAnchor?.constant = recentButton.width * CGFloat(index)
+    } else if let underline = selectedLineLeftAnchor?.firstItem as? UIView {
+      selectedLineLeftAnchor?.isActive = false
+      let button = index == 0 ? recentButton : (index == 1 ? friendButton : teamButton)
+      selectedLineLeftAnchor = underline.leftAnchor.constraint(equalTo: button.leftAnchor)
+      selectedLineLeftAnchor?.isActive = true
+    }
 
     // 设置 tab 按钮文案颜色
     for (i, view) in tabContentView.subviews.enumerated() {

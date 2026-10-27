@@ -57,6 +57,7 @@ open class VideoPlayerViewController: UIViewController {
   }()
 
   var avPlayer: AVPlayer?
+  private var playerLayer: AVPlayerLayer?
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -70,10 +71,11 @@ open class VideoPlayerViewController: UIViewController {
     if let url = videoUrl {
       let palyerItem = AVPlayerItem(url: url)
       avPlayer = AVPlayer(playerItem: palyerItem)
-      let playerLayer = AVPlayerLayer(player: avPlayer)
-      playerLayer.videoGravity = .resizeAspect
-      playerLayer.frame = view.bounds
-      view.layer.addSublayer(playerLayer)
+      let layer = AVPlayerLayer(player: avPlayer)
+      layer.videoGravity = .resizeAspect
+      layer.frame = view.bounds
+      view.layer.addSublayer(layer)
+      playerLayer = layer
       // 播放
       avPlayer?.play()
 
@@ -141,6 +143,14 @@ open class VideoPlayerViewController: UIViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(interruptionStart), name: Notification.Name(kCallKitShowNoti), object: nil)
 
 //      NotificationCenter.default.addObserver(self, selector: #selector(interruptionEnd), name: Notification.Name(kCallKitDismissNoti), object: nil)
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // The Duo preview is presented from the window and its bounds are not
+    // final when viewDidLoad runs. Keep the aspect-fit layer centered after
+    // the full-screen presentation and every subsequent size transition.
+    playerLayer?.frame = view.bounds
   }
 
   func interruptionStart() {

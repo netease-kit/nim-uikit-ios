@@ -3,8 +3,8 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import NEChatKit
 import NEBaseUIKit
+import NEChatKit
 import NIMSDK
 import UIKit
 
@@ -146,6 +146,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
     textField.font = UIFont.systemFont(ofSize: 18.0)
     textField.textColor = .ne_darkText
     textField.returnKeyType = .send
+    textField.clearButtonMode = .never
     textField.attributedPlaceholder = NSAttributedString(string: chatUIKitLoader.localizable("multiple_line_placleholder"), attributes: [NSAttributedString.Key.foregroundColor: ChatUIConfig.shared.messageProperties.inputTextColor])
     return textField
   }()
@@ -175,16 +176,17 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   lazy var inputEmoticonContainerView: InputEmoticonContainerView = {
     let view = InputEmoticonContainerView(
-      frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200),
+      frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200),
       accentColor: emoticonThemeColor
     )
     view.contentVerticalOffset = emoticonContentVerticalOffset
+    if NEAdaptiveDeviceGate.isFoldableDevice { view.autoresizingMask = [.flexibleWidth, .flexibleHeight] }
     view.delegate = self
     return view
   }()
 
   public lazy var emojiView: UIView = {
-    let backView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    let backView = UIView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200))
     backView.isHidden = true
 
     backView.backgroundColor = UIColor.clear
@@ -196,7 +198,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   public lazy var chatAddMoreView: NEChatMoreActionView = {
-    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 200))
+    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200))
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
     view.delegate = self
@@ -227,6 +229,24 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice, contentView.bounds.width > 0 else { return }
+    // These panels are frame-based legacy views. Their old lazy frames use
+    // the phone screen width, which is zero during Duo child construction and
+    // leaves the emoji/action cells outside the detail column.
+    emojiView.frame = CGRect(origin: .zero, size: contentView.bounds.size)
+    inputEmoticonContainerView.frame = emojiView.bounds
+    // The action panel is a legacy frame-based view. It is intentionally not
+    // constrained by Auto Layout; keeping its frame and recalculating the
+    // inner collection after the Duo detail width is known prevents an empty
+    // panel when the view was created before its host column was laid out.
+    chatAddMoreView.translatesAutoresizingMaskIntoConstraints = true
+    chatAddMoreView.frame = CGRect(x: 0, y: chatAddMoreView.frame.origin.y,
+                                   width: contentView.bounds.width, height: contentView.bounds.height)
+    chatAddMoreView.setupConstraints()
   }
 
   deinit {

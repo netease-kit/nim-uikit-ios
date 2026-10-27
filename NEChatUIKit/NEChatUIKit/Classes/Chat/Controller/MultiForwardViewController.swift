@@ -3,12 +3,26 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class MultiForwardViewController: NEChatBaseViewController, UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate, ChatBaseCellDelegate, UIDocumentInteractionControllerDelegate, MultiForwardViewModelDelegate {
+  private var measuredMessageWidth: CGFloat = 0
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    let width = tableView.bounds.width
+    guard width > 0, width != measuredMessageWidth else { return }
+    measuredMessageWidth = width
+    for case let model as MessageContentModel in viewModel.messages {
+      model.applyViewport(NEChatViewport(contentWidth: width))
+    }
+    tableView.reloadData()
+  }
+
   public var viewModel = MultiForwardViewModel()
   private var messageAttachmentUrl: String?
   private var messageAttachmentFilePath: String = ""
@@ -204,6 +218,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
 
       return c
     } else if let c = cell as? NEChatBaseCell, let m = model as? MessageContentModel {
+      c.applyViewport(m.viewport)
       c.setModel(m, false)
       return cell
     } else {
@@ -213,7 +228,11 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
 
   open func tableView(_ tableView: UITableView,
                       heightForRowAt indexPath: IndexPath) -> CGFloat {
-    viewModel.messages[indexPath.row].cellHeight() + chat_content_margin
+    let model = viewModel.messages[indexPath.row]
+    if NEAdaptiveDeviceGate.isFoldableDevice {
+      (model as? MessageContentModel)?.applyViewport(NEChatViewport(contentWidth: tableView.bounds.width))
+    }
+    return model.cellHeight() + chat_content_margin
   }
 
   open func getMultiForwardViewController(_ messageAttachmentUrl: String?,
@@ -258,7 +277,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
             currenIndex
           )
           showController.modalPresentationStyle = .overFullScreen
-          present(showController, animated: false, completion: nil)
+          presentDuoPreview(showController, animated: false, completion: nil)
         }
       }
     } else if model?.type == .video,
@@ -274,7 +293,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
         videoPlayer.modalPresentationStyle = .overFullScreen
         videoPlayer.videoUrl = url
         videoPlayer.totalTime = Int(object.duration)
-        present(videoPlayer, animated: true, completion: nil)
+        presentDuoPreview(videoPlayer, animated: true, completion: nil)
       } else {
         if let index = replyIndex, index >= 0,
            index < tableView.numberOfRows(inSection: 0) {

@@ -7,6 +7,16 @@ import NEBaseUIKit
 import UIKit
 
 public class MineTableViewCell: UITableViewCell {
+  override open func setSelected(_ selected: Bool, animated: Bool) {
+    super.setSelected(selected, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
+  override open func setHighlighted(_ highlighted: Bool, animated: Bool) {
+    super.setHighlighted(highlighted, animated: animated)
+    ne_refreshSelectionBackground()
+  }
+
   /// 头像
   public lazy var avatarImageView: UIImageView = {
     let avatarView = UIImageView()

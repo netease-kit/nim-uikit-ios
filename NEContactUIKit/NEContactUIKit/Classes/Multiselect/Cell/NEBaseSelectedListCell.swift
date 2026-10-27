@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import UIKit
 
@@ -18,6 +19,8 @@ public protocol NEBaseSelectedListCellDelegate: NSObjectProtocol {
 open class NEBaseSelectedListCell: NEBaseSelectCell {
   weak var delegate: NEBaseSelectedListCellDelegate?
   private var contentModel: MultiSelectModel?
+  /// 上次参与标题宽度计算的 cell 宽度
+  private var measuredLayoutWidth: CGFloat = 0
 
   /// 移除按钮
   lazy var removeButton: ExpandButton = {
@@ -92,11 +95,38 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     super.setModel(model)
     contentModel = model
     multiSelectImageView.isHidden = true
-    if model.memberCount == 0 {
-      // 单聊（人数为 0）不展示人数
-      titleLabelMaxWidth = NEConstant.screenWidth - 70 - memberLabelMaxWidth
-    } else {
-      titleLabelMaxWidth = NEConstant.screenWidth - 122 - memberLabelMaxWidth
-    }
+    titleLabelMaxWidth = titleMaxWidth(for: titleLayoutWidth, memberCount: model.memberCount)
+  }
+
+  /// 重写布局方法：折叠屏上页面宽度会随当前列宽变化，需要按 cell 的实际宽度重算标题上限。
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    let width = contentView.bounds.width
+    // 宽度没变时直接返回：既避免重复改约束，也避免每次布局都读取设备门禁。
+    guard width > 0, abs(width - measuredLayoutWidth) > 0.5 else { return }
+    measuredLayoutWidth = width
+    guard NEAdaptiveDeviceGate.isFoldableDevice, let contentModel else { return }
+    titleLabelMaxWidth = titleMaxWidth(for: width, memberCount: contentModel.memberCount)
+  }
+
+  /// 标题宽度上限的参考宽度。
+  ///
+  /// 折叠屏上转发页跟随当前列布局：单屏时窗口右侧有导航 rail 占位，
+  /// 展开双栏时只占详情列，列宽都小于 `NEConstant.screenWidth`。
+  /// 继续按屏幕宽度计算上限会让长会话名越过右侧移除按钮，因此改用 cell 的实际宽度；
+  /// 普通机型保持按屏幕宽度计算，布局结果与改动前一致。
+  private var titleLayoutWidth: CGFloat {
+    guard NEAdaptiveDeviceGate.isFoldableDevice else { return NEConstant.screenWidth }
+    let width = contentView.bounds.width
+    return width > 0 ? width : NEConstant.screenWidth
+  }
+
+  /// 标题宽度上限：右侧预留人数与移除按钮的位置，与原先按屏幕宽度计算的分配保持一致。
+  /// - Parameters:
+  ///   - layoutWidth: 标题所在行的实际宽度
+  ///   - memberCount: 会话人数，0 表示单聊（不展示人数）
+  private func titleMaxWidth(for layoutWidth: CGFloat, memberCount: Int) -> CGFloat {
+    let reservedWidth: CGFloat = memberCount == 0 ? 70 : 122
+    return max(0, layoutWidth - reservedWidth - memberLabelMaxWidth)
   }
 }

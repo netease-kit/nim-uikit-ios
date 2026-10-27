@@ -9,6 +9,10 @@ import NEChatKit
 /// UI 模块 ViewController 基类
 @objcMembers
 open class NEBaseViewController: UIViewController, UIGestureRecognizerDelegate {
+  open var shouldShowTitleBar: Bool { true }
+  /// Controls the default action binding without changing the button's visibility.
+  open var shouldBindMoreButtonAction: Bool { true }
+
   public var topConstant: CGFloat = 0 {
     didSet {
       navigationViewHeightAnchor?.constant = topConstant
@@ -43,6 +47,12 @@ open class NEBaseViewController: UIViewController, UIGestureRecognizerDelegate {
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
+    if !shouldShowTitleBar {
+      navigationController?.isNavigationBarHidden = true
+      navigationView.removeFromSuperview()
+      return
+    }
+
     if let useSystemNav = NEConfigManager.instance.getParameter(key: useSystemNav) as? Bool, useSystemNav {
       navigationController?.isNavigationBarHidden = false
       navigationView.removeFromSuperview()
@@ -62,7 +72,9 @@ open class NEBaseViewController: UIViewController, UIGestureRecognizerDelegate {
       topConstant = NEConstant.navigationAndStatusHeight
       navigationView.translatesAutoresizingMaskIntoConstraints = false
       navigationView.addBackButtonTarget(target: self, selector: #selector(backEvent))
-      navigationView.addMoreButtonTarget(target: self, selector: #selector(toSetting))
+      if shouldBindMoreButtonAction {
+        navigationView.addMoreButtonTarget(target: self, selector: #selector(toSetting))
+      }
 
       view.addSubview(navigationView)
       navigationViewHeightAnchor = navigationView.heightAnchor.constraint(equalToConstant: topConstant)
@@ -75,7 +87,7 @@ open class NEBaseViewController: UIViewController, UIGestureRecognizerDelegate {
     }
   }
 
-  private func setupBackUI() {
+  open func setupBackUI() {
     let image = CommonUIConfig.shared.backArrowImage?.withRenderingMode(.alwaysOriginal)
     let backItem = UIBarButtonItem(
       image: image,
@@ -105,9 +117,19 @@ open class NEBaseViewController: UIViewController, UIGestureRecognizerDelegate {
     view.addGestureRecognizer(gestureRecognizer)
   }
 
-  func swipeDismiss(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
+  open func swipeDismiss(_ gestureRecognizer: UIScreenEdgePanGestureRecognizer) {
     if gestureRecognizer.state == .ended {
       navigationController?.dismiss(animated: true, completion: nil)
     }
+  }
+
+  /// Compatibility with the Objective-C base-controller alert entry point.
+  @objc(showSingleAlertWithMessage:completion:)
+  open func showSingleAlertWithMessage(_ message: String, completion: (() -> Void)?) {
+    let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: commonLocalizable("sure"), style: .default) { _ in
+      completion?()
+    })
+    present(alert, animated: true)
   }
 }

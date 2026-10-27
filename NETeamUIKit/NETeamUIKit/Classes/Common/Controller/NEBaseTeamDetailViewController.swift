@@ -235,21 +235,7 @@ open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableView
           if err.code == alreadyInTeamCode {
             weakSelf?.toChat()
           } else {
-            weakSelf?.showToast(err.localizedDescription)
-          }
-          switch err.code {
-          case protocolSendFailed:
-            weakSelf?.showToast(commonLocalizable("network_error"))
-          case teamNotExistCode:
-            weakSelf?.showToast(commonLocalizable("team_not_exist"))
-          case alreadyInTeamCode:
-            weakSelf?.toChat()
-          case teamMemberLimitExceededCode:
-            weakSelf?.showToast(localizable("team_member_limit_exceeded"))
-          case joinedTeamLimitExceededCode:
-            weakSelf?.showToast(localizable("joined_team_limit_exceeded"))
-          default:
-            weakSelf?.showToast(err.localizedDescription)
+            weakSelf?.showToast(teamErrorToast(err))
           }
         } else {
           if team?.isValidTeam == true {

@@ -32,6 +32,7 @@ Pod::Spec.new do |s|
 
   s.dependency NEChatKit.name
   s.dependency NEBaseUIKit.name
+  s.dependency 'NEAdaptiveUIKit'
   s.dependency MJRefresh.name
   s.dependency 'SDWebImageWebPCoder'
   s.dependency 'SDWebImageSVGKitPlugin'

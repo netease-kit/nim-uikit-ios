@@ -9,6 +9,7 @@ import UIKit
 open class NEBaseChatMessageTipCell: UITableViewCell {
   var timeLabelHeightAnchor: NSLayoutConstraint? // 消息时间高度约束
   var contentLabelCenterYAnchor: NSLayoutConstraint? // 消息内容中心Y约束
+  private var contentWidthAnchor: NSLayoutConstraint?
 
   /// 时间
   public lazy var timeLabel: UILabel = {
@@ -57,13 +58,15 @@ open class NEBaseChatMessageTipCell: UITableViewCell {
     contentView.addSubview(contentLabel)
     contentLabelCenterYAnchor = contentLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
     contentLabelCenterYAnchor?.isActive = true
+    contentWidthAnchor = contentLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW)
+    contentWidthAnchor?.isActive = true
     NSLayoutConstraint.activate([
       contentLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      contentLabel.widthAnchor.constraint(equalToConstant: chat_content_maxW),
     ])
   }
 
   func setModel(_ model: MessageTipsModel) {
+    contentWidthAnchor?.constant = model.viewport?.maximumBubbleWidth ?? chat_content_maxW
     // time
     if let time = model.timeContent, !time.isEmpty {
       timeLabelHeightAnchor?.constant = chat_timeCellH

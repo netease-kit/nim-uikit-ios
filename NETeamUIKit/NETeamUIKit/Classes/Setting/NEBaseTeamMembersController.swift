@@ -109,7 +109,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
         weakSelf?.ownerId = teamInfo?.team?.ownerAccountId
         if error != nil {
           if let err = error {
-            weakSelf?.showToast(err.localizedDescription)
+            weakSelf?.showToast(teamErrorToast(err))
           }
           weakSelf?.didNeedRefreshUI()
         } else {
@@ -456,7 +456,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
       button.tintColor = memberLoadStatusTintColor
       button.setTitleColor(memberLoadStatusTintColor, for: .normal)
       button.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
-      button.setTitle(error.localizedDescription, for: .normal)
+      button.setTitle(teamErrorToast(error), for: .normal)
       button.titleLabel?.font = .systemFont(ofSize: 14)
       button.titleLabel?.numberOfLines = 2
       button.addTarget(self, action: #selector(retryMemberLoad), for: .touchUpInside)
@@ -473,7 +473,7 @@ open class NEBaseTeamMembersController: NETeamBaseViewController, UITableViewDel
     guard let teamId else { return }
     viewModel.getTeamInfo(teamId) { [weak self] _, error in
       if let error {
-        self?.showToast(error.localizedDescription)
+        self?.showToast(teamErrorToast(error))
       }
       self?.didNeedRefreshUI()
     }

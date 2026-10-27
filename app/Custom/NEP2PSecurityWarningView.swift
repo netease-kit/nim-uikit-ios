@@ -103,7 +103,11 @@ open class NEP2PSecurityWarningView: UIView {
 extension NEP2PSecurityWarningView: UITextViewDelegate {
   public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
     let vc = NEWKWebViewController(url: URL.absoluteString, title: URL.absoluteString)
-    neParentContainerViewController()?.navigationController?.pushViewController(vc, animated: true)
+    // The adaptive Duo shell is a tab child without its own navigation
+    // controller. Resolve the controller that owns this warning view first so
+    // the report page is pushed onto the retained chat/detail navigation stack.
+    guard let navigation = neViewContainingController()?.navigationController else { return false }
+    navigation.pushViewController(vc, animated: true)
     return false
   }
 }

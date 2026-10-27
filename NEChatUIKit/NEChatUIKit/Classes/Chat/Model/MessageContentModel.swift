@@ -136,7 +136,107 @@ open class MessageContentModel: NSObject, MessageModel {
 
   public var messageTextFont: UIFont = .systemFont(ofSize: ChatUIConfig.shared.messageProperties.selfMessageTextSize)
   public var messageTextColor = ChatUIConfig.shared.messageProperties.selfMessageTextColor
-  public let messageMaxSize = CGSize(width: chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
+  public private(set) var viewport: NEChatViewport?
+  private var intrinsicViewportWidth: CGFloat?
+  private var intrinsicViewportSize: CGSize?
+  private var viewportFontSize: CGFloat?
+  private var viewportAudioText: String?
+  public var messageMaxSize: CGSize {
+    CGSize(width: viewport?.maximumTextWidth ?? chat_content_maxW, height: CGFloat.greatestFiniteMagnitude)
+  }
+
+  /// Recalculate presentation geometry only. Keeps SDK messages, selections,
+  /// reply metadata, playback state and the existing row decorations intact.
+  open func applyViewport(_ viewport: NEChatViewport) {
+    let audioText = (self as? MessageAudioModel)?.text
+    guard self.viewport?.contentWidth != viewport.contentWidth || viewportFontSize != messageTextFont.pointSize || viewportAudioText != audioText else { return }
+    viewportFontSize = messageTextFont.pointSize
+    viewportAudioText = audioText
+    self.viewport = viewport
+    // Revoke cells own their presentation geometry; resizing must not restore
+    // the original media size or transcript height after a message is revoked.
+    if isRevoked { return }
+    let previousSize = contentSize
+    (self as? MessageAIStreamModel)?.measureMarkdownForViewport()
+    if let stream = self as? MessageAIStreamModel, ChatMessageHelper.isAIStreamLoading(stream.message) {
+      contentSize.width = min(contentSize.width, viewport.maximumBubbleWidth)
+    } else if let text = self as? MessageTextModel, !isRevoked {
+      let size = text.getTextSize(text.attributeStr)
+      text.textHeight = ceil(size.height)
+      text.textWidth = ceil(size.width)
+      var bodyWidth = ceil(size.width) + 2 * chat_content_margin
+      var bodyHeight = ceil(size.height) + 2 * chat_content_margin
+      if let rich = text as? MessageRichTextModel {
+        let title = NSAttributedString.getRealTextViewSize(rich.titleAttributeStr, messageTextFont, messageMaxSize)
+        rich.titleTextHeight = ceil(title.height)
+        bodyWidth = max(bodyWidth, ceil(title.width) + 2 * chat_content_margin)
+        bodyHeight += ceil(title.height) + ((rich.messageText?.isEmpty ?? true) ? 0 : chat_content_margin)
+      }
+      // Keep the skin's reply/minimum-height contribution rather than invoking
+      // its model callback again (which would append the decoration twice).
+      let oldBodyHeight = text.textHeightForViewport ?? previousSize.height - text.addedTranslationHeight
+      let oldInsideTranslation = text.translationInsideBubble ? text.addedTranslationHeight : 0
+      let replyDecoration = max(0, previousSize.height - oldBodyHeight - oldInsideTranslation)
+      text.textHeightForViewport = bodyHeight
+      text.translationBaseContentWidth = bodyWidth
+      let translationHeight = text.addedTranslationHeight > 0 ? text.estimateTranslationBubbleHeight() : 0
+      let translationInside = text.translationInsideBubble
+      let translationDelta = translationHeight - text.addedTranslationHeight
+      text.addedTranslationHeight = translationHeight
+      if translationInside {
+        bodyHeight += translationHeight
+        bodyWidth = max(bodyWidth, text.estimateTranslationTextWidth() + 2 * chat_content_margin)
+      } else {
+        height += translationDelta
+      }
+      contentSize = CGSize(width: min(bodyWidth, viewport.maximumBubbleWidth), height: bodyHeight + replyDecoration)
+    } else if let tip = self as? MessageTipsModel {
+      let font = ChatMessageHelper.isAISender(message) ? messageTextFont : UIFont.systemFont(ofSize: ChatUIConfig.shared.messageProperties.timeTextSize)
+      contentSize = String.getRealSize(tip.text, font, messageMaxSize)
+      textWidth = contentSize.width
+    } else if let call = self as? MessageCallRecordModel {
+      let size = NSAttributedString.getRealTextViewSize(call.attributeStr, messageTextFont, messageMaxSize)
+      let decoration = previousSize.height - (call.viewportTextHeight ?? size.height)
+      call.viewportTextHeight = size.height
+      contentSize = CGSize(width: min(viewport.maximumBubbleWidth, size.width + chat_cell_margin * 2), height: size.height + decoration)
+    } else if let audio = self as? MessageAudioModel {
+      audio.audioWidth = min(audio.duration > 2 ? Double(audio.duration) * 8 + 96 : 96, Double(viewport.maximumAudioWidth))
+      contentSize.width = CGFloat(audio.audioWidth)
+      if let text = audio.text {
+        let maxWidth = audio.transcriptOutsideBubble
+          ? viewport.maximumAudioWidth - audio.transcriptHorizontalInset
+          : max(viewport.maximumTextWidth, CGFloat(audio.audioWidth)) - chat_cell_margin * 2
+        let size = String.getRealSize(text, messageTextFont, CGSize(width: max(1, maxWidth), height: CGFloat.greatestFiniteMagnitude))
+        if audio.transcriptOutsideBubble {
+          height = fun_chat_min_h + ceil(size.height) + chat_content_margin * 4 + fullNameHeight + chat_pin_height + reactionHeight
+          if let timeContent, !timeContent.isEmpty { height += chat_timeCellH }
+        } else {
+          contentSize = CGSize(width: max(CGFloat(audio.audioWidth), ceil(size.width) + chat_cell_margin * 2), height: chat_min_h + ceil(size.height) + chat_content_margin)
+          height = contentSize.height + chat_content_margin * 2 + fullNameHeight + chat_pin_height + reactionHeight
+          if let timeContent, !timeContent.isEmpty { height += chat_timeCellH }
+        }
+        // These are the same absolute row formulas used by the audio cells.
+        // Do not add the generic content-size delta a second time.
+        return
+      }
+    } else {
+      if intrinsicViewportWidth == nil { intrinsicViewportWidth = contentSize.width }
+      if self is MessageImageModel, !(self is MessageFileModel) {
+        if intrinsicViewportSize == nil { intrinsicViewportSize = contentSize }
+        let intrinsicSize = intrinsicViewportSize ?? contentSize
+        if intrinsicSize.width > 0, intrinsicSize.height > 0 {
+          let width = min(intrinsicSize.width, viewport.maximumBubbleWidth)
+          let scale = width / intrinsicSize.width
+          contentSize = CGSize(width: width, height: max(chat_min_h, intrinsicSize.height * scale))
+        } else {
+          contentSize = CGSize(width: viewport.maximumBubbleWidth, height: chat_min_h)
+        }
+      } else {
+        contentSize.width = min(intrinsicViewportWidth ?? contentSize.width, viewport.maximumBubbleWidth)
+      }
+    }
+    height += contentSize.height - previousSize.height
+  }
 
   public required init(message: V2NIMMessage?) {
     self.message = message

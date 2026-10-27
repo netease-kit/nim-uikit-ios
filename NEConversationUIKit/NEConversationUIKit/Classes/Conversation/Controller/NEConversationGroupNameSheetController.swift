@@ -17,27 +17,66 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
   private let textField = NESingleLineTextField()
   private let countLabel = UILabel()
   private let done = UIButton(type: .custom)
+  private var containerWidth: NSLayoutConstraint?
+  private var preferredWidth: CGFloat?
 
+  /// - Parameter cardWidth: 卡片宽度，由调用方传入当前内容栏宽度；
+  ///   转发会话选择页同样按内容栏宽度展示，两者保持一致。
   init(title: String,
        initialName: String? = nil,
        style: NEConversationGroupUIStyle = .normal,
        heightRatio: CGFloat = 0.9,
+       cardWidth: CGFloat? = nil,
        complete: @escaping (String) -> Void) {
     sheetTitle = title
     self.initialName = initialName
     self.style = style
     self.heightRatio = heightRatio
+    self.preferredWidth = cardWidth
     self.complete = complete
     super.init(nibName: nil, bundle: nil)
-    modalPresentationStyle = .overFullScreen
+    // 双屏时按"当前列内呈现"：跟随右列宽度缩放，折叠时不会留下全屏残影，
+    // 也不会盖住右侧工具栏。卡片内容按安全区收边。
+    modalPresentationStyle = .overCurrentContext
+    modalTransitionStyle = .crossDissolve
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
+  /// 作为"列内子页面"呈现：跟随右列宽度，折叠/展开时随列一起缩放，不依赖系统模态。
+  func presentAsColumnSheet(in parent: UIViewController) {
+    modalPresentationStyle = .overCurrentContext
+    parent.addChild(self)
+    view.frame = parent.view.bounds
+    view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    parent.view.addSubview(view)
+    didMove(toParent: parent)
+    view.alpha = 0
+    UIView.animate(withDuration: 0.2) { self.view.alpha = 1 }
+  }
+
+  /// 关闭：子页面形式则从父控制器移除，否则回退到 modal dismiss。
+  func closeSheet(animated: Bool) {
+    guard let parent else {
+      dismiss(animated: animated)
+      return
+    }
+    if !animated {
+      view.removeFromSuperview()
+      removeFromParent()
+      return
+    }
+    UIView.animate(withDuration: 0.2, animations: { self.view.alpha = 0 }) { _ in
+      self.view.removeFromSuperview()
+      self.removeFromParent()
+    }
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+    ne_enableKeyboardDismissOnTap()
     view.backgroundColor = style.sheetMaskColor
     let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(backgroundTapAction(_:)))
     backgroundTap.cancelsTouchesInView = false
@@ -50,7 +89,28 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
     guard container.frame.contains(point) == false else {
       return
     }
-    dismiss(animated: true)
+    closeSheet(animated: true)
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // 作为列内子页面时，宽度必须跟随当前列（折叠后列变窄），
+    // 不能沿用创建时记录的 preferredWidth，否则卡片比可视区宽、右侧留白。
+    let columnWidth: CGFloat
+    if parent != nil {
+      columnWidth = view.bounds.width
+    } else {
+      columnWidth = preferredWidth ?? presentingViewController?.view.bounds.width ?? view.bounds.width
+    }
+    let target = min(view.bounds.width, max(0, columnWidth))
+    if let containerWidth, abs(containerWidth.constant - target) > 0.5 {
+      containerWidth.constant = target
+    }
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    textField.becomeFirstResponder()
   }
 
   private func setupContainer() {
@@ -59,9 +119,13 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
     container.layer.cornerRadius = 16
     container.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
     view.addSubview(container)
+    // 遮罩仍铺满整窗，卡片宽度与转发会话选择页保持一致（即宿主内容栏宽度），
+    // 避免整窗铺满后卡片过宽。
+    let width = containerWidth ?? container.widthAnchor.constraint(equalToConstant: 0)
+    containerWidth = width
     NSLayoutConstraint.activate([
-      container.leftAnchor.constraint(equalTo: view.leftAnchor),
-      container.rightAnchor.constraint(equalTo: view.rightAnchor),
+      container.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      width,
       container.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       container.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: heightRatio),
     ])
@@ -125,7 +189,7 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
   }
 
   @objc private func cancelAction() {
-    dismiss(animated: true)
+    closeSheet(animated: true)
   }
 
   @objc private func doneAction() {

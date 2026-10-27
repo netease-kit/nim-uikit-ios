@@ -12,6 +12,8 @@ open class MessageAudioModel: MessageContentModel {
   public var audioWidth: Double = 0
   public var isPlaying = false
   public var text: String? // 语音转文字结果
+  var transcriptOutsideBubble = false
+  var transcriptHorizontalInset: CGFloat = chat_cell_margin * 2
 
   public required init(message: V2NIMMessage?) {
     super.init(message: message)

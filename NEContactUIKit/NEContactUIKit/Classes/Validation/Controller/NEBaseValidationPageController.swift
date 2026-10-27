@@ -12,6 +12,7 @@ open class NEBaseValidationPageController: NEContactBaseViewController {
   public var contentControllers = [NEContactBaseViewController]()
   var pagingViewController: NEPagingViewController?
   var pagingViewControllerTopAnchor: NSLayoutConstraint?
+  private var validationTabsWidth: CGFloat = 0
 
   public init() {
     super.init(nibName: nil, bundle: nil)
@@ -29,6 +30,11 @@ open class NEBaseValidationPageController: NEContactBaseViewController {
     title = localizable("validation_message")
     initNav()
     setupPageContent()
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    synchronizeValidationTabWidths()
   }
 
   override open func viewWillDisappear(_ animated: Bool) {
@@ -81,6 +87,22 @@ open class NEBaseValidationPageController: NEContactBaseViewController {
     if !IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth {
       pagingViewController.menuItemSize = NEPagingMenuItemSize.fixed(width: 0, height: 0)
     }
+    synchronizeValidationTabWidths()
+  }
+
+  /// The paging controller is created before the shell assigns the final Duo
+  /// detail-column bounds. Set equal tab widths after the first non-zero layout
+  /// and repeat only when that container width changes.
+  private func synchronizeValidationTabWidths() {
+    guard IMKitConfigCenter.shared.enableTeamJoinAgreeModelAuth,
+          let pagingViewController,
+          contentControllers.count > 1,
+          view.bounds.width > 0 else { return }
+    let width = view.bounds.width
+    guard abs(width - validationTabsWidth) > 0.5 else { return }
+    validationTabsWidth = width
+    pagingViewController.menuItemSize = .fixed(width: width / CGFloat(contentControllers.count), height: 40)
+    pagingViewController.collectionView.collectionViewLayout.invalidateLayout()
   }
 
   open func initNav() {
@@ -103,7 +125,16 @@ open class NEBaseValidationPageController: NEContactBaseViewController {
   }
 
   /// 清空申请，当前展示好友则清空好友申请，当前展示群聊则清空入群申请
+  ///
+  /// 折叠屏双屏/分栏时窗口比验证消息页更宽，分页容器里非当前页的 view 也会与
+  /// 窗口相交，子页面自身的 `isVisibleInWindow` 无法再区分当前 Tab。若继续向
+  /// 所有子页面转发，好友与群验证会同时发起清空弹窗，后发起的会被 UIKit 拒绝，
+  /// 导致当前「群验证」页的清空无效。这里按分页当前选中项显式路由。
   override open func toSetting() {
-    contentControllers.forEach { $0.toSetting() }
+    guard let pagingViewController else { return }
+    let selectedIndex =
+      (pagingViewController.state.visuallySelectedPagingItem as? NEPagingIndexItem)?.index ?? 0
+    guard contentControllers.indices.contains(selectedIndex) else { return }
+    contentControllers[selectedIndex].toSetting()
   }
 }

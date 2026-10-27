@@ -33,6 +33,7 @@ final class NEConversationGroupBar: UIView, UICollectionViewDataSource, UICollec
   private lazy var managerButton: UIButton = {
     let button = UIButton(type: .custom)
     button.translatesAutoresizingMaskIntoConstraints = false
+    button.accessibilityLabel = localizable("conversation_group_setting_title")
     button.addTarget(self, action: #selector(managerAction), for: .touchUpInside)
     return button
   }()

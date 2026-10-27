@@ -195,6 +195,15 @@ open class ConversationSearchViewModel: NSObject, NETeamListener, NEIMKitClientL
       NEALog.infoLog(ConversationSearchViewModel.className(), desc: #function + ", get data finish")
     }
   }
+
+  // MARK: - NEIMKitClientListener
+
+  open func onLoginStatus(_ status: V2NIMLoginStatus) {
+    guard status == .LOGIN_STATUS_LOGINED else { return }
+    friendDic.removeAll()
+    teamDic.removeAll()
+    getSearchData(true) {}
+  }
 }
 
 // MARK: - NEContactListener

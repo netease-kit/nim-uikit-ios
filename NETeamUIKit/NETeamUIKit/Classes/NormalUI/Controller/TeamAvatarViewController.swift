@@ -89,7 +89,7 @@ open class TeamAvatarViewController: NEBaseTeamAvatarViewController {
   override open func collectionView(_ collectionView: UICollectionView,
                                     layout collectionViewLayout: UICollectionViewLayout,
                                     sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let space = (NEConstant.screenWidth - 297.0) / 4.0
+    let space = max(0, (collectionView.bounds.width - 297.0) / 4.0)
     if indexPath.row == 0 {
       return CGSize(width: 48, height: 48)
     }
