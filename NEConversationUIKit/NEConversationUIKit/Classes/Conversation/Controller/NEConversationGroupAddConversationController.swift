@@ -126,7 +126,7 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
   }
 
   public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    style.isFunStyle ? 72 : 62
+    62
   }
 
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -262,7 +262,7 @@ private final class AddConversationCell: UITableViewCell {
     contentView.backgroundColor = style.cardBackgroundColor
     titleLabel.textColor = style.titleTextColor
     avatar.layer.cornerRadius = style.addConversationAvatarCornerRadius
-    line.backgroundColor = style.isFunStyle ? .funConversationListLineBorderColor : style.lineColor
+    line.backgroundColor = style.lineColor
     updateSelected(selected, style: style)
     let title = model.conversation?.name ?? model.conversation?.conversationId ?? ""
     if keyword.isEmpty {

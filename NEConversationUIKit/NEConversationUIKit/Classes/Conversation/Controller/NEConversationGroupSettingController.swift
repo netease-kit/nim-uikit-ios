@@ -297,7 +297,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
       message: localizable("conversation_group_delete_message"),
       sureText: localizable("delete"),
       cancelText: localizable("cancel"),
-      sureTextColor: style.isFunStyle ? style.primaryColor : style.dangerColor
+      sureTextColor: style.dangerColor
     ) { [weak self] in
       self?.performNetworkAction {
         guard let self = self else {
@@ -491,7 +491,7 @@ private final class SettingConversationCell: UITableViewCell {
     titleLabel.lineBreakMode = .byTruncatingTail
     titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     removeButton.setTitle(localizable("remove"), for: .normal)
-    removeButton.setTitleColor(.ne_normalTheme, for: .normal)
+    removeButton.setTitleColor(.neUIKitDefaultPrimaryColor, for: .normal)
     removeButton.titleLabel?.font = .systemFont(ofSize: 14)
     removeButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     removeButton.layer.cornerRadius = 4

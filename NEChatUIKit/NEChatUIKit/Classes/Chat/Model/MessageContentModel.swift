@@ -208,7 +208,7 @@ open class MessageContentModel: NSObject, MessageModel {
           : max(viewport.maximumTextWidth, CGFloat(audio.audioWidth)) - chat_cell_margin * 2
         let size = String.getRealSize(text, messageTextFont, CGSize(width: max(1, maxWidth), height: CGFloat.greatestFiniteMagnitude))
         if audio.transcriptOutsideBubble {
-          height = fun_chat_min_h + ceil(size.height) + chat_content_margin * 4 + fullNameHeight + chat_pin_height + reactionHeight
+          height = chat_min_h + ceil(size.height) + chat_content_margin * 4 + fullNameHeight + chat_pin_height + reactionHeight
           if let timeContent, !timeContent.isEmpty { height += chat_timeCellH }
         } else {
           contentSize = CGSize(width: max(CGFloat(audio.audioWidth), ceil(size.width) + chat_cell_margin * 2), height: chat_min_h + ceil(size.height) + chat_content_margin)

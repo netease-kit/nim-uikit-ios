@@ -167,7 +167,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   open var emoticonThemeColor: UIColor {
-    .ne_normalTheme
+    .neUIKitDefaultPrimaryColor
   }
 
   open var emoticonContentVerticalOffset: CGFloat {
@@ -305,7 +305,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         return
       }
 
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) {
+      if isEqualToColor(findColor, UIColor.neUIKitDefaultPrimaryColor) {
         let string = textView.attributedText.string
         if let range = Range(findRange, in: string) {
           let text = String(string[range])
@@ -345,7 +345,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
         return
       }
 
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.neUIKitDefaultPrimaryColor) == false {
         return
       }
 
@@ -368,7 +368,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.neUIKitDefaultPrimaryColor) == false {
         return
       }
       let findStart = findRange.location
@@ -632,7 +632,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.neUIKitDefaultPrimaryColor) == false {
         return
       }
       if let range = Range(findRange, in: string) {
@@ -685,7 +685,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
       guard let findColor = value as? UIColor else {
         return
       }
-      if isEqualToColor(findColor, UIColor.ne_normalTheme) == false {
+      if isEqualToColor(findColor, UIColor.neUIKitDefaultPrimaryColor) == false {
         return
       }
       if let range = Range(findRange, in: string) {

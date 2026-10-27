@@ -62,11 +62,11 @@ open class NEBaseBotSubSessionListViewController: NEChatBaseViewController,
   }
 
   open var emptyActionBackgroundColor: UIColor {
-    .ne_normalTheme
+    .neUIKitDefaultPrimaryColor
   }
 
   open var searchHighlightColor: UIColor {
-    .ne_normalTheme
+    .neUIKitDefaultPrimaryColor
   }
 
   public lazy var emptyActionButton: UIButton = {
@@ -578,7 +578,7 @@ open class BotSubSessionListCell: UITableViewCell {
   open func configure(item: BotSubSessionItem,
                       sessionName: String,
                       keyword: String = "",
-                      highlightColor: UIColor = .ne_normalTheme) {
+                      highlightColor: UIColor = .neUIKitDefaultPrimaryColor) {
     let topic = item.topic
     let title: String
     title = topic.topicName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -823,7 +823,7 @@ open class BotSubSessionRenameDialogController: UIViewController, UITextFieldDel
     nameField.textColor = .ne_darkText
     nameField.layer.cornerRadius = 8
     nameField.layer.borderWidth = 1
-    nameField.layer.borderColor = UIColor(hexString: "#337EFF").cgColor
+    nameField.layer.borderColor = UIColor.neUIKitDefaultPrimaryColor.cgColor
     nameField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))
     nameField.leftViewMode = .always
     nameField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 1))

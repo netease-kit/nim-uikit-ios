@@ -72,29 +72,29 @@ public class ChatMessageHelper: NSObject {
   public static func getChatCellRegisterDic(isFun: Bool) -> [String: UITableViewCell.Type] {
     [
       "\(MessageType.text.rawValue)":
-        isFun ? FunChatMessageTextCell.self : ChatMessageTextCell.self,
+        ChatMessageTextCell.self,
       "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunChatMessageAIStreamTextCell.self : ChatMessageAIStreamTextCell.self,
+        ChatMessageAIStreamTextCell.self,
       "\(MessageType.rtcCallRecord.rawValue)":
-        isFun ? FunChatMessageCallCell.self : ChatMessageCallCell.self,
+        ChatMessageCallCell.self,
       "\(MessageType.audio.rawValue)":
-        isFun ? FunChatMessageAudioCell.self : ChatMessageAudioCell.self,
+        ChatMessageAudioCell.self,
       "\(MessageType.image.rawValue)":
-        isFun ? FunChatMessageImageCell.self : ChatMessageImageCell.self,
+        ChatMessageImageCell.self,
       "\(MessageType.revoke.rawValue)":
-        isFun ? FunChatMessageRevokeCell.self : ChatMessageRevokeCell.self,
+        ChatMessageRevokeCell.self,
       "\(MessageType.video.rawValue)":
-        isFun ? FunChatMessageVideoCell.self : ChatMessageVideoCell.self,
+        ChatMessageVideoCell.self,
       "\(MessageType.file.rawValue)":
-        isFun ? FunChatMessageFileCell.self : ChatMessageFileCell.self,
+        ChatMessageFileCell.self,
       "\(MessageType.location.rawValue)":
-        isFun ? FunChatMessageLocationCell.self : ChatMessageLocationCell.self,
+        ChatMessageLocationCell.self,
       "\(MessageType.time.rawValue)":
-        isFun ? FunChatMessageTipCell.self : ChatMessageTipCell.self,
+        ChatMessageTipCell.self,
       "\(MessageType.multiForward.rawValue)":
-        isFun ? FunChatMessageMultiForwardCell.self : ChatMessageMultiForwardCell.self,
+        ChatMessageMultiForwardCell.self,
       "\(MessageType.richText.rawValue)":
-        isFun ? FunChatMessageRichTextCell.self : ChatMessageRichTextCell.self,
+        ChatMessageRichTextCell.self,
     ]
   }
 
@@ -105,25 +105,25 @@ public class ChatMessageHelper: NSObject {
   public static func getPinCellRegisterDic(isFun: Bool) -> [String: NEBasePinMessageCell.Type] {
     [
       "\(MessageType.text.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
+        PinMessageTextCell.self,
       "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunPinMessageTextCell.self : PinMessageTextCell.self,
+        PinMessageTextCell.self,
       "\(MessageType.image.rawValue)":
-        isFun ? FunPinMessageImageCell.self : PinMessageImageCell.self,
+        PinMessageImageCell.self,
       "\(MessageType.audio.rawValue)":
-        isFun ? FunPinMessageAudioCell.self : PinMessageAudioCell.self,
+        PinMessageAudioCell.self,
       "\(MessageType.video.rawValue)":
-        isFun ? FunPinMessageVideoCell.self : PinMessageVideoCell.self,
+        PinMessageVideoCell.self,
       "\(MessageType.location.rawValue)":
-        isFun ? FunPinMessageLocationCell.self : PinMessageLocationCell.self,
+        PinMessageLocationCell.self,
       "\(MessageType.file.rawValue)":
-        isFun ? FunPinMessageFileCell.self : PinMessageFileCell.self,
+        PinMessageFileCell.self,
       "\(MessageType.multiForward.rawValue)":
-        isFun ? FunPinMessageMultiForwardCell.self : PinMessageMultiForwardCell.self,
+        PinMessageMultiForwardCell.self,
       "\(MessageType.richText.rawValue)":
-        isFun ? FunPinMessageRichTextCell.self : PinMessageRichTextCell.self,
+        PinMessageRichTextCell.self,
       "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunPinMessageDefaultCell.self : PinMessageDefaultCell.self,
+        PinMessageDefaultCell.self,
     ]
   }
 
@@ -134,26 +134,26 @@ public class ChatMessageHelper: NSObject {
   public static func getCollectionCellRegisterDic(isFun: Bool) -> [String: NEBaseCollectionMessageCell.Type] {
     [
       "\(MessageType.text.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
+        CollectionMessageTextCell.self,
       "\(MessageType.aiStreamText.rawValue)":
-        isFun ? FunCollectionMessageTextCell.self : CollectionMessageTextCell.self,
+        CollectionMessageTextCell.self,
       "\(MessageType.image.rawValue)":
-        isFun ? FunCollectionMessageImageCell.self : CollectionMessageImageCell.self,
+        CollectionMessageImageCell.self,
       "\(MessageType.audio.rawValue)":
-        isFun ? FunCollectionMessageAudioCell.self : CollectionMessageAudioCell.self,
+        CollectionMessageAudioCell.self,
       "\(MessageType.video.rawValue)":
-        isFun ? FunCollectionMessageVideoCell.self : CollectionMessageVideoCell.self,
+        CollectionMessageVideoCell.self,
       "\(MessageType.location.rawValue)":
-        isFun ? FunCollectionMessageLocationCell.self : CollectionMessageLocationCell.self,
+        CollectionMessageLocationCell.self,
       "\(MessageType.file.rawValue)":
-        isFun ? FunCollectionMessageFileCell.self : CollectionMessageFileCell.self,
+        CollectionMessageFileCell.self,
       "\(MessageType.multiForward.rawValue)":
-        isFun ? FunCollectionMessageMultiForwardCell.self : CollectionMessageMultiForwardCell.self,
+        CollectionMessageMultiForwardCell.self,
       "\(MessageType.richText.rawValue)":
-        isFun ? FunCollectionMessageRichTextCell.self : CollectionMessageRichTextCell.self,
+        CollectionMessageRichTextCell.self,
       "\(NEBasePinMessageTextCell.self)":
-        isFun ? FunCollectionMessageDefaultCell.self : CollectionMessageDefaultCell.self,
-      "\(NEBaseCollectionDefaultCell.self)": isFun ? FunCollectionDefaultCell.self : CollectionDefaultCell.self,
+        CollectionMessageDefaultCell.self,
+      "\(NEBaseCollectionDefaultCell.self)": CollectionDefaultCell.self,
     ]
   }
 
@@ -816,7 +816,7 @@ public class ChatMessageHelper: NSObject {
                 }
 
                 if attributeStr?.length ?? 0 > end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(start, end - start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.neUIKitDefaultPrimaryColor, range: NSMakeRange(start, end - start + atRangeOffset))
                 }
               }
             }
@@ -832,7 +832,7 @@ public class ChatMessageHelper: NSObject {
             if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
               for model in models {
                 if attributeStr?.length ?? 0 > model.end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.neUIKitDefaultPrimaryColor, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
                 }
               }
             }

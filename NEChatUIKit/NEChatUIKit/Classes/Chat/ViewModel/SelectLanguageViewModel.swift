@@ -16,25 +16,12 @@ open class SelectLanguageViewModel: NSObject {
   public var datas = [NElanguageCellModel]()
 
   func setupData(_ isFun: Bool) {
+    _ = isFun
     let languageDatas = NETranslateLanguageManager.shared.languageDatas
-
-    if isFun {
-      for index in 0 ..< languageDatas.count {
-        let model = NElanguageCellModel()
-        model.language = languageDatas[index]
-        datas.append(model)
-        if index == 0 {
-          model.cornerType = .topLeft.union(.topRight)
-        } else if index == languageDatas.count - 1 {
-          model.cornerType = .bottomLeft.union(.bottomRight)
-        }
-      }
-    } else {
-      for index in 0 ..< languageDatas.count {
-        let model = NElanguageCellModel()
-        model.language = languageDatas[index]
-        datas.append(model)
-      }
+    for index in 0 ..< languageDatas.count {
+      let model = NElanguageCellModel()
+      model.language = languageDatas[index]
+      datas.append(model)
     }
   }
 }

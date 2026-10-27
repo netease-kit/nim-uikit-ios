@@ -13,7 +13,7 @@ open class TextWithSwitchCell: ContactBaseTextCell {
   override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     switchButton.translatesAutoresizingMaskIntoConstraints = false
-    switchButton.onTintColor = UIColor(hexString: "#337EFF")
+    switchButton.onTintColor = UIColor.neUIKitDefaultPrimaryColor
     switchButton.accessibilityIdentifier = "id.tSwitch"
     switchButton.addTarget(self, action: #selector(valueChanged), for: .touchUpInside)
 
