@@ -4,6 +4,9 @@ require_relative "PodConfigs/config_podspec.rb"
 # Uncomment the next line to define a global platform for your project
 platform :ios, YXConfig.deployment_target
 source 'https://github.com/CocoaPods/Specs.git'
+# 云信 IM UIKit 10.9.70+ 的 spec 源（GitHub / Gitee 同一份内容，任选其一即可，这里同时列出作演示）
+source 'https://github.com/netease-im/Specs.git'
+source 'https://gitee.com/netease-im/Specs.git'
 
 target 'app' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -27,8 +30,8 @@ target 'app' do
   pod 'NERtcCallKit/NOS_Special'
   pod 'NERtcCallUIKit/NOS_Special'	# (源码地址：https://github.com/netease-kit/NEVideoCall-1to1/tree/main/NLiteAVDemo-iOS-ObjC/CallKit)
   
-  # 可选 - 图片选择库
-  pod 'ZLPhotoBrowser'
+  # 可选 - 图片选择库（6.0.0 起改为 Swift 6 隔离实现，与 Demo 的 CustomConfig 不兼容）
+  pod 'ZLPhotoBrowser', '4.7.4'
 
   # 如果需要查看UI部分源码请注释掉以上在线依赖(不包含呼叫组件)，打开下面的本地依赖
   pod 'NEBaseUIKit', :path => 'NEBaseUIKit/NEBaseUIKit.podspec'
