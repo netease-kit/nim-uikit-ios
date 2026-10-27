@@ -36,11 +36,63 @@ def scoped_path(root, relative):
     return target
 
 
+def verify_inventory(root, inventory, skin_name, skin):
+    """Return drift issues that would make a removal audit unreliable."""
+    issues = []
+    owned = skin["owned_paths"]
+    shared = inventory["shared_paths"] + skin.get("extra_edit_paths", [])
+    common = inventory["common_removals"]
+
+    for relative in owned:
+        if not scoped_path(root, relative).exists():
+            issues.append(f"STALE owned: {relative} (already removed or path drifted)")
+    for relative in shared:
+        if not scoped_path(root, relative).is_file():
+            issues.append(f"STALE shared: {relative}")
+    for relative in common:
+        if not scoped_path(root, relative).exists():
+            issues.append(f"STALE common removal: {relative}")
+
+    owned_dirs = [relative.rstrip("/") for relative in owned]
+    for relative in shared + common:
+        for directory in owned_dirs:
+            if relative == directory or relative.startswith(directory + "/"):
+                issues.append(f"OVERLAP {relative} is inside skin-owned path {directory}")
+
+    for relative, markers in skin.get("project_cleanup", {}).items():
+        path = scoped_path(root, relative)
+        if not path.is_file():
+            issues.append(f"MISSING project cleanup path: {relative}")
+            continue
+        contents = path.read_text(encoding="utf-8", errors="replace")
+        for marker in markers:
+            if marker not in contents:
+                issues.append(f"STALE project cleanup marker: {marker} in {relative}")
+
+    replacements = inventory.get("shared_replacements", {})
+    for group, mapping in replacements.items():
+        if not isinstance(mapping, dict) or not mapping:
+            issues.append(f"INVALID shared_replacements.{group}")
+            continue
+        for old, new in mapping.items():
+            if not old or new in (None, ""):
+                issues.append(f"INVALID shared_replacements.{group}: {old!r} -> {new!r}")
+
+    print(f"verify-inventory / {skin_name} / {root}")
+    if not issues:
+        print("  inventory ok")
+    for issue in issues:
+        print(f"  {issue}")
+    return issues
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("skin", help="normal / fun (or registered alias)")
     parser.add_argument("--phase", choices=("before", "after"), default="before")
     parser.add_argument("--repo", type=Path, help="source checkout when skill is not installed there")
+    parser.add_argument("--verify-inventory", action="store_true",
+                        help="check inventory drift (stale paths, overlaps, project refs) before auditing")
     args = parser.parse_args()
 
     inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
@@ -55,6 +107,9 @@ def main():
     shared = inventory["shared_paths"] + skin.get("extra_edit_paths", [])
     if len(set(owned + shared)) != len(owned + shared):
         raise ValueError("duplicate paths in inventory")
+
+    if args.verify_inventory:
+        return 1 if verify_inventory(root, inventory, skin_name, skin) else 0
 
     print(f"{skin_name} / {args.phase} / {root}")
     structural_errors = 0
