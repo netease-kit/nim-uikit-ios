@@ -24,7 +24,7 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
   ///   转发会话选择页同样按内容栏宽度展示，两者保持一致。
   init(title: String,
        initialName: String? = nil,
-       style: NEConversationGroupUIStyle = .normal,
+       style: NEConversationGroupUIStyle = .fun,
        heightRatio: CGFloat = 0.9,
        cardWidth: CGFloat? = nil,
        complete: @escaping (String) -> Void) {
@@ -228,7 +228,7 @@ final class NEConversationGroupNameController: NEConversationBaseViewController,
   private let countLabel = UILabel()
   private let maxLength = conversationGroupNameMaxLength
 
-  init(style: NEConversationGroupUIStyle = .normal, complete: @escaping (String, NEConversationGroupNameController) -> Void) {
+  init(style: NEConversationGroupUIStyle = .fun, complete: @escaping (String, NEConversationGroupNameController) -> Void) {
     self.style = style
     self.complete = complete
     super.init(nibName: nil, bundle: nil)

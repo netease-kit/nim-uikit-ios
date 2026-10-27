@@ -29,7 +29,7 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
 
   private var keyword = ""
 
-  init(group: NEConversationGroupModel, existingIds: Set<String>, viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .normal) {
+  init(group: NEConversationGroupModel, existingIds: Set<String>, viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .fun) {
     self.group = group
     groupViewModel = viewModel
     self.style = style
@@ -126,7 +126,7 @@ open class NEConversationGroupAddConversationController: NEConversationBaseViewC
   }
 
   public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    style.isFunStyle ? 72 : 62
+    72
   }
 
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -262,7 +262,7 @@ private final class AddConversationCell: UITableViewCell {
     contentView.backgroundColor = style.cardBackgroundColor
     titleLabel.textColor = style.titleTextColor
     avatar.layer.cornerRadius = style.addConversationAvatarCornerRadius
-    line.backgroundColor = style.isFunStyle ? .funConversationListLineBorderColor : style.lineColor
+    line.backgroundColor = .funConversationListLineBorderColor
     updateSelected(selected, style: style)
     let title = model.conversation?.name ?? model.conversation?.conversationId ?? ""
     if keyword.isEmpty {

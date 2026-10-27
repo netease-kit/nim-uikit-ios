@@ -6,7 +6,7 @@ import NEChatKit
 import UIKit
 
 class NEHistorySearchDateCell: UICollectionViewCell {
-  var selectButtonBackgroundColor = UIColor.normalSearchDateButtonBg
+  var selectButtonBackgroundColor = UIColor.neUIKitDefaultPrimaryColor
   lazy var dayLabel: UILabel = {
     let label = UILabel()
     label.textAlignment = .center

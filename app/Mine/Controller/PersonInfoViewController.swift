@@ -59,13 +59,7 @@ public class PersonInfoViewController: NEBaseViewController,
   func initialConfig() {
     title = localizable("person_info")
 
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .funChatBackgroundColor
 
     navigationView.moreButton.isHidden = true
     viewModel.delegate = self
@@ -73,9 +67,6 @@ public class PersonInfoViewController: NEBaseViewController,
 
   func setupSubviews() {
     view.addSubview(tableView)
-    if NEStyleManager.instance.isNormalStyle() {
-      topConstant += 12
-    }
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -200,67 +191,33 @@ public class PersonInfoViewController: NEBaseViewController,
   // MARK: PersonInfoViewModelDelegate
 
   func didClickHeadImage() {
-    if NEStyleManager.instance.isNormalStyle() {
-      if let callback = ChatUIConfig.shared.chatInputPhotoClick {
-        let chatVC = self
-        let takingPicturesAction = UIAlertAction(title: commonLocalizable("take_picture"),
-                                                 style: .default) { [weak self] action in
-          self?.goCamera(chatVC, true)
-        }
+    if let callback = ChatUIConfig.shared.chatInputPhotoClick {
+      let chatVC = self
+      let takingPicturesAction = NECustomAlertAction(title: commonLocalizable("take_picture")) { [weak self] in
+        self?.goCamera(chatVC, true)
+      }
 
-        let photoAction = UIAlertAction(title: commonLocalizable("select_from_album"), style: .default) { _ in
-          // 自定义图片选择器
-          let vc = self
-          callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
-            for model in models {
-              if model.asset.mediaType == .video {
-                vc.showToast(commonLocalizable("only_support_choose_image"))
-                return
-              }
-              if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
-                vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
-                return
-              }
-              self?.uploadHeadImage(image: model.image)
+      let photoAction = NECustomAlertAction(title: commonLocalizable("select_from_album")) {
+        // 自定义图片选择器
+        let vc = self
+        callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
+          for model in models {
+            if model.asset.mediaType == .video {
+              vc.showToast(commonLocalizable("only_support_choose_image"))
+              return
             }
+            if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
+              vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
+              return
+            }
+            self?.uploadHeadImage(image: model.image)
           }
         }
-
-        let cancelAction = UIAlertAction(title: commonLocalizable("cancel"), style: .cancel) { _ in }
-
-        showActionSheet([takingPicturesAction, photoAction, cancelAction])
-      } else {
-        showBottomAlert(self)
       }
+
+      showCustomActionSheet([takingPicturesAction, photoAction])
     } else {
-      if let callback = ChatUIConfig.shared.chatInputPhotoClick {
-        let chatVC = self
-        let takingPicturesAction = NECustomAlertAction(title: commonLocalizable("take_picture")) { [weak self] in
-          self?.goCamera(chatVC, true)
-        }
-
-        let photoAction = NECustomAlertAction(title: commonLocalizable("select_from_album")) {
-          // 自定义图片选择器
-          let vc = self
-          callback(self, .image, avatarImageCountLimit) { [weak self] models, isOriginal in
-            for model in models {
-              if model.asset.mediaType == .video {
-                vc.showToast(commonLocalizable("only_support_choose_image"))
-                return
-              }
-              if model.asset.mediaType == .image, models.count > avatarImageCountLimit {
-                vc.showToast(String(format: commonLocalizable("image_count_over_limit"), avatarImageCountLimit))
-                return
-              }
-              self?.uploadHeadImage(image: model.image)
-            }
-          }
-        }
-
-        showCustomActionSheet([takingPicturesAction, photoAction])
-      } else {
-        showCustomBottomAlert(self)
-      }
+      showCustomBottomAlert(self)
     }
   }
 
@@ -306,15 +263,9 @@ public class PersonInfoViewController: NEBaseViewController,
         }
       }
     }
-    if NEStyleManager.instance.isNormalStyle() {
-      showAlert(firstContent: localizable("male"),
-                secondContent: localizable("female"),
-                selectValue: block)
-    } else {
-      showCustomAlert(firstContent: localizable("male"),
-                      secondContent: localizable("female"),
-                      selectValue: block)
-    }
+    showCustomAlert(firstContent: localizable("male"),
+                    secondContent: localizable("female"),
+                    selectValue: block)
   }
 
   func didClickBirthday(birth: String) {

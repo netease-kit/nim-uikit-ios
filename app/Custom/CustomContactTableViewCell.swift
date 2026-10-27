@@ -5,7 +5,7 @@
 import Foundation
 import NEContactUIKit
 
-public class CustomContactTableViewCell: ContactTableViewCell {
+public class CustomContactTableViewCell: FunContactTableViewCell {
   private lazy var redDotView: UIImageView = {
     let notifyView = UIImageView()
     notifyView.translatesAutoresizingMaskIntoConstraints = false

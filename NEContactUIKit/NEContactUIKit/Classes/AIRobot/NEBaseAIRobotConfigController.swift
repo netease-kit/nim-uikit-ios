@@ -47,7 +47,7 @@ open class NEBaseAIRobotConfigController: NEContactBaseViewController {
   public lazy var divider: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
-    v.backgroundColor = .funContactLineBorderColor
+    v.backgroundColor = .neUIKitDefaultLineColor
     return v
   }()
 
@@ -177,7 +177,7 @@ open class NEBaseAIRobotConfigController: NEContactBaseViewController {
   /// 复制按钮圆角
   open func copyButtonCornerRadius() -> CGFloat { 4 }
 
-  /// 复制按钮背景色 — 子类 override（Normal: normalContactThemeColor，Fun: funContactThemeColor）
+  /// 复制按钮背景色 — 子类 override；默认使用公共默认色
   open func copyButtonColor() -> UIColor { .neUIKitDefaultPrimaryColor }
 
   /// 卡片圆角 — 子类 override

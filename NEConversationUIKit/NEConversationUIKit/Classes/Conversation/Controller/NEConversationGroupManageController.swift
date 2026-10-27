@@ -22,7 +22,7 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
     return button
   }()
 
-  init(viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .normal) {
+  init(viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .fun) {
     groupViewModel = viewModel
     self.style = style
     super.init(nibName: nil, bundle: nil)
@@ -193,11 +193,7 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
   }
 
   @objc private func createGroupAction() {
-    if style.isFunStyle {
-      pushCreateGroupController()
-    } else {
-      presentCreateGroupSheet()
-    }
+    pushCreateGroupController()
   }
 
   private func pushCreateGroupController() {

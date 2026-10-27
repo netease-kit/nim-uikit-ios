@@ -5,7 +5,7 @@
 import Foundation
 import NEContactUIKit
 
-public class CustomContactViewController: ContactViewController, NEBaseContactViewControllerDelegate {
+public class CustomContactViewController: FunContactViewController, NEBaseContactViewControllerDelegate {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     /// 是否在通讯录界面显示头部模块
     ContactUIConfig.shared.showHeader = false

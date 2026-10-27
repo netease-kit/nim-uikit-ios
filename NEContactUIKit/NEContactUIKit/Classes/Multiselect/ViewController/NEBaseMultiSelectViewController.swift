@@ -32,7 +32,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   /// unchanged on ordinary screens and paired layouts.
   public var usesAdaptiveContainerPresentation = false
 
-  public var themeColor: UIColor = .normalContactThemeColor // 主题颜色
+  public var themeColor: UIColor = .neUIKitDefaultPrimaryColor // 主题颜色
   public var titleText = localizable("select") // 标题文案
   public var sureButtonText = commonLocalizable("sure") // 确定按钮文案
 
@@ -450,7 +450,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     button.translatesAutoresizingMaskIntoConstraints = false
     button.accessibilityIdentifier = "id.sureButton"
     button.setTitle(sureButtonText, for: .normal)
-    button.setTitleColor(UIColor.normalContactThemeColor, for: .normal)
+    button.setTitleColor(UIColor.neUIKitDefaultPrimaryColor, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
     button.layer.cornerRadius = 4
     button.addTarget(self, action: #selector(sureButtonAction), for: .touchUpInside)
@@ -831,7 +831,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       let cell = tableView.dequeueReusableCell(
         withIdentifier: "\(NSStringFromClass(NEBaseSelectCell.self))",
         for: indexPath
-      ) as! SelectCell
+      ) as! FunSelectCell
       cell.showSelect(isMultiSelect)
       cell.setModel(info)
       cell.searchText = searchText
