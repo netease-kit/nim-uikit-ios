@@ -36,52 +36,34 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     contentView.addSubview(titleLabel)
     contentView.addSubview(inputTextField)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
+    let whiteBgView = UIView()
+    whiteBgView.backgroundColor = UIColor.white
+    whiteBgView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
+    NSLayoutConstraint.activate([
+      whiteBgView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      whiteBgView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      whiteBgView.topAnchor.constraint(equalTo: contentView.topAnchor),
+      whiteBgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+    ])
 
-      NSLayoutConstraint.activate([
-        inputTextField.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        inputTextField.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-        inputTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextField.heightAnchor.constraint(equalToConstant: 40),
-      ])
+    NSLayoutConstraint.activate([
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+      titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+    ])
+    titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
+    titleWidthAnchor?.isActive = true
 
-    } else {
-      let whiteBgView = UIView()
-      whiteBgView.backgroundColor = UIColor.white
-      whiteBgView.translatesAutoresizingMaskIntoConstraints = false
-      contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
-      NSLayoutConstraint.activate([
-        whiteBgView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-        whiteBgView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-        whiteBgView.topAnchor.constraint(equalTo: contentView.topAnchor),
-        whiteBgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      ])
+    NSLayoutConstraint.activate([
+      inputTextField.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      inputTextField.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+      inputTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+      inputTextField.heightAnchor.constraint(equalToConstant: 40),
+    ])
 
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
-
-      NSLayoutConstraint.activate([
-        inputTextField.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        inputTextField.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-        inputTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextField.heightAnchor.constraint(equalToConstant: 40),
-      ])
-
-      dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineLeftMargin?.constant = 20
+    dividerLineRightMargin?.constant = 0
   }
 
   /// 绑定数据

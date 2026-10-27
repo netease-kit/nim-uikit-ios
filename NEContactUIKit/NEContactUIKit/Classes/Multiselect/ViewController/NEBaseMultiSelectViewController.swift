@@ -831,7 +831,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       let cell = tableView.dequeueReusableCell(
         withIdentifier: "\(NSStringFromClass(NEBaseSelectCell.self))",
         for: indexPath
-      ) as! SelectCell
+      ) as! FunSelectCell
       cell.showSelect(isMultiSelect)
       cell.setModel(info)
       cell.searchText = searchText

@@ -212,18 +212,16 @@ class NETabBarController: UITabBarController {
     railSelectedImages = selectedImages
     sideRail.frame = CGRect(x: view.bounds.width - Self.railWidth, y: Self.railTopInset,
                             width: Self.railWidth, height: view.bounds.height - Self.railTopInset)
-    sideRail.backgroundColor = NEStyleManager.instance.isNormalStyle()
-      ? UIColor(hexString: "#F6F8FA") : .funContactBackgroundColor
+    sideRail.backgroundColor = .funContactBackgroundColor
     view.addSubview(sideRail)
 
     var items: [UIView] = []
     let back = UIButton(type: .system)
     var backConfig = UIButton.Configuration.plain()
     backConfig.image = UIImage(systemName: "chevron.left")
-    backConfig.baseForegroundColor = NEStyleManager.instance.isNormalStyle()
-      ? UIColor(hexString: "#333333") : .ne_funTheme
+    backConfig.baseForegroundColor = .ne_funTheme
     back.configuration = backConfig
-    back.tintColor = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#333333") : .ne_funTheme
+    back.tintColor = .ne_funTheme
     back.addTarget(self, action: #selector(sideRailBackTapped), for: .touchUpInside)
     sideRail.addSubview(back)
     items.append(back)
@@ -242,7 +240,7 @@ class NETabBarController: UITabBarController {
         return outgoing
       }
       config.baseForegroundColor = index == 0
-        ? (NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#337EFF") : .ne_funTheme)
+        ? .ne_funTheme
         : UIColor(hexString: "#999999")
       button.configuration = config
       button.tag = index
@@ -270,7 +268,7 @@ class NETabBarController: UITabBarController {
   private func updateRailSelection(_ index: Int) {
     guard sideRailButtons.count > 1 else { return }
     lastRailSelection = index
-    let accent = NEStyleManager.instance.isNormalStyle() ? UIColor(hexString: "#337EFF") : UIColor.ne_funTheme
+    let accent = UIColor.ne_funTheme
     for (offset, control) in sideRailButtons.enumerated() where offset > 0 {
       let itemIndex = offset - 1
       guard let button = control as? UIButton else { continue }
@@ -580,8 +578,7 @@ class NETabBarController: UITabBarController {
     // Keep the system/status-area strip in the same color as the selected
     // section's root page. FunUI uses the contact navigation gray; leaving the
     // shell's default white exposes a visible band above the retained page.
-    configuration.contentBackgroundColor = NEStyleManager.instance.isNormalStyle()
-      ? .white : .funContactBackgroundColor
+    configuration.contentBackgroundColor = .funContactBackgroundColor
     let shell = NEAdaptiveShellViewController(sections: sections,
                                               detailNavigationController: detail, configuration: configuration)
     detail.isCompactAdaptiveLayout = { [weak shell] in
@@ -641,10 +638,9 @@ class NETabBarController: UITabBarController {
       }
       return navigation
     }
-    configuration.selectedTintColor = NEStyleManager.instance.isNormalStyle() ? .neUIKitDefaultPrimaryColor : .ne_funTheme
+    configuration.selectedTintColor = .ne_funTheme
     configuration.railBackgroundColor = tabBar.backgroundColor ?? .white
-    configuration.dividerColor = NEStyleManager.instance.isNormalStyle()
-      ? .neUIKitDefaultNavigationDividerColor : .funContactDividerLineColor
+    configuration.dividerColor = .funContactDividerLineColor
     configuration.normalTintColor = UIColor(hexString: "#C5C9D2")
     configuration.backImage = CommonUIConfig.shared.backArrowImage
     configuration.backAccessibilityLabel = localizable("adaptive_back")
@@ -667,7 +663,7 @@ class NETabBarController: UITabBarController {
         conversation.selectConversation(conversationId: conversationId, animated: false)
       }
     }
-    shell.view.tintColor = NEStyleManager.instance.isNormalStyle() ? .neUIKitDefaultPrimaryColor : .ne_funTheme
+    shell.view.tintColor = .ne_funTheme
     shell.conversationCoordinator.controllerFactory = { [weak self] intent in
       self?.makeAdaptiveConversation(intent)
     }
@@ -895,9 +891,8 @@ class NETabBarController: UITabBarController {
 
   private func makeAdaptiveEmptyDetail(textKey: String) -> UIViewController {
     let controller = UIViewController()
-    controller.view.backgroundColor = NEStyleManager.instance.isNormalStyle()
-      ? .white : .funContactItemBackgroundColor
-    let empty = NEEmptyDataView(imageName: NEStyleManager.instance.isNormalStyle() ? "user_empty" : "fun_user_empty",
+    controller.view.backgroundColor = .funContactItemBackgroundColor
+    let empty = NEEmptyDataView(imageName: "fun_user_empty",
                                 content: textKey.isEmpty ? "" : localizable(textKey), frame: .zero)
     controller.view.addSubview(empty)
     empty.translatesAutoresizingMaskIntoConstraints = false
@@ -920,23 +915,22 @@ class NETabBarController: UITabBarController {
 
   private func makeAdaptiveConversation(_ intent: NEConversationOpenIntent) -> UIViewController? {
     guard let cid = intent.parameters["conversationId"] as? String else { return nil }
-    let normal = NEStyleManager.instance.isNormalStyle()
     let anchor = intent.parameters["anchor"] as? V2NIMMessage
     let controller: UIViewController
     switch intent.route {
     case PushP2pChatVCRouter:
-      controller = normal ? P2PChatViewController(conversationId: cid, anchor: anchor) : FunP2PChatViewController(conversationId: cid, anchor: anchor)
+      controller = FunP2PChatViewController(conversationId: cid, anchor: anchor)
     case PushTeamChatVCRouter:
-      controller = normal ? TeamChatViewController(conversationId: cid, anchor: anchor) : FunTeamChatViewController(conversationId: cid, anchor: anchor)
+      controller = FunTeamChatViewController(conversationId: cid, anchor: anchor)
     case PushBotSubSessionListRouter:
       guard let sessionId = intent.parameters["sessionId"] as? String else { return nil }
       let name = intent.parameters["sessionName"] as? String ?? (NEAIUserManager.shared.getShowName(sessionId) ?? sessionId)
-      controller = normal ? BotSubSessionListViewController(conversationId: cid, sessionId: sessionId, sessionName: name) : FunBotSubSessionListViewController(conversationId: cid, sessionId: sessionId, sessionName: name)
+      controller = FunBotSubSessionListViewController(conversationId: cid, sessionId: sessionId, sessionName: name)
     case PushBotSubSessionChatRouter:
       guard let sessionId = intent.parameters["sessionId"] as? String else { return nil }
       let name = intent.parameters["sessionName"] as? String ?? (NEAIUserManager.shared.getShowName(sessionId) ?? sessionId)
       let topic = intent.parameters["topic"] as? V2NIMTopic
-      controller = normal ? BotSubSessionChatViewController(conversationId: cid, sessionId: sessionId, sessionName: name, topic: topic) : FunBotSubSessionChatViewController(conversationId: cid, sessionId: sessionId, sessionName: name, topic: topic)
+      controller = FunBotSubSessionChatViewController(conversationId: cid, sessionId: sessionId, sessionName: name, topic: topic)
     default: return nil
     }
     _ = ChatRouter.applyPresentationParameters(intent.parameters, to: controller, reload: false)
@@ -969,148 +963,73 @@ class NETabBarController: UITabBarController {
 
   private func setUpControllers(useAdaptiveNavigation: Bool) -> [UINavigationController] {
     let sections: [UINavigationController]
-    if NEStyleManager.instance.isNormalStyle() {
-      // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-        chat = LocalConversationController()
-        (chat as? LocalConversationController)?.viewModel.syncFinished = isChangeUIType
-      } else {
-        chat = ConversationController()
-        (chat as? ConversationController)?.viewModel.syncFinished = isChangeUIType
+    // chat
+    if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
+      chat = FunLocalConversationController()
+      (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
+    } else {
+      chat = FunConversationController()
+      (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
+    }
+
+    chat?.tabBarItem = UITabBarItem(
+      title: localizable("message"),
+      image: UIImage(named: "funChat"),
+      selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
+    let chatNav: UINavigationController = useAdaptiveNavigation
+      ? NEAdaptiveDemoNavigationController(rootViewController: chat!)
+      : NENavigationController(rootViewController: chat!)
+
+    // Contacts
+    contactVC = FunContactViewController()
+    contactVC?.tabBarItem = UITabBarItem(
+      title: localizable("contact"),
+      image: UIImage(named: "funContact"),
+      selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
+    let contactsNav: UINavigationController = useAdaptiveNavigation
+      ? NEAdaptiveDemoNavigationController(rootViewController: contactVC!)
+      : NENavigationController(rootViewController: contactVC!)
+
+    // Me
+    meVC.tabBarItem = UITabBarItem(
+      title: localizable("mine"),
+      image: UIImage(named: "funPerson"),
+      selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
+    )
+    meVC.tabBarItem.accessibilityIdentifier = "id.mine"
+    let meNav: UINavigationController = useAdaptiveNavigation
+      ? NEAdaptiveDemoNavigationController(rootViewController: meVC)
+      : NENavigationController(rootViewController: meVC)
+
+    sections = [chatNav, contactsNav, meNav]
+    for vc in sections {
+      vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
+      vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
+    }
+
+    if #available(iOS 13.0, *) {
+      let appearance = UITabBarAppearance()
+      let isFoldableDevice = NEAdaptiveDeviceGate.isFoldableDevice
+      if !isFoldableDevice, #unavailable(iOS 26.0) {
+        appearance.configureWithOpaqueBackground()
       }
-
-      chat?.tabBarItem = UITabBarItem(
-        title: localizable("message"),
-        image: UIImage(named: "chat"),
-        selectedImage: UIImage(named: "chatSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: chat!)
-        : NENavigationController(rootViewController: chat!)
-
-      // Contacts
-      contactVC = ContactViewController()
-      contactVC?.tabBarItem = UITabBarItem(
-        title: localizable("contact"),
-        image: UIImage(named: "contact"),
-        selectedImage: UIImage(named: "contactSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: contactVC!)
-        : NENavigationController(rootViewController: contactVC!)
-
-      // Me
-      meVC.tabBarItem = UITabBarItem(
-        title: localizable("mine"),
-        image: UIImage(named: "person"),
-        selectedImage: UIImage(named: "personSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      meVC.tabBarItem.accessibilityIdentifier = "id.mine"
-      meVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-      meVC.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#337EFF")], for: .selected)
-      let meNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: meVC)
-        : NENavigationController(rootViewController: meVC)
-
-      sections = [chatNav, contactsNav, meNav]
-
-      if #available(iOS 13.0, *) {
-        let appearance = UITabBarAppearance()
-        // 折叠屏保持原逻辑（避免影响 Duo 竖排 tab bar）；非折叠在 iOS 26 以下
-        // 必须先配置不透明背景，否则只设 backgroundColor 会让 tab bar 透明、
-        // 露出窗口黑底（iOS 17 上表现为黑色 tab bar）。
-        let isFoldableDevice = NEAdaptiveDeviceGate.isFoldableDevice
-        if !isFoldableDevice, #unavailable(iOS 26.0) {
-          appearance.configureWithOpaqueBackground()
-        }
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#337EFF")]
-        // 背景色必须放进 appearance：直接设 tabBar.backgroundColor 会让 Duo 竖排 tab bar 退化成空白
-        appearance.backgroundColor = UIColor(hexString: "#F6F8FA")
-        tabBar.standardAppearance = appearance
-        if !isFoldableDevice, #available(iOS 15.0, *) {
-          // 列表停在顶部时使用的是 scrollEdgeAppearance，未设置会退回系统默认背景。
-          tabBar.scrollEdgeAppearance = appearance
-        }
-      } else {
-        tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
-        for vc in sections {
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#337EFF")], for: .selected)
-        }
+      appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
+      appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
+      appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.ne_funTheme]
+      appearance.backgroundColor = UIColor(hexString: "#F6F6F6")
+      tabBar.standardAppearance = appearance
+      if !isFoldableDevice, #available(iOS 15.0, *) {
+        tabBar.scrollEdgeAppearance = appearance
       }
     } else {
-      // chat
-      if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-        chat = FunLocalConversationController()
-        (chat as? FunLocalConversationController)?.viewModel.syncFinished = isChangeUIType
-      } else {
-        chat = FunConversationController()
-        (chat as? FunConversationController)?.viewModel.syncFinished = isChangeUIType
-      }
-
-      chat?.tabBarItem = UITabBarItem(
-        title: localizable("message"),
-        image: UIImage(named: "funChat"),
-        selectedImage: UIImage(named: "funChatSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      chat?.tabBarItem.accessibilityIdentifier = "id.conversation"
-      let chatNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: chat!)
-        : NENavigationController(rootViewController: chat!)
-
-      // Contacts
-      contactVC = FunContactViewController()
-      contactVC?.tabBarItem = UITabBarItem(
-        title: localizable("contact"),
-        image: UIImage(named: "funContact"),
-        selectedImage: UIImage(named: "funContactSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      contactVC?.tabBarItem.accessibilityIdentifier = "id.contact"
-      let contactsNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: contactVC!)
-        : NENavigationController(rootViewController: contactVC!)
-
-      // Me
-      meVC.tabBarItem = UITabBarItem(
-        title: localizable("mine"),
-        image: UIImage(named: "funPerson"),
-        selectedImage: UIImage(named: "funPersonSelect")?.withRenderingMode(.alwaysOriginal)
-      )
-      meVC.tabBarItem.accessibilityIdentifier = "id.mine"
-      let meNav: UINavigationController = useAdaptiveNavigation
-        ? NEAdaptiveDemoNavigationController(rootViewController: meVC)
-        : NENavigationController(rootViewController: meVC)
-
-      sections = [chatNav, contactsNav, meNav]
+      tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
       for vc in sections {
         vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
         vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
-      }
-
-      if #available(iOS 13.0, *) {
-        let appearance = UITabBarAppearance()
-        let isFoldableDevice = NEAdaptiveDeviceGate.isFoldableDevice
-        if !isFoldableDevice, #unavailable(iOS 26.0) {
-          appearance.configureWithOpaqueBackground()
-        }
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hexString: "#C5C9D2")
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hexString: "#999999")]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.ne_funTheme]
-        appearance.backgroundColor = UIColor(hexString: "#F6F6F6")
-        tabBar.standardAppearance = appearance
-        if !isFoldableDevice, #available(iOS 15.0, *) {
-          tabBar.scrollEdgeAppearance = appearance
-        }
-      } else {
-        tabBar.unselectedItemTintColor = UIColor(hexString: "#C5C9D2")
-        for vc in sections {
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor(hexString: "#999999")], for: .normal)
-          vc.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.ne_funTheme], for: .selected)
-        }
       }
     }
     return sections
