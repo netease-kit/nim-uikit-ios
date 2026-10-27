@@ -33,8 +33,6 @@
     "app/Custom/CustomP2PChatViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/SelectLanguageViewModel.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/UserSettingViewModel.swift",
-    "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageRevokeCell.swift",
-    "NEChatUIKit/NEChatUIKit/Classes/FunUI/Cell/FunChatMessageTextCell.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/ChatCellConstantValue.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/ChatConstant.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitClient.swift",
@@ -115,7 +113,12 @@
   },
   "skins": {
     "normal": {
-      "aliases": ["normal", "normalui", "飞书", "通用"],
+      "aliases": [
+        "normal",
+        "normalui",
+        "飞书",
+        "通用"
+      ],
       "owned_paths": [
         "NEBaseUIKit/NEBaseUIKit/Assets/NormalBaseUI.xcassets",
         "NEChatUIKit/NEChatUIKit/Classes/NormalUI",
@@ -128,7 +131,6 @@
         "NELocalConversationUIKit/NELocalConversationUIKit/Assets/NormalLocalConversationUIKit.xcassets",
         "NETeamUIKit/NETeamUIKit/Classes/NormalUI",
         "NETeamUIKit/NETeamUIKit/Assets/NormalTeamUIKit.xcassets",
-        "app/Custom/CustomNormalChatViewController.swift",
         "app/Assets.xcassets/Tabbar/chat.imageset",
         "app/Assets.xcassets/Tabbar/chatSelect.imageset",
         "app/Assets.xcassets/Tabbar/contact.imageset",
@@ -138,7 +140,27 @@
         "app/Assets.xcassets/Mine/clicked_normal.imageset",
         "app/Assets.xcassets/Mine/style_normal.imageset"
       ],
-      "markers": ["NormalUI", "NormalChat", "NormalContact", "NormalConversation", "NormalLocalConversation", "NormalTeam", "normalChat", "normalContact", "normalSearch", "CustomNormal", "registerNormalCustom", "isNormalStyle", "setNormalStyle", "ne_normalTheme", "style_normal", "clicked_normal", "style_default", "style_selection", "didStyleClick"],
+      "markers": [
+        "NormalUI",
+        "NormalChat",
+        "NormalContact",
+        "NormalConversation",
+        "NormalLocalConversation",
+        "NormalTeam",
+        "normalChat",
+        "normalContact",
+        "normalSearch",
+        "CustomNormal",
+        "registerNormalCustom",
+        "isNormalStyle",
+        "setNormalStyle",
+        "ne_normalTheme",
+        "style_normal",
+        "clicked_normal",
+        "style_default",
+        "style_selection",
+        "didStyleClick"
+      ],
       "accepted_candidates": [
         {
           "path": "app/Main/UIStyleManager.swift",
@@ -147,14 +169,18 @@
       ],
       "project_cleanup": {
         "app.xcodeproj/project.pbxproj": [
-          "CustomNormalChatViewController.swift",
           "StyleSelectionViewController.swift",
           "StyleSelectionCell.swift"
         ]
       }
     },
     "fun": {
-      "aliases": ["fun", "funui", "微信", "娱乐"],
+      "aliases": [
+        "fun",
+        "funui",
+        "微信",
+        "娱乐"
+      ],
       "extra_edit_paths": [
         "NEContactUIKit/NEContactUIKit/Classes/NormalUI/ViewController/CreateAIRobotController.swift"
       ],
@@ -171,7 +197,6 @@
         "NELocalConversationUIKit/NELocalConversationUIKit/Assets/FunLocalConversationUIKit.xcassets",
         "NETeamUIKit/NETeamUIKit/Classes/FunUI",
         "NETeamUIKit/NETeamUIKit/Assets/FunTeamUIKit.xcassets",
-        "app/Custom/CustomFunChatViewController.swift",
         "app/Assets.xcassets/Tabbar/funChat.imageset",
         "app/Assets.xcassets/Tabbar/funChatSelect.imageset",
         "app/Assets.xcassets/Tabbar/funContact.imageset",
@@ -181,14 +206,56 @@
         "app/Assets.xcassets/Mine/clicked_fun.imageset",
         "app/Assets.xcassets/Mine/style_fun.imageset"
       ],
-      "markers": ["FunUI", "FunChat", "FunContact", "FunConversation", "FunLocalConversation", "FunTeam", "FunSearch", "FunCollection", "FunPin", "funChat", "funContact", "funConversation", "CustomFun", "registerFunCustom", "setFunStyle", "isFunStyle", "iconUrlsFun", "fun_chat_", "fun_", "style_fun", "clicked_fun", "style_selection", "didStyleClick"],
+      "markers": [
+        "FunUI",
+        "FunChat",
+        "FunContact",
+        "FunConversation",
+        "FunLocalConversation",
+        "FunTeam",
+        "FunSearch",
+        "FunCollection",
+        "FunPin",
+        "funChat",
+        "funContact",
+        "funConversation",
+        "CustomFun",
+        "registerFunCustom",
+        "setFunStyle",
+        "isFunStyle",
+        "iconUrlsFun",
+        "fun_chat_",
+        "fun_",
+        "style_fun",
+        "clicked_fun",
+        "style_selection",
+        "didStyleClick"
+      ],
       "project_cleanup": {
         "app.xcodeproj/project.pbxproj": [
-          "CustomFunChatViewController.swift",
           "StyleSelectionViewController.swift",
           "StyleSelectionCell.swift"
         ]
       }
+    }
+  },
+  "shared_replacements": {
+    "colors": {
+      "ne_normalTheme": "neUIKitDefaultPrimaryColor",
+      "normalSearchDateButtonBg": "neUIKitDefaultPrimaryColor",
+      "normalContactThemeColor": "neUIKitDefaultPrimaryColor",
+      "normalChatNavigationDivideBg": "neUIKitDefaultNavigationDividerColor",
+      "normalContactNavigationDivideBg": "neUIKitDefaultNavigationDividerColor",
+      "normalChatReplyViewBg": "neUIKitDefaultReplyBackgroundColor",
+      "funChatLineBorderColor": "neUIKitDefaultLineColor",
+      "funContactLineBorderColor": "neUIKitDefaultLineColor"
+    },
+    "images": {
+      "fun_chat_photo": "photo",
+      "fun_chat_aiChat": "ai_icon_default"
+    },
+    "style_booleans": {
+      "isNormalStyle": true
     }
   }
 }

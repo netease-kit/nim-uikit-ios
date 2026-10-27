@@ -52,14 +52,14 @@ open class CirleProgressView: UIView {
       clockwise: false
     )
     borderLayer.path = borderPath.cgPath
-    borderLayer.strokeColor = UIColor.ne_normalTheme.cgColor
+    borderLayer.strokeColor = UIColor.neUIKitDefaultPrimaryColor.cgColor
     borderLayer.fillColor = UIColor.clear.cgColor
     borderLayer.lineWidth = 2
     borderLayer.frame = bounds
     layer.addSublayer(borderLayer)
 
     sectorLayer.frame = bounds
-    sectorLayer.fillColor = UIColor.ne_normalTheme.cgColor
+    sectorLayer.fillColor = UIColor.neUIKitDefaultPrimaryColor.cgColor
     layer.addSublayer(sectorLayer)
   }
 

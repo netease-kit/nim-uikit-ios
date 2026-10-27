@@ -5,7 +5,7 @@
 ## 专属删除项
 
 - 五个业务 UI 组件各自的 `Classes/NormalUI/`（`NEBaseUIKit` 没有此目录），及基础 UI 的 `NormalBaseUI.xcassets`、其余五个组件的 `NormalChatUIKit.xcassets`、`NormalContactUIKit.xcassets`、`NormalConversationUIKit.xcassets`、`NormalLocalConversationUIKit.xcassets`、`NormalTeamUIKit.xcassets`。保留相邻 `NEBase*.xcassets` 和 Fun 目录。
-- Demo `app/Custom/CustomNormalChatViewController.swift`；`app/Assets.xcassets/Tabbar/` 的 `chat/chatSelect/contact/contactSelect/person/personSelect.imageset`；`Mine/clicked_normal.imageset`、`Mine/style_normal.imageset`。`Mine/unclicked.imageset` 是选择组件通用态，仅在整个选择页删除后才能删。
+- Demo `app/Assets.xcassets/Tabbar/` 的 `chat/chatSelect/contact/contactSelect/person/personSelect.imageset`；`Mine/clicked_normal.imageset`、`Mine/style_normal.imageset`。`Mine/unclicked.imageset` 是选择组件通用态，仅在整个选择页删除后才能删。
 - Demo 的 `StyleSelectionViewController.swift`、`StyleSelectionCell.swift` 可在双皮肤选择入口撤除后删除（两种移除方向通用），同时删 `app.xcodeproj/project.pbxproj` 对上述 3 个 Swift 文件的 file reference、build file、group、Sources 条目。只移除目标类型和样式选择页，不删保留皮肤的配置页。
 
 ## 必须编辑的接线

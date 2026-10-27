@@ -73,7 +73,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     button.translatesAutoresizingMaskIntoConstraints = false
     button.addTarget(self, action: #selector(sureClick), for: .touchUpInside)
     button.setTitle(chatLocalizable("send"), for: .normal)
-    button.setTitleColor(UIColor.ne_normalTheme, for: .normal)
+    button.setTitleColor(UIColor.neUIKitDefaultPrimaryColor, for: .normal)
     button.accessibilityIdentifier = "id.forwardSendBtn"
     return button
   }()
