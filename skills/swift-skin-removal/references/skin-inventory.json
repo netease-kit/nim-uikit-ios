@@ -241,6 +241,12 @@
   },
   "shared_replacements": {
     "colors": {
+      "ne_normalTheme": "neUIKitDefaultPrimaryColor",
+      "normalSearchDateButtonBg": "neUIKitDefaultPrimaryColor",
+      "normalContactThemeColor": "neUIKitDefaultPrimaryColor",
+      "normalChatNavigationDivideBg": "neUIKitDefaultNavigationDividerColor",
+      "normalContactNavigationDivideBg": "neUIKitDefaultNavigationDividerColor",
+      "normalChatReplyViewBg": "neUIKitDefaultReplyBackgroundColor",
       "funChatLineBorderColor": "neUIKitDefaultLineColor",
       "funContactLineBorderColor": "neUIKitDefaultLineColor"
     },

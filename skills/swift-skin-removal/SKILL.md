@@ -18,7 +18,8 @@ description: 按维护清单从 nim-uikit-ios 开源 Swift UIKit UI 组件和示
 
 ## 共享替换与代码编辑
 
-- 共享文件不能引用任一皮肤目录里的颜色或图片。需要替换皮肤色值时，优先使用 `NEBaseUIKit/Classes/CommonView/NEUIKitDefaultColors.swift` 中的 `neUIKitDefault*` 公共色；公共色缺失时先在该文件补一个命名一致的色值（例如 `neUIKitDefaultLineColor`），再到调用点替换，禁止在多个文件里重复硬编码 hex。
+- 共享文件不能引用任一皮肤目录里的颜色或图片。需要替换皮肤色值时，优先使用 `NEBaseUIKit/Classes/CommonView/NEUIKitDefaultColors.swift` 中的 `neUIKitDefault*` 公共色；公共色缺失时先在该文件补一个**同值**的公共色（例如 `neUIKitDefaultLineColor`），再到调用点替换。
+- **不要为了让代码“看起来属于保留皮肤”而改成另一皮肤的主题色**：共享引用在移除前后视觉值必须一致。只有代码本身是皮肤分支（`if normal { ... } else { ... }`）时，才按保留皮肤取对应分支的值。
 - `skin-inventory.json` 的 `shared_replacements` 登记「旧皮肤符号 → 公共 token / 图片名」。当前映射：`funChatLineBorderColor`、`funContactLineBorderColor` → `neUIKitDefaultLineColor`；`fun_chat_photo` → `photo`；`fun_chat_aiChat` → `ai_icon_default`。
 - 禁止用 sed/正则批量改写 Swift 控制流：`if <skin> { A } else { B }` 里可能还有内层 if/else，正则很容易误删代码。逐处 `apply_patch`，或先做括号配对、确认 if 体结束行是 `} else {` 再替换。
 - 去掉 `if <skin>` 的 else 后，如果 if 体里给 `let` 常量赋值（例如 `let sections`），编译器会报 used before initialized；此时应整体去掉 if 外壳，而不是保留 if。
