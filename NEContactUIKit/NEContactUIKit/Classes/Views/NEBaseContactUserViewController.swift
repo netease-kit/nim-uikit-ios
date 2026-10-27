@@ -166,7 +166,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
           UserItem(title: commonLocalizable("chat"),
                    detailTitle: "",
                    value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
+                   textColor: UIColor.neUIKitDefaultPrimaryColor,
                    cellClass: CenterTextCell.self),
         ],
       ]
@@ -177,7 +177,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
           UserItem(title: commonLocalizable("chat"),
                    detailTitle: "",
                    value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
+                   textColor: UIColor.neUIKitDefaultPrimaryColor,
                    cellClass: CenterTextCell.self),
         ],
       ]
@@ -224,7 +224,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
           UserItem(title: commonLocalizable("chat"),
                    detailTitle: "",
                    value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
+                   textColor: UIColor.neUIKitDefaultPrimaryColor,
                    cellClass: CenterTextCell.self),
           UserItem(title: localizable("delete_friend"),
                    detailTitle: "",
@@ -239,7 +239,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
           UserItem(title: localizable("add_friend"),
                    detailTitle: "",
                    value: false,
-                   textColor: UIColor(hexString: "#337EFF"),
+                   textColor: UIColor.neUIKitDefaultPrimaryColor,
                    cellClass: CenterTextCell.self),
         ],
       ]

@@ -6,7 +6,6 @@ import NEChatKit
 import UIKit
 
 struct NEConversationGroupUIStyle {
-  let isFunStyle: Bool
   let pageBackgroundColor: UIColor
   let navigationBackgroundColor: UIColor
   let contentBackgroundColor: UIColor
@@ -34,7 +33,6 @@ struct NEConversationGroupUIStyle {
   let settingConversationAvatarCornerRadius: CGFloat
 
   static let normal = NEConversationGroupUIStyle(
-    isFunStyle: false,
     pageBackgroundColor: UIColor(hexString: "#F5F7FA"),
     navigationBackgroundColor: UIColor(hexString: "#F5F7FA"),
     contentBackgroundColor: .white,
@@ -62,32 +60,4 @@ struct NEConversationGroupUIStyle {
     settingConversationAvatarCornerRadius: 18
   )
 
-  static let fun = NEConversationGroupUIStyle(
-    isFunStyle: true,
-    pageBackgroundColor: .funConversationBackgroundColor,
-    navigationBackgroundColor: .funConversationNavigationBg,
-    contentBackgroundColor: .white,
-    cardBackgroundColor: .white,
-    primaryColor: .ne_funTheme,
-    primaryDisabledColor: UIColor(hexString: "#58BE6B", 0.5),
-    selectedBackgroundColor: UIColor(hexString: "#EAF8ED"),
-    titleTextColor: .ne_darkText,
-    secondaryTextColor: .ne_greyText,
-    tertiaryTextColor: .ne_lightText,
-    lineColor: .funConversationLineBorderColor,
-    dangerColor: .ne_redText,
-    sheetMaskColor: UIColor.black.withAlphaComponent(0.35),
-    emptyImageName: "fun_user_empty",
-    managerImageName: "conversation_group_manager",
-    addImageName: "ic_conversation_group_set_add",
-    hiddenAddImageName: "conversation_group_hidden_add",
-    deleteImageName: "conversation_group_delete",
-    disableImageName: "conversation_group_disable",
-    settingImageName: "conversation_group_setting",
-    dragImageName: "conversation_group_right_draw",
-    selectedImageName: "conversation_group_select_selected",
-    unselectedImageName: "conversation_group_select_unselected",
-    addConversationAvatarCornerRadius: 4,
-    settingConversationAvatarCornerRadius: 4
-  )
 }

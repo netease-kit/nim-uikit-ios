@@ -71,13 +71,9 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
   func initialConfig() {
     title = localizable("setting")
 
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .ne_backgroundColor
+    navigationView.backgroundColor = .ne_backgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
   }
 
   func setupSubviews() {
@@ -110,19 +106,9 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     logoutButton.addTarget(self, action: #selector(loginOutAction), for: .touchUpInside)
     logoutButton.setTitle(localizable("logout"), for: .normal)
     logoutButton.accessibilityIdentifier = "id.logout"
-    if NEStyleManager.instance.isNormalStyle() {
-      logoutButton.layer.cornerRadius = 8.0
-      if NEAdaptiveDeviceGate.isFoldableDevice { logoutButton.autoresizingMask = [.flexibleWidth] }
-      logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
-    } else {
-      logoutButton.translatesAutoresizingMaskIntoConstraints = false
-      NSLayoutConstraint.activate([
-        logoutButton.leftAnchor.constraint(equalTo: footerView.leftAnchor, constant: 0),
-        logoutButton.rightAnchor.constraint(equalTo: footerView.rightAnchor, constant: 0),
-        logoutButton.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 12),
-        logoutButton.heightAnchor.constraint(equalToConstant: 40),
-      ])
-    }
+    logoutButton.layer.cornerRadius = 8.0
+    if NEAdaptiveDeviceGate.isFoldableDevice { logoutButton.autoresizingMask = [.flexibleWidth] }
+    logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
 
     return footerView
   }
@@ -227,10 +213,6 @@ extension MineSettingViewController: MineSettingViewModelDelegate {
     navigationController?.pushViewController(messageRemindCtrl, animated: true)
   }
 
-  func didStyleClick() {
-    let styleSelectionCtrl = StyleSelectionViewController()
-    navigationController?.pushViewController(styleSelectionCtrl, animated: true)
-  }
 
   func didClickCleanCache() {}
 

@@ -37,7 +37,7 @@ open class NEBaseContactAliasViewController: NEContactBaseViewController, UIText
 
 //    lazy var rightBtn: ExpandButton = {
 //        let btn = ExpandButton(frame: CGRect(x: 0, y: 0, width: 60, height: 44))
-//        btn.setTitleColor(UIColor(hexString: "#337EFF"), for: .normal)
+//        btn.setTitleColor(UIColor.neUIKitDefaultPrimaryColor, for: .normal)
 //        btn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
 //        btn.addTarget(self, action: #selector(saveAlias), for: .touchUpInside)
 //        return btn

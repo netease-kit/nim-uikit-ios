@@ -45,13 +45,9 @@ class MessageRemindViewController: NEBaseViewController, UITableViewDelegate,
   /// 导航栏配置
   func initialConfig() {
     title = localizable("message_remind")
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-      navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .ne_backgroundColor
+    navigationView.backgroundColor = .ne_backgroundColor
+    navigationController?.navigationBar.backgroundColor = .ne_backgroundColor
   }
 
   /// 页面主题元素初始化以及布局

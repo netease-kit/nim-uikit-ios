@@ -124,7 +124,7 @@ open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableView
         TeamDetailItem(title: commonLocalizable("chat"),
                        detailTitle: "",
                        value: false,
-                       textColor: UIColor(hexString: "#337EFF"),
+                       textColor: UIColor.neUIKitDefaultPrimaryColor,
                        cellClass: TeamCenterTextCell.self),
       ])
     } else {
@@ -132,7 +132,7 @@ open class NEBaseTeamDetailViewController: NETeamBaseViewController, UITableView
         TeamDetailItem(title: commonLocalizable("join_team"),
                        detailTitle: "",
                        value: false,
-                       textColor: UIColor(hexString: "#337EFF"),
+                       textColor: UIColor.neUIKitDefaultPrimaryColor,
                        cellClass: TeamCenterTextCell.self),
       ])
     }

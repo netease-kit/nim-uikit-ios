@@ -252,7 +252,7 @@ class SceneDelegate: UIResponder {
   // regist router
   func loadService() {
     // 注册路由
-    ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
+    ChatKitClient.shared.setupInit(isFun: false)
     DemoStickerConfig.registerPackages()
     registerMapFallbackRouter()
 
