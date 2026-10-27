@@ -84,7 +84,7 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
   public lazy var sectionDivider: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
-    v.backgroundColor = .funContactLineBorderColor
+    v.backgroundColor = .neUIKitDefaultLineColor
     return v
   }()
 

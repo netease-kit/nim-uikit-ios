@@ -93,7 +93,7 @@ open class NEHistorySearchFileCell: NEChatBaseCell {
 
     contentView.addSubview(lineBottom)
     lineBottom.translatesAutoresizingMaskIntoConstraints = false
-    lineBottom.backgroundColor = .funChatLineBorderColor.withAlphaComponent(0.5)
+    lineBottom.backgroundColor = .neUIKitDefaultLineColor.withAlphaComponent(0.5)
 
     NSLayoutConstraint.activate([
       // 头像

@@ -9,4 +9,6 @@ import UIKit
 public extension UIColor {
   static let neUIKitDefaultPrimaryColor = UIColor(hexString: "#337EFF")
   static let neUIKitDefaultPageBackgroundColor = UIColor(hexString: "#EDEDED")
+  /// Shared separator/line color. Preserves the previous skin line color (#E5E5E5).
+  static let neUIKitDefaultLineColor = UIColor(hexString: "#E5E5E5")
 }
