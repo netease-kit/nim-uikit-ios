@@ -816,7 +816,7 @@ public class ChatMessageHelper: NSObject {
                 }
 
                 if attributeStr?.length ?? 0 > end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(start, end - start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.neUIKitDefaultPrimaryColor, range: NSMakeRange(start, end - start + atRangeOffset))
                 }
               }
             }
@@ -832,7 +832,7 @@ public class ChatMessageHelper: NSObject {
             if let models = NSArray.yx_modelArray(with: MessageAtInfoModel.self, json: array) as? [MessageAtInfoModel] {
               for model in models {
                 if attributeStr?.length ?? 0 > model.end {
-                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
+                  attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.neUIKitDefaultPrimaryColor, range: NSMakeRange(model.start, model.end - model.start + atRangeOffset))
                 }
               }
             }

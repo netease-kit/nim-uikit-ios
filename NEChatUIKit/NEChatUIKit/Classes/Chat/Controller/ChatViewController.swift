@@ -2920,7 +2920,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   open func addToAtUsers(addText: String, isReply: Bool = false, accid: String, _ isLongPress: Bool = false) {
     if let font = chatInputView.textView.font {
       let mutaString = NSMutableAttributedString(attributedString: chatInputView.textView.attributedText)
-      let atString = NSAttributedString(string: addText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.ne_normalTheme, NSAttributedString.Key.font: font])
+      let atString = NSAttributedString(string: addText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.neUIKitDefaultPrimaryColor, NSAttributedString.Key.font: font])
       var selectRange = NSMakeRange(0, 0)
       var location = 0
       if chatInputView.textView.isFirstResponder == true {
@@ -5216,7 +5216,7 @@ extension ChatViewController: ChatBaseCellDelegate {
                   }
 
                   if (attributeStr?.length ?? 0) > model.end {
-                    attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.ne_normalTheme, range: NSMakeRange(model.start, model.end - model.start))
+                    attributeStr?.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.neUIKitDefaultPrimaryColor, range: NSMakeRange(model.start, model.end - model.start))
                   }
                 }
               }

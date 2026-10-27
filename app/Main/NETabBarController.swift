@@ -641,10 +641,10 @@ class NETabBarController: UITabBarController {
       }
       return navigation
     }
-    configuration.selectedTintColor = NEStyleManager.instance.isNormalStyle() ? .ne_normalTheme : .ne_funTheme
+    configuration.selectedTintColor = NEStyleManager.instance.isNormalStyle() ? .neUIKitDefaultPrimaryColor : .ne_funTheme
     configuration.railBackgroundColor = tabBar.backgroundColor ?? .white
     configuration.dividerColor = NEStyleManager.instance.isNormalStyle()
-      ? .normalContactNavigationDivideBg : .funContactDividerLineColor
+      ? .neUIKitDefaultNavigationDividerColor : .funContactDividerLineColor
     configuration.normalTintColor = UIColor(hexString: "#C5C9D2")
     configuration.backImage = CommonUIConfig.shared.backArrowImage
     configuration.backAccessibilityLabel = localizable("adaptive_back")
@@ -667,7 +667,7 @@ class NETabBarController: UITabBarController {
         conversation.selectConversation(conversationId: conversationId, animated: false)
       }
     }
-    shell.view.tintColor = NEStyleManager.instance.isNormalStyle() ? .ne_normalTheme : .ne_funTheme
+    shell.view.tintColor = NEStyleManager.instance.isNormalStyle() ? .neUIKitDefaultPrimaryColor : .ne_funTheme
     shell.conversationCoordinator.controllerFactory = { [weak self] intent in
       self?.makeAdaptiveConversation(intent)
     }
