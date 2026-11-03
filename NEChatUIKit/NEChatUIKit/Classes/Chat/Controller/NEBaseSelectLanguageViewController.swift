@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEChatKit
 import UIKit
 
 @objc
@@ -22,6 +23,18 @@ open class NEBaseSelectLanguageViewController: NEChatBaseViewController, UITable
 
   /// 当前选择语言，从外部传入
   public var currentContent = ""
+
+  /// 列内嵌入时的关闭回调；为 nil 时保持原 modal dismiss 语义。
+  public var columnDismissHandler: (() -> Void)?
+
+  override open func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    guard let columnDismissHandler else {
+      super.dismiss(animated: flag, completion: completion)
+      return
+    }
+    columnDismissHandler()
+    completion?()
+  }
 
   open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     viewModel.datas.count
@@ -72,6 +85,18 @@ open class NEBaseSelectLanguageViewController: NEChatBaseViewController, UITable
     }
     return tableView
   }()
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+    // 自适应宿主下语言面板按列内覆盖层登记过 dismiss，关闭时复位侧栏状态。
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidDismiss"), object: nil)
+  }
 
   /// UI 初始化
   open func setupLanguageUI() {

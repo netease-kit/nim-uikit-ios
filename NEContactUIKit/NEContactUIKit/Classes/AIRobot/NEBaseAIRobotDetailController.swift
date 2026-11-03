@@ -523,8 +523,10 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
   open func showConfirmAlert(tag: Int, title: String, desc: String,
                              confirmTitle: String, confirmColor: UIColor,
                              onConfirm: @escaping () -> Void) {
-    let overlay = UIView(frame: UIScreen.main.bounds)
+    let overlay = UIView(frame: view.bounds)
     overlay.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+    // 折叠/展开会改变窗口（或页面）尺寸：遮罩跟随重排。
+    overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     overlay.tag = tag
 
     let alertView = UIView()
@@ -617,7 +619,7 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
       confirmBtn.heightAnchor.constraint(equalToConstant: 44),
     ])
 
-    if let window = UIApplication.shared.keyWindow {
+    if let window = view.window ?? UIWindow.ne_activeKeyWindow {
       window.addSubview(overlay)
       overlay.frame = window.bounds
     } else {
@@ -635,7 +637,7 @@ open class NEBaseAIRobotDetailController: NEContactBaseViewController, UITableVi
   }
 
   open func removeAlert(tag: Int) {
-    (UIApplication.shared.keyWindow ?? view)?.subviews.first(where: { $0.tag == tag })?.removeFromSuperview()
+    (view.window ?? UIWindow.ne_activeKeyWindow ?? view).subviews.first(where: { $0.tag == tag })?.removeFromSuperview()
   }
 
   // MARK: - Helper

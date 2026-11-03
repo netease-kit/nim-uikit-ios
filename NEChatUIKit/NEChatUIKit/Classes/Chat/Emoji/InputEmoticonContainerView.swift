@@ -317,7 +317,7 @@ open class InputEmoticonContainerView: UIView {
       NEALog.errorLog(classTag, desc: "default emoji catalog is nil")
       return nil
     }
-    let layoutWidth = bounds.width > 0 ? bounds.width : UIScreen.main.bounds.width
+    let layoutWidth = bounds.width > 0 ? bounds.width : kScreenWidth
     let layout = NIMInputEmoticonLayout(width: layoutWidth)
     emoticonCatalog.layout = layout
     emoticonCatalog.pagesCount = numberOfPagesWithEmoticon(emoticonCatalog: emoticonCatalog)

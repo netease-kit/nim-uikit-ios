@@ -1,6 +1,6 @@
 ---
 name: swift-feature-removal
-description: 按维护清单完整移除 nim-uikit-ios Swift 开源 UI 组件和 Demo 中的已登记功能，包括入口、资源、接线和功能专属代码。当用户说“移除...功能”“去掉...功能”“删除...功能”且目标匹配登记名称或别名时自动使用，也支持显式调用 $swift-feature-removal；不要用于普通重构、未登记功能、旧 IMUIKit 副本或闭源 NEChatKit 修改。
+description: 按维护清单完整移除 nim-uikit-ios Swift 开源 UI 组件和 Demo 中的已登记功能，包括入口、资源、接线和功能专属代码。当用户说“移除...功能”“去掉...功能”“删除...功能”且目标匹配登记名称或别名时自动使用，也支持显式调用 $swift-feature-removal；不要用于普通重构、未登记功能或闭源 NEChatKit 修改。
 ---
 
 # Swift Feature Removal
@@ -12,10 +12,11 @@ description: 按维护清单完整移除 nim-uikit-ios Swift 开源 UI 组件和
 - 用户使用“移除...功能”“去掉...功能”“删除...功能”等明确删除表达，且目标命中登记名称或别名时，自动调用本技能；无需用户写 `$swift-feature-removal`。
 - 用户也可以显式调用 `$swift-feature-removal`。上述两种调用都已授权移除点名功能，不要重复询问是否删除。
 - 仅扫描和修改开源仓库的 `NEChatUIKit/` 与 `app/`。只有清单明确记录了真实 Demo 源码或资源引用时，才修改 `app.xcodeproj/`。
-- 不扫描、不打开、不修改 `NEChatKit/`、旧副本 `IMUIKit/`、Objective-C 或 SwiftUI 工程，也不得离开当前源码 checkout 追删其他实现。
+- 不扫描、不打开、不修改 `NEChatKit/`、Objective-C 或 SwiftUI 工程，也不得离开当前源码 checkout 追删其他实现。
 - 未登记功能不要自动套用本技能；先按“Register Future Features”建立 UI/Demo 清单。
 - 不提交、不推送，除非用户另外明确要求。
 - 保留 dirty worktree 中与目标需求无关的改动；禁止 reset、checkout 或按历史提交整体 revert。
+- 交付标准是客户拿到的最终代码：功能入口、实现、资源、路由与 ObjC/Swift 兼容层一并删除，不为“兼容”保留空壳类型、空 override 或仅剩转发的 @objc 声明。确有必须保留的公开符号时，只能在清单中显式登记并写明原因，不能默认保留。
 
 ## Registered Features
 
@@ -32,6 +33,20 @@ python3 skills/swift-feature-removal/scripts/audit_inventory.py --list
 python3 skills/swift-feature-removal/scripts/audit_inventory.py <feature> --phase before
 # skill 尚未放入目标仓库时：追加 --repo /absolute/path/to/checkout
 ```
+
+审计优先用 `rg`（ripgrep）加速残留扫描；目标机器没装 ripgrep 时脚本自动回退到内置纯 Python 扫描，结果一致，不需要额外安装。
+
+## 编译陷阱（实测，10.9.75 移除 Last Read 时踩过）
+
+- 删除源码文件后必须重跑 `pod install --no-repo-update`。否则构建直接失败：
+  `Build input file cannot be found: <被删文件>`——Pods 工程缓存了旧文件列表，这一步不能省。
+- 不要用大括号配对脚本或正则批量删除 Swift 方法。实测会残留孤立的 `@nonobjc` / `@objc`
+  属性和文档注释，编译报 `Duplicate attribute`；也会误删仍被其他功能使用的通用属性。
+  逐处 `apply_patch`，删除后检查：孤立属性/注释、空 `else` 分支、空 `guard`、多个连续 `@nonobjc`。
+- 只被某个观察器调用的通用属性要保留属性本身，只删观察器里的调用
+  （例如 `ChatViewModel.anchor` 只删 `didSet` 里的 `refreshLastReadPositionAnchorSuppression()`）。
+- 删完后必须真正编译，至少构建 `NEChatUIKit` target 和 `app`；`swiftc -parse` 不能替代。
+批量替换三元表达式也会吞掉行尾的 `)`、`,` 等符号（实测 `constant: 0 : 60),` 被截断），替换后必须编译验证。
 
 ## Removal Workflow
 
@@ -57,7 +72,7 @@ python3 skills/swift-feature-removal/scripts/audit_inventory.py <feature> --phas
 
 ## Register Future Features
 
-用户要求把新需求纳入本技能时，只在开源仓库 `NEChatUIKit/` 和 `app/` 内按 [references/manifest-template.md](references/manifest-template.md) 做一次完整发现并建立清单。不要扫描 `IMUIKit/` 或 `NEChatKit/`。新增需求必须同时：
+用户要求把新需求纳入本技能时，只在开源仓库 `NEChatUIKit/` 和 `app/` 内按 [references/manifest-template.md](references/manifest-template.md) 做一次完整发现并建立清单。不要扫描 `NEChatKit/`。新增需求必须同时：
 
 - 在 `references/registry.md` 登记名称和别名。
 - 新建 `references/features/<slug>.md`，记录删除项、共享边界、交叉需求和验证条件。

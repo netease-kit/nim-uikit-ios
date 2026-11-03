@@ -14,7 +14,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   /// otherwise make UIKit use the column as the presentation container.
   open func presentDuoPreview(_ controller: UIViewController, animated: Bool,
                               completion: (() -> Void)? = nil) {
-    guard NEAdaptiveDeviceGate.isFoldableDevice,
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive,
           let root = view.window?.rootViewController,
           root !== self else {
       present(controller, animated: animated, completion: completion)
@@ -29,7 +29,7 @@ open class NEChatBaseViewController: UIViewController, UIGestureRecognizerDelega
   }
 
   open var documentPreviewPresenter: UIViewController {
-    guard NEAdaptiveDeviceGate.isFoldableDevice,
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive,
           let root = view.window?.rootViewController else { return self }
     return root
   }

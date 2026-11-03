@@ -256,7 +256,7 @@ open class FunChatInputView: NEBaseChatInputView {
       if let cgImage = UIImage.ne_imageNamed(name: "fun_ai_back")?.cgImage {
         aiChatViewController.view.layer.contents = cgImage
         aiChatViewController.view.layer.contentsGravity = .resizeAspectFill // 内容填充模式
-        aiChatViewController.view.layer.contentsScale = UIScreen.main.scale // 适配 Retina 屏幕
+        aiChatViewController.view.layer.contentsScale = traitCollection.displayScale // 适配 Retina 屏幕
       }
     } else {
       aiChatViewController.view.layer.contents = nil

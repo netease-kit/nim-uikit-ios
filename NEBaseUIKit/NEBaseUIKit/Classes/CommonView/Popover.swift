@@ -98,7 +98,7 @@ open class Popover: UIView {
   }
 
   open func showAsDialog(_ contentView: UIView) {
-    guard let rootView = UIApplication.shared.keyWindow else {
+    guard let rootView = UIWindow.ne_activeKeyWindow else {
       return
     }
     showAsDialog(contentView, inView: rootView)
@@ -112,7 +112,7 @@ open class Popover: UIView {
   }
 
   open func show(_ contentView: UIView, fromView: UIView) {
-    guard let rootView = UIApplication.shared.keyWindow else {
+    guard let rootView = fromView.window ?? UIWindow.ne_activeKeyWindow else {
       return
     }
     show(contentView, fromView: fromView, inView: rootView)
@@ -166,7 +166,7 @@ open class Popover: UIView {
   }
 
   open func show(_ contentView: UIView, point: CGPoint) {
-    guard let rootView = UIApplication.shared.keyWindow else {
+    guard let rootView = UIWindow.ne_activeKeyWindow else {
       return
     }
     show(contentView, point: point, inView: rootView)

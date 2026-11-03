@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
   YXConfig.pod_target_xcconfig(s)
 
   s.source = { :git => "https://github.com/netease-kit/" }
-  s.source_files = 'Sources/NEAdaptiveUIKit/**/*.swift'
+  s.source_files = 'NEAdaptiveUIKit/Classes/**/*.swift'
 
 end

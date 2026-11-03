@@ -17,6 +17,15 @@ public func commonLocalizable(_ key: String) -> String {
 public let useSystemNav = "useSystemNav"
 
 public enum NEAdaptiveDeviceGate {
+  /// 宿主是否已装配自适应外壳。页面只读取这个能力标记，不再用机型决定尺寸。
+  /// 由 `NETabBarController` 在首次组装根页面之前写入；未显式设置的宿主
+  /// 继续回退到原有门禁，保证 SDK 独立接入时的行为不变。
+  private static var adaptiveHostOverride: Bool?
+  public static var isAdaptiveHostActive: Bool {
+    get { adaptiveHostOverride ?? isFoldableDevice }
+    set { adaptiveHostOverride = newValue }
+  }
+
   /// 机型判定：只作为几何无法确认时的补充信号（Duo 的机型标识符）。
   /// Simulator 名称可被修改，因此只接受机型标识符这一个模拟器信号。
   public static func isFoldable(identifier: String, simulatorModelIdentifier: String?, isSimulator: Bool) -> Bool {

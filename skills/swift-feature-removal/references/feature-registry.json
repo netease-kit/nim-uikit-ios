@@ -48,6 +48,7 @@
       "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/MessageOperationView.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/ChatViewModel.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCChat.swift",
       "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/NormalChatMessageBaseCell.swift",
       "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageTextCell.swift",
       "NEChatUIKit/NEChatUIKit/Classes/NormalUI/Cell/ChatMessageRichTextCell.swift",
@@ -104,6 +105,8 @@
       "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/ChatViewModel.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/TopicChatViewModel.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCChat.swift",
+      "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCModels.swift",
       "NEChatUIKit/NEChatUIKit/Classes/FunUI/Controller/FunChatViewController.swift"
     ],
     "residual": {
@@ -115,9 +118,7 @@
         "NELastReadPosition|LastReadPosition|lastReadPosition",
         "enableLastReadPosition|last_read_position"
       ],
-      "allowed_paths": [
-        "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift"
-      ]
+      "allowed_paths": []
     }
   }
 }

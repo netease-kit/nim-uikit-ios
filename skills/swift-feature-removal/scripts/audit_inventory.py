@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -99,6 +100,38 @@ def existing_paths(repo_root, paths):
     return [path for path in paths if (repo_root / path).exists()]
 
 
+SKIPPED_SCAN_DIRS = {".git", "Pods", "build", "DerivedData", ".build", "xcuserdata"}
+
+
+def python_residual_scan(repo_root, roots, patterns):
+    """Pure-Python fallback used when ripgrep is unavailable.
+
+    Mirrors the rg invocation below: per-file regex search under the registered
+    roots, skipping VCS/CocoaPods/build output and binary files.
+    """
+    compiled = [re.compile(pattern) for pattern in patterns]
+    hits = set()
+    for root in roots:
+        base = repo_root / root
+        candidates = [base] if base.is_file() else sorted(base.rglob("*"))
+        for path in candidates:
+            if not path.is_file():
+                continue
+            relative = path.relative_to(repo_root)
+            if SKIPPED_SCAN_DIRS.intersection(relative.parts):
+                continue
+            try:
+                data = path.read_bytes()
+            except OSError:
+                continue
+            if b"\0" in data:
+                continue
+            text = data.decode("utf-8", errors="ignore")
+            if any(pattern.search(text) for pattern in compiled):
+                hits.add(str(relative))
+    return sorted(hits)
+
+
 def residual_files(repo_root, residual):
     roots = [root for root in residual.get("roots", []) if (repo_root / root).exists()]
     patterns = residual.get("patterns", [])
@@ -119,9 +152,12 @@ def residual_files(repo_root, residual):
     for pattern in patterns:
         command.extend(["-e", pattern])
     command.extend(roots)
-    result = subprocess.run(command, cwd=repo_root, capture_output=True, text=True)
+    try:
+        result = subprocess.run(command, cwd=repo_root, capture_output=True, text=True)
+    except FileNotFoundError:
+        return python_residual_scan(repo_root, roots, patterns)
     if result.returncode not in (0, 1):
-        raise RuntimeError(result.stderr.strip() or "rg failed")
+        return python_residual_scan(repo_root, roots, patterns)
     return sorted({line.strip() for line in result.stdout.splitlines() if line.strip()})
 
 

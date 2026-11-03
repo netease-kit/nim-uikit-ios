@@ -32,7 +32,7 @@ open class FunTeamIntroduceViewController: NEBaseTeamIntroduceViewController {
 
     NSLayoutConstraint.activate([
       clearButton.rightAnchor.constraint(equalTo: backView.rightAnchor, constant: -16),
-      clearButton.bottomAnchor.constraint(equalTo: countLabel.topAnchor, constant: -6),
+      clearButton.centerYAnchor.constraint(equalTo: backView.centerYAnchor),
       clearButton.widthAnchor.constraint(equalToConstant: 16),
       clearButton.heightAnchor.constraint(equalToConstant: 16),
     ])

@@ -254,7 +254,7 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
       separatorLine.topAnchor.constraint(equalTo: topAnchor, constant: 34),
     ])
 
-    if let width = UIApplication.shared.keyWindow?.width {
+    if let width = UIWindow.ne_activeKeyWindow?.width {
       showTranslateContentText.frame = CGRectMake(12, 46, width - 112, 20)
     }
 
@@ -345,8 +345,8 @@ open class NEAITranslateView: UIView, NEGrowingTextViewDelegate {
     if let textView = chatInputText {
       if textView.attributedText.length > 0 {
         if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-          UIApplication.shared.keyWindow?.endEditing(true)
-          UIApplication.shared.keyWindow?.ne_baseMakeToast(commonLocalizable("network_error"))
+          window?.endEditing(true)
+          window?.ne_baseMakeToast(commonLocalizable("network_error"))
           return
         }
         delegate?.didStartClick?()

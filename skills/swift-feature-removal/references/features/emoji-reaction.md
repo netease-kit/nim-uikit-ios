@@ -2,7 +2,7 @@
 
 ## Boundary
 
-移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `app/` 中的“表情评论”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Reaction API 的接线。旧 `IMUIKit/` 副本、Objective-C 和 SwiftUI 工程不属于本技能。
+移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `app/` 中的“表情评论”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Reaction API 的接线。Objective-C 和 SwiftUI 工程不属于本技能。
 
 核心名称包括 `MessageReaction*`、`NEMessageReaction*`、`reactionGroups`、`reactionHeight`、`enableEmojiReaction`、Quick Comment。
 
@@ -45,7 +45,7 @@
 
 - `MessageContentModel.swift`：删除 `reactionGroups`、`reactionHeight`、`hasReaction` 及撤回/复用时的 Reaction 清理；保持原始 `height` 计算和撤回状态。
 - `MessageOperationView.swift`：删除 Reaction strip 的常量、collection views、展开按钮、provider/items、`configureReactions`、Reaction data source/delegate 分支和 `MessageReactionEmojiCell`。普通 operation grid 必须恢复为唯一布局来源。
-- `NEChatUIKitObjCBridge.swift`：删除 `NEChatUIKitReactionProviderAdapter` 及 `MessageOperationView.objcConfigureReactions` 扩展。不要进入闭源组件追删其公开类型。
+- `NEChatUIKitObjCChat.swift`：删除 `NEChatUIKitReactionProviderAdapter`、`MessageOperationView.objcConfigureReactions` 扩展及仅被它们引用的私有辅助，不保留 ObjC 兼容外壳；`NEChatUIKitObjCBridge.swift` 若出现 Reaction 声明同样删除。不要进入闭源组件追删其公开类型。
 
 ### Base Message Cell
 
@@ -101,11 +101,13 @@ FunUI 必须恢复其微信气泡 tail、媒体遮罩和文本内边距，不要
 - 不搜索、不打开、不修改 `NEChatKit/`。`MessageReactionManager`、`enableEmojiReaction`、Reaction 专属 Quick Comment wrapper、事件转发及颜色 token 均视为闭源能力。
 - UI/Demo 中对上述能力的 import、属性、回调和调用必须删除；闭源符号定义保留不动。
 - 当前开源基线 `ChatViewModel` 中已有通用 Quick Comment 通知日志。不要仅因出现 `quickComment` / `QuickComment` 就删除；只有清单点名的 Reaction UI 接线才属于本功能。
-- 不扫描或修改旧 `IMUIKit/` 副本、Objective-C 或 SwiftUI 工程。
+- 不扫描或修改 Objective-C 或 SwiftUI 工程。
 
 ## Verification
 
-1. `audit_inventory.py emoji-reaction --phase after` 无非允许残留。
+交叉边界：保留 `NEChatViewport`、`applyViewport` 和窗口宽度变化引起的通用布局失效；只移除本功能的测量/布局分支。可选 adaptive shell 的 Router 接线属于独立 `adaptive-shell` 清单，不随本功能删除。
+
+1. `audit_inventory.py emoji-reaction --phase after` 不允许任何残留（含 ObjC 适配层）。
 2. Swift UIKit 资源目录中不再有 `reaction_emoji` 和三个 operation imageset。
 3. `git diff --check` 通过；对修改的 Swift 文件运行 `swiftc -frontend -parse` 或构建 `NEChatUIKit`。
 4. 运行时检查 NormalUI/FunUI：普通长按菜单无 Reaction 区域；文本、富文本、语音转文字、图片、视频、文件、位置、合并转发、撤回、话单、AIStream 无额外空白或复用残影。

@@ -2,7 +2,7 @@
 
 每个新增需求使用一个稳定的 kebab-case slug，并建立 `references/features/<slug>.md`。清单至少包含：
 
-1. **边界**：只允许开源仓库的 `NEChatUIKit/` 和 `app/`；`NEChatKit/`、旧 `IMUIKit/`、OC、SwiftUI 固定排除。
+1. **边界**：只允许开源仓库的 `NEChatUIKit/` 和 `app/`；`NEChatKit/`、OC、SwiftUI 固定排除。
 2. **整项删除**：完整文件、目录、图片、asset。
 3. **局部编辑**：文件路径、要删的类型/属性/方法/调用锚点、必须保留的相邻行为。
 4. **入口**：Demo 配置、路由、点击/长按菜单、公开 API、兼容桥。

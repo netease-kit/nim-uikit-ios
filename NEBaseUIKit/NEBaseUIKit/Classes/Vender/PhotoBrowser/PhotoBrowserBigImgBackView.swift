@@ -51,7 +51,7 @@ open class PhotoBrowserBigImgBackView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice,
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive,
           let container = superview,
           container.bounds.width > 0,
           container.bounds.height > 0 else { return }
@@ -123,7 +123,7 @@ open class PhotoBrowserBigImgBackView: UIView {
   }
 
   public func currentIndex() -> Int {
-    let width = NEAdaptiveDeviceGate.isFoldableDevice ? max(1, bounds.width) : NEConstant.screenWidth
+    let width = NEAdaptiveDeviceGate.isAdaptiveHostActive ? max(1, bounds.width) : NEConstant.screenWidth
     return Int(collectionView.contentOffset.x / width)
   }
 

@@ -9,7 +9,7 @@
 "team_nick"="我在群里的昵称";
 "team_no_speak"="群禁言";
 "invitation_acceptance_requirement"="入群邀请需同意";
-"invitation_acceptance_requirement_desc"="开启后，拉入入群，需被邀请人同意后才可成功";
+"invitation_acceptance_requirement_desc"="开启后，拉人入群，需被邀请人同意后才可成功";
 "require_verification_to_join"="入群审核";
 "require_verification_to_join_desc"="开启后，成员入群时需要群主或管理同意后才可加入";
 "setting"="设置";

@@ -40,7 +40,7 @@ open class CopyableLabel: NELinkableLabel {
     }
 
     UIMenuController.shared.setMenuVisible(false, animated: true)
-    UIApplication.shared.keyWindow?.neMakeToast(commonLocalizable("copy_success"), position: .center)
+    window?.neMakeToast(commonLocalizable("copy_success"), position: .center)
   }
 
   override open func copy(_ sender: Any?) {

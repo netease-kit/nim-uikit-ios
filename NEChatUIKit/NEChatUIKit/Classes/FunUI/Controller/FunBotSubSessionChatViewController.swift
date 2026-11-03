@@ -126,7 +126,7 @@ open class FunBotSubSessionChatViewController: FunP2PChatViewController, TopicCh
       controller?.dismiss(animated: false)
       self?.showDeleteAlert()
     }
-    // 微信皮肤：展开双栏时底部弹窗只覆盖右列，折叠外屏保持窗口级呈现。
+    // FunUI：展开双栏时底部弹窗只覆盖右列，折叠外屏保持窗口级呈现。
     showBottomSheetInDetailColumn(controller, animated: false)
   }
 

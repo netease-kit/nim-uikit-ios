@@ -2,12 +2,24 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
-import UIKit
 import NEBaseUIKit
+import NEChatKit
+import UIKit
 
 private let conversationGroupNameMaxLength = 20
 
 final class NEConversationGroupNameSheetController: UIViewController, UITextFieldDelegate {
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    // 列内弹层出现/消失时通知自适应侧栏重新解析，避免继续显示底层页面动作。
+    notifyColumnPresentationChanged()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    notifyColumnPresentationChanged()
+  }
+
   private let complete: (String) -> Void
   private let sheetTitle: String
   private let initialName: String?
@@ -48,6 +60,9 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
   /// 作为"列内子页面"呈现：跟随右列宽度，折叠/展开时随列一起缩放，不依赖系统模态。
   func presentAsColumnSheet(in parent: UIViewController) {
     modalPresentationStyle = .overCurrentContext
+    // 声明为"列内覆盖页"：自适应外壳据此把本页作为侧栏承载页，由侧栏接管
+    // 返回/保存入口，避免侧栏继续展示被覆盖页面（分组管理/分组设置）的按钮。
+    view.accessibilityIdentifier = "id.adaptive.columnOverlay"
     parent.addChild(self)
     view.frame = parent.view.bounds
     view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -55,6 +70,7 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
     didMove(toParent: parent)
     view.alpha = 0
     UIView.animate(withDuration: 0.2) { self.view.alpha = 1 }
+    notifyColumnPresentationChanged()
   }
 
   /// 关闭：子页面形式则从父控制器移除，否则回退到 modal dismiss。
@@ -66,12 +82,20 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
     if !animated {
       view.removeFromSuperview()
       removeFromParent()
+      notifyColumnPresentationChanged()
       return
     }
     UIView.animate(withDuration: 0.2, animations: { self.view.alpha = 0 }) { _ in
       self.view.removeFromSuperview()
       self.removeFromParent()
+      self.notifyColumnPresentationChanged()
     }
+  }
+
+  /// 列内嵌页面不参与导航栈，出现/消失不会触发侧栏重解析，需显式通知，
+  /// 否则侧栏无法在表单出现时接管入口、关闭时恢复底层页面入口。
+  private func notifyColumnPresentationChanged() {
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
   }
 
   override func viewDidLoad() {
@@ -130,20 +154,21 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
       container.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: heightRatio),
     ])
 
-    let cancel = UIButton(type: .custom)
+    // 返回入口与导航栏共用统一返回箭头，原「取消」只保留为无障碍标签。
+    let cancel = NEUnifiedBackButton(accessibilityLabel: localizable("cancel"))
+    cancel.accessibilityIdentifier = "id.cancel"
     let titleLabel = UILabel()
     for item in [cancel, done, titleLabel, textField, countLabel] {
       item.translatesAutoresizingMaskIntoConstraints = false
       container.addSubview(item)
     }
 
-    cancel.setTitle(localizable("cancel"), for: .normal)
-    cancel.setTitleColor(style.tertiaryTextColor, for: .normal)
-    cancel.titleLabel?.font = .systemFont(ofSize: 16)
     cancel.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
     done.setTitle(localizable("confirm"), for: .normal)
     done.setTitleColor(style.primaryColor, for: .normal)
     done.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+    // 供自适应侧栏识别并投影「确定」入口。
+    done.accessibilityIdentifier = "id.sureButton"
     done.addTarget(self, action: #selector(doneAction), for: .touchUpInside)
     titleLabel.text = sheetTitle
     titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
@@ -171,8 +196,6 @@ final class NEConversationGroupNameSheetController: UIViewController, UITextFiel
     NSLayoutConstraint.activate([
       cancel.leftAnchor.constraint(equalTo: container.leftAnchor, constant: 16),
       cancel.topAnchor.constraint(equalTo: container.topAnchor, constant: 16),
-      cancel.widthAnchor.constraint(equalToConstant: 60),
-      cancel.heightAnchor.constraint(equalToConstant: 32),
       done.rightAnchor.constraint(equalTo: container.rightAnchor, constant: -16),
       done.centerYAnchor.constraint(equalTo: cancel.centerYAnchor),
       done.widthAnchor.constraint(equalToConstant: 60),

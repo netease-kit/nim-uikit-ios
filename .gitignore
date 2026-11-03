@@ -114,3 +114,6 @@ Podfile.lock
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,cocoapods,xcode
+
+# Python bytecode from the skills' audit scripts
+__pycache__/

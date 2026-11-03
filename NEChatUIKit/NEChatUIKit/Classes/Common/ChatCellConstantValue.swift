@@ -36,10 +36,10 @@ public let chat_reply_height: CGFloat = 16.0
 public let fun_chat_reply_height: CGFloat = 44.0
 
 // 气泡最大宽度
-public let chat_content_maxW: CGFloat = (kScreenWidth - 156)
+public var chat_content_maxW: CGFloat { kScreenWidth - 156 }
 
 // 文本内容最大宽度
-public let chat_text_maxW: CGFloat = chat_content_maxW - 2 * chat_content_margin
+public var chat_text_maxW: CGFloat { chat_content_maxW - 2 * chat_content_margin }
 
 // pin消息需要增加的高度
 public let chat_pin_height: CGFloat = 16.0
@@ -48,7 +48,7 @@ public let chat_pin_height: CGFloat = 16.0
 public let chat_full_name_height: CGFloat = 16.0
 
 // 语音消息最大宽度
-public let audio_max_width = kScreenWidth <= 325 ? 230 : 265.0
+public var audio_max_width: CGFloat { kScreenWidth <= 325 ? 230 : 265.0 }
 
 // AI 助聊区域高度
 public let ai_chat_view_height: CGFloat = 234

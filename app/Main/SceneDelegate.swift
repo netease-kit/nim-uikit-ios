@@ -91,18 +91,17 @@ private final class NELoginContainerViewController: UIViewController {
 }
 
 class SceneDelegate: UIResponder {
-  static var window: UIWindow?
+  /// 每个 scene 持有自己的窗口，避免多 scene 时复用第一个 scene 的窗口。
+  var window: UIWindow?
   private var voipPushRegistry: PKPushRegistry?
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
-    if Self.window == nil {
-      let window = UIWindow(windowScene: windowScene)
-      Self.window = window
-    }
-    Self.window!.rootViewController = ViewController()
-    Self.window!.makeKeyAndVisible()
+    let window = UIWindow(windowScene: windowScene)
+    self.window = window
+    window.rootViewController = ViewController()
+    window.makeKeyAndVisible()
 
     NotificationCenter.default.addObserver(self, selector: #selector(refreshRoot), name: Notification.Name("logout"), object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(refreshUIStyle), name: Notification.Name(CHANGE_UI), object: nil)
@@ -201,7 +200,7 @@ class SceneDelegate: UIResponder {
       weakSelf?.initConfig()
       weakSelf?.initializePage()
     }
-    SceneDelegate.window?.rootViewController = NELoginContainerViewController(rootViewController: loginCtrl)
+    window?.rootViewController = NELoginContainerViewController(rootViewController: loginCtrl)
   }
 
   func initConfig() {
@@ -222,9 +221,9 @@ class SceneDelegate: UIResponder {
     }
 
     // 注册呼叫路由，ChatViewController 的 CallViewRouter 入口依赖此处理器。
-    Router.shared.register(CallViewRouter) { param in
+    Router.shared.register(CallViewRouter) { [weak self] param in
       if NEChatDetectNetworkTool.shareInstance.manager?.isReachable == false {
-        UIApplication.shared.keyWindow?.neMakeToast(commonLocalizable("network_error"), duration: 2, position: .center)
+        self?.window?.neMakeToast(commonLocalizable("network_error"), duration: 2, position: .center)
         return
       }
 
@@ -240,13 +239,13 @@ class SceneDelegate: UIResponder {
   func initializePage(_ isLoginInit: Bool = false) {
     loadService()
     let tab = NETabBarController(isLoginInit)
-    SceneDelegate.window?.rootViewController = tab
+    window?.rootViewController = tab
   }
 
   func windowScene(_ windowScene: UIWindowScene, didUpdate previousCoordinateSpace: UICoordinateSpace,
                    interfaceOrientation previousInterfaceOrientation: UIInterfaceOrientation,
                    traitCollection previousTraitCollection: UITraitCollection) {
-    (SceneDelegate.window?.rootViewController as? NETabBarController)?.adaptiveShell?.refreshWindow()
+    (window?.rootViewController as? NETabBarController)?.adaptiveShell?.refreshWindow()
   }
 
   // regist router
@@ -338,7 +337,7 @@ class SceneDelegate: UIResponder {
         IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
           if let err = error {
             NEALog.infoLog(SceneDelegate.className(), desc: "login IM error : \(err.localizedDescription)")
-            SceneDelegate.window?.neMakeToast(err.localizedDescription)
+            self?.window?.neMakeToast(err.localizedDescription)
             self?.loginWithUI()
           } else {
             NEALog.infoLog(SceneDelegate.className(), desc: "login IM Success")
@@ -365,7 +364,7 @@ class SceneDelegate: UIResponder {
       IMKitClient.instance.login(accountId, accountIdToken, nil) { [weak self] error in
         if let err = error {
           NEALog.infoLog(SceneDelegate.className(), desc: "login IM error : \(err.localizedDescription)")
-          SceneDelegate.window?.neMakeToast(err.localizedDescription)
+          self?.window?.neMakeToast(err.localizedDescription)
           self?.loginWithUI()
         } else {
           NEALog.infoLog(SceneDelegate.className(), desc: "login IM Success")
@@ -385,8 +384,8 @@ class SceneDelegate: UIResponder {
     center.delegate = self
     center.requestAuthorization(options: [.badge, .sound, .alert]) { grant, error in
       if grant == false {
-        DispatchQueue.main.async {
-          Self.window?.neMakeToast(localizable("open_push"))
+        DispatchQueue.main.async { [weak self] in
+          self?.window?.neMakeToast(localizable("open_push"))
         }
       }
     }
@@ -473,14 +472,14 @@ extension SceneDelegate: AIUserAgentProvider {
 extension SceneDelegate: NEIMKitClientListener {
   func onLoginFailed(_ error: V2NIMError) {
     if error.code == userBannedCode {
-      SceneDelegate.window?.neMakeToast(localizable("account_forbidden"))
+      window?.neMakeToast(localizable("account_forbidden"))
       loginWithUI()
     }
   }
 
   func onKickedOffline(_ detail: V2NIMKickedOfflineDetail) {
     if detail.reason == .KICKED_OFFLINE_REASON_SERVER {
-      SceneDelegate.window?.neMakeToast(localizable("account_kicked_offline"))
+      window?.neMakeToast(localizable("account_kicked_offline"))
       loginWithUI()
     }
   }
@@ -513,7 +512,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     // 获取 sessionId 和 type
     if let sessionId = userInfo["sessionId"] as? String,
        let sessionType = userInfo["sessionType"] as? String {
-      let tabBar = SceneDelegate.window?.rootViewController as? NETabBarController
+      let tabBar = window?.rootViewController as? NETabBarController
       tabBar?.adaptiveShell?.selectSection(0)
       let navigation = tabBar?.adaptiveShell?.sections.first ?? tabBar?.viewControllers?[tabBar?.selectedIndex ?? 0] as? UINavigationController
       let adaptivePresentation = tabBar?.adaptiveShell != nil

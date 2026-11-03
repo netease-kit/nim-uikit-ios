@@ -122,14 +122,14 @@ open class FunRecordAudioView: UIView {
   }
 
   open func setupUI() {
-    if !NEAdaptiveDeviceGate.isFoldableDevice {
-      let totalWidth = UIScreen.main.bounds.width - maxRecordProgressMargin * 2 - minRecordProgressWidth
+    if !NEAdaptiveDeviceGate.isAdaptiveHostActive {
+      let totalWidth = kScreenWidth - maxRecordProgressMargin * 2 - minRecordProgressWidth
       let delta = CGFloat(maxDuration - lastTimeDuration)
       progressWidthIncreaseFactor = totalWidth / delta
     }
     backgroundColor = UIColor.funRecordAudioViewBg.withAlphaComponent(0.7)
     addSubview(recordGestureArea)
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       let gestureHeight = recordGestureArea.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 128.0 / 375.0)
       gestureHeight.priority = .defaultHigh
       NSLayoutConstraint.activate([
@@ -202,10 +202,10 @@ open class FunRecordAudioView: UIView {
     ])
 
     weak var weakSelf = self
-    let finalWidth = UIScreen.main.bounds.width - maxRecordProgressMargin * 2
+    let finalWidth = kScreenWidth - maxRecordProgressMargin * 2
     let animDuration = TimeInterval(maxDuration - lastTimeDuration)
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-      guard NEAdaptiveDeviceGate.isFoldableDevice else {
+      guard NEAdaptiveDeviceGate.isAdaptiveHostActive else {
         weakSelf?.progressWidthConstraint?.constant = finalWidth
         UIView.animate(withDuration: animDuration) { weakSelf?.layoutIfNeeded() }
         return
@@ -228,7 +228,7 @@ open class FunRecordAudioView: UIView {
   }
 
   static func getGestureHeight() -> CGFloat {
-    UIScreen.main.bounds.width / 375.0 * 128.0
+    kScreenWidth / 375.0 * 128.0
   }
 
   open func changeToCancelStyle() {

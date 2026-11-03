@@ -19,6 +19,8 @@ public class PersonInfoViewController: NEBaseViewController,
   ]
   private var viewModel = PersonInfoViewModel()
   private var className = "PersonInfoViewController"
+  /// 折叠屏列内覆盖承载：生日选择器展示期间存在，用于侧栏接管入口与关闭同步。
+  private weak var birthdayPickerOverlay: UIViewController?
 
   lazy var tableView: UITableView = {
     let tableView = UITableView()
@@ -132,7 +134,6 @@ public class PersonInfoViewController: NEBaseViewController,
   }
 
   func showDatePicker() {
-    view.addSubview(pickerView)
     pickerView.timeCallBack = { [weak self] time in
       if let t = time {
         self?.viewModel.updateSelfBirthday(t) { error in
@@ -146,12 +147,56 @@ public class PersonInfoViewController: NEBaseViewController,
         }
       }
     }
+    if mountBirthdayPickerOverlayIfNeeded() { return }
+    pickerView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(pickerView)
     NSLayoutConstraint.activate([
       pickerView.leftAnchor.constraint(equalTo: view.leftAnchor),
       pickerView.rightAnchor.constraint(equalTo: view.rightAnchor),
       pickerView.topAnchor.constraint(equalTo: view.topAnchor),
       pickerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
+  }
+
+  /// 折叠屏：生日选择器作为列内覆盖页承载，页面的「取消 / 确定」由侧栏承接；
+  /// 非折叠（或未装配自适应外壳）保持原来的页面内弹层，不改变现有表现。
+  private func mountBirthdayPickerOverlayIfNeeded() -> Bool {
+    if let existing = birthdayPickerOverlay {
+      // 重复点开时复用承载页，避免叠加遮罩；宽高按当前列尺寸重算。
+      pickerView.frame = existing.view.bounds
+      return true
+    }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive,
+          let host = viewIfLoaded, host.window != nil else { return false }
+    let overlay = UIViewController()
+    overlay.view.backgroundColor = .clear
+    overlay.view.accessibilityIdentifier = "id.adaptive.columnOverlay"
+    addChild(overlay)
+    overlay.view.frame = host.bounds
+    overlay.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    host.addSubview(overlay.view)
+    overlay.didMove(toParent: self)
+    birthdayPickerOverlay = overlay
+
+    pickerView.translatesAutoresizingMaskIntoConstraints = true
+    pickerView.frame = overlay.view.bounds
+    pickerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    pickerView.onDismiss = { [weak self] in self?.detachBirthdayPickerOverlay() }
+    overlay.view.addSubview(pickerView)
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                    object: overlay)
+    return true
+  }
+
+  private func detachBirthdayPickerOverlay() {
+    guard let overlay = birthdayPickerOverlay else { return }
+    birthdayPickerOverlay = nil
+    pickerView.onDismiss = nil
+    overlay.willMove(toParent: nil)
+    overlay.view.removeFromSuperview()
+    overlay.removeFromParent()
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                    object: self)
   }
 
   // MARK: UIImagePickerControllerDelegate

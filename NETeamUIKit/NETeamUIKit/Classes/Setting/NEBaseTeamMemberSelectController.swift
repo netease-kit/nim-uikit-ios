@@ -97,7 +97,11 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
     }
     let canSubmit = !viewModel.isLoadingMembers && viewModel.memberLoadError == nil
     navigationView.moreButton.isEnabled = canSubmit
-    navigationView.moreButton.alpha = canSubmit ? 1 : 0.45
+    // 侧栏承载时该入口由外壳按 alpha=0 隐藏；成员异步加载完成后的刷新不能
+    // 把 alpha 重置回 1，否则页面内与侧栏会同时出现「确定」。
+    if navigationView.moreButton.alpha > 0 {
+      navigationView.moreButton.alpha = canSubmit ? 1 : 0.45
+    }
     updateMemberLoadStatus()
     reloadPreservingTopMember()
   }
@@ -262,13 +266,17 @@ open class NEBaseTeamMemberSelectController: NETeamBaseViewController, UITableVi
 
   /// 选择成员变更回调，内部根据选择数量来做右上角状态变更
   open func didChangeSelectMember() {
-    if !viewModel.selectDic.isEmpty {
+    // 单选场景（如聊天记录按群成员搜索）选择人数恒为 1，不展示计数，
+    // 避免「确定(1)」和侧栏角标造成多选语义误导。
+    if selectCountLimit > 1, !viewModel.selectDic.isEmpty {
       let title = commonLocalizable("sure") + "(\(viewModel.selectDic.count))"
       navigationView.moreButton.setTitle(title, for: .normal)
       navigationView.setMoreButtonWidth(90)
     } else {
       navigationView.moreButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
+    // 折叠屏侧栏镜像右侧按钮文案，数量变化需要通知外部容器刷新。
+    navigationView.notifyActionsChanged()
   }
 
   /// 刷新回调

@@ -204,7 +204,7 @@ open class NEBaseCollectionMessageCell: UITableViewCell {
       }
     }
 
-    contentWidth?.constant = NEAdaptiveDeviceGate.isFoldableDevice && bounds.width > 0
+    contentWidth?.constant = NEAdaptiveDeviceGate.isAdaptiveHostActive && bounds.width > 0
       ? min(model.chatmodel.contentSize.width, max(16, bounds.width - 72))
       : model.chatmodel.contentSize.width
     contentHeight?.constant = model.chatmodel.contentSize.height

@@ -112,7 +112,7 @@ class MineSettingViewController: NEBaseViewController, UITableViewDataSource, UI
     logoutButton.accessibilityIdentifier = "id.logout"
     if NEStyleManager.instance.isNormalStyle() {
       logoutButton.layer.cornerRadius = 8.0
-      if NEAdaptiveDeviceGate.isFoldableDevice { logoutButton.autoresizingMask = [.flexibleWidth] }
+      if NEAdaptiveDeviceGate.isAdaptiveHostActive { logoutButton.autoresizingMask = [.flexibleWidth] }
       logoutButton.frame = CGRect(x: 20, y: 12, width: view.frame.size.width - 40, height: 40)
     } else {
       logoutButton.translatesAutoresizingMaskIntoConstraints = false

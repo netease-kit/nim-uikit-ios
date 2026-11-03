@@ -5,7 +5,7 @@ description: 按维护清单从 nim-uikit-ios 开源 Swift UIKit UI 组件和示
 
 # Swift Skin Removal
 
-本 skill 随开源源码发布。用户只需说“移除 Swift UIKit 的飞书/NormalUI 皮肤”或“移除微信/FunUI 皮肤”，无需提供路径。删除的是**点名皮肤**，保留另一套的 UI/消息业务能力。仅处理仓库根的 `NEBaseUIKit/`、`NEChatUIKit/`、`NEContactUIKit/`、`NEConversationUIKit/`、`NELocalConversationUIKit/`、`NETeamUIKit/` 和演示 UI `app/`（必要时 `app.xcodeproj/`）；不扫描、不修改 `IMUIKit/` 旧副本、`Common/NECommonUIKit/` 旧资源、`NEChatKit`、其他端或客户自己的 App。不得因名字含 `Normal` 就删除系统控件状态、普通群语义或第三方类。
+本 skill 随开源源码发布。用户只需说“移除 Swift UIKit 的飞书/NormalUI 皮肤”或“移除微信/FunUI 皮肤”，无需提供路径。删除的是**点名皮肤**，保留另一套的 UI/消息业务能力。仅处理仓库根的 `NEBaseUIKit/`、`NEChatUIKit/`、`NEContactUIKit/`、`NEConversationUIKit/`、`NELocalConversationUIKit/`、`NETeamUIKit/` 和演示 UI `app/`（必要时 `app.xcodeproj/`）；不扫描、不修改闭源 `NEChatKit`、其他端或客户自己的 App。不得因名字含 `Normal` 就删除系统控件状态、普通群语义或第三方类。只做两套皮肤的一致性盘点而不删除时，用 `skin-audit`。
 
 ## 使用
 
@@ -24,6 +24,25 @@ description: 按维护清单从 nim-uikit-ios 开源 Swift UIKit UI 组件和示
 - 禁止用 sed/正则批量改写 Swift 控制流：`if <skin> { A } else { B }` 里可能还有内层 if/else，正则很容易误删代码。逐处 `apply_patch`，或先做括号配对、确认 if 体结束行是 `} else {` 再替换。
 - 去掉 `if <skin>` 的 else 后，如果 if 体里给 `let` 常量赋值（例如 `let sections`），编译器会报 used before initialized；此时应整体去掉 if 外壳，而不是保留 if。
 - 删除共享文件里的皮肤分支后，跑 `--phase after` 并构建；`REVIEW` 行只按清单路径逐条处理，不要全仓盲删。
+
+## 交付标准
+
+客户拿到的最终代码里不应留下目标皮肤的任何形态，包括恒真/恒假的兼容函数（如 `isNormalStyle()`）、空 override、空分支和仅剩转发的皮肤参数。保留皮肤的分支要就地收敛，不为“兼容”保留占位；确需保留的公开符号只能登记到 `accepted_candidates` 并写明原因。
+
+## 编译陷阱（实测）
+
+- 删除皮肤目录后必须重跑 `pod install --no-repo-update`，Pods 的 `Classes/**/*`、`Assets/**/*`
+  通配符会缓存旧文件列表，不重装会报 `Build input file cannot be found` 或残留已删 skin 的编译单元。
+- 收敛 `if isNormalStyle { A } else { B }` 时不要用正则或脚本批量删除分支：会留下孤立的
+  `@nonobjc`、空 `else`、悬空 `#if` 和未使用变量，编译报 `Duplicate attribute` 或
+  `used before initialized`。逐处编辑，删完检查括号与空分支。
+- 删完必须真正编译保留皮肤对应的 target 和 `app`，不能以 `swiftc -parse` 代替。
+批量替换三元表达式也会吞掉行尾的 `)`、`,` 等符号（实测 `constant: 0 : 60),` 被截断），替换后必须编译验证。
+- 皮肤专属 router 扩展被删后，服务层的注册分支会悬空。实测移除 NormalUI 后
+  `NEChatService` / `NEContactService` / `NEConversationService` / `NELocalConversationService`
+  / `NETeamService` 里的 `if isFun { X.registerFun() } else { X.register() }` 会因
+  `register()`（原 Normal router 扩展）消失而编译失败，必须把分支收敛成保留皮肤的那一个调用。
+  审计的残留指纹抓不到这种"调用方仍指向已删扩展"的情况，只能靠编译发现。
 
 ## 清单维护
 

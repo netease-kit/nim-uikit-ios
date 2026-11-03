@@ -366,7 +366,7 @@ class IMPushConfigViewController: NEBaseViewController, UITableViewDelegate, UIT
     back.frame = CGRectMake(0, 0, view.frame.width, 60)
     let button = ExpandButton()
     back.addSubview(button)
-    if NEAdaptiveDeviceGate.isFoldableDevice { button.autoresizingMask = [.flexibleWidth] }
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive { button.autoresizingMask = [.flexibleWidth] }
     button.setTitle(localizable("save"), for: .normal)
     button.setTitleColor(.white, for: .normal)
     if NEStyleManager.instance.isNormalStyle() {

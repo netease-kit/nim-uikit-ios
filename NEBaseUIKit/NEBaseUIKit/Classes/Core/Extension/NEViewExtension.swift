@@ -171,3 +171,32 @@ public extension UIView {
     return nil
   }
 }
+
+public extension UIWindow {
+  /// 当前活跃场景的 key window（主线程使用）。
+  ///
+  /// 多 scene 下按激活状态选择场景，避免把弹层、Toast、录音浮层挂到
+  /// 第一个创建的场景窗口上；没有活跃场景时退回任一场景的 key window。
+  static var ne_activeKeyWindow: UIWindow? {
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let ordered = scenes.sorted {
+      activationRank($0.activationState) < activationRank($1.activationState)
+    }
+    for scene in ordered {
+      if let keyWindow = scene.windows.first(where: { $0.isKeyWindow }) {
+        return keyWindow
+      }
+    }
+    return ordered.first?.windows.first
+  }
+
+  private static func activationRank(_ state: UIScene.ActivationState) -> Int {
+    switch state {
+    case .foregroundActive: return 0
+    case .foregroundInactive: return 1
+    case .background: return 2
+    case .unattached: return 3
+    @unknown default: return 4
+    }
+  }
+}

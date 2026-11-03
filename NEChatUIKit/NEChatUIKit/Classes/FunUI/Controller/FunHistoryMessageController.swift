@@ -3,19 +3,18 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
 
 @objcMembers
 open class FunHistoryMessageController: NEBaseHistorySearchController {
-  public lazy var cancelButton: ExpandButton = {
-    let cancelButton = ExpandButton()
-    cancelButton.translatesAutoresizingMaskIntoConstraints = false
-    cancelButton.setTitle(commonLocalizable("cancel"), for: .normal)
-    cancelButton.setTitleColor(.ne_greyText, for: .normal)
-    cancelButton.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
-    return cancelButton
+  /// 返回按钮：统一返回箭头，原「取消」文案只保留为无障碍标签
+  public lazy var cancelButton: NEUnifiedBackButton = {
+    let button = NEUnifiedBackButton(accessibilityLabel: commonLocalizable("cancel"))
+    button.addTarget(self, action: #selector(backEvent), for: .touchUpInside)
+    return button
   }()
 
   public lazy var searchView: FunSearchView = {
@@ -38,6 +37,9 @@ open class FunHistoryMessageController: NEBaseHistorySearchController {
     super.init(coder: coder)
   }
 
+  /// 搜索框左间距约束：侧栏承载时页面返回入口被侧栏接管，需要收回到 12。
+  private var searchTextFieldLeftAnchor: NSLayoutConstraint?
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .funChatBackgroundColor
@@ -47,14 +49,30 @@ open class FunHistoryMessageController: NEBaseHistorySearchController {
     emptyView.setEmptyImage(name: "fun_emptyView")
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateSearchFieldLeftInset()
+  }
+
+  /// 侧栏承载时返回入口由侧栏展示，页面原按钮按 alpha=0 隐藏；
+  /// 此处把搜索框左间距从「返回按钮 + 间距」收回到 12，避免留下不可见的空位。
+  private func updateSearchFieldLeftInset() {
+    guard let searchTextFieldLeftAnchor else { return }
+    let hasPageBackEntry = !cancelButton.isHidden && cancelButton.alpha > 0.01
+    let inset: CGFloat = hasPageBackEntry ? 58 : 12
+    if abs(searchTextFieldLeftAnchor.constant - inset) > 0.5 {
+      searchTextFieldLeftAnchor.constant = inset
+    }
+  }
+
   override open func setupSubviews() {
     super.setupSubviews()
 
+    // 返回入口统一放在左侧，搜索框紧随其后，避免箭头出现在右侧产生方向歧义。
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
+      cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
       cancelButton.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
-      cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
-      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
     ])
 
     let leftImageView = UIImageView(image: coreLoader.loadImage("fun_search"))
@@ -63,10 +81,12 @@ open class FunHistoryMessageController: NEBaseHistorySearchController {
     searchTextField.textColor = .black
     searchTextField.layer.cornerRadius = 4
     searchTextField.backgroundColor = .white
+    let searchTextFieldLeftAnchor = searchTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 58)
+    self.searchTextFieldLeftAnchor = searchTextFieldLeftAnchor
     NSLayoutConstraint.activate([
       searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.statusBarHeight + 12),
-      searchTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
-      searchTextField.rightAnchor.constraint(equalTo: cancelButton.leftAnchor, constant: -8),
+      searchTextFieldLeftAnchor,
+      searchTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
       searchTextField.heightAnchor.constraint(equalToConstant: 36),
     ])
 

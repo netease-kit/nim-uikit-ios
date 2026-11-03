@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swift Skin Removal"
+  short_description: "Remove NormalUI or FunUI from the open-source UIKit repo"
+  default_prompt: "Use $swift-skin-removal to remove one skin completely."

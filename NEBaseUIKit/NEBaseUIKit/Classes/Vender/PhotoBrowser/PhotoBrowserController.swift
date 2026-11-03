@@ -71,6 +71,11 @@ open class PhotoBrowserController: UIViewController {
     showView.transformAnimation()
   }
 
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptivePreviewDidDismiss"), object: nil)
+  }
+
   func layoutViews() {
     view.addSubview(showView)
 

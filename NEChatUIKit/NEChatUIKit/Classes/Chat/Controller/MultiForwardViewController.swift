@@ -13,7 +13,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
   private var measuredMessageWidth: CGFloat = 0
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     let width = tableView.bounds.width
     guard width > 0, width != measuredMessageWidth else { return }
     measuredMessageWidth = width
@@ -229,7 +229,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
   open func tableView(_ tableView: UITableView,
                       heightForRowAt indexPath: IndexPath) -> CGFloat {
     let model = viewModel.messages[indexPath.row]
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       (model as? MessageContentModel)?.applyViewport(NEChatViewport(contentWidth: tableView.bounds.width))
     }
     return model.cellHeight() + chat_content_margin
@@ -286,7 +286,7 @@ open class MultiForwardViewController: NEChatBaseViewController, UINavigationCon
       NEAudioSessionManager.shared.switchToSpeaker()
       NEAudioSessionManager.shared.stopProximityMonitoring()
 
-      let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
+      let path = ChatMessageHelper.videoLocalPath(for: model?.message)
       if FileManager.default.fileExists(atPath: path) {
         let url = URL(fileURLWithPath: path)
         let videoPlayer = VideoPlayerViewController()

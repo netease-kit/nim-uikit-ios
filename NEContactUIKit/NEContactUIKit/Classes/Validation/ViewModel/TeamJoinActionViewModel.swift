@@ -239,8 +239,16 @@ open class TeamJoinActionViewModel: NSObject, NETeamListener {
     teamRepo.clearAllTeamJoinActionInfo { [weak self] error in
       if let err = error {
         print(err.localizedDescription)
+      } else {
+        // 清空入群申请后同步已读时间，避免联系人页按旧时间重新算出未读。
+        let readTime = Date().timeIntervalSince1970
+        neTeamJoinActionReadTime = readTime
+        UserDefaults.standard.setValue(readTime, forKey: keyTeamJoinActionReadTime)
+        self?.teamJoinActions.removeAll()
+        DispatchQueue.main.async {
+          NotificationCenter.default.post(name: NENotificationName.clearValidationMessageUnreadCount, object: nil)
+        }
       }
-      self?.teamJoinActions.removeAll()
       completion(error)
     }
   }

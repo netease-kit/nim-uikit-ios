@@ -1,13 +1,17 @@
 {
   "shared_paths": [
+    "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/NENavigationView.swift",
+    "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/NEUnifiedBackButton.swift",
+    "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/NEUIKitDefaultColors.swift",
+    "NEBaseUIKit/NEBaseUIKit/Classes/Core/Extension/ViewControllerExtension.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Base/NEChatService.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/NEBaseBotSubSessionListViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/NEBaseForwardAlertViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/NEBaseSelectUserViewController.swift",
-    "NEChatUIKit/NEChatUIKit/Classes/Chat/Helper/ChatMessageHelper.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Emoji/InputEmoticonContainerView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/Emoji/InputEmoticonTabView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/Helper/ChatMessageHelper.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEBaseHistorySearchController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistoryDatePickerViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEHistorySearchDateCell.swift",
@@ -21,25 +25,20 @@
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/NEBaseLanguageCell.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/Cell/Reaction/NEMessageReactionView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/CirleProgressView.swift",
-    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatInputView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEAITranslateView.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatInputView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatLastReadPositionView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatNewMessageView.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/ReplyView.swift",
-    "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/TeamHistoryMessageViewModel.swift",
-    "app/Custom/CustomContactTableViewCell.swift",
-    "app/Custom/CustomConversationListCell.swift",
-    "app/Custom/CustomConversationController.swift",
-    "app/Custom/CustomP2PChatViewController.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/SelectLanguageViewModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/TeamHistoryMessageViewModel.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Chat/ViewModel/UserSettingViewModel.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/ChatRouter/NEBaseChatRouter.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/ChatCellConstantValue.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/ChatConstant.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitClient.swift",
     "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatUIKitObjCBridge.swift",
-    "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/NENavigationView.swift",
-    "NEBaseUIKit/NEBaseUIKit/Classes/CommonView/NEUIKitDefaultColors.swift",
-    "NEBaseUIKit/NEBaseUIKit/Classes/Core/Extension/ViewControllerExtension.swift",
+    "NEChatUIKit/NEChatUIKit/Classes/Common/NEChatViewport.swift",
     "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotBindCell.swift",
     "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotBindController.swift",
     "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseAIRobotConfigController.swift",
@@ -50,13 +49,14 @@
     "NEContactUIKit/NEContactUIKit/Classes/AIRobot/NEBaseRobotNicknameEditController.swift",
     "NEContactUIKit/NEContactUIKit/Classes/Base/NEContactService.swift",
     "NEContactUIKit/NEContactUIKit/Classes/Multiselect/Cell/NEBaseSelectCell.swift",
-    "NEContactUIKit/NEContactUIKit/Classes/Multiselect/ViewController/NEBaseMultiSelectedViewController.swift",
     "NEContactUIKit/NEContactUIKit/Classes/Multiselect/ViewController/NEBaseMultiSelectViewController.swift",
+    "NEContactUIKit/NEContactUIKit/Classes/Multiselect/ViewController/NEBaseMultiSelectedViewController.swift",
     "NEContactUIKit/NEContactUIKit/Classes/Views/Cell/NEBaseContactTableViewCell.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Common/NEConversationService.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEBaseConversationController.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupAddConversationController.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupManageController.swift",
+    "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupNameSheetController.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Controller/NEConversationGroupSettingController.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/Utils/NEConversationGroupUIStyle.swift",
     "NEConversationUIKit/NEConversationUIKit/Classes/Conversation/View/NEConversationGroupBar.swift",
@@ -68,6 +68,10 @@
     "NETeamUIKit/NETeamUIKit/Classes/Setting/NEBaseTeamMembersController.swift",
     "app.xcodeproj/project.pbxproj",
     "app/Custom/CustomConfig.swift",
+    "app/Custom/CustomContactTableViewCell.swift",
+    "app/Custom/CustomConversationController.swift",
+    "app/Custom/CustomConversationListCell.swift",
+    "app/Custom/CustomP2PChatViewController.swift",
     "app/Main/Constant.swift",
     "app/Main/NETabBarController.swift",
     "app/Main/SceneDelegate.swift",
@@ -161,12 +165,7 @@
         "style_selection",
         "didStyleClick"
       ],
-      "accepted_candidates": [
-        {
-          "path": "app/Main/UIStyleManager.swift",
-          "contains": "isNormalStyle"
-        }
-      ],
+      "accepted_candidates": [],
       "project_cleanup": {
         "app.xcodeproj/project.pbxproj": [
           "StyleSelectionViewController.swift",
@@ -257,5 +256,16 @@
     "style_booleans": {
       "isNormalStyle": true
     }
+  },
+  "adaptive_list_selection": {
+    "shared_api": [
+      "listSelectionBackgroundColor",
+      "ne_setSelectionBackgroundColor"
+    ],
+    "color_source": "current surviving skin selectedTintColor with alpha 0.1",
+    "selection_retention": "cloud/local conversation ID and contact account/router identity; restore after reload only when listSelectionBackgroundColor is enabled",
+    "device_scope": "Duo adaptive shell only; ordinary devices retain legacy list selection and reload behavior",
+    "device_gate": "NEAdaptiveDeviceGate.isFoldableDevice is evaluated before root assembly; the shared API remains opt-in",
+    "retain_responsive_layout": true
   }
 }

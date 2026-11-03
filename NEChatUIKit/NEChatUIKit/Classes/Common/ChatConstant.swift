@@ -49,10 +49,11 @@ public protocol ViewModelDelegate: NSObjectProtocol {
 
 // MARK: 常量
 
-public let kScreenWidth: CGFloat = UIScreen.main.bounds.size.width
-public let kScreenHeight: CGFloat = UIScreen.main.bounds.size.height
-public let kUISreenWidthScale = kScreenWidth / 375.0
-public let kUISreenHeightScale = kScreenHeight / 667.0
+/// 与 `NEConstant` 共用同一权威来源；不再缓存首屏尺寸。
+public var kScreenWidth: CGFloat { NEConstant.screenWidth }
+public var kScreenHeight: CGFloat { NEConstant.screenHeight }
+public var kUISreenWidthScale: CGFloat { kScreenWidth / 375.0 }
+public var kUISreenHeightScale: CGFloat { kScreenHeight / 667.0 }
 public let kNavigationHeight = 44.0
 public var KStatusBarHeight: CGFloat { NEConstant.statusBarHeight } // 获取statusBar的高度
 public let ModuleName = "NEChatUIKit" // module 模块名称，用于日志输出
@@ -63,7 +64,7 @@ public let file_audio_support: [String] = ["mp3", "aac", "wav", "wma", "flac"]
 // 支持的视频格式
 public let file_video_support: [String] = ["mp4", "avi", "wmv", "mpeg", "m4v", "mov", "asf", "flv", "f4v", "rmvb", "rm", "3gp"]
 // 支持的图片格式
-public let file_img_support: [String] = ["jpg", "jpeg", "png", "tiff", "heic", "gif"]
+public let file_img_support: [String] = ["jpg", "jpeg", "png", "tiff", "heic", "gif", "webp"]
 // 支持的表格格式
 public let file_xls_support: [String] = ["xls", "xlsx", "csv"]
 // 支持的文档格式

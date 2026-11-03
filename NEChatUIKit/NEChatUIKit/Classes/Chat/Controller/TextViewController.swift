@@ -90,6 +90,8 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    // 列内 present 出现/消失时通知自适应侧栏重新解析承载页。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
     if navigationController?.viewControllers.count ?? 0 > 0 {
       if let root = navigationController?.viewControllers[0] as? UIViewController {
         if root.isKind(of: TextViewController.self) {
@@ -107,6 +109,12 @@ open class TextViewController: NEChatBaseViewController, LinkableLabelProtocol {
       return false
     }
     return true
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    // 关闭动画结束后再通知，此时 presentedViewController 已移除。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
   }
 
   override open func viewDidLoad() {
@@ -230,15 +238,23 @@ extension TextViewController {
   /// 点击正文或空白通过 closeHandler 收起。
   func presentAsColumnChild(from parent: UIViewController) {
     let nav = NETextDetailContainerController(rootViewController: self)
+    // 声明为「列内覆盖页」：文本详情没有导航栏入口，展示期间由外壳隐藏底层页面
+    // 的返回/右侧动作；本页不向侧栏提供任何入口（点击正文或空白收起）。
+    nav.view.accessibilityIdentifier = "id.adaptive.columnOverlay"
     parent.addChild(nav)
     nav.view.frame = parent.view.bounds
     nav.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     parent.view.addSubview(nav.view)
     nav.didMove(toParent: parent)
     closeHandler = { [weak nav] in
-      nav?.willMove(toParent: nil)
-      nav?.view.removeFromSuperview()
-      nav?.removeFromParent()
+      guard let nav else { return }
+      nav.willMove(toParent: nil)
+      nav.view.removeFromSuperview()
+      nav.removeFromParent()
+      NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                      object: nav)
     }
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                    object: nav)
   }
 }

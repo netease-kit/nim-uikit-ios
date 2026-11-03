@@ -22,6 +22,11 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   var contentTableViewTopAnchor: NSLayoutConstraint?
 
   var viewHeight: CGFloat = 0
+  private var navTitleMaxWidthConstraint: NSLayoutConstraint?
+  public weak var columnDimView: UIView?
+  /// 由宿主直接嵌入右列时使用：不经过 presentation，frame 跟随父视图。
+  public var isEmbeddedInColumn = false
+  public var columnDismissHandler: (() -> Void)?
   private let compactViewHeight: CGFloat = 406
   private let expandedViewHeight: CGFloat = 700
 
@@ -66,16 +71,38 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     view.layer.borderWidth = 0.5
     view.layer.borderColor = UIColor.lightGray.cgColor
 
+    updateNavTitleMaxWidth()
+    if isEmbeddedInColumn {
+      guard let host = parent?.view else { return }
+      if viewHeight == 0 { viewHeight = compactViewHeight }
+      let width = embeddedColumnWidth(in: host)
+      let height = min(viewHeight, host.bounds.height)
+      view.frame = CGRect(x: 0, y: host.bounds.height - height, width: width, height: height)
+      columnDimView?.frame = CGRect(x: 0, y: 0, width: width, height: host.bounds.height)
+      return
+    }
     if viewHeight == 0 {
       viewHeight = compactViewHeight
-      if !usesNativeSheetPresentation {
-        view.frame = CGRect(x: 0, y: NEConstant.screenHeight - viewHeight, width: NEConstant.screenWidth, height: viewHeight)
-      }
+    }
+    if !usesNativeSheetPresentation {
+      // 列内 overCurrentContext 在折叠/展开时容器尺寸会变化，frame 需跟随重算。
+      let bounds = sheetContainerBounds
+      let height = min(viewHeight, bounds.height)
+      view.frame = CGRect(x: bounds.minX, y: bounds.maxY - height, width: bounds.width, height: height)
     }
   }
 
   override open func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    if modalPresentationStyle == .overCurrentContext,
+       columnDimView == nil,
+       let containerView = presentationController?.containerView {
+      let dim = UIView(frame: containerView.bounds)
+      dim.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+      dim.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      containerView.insertSubview(dim, belowSubview: view)
+      columnDimView = dim
+    }
     guard tap == nil,
           let containerView = presentationController?.containerView else {
       return
@@ -84,6 +111,15 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     backgroundTap.cancelsTouchesInView = false
     containerView.addGestureRecognizer(backgroundTap)
     tap = backgroundTap
+  }
+
+  override open func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    columnDimView?.removeFromSuperview()
+    columnDimView = nil
+    if isEmbeddedInColumn {
+      NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidDismiss"), object: nil)
+    }
   }
 
 //  override open func viewWillAppear(_ animated: Bool) {
@@ -203,6 +239,10 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     if let tap = tap {
       tap.view?.removeGestureRecognizer(tap)
     }
+    if let columnDismissHandler {
+      columnDismissHandler()
+      return
+    }
     dismiss(animated: true, completion: nil)
   }
 
@@ -218,11 +258,22 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   /// 补充信息按钮点击事件
   func moreButtonAction() {
     viewHeight = expandedViewHeight
-    if !updateNativeSheetHeight(expandedViewHeight,
-                                identifier: "com.netease.imuikit.aiSearch.expanded",
-                                animated: true) {
+    if isEmbeddedInColumn, let host = parent?.view {
       UIView.animate(withDuration: 0.25) {
-        self.view.frame = CGRect(x: 0, y: NEConstant.screenHeight - self.viewHeight, width: NEConstant.screenWidth, height: self.viewHeight)
+        let width = self.embeddedColumnWidth(in: host)
+        let height = min(self.viewHeight, host.bounds.height)
+        self.view.frame = CGRect(x: 0, y: host.bounds.height - height,
+                                 width: width, height: height)
+        self.columnDimView?.frame = CGRect(x: 0, y: 0, width: width, height: host.bounds.height)
+        self.view.layoutIfNeeded()
+      }
+    } else if !updateNativeSheetHeight(expandedViewHeight,
+                                       identifier: "com.netease.imuikit.aiSearch.expanded",
+                                       animated: true) {
+      UIView.animate(withDuration: 0.25) {
+        let bounds = self.sheetContainerBounds
+        let height = min(self.viewHeight, bounds.height)
+        self.view.frame = CGRect(x: bounds.minX, y: bounds.maxY - height, width: bounds.width, height: height)
         self.view.layoutIfNeeded()
       }
     }
@@ -240,17 +291,43 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     contentTableViewTopAnchor?.constant = 16 + 120
   }
 
+  private var sheetContainerBounds: CGRect {
+    if let bounds = presentationController?.containerView?.bounds, bounds.width > 0, bounds.height > 0 {
+      return bounds
+    }
+    if let bounds = view.window?.bounds, bounds.width > 0, bounds.height > 0 {
+      return bounds
+    }
+    if let bounds = view.superview?.bounds, bounds.width > 0, bounds.height > 0 {
+      return bounds
+    }
+    return view.bounds
+  }
+
+  private func updateNavTitleMaxWidth() {
+    guard let constraint = navTitleMaxWidthConstraint else { return }
+    let width = max(0, sheetContainerBounds.width - margin * 4 - backButtonWidth - moreButtonWidth - 16)
+    if abs(constraint.constant - width) > 0.5 {
+      constraint.constant = width
+    }
+  }
+
+  /// 折叠态聊天 view 可能仍是整窗宽度；此时扣掉宿主窗口右侧的 rail 安全区。
+  private func embeddedColumnWidth(in host: UIView) -> CGFloat {
+    let windowWidth = host.window?.bounds.width ?? host.bounds.width
+    let isFullWindow = host.bounds.width >= windowWidth - 1
+    let railInset = isFullWindow ? max(0, host.window?.safeAreaInsets.right ?? 0) : 0
+    return max(0, host.bounds.width - railInset)
+  }
+
   private var usesNativeSheetPresentation: Bool {
     if #available(iOS 15.0, *) {
-      return UIDevice.current.userInterfaceIdiom == .phone
+      return modalPresentationStyle == .pageSheet
     }
     return false
   }
 
   private func configureSheetPresentation() {
-    guard UIDevice.current.userInterfaceIdiom == .phone else {
-      return
-    }
     if #available(iOS 15.0, *) {
       modalPresentationStyle = .pageSheet
       _ = updateNativeSheetHeight(compactViewHeight,
@@ -267,10 +344,6 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
   private func updateNativeSheetHeight(_ height: CGFloat,
                                        identifier: String,
                                        animated: Bool) -> Bool {
-    guard UIDevice.current.userInterfaceIdiom == .phone else {
-      return false
-    }
-
     if #available(iOS 16.0, *), let sheet = sheetPresentationController {
       let detentIdentifier = UISheetPresentationController.Detent.Identifier(identifier)
       let update = {
@@ -329,6 +402,7 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
       inputTextView.text = ""
       placeHolderLabel.isHidden = false
       sureButton.isEnabled = false
+      clearButton.isHidden = true
     }
   }
 
@@ -421,10 +495,11 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
       moreButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
+    navTitleMaxWidthConstraint = navTitle.widthAnchor.constraint(lessThanOrEqualToConstant: 0)
     NSLayoutConstraint.activate([
       navTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       navTitle.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      navTitle.widthAnchor.constraint(lessThanOrEqualToConstant: NEConstant.screenWidth - margin * 4 - backButtonWidth - moreButtonWidth - 16), // 16 为补充按钮 icon 宽度
+      navTitleMaxWidthConstraint!, // 16 为补充按钮 icon 宽度
     ])
 
     loadingView.play()
@@ -453,13 +528,18 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     view.layer.cornerRadius = 4
 
     view.addSubview(inputTextView)
+    view.addSubview(clearButton)
     view.addSubview(sureButton)
 
     NSLayoutConstraint.activate([
       inputTextView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
-      inputTextView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
+      inputTextView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -44),
       inputTextView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
       inputTextView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
+      clearButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
+      clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 4),
+      clearButton.widthAnchor.constraint(equalToConstant: 24),
+      clearButton.heightAnchor.constraint(equalToConstant: 24),
     ])
 
     NSLayoutConstraint.activate([
@@ -499,7 +579,7 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
       placeHolderLabel.heightAnchor.constraint(equalToConstant: 18),
     ])
 
-    let accessoryView = UIToolbar(frame: CGRect(x: 0, y: 0, width: NEConstant.screenWidth, height: 40))
+    let accessoryView = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIWindow.ne_activeKeyWindow?.bounds.width ?? 0, height: 40))
     accessoryView.barStyle = .default
 
     // 完成按钮
@@ -520,6 +600,25 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     textView.inputAccessoryView = accessoryView
 
     return textView
+  }()
+
+  lazy var clearButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = .clear
+    if #available(iOS 13.0, *) {
+      let configuration = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+      button.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: configuration), for: .normal)
+    } else {
+      button.setTitle("×", for: .normal)
+      button.setTitleColor(.ne_emptyTitleColor, for: .normal)
+      button.titleLabel?.font = .systemFont(ofSize: 16)
+    }
+    button.tintColor = .ne_emptyTitleColor
+    button.accessibilityIdentifier = "id.clear"
+    button.addTarget(self, action: #selector(clearText), for: .touchUpInside)
+    button.isHidden = true
+    return button
   }()
 
   /// 确认按钮
@@ -608,6 +707,7 @@ extension NEAIWordSearchViewController: UITextViewDelegate {
       placeHolderLabel.isHidden = false
       sureButton.isEnabled = false
     }
+    clearButton.isHidden = textView.text.isEmpty
   }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
@@ -615,6 +715,12 @@ extension NEAIWordSearchViewController: UITextViewDelegate {
       placeHolderLabel.isHidden = false
       sureButton.isEnabled = false
     }
+  }
+
+  @objc
+  func clearText() {
+    inputTextView.text = ""
+    textViewDidChange(inputTextView)
   }
 
   public func tableViewReload(_ isLoading: Bool) {

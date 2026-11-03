@@ -235,7 +235,7 @@ open class ChatMessageFileCell: NormalChatMessageBaseCell {
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
     let bubble = isSend ? bubbleImageRight : bubbleImageLeft
 
-    bubbleW?.constant = NEAdaptiveDeviceGate.isFoldableDevice
+    bubbleW?.constant = NEAdaptiveDeviceGate.isAdaptiveHostActive
       ? min(chat_content_maxW, chatContainerWidth <= 320 ? 222 : 242)
       : (kScreenWidth <= 320 ? 222 : 242)
 

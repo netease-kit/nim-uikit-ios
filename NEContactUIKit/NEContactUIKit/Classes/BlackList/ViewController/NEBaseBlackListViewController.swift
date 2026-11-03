@@ -14,10 +14,10 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   public var tableViewTopAnchor: NSLayoutConstraint?
 
   public lazy var headView: UIView = {
-    let headView = UIView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? 0 : NEConstant.screenWidth, height: 40))
-    if NEAdaptiveDeviceGate.isFoldableDevice { headView.autoresizingMask = [.flexibleWidth] }
+    let headView = UIView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isAdaptiveHostActive ? 0 : NEConstant.screenWidth, height: 40))
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive { headView.autoresizingMask = [.flexibleWidth] }
     headView.addSubview(contentLabel)
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       contentLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       contentLabel.leadingAnchor.constraint(equalTo: headView.leadingAnchor, constant: 20),
@@ -30,7 +30,7 @@ open class NEBaseBlackListViewController: NEContactBaseViewController, UITableVi
   }()
 
   public lazy var contentLabel: UILabel = {
-    let contentLabel = UILabel(frame: NEAdaptiveDeviceGate.isFoldableDevice
+    let contentLabel = UILabel(frame: NEAdaptiveDeviceGate.isAdaptiveHostActive
       ? .zero : CGRect(x: 20, y: 0, width: NEConstant.screenWidth - 20, height: 40))
     contentLabel.text = localizable("black_tip")
     contentLabel.textColor = UIColor.ne_emptyTitleColor

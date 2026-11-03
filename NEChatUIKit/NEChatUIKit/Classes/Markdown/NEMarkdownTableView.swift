@@ -36,7 +36,7 @@ open class NEMarkdownTableView: UIView {
   // MARK: - 样式可配置项
 
   /// 表格最大宽度（调用者传入，默认为屏幕宽度 - 32）
-  open var maxWidth: CGFloat = UIScreen.main.bounds.width - 32
+  open var maxWidth: CGFloat = kScreenWidth - 32
 
   open var headerBackgroundColor: UIColor = .init(red: 0.90, green: 0.92, blue: 0.96, alpha: 1)
   open var oddRowBackgroundColor: UIColor = .init(red: 0.98, green: 0.98, blue: 0.98, alpha: 1)

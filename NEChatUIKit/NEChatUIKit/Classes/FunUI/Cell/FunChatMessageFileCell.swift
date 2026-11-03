@@ -216,7 +216,7 @@ open class FunChatMessageFileCell: FunChatMessageBaseCell {
     let sizeLabel = isSend ? sizeLabelRight : sizeLabelLeft
     let bubbleW = isSend ? bubbleWRight : bubbleWLeft
 
-    bubbleW?.constant = NEAdaptiveDeviceGate.isFoldableDevice
+    bubbleW?.constant = NEAdaptiveDeviceGate.isAdaptiveHostActive
       ? min(chat_content_maxW, chatContainerWidth <= 320 ? 222 : 242)
       : (kScreenWidth <= 320 ? 222 : 242)
 

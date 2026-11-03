@@ -10,7 +10,10 @@
 
 ## 必须编辑的接线
 
-- `app/Main/UIStyleManager.swift`：保留 `isNormalStyle()` 的兼容调用可固定返回 `false`；禁止旧 `UserDefaults` 的值为 1 时重新选中已删除皮肤。`app/Main/Constant.swift` 的 `IMUIKit_Style_Key` 和 `CHANGE_UI` 只有不再有其他用户后才删；`SceneDelegate.swift` 的 `loadService` 固定 `setupInit(isFun: true)`，只注册 `registerFunCustom()`，移除 `registerNormalCustom()` 和样式切换通知/刷新逻辑中不再需要的部分；`NETabBarController.swift` 保留 Fun 分支。已有客户集成用到的 `setupInit` 参数签名不要猜测改变。
+- Duo 自适应外壳 `NEAdaptiveUIKit` 与 `NEChatViewport` 是共享呈现层，保留。`NETabBarController.installAdaptiveShell()` 的 rail 图标来自各自已有 tab item，删除 Normal 分支时保留 Fun 的 section 和 rail 配置；共享 `NEBaseChatRouter` 最终呈现桥保留，NormalChatRouter 随 Normal 目录移除。
+
+- 各组件服务层的路由注册：`NEChatService`、`NEContactService`、`NEConversationService`、`NELocalConversationService`、`NETeamService` 中的 `if isFun { X.registerFun() } else { X.register() }`，删除 Normal 后 `X.register()`（原 Normal router 扩展）不存在，收敛为只调用 `registerFun()`。
+- `app/Main/UIStyleManager.swift`：不留恒假兼容桩。把全部 `isNormalStyle()` 调用点收敛到 Fun 分支后，删除 `isNormalStyle()` 以及不再有调用者的 `setNormalStyle()`；不存在“固定返回 `false`”的保留形态。禁止旧 `UserDefaults` 的值为 1 时重新选中已删除皮肤。`app/Main/Constant.swift` 的 `IMUIKit_Style_Key` 和 `CHANGE_UI` 只有不再有其他用户后才删；`SceneDelegate.swift` 的 `loadService` 固定 `setupInit(isFun: true)`，只注册 `registerFunCustom()`，移除 `registerNormalCustom()` 和样式切换通知/刷新逻辑中不再需要的部分；`NETabBarController.swift` 保留 Fun 分支。已有客户集成用到的 `setupInit` 参数签名不要猜测改变。
 - `app/Mine/ViewModel/MineSettingViewModel.swift` 撤销样式选择数据行及 `didStyleClick` 委托、`MineSettingViewController.swift` 撤销跳转；`MeViewController.swift` 保留 Fun 收藏入口。`app/Custom/CustomConfig.swift`、`Mine/Controller/` 下已登记的其他样式判断及 `Mine/View/Theme/` 的适配 cell 改为 Fun 样式；移除选择页后清理 `style_selection`、`style_default`、`style_fun` 文案。`ConfigTestViewController.swift` 仍通过 `CHANGE_UI` 触发全局配置刷新，不能只因移除皮肤选择器就删整个通知。
 - 五个 UI 服务 `NEChatService`、`NEContactService`、`NEConversationService`、`NELocalConversationService`、`NETeamService` 的 `registerRouter` 保留现有 API 但固定注册 `registerFun()`；保留会话 @ 消息初始化和聊天表情初始化等共享业务。`ChatMessageHelper.swift` 的聊天/标记/收藏三张 cell 注册表只保留 Fun 类型，兼容 `isFun` / ObjC wrapper 入参时仍返回存活的类型。
 - `NEConversationGroupUIStyle.swift` 只保留 `.fun` 所需值；其 `NEConversationGroupAddConversationController.swift`、`NEConversationGroupManageController.swift`、`NEConversationGroupSettingController.swift`、`NEConversationGroupBar.swift` 清理 `.normal` 默认值和二选一渲染；同时检查登记的 `NEBaseConversationController.swift` 初始化样式。`NEChatUIKitClient.swift` 中 Fun 图片是存活皮肤资源，勿误删。
@@ -19,4 +22,10 @@
 
 ## 不得删除
 
-`isNormalTeam()` 是普通群判断，`MJRefreshNormalHeader` 是第三方类型，UIKit 的 `.normal` 是控件状态，`NIMKit_ChartletChartletCatalogIconsSuffixNormal` 是表情包资源协议；都与 NormalUI 皮肤删除无关。公共 `NIMKitEmoticon.bundle/Emoji/*_normal@2x.png` 和 `NEBaseChatUIKit.xcassets/Map/map_reset_normal.imageset` 是表情/地图状态资源，保留。`Common/NECommonUIKit/`、`IMUIKit/` 和闭源 `NEChatKit` 不在此清单。`FunUI` 的 `restoreNormalInputStyle`、`setRecordNormalStyle` 是录音/输入状态方法，不是 NormalUI 皮肤依赖。
+`NEBaseUIKit/Classes/CommonView/NEUnifiedBackButton.swift` 是两套皮肤共用的自绘标题栏统一返回按钮（Fun 搜索页与共享多选页均使用），删除任一皮肤时保留，不得随皮肤目录删除。
+
+分组名称弹层 `NEConversationGroupNameSheetController.swift` 同时包含名称弹层和名称页面，两者都通过 `NEConversationGroupUIStyle` 获取当前皮肤样式；保留 Fun 版本时清理 `.normal` 默认值，保留自动聚焦、淡入淡出及确认回调，不删除整个文件。公共 `TabNavigationView` 的品牌点击通过 delegate 分发，保留皮肤入口不要再额外绑定同一个品牌按钮事件。
+
+`isNormalTeam()` 是普通群判断，`MJRefreshNormalHeader` 是第三方类型，UIKit 的 `.normal` 是控件状态，`NIMKit_ChartletChartletCatalogIconsSuffixNormal` 是表情包资源协议；都与 NormalUI 皮肤删除无关。公共 `NIMKitEmoticon.bundle/Emoji/*_normal@2x.png` 和 `NEBaseChatUIKit.xcassets/Map/map_reset_normal.imageset` 是表情/地图状态资源，保留。闭源 `NEChatKit` 不在此清单。`FunUI` 的 `restoreNormalInputStyle`、`setRecordNormalStyle` 是录音/输入状态方法，不是 NormalUI 皮肤依赖。
+
+自适应根列表的 `listSelectionBackgroundColor` / `ne_setSelectionBackgroundColor` 为通用 opt-in 呈现能力，保留共享实现及会话/联系人按稳定标识在双栏刷新后恢复选中行的逻辑；`NETabBarController` 中以存活皮肤 `selectedTintColor.withAlphaComponent(0.1)` 提供浅色选中背景。资料表头与按钮/网格宽度随父容器变化，不属于任何单皮肤专属逻辑。

@@ -379,5 +379,7 @@ open class NEBaseContactSelectedViewController: NEContactBaseViewController, UIC
     } else {
       sureButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
+    // 折叠屏侧栏镜像右侧按钮文案，数量变化需要通知外部容器刷新。
+    navigationView.notifyActionsChanged()
   }
 }

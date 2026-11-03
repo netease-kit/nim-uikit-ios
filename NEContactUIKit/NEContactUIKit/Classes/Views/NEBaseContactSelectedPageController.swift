@@ -84,7 +84,7 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
 
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice,
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive,
           let pagingController,
           view.bounds.width > 0,
           abs(adaptivePagingWidth - view.bounds.width) > 0.5 else { return }
@@ -250,6 +250,8 @@ open class NEBaseContactSelectedPageController: NEContactBaseViewController, Fus
     } else {
       selectedSureButton.setTitle(commonLocalizable("sure"), for: .normal)
     }
+    // 折叠屏侧栏镜像右侧按钮文案，数量变化需要通知外部容器刷新。
+    navigationView.notifyActionsChanged()
     if selectArray.count <= 0 {
       selectCollectionBackView.isHidden = true
       pagingViewControllerTopAnchor?.constant = topConstant

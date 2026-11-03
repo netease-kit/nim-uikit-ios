@@ -58,6 +58,7 @@ open class VideoPlayerViewController: UIViewController {
 
   var avPlayer: AVPlayer?
   private var playerLayer: AVPlayerLayer?
+  private var statusObservation: NSKeyValueObservation?
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -67,9 +68,18 @@ open class VideoPlayerViewController: UIViewController {
     setupNotifications()
   }
 
+  override public func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptivePreviewDidDismiss"), object: nil)
+  }
+
   func setupUI() {
     if let url = videoUrl {
       let palyerItem = AVPlayerItem(url: url)
+      statusObservation = palyerItem.observe(\.status, options: [.new, .initial]) { item, _ in
+        guard item.status == .failed else { return }
+        NEALog.errorLog("VideoPlayer", desc: "AVPlayerItem failed: \(String(describing: item.error))")
+      }
       avPlayer = AVPlayer(playerItem: palyerItem)
       let layer = AVPlayerLayer(player: avPlayer)
       layer.videoGravity = .resizeAspect

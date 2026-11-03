@@ -411,7 +411,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
 
   // 取消搜索点击
   open func cancelSearch() {
-    UIApplication.shared.keyWindow?.endEditing(true)
+    view.window?.endEditing(true)
     UIView.animate(withDuration: 0.25, animations: {
       self.searchCancelButton.isHidden = true
       self.searchViewConstraint?.constant = -12
@@ -600,7 +600,7 @@ open class NELocationViewController: UIViewController, NELocationBottomViewDeleg
     }
     if models.count <= 0 {
       showEmptyView()
-      UIApplication.shared.keyWindow?.endEditing(true)
+      view.window?.endEditing(true)
     }
     refreshCurrentCache()
   }

@@ -352,39 +352,8 @@ import UIKit
 
   /** Getting keyWindow. */
   func keyWindow() -> UIWindow? {
-    if let keyWindow = textFieldView?.window {
-      return keyWindow
-    } else {
-      enum Static {
-        /** @abstract   Save keyWindow object for reuse.
-         @discussion Sometimes [[UIApplication sharedApplication] keyWindow] is returning nil between the app.   */
-        weak static var keyWindow: UIWindow?
-      }
-
-      var originalKeyWindow: UIWindow?
-
-      #if swift(>=5.1)
-        if #available(iOS 13, *) {
-          originalKeyWindow = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: { $0.isKeyWindow })
-        } else {
-          originalKeyWindow = UIApplication.shared.keyWindow
-        }
-      #else
-        originalKeyWindow = UIApplication.shared.keyWindow
-      #endif
-
-      // If original key window is not nil and the cached keywindow is also not original keywindow
-      // then changing keywindow.
-      if let originalKeyWindow = originalKeyWindow {
-        Static.keyWindow = originalKeyWindow
-      }
-
-      // Return KeyWindow
-      return Static.keyWindow
-    }
+    // 优先取当前输入控件所在窗口；否则取当前活跃场景的窗口，避免多 scene 下命中其他场景。
+    textFieldView?.window ?? UIWindow.ne_activeKeyWindow
   }
 
   // MARK: Public Methods

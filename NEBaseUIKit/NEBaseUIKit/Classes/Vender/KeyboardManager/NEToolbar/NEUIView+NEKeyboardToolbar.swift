@@ -180,7 +180,7 @@ import UIKit
     } else {
       let frame = CGRect(
         origin: .zero,
-        size: .init(width: UIScreen.main.bounds.width, height: 44)
+        size: .init(width: UIWindow.ne_activeKeyWindow?.bounds.width ?? 0, height: 44)
       )
       let newToolbar = NEToolbar(frame: frame)
 

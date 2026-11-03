@@ -7,10 +7,26 @@ import CommonCrypto
 import Foundation
 import NEChatKit
 import NIMSDK
+import UniformTypeIdentifiers
 
 @objcMembers
 public class ChatMessageHelper: NSObject {
   public static let repo = ChatRepo.shared
+
+  /// Whether a file attachment should use the image preview route.
+  public static func isImageFileAttachment(_ attachment: V2NIMMessageFileAttachment?) -> Bool {
+    guard let attachment else { return false }
+
+    let nameExtension = (attachment.name as NSString).pathExtension.lowercased()
+    if !nameExtension.isEmpty {
+      return file_img_support.contains(nameExtension)
+    }
+
+    let attachmentExtension = attachment.ext?
+      .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+      .lowercased() ?? ""
+    return file_img_support.contains(attachmentExtension)
+  }
 
   /// 获取图片合适尺寸
   /// - Parameters:
@@ -982,12 +998,88 @@ public class ChatMessageHelper: NSObject {
       path += messageClientId
     }
 
-    // 后缀（例如：.png）
-    if let ext = attach.ext, ext.count < 5 {
+    // 视频后缀不能直接取 ext：ext 可能是 "quicktime" 这类类型名，也可能是异常长值。
+    // 优先使用原始文件名（name）中的后缀，再用 UTType 校验；无法识别时兜底 .mov。
+    if case .MESSAGE_TYPE_VIDEO = message?.messageType {
+      path += videoFileSuffix(name: attach.name, ext: attach.ext)
+    } else if let ext = attach.ext, ext.count < 5 {
+      // 后缀（例如：.png）
       path += ext
     }
 
     return path
+  }
+
+  /// 视频本地文件后缀。
+  ///
+  /// `ext` 在不同端可能是扩展名，也可能是 "quicktime" 这类类型名，甚至是异常长值，
+  /// 因此不能按字符长度决定是否拼接。这里按以下顺序解析，并始终以 `.` 开头返回：
+  /// 1. `name` 中的后缀，且系统识别为视频类型；
+  /// 2. `ext` 作为扩展名，且系统识别为视频类型；
+  /// 3. `ext` 作为 MIME subtype，如 quicktime -> video/quicktime -> mov；
+  /// 4. 兜底 `.mov`（mov/mp4 均为 ISO BMFF，AVPlayer 均可识别）。
+  public static func videoFileSuffix(name: String?, ext: String?) -> String {
+    let nameExt = ((name ?? "") as NSString).pathExtension.lowercased()
+    if let suffix = movieExtension(nameExt) {
+      return suffix
+    }
+
+    let token = (ext ?? "")
+      .trimmingCharacters(in: CharacterSet(charactersIn: "."))
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .lowercased()
+
+    if let suffix = movieExtension(token) {
+      return suffix
+    }
+
+    if let type = UTType(mimeType: "video/\(token)"),
+       !type.isDynamic,
+       type.conforms(to: .movie),
+       let ext = type.preferredFilenameExtension,
+       !ext.isEmpty {
+      return ".\(ext.lowercased())"
+    }
+
+    return ".mov"
+  }
+
+  /// 视频消息的本地文件路径。
+  ///
+  /// NIM SDK 可能把 `ext`（例如 "quicktime"）直接拼成文件后缀，生成的路径
+  /// 无法被 AVPlayer 识别；这种情况下回退到 `createFilePath` 生成的规范路径。
+  public static func videoLocalPath(for message: V2NIMMessage?) -> String {
+    let canonical = createFilePath(message)
+    guard let attachment = message?.attachment as? V2NIMMessageVideoAttachment,
+          let path = attachment.path,
+          !path.isEmpty else {
+      return canonical
+    }
+
+    let ext = (path as NSString).pathExtension
+    guard !ext.isEmpty,
+          let type = UTType(filenameExtension: ext),
+          !type.isDynamic,
+          type.conforms(to: .movie) else {
+      // 兼容旧版本已下载的无有效后缀文件：硬链接到规范路径，避免重复下载。
+      if FileManager.default.fileExists(atPath: path),
+         !FileManager.default.fileExists(atPath: canonical) {
+        try? FileManager.default.linkItem(atPath: path, toPath: canonical)
+      }
+      NEALog.infoLog("ChatMessageHelper", desc: "video path fallback: \(path) -> \(canonical)")
+      return canonical
+    }
+    return path
+  }
+
+  private static func movieExtension(_ ext: String) -> String? {
+    guard !ext.isEmpty,
+          let type = UTType(filenameExtension: ext),
+          !type.isDynamic,
+          type.conforms(to: .movie) else {
+      return nil
+    }
+    return ".\(ext.lowercased())"
   }
 
   @objc(getSessionName:showAlias:)

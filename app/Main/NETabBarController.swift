@@ -54,26 +54,8 @@ private final class NEAdaptiveDemoNavigationController: NENavigationController {
   /// into the column and then re-laying it out during the transition.
   var suppressDetailPushAnimation: (() -> Bool)?
 
-  /// 页面的返回按钮由页面自己的 NENavigationView 绘制，不看栈深度；
-  /// 这里按"是否导航根"统一显隐：根页面无返回，更深页面有返回。
-  private func updateBackButtonsForStack() {
-    for (index, page) in viewControllers.enumerated() {
-      guard page.isViewLoaded else { continue }
-      setBackButton(in: page.view, hidden: index == 0)
-    }
-  }
-
-  private func setBackButton(in view: UIView, hidden: Bool) {
-    if let button = view as? UIButton, button.accessibilityIdentifier == "id.backArrow" {
-      button.isHidden = hidden
-      return
-    }
-    for child in view.subviews { setBackButton(in: child, hidden: hidden) }
-  }
-
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    updateBackButtonsForStack()
     // 页面可能在入栈前按别的容器尺寸创建；这里统一收敛到导航自身 bounds，
     // 否则换成 arrangement / tab 等容器后会出现"内容被压成一小块"。
     // 页面的 view 挂在 UINavigationTransitionView / Wrapper 里，父视图不是本导航，
@@ -364,6 +346,7 @@ class NETabBarController: UITabBarController {
     // Clearing an already attached tab array is not a synchronous detach contract.
     let useAdaptiveUIKit = NEAdaptiveDeviceGate.isFoldableDevice
       && !UserDefaults.standard.bool(forKey: "disableAdaptiveUIKit")
+    NEAdaptiveDeviceGate.isAdaptiveHostActive = useAdaptiveUIKit
     let sections = setUpControllers(useAdaptiveNavigation: useAdaptiveUIKit)
     if !useAdaptiveUIKit {
       setViewControllers(sections, animated: false)
@@ -422,8 +405,9 @@ class NETabBarController: UITabBarController {
   /// 关闭详情栏或折叠成单栏后释放，行为与普通手机一致。
   private func updateConversationGroupRetention(in shell: NEAdaptiveShellViewController) {
     guard let root = shell.sections.first?.viewControllers.first as? NEBaseConversationController else { return }
-    let activeId = shell.conversationCoordinator.activeIntent?.parameters["conversationId"] as? String
-    root.retainConversationInGroup(shell.isShowingPairedContent ? activeId : nil)
+    let placeholder = shell.conversationCoordinator.isShowingPlaceholder
+    let activeId = placeholder ? nil : shell.conversationCoordinator.activeIntent?.parameters["conversationId"] as? String
+    root.retainConversationInGroup(shell.isShowingPairedContent && !placeholder ? activeId : nil)
   }
 
   /// 递归取消所有表格的选中行（列表的 tableView 可能嵌套在容器里）。
@@ -574,6 +558,8 @@ class NETabBarController: UITabBarController {
     configuration.railItemSpacing = 18
     configuration.railItemsTopInset = 268
     configuration.railBackTopInset = 168
+    // 返回入口与右侧操作使用同一尺寸的圆形控件。
+    configuration.railBackButtonSize = configuration.railActionButtonSize
     // Keep the design breathing room above the hosted page. The shell updates
     // the strip color from the active section so the gap remains continuous.
     configuration.contentTopInset = 12
@@ -648,6 +634,19 @@ class NETabBarController: UITabBarController {
     configuration.normalTintColor = UIColor(hexString: "#C5C9D2")
     configuration.backImage = CommonUIConfig.shared.backArrowImage
     configuration.backAccessibilityLabel = localizable("adaptive_back")
+    // 侧栏导航控件统一为圆形（浅色底 + 细描边）：返回、右侧操作与数量角标
+    // 都使用当前皮肤的颜色资源，Normal / Fun 各自独立。
+    let isNormalStyle = NEStyleManager.instance.isNormalStyle()
+    configuration.backTintColor = isNormalStyle ? UIColor(hexString: "#333333") : .funContactNormalTextColor
+    configuration.railControlBackgroundColor = .white
+    configuration.railControlBorderColor = isNormalStyle
+      ? UIColor(hexString: "#E8EAED") : .funContactDividerLineColor
+    configuration.railActionTextColor = isNormalStyle
+      ? UIColor(hexString: "#333333") : .funContactNormalTextColor
+    // 数量角标跟随当前皮肤主题色：NormalUI #337EFF，FunUI #58BE6B；
+    // 不在示例里固化黑底或主题色快照。
+    configuration.railBadgeBackgroundColor = nil
+    configuration.railBadgeTextColor = .white
     shell.onDetailPlaceholderChanged = { [weak self, weak shell] placeholder in
       guard let self, let shell else { return }
       // 右列有内容才点亮左列选中行；右列回到占位（含折叠态）一律取消。
@@ -661,6 +660,9 @@ class NETabBarController: UITabBarController {
     shell.onConversationOpened = { [weak self] conversationId in
       guard let self, let root = self.adaptiveShell?.sections.first?.viewControllers.first else { return }
       if let shell = self.adaptiveShell { self.updateConversationGroupRetention(in: shell) }
+      // 只有展开态左列可见时才把列表定位到当前会话；折叠态列表不可见，
+      // 定位会改变用户返回后的滚动位置（如从置顶/数字人进入聊天）。
+      guard shell.isShowingPairedContent else { return }
       if let conversation = root as? NEBaseConversationController {
         conversation.selectConversation(conversationId: conversationId, animated: false)
       } else if let conversation = root as? NEBaseLocalConversationController {
@@ -689,15 +691,6 @@ class NETabBarController: UITabBarController {
                                    managedByContainer: shell.isUsingAdaptiveLayout)
         }
       }
-    }
-    shell.onCompactChatVisibilityChanged = { root, _ in
-      // 单屏聊天页的返回入口统一放在右侧工具栏（外壳绘制），
-      // 页面导航栏不再保留返回按钮；其它页面的返回控制不变。
-      root.loadViewIfNeeded()
-      (root as? NEBaseViewController)?.navigationView.backButton.isHidden = true
-      (root as? NEChatBaseViewController)?.navigationView.backButton.isHidden = true
-      root.navigationItem.leftBarButtonItem = nil
-      root.navigationItem.hidesBackButton = true
     }
     let registerNavigation: (UINavigationController) -> Void = { nav in
       ChatRouter.setConversationPresentationHandler({ [weak shell] route, parameters in

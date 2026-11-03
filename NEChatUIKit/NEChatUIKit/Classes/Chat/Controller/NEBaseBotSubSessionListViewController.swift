@@ -590,7 +590,7 @@ open class BotSubSessionListCell: UITableViewCell {
     summaryLabel.isHidden = summary.isEmpty
     timeLabel.text = String.stringFromTimeInterval(time: TimeInterval(item.updateTime))
     if let text = timeLabel.text {
-      let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
+      let maxSize = CGSize(width: kScreenWidth, height: 0)
       let attributes = [NSAttributedString.Key.font: timeLabel.font]
       let labelSize = NSString(string: text).boundingRect(with: maxSize, attributes: attributes as [NSAttributedString.Key: Any], context: nil)
       timeWidth?.constant = labelSize.width + 1
@@ -620,7 +620,7 @@ open class BotSubSessionListCell: UITableViewCell {
 }
 
 @objcMembers
-open class BotSubSessionActionSheetController: UIViewController, UIGestureRecognizerDelegate {
+open class BotSubSessionActionSheetController: NEAdaptiveBottomSheetController, UIGestureRecognizerDelegate {
   public let topicTitle: String
   public var onRename: (() -> Void)?
   public var onDelete: (() -> Void)?

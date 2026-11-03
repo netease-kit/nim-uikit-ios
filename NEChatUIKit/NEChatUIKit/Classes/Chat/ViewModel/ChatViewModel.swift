@@ -544,6 +544,30 @@ open class ChatViewModel: NSObject {
     updateLastReadPositionState(.consumed)
   }
 
+  /// Reconciles a history navigation target that is already loaded in the list.
+  /// A target before the unread range consumes the entry even when the first
+  /// unread message is not visible; a target after the unread range must wait
+  /// for the normal visible-row check above.
+  @nonobjc
+  open func updateLastReadPositionForHistoryAnchor(_ anchor: V2NIMMessage?) {
+    guard let snapshot = preparedLastReadPositionSnapshot,
+          let anchor,
+          anchor.conversationId == snapshot.conversationId,
+          anchor.createTime <= snapshot.lastReadTime else {
+      return
+    }
+
+    switch lastReadPositionState {
+    case .locating:
+      lastReadPositionGeneration += 1
+      updateLastReadPositionState(.consumed)
+    case .visible:
+      updateLastReadPositionState(.consumed)
+    case .disabled, .ready, .consumed:
+      break
+    }
+  }
+
   /// Topic 与机器人会话继续沿用旧的已读流程。
   open var supportsLastReadPosition: Bool {
     let type = V2NIMConversationIdUtil.conversationType(conversationId)
