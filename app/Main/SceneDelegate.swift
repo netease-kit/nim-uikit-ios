@@ -164,6 +164,9 @@ class SceneDelegate: UIResponder {
 
     setupIM()
 
+    // 仓库只保留 NormalUI 皮肤：把历史版本可能写入的非 Normal 样式缓存归一化为 Normal
+    NEStyleManager.instance.setNormalStyle()
+
     NEAIUserManager.shared.setProvider(provider: self)
     NEKeyboardManager.shared.enable = true
     NEKeyboardManager.shared.shouldResignOnTouchOutside = true
@@ -251,7 +254,7 @@ class SceneDelegate: UIResponder {
   // regist router
   func loadService() {
     // 注册路由
-    ChatKitClient.shared.setupInit(isFun: !NEStyleManager.instance.isNormalStyle())
+    ChatKitClient.shared.setupInit(isFun: false)
     DemoStickerConfig.registerPackages()
     registerMapFallbackRouter()
 

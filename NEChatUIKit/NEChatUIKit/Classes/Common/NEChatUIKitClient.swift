@@ -16,7 +16,7 @@ open class NEChatUIKitClient: NSObject {
 
   override public init() {
     let photo = NEMoreItemModel()
-    photo.image = UIImage.ne_imageNamed(name: "fun_chat_photo")
+    photo.image = UIImage.ne_imageNamed(name: "photo")
     photo.title = chatLocalizable("chat_photo")
     photo.type = .photo
     moreAction.append(photo)
@@ -57,7 +57,7 @@ open class NEChatUIKitClient: NSObject {
 
     if IMKitConfigCenter.shared.enableAIChatHelper == true {
       let aiChat = NEMoreItemModel()
-      aiChat.image = UIImage.ne_imageNamed(name: "fun_chat_aiChat")
+      aiChat.image = UIImage.ne_imageNamed(name: "ai_icon_default")
       aiChat.title = chatLocalizable("ai_chat_title")
       aiChat.type = .aiChat
       moreAction.append(aiChat)
