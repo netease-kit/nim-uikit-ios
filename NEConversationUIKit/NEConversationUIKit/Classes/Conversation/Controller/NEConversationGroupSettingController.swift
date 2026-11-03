@@ -50,7 +50,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
   private var didReturnAfterDeletingGroup = false
   private weak var groupNameSheet: NEConversationGroupNameSheetController?
 
-  init(group: NEConversationGroupModel, viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .normal) {
+  init(group: NEConversationGroupModel, viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .fun) {
     self.group = group
     groupViewModel = viewModel
     self.style = style
@@ -254,7 +254,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
         } else {
           self?.group.name = name
           self?.groupNameSheet?.closeSheet(animated: true)
-          self?.groupNameCell.configure(title: localizable("conversation_group_name"), detail: name, showIcon: false, showDisclosure: true, style: self?.style ?? .normal)
+          self?.groupNameCell.configure(title: localizable("conversation_group_name"), detail: name, showIcon: false, showDisclosure: true, style: self?.style ?? .fun)
         }
       }
     }
@@ -297,7 +297,7 @@ open class NEConversationGroupSettingController: NEConversationBaseViewControlle
       message: localizable("conversation_group_delete_message"),
       sureText: localizable("delete"),
       cancelText: localizable("cancel"),
-      sureTextColor: style.isFunStyle ? style.primaryColor : style.dangerColor
+      sureTextColor: style.primaryColor
     ) { [weak self] in
       self?.performNetworkAction {
         guard let self = self else {

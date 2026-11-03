@@ -5,7 +5,7 @@
 import Foundation
 import NEConversationUIKit
 
-open class CustomConversationController: ConversationController, NEBaseConversationControllerDelegate {
+open class CustomConversationController: FunConversationController, NEBaseConversationControllerDelegate {
   override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     delegate = self

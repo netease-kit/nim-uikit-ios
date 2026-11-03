@@ -1165,7 +1165,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   // MARK: - objc 方法
 
   open func getUserSettingViewController() -> NEBaseUserSettingViewController {
-    UserSettingViewController(userId: ChatRepo.sessionId)
+    FunUserSettingViewController(userId: ChatRepo.sessionId)
   }
 
   /// 设置按钮点击事件
@@ -5429,7 +5429,7 @@ extension ChatViewController: ChatBaseCellDelegate {
   }
 
   open func getReadView(_ message: V2NIMMessage, _ teamId: String) -> NEBaseReadViewController {
-    ReadViewController(message: message, teamId: teamId)
+    FunReadViewController(message: message, teamId: teamId)
   }
 
   open func loadDataFinish() {

@@ -7,7 +7,7 @@ import NEChatUIKit
 import NIMSDK
 import UIKit
 
-class CustomP2PChatViewController: P2PChatViewController {
+class CustomP2PChatViewController: FunP2PChatViewController {
   let customMessageType = 20
   override func viewDidLoad() {
     // 自定义消息cell绑定需要放在 super.viewDidLoad() 之前
