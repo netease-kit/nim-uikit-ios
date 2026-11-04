@@ -27,6 +27,7 @@ public class PocLoginViewController: NEBaseViewController {
     // 设置用户名输入框
     usernameTextField.placeholder = "用户名"
     usernameTextField.borderStyle = .roundedRect
+    usernameTextField.clearButtonMode = .always
     usernameTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(usernameTextField)
 
@@ -34,6 +35,7 @@ public class PocLoginViewController: NEBaseViewController {
     passwordTextField.placeholder = "密码"
     passwordTextField.isSecureTextEntry = true
     passwordTextField.borderStyle = .roundedRect
+    passwordTextField.clearButtonMode = .always
     passwordTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(passwordTextField)
 

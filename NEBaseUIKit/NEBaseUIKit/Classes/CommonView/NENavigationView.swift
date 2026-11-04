@@ -7,6 +7,13 @@ import NEChatKit
 
 @objcMembers
 open class NENavigationView: UIView {
+  /// 导航栏动作（返回 / 右侧按钮）的文案、图标、启用态或显隐发生变化。
+  ///
+  /// 需要跟随导航栏状态刷新外部容器的场景（例如折叠屏侧栏）可以监听；
+  /// 名称字符串与 `NEAdaptiveUIKit` 中的同名常量保持一致，双方不新增编译依赖。
+  public static let didChangeActionsNotification =
+    Notification.Name("NENavigationViewDidChangeActions")
+
   public var bottomMargin: CGFloat = 12
   public var leftMargin: CGFloat = 20
   public var titleBarBottomLineHeightAnchor: NSLayoutConstraint?
@@ -122,16 +129,28 @@ open class NENavigationView: UIView {
     ])
   }
 
+  /// 统一返回按钮样式：所有返回入口都使用皮肤统一的返回箭头，不再显示
+  /// 「取消」「关闭」「返回」等文本。传入的标题只作为无障碍标签保留，
+  /// 让读屏仍能读出原入口语义。
   open func setBackButtonTitle(_ title: String) {
     backButton.isHidden = false
-    backButton.setTitle(title, for: .normal)
-    backButton.setImage(nil, for: .normal)
+    backButton.setTitle("", for: .normal)
+    backButton.setImage(CommonUIConfig.shared.backArrowImage, for: .normal)
+    backButton.accessibilityLabel = title
+    notifyActionsChanged()
   }
 
   open func setBackButtonImage(_ image: UIImage?) {
     backButton.isHidden = false
     backButton.setTitle("", for: .normal)
     backButton.setImage(image, for: .normal)
+    notifyActionsChanged()
+  }
+
+  /// 页面直接修改 `backButton` / `moreButton`（例如动态数量文案）后调用，
+  /// 通知外部容器重新读取导航栏动作。
+  open func notifyActionsChanged() {
+    NotificationCenter.default.post(name: NENavigationView.didChangeActionsNotification, object: self)
   }
 
   open func setBackButtonWidth(_ width: CGFloat) {
@@ -148,12 +167,14 @@ open class NENavigationView: UIView {
     moreButton.setTitle(title, for: .normal)
     moreButton.setImage(nil, for: .normal)
     moreButton.setTitleColor(color, for: .normal)
+    notifyActionsChanged()
   }
 
   open func setMoreButtonImage(_ image: UIImage?) {
     moreButton.isHidden = false
     moreButton.setTitle("", for: .normal)
     moreButton.setImage(image, for: .normal)
+    notifyActionsChanged()
   }
 
   open func setMoreButtonWidth(_ width: CGFloat) {
@@ -163,6 +184,7 @@ open class NENavigationView: UIView {
   open func addMoreButtonTarget(target: Any?, selector: Selector) {
     moreButton.isHidden = false
     moreButton.addTarget(target, action: selector, for: .touchUpInside)
+    notifyActionsChanged()
   }
 
   open func setTitleBarBottomLineHeight(_ height: CGFloat) {

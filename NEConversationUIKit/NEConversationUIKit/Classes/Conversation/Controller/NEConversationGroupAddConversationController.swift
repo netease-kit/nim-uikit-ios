@@ -222,6 +222,8 @@ private final class AddConversationCell: UITableViewCell {
   private let avatar = NEUserHeaderView(frame: .zero)
   private let titleLabel = UILabel()
   private let line = UIView()
+  private var checkWidthConstraint: NSLayoutConstraint?
+  private var checkHeightConstraint: NSLayoutConstraint?
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -230,16 +232,20 @@ private final class AddConversationCell: UITableViewCell {
       item.translatesAutoresizingMaskIntoConstraints = false
       contentView.addSubview(item)
     }
-    checkImageView.contentMode = .center
+    checkImageView.contentMode = .scaleAspectFit
     titleLabel.font = .systemFont(ofSize: 16)
     titleLabel.textColor = .ne_darkText
     titleLabel.lineBreakMode = .byTruncatingTail
     avatar.clipsToBounds = true
+    let widthConstraint = checkImageView.widthAnchor.constraint(equalToConstant: 24)
+    let heightConstraint = checkImageView.heightAnchor.constraint(equalToConstant: 24)
+    checkWidthConstraint = widthConstraint
+    checkHeightConstraint = heightConstraint
     NSLayoutConstraint.activate([
       checkImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
       checkImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      checkImageView.widthAnchor.constraint(equalToConstant: 24),
-      checkImageView.heightAnchor.constraint(equalToConstant: 24),
+      widthConstraint,
+      heightConstraint,
       avatar.leftAnchor.constraint(equalTo: checkImageView.rightAnchor, constant: 12),
       avatar.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       avatar.widthAnchor.constraint(equalToConstant: 48),
@@ -261,6 +267,9 @@ private final class AddConversationCell: UITableViewCell {
   func configure(_ model: NEConversationListModel, selected: Bool, keyword: String, style: NEConversationGroupUIStyle) {
     contentView.backgroundColor = style.cardBackgroundColor
     titleLabel.textColor = style.titleTextColor
+    let checkSize: CGFloat = style.isFunStyle ? 22 : 18
+    checkWidthConstraint?.constant = checkSize
+    checkHeightConstraint?.constant = checkSize
     avatar.layer.cornerRadius = style.addConversationAvatarCornerRadius
     line.backgroundColor = style.isFunStyle ? .funConversationListLineBorderColor : style.lineColor
     updateSelected(selected, style: style)

@@ -105,7 +105,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     // 宽度没变时直接返回：既避免重复改约束，也避免每次布局都读取设备门禁。
     guard width > 0, abs(width - measuredLayoutWidth) > 0.5 else { return }
     measuredLayoutWidth = width
-    guard NEAdaptiveDeviceGate.isFoldableDevice, let contentModel else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive, let contentModel else { return }
     titleLabelMaxWidth = titleMaxWidth(for: width, memberCount: contentModel.memberCount)
   }
 
@@ -116,7 +116,7 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
   /// 继续按屏幕宽度计算上限会让长会话名越过右侧移除按钮，因此改用 cell 的实际宽度；
   /// 普通机型保持按屏幕宽度计算，布局结果与改动前一致。
   private var titleLayoutWidth: CGFloat {
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return NEConstant.screenWidth }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return NEConstant.screenWidth }
     let width = contentView.bounds.width
     return width > 0 ? width : NEConstant.screenWidth
   }

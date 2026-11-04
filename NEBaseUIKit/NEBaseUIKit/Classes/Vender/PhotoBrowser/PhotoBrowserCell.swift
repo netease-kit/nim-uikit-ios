@@ -72,14 +72,29 @@ open class PhotoBrowserCell: UICollectionViewCell {
           self.resizeImage(for: loadedImage.size)
         }
       } else {
-        let loadedImage = UIImage(contentsOfFile: imgUrl)
-        imgView.image = loadedImage
-        loading.stopAnimating()
-        guard imageRequestIdentifier == requestIdentifier,
-              self.imgUrl == imgUrl,
-              let loadedImage else { return }
-        imageSize = loadedImage.size
-        resizeImage(for: loadedImage.size)
+        let fileURL = URL(fileURLWithPath: imgUrl)
+        if fileURL.pathExtension.lowercased() == "webp" {
+          imgView.sd_setImage(with: fileURL,
+                              placeholderImage: nil,
+                              options: .allowInvalidSSLCertificates) { [weak self] loadedImage, _, _, _ in
+            guard let self,
+                  self.imageRequestIdentifier == requestIdentifier,
+                  self.imgUrl == imgUrl else { return }
+            self.loading.stopAnimating()
+            guard let loadedImage else { return }
+            self.imageSize = loadedImage.size
+            self.resizeImage(for: loadedImage.size)
+          }
+        } else {
+          let loadedImage = UIImage(contentsOfFile: imgUrl)
+          imgView.image = loadedImage
+          loading.stopAnimating()
+          guard imageRequestIdentifier == requestIdentifier,
+                self.imgUrl == imgUrl,
+                let loadedImage else { return }
+          imageSize = loadedImage.size
+          resizeImage(for: loadedImage.size)
+        }
       }
     }
   }
@@ -164,7 +179,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
       let viewportWidth = self.backScroll.bounds.width > 0 ? self.backScroll.bounds.width : NEConstant.screenWidth
       let viewportHeight = self.backScroll.bounds.height > 0 ? self.backScroll.bounds.height : NEConstant.screenHeight
       self.backScroll.contentOffset = .zero
-      if NEAdaptiveDeviceGate.isFoldableDevice {
+      if NEAdaptiveDeviceGate.isAdaptiveHostActive {
         // The Duo preview is presented by the app window and can be wider
         // than the source chat column. Fit the complete image into that
         // viewport while preserving its aspect ratio.

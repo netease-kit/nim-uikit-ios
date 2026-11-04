@@ -309,7 +309,7 @@ open class NEBaseHistoryMediaResultController: NEChatBaseViewController {
     forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-      UIApplication.shared.keyWindow?.endEditing(true)
+      self.view.window?.endEditing(true)
     }))
   }
 
@@ -413,12 +413,19 @@ extension NEBaseHistoryMediaResultController: UITableViewDataSource, UITableView
 
   public func openFilePreview(filePath: String, fileName: String) {
     let url = URL(fileURLWithPath: filePath)
-    let documentController = UIDocumentInteractionController(url: url)
-    documentController.name = fileName
-    documentController.delegate = self
-    if documentController.presentPreview(animated: true) {}
-    else {
-      documentController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+    let fileExtension = (fileName as NSString).pathExtension.lowercased()
+    if file_img_support.contains(fileExtension) || file_img_support.contains(url.pathExtension.lowercased()) {
+      let showController = PhotoBrowserController(urls: [url.path], url: url.path)
+      showController.modalPresentationStyle = .overFullScreen
+      presentDuoPreview(showController, animated: false, completion: nil)
+    } else {
+      let documentController = UIDocumentInteractionController(url: url)
+      documentController.name = fileName
+      documentController.delegate = self
+      if documentController.presentPreview(animated: true) {}
+      else {
+        documentController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+      }
     }
   }
 }
@@ -518,7 +525,7 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDataSource, UIColl
       return
     }
 
-    let path = object.path ?? ChatMessageHelper.createFilePath(message)
+    let path = ChatMessageHelper.videoLocalPath(for: message)
     if FileManager.default.fileExists(atPath: path) {
       // 设置扬声器
       NEAudioSessionManager.shared.switchToSpeaker()
@@ -643,6 +650,10 @@ extension NEBaseHistoryMediaResultController: UICollectionViewDelegateFlowLayout
 // MARK: - UIDocumentInteractionControllerDelegate
 
 extension NEBaseHistoryMediaResultController: UIDocumentInteractionControllerDelegate {
+  open func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptivePreviewDidDismiss"), object: nil)
+  }
+
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
     documentPreviewPresenter
   }

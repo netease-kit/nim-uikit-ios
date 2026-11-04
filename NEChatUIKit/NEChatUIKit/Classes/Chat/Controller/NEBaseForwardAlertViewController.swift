@@ -156,6 +156,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
     textFeild.layer.borderColor = forwardLineColor.cgColor
     textFeild.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
     textFeild.leftViewMode = .always
+    textFeild.clearButtonMode = .always
     textFeild.font = .systemFont(ofSize: 14)
     textFeild.accessibilityIdentifier = "id.messageInput"
     return textFeild
@@ -187,7 +188,7 @@ open class NEBaseForwardAlertViewController: UIViewController, UICollectionViewD
   open func attach(to source: UIViewController) {
     attachedSource = source
     let host: UIViewController
-    if NEAdaptiveDeviceGate.isFoldableDevice,
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive,
        let root = source.view.window?.rootViewController {
       host = root
     } else {

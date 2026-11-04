@@ -56,12 +56,48 @@ public extension UIViewController {
     present(controller, animated: animated, completion: completion)
   }
 
-  /// 底部选择弹窗（微信皮肤）在双栏展开态只覆盖右侧详情栏；
+  /// 底部选择弹窗（FunUI）在双栏展开态只覆盖右侧详情栏；
   /// 折叠外屏、普通 iPhone/iPad 和单栏布局仍按窗口级底部弹窗展示。
-  /// 飞书皮肤的系统 action sheet 继续走 `showInCurrentColumn`，不受此入口影响。
+  /// NormalUI 的系统 action sheet 继续走 `showInCurrentColumn`，不受此入口影响。
   public func showBottomSheetInDetailColumn(_ controller: UIViewController,
                                             animated: Bool = true,
                                             completion: (() -> Void)? = nil) {
+    // FunUI 底部选择弹窗：直接嵌入内容列，折叠/展开都避开 rail。
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive,
+       let sheet = controller as? NEAdaptiveBottomSheetController,
+       let host = viewIfLoaded,
+       let window = host.window {
+      let isFullWindow = host.bounds.width >= window.bounds.width - 1
+      let railInset = isFullWindow ? max(0, window.safeAreaInsets.right) : 0
+      let width = max(0, host.bounds.width - railInset)
+      if width > 0 {
+        sheet.loadViewIfNeeded()
+        // 不能把子控制器的 view 直接挂到 UIWindow：UIKit 会做 appearance
+        // 层级校验并抛异常。挂到窗口根控制器的 view，控制器父子关系一致，
+        // 同时又不依赖聊天页的父容器，折叠/展开重排时弹窗不会丢失。
+        let owner = window.rootViewController ?? self
+        owner.addChild(sheet)
+        owner.view.addSubview(sheet.view)
+        sheet.didMove(toParent: owner)
+        sheet.embedInColumn(presenter: self, container: owner.view)
+        let dismissSheet = { [weak sheet] in
+          guard let sheet else { return }
+          sheet.willMove(toParent: nil)
+          sheet.beginAppearanceTransition(false, animated: false)
+          sheet.view.removeFromSuperview()
+          sheet.endAppearanceTransition()
+          sheet.removeFromParent()
+          sheet.detachFromColumn()
+          sheet.columnDismissHandler = nil
+          NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidDismiss"), object: nil)
+        }
+        sheet.columnDismissHandler = dismissSheet
+        NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidPresent"),
+                                        object: nil, userInfo: ["dismiss": dismissSheet])
+        completion?()
+        return
+      }
+    }
     if isHostedInDetailColumn {
       // 与列内子页面、@ 选择页保持一致：呈现上下文取当前右列，
       // 弹窗的遮罩和卡片都只在右列范围内排版。
@@ -232,13 +268,13 @@ public extension UIViewController {
   }
 
   func showToast(_ message: String, _ position: NEToastPosition = .center) {
-    UIApplication.shared.keyWindow?.endEditing(true)
+    view.window?.endEditing(true)
     view.neMakeToast(message, duration: 2, position: position)
   }
 
   func showToastInWindow(_ message: String) {
-    UIApplication.shared.keyWindow?.endEditing(true)
-    UIApplication.shared.keyWindow?.neMakeToast(message, duration: 2, position: .center)
+    (view.window ?? UIWindow.ne_activeKeyWindow)?.endEditing(true)
+    (view.window ?? UIWindow.ne_activeKeyWindow)?.neMakeToast(message, duration: 2, position: .center)
   }
 
   func showActionSheet(_ actions: [UIAlertAction]) {

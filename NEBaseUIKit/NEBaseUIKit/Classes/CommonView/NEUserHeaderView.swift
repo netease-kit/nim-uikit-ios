@@ -51,7 +51,7 @@ open class NEUserHeaderView: UIImageView {
   }
 
   open func configHeadData(headUrl: String?, name: String, uid: String) {
-    if !NEAdaptiveDeviceGate.isFoldableDevice {
+    if !NEAdaptiveDeviceGate.isAdaptiveHostActive {
       let requestIdentifier = UUID()
       avatarRequestIdentifier = requestIdentifier
       if let avatar = headUrl, !avatar.isEmpty {

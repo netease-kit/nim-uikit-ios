@@ -108,7 +108,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
 
     layoutInputView(offset: 0, true)
 
-    (NEAdaptiveDeviceGate.isFoldableDevice ? view.window : UIApplication.shared.keyWindow)?.endEditing(true)
+    (view.window ?? UIWindow.ne_activeKeyWindow)?.endEditing(true)
   }
 
   open func didHideRecordMode() {
@@ -174,7 +174,7 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       }
     }
 
-    if !NEAdaptiveDeviceGate.isFoldableDevice,
+    if !NEAdaptiveDeviceGate.isAdaptiveHostActive,
        let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
       currentKeyboardHeight = keyboardRect.height
     }
@@ -220,12 +220,12 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
       }
     case .changed:
       guard let recordView = recordView else { return }
-      let location = NEAdaptiveDeviceGate.isFoldableDevice
+      let location = NEAdaptiveDeviceGate.isAdaptiveHostActive
         ? gesture.location(in: recordView)
         : gesture.location(in: view)
-      let cancelBoundary = NEAdaptiveDeviceGate.isFoldableDevice
+      let cancelBoundary = NEAdaptiveDeviceGate.isAdaptiveHostActive
         ? recordView.recordGestureArea.frame.minY
-        : UIScreen.main.bounds.height - FunRecordAudioView.getGestureHeight()
+        : (view.window?.bounds.height ?? kScreenHeight) - FunRecordAudioView.getGestureHeight()
       if location.y < cancelBoundary {
         recordView.changeToCancelStyle()
       } else {
@@ -260,23 +260,18 @@ open class FunChatViewController: ChatViewController, FunChatInputViewDelegate, 
   }
 
   open func showRecordView() {
-    let window = NEAdaptiveDeviceGate.isFoldableDevice ? view.window : UIApplication.shared.keyWindow
-    if NEAdaptiveDeviceGate.isFoldableDevice && window == nil { return }
+    guard let window = view.window ?? UIWindow.ne_activeKeyWindow else { return }
     if recordView == nil {
       let recordAudio = FunRecordAudioView()
       recordAudio.delegate = self
-      if NEAdaptiveDeviceGate.isFoldableDevice {
-        recordAudio.frame = window!.bounds
+      if NEAdaptiveDeviceGate.isAdaptiveHostActive {
+        recordAudio.frame = window.bounds
         recordAudio.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       } else {
-        recordAudio.frame = UIScreen.main.bounds
+        recordAudio.frame = window.bounds
       }
       recordView = recordAudio
-      if NEAdaptiveDeviceGate.isFoldableDevice {
-        window?.addSubview(recordAudio)
-      } else {
-        UIApplication.shared.keyWindow?.addSubview(recordAudio)
-      }
+      window.addSubview(recordAudio)
     }
     startRecord()
   }

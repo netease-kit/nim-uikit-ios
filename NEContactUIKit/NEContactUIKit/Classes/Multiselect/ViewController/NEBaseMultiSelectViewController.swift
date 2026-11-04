@@ -53,6 +53,18 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     view.layer.borderColor = UIColor.lightGray.cgColor
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    // 列内 present 出现/消失时通知自适应侧栏重新解析承载页。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    // 关闭动画结束后再通知，此时 presentedViewController 已移除。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
 
@@ -135,13 +147,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
 
     let titleTopAnchor = view.safeAreaLayoutGuide.topAnchor
 
-    // 取消按钮
+    // 返回按钮：统一返回箭头，与导航栏返回入口同一套样式
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      cancelButton.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
-      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
-      cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
     // 标题文案
@@ -156,6 +165,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       titleLabel.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       titleLabel.heightAnchor.constraint(equalToConstant: 18),
+      cancelButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
     ])
 
     // 多选按钮
@@ -418,15 +428,10 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
     return button
   }()
 
-  /// 取消按钮
-  lazy var cancelButton: ExpandButton = {
-    let button = ExpandButton(type: .custom)
-    button.translatesAutoresizingMaskIntoConstraints = false
+  /// 返回按钮：统一返回箭头，原「取消」文案只保留为无障碍标签
+  lazy var cancelButton: NEUnifiedBackButton = {
+    let button = NEUnifiedBackButton(accessibilityLabel: commonLocalizable("cancel"))
     button.accessibilityIdentifier = "id.cancel"
-    button.setTitle(commonLocalizable("cancel"), for: .normal)
-    button.setTitleColor(.ne_greyText, for: .normal)
-    button.titleLabel?.font = .systemFont(ofSize: 16)
-    button.titleLabel?.textAlignment = .left
     button.addTarget(self, action: #selector(cancelButtonAction), for: .touchUpInside)
     return button
   }()
@@ -472,7 +477,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
       recentButton.topAnchor.constraint(equalTo: view.topAnchor),
       recentButton.leftAnchor.constraint(equalTo: view.leftAnchor),
       recentButton.heightAnchor.constraint(equalToConstant: 48),
-      NEAdaptiveDeviceGate.isFoldableDevice
+      NEAdaptiveDeviceGate.isAdaptiveHostActive
         ? recentButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: tabWidthRatio)
         : recentButton.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth * tabWidthRatio),
     ])
@@ -725,7 +730,7 @@ open class NEBaseMultiSelectViewController: NEContactBaseViewController, UIColle
   /// - Parameter index: tab 下标
   open func setTabButtonLine(_ index: Int) {
     tabIndex = index
-    if !NEAdaptiveDeviceGate.isFoldableDevice {
+    if !NEAdaptiveDeviceGate.isAdaptiveHostActive {
       selectedLineLeftAnchor?.constant = recentButton.width * CGFloat(index)
     } else if let underline = selectedLineLeftAnchor?.firstItem as? UIView {
       selectedLineLeftAnchor?.isActive = false

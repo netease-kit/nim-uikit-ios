@@ -18,6 +18,25 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
 
   var dataModel: CustomSettingCellModel?
 
+  lazy var clearButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = .clear
+    if #available(iOS 13.0, *) {
+      let configuration = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+      button.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: configuration), for: .normal)
+    } else {
+      button.setTitle("×", for: .normal)
+      button.setTitleColor(.ne_emptyTitleColor, for: .normal)
+      button.titleLabel?.font = .systemFont(ofSize: 16)
+    }
+    button.tintColor = .ne_emptyTitleColor
+    button.accessibilityIdentifier = "id.clear"
+    button.addTarget(self, action: #selector(clearText), for: .touchUpInside)
+    button.isHidden = true
+    return button
+  }()
+
   /// 自定义json配置输入
   lazy var inputTextView: UITextView = {
     let textView = UITextView()
@@ -35,6 +54,7 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
   override func setupUI() {
     contentView.addSubview(titleLabel)
     contentView.addSubview(inputTextView)
+    contentView.addSubview(clearButton)
 
     if NEStyleManager.instance.isNormalStyle() {
       NSLayoutConstraint.activate([
@@ -47,9 +67,13 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
 
       NSLayoutConstraint.activate([
         inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -60),
         inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
         inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+        clearButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -40),
+        clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 8),
+        clearButton.widthAnchor.constraint(equalToConstant: 24),
+        clearButton.heightAnchor.constraint(equalToConstant: 24),
       ])
 
     } else {
@@ -74,9 +98,13 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
 
       NSLayoutConstraint.activate([
         inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -44),
         inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
         inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+        clearButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -24),
+        clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 8),
+        clearButton.widthAnchor.constraint(equalToConstant: 24),
+        clearButton.heightAnchor.constraint(equalToConstant: 24),
       ])
 
       dividerLineLeftMargin?.constant = 20
@@ -91,7 +119,24 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
       subCornerType = model.cornerType
       inputTextView.text = model.customInputText
       dataModel = model
+      updateClearButton()
     }
+  }
+
+  @objc
+  func clearText() {
+    inputTextView.text = ""
+    dataModel?.customInputText = ""
+    updateClearButton()
+  }
+
+  func textViewDidChange(_ textView: UITextView) {
+    dataModel?.customInputText = textView.text
+    updateClearButton()
+  }
+
+  private func updateClearButton() {
+    clearButton.isHidden = inputTextView.text?.isEmpty != false
   }
 
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {

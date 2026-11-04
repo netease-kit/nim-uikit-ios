@@ -83,6 +83,18 @@ open class NEBaseSelectUserViewController: NEChatBaseViewController, UITableView
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    // 列内 present 出现/消失时通知自适应侧栏重新解析承载页。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    // 关闭动画结束后再通知，此时 presentedViewController 已移除。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = true

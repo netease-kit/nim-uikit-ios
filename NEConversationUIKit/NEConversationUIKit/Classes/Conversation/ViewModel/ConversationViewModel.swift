@@ -250,7 +250,7 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
       // Keep the existing row position for presentation-only updates. Reinsert only
       // when the SDK changed ordering (for example, a new message or pin change).
-      if NEAdaptiveDeviceGate.isFoldableDevice && !sortOrderChanged { return }
+      if NEAdaptiveDeviceGate.isAdaptiveHostActive && !sortOrderChanged { return }
       conversationListData.removeAll(where: {
         if let sid = $0.conversation?.conversationId, sid == conversation.conversationId {
           return true

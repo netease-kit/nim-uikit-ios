@@ -105,7 +105,7 @@ open class LocalConversationController: NEBaseLocalConversationController {
     tableView.rowHeight = 62
 
     // 设置置顶列表宽高
-    let pinHeight = NEAdaptiveDeviceGate.isFoldableDevice ? 88.0 : 181 - NEConstant.navigationAndStatusHeight
+    let pinHeight = NEAdaptiveDeviceGate.isAdaptiveHostActive ? 88.0 : 181 - NEConstant.navigationAndStatusHeight
     stickTopCollcetionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width - 20.0, height: pinHeight)
 
     stickTopCollcetionView.addSubview(pinUserDividerLine)
@@ -114,7 +114,7 @@ open class LocalConversationController: NEBaseLocalConversationController {
 
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice, tableView.bounds.width > 0 else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive, tableView.bounds.width > 0 else { return }
     let width = max(0, tableView.bounds.width - 20)
     let height: CGFloat = 88
     if abs(stickTopCollcetionView.frame.width - width) > 0.5 || abs(stickTopCollcetionView.frame.height - height) > 0.5 {
@@ -130,7 +130,7 @@ open class LocalConversationController: NEBaseLocalConversationController {
 
   /// 置顶cell大小
   override open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    CGSize(width: 80, height: NEAdaptiveDeviceGate.isFoldableDevice ? 88 : 181 - NEConstant.navigationAndStatusHeight)
+    CGSize(width: 80, height: NEAdaptiveDeviceGate.isAdaptiveHostActive ? 88 : 181 - NEConstant.navigationAndStatusHeight)
   }
 
   /// 置顶显示隐藏(根据是否有置顶数据)

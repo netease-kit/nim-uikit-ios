@@ -198,7 +198,7 @@ open class NEBaseLocalConversationListCell: UITableViewCell {
       timeLabel
         .text = String.stringFromTimeInterval(time: time)
       if let text = timeLabel.text {
-        let maxSize = CGSize(width: UIScreen.main.bounds.width, height: 0)
+        let maxSize = CGSize(width: bounds.width > 0 ? bounds.width : NEConstant.screenWidth, height: 0)
         let attibutes = [NSAttributedString.Key.font: timeLabel.font]
         let labelSize = NSString(string: text).boundingRect(with: maxSize, attributes: attibutes as [NSAttributedString.Key: Any], context: nil)
         timeWidth?.constant = labelSize.width + 1 // ceil()

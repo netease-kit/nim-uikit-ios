@@ -129,7 +129,9 @@ open class BotSubSessionChatViewController: P2PChatViewController, TopicChatView
       controller?.dismiss(animated: false)
       self?.showDeleteAlert()
     }
-    present(controller, animated: false)
+    // NormalUI 与 FunUI 对齐：自适应宿主下列内呈现（展开只覆盖右列、折叠扣除侧栏），
+    // 非折叠或未装配自适应外壳仍为窗口级呈现。
+    showBottomSheetInDetailColumn(controller, animated: false)
   }
 
   open func showRenameAlert() {

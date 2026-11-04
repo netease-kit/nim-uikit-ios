@@ -176,17 +176,17 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   lazy var inputEmoticonContainerView: InputEmoticonContainerView = {
     let view = InputEmoticonContainerView(
-      frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200),
+      frame: CGRect(x: 0, y: 0, width: bounds.width > 0 ? bounds.width : kScreenWidth, height: 200),
       accentColor: emoticonThemeColor
     )
     view.contentVerticalOffset = emoticonContentVerticalOffset
-    if NEAdaptiveDeviceGate.isFoldableDevice { view.autoresizingMask = [.flexibleWidth, .flexibleHeight] }
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive { view.autoresizingMask = [.flexibleWidth, .flexibleHeight] }
     view.delegate = self
     return view
   }()
 
   public lazy var emojiView: UIView = {
-    let backView = UIView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200))
+    let backView = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width > 0 ? bounds.width : kScreenWidth, height: 200))
     backView.isHidden = true
 
     backView.backgroundColor = UIColor.clear
@@ -198,7 +198,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
   }()
 
   public lazy var chatAddMoreView: NEChatMoreActionView = {
-    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: NEAdaptiveDeviceGate.isFoldableDevice ? bounds.width : kScreenWidth, height: 200))
+    let view = NEChatMoreActionView(frame: CGRect(x: 0, y: 0, width: bounds.width > 0 ? bounds.width : kScreenWidth, height: 200))
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
     view.delegate = self
@@ -233,7 +233,7 @@ open class NEBaseChatInputView: UIView, ChatRecordViewDelegate,
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice, contentView.bounds.width > 0 else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive, contentView.bounds.width > 0 else { return }
     // These panels are frame-based legacy views. Their old lazy frames use
     // the phone screen width, which is zero during Duo child construction and
     // leaves the emoji/action cells outside the detail column.

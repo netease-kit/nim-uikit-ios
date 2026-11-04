@@ -11,12 +11,17 @@ public class BirthdayDatePickerView: UIView {
   public typealias SelectTimeCallBack = (String?) -> Void
   public var timeCallBack: SelectTimeCallBack?
 
+  /// 选择器关闭回调：列内覆盖页承载时用于同步移除承载页并刷新侧栏。
+  public var onDismiss: (() -> Void)?
+
   lazy var cancelButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
     button.setTitle(commonLocalizable("cancel"), for: .normal)
     button.setTitleColor(UIColor.neUIKitDefaultPrimaryColor, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+    // 折叠屏列内覆盖时由侧栏承接返回入口（文案仍保留，非折叠时照常展示）。
+    button.accessibilityIdentifier = "id.adaptiveBack"
     button.addTarget(self, action: #selector(removeFromSuperview), for: .touchUpInside)
     return button
   }()
@@ -27,6 +32,8 @@ public class BirthdayDatePickerView: UIView {
     button.setTitle(commonLocalizable("ok"), for: .normal)
     button.setTitleColor(UIColor.neUIKitDefaultPrimaryColor, for: .normal)
     button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+    // 折叠屏列内覆盖时投影为侧栏右侧「确定」入口。
+    button.accessibilityIdentifier = "id.sureButton"
     button.addTarget(self, action: #selector(sureBtnClick), for: .touchUpInside)
     return button
   }()
@@ -119,6 +126,13 @@ public class BirthdayDatePickerView: UIView {
       picker.bottomAnchor.constraint(equalTo: pickerBackView.bottomAnchor),
       picker.topAnchor.constraint(equalTo: bottomLine.bottomAnchor),
     ])
+  }
+
+  override public func removeFromSuperview() {
+    super.removeFromSuperview()
+    let handler = onDismiss
+    onDismiss = nil
+    handler?()
   }
 
   @objc func pickerBackViewClicked() {

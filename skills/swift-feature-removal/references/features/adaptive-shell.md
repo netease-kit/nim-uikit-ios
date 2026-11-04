@@ -6,7 +6,7 @@
 
 ## 局部编辑
 
-- `app/Main/NETabBarController.swift`：移除 `NEAdaptiveUIKit` import、`NEAdaptiveDemoNavigationController` 的 root push 前置接线及 `presentSectionChild` 绑定/解绑、`adaptiveShell`、`installAdaptiveShell`、`restoreLegacyShell`、`makeAdaptiveConversation`、`makeAdaptiveEmptyDetail`、配置（包含 railBackTopInset 返回位置）、onContentLayout 中根列表 listSelectionBackgroundColor 绑定、updateTableContentInsets 接线及旧布局恢复时的清理和绑定/解绑；恢复原三个导航栈的 tab 宿主。保留原 unread/contact/team listener、皮肤资源、角标、语言更新及旧路由行为。
+- `app/Main/NETabBarController.swift`：移除 `NEAdaptiveUIKit` import、`NEAdaptiveDemoNavigationController` 的 root push 前置接线及 `presentSectionChild` 绑定/解绑、`adaptiveShell`、`installAdaptiveShell`、`restoreLegacyShell`、`makeAdaptiveConversation`、`makeAdaptiveEmptyDetail`、配置（包含返回位置、侧栏圆形控件/右侧操作/角标样式与底部入口组间距；页面导航动作迁移与转发由外壳内部完成，无额外接线）、onContentLayout 中根列表 listSelectionBackgroundColor 绑定、`onCompactChatVisibilityChanged` 返回入口隐藏接线、updateTableContentInsets 接线及旧布局恢复时的清理和绑定/解绑；恢复原三个导航栈的 tab 宿主。保留原 unread/contact/team listener、皮肤资源、角标、语言更新及旧路由行为。
 - `app/Main/SceneDelegate.swift`：移除 shell window refresh 与通知入口选择 shell section；通知使用原 tab 消息导航栈。保留呼叫的模拟器编译保护、登录和通知业务逻辑。
 - `app/en.lproj/Localizable.strings`、`app/zh-Hans.lproj/Localizable.strings`：删除 `adaptive_back`，保留既有返回文案。
 - `NEChatUIKit/NEChatUIKit/Classes/ChatRouter/NEBaseChatRouter.swift`：移除 `NEConversationPresentationBlock`、关联对象 key、`setConversationPresentationHandler`、`presentConversationIfHandled`、`applyPresentationParameters`。保留 registerCommon 与原业务路由。
@@ -14,6 +14,12 @@
 - `NEChatUIKit/NEChatUIKit.podspec`：仅在确认本模块剩余源码没有实际依赖后删除 `NEAdaptiveUIKit` 依赖。其他依赖不变。
 
 没有专属图片或 asset，没有新增 Demo Xcode 文件引用需要删除。
+
+`NENavigationView.notifyActionsChanged()` / `didChangeActionsNotification` 是 NEBaseUIKit 的共享导航栏通知：页面动态改右侧按钮文案（如「确定(n)」）时发布，侧栏据此刷新。它不属于自适应外壳删除范围，客户移除外壳接线后仍应保留（无监听方时为 no-op）。
+
+`NEUnifiedBackButton` 是 NEBaseUIKit 的共享返回按钮：转发选择/已选、Fun 会话搜索/聊天记录搜索在自绘头部使用，移除外壳接线后仍应保留并使用该组件，否则返回样式会回退为文本「取消」。
+
+`NENotificationName.adaptivePresentationDidChange` 及列内 present 页面（@人员选择、转发选择/已选、文本详情、分组名称弹层、语言面板）的 `viewWillAppear` / `viewDidDisappear` 发布调用是共享页面行为；移除外壳接线后无人监听，为 no-op，应保留。
 
 ## 必须保留
 

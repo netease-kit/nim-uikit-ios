@@ -35,8 +35,8 @@ extension PhotoBrowserFlowLayout {
                                            withScrollingVelocity velocity: CGPoint) -> CGPoint {
     var proposedContentOffset = proposedContentOffset
     let pageSpace = stepSpace()
-    let offsetMax: CGFloat = collectionView?.contentSize.width ?? UIScreen.main.bounds.size
-      .width - (pageSpace + sectionInset.right + minimumLineSpacing)
+    let offsetMax: CGFloat = (collectionView?.contentSize.width ?? collectionView?.bounds.width ?? 0)
+      - (pageSpace + sectionInset.right + minimumLineSpacing)
     let offsetMin: CGFloat = 0
     /* 修改之前记录的位置，如果小于最小contentsize或者大于最大contentsize则重置值 */
     if lastOffset.x < offsetMin {

@@ -56,8 +56,8 @@ struct NEConversationGroupUIStyle {
     disableImageName: "conversation_group_disable",
     settingImageName: "conversation_group_setting",
     dragImageName: "conversation_group_right_draw",
-    selectedImageName: "conversation_group_select_selected",
-    unselectedImageName: "conversation_group_select_unselected",
+    selectedImageName: "select",
+    unselectedImageName: "unselect",
     addConversationAvatarCornerRadius: 24,
     settingConversationAvatarCornerRadius: 18
   )
@@ -85,8 +85,8 @@ struct NEConversationGroupUIStyle {
     disableImageName: "conversation_group_disable",
     settingImageName: "conversation_group_setting",
     dragImageName: "conversation_group_right_draw",
-    selectedImageName: "conversation_group_select_selected",
-    unselectedImageName: "conversation_group_select_unselected",
+    selectedImageName: "fun_select",
+    unselectedImageName: "unselect",
     addConversationAvatarCornerRadius: 4,
     settingConversationAvatarCornerRadius: 4
   )

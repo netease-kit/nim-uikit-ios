@@ -142,7 +142,7 @@ public class NECustomAlertAction: UIView {
 }
 
 @objcMembers
-public class NECustomActionSheetController: UIViewController {
+public class NECustomActionSheetController: NEAdaptiveBottomSheetController {
   var sheetHeight: CGFloat = 0
   var topAction: NECustomAlertAction?
   public lazy var cancelAction: NECustomAlertAction = {
@@ -158,7 +158,7 @@ public class NECustomActionSheetController: UIViewController {
     return view
   }()
 
-  override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+  override public init(nibName nibNameOrNil: String? = nil, bundle nibBundleOrNil: Bundle? = nil) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     modalPresentationStyle = .overFullScreen
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: DispatchWorkItem(block: {
@@ -170,6 +170,17 @@ public class NECustomActionSheetController: UIViewController {
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    // 列内底部弹窗出现/消失时通知自适应侧栏重解析，避免关闭后返回入口不再恢复。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
   }
 
   override open func viewDidLoad() {

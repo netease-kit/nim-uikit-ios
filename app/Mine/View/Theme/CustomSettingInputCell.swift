@@ -28,6 +28,7 @@ class CustomSettingInputCell: TeamSettingSubtitleCell, UITextFieldDelegate {
     textField.borderStyle = .roundedRect
     textField.textAlignment = .left
     textField.delegate = self
+    textField.clearButtonMode = .always
     return textField
   }()
 

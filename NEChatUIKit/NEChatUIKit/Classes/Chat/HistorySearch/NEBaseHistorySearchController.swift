@@ -30,7 +30,16 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
   private var measuredMessageWidth: CGFloat = 0
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    // 仅自适应宿主（Duo）按可用宽度等分；非折叠屏保持原 84pt 固定布局。
+    let quickCount = viewModel.operationTypes.count
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive, quickCount > 0, collectionView.bounds.width > 0 {
+      let itemWidth = floor(collectionView.bounds.width / CGFloat(quickCount))
+      if abs(layout.itemSize.width - itemWidth) > 0.5 {
+        layout.itemSize = CGSize(width: itemWidth, height: layout.itemSize.height)
+        layout.invalidateLayout()
+      }
+    }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     let width = tableView.bounds.width
     guard width > 0, width != measuredMessageWidth else { return }
     measuredMessageWidth = width
@@ -614,7 +623,7 @@ extension NEBaseHistorySearchController: UITableViewDelegate, UITableViewDataSou
                       heightForRowAt indexPath: IndexPath) -> CGFloat {
     guard indexPath.row < viewModel.messages.count else { return 0 }
     let model = viewModel.messages[indexPath.row]
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       (model as? MessageContentModel)?.applyViewport(NEChatViewport(contentWidth: tableView.bounds.width))
     }
     return model.cellHeight() - chat_content_margin

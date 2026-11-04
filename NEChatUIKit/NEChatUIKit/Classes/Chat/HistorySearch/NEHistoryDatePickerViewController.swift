@@ -126,6 +126,8 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
 
   var monthPickerView: NEHistorySearchMonthYearPickerView?
   var dimView: UIView?
+  /// 折叠屏列内覆盖承载：月份选择器展示期间存在，用于侧栏接管入口与关闭同步。
+  private weak var monthPickerOverlay: UIViewController?
 
   // MARK: - Lifecycle
 
@@ -361,10 +363,15 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
   }
 
   func showMonthPicker() {
-    let dimView = UIView(frame: view.bounds)
+    // 折叠屏：月份选择器作为列内覆盖页承载，页面内的关闭 / 完成入口由侧栏承接；
+    // 非折叠（或未装配自适应外壳）仍直接覆盖当前页面，行为不变。
+    let containerView: UIView = mountMonthPickerOverlayIfNeeded() ?? view
+    let dimView = UIView(frame: containerView.bounds)
     dimView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
     dimView.alpha = 0
-    view.addSubview(dimView)
+    // 折叠/展开会改变列尺寸：遮罩跟随容器重排。
+    dimView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    containerView.addSubview(dimView)
     self.dimView = dimView
 
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissMonthPicker))
@@ -389,25 +396,64 @@ class NEHistoryDatePickerViewController: NEChatBaseViewController {
     pickerView.onCancel = { [weak self] in
       self?.dismissMonthPicker()
     }
-    view.addSubview(pickerView)
+    // 每次展示都按当前列尺寸重算卡片 frame，并让宽度/贴底关系跟随折叠展开；
+    // 选择器是复用实例，不能沿用上一次展示（可能是另一种姿态）的宽高。
+    pickerView.frame = CGRect(x: 0, y: containerView.bounds.height,
+                              width: containerView.bounds.width, height: pickerHeight)
+    pickerView.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+    containerView.addSubview(pickerView)
     monthPickerView = pickerView
 
     UIView.animate(withDuration: 0.3) { [weak self] in
       guard let self = self else { return }
       dimView.alpha = 1
-      self.pickerView.frame.origin.y = self.view.bounds.height - pickerHeight
+      self.pickerView.frame.origin.y = containerView.bounds.height - self.pickerHeight
+    }
+    if monthPickerOverlay != nil {
+      NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                      object: self)
     }
   }
 
+  /// 折叠屏列内覆盖承载：返回承载页视图（与页面同尺寸），非自适应宿主返回 nil。
+  private func mountMonthPickerOverlayIfNeeded() -> UIView? {
+    if let existing = monthPickerOverlay { return existing.view }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive, let host = viewIfLoaded, host.window != nil else {
+      return nil
+    }
+    let overlay = UIViewController()
+    overlay.view.backgroundColor = .clear
+    overlay.view.accessibilityIdentifier = "id.adaptive.columnOverlay"
+    addChild(overlay)
+    overlay.view.frame = host.bounds
+    overlay.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    host.addSubview(overlay.view)
+    overlay.didMove(toParent: self)
+    monthPickerOverlay = overlay
+    return overlay.view
+  }
+
+  private func detachMonthPickerOverlay() {
+    guard let overlay = monthPickerOverlay else { return }
+    monthPickerOverlay = nil
+    overlay.willMove(toParent: nil)
+    overlay.view.removeFromSuperview()
+    overlay.removeFromParent()
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange,
+                                    object: self)
+  }
+
   @objc func dismissMonthPicker() {
+    let containerHeight = monthPickerView?.superview?.bounds.height ?? view.bounds.height
     UIView.animate(withDuration: 0.3, animations: {
       self.dimView?.alpha = 0
-      self.monthPickerView?.frame.origin.y = self.view.bounds.height
+      self.monthPickerView?.frame.origin.y = containerHeight
     }) { _ in
       self.dimView?.removeFromSuperview()
       self.monthPickerView?.removeFromSuperview()
       self.dimView = nil
       self.monthPickerView = nil
+      self.detachMonthPickerOverlay()
     }
   }
 

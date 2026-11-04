@@ -53,9 +53,9 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
 
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     if !searchTextField.isFirstResponder, searchTextField.text?.isEmpty == true {
-      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isFoldableDevice ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
+      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isAdaptiveHostActive ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
     }
   }
 
@@ -64,7 +64,7 @@ open class FunMultiSelectViewController: NEBaseMultiSelectViewController {
     if !searchTextField.isFirstResponder, searchTextField.text?.isEmpty == true {
       let leftImageView = UIImageView(image: coreLoader.loadImage("fun_search"))
       searchTextField.leftView = leftImageView
-      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isFoldableDevice ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
+      searchTextField.leftViewRectX = (NEAdaptiveDeviceGate.isAdaptiveHostActive ? searchTextField.bounds.width : NEConstant.screenWidth) / 2 - 50
     } else {
       searchTextField.leftView = nil
       searchTextField.leftViewRectX = nil

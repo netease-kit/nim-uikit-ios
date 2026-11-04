@@ -145,7 +145,7 @@ open class NEBaseContactUserViewController: NEContactBaseViewController, UITable
       headerView.leftAnchor.constraint(equalTo: tableView.leftAnchor),
       headerView.topAnchor.constraint(equalTo: tableView.topAnchor),
       headerView.heightAnchor.constraint(equalToConstant: 113),
-      NEAdaptiveDeviceGate.isFoldableDevice
+      NEAdaptiveDeviceGate.isAdaptiveHostActive
         ? headerView.widthAnchor.constraint(equalTo: tableView.widthAnchor)
         : headerView.widthAnchor.constraint(equalToConstant: NEConstant.screenWidth),
     ])

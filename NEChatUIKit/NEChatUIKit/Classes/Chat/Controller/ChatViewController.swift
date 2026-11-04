@@ -37,7 +37,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   /// input view and ViewModel retain identity throughout width transitions.
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     if let frame = keyboardFrameInScreen {
       let height = keyboardOverlap(frame)
       if height != currentKeyboardHeight {
@@ -49,7 +49,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   open func updateChatViewport() {
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     let width = tableView.bounds.width
     guard width > 0, width.isFinite, chatViewport?.contentWidth != width,
           !isUpdatingViewport else { return }
@@ -114,6 +114,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   private var atUsers = [NSRange]()
   private var restoringMentionInput = false
   private var isRecvRolling = false
+  private var shouldRefreshLastReadPositionAfterProgrammaticScroll = false
   private var bottomScrollAfterMessageInsertScheduled = false
   private var pendingReactionReloadIndexPaths = Set<IndexPath>()
   private var isReactionReloadScheduled = false
@@ -502,6 +503,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     NEKeyboardManager.shared.enable = true
     NEKeyboardManager.shared.shouldResignOnTouchOutside = true
     isCurrentPage = false
+    shouldRefreshLastReadPositionAfterProgrammaticScroll = false
     viewModel.stopReactionManager()
     removeOperationView()
     stopPlay()
@@ -806,7 +808,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
 
   open func addObseve() {
     NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       NotificationCenter.default.addObserver(self, selector: #selector(keyboardFrameWillChange(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -1079,7 +1081,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
 
     let rectInTableView = tableView.rectForRow(at: index)
     let rectInView = tableView.convert(rectInTableView, to: view)
-    let midY = kScreenHeight / 2
+    let midY = (view.window?.bounds.height ?? view.bounds.height) / 2
     var underMessage = true
     var operationY = rectInView.origin.y + rectInView.size.height
     if operationY > midY {
@@ -1093,7 +1095,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     }
     var frameX = 8.0
     if model?.message?.isSelf == true {
-      frameX = (NEAdaptiveDeviceGate.isFoldableDevice ? view.bounds.width : kScreenWidth) - w - 8
+      frameX = (NEAdaptiveDeviceGate.isAdaptiveHostActive ? view.bounds.width : (view.window?.bounds.width ?? kScreenWidth)) - w - 8
     }
 
     operationView.visibleFrame = tableView.convert(tableView.bounds, to: view)
@@ -1241,7 +1243,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     closeAIChatView()
 
     guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       keyboardFrameInScreen = keyboardRect
       currentKeyboardHeight = keyboardOverlap(keyboardRect)
     }
@@ -1254,7 +1256,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
 
     // 任何时候弹起键盘都应该滚动到底部
     // 如果是历史聊天模式，scrollTableViewToBottom 会先调用 dataReload() 加载最新消息
-    layoutInputViewWithAnimation(offset: NEAdaptiveDeviceGate.isFoldableDevice ? currentKeyboardHeight : keyboardRect.height, animationDuration, true)
+    layoutInputViewWithAnimation(offset: NEAdaptiveDeviceGate.isAdaptiveHostActive ? currentKeyboardHeight : keyboardRect.height, animationDuration, true)
   }
 
   /// Convert through the owning scene's window. A floating keyboard that does
@@ -1270,7 +1272,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   open func keyboardFrameWillChange(_ notification: Notification) {
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     guard chatInputView.textView.isFirstResponder || chatInputView.titleField.isFirstResponder,
           let frame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
     keyboardFrameInScreen = frame
@@ -1280,12 +1282,12 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   open func keyBoardWillHide(_ notification: Notification) {
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       keyboardFrameInScreen = nil
       currentKeyboardHeight = 0
     }
 
-    if NEAdaptiveDeviceGate.isFoldableDevice,
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive,
        !chatInputView.textView.isFirstResponder,
        !chatInputView.titleField.isFirstResponder {
       // 换行输入等场景会先 resignFirstResponder 再收键盘，此时第一响应者已为 false。
@@ -2169,6 +2171,10 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   // MARK: - UIDocumentInteractionControllerDelegate
+
+  open func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptivePreviewDidDismiss"), object: nil)
+  }
 
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
     documentPreviewPresenter
@@ -3292,7 +3298,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-      UIApplication.shared.keyWindow?.endEditing(true)
+      self.view.window?.endEditing(true)
     }))
   }
 
@@ -3825,6 +3831,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   // MARK: - UIScrollViewDelegate
 
   open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    shouldRefreshLastReadPositionAfterProgrammaticScroll = false
     suppressHistoryPreloadUntilUserScroll = false
     isRecvRolling = false
     cancelPendingReactionBottomPinning()
@@ -3846,6 +3853,11 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+    if shouldRefreshLastReadPositionAfterProgrammaticScroll {
+      shouldRefreshLastReadPositionAfterProgrammaticScroll = false
+      refreshLastReadPositionVisibility()
+      renderLastReadPositionState()
+    }
     if onReceiveNewMsgs.isEmpty ? isLatestMessageVisible() : isLatestPendingNewMessageVisible() {
       isRecvRolling = false
       onReceiveNewMsgs.removeAll()
@@ -4304,7 +4316,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
       return
     }
 
-    let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
+    let path = ChatMessageHelper.videoLocalPath(for: model?.message)
     if FileManager.default.fileExists(atPath: path) {
       // 停止播放语音
       stopPlay()
@@ -4375,11 +4387,17 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
       downloadFile(cell, model, object.url, path)
     } else {
       let url = URL(fileURLWithPath: path)
-      interactionController.url = url
-      interactionController.delegate = self // UIDocumentInteractionControllerDelegate
-      if interactionController.presentPreview(animated: true) {}
-      else {
-        interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+      if ChatMessageHelper.isImageFileAttachment(object) {
+        let showController = PhotoBrowserController(urls: [url.path], url: url.path)
+        showController.modalPresentationStyle = .overFullScreen
+        presentDuoPreview(showController, animated: false, completion: nil)
+      } else {
+        interactionController.url = url
+        interactionController.delegate = self // UIDocumentInteractionControllerDelegate
+        if interactionController.presentPreview(animated: true) {}
+        else {
+          interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+        }
       }
     }
   }
@@ -4498,12 +4516,77 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     }
   }
 
+  /// 列内语言面板及其遮罩（自适应宿主）。
+  private weak var languagePanelOverlay: NEBaseSelectLanguageViewController?
+  private weak var languagePanelDimmingView: UIView?
+
   /// 弹出语言选择
   open func showLanguageContentController(_ controller: NEBaseSelectLanguageViewController) {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive, let host = viewIfLoaded, host.window != nil {
+      showLanguagePanelInColumn(controller, host: host)
+      return
+    }
     controller.modalPresentationStyle = .custom
     controller.transitioningDelegate = self
     controller.delegate = self
     present(controller, animated: true, completion: nil)
+  }
+
+  /// 折叠/双栏下把语言面板作为列内覆盖层：只覆盖聊天所在列，侧栏保持可点，
+  /// 侧栏返回通过覆盖层 dismiss 先关闭面板。
+  private func showLanguagePanelInColumn(_ controller: NEBaseSelectLanguageViewController,
+                                        host: UIView) {
+    controller.loadViewIfNeeded()
+    controller.delegate = self
+    let sheetHeight = min(404, host.bounds.height)
+    let dimming = UIView(frame: host.bounds)
+    dimming.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+    dimming.alpha = 0
+    dimming.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    dimming.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                        action: #selector(closeLanguagePanelInColumn)))
+    host.addSubview(dimming)
+    controller.beginAppearanceTransition(true, animated: false)
+    addChild(controller)
+    controller.view.frame = CGRect(x: 0, y: host.bounds.height,
+                                   width: host.bounds.width, height: sheetHeight)
+    controller.view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+    host.addSubview(controller.view)
+    controller.didMove(toParent: self)
+    controller.endAppearanceTransition()
+    controller.columnDismissHandler = { [weak self] in self?.closeLanguagePanelInColumn() }
+    languagePanelOverlay = controller
+    languagePanelDimmingView = dimming
+    UIView.animate(withDuration: 0.25) {
+      controller.view.frame.origin.y = host.bounds.height - sheetHeight
+      dimming.alpha = 1
+    }
+    // 显式标注类型：单表达式闭包会推导成 `() -> Void?`，外壳按 `() -> Void` 取用会失败。
+    let dismiss: () -> Void = { [weak self] in self?.closeLanguagePanelInColumn() }
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidPresent"),
+                                    object: nil, userInfo: ["dismiss": dismiss])
+  }
+
+  /// 关闭列内语言面板并让侧栏复位。
+  @objc private func closeLanguagePanelInColumn() {
+    guard let controller = languagePanelOverlay else { return }
+    let dimming = languagePanelDimmingView
+    languagePanelOverlay = nil
+    languagePanelDimmingView = nil
+    controller.columnDismissHandler = nil
+    let hostHeight = controller.view.superview?.bounds.height ?? controller.view.frame.maxY
+    controller.beginAppearanceTransition(false, animated: false)
+    UIView.animate(withDuration: 0.2, animations: {
+      controller.view.frame.origin.y = hostHeight
+      dimming?.alpha = 0
+    }, completion: { _ in
+      dimming?.removeFromSuperview()
+      controller.willMove(toParent: nil)
+      controller.view.removeFromSuperview()
+      controller.removeFromParent()
+      controller.endAppearanceTransition()
+      NotificationCenter.default.post(name: Notification.Name("NEAdaptiveOverlayDidDismiss"), object: nil)
+    })
   }
 
   // MARK: - NEBaseTranslateLanguageView Delegate
@@ -4591,7 +4674,11 @@ extension ChatViewController: TopMessageViewDelegate {
 
     if index >= 0, index < tableView.numberOfRows(inSection: 0) {
       // 消息已加载，直接跳转
+      viewModel.updateLastReadPositionForHistoryAnchor(viewModel.topMessage)
+      shouldRefreshLastReadPositionAfterProgrammaticScroll = true
       tableView.scrollToRow(at: IndexPath(row: index, section: 0), at: .middle, animated: true)
+      refreshLastReadPositionVisibility()
+      renderLastReadPositionState()
       showJumpDownMessage(onReceiveNewMsgs.count)
     } else {
       // 消息未加载，重新加载
@@ -4844,7 +4931,7 @@ extension ChatViewController: ChatBaseCellDelegate {
     let frameHeight = 310.0
     let rectInTableView = tableView.rectForRow(at: indexPath)
     let rectInView = tableView.convert(rectInTableView, to: view)
-    let midY = kScreenHeight / 2
+    let midY = (view.window?.bounds.height ?? view.bounds.height) / 2
     var underMessage = true
     var operationY = rectInView.origin.y + rectInView.size.height
     if operationY > midY {
@@ -4856,7 +4943,7 @@ extension ChatViewController: ChatBaseCellDelegate {
     } else {
       operationY += 8
     }
-    let frameX = message.isSelf ? (NEAdaptiveDeviceGate.isFoldableDevice ? view.bounds.width : kScreenWidth) - frameWidth - 8 : 8
+    let frameX = message.isSelf ? (NEAdaptiveDeviceGate.isAdaptiveHostActive ? view.bounds.width : (view.window?.bounds.width ?? kScreenWidth)) - frameWidth - 8 : 8
     operationView.visibleFrame = tableView.convert(tableView.bounds, to: view)
     operationView.frame = CGRect(
       x: frameX,
@@ -5060,7 +5147,7 @@ extension ChatViewController: ChatBaseCellDelegate {
 
     var frameX = 56.0
     if let msg = model?.message, msg.isSelf {
-      frameX = (NEAdaptiveDeviceGate.isFoldableDevice ? view.bounds.width : kScreenWidth) - w - frameX
+      frameX = (NEAdaptiveDeviceGate.isAdaptiveHostActive ? view.bounds.width : (view.window?.bounds.width ?? kScreenWidth)) - w - frameX
     }
 
     var frame = CGRect(x: frameX, y: operationY, width: w, height: h)

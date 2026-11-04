@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
+import NEBaseUIKit
 import NEChatKit
 import NIMSDK
 import UIKit
@@ -31,6 +32,18 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     super.init(coder: coder)
   }
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    // 列内 present 出现/消失时通知自适应侧栏重新解析承载页。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
+  override open func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    // 关闭动画结束后再通知，此时 presentedViewController 已移除。
+    NotificationCenter.default.post(name: NENotificationName.adaptivePresentationDidChange, object: self)
+  }
+
   override open func viewDidLoad() {
     super.viewDidLoad()
     commonUI()
@@ -46,13 +59,10 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
 
     let titleTopAnchor = view.safeAreaLayoutGuide.topAnchor
 
-    // 取消按钮
+    // 返回按钮：统一返回箭头，与导航栏返回入口同一套样式
     view.addSubview(cancelButton)
     NSLayoutConstraint.activate([
       cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-      cancelButton.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
-      cancelButton.widthAnchor.constraint(equalToConstant: NEAppLanguageUtil.getCurrentLanguage() == .english ? 60 : 40),
-      cancelButton.heightAnchor.constraint(equalToConstant: 18),
     ])
 
     // 标题文案
@@ -67,6 +77,7 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
       titleLabel.topAnchor.constraint(equalTo: titleTopAnchor, constant: 16),
       titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       titleLabel.heightAnchor.constraint(equalToConstant: 18),
+      cancelButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
     ])
   }
 
@@ -95,14 +106,10 @@ open class NEBaseMultiSelectedViewController: NEContactBaseViewController, UITab
     ])
   }
 
-  /// 取消按钮
-  lazy var cancelButton: ExpandButton = {
-    let button = ExpandButton()
-    button.translatesAutoresizingMaskIntoConstraints = false
+  /// 返回按钮：统一返回箭头，原「取消」文案只保留为无障碍标签
+  lazy var cancelButton: NEUnifiedBackButton = {
+    let button = NEUnifiedBackButton(accessibilityLabel: commonLocalizable("cancel"))
     button.accessibilityIdentifier = "id.cancel"
-    button.setTitle(commonLocalizable("cancel"), for: .normal)
-    button.setTitleColor(.ne_greyText, for: .normal)
-    button.titleLabel?.font = .systemFont(ofSize: 16)
     button.addTarget(self, action: #selector(cancelButtonClick), for: .touchUpInside)
     return button
   }()

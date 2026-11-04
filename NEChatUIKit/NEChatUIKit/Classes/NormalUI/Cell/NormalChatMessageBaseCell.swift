@@ -125,11 +125,11 @@ open class NormalChatMessageBaseCell: NEBaseChatMessageCell {
         let textSize = NSAttributedString.getRealLabelSize(attriText, font, CGSize(width: chat_text_maxW, height: CGFloat.greatestFiniteMagnitude))
 
         if let _ = model as? MessageTextModel {
-          model.contentSize.width = NEAdaptiveDeviceGate.isFoldableDevice
+          model.contentSize.width = NEAdaptiveDeviceGate.isAdaptiveHostActive
             ? min(chat_content_maxW, max(textSize.width, min(model.textWidth, chat_text_maxW)) + chat_content_margin * 2)
             : max(textSize.width, model.textWidth) + chat_content_margin * 2
         } else {
-          model.contentSize.width = NEAdaptiveDeviceGate.isFoldableDevice
+          model.contentSize.width = NEAdaptiveDeviceGate.isAdaptiveHostActive
             ? min(chat_content_maxW, max(textSize.width + chat_content_margin * 2, model.contentSize.width))
             : max(textSize.width + chat_content_margin * 2, model.contentSize.width)
         }

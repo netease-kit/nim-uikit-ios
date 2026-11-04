@@ -168,7 +168,7 @@ open class NEBasePinMessageCell: UITableViewCell {
     nameLabel.text = item.chatmodel.fullName
     timeLabel.text = String.stringFromDate(date: Date(timeIntervalSince1970: item.message.createTime))
 
-    contentWidth?.constant = NEAdaptiveDeviceGate.isFoldableDevice && bounds.width > 0
+    contentWidth?.constant = NEAdaptiveDeviceGate.isAdaptiveHostActive && bounds.width > 0
       ? min(item.chatmodel.contentSize.width, max(16, bounds.width - 72))
       : item.chatmodel.contentSize.width
     contentHeight?.constant = item.chatmodel.contentSize.height

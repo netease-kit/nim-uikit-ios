@@ -59,7 +59,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
   private var messageHorizontalInset: CGFloat?
   override open func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    guard NEAdaptiveDeviceGate.isFoldableDevice else { return }
+    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return }
     let width = contentTable.bounds.width
     guard width > 0, width != measuredMessageWidth else { return }
     if messageHorizontalInset == nil { messageHorizontalInset = kScreenWidth - collection_content_maxW }
@@ -351,7 +351,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
     forwardAlert.attach(to: self)
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: DispatchWorkItem(block: {
-      UIApplication.shared.keyWindow?.endEditing(true)
+      self.view.window?.endEditing(true)
     }))
   }
 
@@ -473,7 +473,7 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       player.totalTime = Int(object.duration)
       player.modalPresentationStyle = .overFullScreen
       viewModel.lastClickAuidoMessageId = nil
-      let path = object.path ?? ChatMessageHelper.createFilePath(model?.message)
+      let path = ChatMessageHelper.videoLocalPath(for: model?.message)
       if FileManager.default.fileExists(atPath: path) == true {
         let url = URL(fileURLWithPath: path)
         player.videoUrl = url
@@ -538,12 +538,18 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
       } else {
         // 有则直接加载
         let url = URL(fileURLWithPath: path)
-        interactionController.url = url
-        interactionController.delegate = self
+        if ChatMessageHelper.isImageFileAttachment(object) {
+          let showController = PhotoBrowserController(urls: [url.path], url: url.path)
+          showController.modalPresentationStyle = .overFullScreen
+          presentDuoPreview(showController, animated: false, completion: nil)
+        } else {
+          interactionController.url = url
+          interactionController.delegate = self
 
-        if interactionController.presentPreview(animated: true) {}
-        else {
-          interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+          if interactionController.presentPreview(animated: true) {}
+          else {
+            interactionController.presentOptionsMenu(from: view.bounds, in: view, animated: true)
+          }
         }
       }
     }
@@ -804,6 +810,10 @@ open class NEBaseCollectionMessageController: NEChatBaseViewController, UITableV
                                           _ messageAttachmentFilePath: String,
                                           _ messageAttachmentMD5: String?) -> MultiForwardViewController {
     MultiForwardViewController(messageAttachmentUrl, messageAttachmentFilePath, messageAttachmentMD5)
+  }
+
+  open func documentInteractionControllerDidEndPreview(_ controller: UIDocumentInteractionController) {
+    NotificationCenter.default.post(name: Notification.Name("NEAdaptivePreviewDidDismiss"), object: nil)
   }
 
   open func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {

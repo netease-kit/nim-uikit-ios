@@ -375,8 +375,10 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
   /// - Parameter bot: 选中的机器人
   /// - Parameter isRebind: 是否为换绑（UI 弹窗内容相同，仅作语义区分）
   open func showBindConfirmAlert(bot: V2NIMUserAIBot, isRebind: Bool) {
-    let overlay = UIView(frame: UIScreen.main.bounds)
+    let overlay = UIView(frame: view.bounds)
     overlay.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+    // 折叠/展开会改变窗口（或页面）尺寸：遮罩跟随重排。
+    overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     overlay.tag = 9921
 
     let alertView = UIView()
@@ -475,8 +477,8 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
       confirmBtn.heightAnchor.constraint(equalToConstant: 44),
     ])
 
-    // 添加到 keyWindow
-    if let window = UIApplication.shared.keyWindow {
+    // 添加到当前页面所在窗口
+    if let window = view.window ?? UIWindow.ne_activeKeyWindow {
       window.addSubview(overlay)
       overlay.frame = window.bounds
     } else {
@@ -511,7 +513,7 @@ open class NEBaseAIRobotBindController: NEContactBaseViewController, UITableView
   }
 
   private func removeBindAlert() {
-    let window = UIApplication.shared.keyWindow ?? view
+    let window: UIView? = view.window ?? UIWindow.ne_activeKeyWindow ?? view
     window?.subviews.first(where: { $0.tag == 9921 })?.removeFromSuperview()
   }
 

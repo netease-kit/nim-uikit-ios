@@ -254,7 +254,7 @@ open class MessageOperationView: UIView,
     let expandedWidth = oldFrameWidth > 0 ? oldFrameWidth : frame.width
     if frame.width != expandedWidth {
       let oldMaxX = frame.maxX
-      let keepTrailingEdge = frame.midX > UIScreen.main.bounds.width / 2
+      let keepTrailingEdge = frame.midX > (superview?.bounds.midX ?? frame.midX)
       frame.size.width = expandedWidth
       if keepTrailingEdge { frame.origin.x = oldMaxX - expandedWidth }
     }
@@ -378,11 +378,11 @@ open class MessageOperationView: UIView,
     let bottom = min(host.bounds.height, area.maxY)
     // Both collections scroll, keeping every action reachable when the
     // keyboard or landscape viewport leaves less room than the menu needs.
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       frame.size.height = min(frame.height, max(0, bottom - top))
     }
     let maxY = max(top, bottom - frame.height)
-    if NEAdaptiveDeviceGate.isFoldableDevice {
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
       frame.size.width = min(frame.width, max(0, area.width))
       frame.origin.x = min(max(frame.origin.x, area.minX), max(area.minX, area.maxX - frame.width))
     }
@@ -397,7 +397,7 @@ open class MessageOperationView: UIView,
       let targetWidth = oldFrameWidth > 0 ? oldFrameWidth : frame.width
       if frame.width < targetWidth {
         let currentMaxX = frame.maxX
-        let keepTrailingEdge = frame.midX > (NEAdaptiveDeviceGate.isFoldableDevice ? (superview?.bounds.midX ?? bounds.midX) : UIScreen.main.bounds.width / 2)
+        let keepTrailingEdge = frame.midX > (superview?.bounds.midX ?? bounds.midX)
         frame.size.width = targetWidth
         if keepTrailingEdge { frame.origin.x = currentMaxX - targetWidth }
       }

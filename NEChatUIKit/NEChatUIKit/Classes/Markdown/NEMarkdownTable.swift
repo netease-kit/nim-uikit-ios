@@ -35,13 +35,13 @@ open class NEMarkdownTable: NSObject, NEMarkdownElement {
 
   // MARK: - 样式配置
 
-  open var maxWidth: CGFloat = UIScreen.main.bounds.width - 72
+  open var maxWidth: CGFloat = kScreenWidth - 72
   open var headerFont: UIFont = .boldSystemFont(ofSize: 14)
   open var cellFont: UIFont = .systemFont(ofSize: 14)
   open var cellPadding: CGFloat = 8
   open var borderWidth: CGFloat = 0.5
 
-  public init(maxWidth: CGFloat = UIScreen.main.bounds.width - 72) {
+  public init(maxWidth: CGFloat = kScreenWidth - 72) {
     self.maxWidth = maxWidth
   }
 

@@ -247,8 +247,15 @@ open class AddApplicationViewModel: NSObject, NEContactListener {
         print(err.localizedDescription)
       } else {
         self?.markPendingClearCompleted(timestamp)
+        self?.notifyValidationUnreadCleared()
       }
       completion(error)
+    }
+  }
+
+  private func notifyValidationUnreadCleared() {
+    DispatchQueue.main.async {
+      NotificationCenter.default.post(name: NENotificationName.clearValidationMessageUnreadCount, object: nil)
     }
   }
 

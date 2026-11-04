@@ -5,6 +5,7 @@
 
 import NEChatKit
 import NEChatUIKit
+import NETeamUIKit
 import UIKit
 import NEBaseUIKit
 
@@ -55,6 +56,17 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
     return text
   }()
 
+  lazy var signatureClearButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.backgroundColor = .clear
+    let bundle = Bundle(for: NEBaseTeamIntroduceViewController.self)
+    button.setImage(UIImage(named: "clear_btn", in: bundle, compatibleWith: nil), for: .normal)
+    button.accessibilityIdentifier = "id.clear"
+    button.addTarget(self, action: #selector(clearSignature), for: .touchUpInside)
+    return button
+  }()
+
   lazy var textfieldBgView: UIView = {
     let backView = UIView()
     backView.backgroundColor = .white
@@ -84,6 +96,9 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
     view.addSubview(textfieldBgView)
     let inputView: UIView = editType == .specialSign ? signatureTextView : textField
     textfieldBgView.addSubview(inputView)
+    if editType == .specialSign {
+      textfieldBgView.addSubview(signatureClearButton)
+    }
 
     /// 文本框白色背景
     if NEStyleManager.instance.isNormalStyle() {
@@ -107,11 +122,18 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
     /// 文本框
     NSLayoutConstraint.activate([
       inputView.leftAnchor.constraint(equalTo: textfieldBgView.leftAnchor, constant: 16),
-      inputView.rightAnchor.constraint(equalTo: textfieldBgView.rightAnchor, constant: -12),
+      inputView.rightAnchor.constraint(equalTo: textfieldBgView.rightAnchor, constant: editType == .specialSign ? -44 : -12),
       inputView.centerYAnchor.constraint(equalTo: textfieldBgView.centerYAnchor),
     ])
     if editType == .specialSign {
       signatureTextView.heightAnchor.constraint(equalTo: textfieldBgView.heightAnchor, constant: -16).isActive = true
+      NSLayoutConstraint.activate([
+        signatureClearButton.rightAnchor.constraint(equalTo: textfieldBgView.rightAnchor, constant: -12),
+        signatureClearButton.centerYAnchor.constraint(equalTo: textfieldBgView.centerYAnchor),
+        signatureClearButton.widthAnchor.constraint(equalToConstant: 16),
+        signatureClearButton.heightAnchor.constraint(equalToConstant: 16),
+      ])
+      updateSignatureClearButton()
     }
   }
 
@@ -192,5 +214,18 @@ class InputPersonInfoController: NEBaseViewController, UITextFieldDelegate, UITe
       textView.text = text
       showToast(String(format: localizable("text_count_limit"), limitNumberCount))
     }
+    updateSignatureClearButton()
+  }
+
+  @objc
+  func clearSignature() {
+    signatureTextView.text = ""
+    updateSignatureClearButton()
+    textViewDidChange(signatureTextView)
+  }
+
+  private func updateSignatureClearButton() {
+    guard isViewLoaded, editType == .specialSign else { return }
+    signatureClearButton.isHidden = signatureTextView.text?.isEmpty != false
   }
 }

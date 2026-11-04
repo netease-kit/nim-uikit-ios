@@ -27,6 +27,8 @@ class NEHistorySearchMonthYearPickerView: UIView {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "xmark"), for: .normal)
     button.tintColor = .black
+    // 折叠屏列内覆盖时由侧栏承接返回入口（非折叠时仍展示页面内的关闭按钮）。
+    button.accessibilityIdentifier = "id.adaptiveBack"
     button.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
     return button
   }()
@@ -44,6 +46,8 @@ class NEHistorySearchMonthYearPickerView: UIView {
     button.setTitle(commonLocalizable("complete"), for: .normal)
     button.setTitleColor(themeColor, for: .normal)
     button.titleLabel?.font = .systemFont(ofSize: 16)
+    // 折叠屏列内覆盖时投影为侧栏右侧「完成」入口。
+    button.accessibilityIdentifier = "id.sureButton"
     button.addTarget(self, action: #selector(confirmTapped), for: .touchUpInside)
     return button
   }()

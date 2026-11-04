@@ -169,7 +169,7 @@ open class ChatInputView: NEBaseChatInputView {
       if let cgImage = UIImage.ne_imageNamed(name: "ai_back")?.cgImage {
         layer.contents = cgImage
         layer.contentsGravity = .resizeAspectFill // 内容填充模式
-        layer.contentsScale = UIScreen.main.scale // 适配 Retina 屏幕
+        layer.contentsScale = traitCollection.displayScale // 适配 Retina 屏幕
       }
     } else {
       layer.contents = nil

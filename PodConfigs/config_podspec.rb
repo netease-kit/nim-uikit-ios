@@ -4,7 +4,7 @@ module YXConfig
   end
 
   def self.imuikit_version
-    "10.9.70"
+    "10.9.75"
   end
 
   def self.qchatuikit_version
@@ -12,11 +12,14 @@ module YXConfig
   end
 
   def self.nimsdk_version
-    "10.11.0"
+    "10.11.5"
   end
 
+  # 呼叫组件（NERtcCallKit / NERtcCallUIKit）版本。
+  # 当前 Podfile 中这两个 pod 未写版本号，实际解析结果以 Podfile.lock 为准，此处与其保持一致；
+  # 注意 4.8.8 起才提供 arm64 模拟器切片，降级到 4.8.7 及更早需自行 EXCLUDED_ARCHS 排除 arm64。
   def self.calluikit_version
-    ENV.fetch("CALLUIKIT_VERSION", "4.3.0")
+    ENV.fetch("CALLUIKIT_VERSION", "4.8.8")
   end
 
   def self.use_source_files?
