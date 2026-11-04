@@ -5,23 +5,13 @@
 import Foundation
 import NEChatUIKit
 
+/// 仓库只发布 NormalUI 一套皮肤，这里仅保留样式的持久化与历史缓存归一化。
 class NEStyleManager {
   static let instance = NEStyleManager()
   let userDefault = UserDefaults.standard
-  open func isNormalStyle() -> Bool {
-    if let style = userDefault.object(forKey: IMUIKit_Style_Key) as? NSNumber, style.intValue == 2 {
-      return false
-    }
-    return true
-  }
 
   open func setNormalStyle() {
     userDefault.set(NSNumber(integerLiteral: 1), forKey: IMUIKit_Style_Key)
-    userDefault.synchronize()
-  }
-
-  open func setFunStyle() {
-    userDefault.set(NSNumber(integerLiteral: 2), forKey: IMUIKit_Style_Key)
     userDefault.synchronize()
   }
 }

@@ -77,9 +77,7 @@ public final class NEChatUIKitObjCBridge: NSObject {
   public static var chatPictureSize: CGSize { chat_pic_size }
   public static var chatFileSize: CGSize { chat_file_size }
   public static var chatMinimumHeight: CGFloat { chat_min_h }
-  public static var funChatMinimumHeight: CGFloat { fun_chat_min_h }
   public static var chatReplyHeight: CGFloat { chat_reply_height }
-  public static var funChatReplyHeight: CGFloat { fun_chat_reply_height }
   public static var chatContentMaximumWidth: CGFloat { chat_content_maxW }
   public static var chatTextMaximumWidth: CGFloat { chat_text_maxW }
   public static var chatPinHeight: CGFloat { chat_pin_height }
