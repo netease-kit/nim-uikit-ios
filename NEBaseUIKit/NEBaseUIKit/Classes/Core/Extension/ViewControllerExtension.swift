@@ -58,7 +58,6 @@ public extension UIViewController {
 
   /// 底部选择弹窗（FunUI）在双栏展开态只覆盖右侧详情栏；
   /// 折叠外屏、普通 iPhone/iPad 和单栏布局仍按窗口级底部弹窗展示。
-  /// NormalUI 的系统 action sheet 继续走 `showInCurrentColumn`，不受此入口影响。
   public func showBottomSheetInDetailColumn(_ controller: UIViewController,
                                             animated: Bool = true,
                                             completion: (() -> Void)? = nil) {

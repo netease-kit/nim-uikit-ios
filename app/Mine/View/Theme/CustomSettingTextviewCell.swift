@@ -56,60 +56,38 @@ class CustomSettingTextviewCell: TeamSettingSubtitleCell, UITextViewDelegate {
     contentView.addSubview(inputTextView)
     contentView.addSubview(clearButton)
 
-    if NEStyleManager.instance.isNormalStyle() {
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
+    let whiteBgView = UIView()
+    whiteBgView.backgroundColor = UIColor.white
+    whiteBgView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
+    NSLayoutConstraint.activate([
+      whiteBgView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+      whiteBgView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+      whiteBgView.topAnchor.constraint(equalTo: contentView.topAnchor),
+      whiteBgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+    ])
 
-      NSLayoutConstraint.activate([
-        inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
-        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -60),
-        inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-        clearButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -40),
-        clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 8),
-        clearButton.widthAnchor.constraint(equalToConstant: 24),
-        clearButton.heightAnchor.constraint(equalToConstant: 24),
-      ])
+    NSLayoutConstraint.activate([
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+      titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
+    ])
+    titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
+    titleWidthAnchor?.isActive = true
 
-    } else {
-      let whiteBgView = UIView()
-      whiteBgView.backgroundColor = UIColor.white
-      whiteBgView.translatesAutoresizingMaskIntoConstraints = false
-      contentView.insertSubview(whiteBgView, belowSubview: dividerLine)
-      NSLayoutConstraint.activate([
-        whiteBgView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-        whiteBgView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-        whiteBgView.topAnchor.constraint(equalTo: contentView.topAnchor),
-        whiteBgView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      ])
+    NSLayoutConstraint.activate([
+      inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+      inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -44),
+      inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+      inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+      clearButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -24),
+      clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 8),
+      clearButton.widthAnchor.constraint(equalToConstant: 24),
+      clearButton.heightAnchor.constraint(equalToConstant: 24),
+    ])
 
-      NSLayoutConstraint.activate([
-        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
-        titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -20),
-      ])
-      titleWidthAnchor = titleLabel.widthAnchor.constraint(equalToConstant: 0)
-      titleWidthAnchor?.isActive = true
-
-      NSLayoutConstraint.activate([
-        inputTextView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-        inputTextView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -44),
-        inputTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-        inputTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-        clearButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -24),
-        clearButton.topAnchor.constraint(equalTo: inputTextView.topAnchor, constant: 8),
-        clearButton.widthAnchor.constraint(equalToConstant: 24),
-        clearButton.heightAnchor.constraint(equalToConstant: 24),
-      ])
-
-      dividerLineLeftMargin?.constant = 20
-      dividerLineRightMargin?.constant = 0
-    }
+    dividerLineLeftMargin?.constant = 20
+    dividerLineRightMargin?.constant = 0
   }
 
   override func configure(_ anyModel: Any) {

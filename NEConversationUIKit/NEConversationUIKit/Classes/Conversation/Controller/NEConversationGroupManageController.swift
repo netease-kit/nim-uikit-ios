@@ -22,7 +22,7 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
     return button
   }()
 
-  init(viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .normal) {
+  init(viewModel: ConversationGroupViewModel, style: NEConversationGroupUIStyle = .fun) {
     groupViewModel = viewModel
     self.style = style
     super.init(nibName: nil, bundle: nil)
@@ -193,11 +193,7 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
   }
 
   @objc private func createGroupAction() {
-    if style.isFunStyle {
-      pushCreateGroupController()
-    } else {
-      presentCreateGroupSheet()
-    }
+    pushCreateGroupController()
   }
 
   private func pushCreateGroupController() {
@@ -216,32 +212,6 @@ open class NEConversationGroupManageController: NEConversationBaseViewController
       }
     }
     navigationController?.pushViewController(controller, animated: true)
-  }
-
-  private weak var groupNameSheet: NEConversationGroupNameSheetController?
-
-  private func presentCreateGroupSheet() {
-    let controller = NEConversationGroupNameSheetController(
-      title: localizable("conversation_group_create"),
-      style: style,
-      heightRatio: 0.93,
-      cardWidth: view.bounds.width
-    ) { [weak self] name in
-      guard let self = self, let sheet = self.groupNameSheet else {
-        return
-      }
-      self.performNetworkAction(on: sheet) {
-        self.groupViewModel.createGroup(name: name) { [weak self, weak sheet] _, error in
-          if let error = error {
-            sheet?.showToast(self?.groupViewModel.groupErrorMessage(error) ?? error.localizedDescription)
-          } else {
-            sheet?.closeSheet(animated: true)
-          }
-        }
-      }
-    }
-    groupNameSheet = controller
-    controller.presentAsColumnSheet(in: self)
   }
 
   private func performNetworkAction(on controller: UIViewController, _ action: @escaping () -> Void) {

@@ -105,7 +105,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
     let customType: Int
   }
   var conversationGroupUIStyle: NEConversationGroupUIStyle {
-    .normal
+    .fun
   }
 
   private lazy var conversationGroupBar: NEConversationGroupBar = {

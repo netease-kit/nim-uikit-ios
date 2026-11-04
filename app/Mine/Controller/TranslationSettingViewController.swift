@@ -56,12 +56,7 @@ class TranslationSettingViewController: NEBaseViewController, UITableViewDataSou
     super.viewDidLoad()
     title = localizable("translation_setting")
 
-    if NEStyleManager.instance.isNormalStyle() {
-      view.backgroundColor = .ne_backgroundColor
-      navigationView.backgroundColor = .ne_backgroundColor
-    } else {
-      view.backgroundColor = .funChatBackgroundColor
-    }
+    view.backgroundColor = .funChatBackgroundColor
     navigationView.moreButton.isHidden = true
 
     // 注册普通 ArrowCell（自动翻译开关行）和 SwitchCell
@@ -73,23 +68,19 @@ class TranslationSettingViewController: NEBaseViewController, UITableViewDataSou
       CustomTeamSettingSwitchCell.self,
       forCellReuseIdentifier: "\(SettingCellType.SettingSwitchCell.rawValue)"
     )
-    let subtitleSwitchCellClass: AnyClass = NEStyleManager.instance.isNormalStyle()
-      ? TranslationAutoSettingCell.self
-      : FunTranslationAutoSettingCell.self
+    let subtitleSwitchCellClass: AnyClass = FunTranslationAutoSettingCell.self
     tableView.register(
       subtitleSwitchCellClass,
       forCellReuseIdentifier: "\(SettingCellType.SettingSubtitleSelectCell.rawValue)"
     )
-    let selectCellClass: AnyClass = NEStyleManager.instance.isNormalStyle()
-      ? TranslationLanguageSettingCell.self
-      : FunTranslationLanguageSettingCell.self
+    let selectCellClass: AnyClass = FunTranslationLanguageSettingCell.self
     tableView.register(
       selectCellClass,
       forCellReuseIdentifier: "\(languageCellType)"
     )
 
     view.addSubview(tableView)
-    let topOffset = topConstant + (NEStyleManager.instance.isNormalStyle() ? 12 : 0)
+    let topOffset = topConstant
     NSLayoutConstraint.activate([
       tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
       tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -234,20 +225,6 @@ private extension TranslationLanguageValueCell where Self: NEBaseTeamSettingSele
   }
 }
 
-private final class TranslationLanguageSettingCell: TeamSettingSelectCell, TranslationLanguageValueCell {
-  let languageValueLabel = UILabel()
-
-  override func setupUI() {
-    super.setupUI()
-    setupLanguageValueLabel()
-  }
-
-  override func configure(_ anyModel: Any) {
-    super.configure(anyModel)
-    configureLanguageValue(anyModel)
-  }
-}
-
 private final class FunTranslationLanguageSettingCell: FunTeamSettingSelectCell, TranslationLanguageValueCell {
   let languageValueLabel = UILabel()
 
@@ -277,13 +254,6 @@ private extension TranslationAutoSubtitleCell where Self: NEBaseTeamSettingSubti
       subTitleLabel.rightAnchor.constraint(equalTo: titleLabel.rightAnchor),
       subTitleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
     ])
-  }
-}
-
-private final class TranslationAutoSettingCell: TeamSettingSubtitleSwitchCell, TranslationAutoSubtitleCell {
-  override func setupUI() {
-    super.setupUI()
-    constrainSubtitleToTitle()
   }
 }
 

@@ -13,7 +13,7 @@ final class NEConversationGroupBar: UIView, UICollectionViewDataSource, UICollec
   weak var delegate: NEConversationGroupBarDelegate?
   private var groups = [NEConversationGroupModel]()
   private var selectedId: String?
-  private var style = NEConversationGroupUIStyle.normal
+  private var style = NEConversationGroupUIStyle.fun
 
   private lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -59,7 +59,7 @@ final class NEConversationGroupBar: UIView, UICollectionViewDataSource, UICollec
     super.init(coder: coder)
   }
 
-  func configure(groups: [NEConversationGroupModel], selectedId: String?, style: NEConversationGroupUIStyle = .normal) {
+  func configure(groups: [NEConversationGroupModel], selectedId: String?, style: NEConversationGroupUIStyle = .fun) {
     self.groups = groups
     self.selectedId = selectedId
     self.style = style
@@ -70,7 +70,7 @@ final class NEConversationGroupBar: UIView, UICollectionViewDataSource, UICollec
   }
 
   private func backgroundColor(for style: NEConversationGroupUIStyle) -> UIColor {
-    style.isFunStyle ? .funConversationTopItemBackgroundColor : style.contentBackgroundColor
+    .funConversationTopItemBackgroundColor
   }
 
   @objc private func managerAction() {
