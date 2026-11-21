@@ -4,7 +4,7 @@ module YXConfig
   end
 
   def self.imuikit_version
-    "10.9.75"
+    "10.9.77"
   end
 
   def self.qchatuikit_version

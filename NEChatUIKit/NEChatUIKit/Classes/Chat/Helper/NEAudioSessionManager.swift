@@ -8,6 +8,8 @@ import AVFoundation
 open class NEAudioSessionManager: NSObject {
   public static let shared = NEAudioSessionManager()
 
+  /// 录音进行中：此时 stopPlay 不能释放音频会话，否则会打断录音。
+  public var isRecording = false
   private var isSpeakerActive = false {
     didSet {
       isSpeakerActive ? startProximityMonitoring() : stopProximityMonitoring()
@@ -47,6 +49,17 @@ open class NEAudioSessionManager: NSObject {
       try session.setActive(true)
     } catch {
       print("[Audio] Session config error: \(error)")
+    }
+  }
+
+  /// 播放结束/停止后释放音频会话，避免会话常驻导致折叠/展开时系统弹出
+  /// “音频已转至扬声器”的路由提示。
+  public func deactivate() {
+    let session = AVAudioSession.sharedInstance()
+    do {
+      try session.setActive(false, options: .notifyOthersOnDeactivation)
+    } catch {
+      print("[Audio] Session deactivate error: \(error)")
     }
   }
 

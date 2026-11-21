@@ -1,6 +1,6 @@
 # Feature Registry
 
-当前清单以承载本技能的源码仓库根目录为相对路径基准，只覆盖正式发布的 `NEChatUIKit/` 和 Demo `app/`。复制或发布本技能时，目录结构应保持为 `skills/swift-feature-removal/`，审计脚本即可从自身位置识别仓库根目录。
+当前清单以承载本技能的源码仓库根目录为相对路径基准，只覆盖正式发布的 `NEChatUIKit/` 和 Demo `IMUIKitExample/`。复制或发布本技能时，目录结构应保持为 `skills/swift-feature-removal/`，审计脚本即可从自身位置识别仓库根目录。
 
 | Slug | 用户名称与别名 | 默认范围 | 清单 |
 | --- | --- | --- | --- |

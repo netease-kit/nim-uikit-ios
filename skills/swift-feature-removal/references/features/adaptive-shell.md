@@ -2,13 +2,13 @@
 
 ## 范围
 
-本清单仅覆盖开源根目录的 `NEChatUIKit/` 和 `app/` 中自适应呈现接线。没有本范围内的整文件删除项。此登记不授权删除 `NEAdaptiveUIKit/`、云端/本地会话组件或其他 UIKit；这些组件的接入与依赖由客户在明确的额外范围中处理。不扫描闭源 `NEChatKit`、旧副本、OC 或 SwiftUI。
+本清单仅覆盖开源根目录的 `NEChatUIKit/` 和 `IMUIKitExample/` 中自适应呈现接线。没有本范围内的整文件删除项。此登记不授权删除 `NEAdaptiveUIKit/`、云端/本地会话组件或其他 UIKit；这些组件的接入与依赖由客户在明确的额外范围中处理。不扫描闭源 `NEChatKit`、旧副本、OC 或 SwiftUI。
 
 ## 局部编辑
 
-- `app/Main/NETabBarController.swift`：移除 `NEAdaptiveUIKit` import、`NEAdaptiveDemoNavigationController` 的 root push 前置接线及 `presentSectionChild` 绑定/解绑、`adaptiveShell`、`installAdaptiveShell`、`restoreLegacyShell`、`makeAdaptiveConversation`、`makeAdaptiveEmptyDetail`、配置（包含返回位置、侧栏圆形控件/右侧操作/角标样式与底部入口组间距；页面导航动作迁移与转发由外壳内部完成，无额外接线）、onContentLayout 中根列表 listSelectionBackgroundColor 绑定、`onCompactChatVisibilityChanged` 返回入口隐藏接线、updateTableContentInsets 接线及旧布局恢复时的清理和绑定/解绑；恢复原三个导航栈的 tab 宿主。保留原 unread/contact/team listener、皮肤资源、角标、语言更新及旧路由行为。
-- `app/Main/SceneDelegate.swift`：移除 shell window refresh 与通知入口选择 shell section；通知使用原 tab 消息导航栈。保留呼叫的模拟器编译保护、登录和通知业务逻辑。
-- `app/en.lproj/Localizable.strings`、`app/zh-Hans.lproj/Localizable.strings`：删除 `adaptive_back`，保留既有返回文案。
+- `IMUIKitExample/Main/NETabBarController.swift`：移除 `NEAdaptiveUIKit` import、`NEAdaptiveDemoNavigationController` 的 root push 前置接线及 `presentSectionChild` 绑定/解绑、`adaptiveShell`、`installAdaptiveShell`、`restoreLegacyShell`、`makeAdaptiveConversation`、`makeAdaptiveEmptyDetail`、配置（包含返回位置、侧栏圆形控件/右侧操作/角标样式与底部入口组间距；页面导航动作迁移与转发由外壳内部完成，无额外接线）、onContentLayout 中根列表 listSelectionBackgroundColor 绑定、`onCompactChatVisibilityChanged` 返回入口隐藏接线、updateTableContentInsets 接线及旧布局恢复时的清理和绑定/解绑；恢复原三个导航栈的 tab 宿主。保留原 unread/contact/team listener、皮肤资源、角标、语言更新及旧路由行为。
+- `IMUIKitExample/Main/SceneDelegate.swift`：移除 shell window refresh 与通知入口选择 shell section；通知使用原 tab 消息导航栈。保留呼叫的模拟器编译保护、登录和通知业务逻辑。
+- `IMUIKitExample/en.lproj/Localizable.strings`、`IMUIKitExample/zh-Hans.lproj/Localizable.strings`：删除 `adaptive_back`，保留既有返回文案。
 - `NEChatUIKit/NEChatUIKit/Classes/ChatRouter/NEBaseChatRouter.swift`：移除 `NEConversationPresentationBlock`、关联对象 key、`setConversationPresentationHandler`、`presentConversationIfHandled`、`applyPresentationParameters`。保留 registerCommon 与原业务路由。
 - `NEChatUIKit/NEChatUIKit/Classes/NormalUI/NormalChatRouter.swift`、`NEChatUIKit/NEChatUIKit/Classes/FunUI/FunChatRouter.swift`：删除四类默认会话路由开头的 optional presentation 拦截，完整保留默认 handler 创建、anchor、新消息恢复、旧栈回收以及客户 Router 覆盖机制。
 - `NEChatUIKit/NEChatUIKit.podspec`：仅在确认本模块剩余源码没有实际依赖后删除 `NEAdaptiveUIKit` 依赖。其他依赖不变。

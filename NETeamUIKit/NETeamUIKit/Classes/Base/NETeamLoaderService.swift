@@ -17,6 +17,10 @@ public class NETeamLoaderService: NSObject {
   /// 此方法会在模块被加载时调用
   open func setupInit() {
     ChatKitClient.shared.registerInit(NETeamService.shared)
-    ChatKitClient.shared.buryDataPoints("TeamUIKit")
+    ChatKitClient.shared.buryDataPoints(
+      "TeamUIKit",
+      version: ChatKitClient.componentVersion(for: Bundle(for: NETeamLoaderService.self),
+                                             fallback: imkitVersion)
+    )
   }
 }

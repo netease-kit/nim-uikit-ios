@@ -154,6 +154,12 @@
           return navigation
         }
       }
+      if let tab = tabNavigationSource(in: page) {
+        navigation.customBar = tab.bar
+        navigation.customBackControl = tab.back
+        navigation.customTrailingControls = tab.trailing
+        return navigation
+      }
       if let custom = customHeaderSource(in: page) {
         navigation.usesCustomHeader = true
         navigation.customBackControl = custom.back
@@ -171,6 +177,38 @@
         return navigation
       }
       return nil
+    }
+
+    /// 根列表使用的 `TabNavigationView`（会话/通讯录/我的）：
+    /// 单屏时它左列根列表仍紧邻侧栏，右侧搜索/添加按钮迁移到 rail 更整齐。
+    private static func tabNavigationSource(in page: UIViewController)
+      -> (bar: UIView, back: UIButton?, trailing: [UIButton])? {
+      var match: UIView?
+      func walk(_ view: UIView) {
+        if match != nil { return }
+        if isTabNavigationView(view), !view.isHidden, view.superview != nil {
+          match = view
+          return
+        }
+        for child in view.subviews { walk(child) }
+      }
+      walk(page.view)
+      guard let bar = match, bar.bounds.width > 0 else { return nil }
+      let trailing = controls(in: bar, identifiers: ["id.titleBarSearchImg", "id.titleBarMoreImg"])
+        .sorted { $0.convert($0.bounds, to: bar).minX < $1.convert($1.bounds, to: bar).minX }
+      let back = firstControl(in: bar, identifiers: ["id.backArrow"])
+      guard !trailing.isEmpty || back != nil else { return nil }
+      return (bar, back, trailing)
+    }
+
+    private static func isTabNavigationView(_ view: UIView) -> Bool {
+      var cls: AnyClass? = type(of: view)
+      while let current = cls {
+        let name = NSStringFromClass(current)
+        if name == "TabNavigationView" || name.hasSuffix(".TabNavigationView") { return true }
+        cls = class_getSuperclass(current)
+      }
+      return false
     }
 
     // MARK: - 来源解析

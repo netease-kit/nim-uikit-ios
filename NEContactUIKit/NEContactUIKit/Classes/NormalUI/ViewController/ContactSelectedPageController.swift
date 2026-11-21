@@ -8,7 +8,8 @@ import UIKit
 open class ContactSelectedPageController: NEBaseContactSelectedPageController {
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    pagingViewControllerTopAnchor?.constant = topConstant
+    // 与 OC 对齐：这里直接用统一的选择变更逻辑，避免重置顶边距后盖住已选头像条。
+    didChangeSelectUser()
   }
 
   override open func getContentControllers(_ filterUsers: Set<String>? = nil) -> [NEBaseFusionContactSelectedController]? {

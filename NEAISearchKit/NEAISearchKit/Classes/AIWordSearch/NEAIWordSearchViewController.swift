@@ -92,6 +92,18 @@ open class NEAIWordSearchViewController: UIViewController, NEAIWordSearchViewMod
     }
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // 结果面板可能被嵌入右列（宽约 558），行高必须按当前列表宽度重测；
+    // 首次布局时宽度从 0 变成列宽，也需要补一次重算。
+    let width = contentTableView.bounds.width
+    guard width > 0, abs(width - (viewModel.itemMaxWidth ?? 0)) > 0.5 else { return }
+    viewModel.updateItemMaxWidth(width)
+    if !viewModel.data.isEmpty {
+      contentTableView.reloadData()
+    }
+  }
+
   override open func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     if modalPresentationStyle == .overCurrentContext,

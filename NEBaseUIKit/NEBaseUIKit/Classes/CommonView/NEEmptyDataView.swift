@@ -13,6 +13,17 @@ open class NEEmptyDataView: UIView {
   private var content: String?
   public var widthConstraint: NSLayoutConstraint?
   public var heightConstraint: NSLayoutConstraint?
+  /// 图片距顶部的约束（默认 176，保持既有页面视觉不变）。
+  public private(set) var imageTopConstraint: NSLayoutConstraint?
+
+  /// 为 true 时，图片 + 文案整体在自身高度内垂直居中。
+  ///
+  /// 默认 false：沿用原设计（距顶 176）以保持既有页面一致；容器宽高比与手机差异较大时
+  /// （折叠屏展开左列 320×657、或竖屏之外的窗口）固定 176 会把空态推到容器底部甚至裁掉，
+  /// 这类页面应打开该开关并按容器高度布局。
+  public var verticallyCentersContent = false {
+    didSet { setNeedsLayout() }
+  }
 
   /// 空占位图
   public lazy var emptyImageView: UIImageView = {
@@ -65,16 +76,36 @@ open class NEEmptyDataView: UIView {
     widthConstraint?.isActive = true
     heightConstraint = emptyImageView.heightAnchor.constraint(equalToConstant: 91)
     heightConstraint?.isActive = true
-    NSLayoutConstraint.activate([
-      emptyImageView.topAnchor.constraint(equalTo: topAnchor, constant: 176),
-      emptyImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-    ])
+    imageTopConstraint = emptyImageView.topAnchor.constraint(equalTo: topAnchor, constant: 176)
+    if let imageTopConstraint {
+      imageTopConstraint.isActive = true
+    }
+    emptyImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
 
     NSLayoutConstraint.activate([
       contentLabel.topAnchor.constraint(equalTo: emptyImageView.bottomAnchor, constant: 8),
       contentLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 20),
       contentLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
     ])
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    guard verticallyCentersContent, bounds.height > 0, let imageTopConstraint else { return }
+    let imageHeight = heightConstraint?.constant ?? 91
+    let labelHeight: CGFloat
+    if contentLabel.bounds.height > 0 {
+      labelHeight = contentLabel.bounds.height
+    } else {
+      labelHeight = contentLabel.sizeThatFits(
+        CGSize(width: max(0, bounds.width - 40), height: .greatestFiniteMagnitude)
+      ).height
+    }
+    let contentHeight = imageHeight + 8 + max(0, labelHeight)
+    let offset = max(0, (bounds.height - contentHeight) / 2)
+    if abs(imageTopConstraint.constant - offset) > 0.5 {
+      imageTopConstraint.constant = offset
+    }
   }
 
   func setupSubviewStyle() {

@@ -312,8 +312,18 @@ open class NEBaseHistorySearchController: NEChatBaseViewController, UITextFieldD
         self?.searchTextField.isHidden = true
       }
 
-      self?.emptyView.isHidden = self?.viewModel.messages.isEmpty == false
-      self?.tableView.isHidden = self?.viewModel.messages.isEmpty == true
+      let empty = self?.viewModel.messages.isEmpty ?? true
+      self?.emptyView.isHidden = !empty
+      if empty {
+        // 无结果时收起快捷分类入口并把空态页置顶，避免点击穿透到“按图片/按文件”。
+        self?.tipLable.isHidden = true
+        self?.collectionView.isHidden = true
+        self?.emptyView.isUserInteractionEnabled = true
+        if let view = self?.view, let emptyView = self?.emptyView {
+          view.bringSubviewToFront(emptyView)
+        }
+      }
+      self?.tableView.isHidden = empty
       self?.tableView.reloadData()
       if firstLoad {
         self?.tableView.contentOffset = .zero

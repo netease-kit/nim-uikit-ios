@@ -66,44 +66,44 @@
     "NETeamUIKit/NETeamUIKit/Classes/Base/NETeamService.swift",
     "NETeamUIKit/NETeamUIKit/Classes/Setting/NEBaseTeamMemberSelectController.swift",
     "NETeamUIKit/NETeamUIKit/Classes/Setting/NEBaseTeamMembersController.swift",
-    "app.xcodeproj/project.pbxproj",
-    "app/Custom/CustomConfig.swift",
-    "app/Custom/CustomContactTableViewCell.swift",
-    "app/Custom/CustomConversationController.swift",
-    "app/Custom/CustomConversationListCell.swift",
-    "app/Custom/CustomP2PChatViewController.swift",
-    "app/Main/Constant.swift",
-    "app/Main/NETabBarController.swift",
-    "app/Main/SceneDelegate.swift",
-    "app/Main/UIStyleManager.swift",
-    "app/Mine/Controller/ConfigTestViewController.swift",
-    "app/Mine/Controller/IMPocConfigViewController.swift",
-    "app/Mine/Controller/IMPushConfigViewController.swift",
-    "app/Mine/Controller/InputPersonInfoController.swift",
-    "app/Mine/Controller/LanguageViewController.swift",
-    "app/Mine/Controller/MeViewController.swift",
-    "app/Mine/Controller/MessageRemindViewController.swift",
-    "app/Mine/Controller/MineSettingViewController.swift",
-    "app/Mine/Controller/NELoginViewController.swift",
-    "app/Mine/Controller/PersonInfoViewController.swift",
-    "app/Mine/Controller/PocLoginViewController.swift",
-    "app/Mine/Controller/TranslationLanguageViewController.swift",
-    "app/Mine/Controller/TranslationSettingViewController.swift",
-    "app/Mine/View/BirthdayDatePickerView.swift",
-    "app/Mine/View/Theme/CustomSettingInputCell.swift",
-    "app/Mine/View/Theme/CustomSettingTextviewCell.swift",
-    "app/Mine/View/Theme/CustomTeamArrowSettingCell.swift",
-    "app/Mine/View/Theme/CustomTeamSettingHeaderCell.swift",
-    "app/Mine/View/Theme/CustomTeamSettingRightCustomCell.swift",
-    "app/Mine/View/Theme/CustomTeamSettingSubtitleCell.swift",
-    "app/Mine/View/Theme/CustomTeamSettingSwitchCell.swift",
-    "app/Mine/ViewModel/MineSettingViewModel.swift",
-    "app/en.lproj/Localizable.strings",
-    "app/zh-Hans.lproj/Localizable.strings"
+    "IMUIKitExample.xcodeproj/project.pbxproj",
+    "IMUIKitExample/Custom/CustomConfig.swift",
+    "IMUIKitExample/Custom/CustomContactTableViewCell.swift",
+    "IMUIKitExample/Custom/CustomConversationController.swift",
+    "IMUIKitExample/Custom/CustomConversationListCell.swift",
+    "IMUIKitExample/Custom/CustomP2PChatViewController.swift",
+    "IMUIKitExample/Main/Constant.swift",
+    "IMUIKitExample/Main/NETabBarController.swift",
+    "IMUIKitExample/Main/SceneDelegate.swift",
+    "IMUIKitExample/Main/UIStyleManager.swift",
+    "IMUIKitExample/Mine/Controller/ConfigTestViewController.swift",
+    "IMUIKitExample/Mine/Controller/IMPocConfigViewController.swift",
+    "IMUIKitExample/Mine/Controller/IMPushConfigViewController.swift",
+    "IMUIKitExample/Mine/Controller/InputPersonInfoController.swift",
+    "IMUIKitExample/Mine/Controller/LanguageViewController.swift",
+    "IMUIKitExample/Mine/Controller/MeViewController.swift",
+    "IMUIKitExample/Mine/Controller/MessageRemindViewController.swift",
+    "IMUIKitExample/Mine/Controller/MineSettingViewController.swift",
+    "IMUIKitExample/Mine/Controller/NELoginViewController.swift",
+    "IMUIKitExample/Mine/Controller/PersonInfoViewController.swift",
+    "IMUIKitExample/Mine/Controller/PocLoginViewController.swift",
+    "IMUIKitExample/Mine/Controller/TranslationLanguageViewController.swift",
+    "IMUIKitExample/Mine/Controller/TranslationSettingViewController.swift",
+    "IMUIKitExample/Mine/View/BirthdayDatePickerView.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomSettingInputCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomSettingTextviewCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomTeamArrowSettingCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomTeamSettingHeaderCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomTeamSettingRightCustomCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomTeamSettingSubtitleCell.swift",
+    "IMUIKitExample/Mine/View/Theme/CustomTeamSettingSwitchCell.swift",
+    "IMUIKitExample/Mine/ViewModel/MineSettingViewModel.swift",
+    "IMUIKitExample/en.lproj/Localizable.strings",
+    "IMUIKitExample/zh-Hans.lproj/Localizable.strings"
   ],
   "common_removals": [
-    "app/Mine/Controller/StyleSelectionViewController.swift",
-    "app/Mine/View/StyleSelectionCell.swift"
+    "IMUIKitExample/Mine/Controller/StyleSelectionViewController.swift",
+    "IMUIKitExample/Mine/View/StyleSelectionCell.swift"
   ],
   "shared_migrations": {
     "fun": [
@@ -135,14 +135,14 @@
         "NELocalConversationUIKit/NELocalConversationUIKit/Assets/NormalLocalConversationUIKit.xcassets",
         "NETeamUIKit/NETeamUIKit/Classes/NormalUI",
         "NETeamUIKit/NETeamUIKit/Assets/NormalTeamUIKit.xcassets",
-        "app/Assets.xcassets/Tabbar/chat.imageset",
-        "app/Assets.xcassets/Tabbar/chatSelect.imageset",
-        "app/Assets.xcassets/Tabbar/contact.imageset",
-        "app/Assets.xcassets/Tabbar/contactSelect.imageset",
-        "app/Assets.xcassets/Tabbar/person.imageset",
-        "app/Assets.xcassets/Tabbar/personSelect.imageset",
-        "app/Assets.xcassets/Mine/clicked_normal.imageset",
-        "app/Assets.xcassets/Mine/style_normal.imageset"
+        "IMUIKitExample/Assets.xcassets/Tabbar/chat.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/chatSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/contact.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/contactSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/person.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/personSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Mine/clicked_normal.imageset",
+        "IMUIKitExample/Assets.xcassets/Mine/style_normal.imageset"
       ],
       "markers": [
         "NormalUI",
@@ -167,7 +167,7 @@
       ],
       "accepted_candidates": [],
       "project_cleanup": {
-        "app.xcodeproj/project.pbxproj": [
+        "IMUIKitExample.xcodeproj/project.pbxproj": [
           "StyleSelectionViewController.swift",
           "StyleSelectionCell.swift"
         ]
@@ -196,14 +196,14 @@
         "NELocalConversationUIKit/NELocalConversationUIKit/Assets/FunLocalConversationUIKit.xcassets",
         "NETeamUIKit/NETeamUIKit/Classes/FunUI",
         "NETeamUIKit/NETeamUIKit/Assets/FunTeamUIKit.xcassets",
-        "app/Assets.xcassets/Tabbar/funChat.imageset",
-        "app/Assets.xcassets/Tabbar/funChatSelect.imageset",
-        "app/Assets.xcassets/Tabbar/funContact.imageset",
-        "app/Assets.xcassets/Tabbar/funContactSelect.imageset",
-        "app/Assets.xcassets/Tabbar/funPerson.imageset",
-        "app/Assets.xcassets/Tabbar/funPersonSelect.imageset",
-        "app/Assets.xcassets/Mine/clicked_fun.imageset",
-        "app/Assets.xcassets/Mine/style_fun.imageset"
+        "IMUIKitExample/Assets.xcassets/Tabbar/funChat.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/funChatSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/funContact.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/funContactSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/funPerson.imageset",
+        "IMUIKitExample/Assets.xcassets/Tabbar/funPersonSelect.imageset",
+        "IMUIKitExample/Assets.xcassets/Mine/clicked_fun.imageset",
+        "IMUIKitExample/Assets.xcassets/Mine/style_fun.imageset"
       ],
       "markers": [
         "FunUI",
@@ -231,7 +231,7 @@
         "didStyleClick"
       ],
       "project_cleanup": {
-        "app.xcodeproj/project.pbxproj": [
+        "IMUIKitExample.xcodeproj/project.pbxproj": [
           "StyleSelectionViewController.swift",
           "StyleSelectionCell.swift"
         ]

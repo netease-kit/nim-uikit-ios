@@ -393,3 +393,4 @@
 "last_read_position_overflow"="99+ 条新消息";
 "last_read_position_accessibility_hint"="返回上次阅读位置后的第一条消息";
 "bot_sub_session_delete_failed"="删除失败，请重试";
+"reaction_sync_failed"="表情状态同步失败，请重试";

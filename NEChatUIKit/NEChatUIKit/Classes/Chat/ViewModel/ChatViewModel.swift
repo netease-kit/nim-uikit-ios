@@ -277,7 +277,7 @@ open class ChatViewModel: NSObject {
     let manager = MessageReactionManager(conversationId: conversationId,
                                          currentAccountId: IMKitClient.instance.account())
     manager.onSyncFailure = { [weak self] _, _ in
-      self?.delegate?.showErrorToast?(nil, "表情状态同步失败，请重试")
+      self?.delegate?.showErrorToast?(nil, chatLocalizable("reaction_sync_failed"))
     }
     manager.addObserver(self)
     manager.start()

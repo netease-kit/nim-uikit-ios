@@ -17,6 +17,10 @@ public class NELocalConversationLoaderService: NSObject {
   /// 此方法会在模块被加载时调用
   open func setupInit() {
     ChatKitClient.shared.registerInit(NELocalConversationService.shared)
-    ChatKitClient.shared.buryDataPoints("LocalConversationUIKit")
+    ChatKitClient.shared.buryDataPoints(
+      "LocalConversationUIKit",
+      version: ChatKitClient.componentVersion(for: Bundle(for: NELocalConversationLoaderService.self),
+                                             fallback: imkitVersion)
+    )
   }
 }

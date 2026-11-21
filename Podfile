@@ -8,7 +8,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 source 'https://github.com/netease-im/Specs.git'
 source 'https://gitee.com/netease-im/Specs.git'
 
-target 'app' do
+target 'IMUIKitExample' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 

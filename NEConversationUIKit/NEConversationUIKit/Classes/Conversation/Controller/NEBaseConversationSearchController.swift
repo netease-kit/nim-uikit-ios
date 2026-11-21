@@ -83,10 +83,26 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
     initialConfig()
     setupSubviews()
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: DispatchWorkItem(block: { [weak self] in
-      self?.searchTextField.becomeFirstResponder()
-    }))
+    let focusItem = DispatchWorkItem(block: { [weak self] in
+      guard let self, self.isViewLoaded, self.view.window != nil,
+            self.navigationController?.topViewController === self else { return }
+      self.searchTextField.becomeFirstResponder()
+    })
+    pendingSearchFocus = focusItem
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: focusItem)
   }
+
+  override open func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    pendingSearchFocus?.cancel()
+    pendingSearchFocus = nil
+    // 进入聊天页后搜索页不会立刻销毁，必须主动收起搜索键盘，
+    // 否则搜索键盘会留在聊天页上盖住输入栏（折叠态反复进入时复现）。
+    searchTextField.resignFirstResponder()
+    view.endEditing(true)
+  }
+
+  private var pendingSearchFocus: DispatchWorkItem?
 
   open func initialConfig() {
     title = commonLocalizable("search")
@@ -191,6 +207,11 @@ open class NEBaseConversationSearchController: NEConversationBaseViewController,
   }
 
   open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    // 搜索结果点击后先收起搜索框键盘，避免搜索键盘残留到聊天页覆盖输入栏。
+    pendingSearchFocus?.cancel()
+    pendingSearchFocus = nil
+    searchTextField.resignFirstResponder()
+    view.endEditing(true)
     weak var weakSelf = self
     if indexPath.section == 0 {
       let searchModel = viewModel.friendDatas[indexPath.row]

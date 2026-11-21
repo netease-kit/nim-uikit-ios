@@ -371,6 +371,19 @@
   /// One right rail, retained section stacks, and a retained double-column content container.
   @objcMembers public final class NEAdaptiveShellViewController: UIViewController, NEConversationPresentationHandler, UITabBarDelegate {
     public let configuration: NEAdaptiveShellConfiguration
+
+    /// 侧栏动作即将执行时广播入口的窗口坐标，页面弹窗据此定位。
+    public static let railActionWillPerform = Notification.Name("NEAdaptiveRailActionWillPerform")
+
+    /// 是否把头部分区根列表的导航栏按钮迁移到侧栏。
+    /// 仅在“展开后被转成竖屏（669x951 单栏）”时为 true；折叠单屏保持原导航栏按钮。
+    public var migratesSectionRootNavigation = false {
+      didSet {
+        guard oldValue != migratesSectionRootNavigation else { return }
+        resetRailNavigationBindings()
+        if isViewLoaded { layoutContent() }
+      }
+    }
     public let sections: [UINavigationController]
     public let detailHost: NEChatDetailHostController
     public let conversationCoordinator: NEConversationNavigationCoordinator
@@ -649,14 +662,49 @@
       super.viewDidLayoutSubviews(); refreshWindow(); layoutContent()
     }
 
-    override public func viewSafeAreaInsetsDidChange() { super.viewSafeAreaInsetsDidChange(); refreshWindow() }
+    /// 折叠/展开时最后到达的往往只有安全区变化（窗口尺寸可能先到）。过去这里只
+    /// `refreshWindow()`：窗口快照按"窗口"去重，若窗口值没变就不会重排，内容列会
+    /// 停在过渡态几何上（真机"展开 → 折叠"后整列右移的根因）。现在显式重排并自检。
+    override public func viewSafeAreaInsetsDidChange() {
+      super.viewSafeAreaInsetsDidChange()
+      NEAdaptiveDiagnostics.shared.log("safeArea",
+        "view=\(NEAdaptiveDiagnostics.describe(view.safeAreaInsets)) "
+        + "window=\(NEAdaptiveDiagnostics.describe(view.window?.safeAreaInsets ?? .zero)) "
+        + "bounds=\(NEAdaptiveDiagnostics.describe(view.bounds)) geometry=\(NEAdaptiveDiagnostics.currentSummary())")
+      refreshWindow()
+      layoutContent()
+      scheduleLayoutAudit(reason: "safeArea")
+    }
+
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
       super.viewWillTransition(to: size, with: coordinator)
-      coordinator.animate(alongsideTransition: { [weak self] _ in self?.refreshWindow() }, completion: { [weak self] _ in self?.refreshWindow() })
+      isPostureTransitioning = true
+      pendingFoldInstantWork = false
+      auditPendingAfterTransition = true
+      NEAdaptiveDiagnostics.shared.log("transition",
+        "begin to=\(NEAdaptiveDiagnostics.describe(CGRect(origin: .zero, size: size))) "
+        + "bounds=\(NEAdaptiveDiagnostics.describe(view.bounds)) safe=\(NEAdaptiveDiagnostics.describe(view.safeAreaInsets))")
+      NEAdaptiveDiagnostics.shared.dumpEnvironment("transition.begin")
+      coordinator.animate(alongsideTransition: { [weak self] _ in self?.refreshWindow() }, completion: { [weak self] _ in
+        guard let self else { return }
+        self.isPostureTransitioning = false
+        NEAdaptiveDiagnostics.shared.log("transition",
+          "end bounds=\(NEAdaptiveDiagnostics.describe(self.view.bounds)) safe=\(NEAdaptiveDiagnostics.describe(self.view.safeAreaInsets))")
+        // 过渡结束必须按最终几何再排一次，并补做被推迟的折叠瞬间工作。
+        self.refreshWindow()
+        self.layoutContent()
+        self.runPendingFoldInstantWorkIfNeeded()
+        NEAdaptiveDiagnostics.shared.dumpEnvironment("transition.end")
+        self.scheduleLayoutAudit(reason: "transition.end")
+      })
     }
 
     override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-      super.traitCollectionDidChange(previousTraitCollection); refreshWindow()
+      super.traitCollectionDidChange(previousTraitCollection)
+      NEAdaptiveDiagnostics.shared.log("trait",
+        "h=\(traitCollection.horizontalSizeClass.rawValue) v=\(traitCollection.verticalSizeClass.rawValue) "
+        + "scale=\(traitCollection.displayScale)")
+      refreshWindow()
     }
 
     /// SceneDelegate can forward scene updates here. Root/safe-area/trait updates are automatic.
@@ -665,7 +713,12 @@
       if observedWindow !== window {
         context?.invalidate()
         observedWindow = window
-        context = NEAdaptiveWindowContext(window: window) { [weak self] snapshot in self?.apply(snapshot) }
+        NEAdaptiveDiagnostics.shared.log("window", "attach bounds=\(NEAdaptiveDiagnostics.describe(window.bounds)) safe=\(NEAdaptiveDiagnostics.describe(window.safeAreaInsets))")
+        NEAdaptiveDiagnostics.shared.dumpEnvironment("window.attach")
+        // 布局读的是本视图的 bounds/safeAreaInsets，快照也用同一来源；
+        // 真机转场里窗口与视图的安全区会短暂不同步（实测 view r88 / window r84），
+        // 只采窗口会把这次变化判成“无变化”而跳过重排。
+        context = NEAdaptiveWindowContext(window: window, samplingView: view) { [weak self] snapshot in self?.apply(snapshot) }
       }
       context?.refresh()
     }
@@ -939,13 +992,21 @@
         return
       }
       // 折叠态从通讯录等分区进入聊天时，返回优先回到来源分区；
-      // 页面自身的返回 binding 不能越过这个来源信息。
-      if restoreCompactChatOriginSection() {
+      // 但只有「当前可见页就是聊天根」才成立：聊天栈上方的设置页/子页面/present 页面
+      // 必须逐级返回，不能直接跳回来源分区（否则会跳过聊天页）。
+      if isCompactChatRootVisible, restoreCompactChatOriginSection() {
         view.setNeedsLayout()
         return
       }
       railBackHandler?()
       view.setNeedsLayout()
+    }
+
+    /// 折叠态可见页是否为聊天根（占位页之上只有一个会话页）。
+    private var isCompactChatRootVisible: Bool {
+      guard !isUsingLegacyLayout, decision?.mode == .compact else { return false }
+      let stack = conversationCoordinator.navigationController.viewControllers
+      return !conversationCoordinator.isShowingPlaceholder && stack.count <= 2
     }
 
     /// 恢复折叠态聊天的来源分区；没有来源或已展开时返回 false。
@@ -967,7 +1028,17 @@
 
     @objc private func railActionTapped(_ sender: UIButton) {
       guard railActions.indices.contains(sender.tag) else { return }
-      railActions[sender.tag].perform()
+      let action = railActions[sender.tag]
+      // 页面弹窗需要知道入口的真实位置（按钮已从导航栏迁到侧栏）。
+      if let identifier = action.identifier, let window = view.window {
+        let frame = sender.convert(sender.bounds, to: window)
+        NotificationCenter.default.post(
+          name: NEAdaptiveShellViewController.railActionWillPerform,
+          object: nil,
+          userInfo: ["identifier": identifier, "frame": NSValue(cgRect: frame)]
+        )
+      }
+      action.perform()
     }
 
     /// present/dismiss 发生时立即重解析承载链并压制入口；不做整页布局，避免打断转场。
@@ -1060,6 +1131,14 @@
       }
     }
 
+    private func resetRailNavigationBindings() {
+      for (key, binding) in railNavigationBindings {
+        binding.onChange = nil
+        binding.restore()
+        railNavigationBindings[key] = nil
+      }
+    }
+
     /// 每轮布局把页面导航栏的返回/右侧按钮同步到侧栏，并在页面切换时归还原入口。
     private func syncRailNavigation(legacy: Bool, compactChat: Bool) {
       if legacy {
@@ -1080,6 +1159,15 @@
       // 链上每一页都保持压制，避免叠加 present 时底层页面的返回/动作重新露出；
       // 侧栏只展示最上层页面的入口。
       for page in chain {
+        // 折叠单屏：头部分区根列表保留自己的导航栏按钮，不迁移到侧栏。
+        if !migratesSectionRootNavigation, sections.contains(where: { $0.viewControllers.first === page }) {
+          if let existing = railNavigationBindings[ObjectIdentifier(page)] {
+            existing.onChange = nil
+            existing.restore()
+            railNavigationBindings[ObjectIdentifier(page)] = nil
+          }
+          continue
+        }
         _ = bindRailNavigationIfNeeded(for: page)
       }
       let topPage = chain.last
@@ -1264,6 +1352,14 @@
       let wasSinglePage = old?.mode == .compact || isUsingLegacyLayout
       decision = NEAdaptiveLayoutPolicy.resolve(window: .init(width: snapshot.size.width, height: snapshot.size.height,
                                                               top: snapshot.safeAreaTop, left: snapshot.safeAreaLeft, bottom: snapshot.safeAreaBottom, right: snapshot.safeAreaRight), configuration: configuration.policy)
+      if old != decision {
+        let from = old.map { String(describing: $0.mode) } ?? "nil"
+        let to = decision.map { String(describing: $0.mode) } ?? "nil"
+        let fallback = decision.map { String(describing: $0.fallback) } ?? "-"
+        NEAdaptiveDiagnostics.shared.log("decision",
+          "\(from) -> \(to) fallback=\(fallback) window=\(NEAdaptiveDiagnostics.describe(CGRect(origin: .zero, size: snapshot.size))) "
+          + "safe=\(NEAdaptiveDiagnostics.describe(UIEdgeInsets(top: snapshot.safeAreaTop, left: snapshot.safeAreaLeft, bottom: snapshot.safeAreaBottom, right: snapshot.safeAreaRight)))")
+      }
       let enteringFallback = decision?.mode == nil && !isUsingLegacyLayout
       isUsingLegacyLayout = decision?.mode == nil
       if !wasSinglePage, decision?.mode == .compact || isUsingLegacyLayout {
@@ -1277,10 +1373,23 @@
 
     private func layoutContent() {
       guard isViewLoaded else { return }
+      layoutSequence &+= 1
+      let sequence = layoutSequence
+      let startBounds = view.bounds
+      let startSafe = view.safeAreaInsets
       let enteringFallback = syncDecisionToCurrentViewBounds()
       guard let decision else { return }
+      let enteringCompact = lastLaidOutMode != .compact && decision.mode == .compact
+      if enteringCompact, sectionHosts.indices.contains(selectedSectionIndex),
+         let top = sectionHosts[selectedSectionIndex].content.topViewController {
+        var snapshot: [(table: UITableView, offset: CGPoint)] = []
+        captureTableOffsets(in: top.view, into: &snapshot)
+        foldOffsetSnapshot = snapshot
+        NEAdaptiveDiagnostics.shared.log("fold", "capture offsets=\(snapshot.count)")
+      }
       if decision.mode != .compact {
         compactChatOriginSection = nil
+        foldOffsetSnapshot.removeAll()
       }
       // 用户从聊天页返回占位后，不能继续用旧 intent 判断“右列仍打开会话”。
       _ = conversationCoordinator.syncActiveIntentWithNavigationStack()
@@ -1305,6 +1414,8 @@
       let contentBottom = legacy ? safe.maxY - tabHeight : view.bounds.maxY
       // Duo keeps a small design gap above the hosted page. Its color is
       // resolved from the active section so the strip remains continuous.
+      // 内容顶部恢复原设计距离（窗口顶部 + 设计 gap）。单屏时导航栏右侧按钮已迁移到
+      // rail，标题在左侧不会与右上角状态栏重叠；rail 自己再按 safe.top 下移避让。
       let contentTop = legacy
         ? safe.minY
         : view.bounds.minY + max(0, configuration.contentTopInset)
@@ -1366,9 +1477,10 @@
       if legacy {
         backTop = contentTop
       } else if let occlusionBottom = railMetrics.railOcclusionBottom {
-        backTop = min(max(contentTop, occlusionBottom), max(contentTop, safe.maxY - backSize))
+        backTop = min(max(max(contentTop, occlusionBottom), safe.minY), max(contentTop, safe.maxY - backSize))
       } else {
-        backTop = min(max(contentTop, view.bounds.minY + configuration.railBackTopInset), max(contentTop, safe.maxY - backSize))
+        // rail 控件避让顶部安全区：内容可以贴顶，但按钮在右侧，必须避开状态栏/系统按钮。
+        backTop = min(max(contentTop, safe.minY + configuration.railBackTopInset), max(contentTop, safe.maxY - backSize))
       }
       // 返回按钮固定在垂直轴顶部（HIG），右侧操作紧随其下；
       // 窗口高度不足时上移整组控件，避免压住底部入口组。
@@ -1419,13 +1531,15 @@
           top.view.layoutIfNeeded()
           if lastLaidOutMode != .compact {
             // 折叠瞬间：行高依赖宽度重算，重新加载一次并用有效内容高度校正偏移。
-            reloadTablesAndResetOffset(in: top.view)
-            // 折叠后偶发"层级与数据都正常但不绘制"：做一次可见性抖动并强制提交一帧。
-            host.view.isHidden = true
-            host.view.isHidden = false
-            top.view.setNeedsDisplay()
-            top.view.layer.setNeedsDisplay()
-            CATransaction.flush()
+            // 转场动画进行中不能做——那时宽度是中间值，重载后的行高/偏移会固化下来，
+            // 必须等动画结束用最终宽度再做（真机"折叠后整列错位、切 tab 才恢复"）。
+            if isPostureTransitioning {
+              pendingFoldInstantWork = true
+              NEAdaptiveDiagnostics.shared.log("fold",
+                "defer width=\(String(format: "%.1f", view.bounds.width)) safe=\(NEAdaptiveDiagnostics.describe(view.safeAreaInsets))")
+            } else {
+              performFoldInstantWork(in: top)
+            }
           }
           fixOverflowingScrollOffsets(in: top.view)
         }
@@ -1547,10 +1661,17 @@
       onContentLayout?(sections + [conversationCoordinator.navigationController] + sectionHosts.compactMap(\.splitDetail))
       onGeometryChanged?(["windowWidth": view.window?.bounds.width ?? view.bounds.width,
                           "windowHeight": view.window?.bounds.height ?? view.bounds.height, "contentWidth": contentHost.bounds.width,
+                          "contentHostX": contentHost.frame.minX, "contentHostY": contentHost.frame.minY,
+                          "safeLeft": view.safeAreaInsets.left, "safeRight": view.safeAreaInsets.right,
+                          "safeTop": view.safeAreaInsets.top, "safeBottom": view.safeAreaInsets.bottom,
                           "masterWidth": decision.masterWidth, "detailWidth": detailHost.view.bounds.width,
                           "railWidth": legacy ? 0 : railWidth,
+                          "section": selectedSectionIndex, "paired": isShowingPairedContent,
+                          "legacy": isUsingLegacyLayout, "transitioning": isPostureTransitioning,
                           "mode": legacy ? "legacy" : String(describing: decision.mode!)] as NSDictionary)
       NotificationCenter.default.post(name: Notification.Name("NEAdaptiveGeometryDidChange"), object: self)
+      recordLayout(sequence: sequence, startBounds: startBounds, startSafe: startSafe,
+                   mode: decision.mode, contentHost: contentHost.frame, masterWidth: masterWidth)
       if enteringFallback {
         legacyFallbackPending = conversationCoordinator.activeIntent != nil
         if !legacyFallbackPending { onLegacyFallback?() }
@@ -1568,11 +1689,12 @@
     private func syncDecisionToCurrentViewBounds() -> Bool {
       guard view.bounds.width > 0, view.bounds.height > 0 else { return false }
       let safe = view.safeAreaInsets
-      let current = NEAdaptiveLayoutPolicy.resolve(
+      let resolved = NEAdaptiveLayoutPolicy.resolve(
         window: .init(width: view.bounds.width, height: view.bounds.height,
                       top: safe.top, left: safe.left, bottom: safe.bottom, right: safe.right),
         configuration: configuration.policy
       )
+      let current = resolved
       guard current != decision else { return false }
       let old = decision
       let wasSinglePage = old?.mode == .compact || isUsingLegacyLayout
@@ -1591,6 +1713,19 @@
     /// 统一迁移：展开态把左列子页面移入共享右列；折叠态把右列一级页面移回
     /// 左列。唯一的例外是会话语义页面（聊天详情）：它始终留在右列，由外壳
     /// 在侧栏绘制系统返回入口（D-C），不能迁回页面导航栈。
+    /// 仅迁移转发选择页这类显式声明了列内呈现的选择器，避免误搬普通弹窗。
+    private func adaptiveForwardPicker(in navigationController: UINavigationController) -> UIViewController? {
+      let selector = NSSelectorFromString("usesAdaptiveContainerPresentation")
+      guard let presented = navigationController.presentedViewController,
+            !(presented is UIAlertController),
+            presented.modalPresentationStyle == .overCurrentContext,
+            presented.responds(to: selector),
+            (presented.value(forKey: "usesAdaptiveContainerPresentation") as? Bool) == true else {
+        return nil
+      }
+      return presented
+    }
+
     private func syncDetailStackAcrossPosture(paired: Bool) {
       guard !isTransferringConversationSectionChild, sections.indices.contains(selectedSectionIndex) else { return }
       let master = sections[selectedSectionIndex]
@@ -1604,10 +1739,28 @@
       }
       let masters = Array(master.viewControllers.dropFirst())
       let detailPages = detail.viewControllers.filter { $0 !== conversationCoordinator.currentPlaceholder }
+      // 转发选择页等「列内呈现」在换列时不能收起，要跟着原页面迁到新列并在新列
+      // 重新展示；否则会出现「左列选择页 + 右列原页面」或直接消失。
+      let picker = (paired ? !masters.isEmpty : !detailPages.isEmpty)
+        ? adaptiveForwardPicker(in: paired ? master : detail) : nil
+      let pickerTarget = paired ? detail : master
+      if let picker {
+        picker.dismiss(animated: false) {
+          DispatchQueue.main.async {
+            guard pickerTarget.presentedViewController == nil else { return }
+            pickerTarget.definesPresentationContext = true
+            picker.modalPresentationStyle = .overCurrentContext
+            pickerTarget.present(picker, animated: false)
+          }
+        }
+      }
       isTransferringConversationSectionChild = true
       UIView.performWithoutAnimation {
         if paired {
           if !masters.isEmpty {
+            // 列内选择器（转发/搜索等）挂在左列导航上时，页面迁到右列后选择器
+            // 会继续留在左列，形成「选择页 + 原页面」并排的异常布局；换列前先收起。
+            dismissColumnPresentations()
             master.setViewControllers([masterRoot], animated: false)
             // 迁移到右列时保留占位根，否则搜索/设置等一级子页会成为栈底，
             // rail 返回没有可 pop 的目标。
@@ -1619,6 +1772,8 @@
             detail.setViewControllers(pages, animated: false)
           }
         } else if !detailPages.isEmpty {
+          // 折叠时页面从右列迁回左列，挂在右列上的列内呈现同样随栏位变化收起。
+          dismissColumnPresentations()
           detail.setViewControllers([conversationCoordinator.currentPlaceholder ?? UIViewController()], animated: false)
           master.setViewControllers([masterRoot] + detailPages, animated: false)
         }
@@ -1706,6 +1861,149 @@
   /// 文本消息详情等页面是以 `.overCurrentContext` present 在右栏导航上的，
   /// 只替换导航栈不会移除它：用户点选另一个会话时，新会话会被上一个会话
   /// 打开的详情页整栏盖住。切换会话、切换一级页面、切换分区前统一回收。
+  // MARK: - 真机诊断与几何自检
+
+  /// 一次布局实际吃到的几何输入。
+  ///
+  /// 真机上"展开 → 折叠"时，窗口尺寸、安全区、占位区是分几批到达的；如果最后
+  /// 一次布局吃的是过渡中间值，页面会整体错位，而且不会自己恢复（除非再触发一次
+  /// 布局）。这里把每次布局的输入记下来，过渡结束后做一次自检比对。
+  private struct NELayoutGeometry: Equatable {
+    let bounds: CGRect
+    let safeArea: UIEdgeInsets
+    let mode: NEAdaptiveLayoutMode?
+    let contentHost: CGRect
+    let transitioning: Bool
+  }
+
+  private var layoutSequence: UInt64 = 0
+  private var lastLayoutGeometry: NELayoutGeometry?
+  private var layoutAuditWorkItem: DispatchWorkItem?
+  private var layoutAuditRepairs = 0
+  private var lastLoggedLayoutSignature = ""
+  /// 是否处于折叠/展开的转场动画中。
+  private var isPostureTransitioning = false
+  /// 折叠瞬间的表格重载被推迟到转场结束（避免用动画中间宽度重载）。
+  private var pendingFoldInstantWork = false
+  /// 姿态变化后是否还需要记录一次"自检稳定"结论（真机上用来证明收尾布局已一致）。
+  private var auditPendingAfterTransition = false
+
+  private func describeGeometry(_ geometry: NELayoutGeometry) -> String {
+    let mode = geometry.mode.map { String(describing: $0) } ?? "legacy"
+    return "bounds=\(NEAdaptiveDiagnostics.describe(geometry.bounds)) "
+      + "safe=\(NEAdaptiveDiagnostics.describe(geometry.safeArea)) mode=\(mode) "
+      + "host=\(NEAdaptiveDiagnostics.describe(geometry.contentHost)) transitioning=\(geometry.transitioning)"
+  }
+
+  private func recordLayout(sequence: UInt64, startBounds: CGRect, startSafe: UIEdgeInsets,
+                            mode: NEAdaptiveLayoutMode?, contentHost: CGRect, masterWidth: CGFloat) {
+    let geometry = NELayoutGeometry(bounds: view.bounds, safeArea: view.safeAreaInsets, mode: mode,
+                                    contentHost: contentHost, transitioning: isPostureTransitioning)
+    lastLayoutGeometry = geometry
+    let signature = describeGeometry(geometry)
+    // 相同的几何输入不重复刷日志；真机上布局回调非常密集。
+    if signature != lastLoggedLayoutSignature {
+      lastLoggedLayoutSignature = signature
+      NEAdaptiveDiagnostics.shared.log("layout",
+        "#\(sequence) \(signature) master=\(String(format: "%.1f", masterWidth)) rail=\(NEAdaptiveDiagnostics.describe(rail.frame)) "
+        + "startBounds=\(NEAdaptiveDiagnostics.describe(startBounds)) startSafe=\(NEAdaptiveDiagnostics.describe(startSafe)) "
+        + NEAdaptiveDiagnostics.currentSummary())
+    }
+    scheduleLayoutAudit(reason: "layout")
+  }
+
+  /// 过渡/安全区变化后 0.35s 自检：上次布局的几何与当前几何不一致，说明
+  /// 最后一次布局吃的是中间值，立刻补一次重排。这是真机错位的兜底修复，
+  /// 同时把结论写进日志，避免反复手工验证。
+  private func scheduleLayoutAudit(reason: String) {
+    layoutAuditWorkItem?.cancel()
+    let item = DispatchWorkItem { [weak self] in self?.runLayoutAudit(reason: reason) }
+    layoutAuditWorkItem = item
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: item)
+  }
+
+  private func runLayoutAudit(reason: String) {
+    guard isViewLoaded, view.window != nil, let last = lastLayoutGeometry else { return }
+    // 转场动画期间几何本来就在变，此时"修复"只会打断动画；等动画结束的
+    // completion 会再排一次并重新安排自检。
+    guard !isPostureTransitioning else {
+      scheduleLayoutAudit(reason: reason + ".waitTransition")
+      return
+    }
+    let current = NELayoutGeometry(bounds: view.bounds, safeArea: view.safeAreaInsets,
+                                   mode: decision?.mode, contentHost: contentHost.frame,
+                                   transitioning: isPostureTransitioning)
+    let stale = current.bounds != last.bounds || current.safeArea != last.safeArea
+      || current.mode != last.mode || current.contentHost != last.contentHost
+    guard stale else {
+      if layoutAuditRepairs > 0 {
+        NEAdaptiveDiagnostics.shared.log("audit", "OK reason=\(reason) repairs=\(layoutAuditRepairs) \(describeGeometry(current))")
+        layoutAuditRepairs = 0
+      }
+      if auditPendingAfterTransition {
+        auditPendingAfterTransition = false
+        // 姿态变化后至少留一条"已稳定"结论：证明最后一次布局用的是最终几何。
+        NEAdaptiveDiagnostics.shared.log("audit", "stable reason=\(reason) \(describeGeometry(current))")
+      }
+      return
+    }
+    layoutAuditRepairs += 1
+    guard layoutAuditRepairs <= 4 else {
+      NEAdaptiveDiagnostics.shared.log("audit", "GIVE-UP reason=\(reason) attempts=\(layoutAuditRepairs) last=\(describeGeometry(last)) now=\(describeGeometry(current))")
+      return
+    }
+    NEAdaptiveDiagnostics.shared.log("audit", "STALE reason=\(reason) attempts=\(layoutAuditRepairs) last=\(describeGeometry(last)) now=\(describeGeometry(current)) -> relayout")
+    layoutContent()
+    runPendingFoldInstantWorkIfNeeded()
+    scheduleLayoutAudit(reason: "audit.\(reason)")
+  }
+
+  /// 折叠瞬间需要重载表格并强制提交一帧；若此刻仍在转场动画中，推迟到动画结束，
+  /// 否则会用动画中间宽度重实行高/偏移，页面要等下一次进入才恢复。
+  private func performFoldInstantWork(in top: UIViewController) {
+    let width = String(format: "%.1f", view.bounds.width)
+    NEAdaptiveDiagnostics.shared.log("fold", "begin width=\(width) safe=\(NEAdaptiveDiagnostics.describe(view.safeAreaInsets)) mode=\(String(describing: decision?.mode))")
+    if foldOffsetSnapshot.isEmpty {
+      // 冷启动直接进入 compact 等没有快照的场景：只修正越界偏移，不主动归零。
+      fixOverflowingScrollOffsets(in: top.view)
+    } else {
+      restoreTableOffsets(foldOffsetSnapshot, reload: true)
+      foldOffsetSnapshot.removeAll()
+    }
+    // 折叠后偶发"层级与数据都正常但不绘制"：做一次可见性抖动并强制提交一帧。
+    sectionHosts[selectedSectionIndex].view.isHidden = true
+    sectionHosts[selectedSectionIndex].view.isHidden = false
+    top.view.setNeedsDisplay()
+    top.view.layer.setNeedsDisplay()
+    CATransaction.flush()
+    NEAdaptiveDiagnostics.shared.log("fold", "end width=\(width)")
+  }
+
+  private func runPendingFoldInstantWorkIfNeeded() {
+    guard pendingFoldInstantWork else { return }
+    pendingFoldInstantWork = false
+    guard decision?.mode == .compact, sectionHosts.indices.contains(selectedSectionIndex),
+          let top = sectionHosts[selectedSectionIndex].content.topViewController else { return }
+    performFoldInstantWork(in: top)
+  }
+
+  /// 宿主可显式触发一次重排（诊断/回放用）。
+  public func refreshLayout() {
+    guard isViewLoaded else { return }
+    view.setNeedsLayout()
+    layoutContent()
+  }
+
+  /// 输出一次诊断环境快照与当前外壳几何，供真机无调试器时抓取。
+  public func dumpDiagnostics(_ tag: String) {
+    NEAdaptiveDiagnostics.shared.dumpEnvironment(tag)
+    let mode = decision.map { String(describing: $0.mode) } ?? "nil"
+    NEAdaptiveDiagnostics.shared.log("shell", "dump tag=\(tag) mode=\(mode) legacy=\(isUsingLegacyLayout) paired=\(isShowingPairedContent) "
+      + "section=\(selectedSectionIndex) compactDetail=\(compactShowsDetail) "
+      + "contentHost=\(NEAdaptiveDiagnostics.describe(contentHost.frame)) rail=\(NEAdaptiveDiagnostics.describe(rail.frame)) "
+      + "back=\(NEAdaptiveDiagnostics.describe(backButton.frame)) transitioning=\(isPostureTransitioning)")
+  }
+
   /// 上一次布局是否处于折叠（单栏）状态，用于识别"展开 → 折叠"这一刻。
   private var lastLaidOutMode: NEAdaptiveLayoutMode?
   /// 用户主动点击"返回会话列表"后置位：布局时不再被"右列有页面"重新覆盖。
@@ -1713,15 +2011,34 @@
   /// 上一次布局时右列栈顶页面；一旦变化说明有新页面被打开，需清除上面的标记。
   private weak var lastDetailTopController: UIViewController?
 
-  /// 折叠后页面宽度变化会让行高/内容高度重算，但表格可能保留展开态的超大偏移，
-  /// 可视区就落到空白处（表现为"折叠后整屏空白"）。这里做一次布局并修正越界偏移。
-  private func reloadTablesAndResetOffset(in root: UIView) {
+  /// 折叠前的表格偏移快照。
+  ///
+  /// UIKit 在宽度变化的首次布局里会先把 offset 夹到一个很小的值（OC 侧实测掉到 ~35），
+  /// 因此必须在设置新 frame 之前采集，布局结束后再按新内容高度夹取恢复；
+  /// 直接归零会让「展开滑动后折叠」回到列表顶部。
+  private var foldOffsetSnapshot: [(table: UITableView, offset: CGPoint)] = []
+
+  private func captureTableOffsets(in root: UIView, into result: inout [(table: UITableView, offset: CGPoint)]) {
     if let table = root as? UITableView {
-      table.reloadData()
-      table.layoutIfNeeded()
-      table.setContentOffset(.zero, animated: false)
-    } else {
-      for child in root.subviews { reloadTablesAndResetOffset(in: child) }
+      result.append((table, table.contentOffset))
+      return
+    }
+    for child in root.subviews { captureTableOffsets(in: child, into: &result) }
+  }
+
+  private func restoreTableOffsets(_ snapshot: [(table: UITableView, offset: CGPoint)], reload: Bool) {
+    for entry in snapshot {
+      let table = entry.table
+      if reload {
+        table.reloadData()
+        table.layoutIfNeeded()
+      }
+      var offset = entry.offset
+      let maxY = max(0, table.contentSize.height - table.bounds.height + table.contentInset.bottom)
+      if offset.y > maxY { offset.y = maxY }
+      if table.contentOffset != offset {
+        table.setContentOffset(offset, animated: false)
+      }
     }
   }
 
@@ -1777,9 +2094,28 @@
       return NEReservedRegionMetrics(railOcclusionBottom: nil, railOcclusionCenterX: nil,
                                      divisionMaxX: nil, divisionMinX: nil)
     }
-    let active = view.reservedRegions(kind: .occlusion).filter(\.isActive)
+    let bounds = view.bounds
+    // 真机转场中 reservedRegions 会给出旋转、错位甚至越界的 frame（实测出现过 y=867
+    // 超出 669 高窗口、以及 170x84 的横向条）。这类值参与计算会让 rail 返回按钮和
+    // 分栏边界在动画中跳变；只接受“落在窗口内 + 竖向”的占位区。
+    func isUsable(_ frame: CGRect) -> Bool {
+      guard frame.width > 0.5, frame.height > 0.5 else { return false }
+      guard frame.minX >= bounds.minX - 0.5, frame.minY >= bounds.minY - 0.5,
+            frame.maxX <= bounds.maxX + 0.5, frame.maxY <= bounds.maxY + 0.5 else {
+        NEAdaptiveDiagnostics.shared.logVerbose("regions",
+          "drop out-of-bounds \(NEAdaptiveDiagnostics.describe(frame)) bounds=\(NEAdaptiveDiagnostics.describe(bounds))")
+        return false
+      }
+      guard frame.height > frame.width else {
+        NEAdaptiveDiagnostics.shared.logVerbose("regions",
+          "drop non-vertical \(NEAdaptiveDiagnostics.describe(frame))")
+        return false
+      }
+      return true
+    }
+    let active = view.reservedRegions(kind: .occlusion).filter { $0.isActive && isUsable($0.frame) }
     let railHits = active.filter { $0.frame.maxX > railMinX && $0.frame.minX < view.bounds.maxX }
-    let divisions = view.reservedRegions(kind: .division).filter(\.isActive)
+    let divisions = view.reservedRegions(kind: .division).filter { $0.isActive && isUsable($0.frame) }
     let occlusionFrame = railHits.map(\.frame).reduce(nil as CGRect?) { partial, frame in
       partial.map { $0.union(frame) } ?? frame
     }

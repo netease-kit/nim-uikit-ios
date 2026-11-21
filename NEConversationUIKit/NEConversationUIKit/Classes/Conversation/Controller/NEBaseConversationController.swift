@@ -31,6 +31,15 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
   private var adaptiveSelectedConversationID: String?
 
+  /// 右列回到空白占位时宿主调用：清掉「上一次点过的行」，避免再次高亮过期选中项。
+  /// 只在宿主明确关闭左列高亮（右列已无内容）时调用；列表自身刷新仍走 `restoreAdaptiveSelection()`。
+  public func clearAdaptiveSelection() {
+    adaptiveSelectedConversationID = nil
+    if let selected = tableView.indexPathForSelectedRow {
+      tableView.deselectRow(at: selected, animated: false)
+    }
+  }
+
   private func restoreAdaptiveSelection() {
     guard listSelectionBackgroundColor != nil, let selectedID = adaptiveSelectedConversationID else { return }
     let data = displayConversationList()
@@ -67,6 +76,10 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
   public var contentViewTopAnchor: NSLayoutConstraint?
   public var topConstant: CGFloat = 0
   public var popListView = NEBasePopListView()
+
+  /// 侧栏动作广播的入口位置（窗口坐标），优先于 identifier 搜索。
+  private var railActionAnchorFrame: CGRect?
+  private static let railActionWillPerformName = Notification.Name("NEAdaptiveRailActionWillPerform")
 
   public weak var delegate: NEBaseConversationControllerDelegate?
 
@@ -343,6 +356,7 @@ open class NEBaseConversationController: UIViewController, UIGestureRecognizerDe
 
   override open func viewDidLoad() {
     super.viewDidLoad()
+    observeRailActionFrames()
     // 双栏同时可见时，分组配置可能在另一栏被修改：直接监听配置变更，
     // 不依赖 groupViewModel.delegate 的单播回调。
     NotificationCenter.default.addObserver(self,
@@ -550,6 +564,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
 
   /// 点击搜索会话
   open func searchAction() {
+    // 搜索 / 新建会话不是左列的行：先清掉过期选中。
+    clearAdaptiveSelection()
     if let searchBlock = ConversationUIConfig.shared.titleBarRight2Click {
       searchBlock(self)
       return
@@ -681,6 +697,8 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
   }
 
   open func didClickAddBtn() {
+    // 搜索 / 新建会话不是左列的行：先清掉过期选中。
+    clearAdaptiveSelection()
     if let addBlock = ConversationUIConfig.shared.titleBarRightClick {
       addBlock(self)
       return
@@ -688,9 +706,21 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
 
     if IMKitConfigCenter.shared.enableTeam {
       popListView.itemDatas = getPopListItems()
-      popListView.frame = CGRect(origin: .zero, size: view.frame.size)
+      // 弹窗挂到窗口上：添加按钮迁移到侧栏后，锚点可能落在页面视图之外。
+      let host: UIView = view.window ?? view
+      popListView.frame = host.bounds
       popListView.removeSelf()
-      view.addSubview(popListView)
+      host.addSubview(popListView)
+      if let frame = railActionAnchorFrame {
+        // broadcast frame 是窗口坐标；弹窗铺满窗口时坐标系一致。
+        popListView.anchorRect = frame
+        railActionAnchorFrame = nil
+      } else {
+        popListView.anchorRect = nil
+        popListView.anchorView = addEntryAnchor()
+      }
+      popListView.setNeedsLayout()
+      popListView.layoutIfNeeded()
     } else {
       Router.shared.use(
         ContactAddFriendRouter,
@@ -698,6 +728,56 @@ extension NEBaseConversationController: TabNavigationViewDelegate {
                      "animated": false],
         closure: nil
       )
+    }
+  }
+
+  private func observeRailActionFrames() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleRailActionWillPerform(_:)),
+      name: Self.railActionWillPerformName,
+      object: nil
+    )
+  }
+
+  @objc private func handleRailActionWillPerform(_ note: Notification) {
+    guard let identifier = note.userInfo?["identifier"] as? String,
+          identifier.hasSuffix("titleBarMoreImg"),
+          let value = note.userInfo?["frame"] as? NSValue else { return }
+    railActionAnchorFrame = value.cgRectValue
+  }
+
+  /// 弹窗锚点：优先侧栏上的添加按钮（导航栏按钮迁移后原按钮已隐藏），否则用页面自己的按钮。
+  private func addEntryAnchor() -> UIView? {
+    // 侧栏按钮的 identifier 带 "id.adaptive.action." 前缀，用后缀匹配同时覆盖
+    // 页面原按钮与侧栏按钮；只接受可见的那个（原按钮会被外壳按透明度隐藏）。
+    if let window = view.window, let rail = findVisibleEntry(suffix: "titleBarMoreImg", in: window) {
+      return rail
+    }
+    let add = navigationView.addBtn
+    return add.isHidden ? nil : add
+  }
+
+  private func findVisibleEntry(suffix: String, in root: UIView) -> UIView? {
+    if let identifier = root.accessibilityIdentifier, identifier.hasSuffix(suffix),
+       !root.isHidden, root.alpha > 0.01, root.window != nil {
+      return root
+    }
+    for child in root.subviews {
+      if let match = findVisibleEntry(suffix: suffix, in: child) { return match }
+    }
+    return nil
+  }
+
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // 弹窗显示期间旋转/折叠：保持铺满宿主并按锚点重新定位。
+    guard let host = popListView.superview else { return }
+    if abs(popListView.bounds.width - host.bounds.width) > 0.5
+      || abs(popListView.bounds.height - host.bounds.height) > 0.5 {
+      popListView.frame = host.bounds
+      popListView.setNeedsLayout()
+      popListView.layoutIfNeeded()
     }
   }
 

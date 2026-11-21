@@ -122,13 +122,30 @@ open class FunTeamAvatarViewController: NEBaseTeamAvatarViewController {
     return UICollectionViewCell()
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateCandidateIconSpacing()
+  }
+
+  /// 5 个候选头像两端对齐：固定 56pt，剩余宽度均分为 4 段间距。
+  private func updateCandidateIconSpacing() {
+    let width = iconsCollectionView.bounds.width
+    guard width > 0,
+          let layout = iconsCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+    let itemWidth: CGFloat = 56
+    let spacing = max(0, (width - itemWidth * 5) / 4)
+    let target = CGSize(width: itemWidth, height: itemWidth)
+    guard layout.itemSize != target || abs(layout.minimumLineSpacing - spacing) > 0.5 else { return }
+    layout.itemSize = target
+    layout.minimumLineSpacing = spacing
+    layout.sectionInset = .zero
+    layout.invalidateLayout()
+  }
+
   override open func collectionView(_ collectionView: UICollectionView,
                                     layout collectionViewLayout: UICollectionViewLayout,
                                     sizeForItemAt indexPath: IndexPath) -> CGSize {
-    let space = max(0, (collectionView.bounds.width - 312.0) / 4.0)
-    if indexPath.row == 0 {
-      return CGSize(width: 56, height: 56)
-    }
-    return CGSize(width: 56.0 + space, height: 56)
+    // 候选头像固定尺寸，间距由 layout 动态计算，保证 5 个候选在容器内两端对齐。
+    return CGSize(width: 56, height: 56)
   }
 }

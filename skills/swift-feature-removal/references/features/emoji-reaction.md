@@ -2,7 +2,7 @@
 
 ## Boundary
 
-移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `app/` 中的“表情评论”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Reaction API 的接线。Objective-C 和 SwiftUI 工程不属于本技能。
+移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `IMUIKitExample/` 中的“表情评论”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Reaction API 的接线。Objective-C 和 SwiftUI 工程不属于本技能。
 
 核心名称包括 `MessageReaction*`、`NEMessageReaction*`、`reactionGroups`、`reactionHeight`、`enableEmojiReaction`、Quick Comment。
 
@@ -18,11 +18,11 @@
 
 ## Remove Demo Entries
 
-- `app/Mine/Controller/ConfigTestViewController.swift`：删除 `showEmojiReaction` 配置块。
-- `app/en.lproj/Localizable.strings`：删除 `emoji_reaction`。
-- `app/zh-Hans.lproj/Localizable.strings`：删除 `emoji_reaction`。
+- `IMUIKitExample/Mine/Controller/ConfigTestViewController.swift`：删除 `showEmojiReaction` 配置块。
+- `IMUIKitExample/en.lproj/Localizable.strings`：删除 `emoji_reaction`。
+- `IMUIKitExample/zh-Hans.lproj/Localizable.strings`：删除 `emoji_reaction`。
 
-本功能没有需要修改的 Demo 工程文件或依赖；不得因移除本功能修改 `app.xcodeproj/` 或 `Podfile`。
+本功能没有需要修改的 Demo 工程文件或依赖；不得因移除本功能修改 `IMUIKitExample.xcodeproj/` 或 `Podfile`。
 
 ## Remove Swift UIKit Wiring
 
@@ -111,4 +111,4 @@ FunUI 必须恢复其微信气泡 tail、媒体遮罩和文本内边距，不要
 2. Swift UIKit 资源目录中不再有 `reaction_emoji` 和三个 operation imageset。
 3. `git diff --check` 通过；对修改的 Swift 文件运行 `swiftc -frontend -parse` 或构建 `NEChatUIKit`。
 4. 运行时检查 NormalUI/FunUI：普通长按菜单无 Reaction 区域；文本、富文本、语音转文字、图片、视频、文件、位置、合并转发、撤回、话单、AIStream 无额外空白或复用残影。
-5. 最终业务 diff 只能位于 `NEChatUIKit/` 和 `app/`；只有真实 Demo 源码/资源引用需要时才允许 `app.xcodeproj/`。
+5. 最终业务 diff 只能位于 `NEChatUIKit/` 和 `IMUIKitExample/`；只有真实 Demo 源码/资源引用需要时才允许 `IMUIKitExample.xcodeproj/`。

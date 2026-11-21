@@ -34,6 +34,15 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     return "\(contact.contactCellType.rawValue)|\(contact.router)|\(accountId)"
   }
 
+  /// 右列回到空白占位时宿主调用：清掉「上一次点过的行」，避免再次高亮过期选中项。
+  /// 只在宿主明确关闭左列高亮（右列已无内容）时调用；列表自身刷新仍走 `restoreAdaptiveSelection()`。
+  public func clearAdaptiveSelection() {
+    adaptiveSelectedContactKey = nil
+    if let selected = tableView.indexPathForSelectedRow {
+      tableView.deselectRow(at: selected, animated: false)
+    }
+  }
+
   private func restoreAdaptiveSelection() {
     guard listSelectionBackgroundColor != nil, let selectedKey = adaptiveSelectedContactKey,
           let sections = viewModel?.contactSections else { return }
@@ -115,6 +124,10 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     return view
   }()
 
+  /// 空态顶部约束：自适应布局下从系统入口行下方开始，让空态在“剩余区域”里居中，
+  /// 而不是贴着入口行（原实现用 `screenWidth/2` 当偏移，展开态会把空态推到列底部）。
+  private var emptyViewTopConstraint: NSLayoutConstraint?
+
   public lazy var contentView: UIView = {
     let view = UIView()
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -129,10 +142,15 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
+    // 空态按容器高度垂直居中：原先用 `screenWidth/2` 当顶部偏移，
+    // 折叠屏展开态左列只有 320 宽而 scene 951，会把空态推到列底部（甚至裁掉）。
+    emptyView.verticallyCentersContent = true
+    let emptyTop = emptyView.topAnchor.constraint(equalTo: view.topAnchor)
+    emptyViewTopConstraint = emptyTop
     NSLayoutConstraint.activate([
       emptyView.leftAnchor.constraint(equalTo: view.leftAnchor),
       emptyView.rightAnchor.constraint(equalTo: view.rightAnchor),
-      emptyView.topAnchor.constraint(equalTo: view.topAnchor, constant: NEConstant.screenWidth / 2),
+      emptyTop,
       emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
 
@@ -509,6 +527,30 @@ open class NEBaseContactViewController: UIViewController, UITableViewDelegate, U
     subscribeVisibleRows()
   }
 
+  override open func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateEmptyViewTopOffset()
+  }
+
+  /// 自适应外壳下把空态放到系统入口行下方的剩余区域里居中；普通机型保持整块居中
+  /// （与原有手机视觉一致）。表格内容超出可视区时退回整块居中，避免空态被挤没。
+  private func updateEmptyViewTopOffset() {
+    guard let emptyViewTopConstraint, !emptyView.isHidden else { return }
+    let height = contentView.bounds.height
+    guard height > 0 else { return }
+    var offset: CGFloat = 0
+    if NEAdaptiveDeviceGate.isAdaptiveHostActive {
+      let rowsBottom = tableView.contentSize.height
+      let minimumRemaining: CGFloat = 160
+      if rowsBottom > 0, rowsBottom < height - minimumRemaining {
+        offset = rowsBottom
+      }
+    }
+    if abs(emptyViewTopConstraint.constant - offset) > 0.5 {
+      emptyViewTopConstraint.constant = offset
+    }
+  }
+
   open func didRefreshTable() {
     tableView.reloadData()
     restoreAdaptiveSelection()
@@ -546,6 +588,8 @@ extension NEBaseContactViewController {
   // MARK: TabNavigationViewDelegate
 
   open func searchAction() {
+    // 搜索不是左列的行：右列内容与当前高亮行无关，先清掉过期选中。
+    clearAdaptiveSelection()
     if let searchBlock = ContactUIConfig.shared.titleBarRight2Click {
       searchBlock(self)
       return
@@ -554,6 +598,8 @@ extension NEBaseContactViewController {
   }
 
   open func didClickAddBtn() {
+    // 添加好友/新建会话不是左列的行：同样先清掉过期选中。
+    clearAdaptiveSelection()
     if let addBlock = ContactUIConfig.shared.titleBarRightClick {
       addBlock(self)
       return

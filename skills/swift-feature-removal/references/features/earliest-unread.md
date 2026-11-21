@@ -2,7 +2,7 @@
 
 ## Boundary
 
-移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `app/` 中的“跳转最早未读/上次阅读位置”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Last Read API 的接线。Objective-C 和 SwiftUI 工程不属于本技能。
+移除范围只包括开源仓库 `nim-uikit-ios` 的 `NEChatUIKit/` 和 Demo `IMUIKitExample/` 中的“跳转最早未读/上次阅读位置”。`NEChatKit` 是闭源组件，禁止扫描或修改；只移除 UI/Demo 对其 Last Read API 的接线。Objective-C 和 SwiftUI 工程不属于本技能。
 
 核心名称包括 `NELastReadPosition*`、`LastReadPositionState`、`lastReadPosition*`、`enableLastReadPosition`。
 
@@ -14,11 +14,11 @@
 
 ## Remove Demo And Localization Entries
 
-- `app/Mine/Controller/ConfigTestViewController.swift`：删除 `showLastReadPosition` 配置块。
+- `IMUIKitExample/Mine/Controller/ConfigTestViewController.swift`：删除 `showLastReadPosition` 配置块。
 - `NEChatUIKit/NEChatUIKit/Assets/en.lproj/Localizable.strings`：删除 `last_read_position_count`、`last_read_position_overflow`、`last_read_position_accessibility_hint`。
 - `NEChatUIKit/NEChatUIKit/Assets/zh-Hans.lproj/Localizable.strings`：删除同名三个 key。
 
-本功能没有需要修改的 Demo 工程文件或依赖；不得因移除本功能修改 `app.xcodeproj/` 或 `Podfile`。
+本功能没有需要修改的 Demo 工程文件或依赖；不得因移除本功能修改 `IMUIKitExample.xcodeproj/` 或 `Podfile`。
 
 ## Remove Swift UIKit Wiring
 
@@ -83,4 +83,4 @@
 2. Swift UIKit 本地化文件不再包含三个 `last_read_position_*` key。
 3. `git diff --check` 通过；对修改的 Swift 文件运行 `swiftc -frontend -parse` 或构建 `NEChatUIKit`。
 4. 运行时检查 NormalUI/FunUI：聊天页无最早未读入口；顶部置顶、回到底部、多选、历史分页、Reaction 更新仍正常。
-5. 最终业务 diff 只能位于 `NEChatUIKit/` 和 `app/`；只有真实 Demo 源码/资源引用需要时才允许 `app.xcodeproj/`。
+5. 最终业务 diff 只能位于 `NEChatUIKit/` 和 `IMUIKitExample/`；只有真实 Demo 源码/资源引用需要时才允许 `IMUIKitExample.xcodeproj/`。
