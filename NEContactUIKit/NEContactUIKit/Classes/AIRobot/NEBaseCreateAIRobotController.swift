@@ -412,11 +412,31 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
   // MARK: - 相册/相机
 
   open func openPhotoLibrary() {
+    // 与群头像/个人头像一致：优先使用宿主注入的第三方图片选择器。
+    // NEContactUIKit 不依赖消息 UI，通过 NEBaseUIKit 的桥消费宿主实现（未注入时走系统相册）。
+    if let pickImage = NEPhotoPickerBridge.pickImage {
+      pickImage(self, 1) { [weak self] image in
+        guard let self, let image else { return }
+        self.applyAvatarImage(image)
+      }
+      return
+    }
     let picker = UIImagePickerController()
     picker.sourceType = .photoLibrary
     picker.allowsEditing = true
     picker.delegate = self
     present(picker, animated: true)
+  }
+
+  open func applyAvatarImage(_ image: UIImage) {
+    guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+    let tmpURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("robot_avatar_\(Int(Date().timeIntervalSince1970)).jpg")
+    try? data.write(to: tmpURL)
+    viewModel.avatarLocalPath = tmpURL.path
+    hasExistingAvatar = true
+    avatarImageView.image = image
+    avatarImageView.setTitle("")
   }
 
   open func openCamera() {
@@ -432,16 +452,7 @@ open class NEBaseCreateAIRobotController: NEContactBaseViewController,
                                     didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
     picker.dismiss(animated: true)
     let image = (info[.editedImage] ?? info[.originalImage]) as? UIImage
-    guard let image = image, let data = image.jpegData(compressionQuality: 0.8) else { return }
-
-    let tmpURL = FileManager.default.temporaryDirectory
-      .appendingPathComponent("robot_avatar_\(Int(Date().timeIntervalSince1970)).jpg")
-    try? data.write(to: tmpURL)
-
-    viewModel.avatarLocalPath = tmpURL.path
-    hasExistingAvatar = true
-    avatarImageView.image = image
-    avatarImageView.setTitle("")
+    if let image { applyAvatarImage(image) }
   }
 }
 

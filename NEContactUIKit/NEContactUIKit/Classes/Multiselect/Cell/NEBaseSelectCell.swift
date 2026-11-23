@@ -20,10 +20,12 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
   /// 人数最大宽度
   public var memberLabelMaxWidth: CGFloat = 52 {
     didSet {
-      memberLabelWidthAnchor?.constant = titleLabelMaxWidth
+      memberLabelWidthAnchor?.constant = memberLabelMaxWidth
     }
   }
 
+  /// 是否展示人数（决定右侧预留宽度）
+  private var showsMemberCount = false
   /// 名称宽度约束（受单选/多选状态影响）
   public var titleLabelWidthAnchor: NSLayoutConstraint?
   /// 名称宽度约束（受单选/多选状态影响）
@@ -91,7 +93,28 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
   open func showSelect(_ isShow: Bool) {
     multiSelectImageView.isHidden = !isShow
     leftConstraint?.constant = isShow ? 50 : 20
-    titleLabelMaxWidth = NEConstant.screenWidth - (isShow ? 118 + memberLabelMaxWidth : 88 + memberLabelMaxWidth)
+    // 名称宽度改由 `recalculateTitleLabelMaxWidth()` 按 cell 实际宽度计算：
+    // 折叠屏折叠/展开时列宽会变，继续用 `NEConstant.screenWidth` 会算出超过列宽的上限。
+    setNeedsLayout()
+  }
+
+  /// 按 cell 的实际宽度重算名称上限。
+  ///
+  /// 子类可覆写以保留自己的预留量（如“已选”列表）。
+  open func recalculateTitleLabelMaxWidth() {
+    let width = contentView.bounds.width
+    guard width > 0 else { return }
+    let left = titleLabel.frame.minX
+    guard left > 0 else { return }
+    let reserved = (showsMemberCount ? memberLabelMaxWidth : 0) + 20
+    let candidate = max(0, width - left - reserved)
+    guard abs(candidate - titleLabelMaxWidth) > 0.5 else { return }
+    titleLabelMaxWidth = candidate
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    recalculateTitleLabelMaxWidth()
   }
 
   /// 设置控件内容
@@ -101,12 +124,10 @@ open class NEBaseSelectCell: NEBaseContactViewCell {
 
     multiSelectImageView.isHighlighted = model.isSelected
     titleLabel.text = model.name
-    optionLabel.text = model.memberCount > 0 ? " (\(model.memberCount))" : nil
-
-    // 单聊（人数为 0）不展示人数
-    if model.memberCount == 0 {
-      titleLabelMaxWidth += memberLabelMaxWidth
-    }
+    showsMemberCount = model.memberCount > 0
+    optionLabel.text = showsMemberCount ? " (\(model.memberCount))" : nil
+    memberLabelWidthAnchor?.constant = memberLabelMaxWidth
+    setNeedsLayout()
 
     let url = model.avatar
     let accountId = V2NIMConversationIdUtil.conversationTargetId(model.conversationId ?? "") ?? ""

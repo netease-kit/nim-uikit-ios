@@ -12,7 +12,6 @@ func localizable(_ key: String) -> String {
 }
 
 let textFont = UIFont.systemFont(ofSize: 14)
-let textMaxSize = CGSize(width: NEConstant.screenWidth - 20 * 2, height: CGFloat.greatestFiniteMagnitude)
 
 public extension UIImage {
   class func ne_imageNamed(name: String?) -> UIImage? {

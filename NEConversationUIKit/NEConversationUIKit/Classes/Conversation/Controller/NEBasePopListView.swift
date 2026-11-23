@@ -29,6 +29,13 @@ open class NEBasePopListView: UIView {
   public var popViewRadius: CGFloat = 8.0
   public var topConstant: CGFloat = 0
 
+  /// 弹窗锚点：优先跟随实际点击的入口（导航栏按钮或迁移到侧栏后的侧栏按钮）。
+  public weak var anchorView: UIView?
+  /// 直接给定的锚点矩形（self 坐标系），优先于 anchorView。
+  public var anchorRect: CGRect?
+  public var shadowTopConstraint: NSLayoutConstraint?
+  public var shadowRightConstraint: NSLayoutConstraint?
+
   public var itemDatas = [PopListItem]() {
     didSet {
       popViewHeight = CGFloat(itemDatas.count) * 32 + 16
@@ -107,6 +114,22 @@ open class NEBasePopListView: UIView {
         itemBtn.heightAnchor.constraint(equalToConstant: 32),
       ])
     }
+  }
+
+  override open func layoutSubviews() {
+    super.layoutSubviews()
+    guard bounds.width > 0 else { return }
+    let rect: CGRect
+    if let anchorRect, anchorRect.width > 0, anchorRect.height > 0 {
+      rect = anchorRect
+    } else if let anchor = anchorView, anchor.window != nil {
+      rect = anchor.convert(anchor.bounds, to: self)
+    } else {
+      return
+    }
+    guard rect.width > 0, rect.height > 0 else { return }
+    shadowTopConstraint?.constant = rect.maxY + 8
+    shadowRightConstraint?.constant = rect.maxX - bounds.width
   }
 
   open func itemClick(_ sender: UIButton) {

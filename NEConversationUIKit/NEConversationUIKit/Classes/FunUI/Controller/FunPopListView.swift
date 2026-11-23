@@ -19,10 +19,10 @@ open class FunPopListView: NEBasePopListView {
 
   override open func setupUI() {
     super.setupUI()
-    NSLayoutConstraint.activate([
-      shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
-      shadowView.rightAnchor.constraint(equalTo: rightAnchor, constant: -8),
-    ])
+    shadowTopConstraint = shadowView.topAnchor.constraint(equalTo: topAnchor, constant: topConstant)
+    shadowRightConstraint = shadowView.rightAnchor.constraint(equalTo: rightAnchor, constant: -8)
+    shadowTopConstraint?.isActive = true
+    shadowRightConstraint?.isActive = true
 
     popView.backgroundColor = UIColor.funConversationPopViewBg
 

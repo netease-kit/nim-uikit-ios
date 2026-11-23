@@ -200,6 +200,8 @@ open class LocalConversationViewModel: NSObject, NELocalConversationListener, NE
           ContactRepo.shared.getUserListFromCloud(accountIds: Array(p2pAccountIds)) { [weak self] _, _ in
             guard let self else { return }
             let conversationIds = p2pAccountIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+            // 空数组会让 SDK 报 `invalid param: conversationIds is empty`，这里与云端实现保持一致。
+            guard !conversationIds.isEmpty else { return }
             self.conversationRepo.getConversationListByIds(conversationIds) { [weak self] conversations, _ in
               guard let self, let conversations else { return }
               DispatchQueue.main.async {

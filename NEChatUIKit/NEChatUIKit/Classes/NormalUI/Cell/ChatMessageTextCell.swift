@@ -323,9 +323,20 @@ open class ChatMessageTextCell: NormalChatMessageBaseCell {
     // measured width; otherwise the Reaction surface is wider than the
     // bubble and the leading capsule can render outside the text area.
     let bubbleMaxWidth = chat_content_maxW + reactionInset * 2
-    let bubbleWidth = hasReaction
+    var bubbleWidth = hasReaction
       ? min(bubbleMaxWidth, max(model.contentSize.width, reactionWidth + reactionInset * 2))
       : model.contentSize.width
+    // 极短消息的原文宽度可能小于译文 footer；只按原文宽度约束气泡会裁切译文区域。
+    // 在 cell 绑定阶段按译文所需宽度再兜底一次，保证译文正文和 footer 完整展示。
+    if let textModel = model as? MessageTextModel {
+      let hasTranslation = textModel.translationVisible &&
+        (textModel.translationFailed || !(textModel.translationInfo?.translatedText.isEmpty ?? true)) &&
+        !textModel.inMultiForward
+      if hasTranslation {
+        bubbleWidth = max(bubbleWidth,
+                          textModel.estimateTranslationTextWidth() + 2 * chat_content_margin)
+      }
+    }
     if isSend {
       bubbleWRight?.constant = bubbleWidth
       bubbleHRight?.constant = model.contentSize.height + (hasReaction ? model.reactionHeight : 0)

@@ -11,7 +11,7 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 INVENTORY = SKILL_DIR / "references" / "skin-inventory.json"
 ALLOWED_ROOTS = {
     "NEBaseUIKit", "NEChatUIKit", "NEContactUIKit", "NEConversationUIKit",
-    "NELocalConversationUIKit", "NETeamUIKit", "app", "app.xcodeproj",
+    "NELocalConversationUIKit", "NETeamUIKit", "IMUIKitExample", "IMUIKitExample.xcodeproj",
 }
 
 
@@ -21,8 +21,8 @@ def source_root(candidate):
         check=True, capture_output=True, text=True,
     )
     root = Path(result.stdout.strip()).resolve()
-    if not (root / "NEChatUIKit").is_dir() or not (root / "app").is_dir():
-        raise ValueError("checkout must contain NEChatUIKit/ and app/")
+    if not (root / "NEChatUIKit").is_dir() or not (root / "IMUIKitExample").is_dir():
+        raise ValueError("checkout must contain NEChatUIKit/ and IMUIKitExample/")
     return root
 
 

@@ -3,17 +3,17 @@
     "aliases": ["自适应外壳", "折叠屏外壳", "Duo UI", "foldable shell"],
     "owned_paths": [],
     "edit_paths": [
-      "app/Main/NETabBarController.swift",
-      "app/Main/SceneDelegate.swift",
-      "app/en.lproj/Localizable.strings",
-      "app/zh-Hans.lproj/Localizable.strings",
+      "IMUIKitExample/Main/NETabBarController.swift",
+      "IMUIKitExample/Main/SceneDelegate.swift",
+      "IMUIKitExample/en.lproj/Localizable.strings",
+      "IMUIKitExample/zh-Hans.lproj/Localizable.strings",
       "NEChatUIKit/NEChatUIKit.podspec",
       "NEChatUIKit/NEChatUIKit/Classes/ChatRouter/NEBaseChatRouter.swift",
       "NEChatUIKit/NEChatUIKit/Classes/NormalUI/NormalChatRouter.swift",
       "NEChatUIKit/NEChatUIKit/Classes/FunUI/FunChatRouter.swift"
     ],
     "residual": {
-      "roots": ["NEChatUIKit", "app"],
+      "roots": ["NEChatUIKit", "IMUIKitExample"],
       "patterns": [
         "NEAdaptiveUIKit|NEAdaptiveShell|NEConversationOpenIntent",
         "adaptiveShell|installAdaptiveShell|restoreLegacyShell|makeAdaptiveConversation|makeAdaptiveEmptyDetail|NEAdaptiveDemoNavigationController|presentSectionChild",
@@ -38,9 +38,9 @@
       "NEChatUIKit/NEChatUIKit/Assets/NEBaseChatUIKit.xcassets/operation/reaction_less_emoji.imageset"
     ],
     "edit_paths": [
-      "app/Mine/Controller/ConfigTestViewController.swift",
-      "app/en.lproj/Localizable.strings",
-      "app/zh-Hans.lproj/Localizable.strings",
+      "IMUIKitExample/Mine/Controller/ConfigTestViewController.swift",
+      "IMUIKitExample/en.lproj/Localizable.strings",
+      "IMUIKitExample/zh-Hans.lproj/Localizable.strings",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/HistorySearch/NEBaseHistorySearchController.swift",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/Model/MessageContentModel.swift",
@@ -73,7 +73,7 @@
     "residual": {
       "roots": [
         "NEChatUIKit/NEChatUIKit",
-        "app"
+        "IMUIKitExample"
       ],
       "patterns": [
         "MessageReaction|NEMessageReaction",
@@ -98,7 +98,7 @@
       "NEChatUIKit/NEChatUIKit/Classes/Chat/View/ChatView/NEBaseChatLastReadPositionView.swift"
     ],
     "edit_paths": [
-      "app/Mine/Controller/ConfigTestViewController.swift",
+      "IMUIKitExample/Mine/Controller/ConfigTestViewController.swift",
       "NEChatUIKit/NEChatUIKit/Assets/en.lproj/Localizable.strings",
       "NEChatUIKit/NEChatUIKit/Assets/zh-Hans.lproj/Localizable.strings",
       "NEChatUIKit/NEChatUIKit/Classes/Chat/Controller/ChatViewController.swift",
@@ -112,7 +112,7 @@
     "residual": {
       "roots": [
         "NEChatUIKit/NEChatUIKit",
-        "app"
+        "IMUIKitExample"
       ],
       "patterns": [
         "NELastReadPosition|LastReadPosition|lastReadPosition",

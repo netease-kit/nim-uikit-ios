@@ -6,6 +6,7 @@
 import Darwin
 import Foundation
 import NEChatKit
+import UIKit
 
 public let coreLoader = CommonLoader<TabNavigationView>()
 public func commonLocalizable(_ key: String) -> String {
@@ -88,6 +89,43 @@ public enum NEAdaptiveDeviceGate {
   private static var activeWindow: UIWindow? {
     let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
     return scenes.flatMap(\.windows).first(where: { $0.isKeyWindow }) ?? scenes.flatMap(\.windows).first
+  }
+
+  /// 真机排障用的一行门禁/几何摘要（不参与布局）。
+  ///
+  /// 模拟器与真机的差异几乎都落在这几项上：`UIScreen` 是否等于当前窗口、
+  /// 安全区单侧性、`reservedRegions` 的 frame。真机无法接调试器时，把它随
+  /// 诊断日志一起输出即可定位。
+  public static var diagnosticDescription: String {
+    var parts: [String] = []
+    parts.append("adaptiveHost=\(isAdaptiveHostActive)")
+    parts.append("foldable=\(isFoldableDevice) geometry=\(foldableBySceneGeometry) model=\(foldableByModel)")
+    parts.append("UIScreen=\(format(UIScreen.main.bounds))")
+    if let window = activeWindow {
+      parts.append("window=\(format(window.bounds)) safe=\(format(window.safeAreaInsets))")
+      if let scene = window.windowScene {
+        parts.append("scene=\(format(scene.coordinateSpace.bounds)) statusBar=\(format(scene.statusBarManager?.statusBarFrame ?? .zero))")
+      }
+      if #available(iOS 27.1, *) {
+        let occlusion = window.reservedRegions(kind: .occlusion)
+          .map { "\(format($0.frame)):\($0.isActive ? "on" : "off")" }
+        let division = window.reservedRegions(kind: .division)
+          .map { "\(format($0.frame)):\($0.isActive ? "on" : "off")" }
+        parts.append("occlusion=[\(occlusion.joined(separator: " "))] division=[\(division.joined(separator: " "))]")
+      }
+    } else {
+      parts.append("window=nil")
+    }
+    parts.append("statusBarHeight=\(String(format: "%.1f", NEConstant.statusBarHeight))")
+    return parts.joined(separator: " ")
+  }
+
+  private static func format(_ rect: CGRect) -> String {
+    String(format: "%.1f,%.1f %.1fx%.1f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)
+  }
+
+  private static func format(_ insets: UIEdgeInsets) -> String {
+    String(format: "t%.1f l%.1f b%.1f r%.1f", insets.top, insets.left, insets.bottom, insets.right)
   }
 
   /// 机型不会变化，只解析一次；避免每次布局都执行 `uname`。

@@ -164,11 +164,17 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
       return true
     }
 
+    // 成员角色尚未加载完成（首进群/刚入群）：不做本地拦截，交给服务端校验，
+    // 否则群主/管理员在角色回来之前会被误报「暂无操作权限」。
+    guard let memberRole = teamMember?.memberRole else {
+      return true
+    }
+
     // 高级群
-    if teamMember?.memberRole == .TEAM_MEMBER_ROLE_OWNER || teamMember?.memberRole == .TEAM_MEMBER_ROLE_MANAGER {
+    if memberRole == .TEAM_MEMBER_ROLE_OWNER || memberRole == .TEAM_MEMBER_ROLE_MANAGER {
       // 群主和管理员都有权限
       return true
-    } else if teamMember?.memberRole == .TEAM_MEMBER_ROLE_NORMAL {
+    } else if memberRole == .TEAM_MEMBER_ROLE_NORMAL {
       if let custom = team?.serverExtension,
          let json = getDictionaryFromJSONString(custom) {
         if let atValue = json[keyAllowTopMessage] as? String, atValue == allowAtAllValue {
@@ -226,9 +232,22 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
 
       serverExtension[keyTopMessage] = topMessageDic
       serverExtension["lastOpt"] = keyTopMessage
-      TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { error in
+      TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { [weak self] error in
         print("updateTeamExtension error: \(String(describing: error))")
-        completion(error)
+        guard error == nil, let self else {
+          completion(error)
+          return
+        }
+        // 立即刷新顶部横幅：不依赖群扩展变更通知的到达时机（首进群时容易延迟/丢失）。
+        TeamRepo.shared.getTeamInfo(tid) { [weak self] latestTeam, _ in
+          guard let self else {
+            completion(nil)
+            return
+          }
+          if let latestTeam { self.team = latestTeam }
+          self.loadTopMessage()
+          completion(nil)
+        }
       }
     }
   }
@@ -274,8 +293,11 @@ open class TeamChatViewModel: ChatViewModel, NETeamListener {
         serverExtension["lastOpt"] = keyTopMessage
 
         self?.topMessage = nil
-        TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { error in
+        TeamRepo.shared.updateTeamExtension(tid, .TEAM_TYPE_NORMAL, NECommonUtil.getJSONStringFromDictionary(serverExtension)) { [weak self] error in
           print("updateTeamExtension error: \(String(describing: error))")
+          if error == nil {
+            self?.delegate?.setTopValue(name: nil, content: nil, url: nil, isVideo: false, hideClose: false)
+          }
           completion(error)
         }
       }

@@ -227,6 +227,9 @@ open class NEBaseScanQRViewController: NEBaseViewController, AVCaptureMetadataOu
     navigationView.backgroundColor = .clear
     navigationView.navTitle.textColor = .white
     navigationView.titleBarBottomLine.isHidden = true
+    // 扫码页没有右上角操作：隐藏基类默认的 moreButton，否则折叠屏右侧栏会把它
+    // 镜像成一个无动作的“…”按钮。
+    navigationView.moreButton.isHidden = true
     if let backImg = navigationView.backButton.image(for: .normal)?
       .withRenderingMode(.alwaysTemplate) {
       navigationView.backButton.setImage(backImg, for: .normal)

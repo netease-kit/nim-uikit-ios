@@ -109,6 +109,9 @@ open class BotSubSessionChatViewController: P2PChatViewController, TopicChatView
   }
 
   override open func toSetting() {
+    // 子会话设置以列内底部弹层呈现，不会像普通聊天 push 设置页那样自然收键盘；
+    // 先结束输入态，避免键盘盖住动作面板。
+    view.endEditing(true)
     guard let vm = topicChatViewModel,
           vm.topic != nil else {
       return

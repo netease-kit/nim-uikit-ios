@@ -31,6 +31,15 @@ open class NEBaseLocalConversationController: UIViewController, UIGestureRecogni
 
   private var adaptiveSelectedConversationID: String?
 
+  /// 右列回到空白占位时宿主调用：清掉「上一次点过的行」，避免再次高亮过期选中项。
+  /// 只在宿主明确关闭左列高亮（右列已无内容）时调用；列表自身刷新仍走 `restoreAdaptiveSelection()`。
+  public func clearAdaptiveSelection() {
+    adaptiveSelectedConversationID = nil
+    if let selected = tableView.indexPathForSelectedRow {
+      tableView.deselectRow(at: selected, animated: false)
+    }
+  }
+
   private func restoreAdaptiveSelection() {
     guard listSelectionBackgroundColor != nil, let selectedID = adaptiveSelectedConversationID,
           let row = viewModel.conversationListData.firstIndex(where: { $0.conversation?.conversationId == selectedID }) else { return }
@@ -459,6 +468,8 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
 
   /// 点击搜索会话
   open func searchAction() {
+    // 搜索 / 新建会话不是左列的行：先清掉过期选中。
+    clearAdaptiveSelection()
     if let searchBlock = LocalConversationUIConfig.shared.titleBarRight2Click {
       searchBlock(self)
       return
@@ -590,6 +601,8 @@ extension NEBaseLocalConversationController: TabNavigationViewDelegate {
   }
 
   open func didClickAddBtn() {
+    // 搜索 / 新建会话不是左列的行：先清掉过期选中。
+    clearAdaptiveSelection()
     if let addBlock = LocalConversationUIConfig.shared.titleBarRightClick {
       addBlock(self)
       return

@@ -2,11 +2,11 @@
 
 每个新增需求使用一个稳定的 kebab-case slug，并建立 `references/features/<slug>.md`。清单至少包含：
 
-1. **边界**：只允许开源仓库的 `NEChatUIKit/` 和 `app/`；`NEChatKit/`、OC、SwiftUI 固定排除。
+1. **边界**：只允许开源仓库的 `NEChatUIKit/` 和 `IMUIKitExample/`；`NEChatKit/`、OC、SwiftUI 固定排除。
 2. **整项删除**：完整文件、目录、图片、asset。
 3. **局部编辑**：文件路径、要删的类型/属性/方法/调用锚点、必须保留的相邻行为。
 4. **入口**：Demo 配置、路由、点击/长按菜单、公开 API、兼容桥。
-5. **工程元数据**：仅当真实 Demo 源码或资源引用需要时记录 `app.xcodeproj/`；记录 podspec/resource glob 或依赖变化。
+5. **工程元数据**：仅当真实 Demo 源码或资源引用需要时记录 `IMUIKitExample.xcodeproj/`；记录 podspec/resource glob 或依赖变化。
 6. **交叉需求**：混合文件中应保留的非目标代码。
 7. **闭源边界**：只记录 UI/Demo 对闭源 API 的调用点，不扫描或登记闭源实现文件。
 8. **残留指纹**：唯一类型、配置 key、本地化 key、资源名、回调名。

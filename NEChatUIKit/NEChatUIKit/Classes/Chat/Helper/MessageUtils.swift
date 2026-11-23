@@ -25,7 +25,12 @@ open class MessageUtils: NSObject {
 
   @nonobjc
   open class func forwardMessage(message: V2NIMMessage) -> V2NIMMessage {
-    V2NIMMessageCreator.createForwardMessage(message)
+    let forwardMessage = V2NIMMessageCreator.createForwardMessage(message)
+    // 译文是本地展示缓存，不属于消息正文；转发时只带走原文，避免被转发方看到译文。
+    if let cleared = TranslationInfo.cleared(from: forwardMessage.localExtension) {
+      forwardMessage.localExtension = cleared
+    }
+    return forwardMessage
   }
 
   @nonobjc

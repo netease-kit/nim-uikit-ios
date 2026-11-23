@@ -481,11 +481,11 @@ open class TeamSettingViewModel: NSObject, NETeamListener {
     NEALog.infoLog(ModuleName + " " + className, desc: #function)
     if let teamId = teamInfoModel?.team?.teamId, let conversationId = V2NIMConversationIdUtil.teamConversationId(teamId) {
       if NIMSDK.shared().v2Option?.enableV2CloudConversation == false {
-        localConversationRepo.setStickTop(conversationId, true) { error in
+        localConversationRepo.setStickTop(conversationId, false) { error in
           completion(error)
         }
       } else {
-        conversationRepo.setStickTop(conversationId, true) { error in
+        conversationRepo.setStickTop(conversationId, false) { error in
           completion(error)
         }
       }

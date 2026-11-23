@@ -216,6 +216,11 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
           NEFriendUserCache.shared.loadShowName(Array(nonFriendIds)) { [weak self] _ in
             guard let self else { return }
             let conversationIds = nonFriendIds.compactMap { V2NIMConversationIdUtil.p2pConversationId($0) }
+            // 账号 id 可能反解不出会话 id（空串/非法 target），空数组会让 SDK 报
+            // `invalid param: conversationIds is empty`，这里与同文件 :748 保持一致直接跳过。
+            guard !conversationIds.isEmpty else {
+              return
+            }
             self.conversationRepo.getConversationListByIds(conversationIds) { [weak self] conversations, _ in
               guard let self, let conversations else { return }
               DispatchQueue.main.async {
@@ -378,7 +383,9 @@ open class ConversationViewModel: NSObject, NEConversationListener, NETeamListen
 
       // 订阅单聊在线状态
       if IMKitConfigCenter.shared.enableOnlineStatus,
-         let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId) {
+         V2NIMConversationIdUtil.conversationType(conversation.conversationId) == .CONVERSATION_TYPE_P2P,
+         let accountId = V2NIMConversationIdUtil.conversationTargetId(conversation.conversationId),
+         !accountId.isEmpty {
         self.p2pAccountIds.insert(accountId)
         self.subscribeOnlineStatus([accountId], notifyOnCachedChange: false)
       }

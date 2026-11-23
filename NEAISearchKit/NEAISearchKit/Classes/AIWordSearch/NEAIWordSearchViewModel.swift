@@ -17,6 +17,18 @@ open class NEAIWordSearchViewModel: NSObject {
   let repo = AIRepo.shared
   public weak var delegate: NEAIWordSearchViewModelDelegate?
   public var data: [NEAIWordSearchModel] = []
+  /// 结果列表的容器宽度；用于按当前列宽测量行高，nil 时回退整窗宽度。
+  var itemMaxWidth: CGFloat?
+
+  /// 更新结果列表宽度并重测已有行高（折叠/展开、进出右列时调用）。
+  func updateItemMaxWidth(_ width: CGFloat) {
+    guard width > 0 else { return }
+    itemMaxWidth = width
+    let textWidth = max(1, width - 40)
+    for model in data {
+      model.updateMaxTextWidth(textWidth)
+    }
+  }
   var searchTexts: [String] = []
   let aiModelTemperature: CGFloat = 0.8
   var requestIds = [String]()
@@ -169,7 +181,8 @@ extension NEAIWordSearchViewModel: V2NIMAIListener {
 
     let showText = getErrorText(data)
     let arr = NSAttributedString(string: showText)
-    let model = NEAIWordSearchModel(arr)
+    let textWidth = max(1, (itemMaxWidth ?? NEConstant.screenWidth) - 40)
+    let model = NEAIWordSearchModel(arr, maxTextWidth: textWidth)
     self.data.insert(model, at: 0)
     requestIds.removeAll { $0 == data.requestId }
 

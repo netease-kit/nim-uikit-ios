@@ -24,7 +24,7 @@
 "unknown_system_message"="Unknown message";
 "You"="you";
 "dissolve"="dissolved";
-"kick"="将 ";
+"kick"="removed ";
 "out"="remove";
 "has_updated" = "update ";
 "has_open" = "open ";
@@ -395,3 +395,4 @@
 "last_read_position_overflow"="99+ new messages";
 "last_read_position_accessibility_hint"="Returns to the first message after your previous reading position";
 "bot_sub_session_delete_failed"="Failed to delete. Please try again";
+"reaction_sync_failed"="Reaction status sync failed, please retry.";

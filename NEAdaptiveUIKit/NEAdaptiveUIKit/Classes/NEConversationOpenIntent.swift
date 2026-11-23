@@ -81,6 +81,13 @@ import Foundation
       precondition(Thread.isMainThread)
       guard !intent.key.isEmpty else { return false }
       if activeIntent?.key == intent.key {
+        // 从搜索页进入会话后返回：聊天页已被 pop，但 activeIntent 仍残留在搜索页上；
+        // 再次点同一会话时必须重建聊天，不能复用已离开导航栈的页面。
+        if let active = activeController,
+           !navigationController.viewControllers.contains(where: { $0 === active }) {
+          activeIntent = nil
+          activeController = nil
+        } else {
         // 同一个会话：保持现状，只执行额外的定位动作
         if intent.requiresPresentationAction {
           guard let presentationAction,
@@ -95,6 +102,7 @@ import Foundation
         // 需要转场的来源（例如列表间切换）显式传入 `animated: true`。
         popExtensionsToChatRoot(animated: intent.parameters["animated"] as? Bool ?? false)
         return true
+        }
       }
       guard let controller = controllerFactory?(intent) else { return false }
       // 有占位根时把聊天压在其上，保留页面自身返回；没有占位（测试/自定义栈）时

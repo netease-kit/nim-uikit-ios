@@ -514,6 +514,24 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     }
   }
 
+  override open func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    // 搜索页等入口可能把键盘带进聊天页：聊天页出现后统一清掉非本页的键盘，
+    // 避免搜索键盘（带搜索键）盖住底部输入栏；已聚焦聊天输入框时不能清理。
+    if !chatInputView.textView.isFirstResponder, !chatInputView.titleField.isFirstResponder {
+      view.window?.endEditing(true)
+    }
+    // 上一级页面可能延迟聚焦（如搜索页 0.5s 自动聚焦），延迟再兜底清理。
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+      guard let self, !chatInputView.textView.isFirstResponder, !chatInputView.titleField.isFirstResponder else { return }
+      view.window?.endEditing(true)
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+      guard let self, !chatInputView.textView.isFirstResponder, !chatInputView.titleField.isFirstResponder else { return }
+      view.window?.endEditing(true)
+    }
+  }
+
   override open func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     stopPlay()
@@ -1286,7 +1304,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
       keyboardFrameInScreen = nil
       currentKeyboardHeight = 0
     }
-
+ 
     if NEAdaptiveDeviceGate.isAdaptiveHostActive,
        !chatInputView.textView.isFirstResponder,
        !chatInputView.titleField.isFirstResponder {
@@ -2758,6 +2776,9 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
     playingCell?.stopAnimation(byRight: ChatMessageHelper.isSelf(message: playingModel?.message))
     playingModel = nil
     NEAudioSessionManager.shared.stopProximityMonitoring()
+    if !NEAudioSessionManager.shared.isRecording {
+      NEAudioSessionManager.shared.deactivate()
+    }
   }
 
   //    MARK: - NIMMediaManagerDelegate
@@ -2765,10 +2786,13 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   //  record
   open func recordAudio(_ filePath: String?, didBeganWithError error: Error?) {
     print("\(Date().timeIntervalSince1970) [record] sdk Began error:\(error?.localizedDescription ?? "")")
+    // 录音已开始：stopPlay 只停播放，不能释放音频会话。
+    NEAudioSessionManager.shared.isRecording = true
     stopPlay()
   }
 
   open func recordAudio(_ filePath: String?, didCompletedWithError error: Error?) {
+    NEAudioSessionManager.shared.isRecording = false
     print("\(Date().timeIntervalSince1970) [record] sdk Completed error:\(error?.localizedDescription ?? "")")
     chatInputView.stopRecordAnimation()
     guard let fp = filePath else {
@@ -2792,6 +2816,7 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
   }
 
   open func recordAudioDidCancelled() {
+    NEAudioSessionManager.shared.isRecording = false
     print("[record] sdk cancel")
   }
 
@@ -4522,6 +4547,8 @@ open class ChatViewController: NEChatBaseViewController, NEMessageListener, UINa
 
   /// 弹出语言选择
   open func showLanguageContentController(_ controller: NEBaseSelectLanguageViewController) {
+    // 打开翻译语言切换页前先收起聊天键盘，避免键盘盖住语言页。
+    view.endEditing(true)
     if NEAdaptiveDeviceGate.isAdaptiveHostActive, let host = viewIfLoaded, host.window != nil {
       showLanguagePanelInColumn(controller, host: host)
       return

@@ -5,13 +5,13 @@ description: 按维护清单完整移除 nim-uikit-ios Swift 开源 UI 组件和
 
 # Swift Feature Removal
 
-这个技能用于“按已维护清单移除功能”，不是在删除时重新发现功能范围。清单路径均相对于承载本技能的源码仓库根目录，唯一业务代码范围是 Swift UI 组件 `NEChatUIKit/` 和 Demo `app/`。`NEChatKit` 是闭源组件，不扫描、不修改。
+这个技能用于“按已维护清单移除功能”，不是在删除时重新发现功能范围。清单路径均相对于承载本技能的源码仓库根目录，唯一业务代码范围是 Swift UI 组件 `NEChatUIKit/` 和 Demo `IMUIKitExample/`。`NEChatKit` 是闭源组件，不扫描、不修改。
 
 ## Invocation Contract
 
 - 用户使用“移除...功能”“去掉...功能”“删除...功能”等明确删除表达，且目标命中登记名称或别名时，自动调用本技能；无需用户写 `$swift-feature-removal`。
 - 用户也可以显式调用 `$swift-feature-removal`。上述两种调用都已授权移除点名功能，不要重复询问是否删除。
-- 仅扫描和修改开源仓库的 `NEChatUIKit/` 与 `app/`。只有清单明确记录了真实 Demo 源码或资源引用时，才修改 `app.xcodeproj/`。
+- 仅扫描和修改开源仓库的 `NEChatUIKit/` 与 `IMUIKitExample/`。只有清单明确记录了真实 Demo 源码或资源引用时，才修改 `IMUIKitExample.xcodeproj/`。
 - 不扫描、不打开、不修改 `NEChatKit/`、Objective-C 或 SwiftUI 工程，也不得离开当前源码 checkout 追删其他实现。
 - 未登记功能不要自动套用本技能；先按“Register Future Features”建立 UI/Demo 清单。
 - 不提交、不推送，除非用户另外明确要求。
@@ -45,7 +45,7 @@ python3 skills/swift-feature-removal/scripts/audit_inventory.py <feature> --phas
   逐处 `apply_patch`，删除后检查：孤立属性/注释、空 `else` 分支、空 `guard`、多个连续 `@nonobjc`。
 - 只被某个观察器调用的通用属性要保留属性本身，只删观察器里的调用
   （例如 `ChatViewModel.anchor` 只删 `didSet` 里的 `refreshLastReadPositionAnchorSuppression()`）。
-- 删完后必须真正编译，至少构建 `NEChatUIKit` target 和 `app`；`swiftc -parse` 不能替代。
+- 删完后必须真正编译，至少构建 `NEChatUIKit` target 和 `IMUIKitExample`；`swiftc -parse` 不能替代。
 批量替换三元表达式也会吞掉行尾的 `)`、`,` 等符号（实测 `constant: 0 : 60),` 被截断），替换后必须编译验证。
 
 ## Removal Workflow
@@ -72,7 +72,7 @@ python3 skills/swift-feature-removal/scripts/audit_inventory.py <feature> --phas
 
 ## Register Future Features
 
-用户要求把新需求纳入本技能时，只在开源仓库 `NEChatUIKit/` 和 `app/` 内按 [references/manifest-template.md](references/manifest-template.md) 做一次完整发现并建立清单。不要扫描 `NEChatKit/`。新增需求必须同时：
+用户要求把新需求纳入本技能时，只在开源仓库 `NEChatUIKit/` 和 `IMUIKitExample/` 内按 [references/manifest-template.md](references/manifest-template.md) 做一次完整发现并建立清单。不要扫描 `NEChatKit/`。新增需求必须同时：
 
 - 在 `references/registry.md` 登记名称和别名。
 - 新建 `references/features/<slug>.md`，记录删除项、共享边界、交叉需求和验证条件。

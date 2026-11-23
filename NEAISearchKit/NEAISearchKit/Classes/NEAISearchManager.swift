@@ -19,9 +19,13 @@ open class NEAISearchManager: NSObject, XKitService, IMKitPluginService {
 
   /// 插件初始化
   public func setupInit() {
-    XKit.instance().register(self)
+    XKitServiceManager.getInstance().registerService(serviceName, service: self)
     IMKitPluginManager.shared.registerPlugin(serviceName, self)
-    ChatKitClient.shared.buryDataPoints("AISearchKit")
+    ChatKitClient.shared.buryDataPoints(
+      "AISearchKit",
+      version: ChatKitClient.componentVersion(for: Bundle(for: NEAISearchManager.self),
+                                             fallback: imkitVersion)
+    )
   }
 
   // MARK: - IMKitPluginService

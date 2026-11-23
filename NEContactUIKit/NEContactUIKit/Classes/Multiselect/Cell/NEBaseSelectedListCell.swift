@@ -20,7 +20,6 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
   weak var delegate: NEBaseSelectedListCellDelegate?
   private var contentModel: MultiSelectModel?
   /// 上次参与标题宽度计算的 cell 宽度
-  private var measuredLayoutWidth: CGFloat = 0
 
   /// 移除按钮
   lazy var removeButton: ExpandButton = {
@@ -95,30 +94,19 @@ open class NEBaseSelectedListCell: NEBaseSelectCell {
     super.setModel(model)
     contentModel = model
     multiSelectImageView.isHidden = true
-    titleLabelMaxWidth = titleMaxWidth(for: titleLayoutWidth, memberCount: model.memberCount)
+    let layoutWidth = contentView.bounds.width > 0 ? contentView.bounds.width : NEConstant.screenWidth
+    titleLabelMaxWidth = titleMaxWidth(for: layoutWidth, memberCount: model.memberCount)
   }
 
-  /// 重写布局方法：折叠屏上页面宽度会随当前列宽变化，需要按 cell 的实际宽度重算标题上限。
-  override open func layoutSubviews() {
-    super.layoutSubviews()
-    let width = contentView.bounds.width
-    // 宽度没变时直接返回：既避免重复改约束，也避免每次布局都读取设备门禁。
-    guard width > 0, abs(width - measuredLayoutWidth) > 0.5 else { return }
-    measuredLayoutWidth = width
-    guard NEAdaptiveDeviceGate.isAdaptiveHostActive, let contentModel else { return }
-    titleLabelMaxWidth = titleMaxWidth(for: width, memberCount: contentModel.memberCount)
-  }
-
-  /// 标题宽度上限的参考宽度。
+  /// “已选”列表的标题上限：按 cell 实际宽度减去人数与移除按钮的预留量。
   ///
-  /// 折叠屏上转发页跟随当前列布局：单屏时窗口右侧有导航 rail 占位，
-  /// 展开双栏时只占详情列，列宽都小于 `NEConstant.screenWidth`。
-  /// 继续按屏幕宽度计算上限会让长会话名越过右侧移除按钮，因此改用 cell 的实际宽度；
-  /// 普通机型保持按屏幕宽度计算，布局结果与改动前一致。
-  private var titleLayoutWidth: CGFloat {
-    guard NEAdaptiveDeviceGate.isAdaptiveHostActive else { return NEConstant.screenWidth }
+  /// 基类在 `layoutSubviews` 里调用本方法；这里覆写以保留“已选”列表自己的预留量。
+  override open func recalculateTitleLabelMaxWidth() {
     let width = contentView.bounds.width
-    return width > 0 ? width : NEConstant.screenWidth
+    guard width > 0 else { return }
+    let target = titleMaxWidth(for: width, memberCount: contentModel?.memberCount ?? 0)
+    guard abs(target - titleLabelMaxWidth) > 0.5 else { return }
+    titleLabelMaxWidth = target
   }
 
   /// 标题宽度上限：右侧预留人数与移除按钮的位置，与原先按屏幕宽度计算的分配保持一致。
